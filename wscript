@@ -4,22 +4,38 @@ def build(bld):
     module = bld.create_ns3_module('NDNabstraction', ['internet', 'config-store', 'tools', 'point-to-point', 'wifi', 'mobility', 'applications', 'csma'])
     module.includes = '.'
     module.source = [
-        'model/ndnabstraction-header.c',
-        'helper/ndnabstraction-helper.c',
+        'model/ndnabstraction-header.cc',
+        'model/ccn_charbuf.cc',
+        'model/ccn_name_util.cc',
+        'model/ccn_coding.cc',
+        'model/ccn_indexbuf.cc',
+        'model/ccn_random.cc',
+        'model/ccn_buf_decoder.cc',
+        'model/ccn_buf_encoder.cc',
+        'helper/ndnabstraction-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
     module_test.source = [
-        'test/ndnabstraction-basictest.c',
+        'test/ndnabstraction-basictest.cc',
 		]
 
     headers = bld.new_task_gen('ns3header')
     headers.module = 'NDNabstraction'
     headers.source = [
         'model/ndnabstraction-header.h',
+        'model/ccn_charbuf.h',
+        'model/ccn_name_util.h',
+        'model/ccn_coding.h',
+        'model/ccn_indexbuf.h',
+        'model/ccn_random.h',
+        'model/ccn_ccn.h',
         'helper/ndnabstraction-helper.h',
         ]
 
+
+    if bld.env['ENABLE_OPENSSL']:
+        module.uselib      = 'OPENSSL'
 
     if bld.env['ENABLE_EXAMPLES']:
         bld.add_subdirs('examples')
