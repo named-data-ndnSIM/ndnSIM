@@ -16,9 +16,6 @@
 #include "ns3/nstime.h"
 
 namespace ns3 {
-namespace olsr {
-	const int constanta = 10;
-}
 }
 
 #endif
