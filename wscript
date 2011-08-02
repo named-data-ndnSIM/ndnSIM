@@ -12,6 +12,9 @@ def build(bld):
         'model/ccn_random.cc',
         'model/ccn_buf_decoder.cc',
         'model/ccn_buf_encoder.cc',
+        'model/ndn_face.cc',
+        'model/ndn_interestpacket.cc',
+        'model/ndn_contentpacket.cc',
         'helper/ndnabstraction-helper.cc',
         ]
 
@@ -30,6 +33,9 @@ def build(bld):
         'model/ccn_indexbuf.h',
         'model/ccn_random.h',
         'model/ccn_ccn.h',
+        'model/ndn_face.h',
+        'model/ndn_interestpacket.h',
+        'model/ndn_contentpacket.h',
         'helper/ndnabstraction-helper.h',
         ]
 
