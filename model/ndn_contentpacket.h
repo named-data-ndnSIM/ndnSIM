@@ -10,13 +10,20 @@
 
 #include "ns3/header.h"
 #include <ns3/packet.h>
+#include "ccn_ccn.h"
 
 namespace ns3
 {
-    class InterestPacket : public Packet 
+namespace NDNabstraction
+{
+    class ContentPacket : public Packet 
     {
+    public: 
+        ContentPacket(const struct ccn_charbuf *Name,const void *data,size_t size);
+
         
     };
+}
 }
 
 #endif 

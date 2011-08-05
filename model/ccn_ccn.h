@@ -15,14 +15,90 @@
 #include "ccn_charbuf.h"
 #include "ccn_indexbuf.h"
 
+/***********************************
+ * Writing Names
+ * Names for interests are constructed in charbufs using 
+ * the following routines.
+ */
+
+/*
+ * ccn_name_init: reset charbuf to represent an empty Name in binary format
+ * Return value is 0, or -1 for error.
+ */
+int ccn_name_init(struct ccn_charbuf *c);
+
+/*
+ * ccn_name_append: add a Component to a Name
+ * The component is an arbitrary string of n octets, no escaping required.
+ * Return value is 0, or -1 for error.
+ */
+int ccn_name_append(struct ccn_charbuf *c, const void *component, size_t n);
+
+/*
+ * ccn_name_append_str: add a Component that is a \0 terminated string.
+ * The component added is the bytes of the string without the \0.
+ * This function is convenient for those applications that construct 
+ * component names from simple strings.
+ * Return value is 0, or -1 for error
+ */
+int ccn_name_append_str(struct ccn_charbuf *c, const char *s);
+
+/*
+ * ccn_name_append_components: add sequence of ccnb-encoded Components
+ *    to a ccnb-encoded Name
+ * start and stop are offsets from ccnb
+ * Return value is 0, or -1 for obvious error
+ */
+int ccn_name_append_components(struct ccn_charbuf *c,
+                               const unsigned char *ccnb,
+                               size_t start, size_t stop);
+
 enum ccn_marker {
-  CCN_MARKER_NONE = -1,
-  CCN_MARKER_SEQNUM  = 0x00, /**< consecutive block sequence numbers */
-  CCN_MARKER_CONTROL = 0xC1, /**< commands, etc. */ 
-  CCN_MARKER_OSEQNUM = 0xF8, /**< deprecated */
-  CCN_MARKER_BLKID   = 0xFB, /**< nonconsecutive block ids */
-  CCN_MARKER_VERSION = 0xFD  /**< timestamp-based versioning */
+    CCN_MARKER_NONE = -1,
+    CCN_MARKER_SEQNUM  = 0x00, /**< consecutive block sequence numbers */
+    CCN_MARKER_CONTROL = 0xC1, /**< commands, etc. */ 
+    CCN_MARKER_OSEQNUM = 0xF8, /**< deprecated */
+    CCN_MARKER_BLKID   = 0xFB, /**< nonconsecutive block ids */
+    CCN_MARKER_VERSION = 0xFD  /**< timestamp-based versioning */
 };
+
+/*
+ * ccn_name_append_numeric: add binary Component to ccnb-encoded Name
+ * These are special components used for marking versions, fragments, etc.
+ * Return value is 0, or -1 for error
+ * see doc/technical/NameConventions.html
+ */
+int ccn_name_append_numeric(struct ccn_charbuf *c,
+                            enum ccn_marker tag, uintmax_t value);
+
+/*
+ * ccn_name_append_nonce: add nonce Component to ccnb-encoded Name
+ * Uses %C1.N.n marker.
+ * see doc/technical/NameConventions.html
+ */
+int ccn_name_append_nonce(struct ccn_charbuf *c);
+
+/*
+ * ccn_name_split: find Component boundaries in a ccnb-encoded Name
+ * Thin veneer over ccn_parse_Name().
+ * returns -1 for error, otherwise the number of Components
+ * components arg may be NULL to just do a validity check
+ */
+int ccn_name_split(const struct ccn_charbuf *c,
+                   struct ccn_indexbuf* components);
+
+/*
+ * ccn_name_chop: Chop the name down to n components.
+ * returns -1 for error, otherwise the new number of Components
+ * components arg may be NULL; if provided it must be consistent with
+ * some prefix of the name, and is updated accordingly.
+ * n may be negative to say how many components to remove instead of how
+ * many to leave, e.g. -1 will remove just the last component.
+ */
+int ccn_name_chop(struct ccn_charbuf *c,
+                  struct ccn_indexbuf* components, int n);
+
+
 
 
 /*********** Interest parsing ***********/
@@ -303,4 +379,9 @@ struct ccn_parsed_ContentObject {
   unsigned char digest[32];	/* Computed only when needed */
   int digest_bytes;
 };
+
+int ccn_encode_ContentObject(struct ccn_charbuf *buf,
+                             const struct ccn_charbuf *Name,
+                             const void *data,
+                             size_t size);
 #endif
