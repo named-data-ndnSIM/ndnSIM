@@ -15,6 +15,9 @@ def build(bld):
         'model/ndn_face.cc',
         'model/ndn_interestpacket.cc',
         'model/ndn_contentpacket.cc',
+        'model/ndn_timeoutheader.cc',
+        'model/ndn_nonceheader.cc',
+        'model/ndn_namebuilder.cc',
         'helper/ndnabstraction-helper.cc',
         ]
 
@@ -36,6 +39,9 @@ def build(bld):
         'model/ndn_face.h',
         'model/ndn_interestpacket.h',
         'model/ndn_contentpacket.h',
+        'model/ndn_timeoutheader.h',
+        'model/ndn_nonceheader.h',
+        'model/ndn_namebuilder.h',
         'helper/ndnabstraction-helper.h',
         ]
 
