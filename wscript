@@ -18,7 +18,9 @@ def build(bld):
         'model/ndn_timeoutheader.cc',
         'model/ndn_nonceheader.cc',
         'model/ndn_namebuilder.cc',
+        'model/ndn_stupidinterestgenerator.cc',
         'helper/ndnabstraction-helper.cc',
+        'helper/ndn_stupidinterestgenerator_helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
@@ -42,7 +44,9 @@ def build(bld):
         'model/ndn_timeoutheader.h',
         'model/ndn_nonceheader.h',
         'model/ndn_namebuilder.h',
+        'model/ndn_stupidinterestgenerator.h',
         'helper/ndnabstraction-helper.h',
+        'helper/ndn_stupidinterestgenerator_helper.h',
         ]
 
 
