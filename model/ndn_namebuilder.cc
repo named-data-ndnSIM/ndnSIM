@@ -19,28 +19,43 @@
  */
 
 #include "ndn_namebuilder.h"
+#include <ccn/ccn.h>
 
-namespace ns3 
+using namespace std;
+
+namespace ns3 {
+namespace NDNabstraction {
+
+NameBuilder::NameBuilder ()
 {
-namespace NDNabstraction
+  m_value = ccn_charbuf_create ();
+  ccn_name_init(m_value);
+}
+
+NameBuilder::NameBuilder (const string &s)
 {
-    NameBuilder::NameBuilder()
-    {
-        m_value = ccn_charbuf_create();
-        ccn_name_init(m_value);
-    }
-    
-    ccn_charbuf*
-    NameBuilder::GetName()
-    {
-        return m_value;
-    }
-    
-    void
-    NameBuilder::AddComponent(string s)
-    {
-        
-        ccn_name_append_str(m_value,s.c_str());
-    }
+  m_value = ccn_charbuf_create ();
+  ccn_name_init(m_value);
+  (*this) (s);
+}
+
+NameBuilder::~NameBuilder ()
+{
+  ccn_charbuf_destroy(&m_value);
+}
+
+const ccn_charbuf*
+NameBuilder::GetName () const
+{
+  return m_value;
+}
+
+NameBuilder&
+NameBuilder::operator () (const string &s)
+{
+  ccn_name_append_str (m_value,s.c_str());
+  return *this;
+}
+
 }
 }

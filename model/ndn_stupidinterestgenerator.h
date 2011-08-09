@@ -13,7 +13,7 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 #include "ns3/ptr.h"
-#include "ccn_ccn.h"
+#include <ccn/ccn.h>
 #include "ns3/udp-socket-factory.h"
 
 namespace ns3 

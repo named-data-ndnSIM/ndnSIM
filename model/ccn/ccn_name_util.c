@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ccn_random.h"
-#include "ccn_ccn.h"
+#include "ccn.h"
 
 /**
  * @file ccn_name_util.c

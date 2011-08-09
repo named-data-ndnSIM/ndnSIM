@@ -23,7 +23,7 @@
 
 #include "ns3/header.h"
 #include <ns3/packet.h>
-#include "ccn_ccn.h"
+#include "ccn/ccn.h"
 
 namespace ns3
 {

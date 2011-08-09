@@ -62,7 +62,7 @@ namespace NDNabstraction
     InterestPacket::AddNonce(uint32_t nonce)
     {
         NonceHeader tHeader (nonce);
-        AddHeader (tHeader);    
+        AddHeader (tHeader);
     }
     
     uint32_t

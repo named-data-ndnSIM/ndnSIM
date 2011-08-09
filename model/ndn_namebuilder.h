@@ -18,24 +18,30 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ccn_ccn.h"
+#ifndef _NDN_NAMEBUILDER_H_
+#define _NDN_NAMEBUILDER_H_
+
 #include <string>
 
-using namespace std;
+class ccn_charbuf;
 
-namespace ns3 
+namespace ns3 {
+namespace NDNabstraction {
+  
+class NameBuilder
 {
-namespace NDNabstraction
-{
-    class NameBuilder
-    {
-    public:
-        NameBuilder();
-        ccn_charbuf* GetName();
-        void AddComponent(string s);
-        //TODO add more overloads
-    private:
-        ccn_charbuf *m_value;
-    };
+public:
+  NameBuilder ();
+  NameBuilder (const std::string &s);
+  ~NameBuilder ();
+  
+  const ccn_charbuf* GetName () const;
+  NameBuilder& operator () (const std::string &s);
+private:
+  ccn_charbuf *m_value;
+};
+
 }
 }
+#endif // _NDN_NAMEBUILDER_H_
+

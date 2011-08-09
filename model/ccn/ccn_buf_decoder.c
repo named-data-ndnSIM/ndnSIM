@@ -29,7 +29,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "ccn_ccn.h"
+#include "ccn.h"
 #include "ccn_charbuf.h"
 #include "ccn_coding.h"
 #include "ccn_indexbuf.h"

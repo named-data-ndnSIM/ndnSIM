@@ -13,6 +13,8 @@
 #include "ndn_interestpacket.h"
 #include "ndn_namebuilder.h"
 
+#include "ccn/ccn_charbuf.h"
+
 NS_LOG_COMPONENT_DEFINE ("StupidInterestGenerator");
 
 namespace ns3
@@ -159,11 +161,9 @@ namespace ns3
         NS_LOG_LOGIC ("sending packet at " << Simulator::Now ());
         NS_ASSERT (m_sendEvent.IsExpired ());
         
-        NameBuilder name;        
-        name.AddComponent("prefix1");
-        name.AddComponent("prefix2");
-        name.AddComponent("filename");
-        ccn_charbuf *output = name.GetName();
+        NameBuilder name;
+		name("prefix1")("prefix2")("filename");
+        const ccn_charbuf *output = name.GetName();
         Ptr<InterestPacket> packet = Create<InterestPacket>(output->buf,(uint32_t)output->length);
         packet->AddTimeout(4000);
         UniformVariable var;
