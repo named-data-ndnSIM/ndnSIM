@@ -57,5 +57,10 @@ NameBuilder::operator () (const string &s)
   return *this;
 }
 
+NameBuilder::operator const unsigned char* ()
+{
+  return m_value->buf;
+}
+  
 }
 }

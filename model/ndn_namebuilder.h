@@ -37,6 +37,8 @@ public:
   
   const ccn_charbuf* GetName () const;
   NameBuilder& operator () (const std::string &s);
+
+  operator const unsigned char* ();
 private:
   ccn_charbuf *m_value;
 };

@@ -34,23 +34,25 @@ namespace ns3
 {
 namespace NDNabstraction
 {
-    class InterestPacket : public Packet 
-    {
-        public: 
-            InterestPacket(unsigned char *name, uint32_t size);
+  
+  class InterestPacket : public Packet 
+  {
+  public: 
+    InterestPacket(const unsigned char *name, uint32_t size);
             
-            uint32_t GetName(unsigned char *name);
+    uint32_t GetName(unsigned char *name);
         
-            void AddTimeout(uint32_t milliseconds);
-            uint32_t GetTimeout(void);
-            void RemoveTimeout(void);
+    void AddTimeout(uint32_t milliseconds);
+    uint32_t GetTimeout(void);
+    void RemoveTimeout(void);
         
-            void AddNonce(uint32_t nonce);
-            uint32_t GetNonce(void);
-            void RemoveNonce(void);
+    void AddNonce(uint32_t nonce);
+    uint32_t GetNonce(void);
+    void RemoveNonce(void);
         
-            uint32_t maxNameLength;
-    };
+    uint32_t maxNameLength;
+  };
+  
 }
 }
 

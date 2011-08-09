@@ -163,8 +163,9 @@ namespace ns3
         
         NameBuilder name;
 		name("prefix1")("prefix2")("filename");
+		
         const ccn_charbuf *output = name.GetName();
-        Ptr<InterestPacket> packet = Create<InterestPacket>(output->buf,(uint32_t)output->length);
+        Ptr<InterestPacket> packet = Create<InterestPacket>(name,(uint32_t)output->length);
         packet->AddTimeout(4000);
         UniformVariable var;
         packet->AddNonce(var.GetInteger(1,10000));
