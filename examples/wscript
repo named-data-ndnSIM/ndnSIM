@@ -1,6 +1,8 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('syntactic-topology-ndnabstraction',
-                                 ['core-module'])
-    obj.source = 'syntactic-topology-ndnabstraction.cc'
+    if not bld.env['ENABLE_EXAMPLES']:
+        return;
+    
+    # obj = bld.create_ns3_program('stupid-interest-generator', ['NDNabstraction'])
+    # obj.source = 'stupid-interest-generator.cc'

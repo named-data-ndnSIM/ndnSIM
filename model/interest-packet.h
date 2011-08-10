@@ -18,49 +18,43 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ndn_namebuilder.h"
-#include <ccn/ccn.h>
+#ifndef _INTEREST_PACKET_H_
+#define _INTEREST_PACKET_H_
 
-using namespace std;
+//#define CCN_INTEREST_LIFETIME_SEC 4
+//#define CCN_INTEREST_LIFETIME_MICROSEC (CCN_INTEREST_LIFETIME_SEC * 1000000)
 
-namespace ns3 {
-namespace NDNabstraction {
+#include <ns3/header.h>
+#include <ns3/packet.h>
+#include <string>
 
-NameBuilder::NameBuilder ()
+namespace ns3
 {
-  m_value = ccn_charbuf_create ();
-  ccn_name_init(m_value);
-}
-
-NameBuilder::NameBuilder (const string &s)
+namespace NDNabstraction
 {
-  m_value = ccn_charbuf_create ();
-  ccn_name_init(m_value);
-  (*this) (s);
-}
-
-NameBuilder::~NameBuilder ()
+  
+class InterestPacket : public Packet 
 {
-  ccn_charbuf_destroy(&m_value);
-}
-
-const ccn_charbuf*
-NameBuilder::GetName () const
-{
-  return m_value;
-}
-
-NameBuilder&
-NameBuilder::operator () (const string &s)
-{
-  ccn_name_append_str (m_value,s.c_str());
-  return *this;
-}
-
-NameBuilder::operator const unsigned char* ()
-{
-  return m_value->buf;
-}
+public:
+  InterestPacket( );
+  // InterestPacket (const unsigned char *name, uint32_t size);
+  
+          
+  // uint32_t GetName (unsigned char *name);
+      
+  // void AddTimeout (uint32_t milliseconds);
+  // uint32_t GetTimeout (void);
+  // void RemoveTimeout (void);
+      
+  // void AddNonce (uint32_t nonce);
+  // uint32_t GetNonce (void);
+  // void RemoveNonce (void);
+      
+  // uint32_t maxNameLength;
+  
+};
   
 }
 }
+
+#endif // _NDN_PACKET_H_

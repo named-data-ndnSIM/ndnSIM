@@ -6,14 +6,14 @@
 //  Copyright 2011 UCLA. All rights reserved.
 //
 
-#include "ndn_stupidinterestgenerator.h"
+#include "stupid-interest-generator.h"
+
 #include "ns3/socket.h"
 #include "ns3/socket-factory.h"
 #include "ns3/simulator.h"
-#include "ndn_interestpacket.h"
-#include "ndn_namebuilder.h"
 
-#include "ccn/ccn_charbuf.h"
+#include "model/interest-packet.h"
+#include "model/name-builder.h"
 
 NS_LOG_COMPONENT_DEFINE ("StupidInterestGenerator");
 
@@ -157,21 +157,21 @@ namespace ns3
         
     void StupidInterestGenerator::SendPacket ()
     {
-        NS_LOG_FUNCTION_NOARGS ();
-        NS_LOG_LOGIC ("sending packet at " << Simulator::Now ());
-        NS_ASSERT (m_sendEvent.IsExpired ());
+        // NS_LOG_FUNCTION_NOARGS ();
+        // NS_LOG_LOGIC ("sending packet at " << Simulator::Now ());
+        // NS_ASSERT (m_sendEvent.IsExpired ());
         
-        NameBuilder name;
-		name("prefix1")("prefix2")("filename");
+        // NameBuilder name;
+		// name("prefix1")("prefix2")("filename");
 		
-        const ccn_charbuf *output = name.GetName();
-        Ptr<InterestPacket> packet = Create<InterestPacket>(name,(uint32_t)output->length);
-        packet->AddTimeout(4000);
-        UniformVariable var;
-        packet->AddNonce(var.GetInteger(1,10000));
-        m_socket->Send(packet);
+        // const ccn_charbuf *output = name.GetName();
+        // Ptr<InterestPacket> packet = Create<InterestPacket>(name,(uint32_t)output->length);
+        // packet->AddTimeout(4000);
+        // UniformVariable var;
+        // packet->AddNonce(var.GetInteger(1,10000));
+        // m_socket->Send(packet);
         
-        ScheduleStartEvent();
+        // ScheduleStartEvent();
     }
 
 //}

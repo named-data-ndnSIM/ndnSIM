@@ -12,17 +12,14 @@ def build(bld):
 		'model/ccn/ccn_buf_decoder.c',
 		'model/ccn/ccn_buf_encoder.c',
         
-        'model/ndnabstraction-header.cc',
-
         'model/ndn_face.cc',
-        'model/ndn_interestpacket.cc',
+        'model/interest-packet.cc',
         'model/ndn_contentpacket.cc',
         'model/ndn_timeoutheader.cc',
         'model/ndn_nonceheader.cc',
-        'model/ndn_namebuilder.cc',
-        'model/ndn_stupidinterestgenerator.cc',
-        'helper/ndnabstraction-helper.cc',
-        'helper/ndn_stupidinterestgenerator_helper.cc',
+        'model/name-builder.cc',
+
+        'apps/stupid-interest-generator.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
@@ -40,22 +37,23 @@ def build(bld):
 		'model/ccn/ccn_indexbuf.h',
 		'model/ccn/ccn_random.h',
 
-        'model/ndnabstraction-header.h',
+        # 'model/ndnabstraction-header.h',
 
         'model/ndn_face.h',
-        'model/ndn_interestpacket.h',
+        'model/interest-packet.h',
         'model/ndn_contentpacket.h',
         'model/ndn_timeoutheader.h',
         'model/ndn_nonceheader.h',
-        'model/ndn_namebuilder.h',
-        'model/ndn_stupidinterestgenerator.h',
-        'helper/ndnabstraction-helper.h',
-        'helper/ndn_stupidinterestgenerator_helper.h',
+        'model/name-builder.h',
+        # 'helper/ndnabstraction-helper.h',
+        # 'helper/ndn_stupidinterestgenerator_helper.h',
+
+        'apps/stupid-interest-generator.h',
         ]
 
 
     if bld.env['ENABLE_OPENSSL']:
-        module.uselib      = 'OPENSSL'
+        module.uselib = 'OPENSSL'
 
     if bld.env['ENABLE_EXAMPLES']:
         bld.add_subdirs('examples')
