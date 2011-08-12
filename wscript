@@ -4,13 +4,13 @@ def build(bld):
     module = bld.create_ns3_module('NDNabstraction', ['applications', 'core', 'network', 'internet', 'point-to-point'])
     module.includes = '.'
     module.source = [
-        'model/ccn/ccn_charbuf.c',
-		'model/ccn/ccn_name_util.c',
-		'model/ccn/ccn_coding.c',
-		'model/ccn/ccn_indexbuf.c',
-		'model/ccn/ccn_random.c',
-		'model/ccn/ccn_buf_decoder.c',
-		'model/ccn/ccn_buf_encoder.c',
+        'model/ccn/ccn_charbuf.cc',
+		'model/ccn/ccn_name_util.cc',
+		'model/ccn/ccn_coding.cc',
+		'model/ccn/ccn_indexbuf.cc',
+		'model/ccn/ccn_random.cc',
+		'model/ccn/ccn_buf_decoder.cc',
+		'model/ccn/ccn_buf_encoder.cc',
         
         'model/ndn_face.cc',
         'model/interest-packet.cc',
