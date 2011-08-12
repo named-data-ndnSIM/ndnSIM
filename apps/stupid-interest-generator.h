@@ -6,15 +6,16 @@
 //  Copyright 2011 UCLA. All rights reserved.
 //
 
-#include "ns3/application.h"
-#include "ns3/log.h"
-#include "ns3/address.h"
-#include "ns3/random-variable.h"
-#include "ns3/nstime.h"
-#include "ns3/event-id.h"
-#include "ns3/ptr.h"
-#include <ccn/ccn.h>
-#include "ns3/udp-socket-factory.h"
+#include <ns3/application.h>
+#include <ns3/log.h>
+#include <ns3/address.h>
+#include <ns3/random-variable.h>
+#include <ns3/nstime.h>
+#include <ns3/event-id.h>
+#include <ns3/ptr.h>
+
+#include "../model/ccn/ccn.h"
+#include <ns3/udp-socket-factory.h>
 
 namespace ns3 
 {

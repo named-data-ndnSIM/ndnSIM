@@ -18,70 +18,175 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
+///< #CCN_PR_SCOPE0 (0x20) local scope,
+///< #CCN_PR_SCOPE1 (0x40) this host,
+///< #CCN_PR_SCOPE2 (0x80) immediate neighborhood
+
+
 #include "interest-packet.h"
 
 namespace ns3
 {
 namespace NDNabstraction
 {
-  InterestPacket::InterestPacket ()
+
+  InterestHeader::InterestHeader ()
+    : m_minSuffixComponents (-1)
+    , m_maxSuffixComponents (-1)
+    , m_childSelector (false)
+    , m_answerOriginKind (false)
+    , m_scope (-1)
+    , m_interestLifetime (-1)
+    , m_nonce (0)
   {
   }
-  // InterestPacket::InterestPacket(const unsigned char *name, uint32_t size)
-  //   :Packet(name,size)
-  // {
-  //   maxNameLength = 10240;
-  // }
+
+  void
+  InterestHeader::SetName (const Ptr<Name::Components> &name)
+  {
+    m_name = name;
+  }
+
+  const Name::Components&
+  InterestHeader::GetName () const
+  {
+    return *m_name;
+  }
+
+  void
+  InterestHeader::SetMinSuffixComponents (int32_t value)
+  {
+    m_minSuffixComponents = value;
+  }
+
+  int32_t
+  InterestHeader::GetMinSuffixComponents () const
+  {
+    return m_minSuffixComponents;
+  }
+
+  void
+  InterestHeader::SetMaxSuffixComponents (int32_t value)
+  {
+    m_maxSuffixComponents = value;
+  }
+
+  int32_t
+  InterestHeader::GetMaxSuffixComponents () const
+  {
+    return m_maxSuffixComponents;
+  }
+
+  void
+  InterestHeader::SetExclude (const Ptr<Name::Components> &exclude)
+  {
+    m_exclude = exclude;
+  }
+
+  const Name::Components&
+  InterestHeader::GetExclude () const
+  {
+    return *m_exclude;
+  }
+
+  void
+  InterestHeader::EnableChildSelector ()
+  {
+    m_childSelector = true;
+  }
+
+  bool
+  InterestHeader::IsEnabledChildSelector () const
+  {
+    return m_childSelector;
+  }
+
+  void
+  InterestHeader::EnableAnswerOriginKind ()
+  {
+    m_answerOriginKind = true;
+  }
+
+  bool
+  InterestHeader::IsEnabledAnswerOriginKind () const
+  {
+    return m_answerOriginKind;
+  }
+
+  void
+  InterestHeader::SetScope (int8_t scope)
+  {
+    m_scope = scope;
+  }
+
+  int8_t
+  InterestHeader::GetScope () const
+  {
+    return m_scope;
+  }
+
+  void
+  InterestHeader::SetInterestLifetime (intmax_t lifetime)
+  {
+    m_interestLifetime = lifetime;
+  }
+
+  intmax_t
+  InterestHeader::GetInterestLifetime () const
+  {
+    return m_interestLifetime;
+  }
+
+  void
+  InterestHeader::SetNonce (uint32_t nonce)
+  {
+    m_nonce = nonce;
+  }
+
+  uint32_t
+  InterestHeader::GetNonce () const
+  {
+    return m_nonce;
+  }
+  
+  uint32_t
+  InterestHeader::GetSerializedSize (void) const
+  {
+    return 0;
+  }
     
-  // uint32_t 
-  // InterestPacket::GetName(unsigned char *name)
-  // {
-  //   //uint32_t Packet::CopyData (uint8_t *buffer, uint32_t size) const
-  //   return CopyData((uint8_t*) name, maxNameLength); 
-  // }
-    
-  // void 
-  // InterestPacket::AddTimeout(uint32_t milliseconds)
-  // {
-  //   TimeoutHeader tHeader (milliseconds);
-  //   AddHeader (tHeader);    
-  // }
-    
-  // uint32_t
-  // InterestPacket::GetTimeout(void)
-  // {
-  //   TimeoutHeader tHeader;
-  //   PeekHeader(tHeader);
-  //   return tHeader.GetValue();
-  // }
-    
-  // void
-  // InterestPacket::RemoveTimeout(void)
-  // {
-  //   TimeoutHeader tHeader;
-  //   RemoveHeader(tHeader);
-  // }
-    
-  // void 
-  // InterestPacket::AddNonce(uint32_t nonce)
-  // {
-  //   NonceHeader tHeader (nonce);
-  //   AddHeader (tHeader);
-  // }
-    
-  // uint32_t
-  // InterestPacket::GetNonce(void)
-  // {
-  //   NonceHeader tHeader;
-  //   PeekHeader(tHeader);
-  //   return tHeader.GetValue();
-  // }
-    
-  // void
-  // InterestPacket::RemoveNonce(void)
-  // {
-  //   NonceHeader tHeader;
-  //   RemoveHeader(tHeader);
-  // }
+  void
+  InterestHeader::Serialize (Buffer::Iterator start) const
+  {
+    return;
+  }
+
+  uint32_t
+  InterestHeader::Deserialize (Buffer::Iterator start)
+  {
+    return 0;
+  }
+
+  TypeId
+  InterestHeader::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::NDNabstraction::InterestHeader")
+      .SetParent<Header> ()
+      .AddConstructor<InterestHeader> ()
+      ;
+    return tid;
+  }
+  
+  TypeId
+  InterestHeader::GetInstanceTypeId (void) const
+  {
+    return GetTypeId ();
+  }
+  
+  void
+  InterestHeader::Print (std::ostream &os) const
+  {
+    os << "Interest: " << *m_name;
+  }
 }
 }

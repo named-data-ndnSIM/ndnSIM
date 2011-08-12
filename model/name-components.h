@@ -18,32 +18,50 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef _NDN_NAMEBUILDER_H_
-#define _NDN_NAMEBUILDER_H_
+#ifndef _NDN_NAME_COMPONENTS_H_
+#define _NDN_NAME_COMPONENTS_H_
 
 #include <string>
+#include <list>
 
-class ccn_charbuf;
+#include <ns3/simple-ref-count.h>
 
 namespace ns3 {
 namespace NDNabstraction {
-  
-class NameBuilder
+namespace Name {
+
+class Components : public SimpleRefCount<Components>
 {
 public:
-  NameBuilder ();
-  NameBuilder (const std::string &s);
-  ~NameBuilder ();
+  Components ();
+  Components (const std::string &s);
+  ~Components ();
   
-  const ccn_charbuf* GetName () const;
-  NameBuilder& operator () (const std::string &s);
+  Components& operator () (const std::string &s);
+  
+  // virtual uint32_t
+  // GetSerializedSize (void) const;
 
-  operator const unsigned char* ();
+  // virtual void
+  // Serialize (Buffer::Iterator start) const;
+
+  // virtual uint32_t
+  // Deserialize (Buffer::Iterator start);
+
+  void Print (std::ostream &os) const;
+  
 private:
-  ccn_charbuf *m_value;
+  std::list<std::string> m_prefix;
+
+  typedef std::list<std::string>::iterator iterator;
+  typedef std::list<std::string>::const_iterator const_iterator;
 };
 
-}
-}
-#endif // _NDN_NAMEBUILDER_H_
+std::ostream & operator << (std::ostream &os, const Components &components);
+
+} // Namespace Name
+} // namespace NDNabstraction 
+} // namespace ns3
+
+#endif // _NDN_NAME_COMPONENTS_H_
 
