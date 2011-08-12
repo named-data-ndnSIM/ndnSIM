@@ -19,7 +19,10 @@
  */
 
 #include "name-components.h"
-#include "ccn/ccn.h"
+
+#include "ns3/ccn.h"
+#include "ns3/ccn_charbuf.h"
+
 #include <iostream>
 
 using namespace std;

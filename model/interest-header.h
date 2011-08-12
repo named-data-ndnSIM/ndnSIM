@@ -22,8 +22,8 @@
 #ifndef _INTEREST_HEADER_H_
 #define _INTEREST_HEADER_H_
 
-#include <ns3/integer.h>
-#include <ns3/header.h>
+#include "ns3/integer.h"
+#include "ns3/header.h"
 
 #include <string>
 #include <vector>
@@ -35,7 +35,7 @@ namespace ns3
 {
 namespace NDNabstraction
 {
-
+  
 /**
  * CCNx XML definition of Interest
  * 

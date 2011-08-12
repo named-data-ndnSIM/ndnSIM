@@ -18,7 +18,6 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-
 #include "content-object-header.h"
 
 namespace ns3

@@ -16,8 +16,8 @@ def build(bld):
         'model/interest-header.cc',
         'model/content-object-header.cc',
 
-        'model/stupid-interest-generator.cc',
-        'model/stupid-interest-sink.cc',
+        'apps/stupid-interest-generator.cc',
+        'apps/stupid-interest-sink.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
@@ -44,8 +44,8 @@ def build(bld):
         # 'helper/ndnabstraction-helper.h',
         'helper/ndn_stupidinterestgenerator_helper.h',
 
-        'model/stupid-interest-generator.h',
-        'model/stupid-interest-sink.h'
+        'apps/stupid-interest-generator.h',
+        'apps/stupid-interest-sink.h'
         ]
 
 

@@ -8,12 +8,11 @@
 
 #include "stupid-interest-generator.h"
 
-#include "ns3/socket.h"
 #include "ns3/socket-factory.h"
 #include "ns3/simulator.h"
 
-#include "interest-header.h"
-#include "content-object-header.h"
+#include "ns3/interest-header.h"
+#include "ns3/content-object-header.h"
 
 NS_LOG_COMPONENT_DEFINE ("StupidInterestGenerator");
 

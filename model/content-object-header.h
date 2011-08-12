@@ -22,8 +22,8 @@
 #ifndef _CONTENT_OBJECT_HEADER_H_
 #define _CONTENT_OBJECT_HEADER_H_
 
-#include <ns3/integer.h>
-#include <ns3/header.h>
+#include "ns3/integer.h"
+#include "ns3/header.h"
 
 #include <string>
 #include <vector>
