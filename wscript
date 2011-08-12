@@ -38,8 +38,6 @@ def build(bld):
 		'model/ccn/ccn_indexbuf.h',
 		'model/ccn/ccn_random.h',
 
-        # 'model/ndnabstraction-header.h',
-
         'model/ndn_face.h',
         'model/interest-packet.h',
         'model/ndn_contentpacket.h',

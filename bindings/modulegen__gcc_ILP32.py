@@ -162,6 +162,8 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::CallbackImplBase', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CallbackImplBase>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::EventImpl', 'ns3::empty', 'ns3::DefaultDeleter<ns3::EventImpl>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::NDNabstraction::Name::Components', 'ns3::empty', 'ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::NixVector', 'ns3::empty', 'ns3::DefaultDeleter<ns3::NixVector>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> > [class]
@@ -196,6 +198,8 @@ def register_types(module):
     module.add_class('EmptyAttributeValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## event-impl.h (module 'core'): ns3::EventImpl [class]
     module.add_class('EventImpl', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
+    ## integer.h (module 'core'): ns3::IntegerValue [class]
+    module.add_class('IntegerValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## ipv4-address.h (module 'network'): ns3::Ipv4AddressChecker [class]
     module.add_class('Ipv4AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## ipv4-address.h (module 'network'): ns3::Ipv4AddressValue [class]
@@ -265,6 +269,12 @@ def register_types(module):
     nested_module = module.add_cpp_namespace('NDNabstraction')
     register_types_ns3_NDNabstraction(nested_module)
     
+    
+    ## Register a nested module for the namespace internal
+    
+    nested_module = module.add_cpp_namespace('internal')
+    register_types_ns3_internal(nested_module)
+    
 
 def register_types_ns3_FatalImpl(module):
     root_module = module.get_root()
@@ -275,14 +285,28 @@ def register_types_ns3_NDNabstraction(module):
     
     ## ndn_contentpacket.h (module 'NDNabstraction'): ns3::NDNabstraction::ContentPacket [class]
     module.add_class('ContentPacket', parent=root_module['ns3::Packet'])
-    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestPacket [class]
-    module.add_class('InterestPacket', parent=root_module['ns3::Packet'])
-    ## name-builder.h (module 'NDNabstraction'): ns3::NDNabstraction::NameBuilder [class]
-    module.add_class('NameBuilder')
+    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestHeader [class]
+    module.add_class('InterestHeader', parent=root_module['ns3::Header'])
     ## ndn_nonceheader.h (module 'NDNabstraction'): ns3::NDNabstraction::NonceHeader [class]
     module.add_class('NonceHeader', parent=root_module['ns3::Header'])
     ## ndn_timeoutheader.h (module 'NDNabstraction'): ns3::NDNabstraction::TimeoutHeader [class]
     module.add_class('TimeoutHeader', parent=root_module['ns3::Header'])
+    
+    ## Register a nested module for the namespace Name
+    
+    nested_module = module.add_cpp_namespace('Name')
+    register_types_ns3_NDNabstraction_Name(nested_module)
+    
+
+def register_types_ns3_NDNabstraction_Name(module):
+    root_module = module.get_root()
+    
+    ## name-components.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components [class]
+    module.add_class('Components', parent=root_module['ns3::SimpleRefCount< ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> >'])
+
+def register_types_ns3_internal(module):
+    root_module = module.get_root()
+    
 
 def register_methods(root_module):
     register_Ns3Address_methods(root_module, root_module['ns3::Address'])
@@ -350,6 +374,7 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3AttributeValue_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeValue__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
     register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3EventImpl__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
+    register_Ns3SimpleRefCount__Ns3NDNabstractionNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3NDNabstractionNameComponents__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> >'])
     register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >'])
     register_Ns3SimpleRefCount__Ns3Packet_Ns3Empty_Ns3DefaultDeleter__lt__ns3Packet__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> >'])
     register_Ns3SocketFactory_methods(root_module, root_module['ns3::SocketFactory'])
@@ -365,6 +390,7 @@ def register_methods(root_module):
     register_Ns3CallbackValue_methods(root_module, root_module['ns3::CallbackValue'])
     register_Ns3EmptyAttributeValue_methods(root_module, root_module['ns3::EmptyAttributeValue'])
     register_Ns3EventImpl_methods(root_module, root_module['ns3::EventImpl'])
+    register_Ns3IntegerValue_methods(root_module, root_module['ns3::IntegerValue'])
     register_Ns3Ipv4AddressChecker_methods(root_module, root_module['ns3::Ipv4AddressChecker'])
     register_Ns3Ipv4AddressValue_methods(root_module, root_module['ns3::Ipv4AddressValue'])
     register_Ns3Ipv4MaskChecker_methods(root_module, root_module['ns3::Ipv4MaskChecker'])
@@ -390,10 +416,10 @@ def register_methods(root_module):
     register_Ns3AddressChecker_methods(root_module, root_module['ns3::AddressChecker'])
     register_Ns3AddressValue_methods(root_module, root_module['ns3::AddressValue'])
     register_Ns3NDNabstractionContentPacket_methods(root_module, root_module['ns3::NDNabstraction::ContentPacket'])
-    register_Ns3NDNabstractionInterestPacket_methods(root_module, root_module['ns3::NDNabstraction::InterestPacket'])
-    register_Ns3NDNabstractionNameBuilder_methods(root_module, root_module['ns3::NDNabstraction::NameBuilder'])
+    register_Ns3NDNabstractionInterestHeader_methods(root_module, root_module['ns3::NDNabstraction::InterestHeader'])
     register_Ns3NDNabstractionNonceHeader_methods(root_module, root_module['ns3::NDNabstraction::NonceHeader'])
     register_Ns3NDNabstractionTimeoutHeader_methods(root_module, root_module['ns3::NDNabstraction::TimeoutHeader'])
+    register_Ns3NDNabstractionNameComponents_methods(root_module, root_module['ns3::NDNabstraction::Name::Components'])
     return
 
 def register_Ns3Address_methods(root_module, cls):
@@ -2632,6 +2658,18 @@ def register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3
                    is_static=True)
     return
 
+def register_Ns3SimpleRefCount__Ns3NDNabstractionNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3NDNabstractionNameComponents__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> >::SimpleRefCount(ns3::SimpleRefCount<ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter< ns3::NDNabstraction::Name::Components > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::NDNabstraction::Name::Components, ns3::empty, ns3::DefaultDeleter<ns3::NDNabstraction::Name::Components> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -3100,6 +3138,39 @@ def register_Ns3EventImpl_methods(root_module, cls):
                    'void', 
                    [], 
                    is_pure_virtual=True, visibility='protected', is_virtual=True)
+    return
+
+def register_Ns3IntegerValue_methods(root_module, cls):
+    ## integer.h (module 'core'): ns3::IntegerValue::IntegerValue() [constructor]
+    cls.add_constructor([])
+    ## integer.h (module 'core'): ns3::IntegerValue::IntegerValue(ns3::IntegerValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::IntegerValue const &', 'arg0')])
+    ## integer.h (module 'core'): ns3::IntegerValue::IntegerValue(int64_t const & value) [constructor]
+    cls.add_constructor([param('int64_t const &', 'value')])
+    ## integer.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::IntegerValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## integer.h (module 'core'): bool ns3::IntegerValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## integer.h (module 'core'): int64_t ns3::IntegerValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'int64_t', 
+                   [], 
+                   is_const=True)
+    ## integer.h (module 'core'): std::string ns3::IntegerValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## integer.h (module 'core'): void ns3::IntegerValue::Set(int64_t const & value) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('int64_t const &', 'value')])
     return
 
 def register_Ns3Ipv4AddressChecker_methods(root_module, cls):
@@ -3975,30 +4046,122 @@ def register_Ns3NDNabstractionContentPacket_methods(root_module, cls):
     cls.add_constructor([param('ccn_charbuf const *', 'Name'), param('void const *', 'data'), param('size_t', 'size')])
     return
 
-def register_Ns3NDNabstractionInterestPacket_methods(root_module, cls):
-    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestPacket::InterestPacket(ns3::NDNabstraction::InterestPacket const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::NDNabstraction::InterestPacket const &', 'arg0')])
-    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestPacket::InterestPacket() [constructor]
+def register_Ns3NDNabstractionInterestHeader_methods(root_module, cls):
+    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestHeader::InterestHeader(ns3::NDNabstraction::InterestHeader const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::NDNabstraction::InterestHeader const &', 'arg0')])
+    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::InterestHeader::InterestHeader() [constructor]
     cls.add_constructor([])
-    return
-
-def register_Ns3NDNabstractionNameBuilder_methods(root_module, cls):
-    ## name-builder.h (module 'NDNabstraction'): ns3::NDNabstraction::NameBuilder::NameBuilder(ns3::NDNabstraction::NameBuilder const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::NDNabstraction::NameBuilder const &', 'arg0')])
-    ## name-builder.h (module 'NDNabstraction'): ns3::NDNabstraction::NameBuilder::NameBuilder() [constructor]
-    cls.add_constructor([])
-    ## name-builder.h (module 'NDNabstraction'): ns3::NDNabstraction::NameBuilder::NameBuilder(std::string const & s) [constructor]
-    cls.add_constructor([param('std::string const &', 's')])
-    ## name-builder.h (module 'NDNabstraction'): ccn_charbuf const * ns3::NDNabstraction::NameBuilder::GetName() const [member function]
-    cls.add_method('GetName', 
-                   'ccn_charbuf const *', 
+    ## interest-packet.h (module 'NDNabstraction'): uint32_t ns3::NDNabstraction::InterestHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::EnableAnswerOriginKind() [member function]
+    cls.add_method('EnableAnswerOriginKind', 
+                   'void', 
+                   [])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::EnableChildSelector() [member function]
+    cls.add_method('EnableChildSelector', 
+                   'void', 
+                   [])
+    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components const & ns3::NDNabstraction::InterestHeader::GetExclude() const [member function]
+    cls.add_method('GetExclude', 
+                   'ns3::NDNabstraction::Name::Components const &', 
                    [], 
                    is_const=True)
-    ## name-builder.h (module 'NDNabstraction'): ns3::NDNabstraction::NameBuilder & ns3::NDNabstraction::NameBuilder::operator()(std::string const & s) [member operator]
-    cls.add_method('operator()', 
-                   'ns3::NDNabstraction::NameBuilder &', 
-                   [param('std::string const &', 's')], 
-                   custom_name='__call__')
+    ## interest-packet.h (module 'NDNabstraction'): ns3::TypeId ns3::NDNabstraction::InterestHeader::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## interest-packet.h (module 'NDNabstraction'): intmax_t ns3::NDNabstraction::InterestHeader::GetInterestLifetime() const [member function]
+    cls.add_method('GetInterestLifetime', 
+                   'intmax_t', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): int32_t ns3::NDNabstraction::InterestHeader::GetMaxSuffixComponents() const [member function]
+    cls.add_method('GetMaxSuffixComponents', 
+                   'int32_t', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): int32_t ns3::NDNabstraction::InterestHeader::GetMinSuffixComponents() const [member function]
+    cls.add_method('GetMinSuffixComponents', 
+                   'int32_t', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components const & ns3::NDNabstraction::InterestHeader::GetName() const [member function]
+    cls.add_method('GetName', 
+                   'ns3::NDNabstraction::Name::Components const &', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): uint32_t ns3::NDNabstraction::InterestHeader::GetNonce() const [member function]
+    cls.add_method('GetNonce', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): int8_t ns3::NDNabstraction::InterestHeader::GetScope() const [member function]
+    cls.add_method('GetScope', 
+                   'int8_t', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): uint32_t ns3::NDNabstraction::InterestHeader::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## interest-packet.h (module 'NDNabstraction'): static ns3::TypeId ns3::NDNabstraction::InterestHeader::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## interest-packet.h (module 'NDNabstraction'): bool ns3::NDNabstraction::InterestHeader::IsEnabledAnswerOriginKind() const [member function]
+    cls.add_method('IsEnabledAnswerOriginKind', 
+                   'bool', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): bool ns3::NDNabstraction::InterestHeader::IsEnabledChildSelector() const [member function]
+    cls.add_method('IsEnabledChildSelector', 
+                   'bool', 
+                   [], 
+                   is_const=True)
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetExclude(ns3::Ptr<ns3::NDNabstraction::Name::Components> const & exclude) [member function]
+    cls.add_method('SetExclude', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NDNabstraction::Name::Components > const &', 'exclude')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetInterestLifetime(intmax_t lifetime) [member function]
+    cls.add_method('SetInterestLifetime', 
+                   'void', 
+                   [param('intmax_t', 'lifetime')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetMaxSuffixComponents(int32_t value) [member function]
+    cls.add_method('SetMaxSuffixComponents', 
+                   'void', 
+                   [param('int32_t', 'value')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetMinSuffixComponents(int32_t value) [member function]
+    cls.add_method('SetMinSuffixComponents', 
+                   'void', 
+                   [param('int32_t', 'value')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetName(ns3::Ptr<ns3::NDNabstraction::Name::Components> const & name) [member function]
+    cls.add_method('SetName', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NDNabstraction::Name::Components > const &', 'name')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetNonce(uint32_t nonce) [member function]
+    cls.add_method('SetNonce', 
+                   'void', 
+                   [param('uint32_t', 'nonce')])
+    ## interest-packet.h (module 'NDNabstraction'): void ns3::NDNabstraction::InterestHeader::SetScope(int8_t scope) [member function]
+    cls.add_method('SetScope', 
+                   'void', 
+                   [param('int8_t', 'scope')])
     return
 
 def register_Ns3NDNabstractionNonceHeader_methods(root_module, cls):
@@ -4087,16 +4250,44 @@ def register_Ns3NDNabstractionTimeoutHeader_methods(root_module, cls):
                    is_const=True, is_virtual=True)
     return
 
+def register_Ns3NDNabstractionNameComponents_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## name-components.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components::Components(ns3::NDNabstraction::Name::Components const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::NDNabstraction::Name::Components const &', 'arg0')])
+    ## name-components.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components::Components() [constructor]
+    cls.add_constructor([])
+    ## name-components.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components::Components(std::string const & s) [constructor]
+    cls.add_constructor([param('std::string const &', 's')])
+    ## name-components.h (module 'NDNabstraction'): void ns3::NDNabstraction::Name::Components::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    ## name-components.h (module 'NDNabstraction'): ns3::NDNabstraction::Name::Components & ns3::NDNabstraction::Name::Components::operator()(std::string const & s) [member operator]
+    cls.add_method('operator()', 
+                   'ns3::NDNabstraction::Name::Components &', 
+                   [param('std::string const &', 's')], 
+                   custom_name='__call__')
+    return
+
 def register_functions(root_module):
     module = root_module
     register_functions_ns3_FatalImpl(module.get_submodule('FatalImpl'), root_module)
     register_functions_ns3_NDNabstraction(module.get_submodule('NDNabstraction'), root_module)
+    register_functions_ns3_internal(module.get_submodule('internal'), root_module)
     return
 
 def register_functions_ns3_FatalImpl(module, root_module):
     return
 
 def register_functions_ns3_NDNabstraction(module, root_module):
+    register_functions_ns3_NDNabstraction_Name(module.get_submodule('Name'), root_module)
+    return
+
+def register_functions_ns3_NDNabstraction_Name(module, root_module):
+    return
+
+def register_functions_ns3_internal(module, root_module):
     return
 
 def main():
