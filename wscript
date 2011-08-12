@@ -20,6 +20,7 @@ def build(bld):
         'model/name-builder.cc',
 
         'apps/stupid-interest-generator.cc',
+        'apps/stupid-interest-sink.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
@@ -45,10 +46,10 @@ def build(bld):
         'model/ndn_timeoutheader.h',
         'model/ndn_nonceheader.h',
         'model/name-builder.h',
-        # 'helper/ndnabstraction-helper.h',
-        # 'helper/ndn_stupidinterestgenerator_helper.h',
+        'helper/ndn_stupidinterestgenerator_helper.h',
 
         'apps/stupid-interest-generator.h',
+        'apps/stupid-interest-sink.h'
         ]
 
 
@@ -58,7 +59,7 @@ def build(bld):
     if bld.env['ENABLE_EXAMPLES']:
         bld.add_subdirs('examples')
 
-    #bld.ns3_python_bindings()
+    bld.ns3_python_bindings()
     #bld.env['CXXFLAGS']=[filter(lambda x: x not in bld.env, sublist) for sublist in [['-Wall'], ['-Werror'], ['-Wextra']]]
     # bld.env['CXXFLAGS']=[]
     # bld.env['CFLAGS']=[]
