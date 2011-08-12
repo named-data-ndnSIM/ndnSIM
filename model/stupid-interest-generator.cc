@@ -12,7 +12,8 @@
 #include "ns3/socket-factory.h"
 #include "ns3/simulator.h"
 
-#include "model/interest-packet.h"
+#include "interest-header.h"
+#include "content-object-header.h"
 
 NS_LOG_COMPONENT_DEFINE ("StupidInterestGenerator");
 
@@ -163,6 +164,8 @@ namespace ns3
         // NameBuilder name;
 		// name("prefix1")("prefix2")("filename");
 		InterestHeader ();
+
+		ContentObjectHeader ();
 		
         // const ccn_charbuf *output = name.GetName();
         // Ptr<InterestPacket> packet = Create<InterestPacket>(name,(uint32_t)output->length);

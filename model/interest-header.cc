@@ -23,7 +23,7 @@
 ///< #CCN_PR_SCOPE2 (0x80) immediate neighborhood
 
 
-#include "interest-packet.h"
+#include "interest-header.h"
 
 namespace ns3
 {

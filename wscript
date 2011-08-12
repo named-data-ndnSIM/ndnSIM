@@ -5,22 +5,19 @@ def build(bld):
     module.includes = '.'
     module.source = [
         'model/ccn/ccn_charbuf.cc',
-		'model/ccn/ccn_name_util.cc',
-		'model/ccn/ccn_coding.cc',
-		'model/ccn/ccn_indexbuf.cc',
-		'model/ccn/ccn_random.cc',
-		'model/ccn/ccn_buf_decoder.cc',
-		'model/ccn/ccn_buf_encoder.cc',
+        'model/ccn/ccn_name_util.cc',
+        'model/ccn/ccn_coding.cc',
+        'model/ccn/ccn_indexbuf.cc',
+        'model/ccn/ccn_random.cc',
+        'model/ccn/ccn_buf_decoder.cc',
+        'model/ccn/ccn_buf_encoder.cc',
         
-        'model/ndn_face.cc',
-        'model/interest-packet.cc',
-        'model/ndn_contentpacket.cc',
-        'model/ndn_timeoutheader.cc',
-        'model/ndn_nonceheader.cc',
         'model/name-components.cc',
+        'model/interest-header.cc',
+        'model/content-object-header.cc',
 
-        'apps/stupid-interest-generator.cc',
-        'apps/stupid-interest-sink.cc',
+        'model/stupid-interest-generator.cc',
+        'model/stupid-interest-sink.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('NDNabstraction')
@@ -32,23 +29,23 @@ def build(bld):
     headers.module = 'NDNabstraction'
     headers.source = [
         'model/ccn/ccn.h',
-		'model/ccn/ccn_charbuf.h',
-		'model/ccn/ccn_coding.h',
-		'model/ccn/ccn_name_util.h',
-		'model/ccn/ccn_indexbuf.h',
-		'model/ccn/ccn_random.h',
+        'model/ccn/ccn_charbuf.h',
+        'model/ccn/ccn_coding.h',
+        'model/ccn/ccn_name_util.h',
+        'model/ccn/ccn_indexbuf.h',
+        'model/ccn/ccn_random.h',
 
-        'model/ndn_face.h',
-        'model/interest-packet.h',
-        'model/ndn_contentpacket.h',
-        'model/ndn_timeoutheader.h',
-        'model/ndn_nonceheader.h',
+        # 'model/ndnabstraction-header.h',
+
         'model/name-components.h',
+        'model/interest-header.h',
+        'model/content-object-header.h',
+
         # 'helper/ndnabstraction-helper.h',
         'helper/ndn_stupidinterestgenerator_helper.h',
 
-        'apps/stupid-interest-generator.h',
-        'apps/stupid-interest-sink.h'
+        'model/stupid-interest-generator.h',
+        'model/stupid-interest-sink.h'
         ]
 
 

@@ -16,17 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _INTEREST_PACKET_H_
-#define _INTEREST_PACKET_H_
-
-//#define CCN_INTEREST_LIFETIME_SEC 4
-//#define CCN_INTEREST_LIFETIME_MICROSEC (CCN_INTEREST_LIFETIME_SEC * 1000000)
+#ifndef _INTEREST_HEADER_H_
+#define _INTEREST_HEADER_H_
 
 #include <ns3/integer.h>
 #include <ns3/header.h>
-#include <ns3/packet.h>
 
 #include <string>
 #include <vector>
@@ -117,138 +114,114 @@ namespace NDNabstraction
  *
  **/
 
+/**
+   NDN InterestHeader and routines to serialize/deserialize
+
+   Simplifications:
+   - Name:  binary name components are not supported
+   - MinSuffixComponents and MasSuffixComponents: if value is negative (default), will not be serialized
+   - ChildSelector, AnswerOriginKind: 0 - false, 1 - true, -1 not set
+   - Publisher* elements are not supported
+   - Exclude: only simple name matching is supported (Bloom support has been deprecated in CCNx)
+   - InterestLifetime: not used if negative
+   - Nonce: 32 bit random integer.  If value is 0, will not be serialized
+ */
+class InterestHeader : public Header
+{
+public:
   /**
-     NDN InterestPacket and routes to serialize/deserialize
+   * Constructor
+   *
+   * Creates a null header
+   **/
+  InterestHeader ();
 
-     Simplifications:
-     - Name:  binary name components are not supported
-     - MinSuffixComponents and MasSuffixComponents: if value is negative (default), will not be serialized
-     - ChildSelector, AnswerOriginKind: 0 - false, 1 - true, -1 not set
-     - Publisher* elements are not supported
-     - Exclude: only simple name matching is supported (Bloom support has been deprecated in CCNx)
-     - InterestLifetime: not used if negative
-     - Nonce: 32 bit random integer.  If value is 0, will not be serialized
-   */
-  class InterestHeader : public Header
-  {
-  public:
-    /**
-     * Constructor
-     *
-     * Creates a null header
-     **/
-    InterestHeader ();
+  /**
+   * \brief Set interest name
+   *
+   * Sets name of the interest. For example, SetName( Name::Components("prefix")("postfix") );
+   **/
+  void
+  SetName (const Ptr<Name::Components> &name);
 
-    /**
-     * \brief Set interest name
-     *
-     * Sets name of the interest. For example, SetName( Name::Components("prefix")("postfix") );
-     **/
-    void
-    SetName (const Ptr<Name::Components> &name);
+  const Name::Components&
+  GetName () const;
 
-    const Name::Components&
-    GetName () const;
+  void
+  SetMinSuffixComponents (int32_t value);
 
-    void
-    SetMinSuffixComponents (int32_t value);
+  int32_t
+  GetMinSuffixComponents () const;
 
-    int32_t
-    GetMinSuffixComponents () const;
+  void
+  SetMaxSuffixComponents (int32_t value);
 
-    void
-    SetMaxSuffixComponents (int32_t value);
+  int32_t
+  GetMaxSuffixComponents () const;
 
-    int32_t
-    GetMaxSuffixComponents () const;
+  /**
+   * \brief Set exclude filer
+   *
+   * For example, SetExclude (Name::Components("exclude1")("exclude2")("exclude3"))
+   **/
+  void
+  SetExclude (const Ptr<Name::Components> &exclude);
 
-    /**
-     * \brief Set exclude filer
-     *
-     * For example, SetExclude (Name::Components("exclude1")("exclude2")("exclude3"))
-     **/
-    void
-    SetExclude (const Ptr<Name::Components> &exclude);
+  const Name::Components&
+  GetExclude () const;
 
-    const Name::Components&
-    GetExclude () const;
+  void
+  EnableChildSelector ();
 
-    void
-    EnableChildSelector ();
+  bool
+  IsEnabledChildSelector () const;
 
-    bool
-    IsEnabledChildSelector () const;
+  void
+  EnableAnswerOriginKind ();
 
-    void
-    EnableAnswerOriginKind ();
+  bool
+  IsEnabledAnswerOriginKind () const;
 
-    bool
-    IsEnabledAnswerOriginKind () const;
+  void
+  SetScope (int8_t scope);
 
-    void
-    SetScope (int8_t scope);
+  int8_t
+  GetScope () const;
 
-    int8_t
-    GetScope () const;
+  void
+  SetInterestLifetime (intmax_t lifetime);
 
-    void
-    SetInterestLifetime (intmax_t lifetime);
+  intmax_t
+  GetInterestLifetime () const;
 
-    intmax_t
-    GetInterestLifetime () const;
+  void
+  SetNonce (uint32_t nonce);
 
-    void
-    SetNonce (uint32_t nonce);
+  uint32_t
+  GetNonce () const;
 
-    uint32_t
-    GetNonce () const;
-
-    //////////////////////////////////////////////////////////////////
-    
-    static TypeId GetTypeId (void);
-    virtual TypeId GetInstanceTypeId (void) const;
-    virtual void Print (std::ostream &os) const;
-    virtual uint32_t GetSerializedSize (void) const;
-    virtual void Serialize (Buffer::Iterator start) const;
-    virtual uint32_t Deserialize (Buffer::Iterator start);
-
-  private:
-    Ptr<Name::Components> m_name;
-    int32_t m_minSuffixComponents; ///< minimum suffix components. not used if negative
-    int32_t m_maxSuffixComponents; ///< maximum suffix components. not used if negative
-    Ptr<Name::Components> m_exclude; ///< exclude filter
-    bool m_childSelector;    
-    bool m_answerOriginKind; 
-    int8_t m_scope;            ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
-    intmax_t m_interestLifetime; ///< InterestLifetime in 2^{-12} (0.000244140625 sec). not used if negative
-    uint32_t m_nonce; ///< Nonce. not used if zero
-  };
-
-
-  // Not sure that we need a separate NndPacket class. Everything useful will be inside (Interest|ContentObject)Header
-// class NdnPacket : public Packet 
-// {
-// public:
-//   NdnPacket( )
-    // ; 
-  // InterestPacket (const unsigned char *name, uint32_t size);
+  //////////////////////////////////////////////////////////////////
   
-          
-  // uint32_t GetName (unsigned char *name);
-      
-  // void AddTimeout (uint32_t milliseconds);
-  // uint32_t GetTimeout (void);
-  // void RemoveTimeout (void);
-      
-  // void AddNonce (uint32_t nonce);
-  // uint32_t GetNonce (void);
-  // void RemoveNonce (void);
-      
-  // uint32_t maxNameLength;
-  
-// };
-  
-}
-}
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Print (std::ostream &os) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (Buffer::Iterator start) const;
+  virtual uint32_t Deserialize (Buffer::Iterator start);
 
-#endif // _NDN_PACKET_H_
+private:
+  Ptr<Name::Components> m_name;
+  int32_t m_minSuffixComponents; ///< minimum suffix components. not used if negative
+  int32_t m_maxSuffixComponents; ///< maximum suffix components. not used if negative
+  Ptr<Name::Components> m_exclude; ///< exclude filter
+  bool m_childSelector;    
+  bool m_answerOriginKind; 
+  int8_t m_scope;            ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
+  intmax_t m_interestLifetime; ///< InterestLifetime in 2^{-12} (0.000244140625 sec). not used if negative
+  uint32_t m_nonce; ///< Nonce. not used if zero
+};
+
+} // namespace NDNabstraction
+} // namespace ns3
+
+#endif // _INTEREST_HEADER_H_
