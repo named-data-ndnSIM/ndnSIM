@@ -18,6 +18,7 @@ def build(bld):
         'model/ndn_timeoutheader.cc',
         'model/ndn_nonceheader.cc',
         'model/name-components.cc',
+        'model/ndn_contentstore.cc',
 
         'apps/stupid-interest-generator.cc',
         'apps/stupid-interest-sink.cc',
@@ -44,6 +45,9 @@ def build(bld):
         'model/ndn_timeoutheader.h',
         'model/ndn_nonceheader.h',
         'model/name-components.h',
+        #'model/ndn_hashhelper.h',
+        'model/ndn_contentstore.h',
+        'model/uthash.h',
         # 'helper/ndnabstraction-helper.h',
         'helper/ndn_stupidinterestgenerator_helper.h',
 
