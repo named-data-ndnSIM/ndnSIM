@@ -14,48 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
  */
 
-#include "ccnx-route.h"
-
-#include "ns3/ccnx-face.h"
 #include "ns3/assert.h"
+
+#include "ccnx-route.h"
+#include "ccnx-forwarding-protocol.h"
 
 namespace ns3 {
 
-CcnxRoute::CcnxRoute ()
+NS_OBJECT_ENSURE_REGISTERED (CcnxForwardingProtocol);
+
+TypeId CcnxForwardingProtocol::GetTypeId (void)
 {
+  static TypeId tid = TypeId ("ns3::CcnxForwardingProtocol")
+    .SetParent<Object> ()
+  ;
+  return tid;
 }
 
 void
-CcnxRoute::SetPrefix (const Ptr<Name::Components> &prefix)
+CcnxForwardingProtocol::SetCcnx (Ptr<Ccnx> ccnx)
 {
-  m_prefix = prefix;
-}
-
-const Name::Components&
-CcnxRoute::GetPrefix (void) const
-{
-  return *m_prefix;
-}
-
-void
-CcnxRoute::SetOutputFace (Ptr<CcnxFace> outputFace)
-{
-  m_outputFace = outputFace;
-}
-
-Ptr<CcnxFace>
-CcnxRoute::GetOutputFace (void) const
-{
-  return m_outputFace;
-}
-
-std::ostream& operator<< (std::ostream& os, CcnxRoute const& route)
-{
-  os << "prefix=" << route.GetPrefix () << ", " << route.GetOutputFace ();
-  return os;
+  m_ccnx = ccnx;
 }
 
 } //namespace ns3

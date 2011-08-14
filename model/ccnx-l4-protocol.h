@@ -48,7 +48,10 @@ public:
 
   static TypeId GetTypeId (void);
 
+  CcnxL4Protocol ();
   virtual ~CcnxL4Protocol ();
+
+  void SetNode (Ptr<Node> node);
 
   /**
    * \param p packet to forward up
@@ -60,7 +63,7 @@ public:
    */
   virtual enum RxStatus Receive (Ptr<Packet> p,
                                  CcnxHeader const &header,
-                                 Ptr<CcnxInterface> incomingInterface) = 0;
+                                 Ptr<CcnxInterface> incomingInterface);
 
   typedef Callback<void,Ptr<Packet>, Ptr<CcnxRoute> > DownTargetCallback;
   /**
@@ -69,14 +72,25 @@ public:
    *
    * \param cb current Callback for the L4 protocol
    */
-  virtual void SetDownTarget (DownTargetCallback cb) = 0;
+  virtual void SetDownTarget (DownTargetCallback cb);
   /**
    * This method allows a caller to get the current down target callback
    * set for this L4 protocol, for
    *
    * \return current Callback for the L4 protocol
    */
-  virtual DownTargetCallback GetDownTarget (void) const = 0;
+  virtual DownTargetCallback GetDownTarget (void) const;
+
+protected:
+  virtual void DoDispose (void);
+  /*
+   * This function will notify other components connected to the node that a new stack member is now connected
+   * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
+   */
+  virtual void NotifyNewAggregate ();
+
+private:
+  DownTargetCallback m_downTarget;
 };
 
 } // Namespace ns3

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// Author: George F. Riley<riley@ece.gatech.edu>
+// Author: 
 //
 
 #include "ns3/packet.h"
@@ -24,16 +24,13 @@
 #include "ns3/ccnx-address.h"
 #include "ns3/ccnx-route.h"
 #include "ns3/node.h"
-#include "ns3/socket.h"
 #include "ns3/net-device.h"
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/object-vector.h"
-#include "ns3/ccnx-header.h"
 #include "ns3/boolean.h"
 //#include "ns3/ccnx-routing-table-entry.h"
 
-#include "arp-l3-protocol.h"
 #include "ccnx-l3-protocol.h"
 #include "ccnx-interface.h"
 
@@ -70,7 +67,6 @@ CcnxL3Protocol::GetTypeId (void)
 }
 
 CcnxL3Protocol::CcnxL3Protocol()
-  : m_identification (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -84,8 +80,6 @@ void
 CcnxL3Protocol::SetNode (Ptr<Node> node)
 {
   m_node = node;
-  // Add a LoopbackNetDevice if needed, and an CcnxInterface on top of it
-  SetupLoopback ();
 }
 
 /*
@@ -108,442 +102,155 @@ CcnxL3Protocol::NotifyNewAggregate ()
   Object::NotifyNewAggregate ();
 }
 
-// void 
-// CcnxL3Protocol::SetRoutingProtocol (Ptr<CcnxRoutingProtocol> routingProtocol)
-// {
-//   NS_LOG_FUNCTION (this);
-//   m_routingProtocol = routingProtocol;
-//   m_routingProtocol->SetCcnx (this);
-// }
+void
+CcnxL3Protocol::SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol)
+{
+  NS_LOG_FUNCTION (this);
+  m_forwardingProtocol = forwardingProtocol;
+  m_forwardingProtocol->SetCcnx (this);
+}
 
-
-// Ptr<CcnxRoutingProtocol> 
-// CcnxL3Protocol::GetRoutingProtocol (void) const
-// {
-//   return m_routingProtocol;
-// }
+Ptr<CcnxForwardingProtocol>
+CcnxL3Protocol::GetForwardingProtocol (void) const
+{
+  return m_forwardingProtocol;
+}
 
 void 
 CcnxL3Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
 
-  for (CcnxInterfaceList::iterator i = m_interfaces.begin (); i != m_interfaces.end (); ++i)
+  for (CcnxInterfaceList::iterator i = m_faces.begin (); i != m_faces.end (); ++i)
     {
       *i = 0;
     }
-  m_interfaces.clear ();
+  m_faces.clear ();
   m_node = 0;
-  // m_routingProtocol = 0;
+  // m_forwardingProtocol = 0;
   Object::DoDispose ();
 }
 
 uint32_t 
-CcnxL3Protocol::AddInterface (Ptr<NetDevice> device)
+CcnxL3Protocol::AddFace (Ptr<CcnxFace> face)
 {
-  NS_LOG_FUNCTION (this << &device);
+  NS_LOG_FUNCTION (this << *face);
 
-  Ptr<Node> node = GetObject<Node> ();
-  node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::Receive, this), 
-                                 CcnxL3Protocol::PROT_NUMBER, device, true);
+  // Ptr<Node> node = GetObject<Node> (); ///< \todo not sure why this thing should be called...
+  face->setNode (m_node);
 
-  // ccnx doesn't need arp protocol to run. Everything is broadcast!
-  // node->RegisterProtocolHandler (MakeCallback (&ArpL3Protocol::Receive, PeekPointer (GetObject<ArpL3Protocol> ())),
-  //                                ArpL3Protocol::PROT_NUMBER, device, true);
+  if (face->GetDevice() != 0)
+    {
+      m_node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::Receive, this), 
+                                       CcnxL3Protocol::PROT_NUMBER, face->GetDevice(), true/*promiscuous mode*/);
+    }
 
-  Ptr<CcnxInterface> interface = CreateObject<CcnxInterface> ();
-  interface->SetNode (m_node);
-  interface->SetDevice (device);
-  // interface->SetForwarding (m_ipForward);
-  return AddCcnxInterface (interface);
-}
-
-uint32_t 
-CcnxL3Protocol::AddCcnxInterface (Ptr<CcnxInterface>interface)
-{
-  NS_LOG_FUNCTION (this << interface);
-  uint32_t index = m_interfaces.size ();
-  m_interfaces.push_back (interface);
+  uint32_t index = m_faces.size ();
+  m_faces.push_back (interface);
   return index;
 }
 
+
 Ptr<CcnxInterface>
-CcnxL3Protocol::GetInterface (uint32_t index) const
+CcnxL3Protocol::GetFace (uint32_t index) const
 {
-  if (index < m_interfaces.size ())
+  if (index < m_faces.size ())
     {
-      return m_interfaces[index];
+      return m_faces[index];
     }
   return 0;
 }
 
 uint32_t 
-CcnxL3Protocol::GetNInterfaces (void) const
+CcnxL3Protocol::GetNFaces (void) const
 {
-  return m_interfaces.size ();
+  return m_faces.size ();
 }
 
-int32_t 
-CcnxL3Protocol::GetInterfaceForDevice (
-  Ptr<const NetDevice> device) const
+Ptr<CcnxFace>
+GetFaceForDevice (Ptr<const NetDevice> device) const
 {
-  int32_t interface = 0;
-  for (CcnxInterfaceList::const_iterator i = m_interfaces.begin (); 
-       i != m_interfaces.end (); 
-       i++, interface++)
+  for (CcnxInterfaceList::const_iterator i = m_faces.begin (); 
+       i != m_faces.end (); 
+       i++, face++)
     {
       if ((*i)->GetDevice () == device)
         {
-          return interface;
+          return *i;
         }
     }
 
-  return -1;
+  NS_ASSERT_MSG (false "Should never get to this place" );
+  return 0;
 }
 
+// Callback from lower layer
 void 
 CcnxL3Protocol::Receive ( Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol, const Address &from,
                           const Address &to, NetDevice::PacketType packetType)
 {
   NS_LOG_FUNCTION (this << &device << p << protocol <<  from);
 
-  NS_LOG_LOGIC ("Packet from " << from << " received on node " << 
-                m_node->GetId ());
+  NS_LOG_LOGIC ("Packet from " << from << " received on node " <<  m_node->GetId ());
 
   uint32_t interface = 0;
   Ptr<Packet> packet = p->Copy ();
 
-  Ptr<CcnxInterface> ccnxInterface;
-  for (CcnxInterfaceList::const_iterator i = m_interfaces.begin (); 
-       i != m_interfaces.end (); 
-       i++, interface++)
-    {
-      ccnxInterface = *i;
-      if (ccnxInterface->GetDevice () == device)
-        {
-          if (ccnxInterface->IsUp ())
-            {
-              m_rxTrace (packet, m_node->GetObject<Ccnx> (), interface);
-              break;
-            }
-          else
-            {
-              NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-              CcnxHeader ipHeader;
-              packet->RemoveHeader (ipHeader);
-              m_dropTrace (ipHeader, packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), interface);
-              return;
-            }
-        }
-    }
+  Ptr<CcnxFace> ccnxFace = GetFaceFromDevice (device);
 
-  CcnxHeader ipHeader;
-  if (Node::ChecksumEnabled ())
-    {
-      ipHeader.EnableChecksum ();
-    }
-  packet->RemoveHeader (ipHeader);
+  Receive (ccnxFace, p);
+}
 
-  // Trim any residual frame padding from underlying devices
-  if (ipHeader.GetPayloadSize () < packet->GetSize ())
+// Callback from higher level
+void Receive (Ptr<CcnxFace> incomingFace, Ptr<const Packet> p)
+{
+  if ( incomingFace->IsUp ())
     {
-      packet->RemoveAtEnd (packet->GetSize () - ipHeader.GetPayloadSize ());
-    }
-
-  if (!ipHeader.IsChecksumOk ()) 
-    {
-      NS_LOG_LOGIC ("Dropping received packet -- checksum not ok");
-      m_dropTrace (ipHeader, packet, DROP_BAD_CHECKSUM, m_node->GetObject<Ccnx> (), interface);
+      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
+      m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
-
-  for (SocketList::iterator i = m_sockets.begin (); i != m_sockets.end (); ++i)
-    {
-      NS_LOG_LOGIC ("Forwarding to raw socket"); 
-      Ptr<CcnxRawSocketImpl> socket = *i;
-      socket->ForwardUp (packet, ipHeader, ccnxInterface);
-    }
+  
+  m_rxTrace (packet, m_node->GetObject<Ccnx> (), incomingFace);
 
   NS_ASSERT_MSG (m_routingProtocol != 0, "Need a routing protocol object to process packets");
-  if (!m_routingProtocol->RouteInput (packet, ipHeader, device,
-                                      MakeCallback (&CcnxL3Protocol::IpForward, this),
-                                      MakeCallback (&CcnxL3Protocol::IpMulticastForward, this),
-                                      MakeCallback (&CcnxL3Protocol::LocalDeliver, this),
+  if (!m_routingProtocol->RouteInput (packet, incomingFace,
+                                      MakeCallback (&CcnxL3Protocol::Send, this),
                                       MakeCallback (&CcnxL3Protocol::RouteInputError, this)
                                       ))
     {
       NS_LOG_WARN ("No route found for forwarding packet.  Drop.");
-      m_dropTrace (ipHeader, packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), interface);
+      m_dropTrace (packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), incomingFace);
     }
-
-
-}
-
-// void 
-// CcnxL3Protocol::SendWithHeader (Ptr<Packet> packet, 
-//                                 CcnxHeader ipHeader,
-//                                 Ptr<CcnxRoute> route)
-// {
-//   NS_LOG_FUNCTION (this << packet << ipHeader << route);
-//   SendRealOut (route, packet, ipHeader);
-// }
-
-void 
-CcnxL3Protocol::Send (Ptr<Packet> packet, 
-                      Ptr<CcnxRoute> route)
-{
-  NS_LOG_FUNCTION (this << packet << route);
-
-  // CcnxHeader ipHeader;
-  // bool mayFragment = true;
-  // uint8_t ttl = m_defaultTtl;
-  // SocketIpTtlTag tag;
-  // bool found = packet->RemovePacketTag (tag);
-  // if (found)
-  //   {
-  //     ttl = tag.GetTtl ();
-  //   }
-
-  // // Handle a few cases:
-  // // 1) packet is destined to limited broadcast address
-  // // 2) packet is destined to a subnet-directed broadcast address
-  // // 3) packet is not broadcast, and is passed in with a route entry
-  // // 4) packet is not broadcast, and is passed in with a route entry but route->GetGateway is not set (e.g., on-demand)
-  // // 5) packet is not broadcast, and route is NULL (e.g., a raw socket call, or ICMP)
-
-  // // 1) packet is destined to limited broadcast address or link-local multicast address
-  // if (destination.IsBroadcast () || destination.IsLocalMulticast ())
-  //   {
-  //     NS_LOG_LOGIC ("CcnxL3Protocol::Send case 1:  limited broadcast");
-  //     ipHeader = BuildHeader (source, destination, protocol, packet->GetSize (), ttl, mayFragment);
-  //     uint32_t ifaceIndex = 0;
-  //     for (CcnxInterfaceList::iterator ifaceIter = m_interfaces.begin ();
-  //          ifaceIter != m_interfaces.end (); ifaceIter++, ifaceIndex++)
-  //       {
-  //         Ptr<CcnxInterface> outInterface = *ifaceIter;
-  //         Ptr<Packet> packetCopy = packet->Copy ();
-
-  //         NS_ASSERT (packetCopy->GetSize () <= outInterface->GetDevice ()->GetMtu ());
-
-  //         m_sendOutgoingTrace (ipHeader, packetCopy, ifaceIndex);
-  //         packetCopy->AddHeader (ipHeader);
-  //         m_txTrace (packetCopy, m_node->GetObject<Ccnx> (), ifaceIndex);
-  //         outInterface->Send (packetCopy, destination);
-  //       }
-  //     return;
-  //   }
-
-  // // 2) check: packet is destined to a subnet-directed broadcast address
-  // uint32_t ifaceIndex = 0;
-  // for (CcnxInterfaceList::iterator ifaceIter = m_interfaces.begin ();
-  //      ifaceIter != m_interfaces.end (); ifaceIter++, ifaceIndex++)
-  //   {
-  //     Ptr<CcnxInterface> outInterface = *ifaceIter;
-  //     for (uint32_t j = 0; j < GetNAddresses (ifaceIndex); j++)
-  //       {
-  //         CcnxInterfaceAddress ifAddr = GetAddress (ifaceIndex, j);
-  //         NS_LOG_LOGIC ("Testing address " << ifAddr.GetLocal () << " with mask " << ifAddr.GetMask ());
-  //         if (destination.IsSubnetDirectedBroadcast (ifAddr.GetMask ()) && 
-  //             destination.CombineMask (ifAddr.GetMask ()) == ifAddr.GetLocal ().CombineMask (ifAddr.GetMask ())   )
-  //           {
-  //             NS_LOG_LOGIC ("CcnxL3Protocol::Send case 2:  subnet directed bcast to " << ifAddr.GetLocal ());
-  //             ipHeader = BuildHeader (source, destination, protocol, packet->GetSize (), ttl, mayFragment);
-  //             Ptr<Packet> packetCopy = packet->Copy ();
-  //             m_sendOutgoingTrace (ipHeader, packetCopy, ifaceIndex);
-  //             packetCopy->AddHeader (ipHeader);
-  //             m_txTrace (packetCopy, m_node->GetObject<Ccnx> (), ifaceIndex);
-  //             outInterface->Send (packetCopy, destination);
-  //             return;
-  //           }
-  //       }
-  //   }
-
-  // // 3) packet is not broadcast, and is passed in with a route entry
-  // //    with a valid CcnxAddress as the gateway
-  // if (route && route->GetGateway () != CcnxAddress ())
-  //   {
-  //     NS_LOG_LOGIC ("CcnxL3Protocol::Send case 3:  passed in with route");
-  //     ipHeader = BuildHeader (source, destination, protocol, packet->GetSize (), ttl, mayFragment);
-  //     int32_t interface = GetInterfaceForDevice (route->GetOutputDevice ());
-  //     m_sendOutgoingTrace (ipHeader, packet, interface);
-  //     SendRealOut (route, packet->Copy (), ipHeader);
-  //     return; 
-  //   } 
-  // // 4) packet is not broadcast, and is passed in with a route entry but route->GetGateway is not set (e.g., on-demand)
-  // if (route && route->GetGateway () == CcnxAddress ())
-  //   {
-  //     // This could arise because the synchronous RouteOutput() call
-  //     // returned to the transport protocol with a source address but
-  //     // there was no next hop available yet (since a route may need
-  //     // to be queried).
-  //     NS_FATAL_ERROR ("CcnxL3Protocol::Send case 4: This case not yet implemented");
-  //   }
-  // // 5) packet is not broadcast, and route is NULL (e.g., a raw socket call)
-  // NS_LOG_LOGIC ("CcnxL3Protocol::Send case 5:  passed in with no route " << destination);
-  // Socket::SocketErrno errno_; 
-  // Ptr<NetDevice> oif (0); // unused for now
-  // ipHeader = BuildHeader (source, destination, protocol, packet->GetSize (), ttl, mayFragment);
-  // Ptr<CcnxRoute> newRoute;
-  // if (m_routingProtocol != 0)
-  //   {
-  //     newRoute = m_routingProtocol->RouteOutput (packet, ipHeader, oif, errno_);
-  //   }
-  // else
-  //   {
-  //     NS_LOG_ERROR ("CcnxL3Protocol::Send: m_routingProtocol == 0");
-  //   }
-  // if (newRoute)
-  //   {
-  //     int32_t interface = GetInterfaceForDevice (newRoute->GetOutputDevice ());
-  //     m_sendOutgoingTrace (ipHeader, packet, interface);
-  //     SendRealOut (newRoute, packet->Copy (), ipHeader);
-  //   }
-  // else
-  //   {
-  //     NS_LOG_WARN ("No route to host.  Drop.");
-  //     m_dropTrace (ipHeader, packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), 0);
-  //   }
 }
 
 
 void
-CcnxL3Protocol::SendRealOut (Ptr<CcnxRoute> route,
-                             Ptr<Packet> packet,
-                             CcnxHeader const &ipHeader)
+CcnxL3Protocol::Send (Ptr<Packet> packet, Ptr<CcnxRoute> route)
 {
-  NS_LOG_FUNCTION (this << packet << &ipHeader);
+  NS_LOG_FUNCTION (this << "packet: " << packet << ", route: "<< route);
 
-  // if (route == 0)
-  //   {
-  //     NS_LOG_WARN ("No route to host.  Drop.");
-  //     m_dropTrace (ipHeader, packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), 0);
-  //     return;
-  //   }
-  // packet->AddHeader (ipHeader);
-  // Ptr<NetDevice> outDev = route->GetOutputDevice ();
-  // int32_t interface = GetInterfaceForDevice (outDev);
-  // NS_ASSERT (interface >= 0);
-  // Ptr<CcnxInterface> outInterface = GetInterface (interface);
-  // NS_LOG_LOGIC ("Send via NetDevice ifIndex " << outDev->GetIfIndex () << " ccnxInterfaceIndex " << interface);
+  if (route == 0)
+    {
+      NS_LOG_WARN ("No route to host.  Drop.");
+      m_dropTrace (ipHeader, packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), 0);
+      return;
+    }
+  Ptr<CcnxFace> outFace = route->GetOutputFace ();
 
-  // NS_ASSERT_MSG (packet->GetSize () <= outInterface->GetDevice ()->GetMtu (), 
-  //                "Packet size " << packet->GetSize () << " exceeds device MTU "
-  //                               << outInterface->GetDevice ()->GetMtu ()
-  //                               << " for Ccnx; fragmentation not supported");
-  // if (!route->GetGateway ().IsEqual (CcnxAddress ("0.0.0.0"))) 
-  //   {
-  //     if (outInterface->IsUp ())
-  //       {
-  //         NS_LOG_LOGIC ("Send to gateway " << route->GetGateway ());
-  //         m_txTrace (packet, m_node->GetObject<Ccnx> (), interface);
-  //         outInterface->Send (packet, route->GetGateway ());
-  //       }
-  //     else
-  //       {
-  //         NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << route->GetGateway ());
-  //         CcnxHeader ipHeader;
-  //         packet->RemoveHeader (ipHeader);
-  //         m_dropTrace (ipHeader, packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), interface);
-  //       }
-  //   } 
-  // else 
-  //   {
-  //     if (outInterface->IsUp ())
-  //       {
-  //         NS_LOG_LOGIC ("Send to destination " << ipHeader.GetDestination ());
-  //         m_txTrace (packet, m_node->GetObject<Ccnx> (), interface);
-  //         outInterface->Send (packet, ipHeader.GetDestination ());
-  //       }
-  //     else
-  //       {
-  //         NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << ipHeader.GetDestination ());
-  //         CcnxHeader ipHeader;
-  //         packet->RemoveHeader (ipHeader);
-  //         m_dropTrace (ipHeader, packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), interface);
-  //       }
-  //   }
+  if (outFace->IsUp ())
+    {
+      NS_LOG_LOGIC ("Sending via face " << *outFace);
+      m_txTrace (packet, m_node->GetObject<Ccnx> (), outFace);
+      outFace->Send (packet);
+    }
+  else
+    {
+      NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << *outFace);
+      m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), outFace);
+    }
 }
 
-
-// This function analogous to Linux ip_forward()
-// void
-// CcnxL3Protocol::IpForward (Ptr<CcnxRoute> rtentry, Ptr<const Packet> p, const CcnxHeader &header)
-// {
-//   NS_LOG_FUNCTION (this << rtentry << p << header);
-//   NS_LOG_LOGIC ("Forwarding logic for node: " << m_node->GetId ());
-//   // Forwarding
-//   CcnxHeader ipHeader = header;
-//   Ptr<Packet> packet = p->Copy ();
-//   int32_t interface = GetInterfaceForDevice (rtentry->GetOutputDevice ());
-//   ipHeader.SetTtl (ipHeader.GetTtl () - 1);
-//   if (ipHeader.GetTtl () == 0)
-//     {
-//       // Do not reply to ICMP or to multicast/broadcast IP address 
-//       if (ipHeader.GetProtocol () != Icmpv4L4Protocol::PROT_NUMBER && 
-//           ipHeader.GetDestination ().IsBroadcast () == false &&
-//           ipHeader.GetDestination ().IsMulticast () == false)
-//         {
-//           Ptr<Icmpv4L4Protocol> icmp = GetIcmp ();
-//           icmp->SendTimeExceededTtl (ipHeader, packet);
-//         }
-//       NS_LOG_WARN ("TTL exceeded.  Drop.");
-//       m_dropTrace (header, packet, DROP_TTL_EXPIRED, m_node->GetObject<Ccnx> (), interface);
-//       return;
-//     }
-//   m_unicastForwardTrace (ipHeader, packet, interface);
-//   SendRealOut (rtentry, packet, ipHeader);
-// }
-
-// Will be called from CcnxRoutingProtocol if prefix is locally registered
-// Local interest will be satisfied inside CcnxInterface::Send call
-
-void
-CcnxL3Protocol::LocalDeliver (Ptr<const Packet> packet, CcnxHeader const&ip, uint32_t iif)
-{
-  NS_LOG_FUNCTION (this << packet << &ip);
-  Ptr<Packet> p = packet->Copy (); // need to pass a non-const packet up
-
-//   m_localDeliverTrace (ip, packet, iif);
-
-//   Ptr<CcnxL4Protocol> protocol = GetProtocol (ip.GetProtocol ());
-//   if (protocol != 0)
-//     {
-//       // we need to make a copy in the unlikely event we hit the
-//       // RX_ENDPOINT_UNREACH codepath
-//       Ptr<Packet> copy = p->Copy ();
-//       enum CcnxL4Protocol::RxStatus status = 
-//         protocol->Receive (p, ip, GetInterface (iif));
-//       switch (status) {
-//         case CcnxL4Protocol::RX_OK:
-//         // fall through
-//         case CcnxL4Protocol::RX_ENDPOINT_CLOSED:
-//         // fall through
-//         case CcnxL4Protocol::RX_CSUM_FAILED:
-//           break;
-//         case CcnxL4Protocol::RX_ENDPOINT_UNREACH:
-//           if (ip.GetDestination ().IsBroadcast () == true ||
-//               ip.GetDestination ().IsMulticast () == true)
-//             {
-//               break; // Do not reply to broadcast or multicast
-//             }
-//           // Another case to suppress ICMP is a subnet-directed broadcast
-//           bool subnetDirected = false;
-//           for (uint32_t i = 0; i < GetNAddresses (iif); i++)
-//             {
-//               CcnxInterfaceAddress addr = GetAddress (iif, i);
-//               if (addr.GetLocal ().CombineMask (addr.GetMask ()) == ip.GetDestination ().CombineMask (addr.GetMask ()) &&
-//                   ip.GetDestination ().IsSubnetDirectedBroadcast (addr.GetMask ()))
-//                 {
-//                   subnetDirected = true;
-//                 }
-s//             }
-//           if (subnetDirected == false)
-//             {
-//               GetIcmp ()->SendDestUnreachPort (ip, copy);
-//             }
-//         }
-//     }
-}
 
 void 
 CcnxL3Protocol::SetMetric (uint32_t i, uint16_t metric)
@@ -598,12 +305,6 @@ CcnxL3Protocol::SetDown (uint32_t ifaceIndex)
     {
       m_routingProtocol->NotifyInterfaceDown (ifaceIndex);
     }
-}
-
-Ptr<NetDevice>
-CcnxL3Protocol::GetNetDevice (uint32_t i)
-{
-  return GetInterface (i)->GetDevice ();
 }
 
 void

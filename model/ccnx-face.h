@@ -17,10 +17,12 @@
  *
  * Authors: 
  */
-#ifndef CCNX_INTERFACE_H
-#define CCNX_INTERFACE_H
+#ifndef CCNX_FACE_H
+#define CCNX_FACE_H
 
 #include <list>
+#include <ostream>
+
 #include "ns3/ptr.h"
 #include "ns3/object.h"
 
@@ -31,79 +33,79 @@ class Packet;
 class Node;
 
 /**
- * \brief The Ccnx representation of a network interface
+ * \brief The Ccnx representation of a network face
  *
  * This class roughly corresponds to the struct in_device
  * of Linux; the main purpose is to provide address-family
- * specific information (addresses) about an interface.
+ * specific information (addresses) about an face.
  *
- * By default, Ccnx interface are created in the "down" state
+ * By default, Ccnx face are created in the "down" state
  * no IP addresses.  Before becoming useable, the user must 
  * add an address of some type and invoke Setup on them.
  */
-class CcnxInterface  : public Object
+class CcnxFace  : public Object
 {
 public:
   static TypeId GetTypeId (void);
 
-  CcnxInterface ();
-  virtual ~CcnxInterface();
+  CcnxFace ();
+  virtual ~CcnxFace();
 
-  void SetNode (Ptr<Node> node); 
-  void SetDevice (Ptr<NetDevice> device);
+  virtual void SetNode (Ptr<Node> node); 
+  virtual void SetDevice (Ptr<NetDevice> device);
 
   /**
    * \returns the underlying NetDevice. This method cannot return zero.
    */
-  Ptr<NetDevice> GetDevice (void) const;
+  virtual Ptr<NetDevice> GetDevice (void) const;
 
   /**
-   * \param metric configured routing metric (cost) of this interface
+   * \param metric configured routing metric (cost) of this face
    *
    * Note:  This is synonymous to the Metric value that ifconfig prints
    * out.  It is used by ns-3 global routing, but other routing daemons
    * choose to ignore it. 
    */
-  void SetMetric (uint16_t metric);
+  virtual void SetMetric (uint16_t metric);
 
   /**
-   * \returns configured routing metric (cost) of this interface
+   * \returns configured routing metric (cost) of this face
    *
    * Note:  This is synonymous to the Metric value that ifconfig prints
    * out.  It is used by ns-3 global routing, but other routing daemons 
    * may choose to ignore it. 
    */
-  uint16_t GetMetric (void) const;
+  virtual uint16_t GetMetric (void) const;
 
   /**
-   * These are IP interface states and may be distinct from 
+   * These are IP face states and may be distinct from 
    * NetDevice states, such as found in real implementations
-   * (where the device may be down but IP interface state is still up).
+   * (where the device may be down but IP face state is still up).
    */
   /**
-   * \returns true if this interface is enabled, false otherwise.
+   * \returns true if this face is enabled, false otherwise.
    */
-  bool IsUp (void) const;
+  virtual bool IsUp (void) const;
 
   /**
-   * \returns true if this interface is disabled, false otherwise.
+   * \returns true if this face is disabled, false otherwise.
    */
-  bool IsDown (void) const;
+  virtual bool IsDown (void) const;
 
   /**
-   * Enable this interface
+   * Enable this face
    */
-  void SetUp (void);
+  virtual void SetUp (void);
 
   /**
-   * Disable this interface
+   * Disable this face
    */
-  void SetDown (void);
+  virtual void SetDown (void);
 
   /**
    * \param p packet to send
    */ 
-  void Send (Ptr<Packet> p);
+  virtual void Send (Ptr<Packet> p);
 
 protected:
   virtual void DoDispose (void);
@@ -115,6 +117,8 @@ private:
   Ptr<NetDevice> m_device;
 };
 
+std::ostream& operator<< (std::ostream& os, CcnxFace const& face);
+
 } // namespace ns3
 
-#endif
+#endif //CCNX_FACE_H

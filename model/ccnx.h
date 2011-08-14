@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
+ * Author: 
  */
 #ifndef CCNX_H
 #define CCNX_H
@@ -90,12 +90,12 @@ public:
    * to disable it, you can invoke Ccnx::SetDown which will
    * make sure that it is never used during packet forwarding.
    */
-  virtual uint32_t AddInterface (Ptr<NetDevice> device) = 0;
+  virtual uint32_t AddFace (Ptr<CcnxFace> face) = 0;
 
   /**
    * \returns the number of interfaces added by the user.
    */
-  virtual uint32_t GetNInterfaces (void) const = 0;
+  virtual uint32_t GetNFaces (void) const = 0;
 
   /**
    * \param packet packet to send
@@ -104,63 +104,63 @@ public:
    * Higher-level layers call this method to send a packet
    * down the stack to the MAC and PHY layers.
    */
-  virtual void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route) = 0;
+  // virtual void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route) = 0;
 
   /**
-   * \param interface The interface number of an Ccnx interface.
-   * \returns The NetDevice associated with the Ccnx interface number.
+   * \param face The face number of an Ccnx interface.
+   * \returns The CcnxFace associated with the Ccnx face number.
    */
-  virtual Ptr<NetDevice> GetNetDevice (uint32_t interface) = 0;
+  virtual Ptr<CcnxFace> GetFace (uint32_t face) = 0;
+
+  // /**
+  //  * \param face CcnxFace object pointer 
+  //  * \returns The interface number of an Ccnx face or -1 if not found.
+  //  */
+  // virtual int32_t GetFaceForDevice (Ptr<const CcnxFace> face) const = 0;
 
   /**
-   * \param device The NetDevice for an CcnxInterface
-   * \returns The interface number of an Ccnx interface or -1 if not found.
-   */
-  virtual int32_t GetInterfaceForDevice (Ptr<const NetDevice> device) const = 0;
-
-  /**
-   * \param interface The interface number of an Ccnx interface
+   * \param face The face number of an Ccnx face
    * \param metric routing metric (cost) associated to the underlying 
    *          Ccnx interface
    */
-  virtual void SetMetric (uint32_t interface, uint16_t metric) = 0;
+  virtual void SetMetric (uint32_t face, uint16_t metric) = 0;
 
   /**
-   * \param interface The interface number of an Ccnx interface
+   * \param face The interface number of an Ccnx interface
    * \returns routing metric (cost) associated to the underlying 
    *          Ccnx interface
    */
-  virtual uint16_t GetMetric (uint32_t interface) const = 0;
+  virtual uint16_t GetMetric (uint32_t face) const = 0;
 
   /**
-   * \param interface Interface number of Ccnx interface
+   * \param face Interface number of Ccnx interface
    * \returns the Maximum Transmission Unit (in bytes) associated
    *          to the underlying Ccnx interface
    */
-  virtual uint16_t GetMtu (uint32_t interface) const = 0;
+  virtual uint16_t GetMtu (uint32_t face) const = 0;
 
   /**
-   * \param interface Interface number of Ccnx interface
+   * \param face Interface number of Ccnx interface
    * \returns true if the underlying interface is in the "up" state,
    *          false otherwise.
    */
-  virtual bool IsUp (uint32_t interface) const = 0;
+  virtual bool IsUp (uint32_t face) const = 0;
 
   /**
-   * \param interface Interface number of Ccnx interface
+   * \param face Interface number of Ccnx interface
    * 
    * Set the interface into the "up" state. In this state, it is
    * considered valid during Ccnx forwarding.
    */
-  virtual void SetUp (uint32_t interface) = 0;
+  virtual void SetUp (uint32_t face) = 0;
 
   /**
-   * \param interface Interface number of Ccnx interface
+   * \param face Interface number of Ccnx interface
    *
    * Set the interface into the "down" state. In this state, it is
    * ignored during Ccnx forwarding.
    */
-  virtual void SetDown (uint32_t interface) = 0;
+  virtual void SetDown (uint32_t face) = 0;
 };
 
 } // namespace ns3 

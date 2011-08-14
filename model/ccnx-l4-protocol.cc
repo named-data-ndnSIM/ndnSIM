@@ -23,6 +23,8 @@
 
 #include "ns3/uinteger.h"
 
+NS_LOG_COMPONENT_DEFINE ("CcnxL4Protocol");
+
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxL4Protocol);
@@ -36,8 +38,70 @@ CcnxL4Protocol::GetTypeId (void)
   return tid;
 }
 
+CcnxL4Protocol::CcnxL4Protocol ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+}
+
 CcnxL4Protocol::~CcnxL4Protocol ()
 {
+  NS_LOG_FUNCTION_NOARGS ();
+}
+
+void 
+CcnxL4Protocol::SetNode (Ptr<Node> node)
+{
+  m_node = node;
+}
+
+/*
+ * This method is called by AddAgregate and completes the aggregation
+ * by setting the node in the udp stack and link it to the ipv4 object
+ * present in the node along with the socket factory
+ */
+void
+CcnxL4Protocol::NotifyNewAggregate ()
+{
+  if (m_node == 0)
+    {
+      Ptr<Node> node = this->GetObject<Node> ();
+      if (node != 0)
+        {
+          Ptr<Ccnx> ccnx = this->GetObject<Ccnx> ();
+          if (ccnx != 0)
+            {
+              this->SetNode (node);
+              ccnx->Insert (this);
+              // Ptr<UdpSocketFactoryImpl> udpFactory = CreateObject<UdpSocketFactoryImpl> ();
+              // udpFactory->SetUdp (this);
+              // node->AggregateObject (udpFactory);
+              this->SetDownTarget (MakeCallback (&Ccnx::Send, ccnx));
+            }
+        }
+    }
+  Object::NotifyNewAggregate ();
+}
+
+void
+CcnxL4Protocol::DoDispose (void)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  m_node = 0;
+  m_downTarget.Nullify ();
+  CcnxL4Protocol::DoDispose ();
+}
+
+void
+SetDownTarget (DownTargetCallback cb)
+{
+  m_downTarget = cb;
+}
+
+DownTargetCallback
+GetDownTarget (void) const
+{
+  retur m_downTarget;
 }
 
 } //namespace ns3

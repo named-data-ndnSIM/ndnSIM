@@ -24,10 +24,11 @@
 #include <ostream>
 
 #include "ns3/simple-ref-count.h"
+#include "ns3/name-components.h"
 
 namespace ns3 {
   
-class NetDevice;
+class CcnxFace;
 
 /**
  * \ingroup ccnxRouting
@@ -56,20 +57,19 @@ public:
    *
    * \param outputDevice pointer to NetDevice for outgoing packets
    */
-  void SetOutputDevice (Ptr<NetDevice> outputDevice);
+  void SetOutputFace (Ptr<CcnxFace> outputDevice);
   /**
    * \return pointer to NetDevice for outgoing packets
    */
-  Ptr<NetDevice> GetOutputDevice (void) const;
+  Ptr<CcnxFace> GetOutputFace (void) const;
 
 private:
   Name::Components m_prefix;
-  Ptr<NetDevice> m_outputDevice;
+  Ptr<CcnxFace> m_outputFace;
 };
 
 std::ostream& operator<< (std::ostream& os, CcnxRoute const& route);
 
-} //namespace NDNabstraction
 } //namespace ns3
 
 #endif /* CCNX_ROUTE_H */

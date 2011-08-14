@@ -19,7 +19,7 @@
  *
  */
 
-#include "ccnx-interface.h"
+#include "ccnx-face.h"
 
 #include "ns3/ccnx-address.h"
 #include "ns3/ccnx-l3-protocol.h"
@@ -29,27 +29,27 @@
 #include "ns3/node.h"
 #include "ns3/pointer.h"
 
-NS_LOG_COMPONENT_DEFINE ("CcnxInterface");
+NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxInterface);
+NS_OBJECT_ENSURE_REGISTERED (CcnxFace);
 
 TypeId 
-CcnxInterface::GetTypeId (void)
+CcnxFace::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxInterface")
+  static TypeId tid = TypeId ("ns3::CcnxFace")
     .SetParent<Object> ()
   ;
   return tid;
 }
 
 /** 
- * By default, Ccnx interface are created in the "down" state
+ * By default, Ccnx face are created in the "down" state
  *  with no IP addresses.  Before becoming useable, the user must 
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
-CcnxInterface::CcnxInterface () 
+CcnxFace::CcnxFace () 
   : m_ifup (false),
     m_metric (1),
     m_node (0), 
@@ -58,13 +58,13 @@ CcnxInterface::CcnxInterface ()
   NS_LOG_FUNCTION (this);
 }
 
-CcnxInterface::~CcnxInterface ()
+CcnxFace::~CcnxFace ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
 void
-CcnxInterface::DoDispose (void)
+CcnxFace::DoDispose (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_node = 0;
@@ -73,92 +73,92 @@ CcnxInterface::DoDispose (void)
 }
 
 void 
-CcnxInterface::SetNode (Ptr<Node> node)
+CcnxFace::SetNode (Ptr<Node> node)
 {
   m_node = node;
 }
 
 void 
-CcnxInterface::SetDevice (Ptr<NetDevice> device)
+CcnxFace::SetDevice (Ptr<NetDevice> device)
 {
   m_device = device;
 }
 
 Ptr<NetDevice>
-CcnxInterface::GetDevice (void) const
+CcnxFace::GetDevice (void) const
 {
   return m_device;
 }
 
 void
-CcnxInterface::SetMetric (uint16_t metric)
+CcnxFace::SetMetric (uint16_t metric)
 {
   NS_LOG_FUNCTION (metric);
   m_metric = metric;
 }
 
 uint16_t
-CcnxInterface::GetMetric (void) const
+CcnxFace::GetMetric (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_metric;
 }
 
 /**
- * These are interface states and may be distinct from 
+ * These are face states and may be distinct from 
  * NetDevice states, such as found in real implementations
- * (where the device may be down but interface state is still up).
+ * (where the device may be down but face state is still up).
  */
 bool 
-CcnxInterface::IsUp (void) const
+CcnxFace::IsUp (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_ifup;
 }
 
 bool 
-CcnxInterface::IsDown (void) const
+CcnxFace::IsDown (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return !m_ifup;
 }
 
 void 
-CcnxInterface::SetUp (void)
+CcnxFace::SetUp (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_ifup = true;
 }
 
 void 
-CcnxInterface::SetDown (void)
+CcnxFace::SetDown (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_ifup = false;
 }
 
 void
-CcnxInterface::Send (Ptr<Packet> p)
+CcnxFace::Send (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (*p);
+  NS_ASSERT_MSG (packet->GetSize () <= GetDevice ()->GetMtu (), 
+                 "Packet size " << packet->GetSize () << " exceeds device MTU "
+                                << GetDevice ()->GetMtu ()
+                                << " for Ccnx; fragmentation not supported");
+
+  NS_LOG_FUNCTION (*packet);
   if (!IsUp ())
     {
       return;
     }
 
-  // Check if Local Delivery
-  // if (DynamicCast<LoopbackNetDevice> (m_device))
-  //   {
-  //     // XXX additional checks needed here (such as whether multicast
-  //     // goes to loopback)?
-  //     m_device->Send (p, m_device->GetBroadcast (), 
-  //                     CcnxL3Protocol::PROT_NUMBER);
-  //     return;
-  //   }
-
-  NS_LOG_LOGIC ("Doesn't need ARP");
-  m_device->Send (p, m_device->GetBroadcast (), 
+  m_device->Send (packet, m_device->GetBroadcast (), 
                   CcnxL3Protocol::PROT_NUMBER);
+}
+
+std::ostream& operator<< (std::ostream& os, CcnxFace const& face)
+{
+  os << "dev=" << face.GetDevice ()->GetIfIndex ();
+  return os;
 }
 
 }; // namespace ns3

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-// Author: George F. Riley<riley@ece.gatech.edu>
+// Author: 
 //
 
 #ifndef CCNX_L3_PROTOCOL_H
@@ -34,12 +34,10 @@ namespace ns3 {
 class Packet;
 class NetDevice;
 class CcnxInterface;
-// class CcnxAddress;
-// class CcnxHeader;
-// class CcnxRoutingTableEntry;
 class CcnxRoute;
 class Node;
 class Socket;
+class CcnxForwardingProtocol;
 
 
 /**
@@ -73,9 +71,10 @@ public:
    */
   enum DropReason 
   {
-    DROP_TTL_EXPIRED = 1,   /**< Packet TTL has expired */
+    /** \todo  Fill reasons from QualNet code */
+    DROP_DUPLICATE_INTEREST=1,  /**< Duplicate Interest */
+    DROP_CONGESTION, /**< Congestion detected */
     DROP_NO_ROUTE,   /**< No route to host */
-    DROP_BAD_CHECKSUM,   /**< Bad checksum */
     DROP_INTERFACE_DOWN,   /**< Interface is down so can not send packet */
     DROP_ROUTE_ERROR,   /**< Route error */
   };
@@ -83,19 +82,13 @@ public:
   void SetNode (Ptr<Node> node);
 
   // functions defined in base class Ccnx
-
-  // void SetRoutingProtocol (Ptr<CcnxRoutingProtocol> routingProtocol);
-  // Ptr<CcnxRoutingProtocol> GetRoutingProtocol (void) const;
-
-  // Ptr<Socket> CreateRawSocket (void);
-  // void DeleteRawSocket (Ptr<Socket> socket);
+  
+  void SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol);
+  Ptr<CcnxForwardingProtocol> GetForwardingProtocol (void) const;
 
   /**
    * Lower layer calls this method after calling L3Demux::Lookup
-   * The ARP subclass needs to know from which NetDevice this
-   * packet is coming to:
-   *    - implement a per-NetDevice ARP cache
-   *    - send back arp replies on the right device
+   *
    * \param device network device
    * \param p the packet
    * \param protocol lower layer protocol value
@@ -103,11 +96,16 @@ public:
    * \param to lower layer address of the destination
    * \param packetType type of the packet (broadcast/multicast/unicast/otherhost)
    */
-  void Receive ( Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
+  void Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
                  const Address &from,
                  const Address &to,
                  NetDevice::PacketType packetType);
 
+  /**
+   * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
+   */
+  void Receive (Ptr<CcnxFace> face, Ptr<const Packet> p);
+  
   /**
    * \param packet packet to send
    * \param route route entry
@@ -115,63 +113,45 @@ public:
    * Higher-level layers call this method to send a packet
    * down the stack to the MAC and PHY layers.
    */
-  void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route);
+  virtual void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route);
 
-  uint32_t AddInterface (Ptr<NetDevice> device);
-  Ptr<CcnxInterface> GetInterface (uint32_t i) const;
-  uint32_t GetNInterfaces (void) const;
+  virtual uint32_t AddFace (Ptr<CcnxFace> face);
+  virtual uint32_t GetNFaces (void) const;
+  virtual Ptr<CcnxFace> GetFace (uint32_t face);
 
-  int32_t GetInterfaceForDevice (Ptr<const NetDevice> device) const;
-  // bool IsDestinationAddress (CcnxAddress address, uint32_t iif) const;
-
-  void SetMetric (uint32_t i, uint16_t metric);
-  uint16_t GetMetric (uint32_t i) const;
-  uint16_t GetMtu (uint32_t i) const;
-  bool IsUp (uint32_t i) const;
-  void SetUp (uint32_t i);
-  void SetDown (uint32_t i);
-
-  Ptr<NetDevice> GetNetDevice (uint32_t i);
+  virtual void SetMetric (uint32_t i, uint16_t metric);
+  virtual uint16_t GetMetric (uint32_t i) const;
+  virtual uint16_t GetMtu (uint32_t i) const;
+  virtual bool IsUp (uint32_t i) const;
+  virtual void SetUp (uint32_t i);
+  virtual void SetDown (uint32_t i);
 
 protected:
-
   virtual void DoDispose (void);
   /**
    * This function will notify other components connected to the node that a new stack member is now connected
    * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
    */
   virtual void NotifyNewAggregate ();
+
 private:
   // friend class CcnxL3ProtocolTestCase;
   CcnxL3Protocol(const CcnxL3Protocol &);
   CcnxL3Protocol &operator = (const CcnxL3Protocol &);
 
-  void
-  SendRealOut (Ptr<CcnxRoute> route,
-               Ptr<Packet> packet,
-               CcnxHeader const &ipHeader);
-
-  // void 
-  // IpForward (Ptr<CcnxRoute> rtentry, 
-  //            Ptr<const Packet> p, 
-  //            const CcnxHeader &header);
-
-  // void
-  // IpMulticastForward (Ptr<CcnxMulticastRoute> mrtentry, 
-  //                     Ptr<const Packet> p, 
-  //                     const CcnxHeader &header);
-
-  void LocalDeliver (Ptr<const Packet> p, CcnxHeader const&ip, uint32_t iif);
+  /**
+   * Helper function to get CcnxFace from NetDevice
+   */
+  Ptr<CcnxFace> GetFaceForDevice (Ptr<const NetDevice> device) const;
+  
   void RouteInputError (Ptr<const Packet> p, const CcnxHeader & ipHeader, Socket::SocketErrno sockErrno);
 
-  uint32_t AddCcnxInterface (Ptr<CcnxInterface> interface);
+private:
+  typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
+  CcnxFaceList m_faces;
 
-  typedef std::vector<Ptr<CcnxInterface> > CcnxInterfaceList;
-
-  CcnxInterfaceList m_interfaces;
-  uint16_t m_identification;
   Ptr<Node> m_node;
-  CcnxL4Protocol m_layer4;
+  // Ptr<CcnxForwardingProtocol> m_forwardingProtocol;
 
   TracedCallback<const CcnxHeader &, Ptr<const Packet>, uint32_t> m_sendOutgoingTrace;
   TracedCallback<const CcnxHeader &, Ptr<const Packet>, uint32_t> m_unicastForwardTrace;
@@ -182,8 +162,6 @@ private:
   TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, uint32_t> m_rxTrace;
   // <ip-header, payload, reason, ifindex> (ifindex not valid if reason is DROP_NO_ROUTE)
   TracedCallback<const CcnxHeader &, Ptr<const Packet>, DropReason, Ptr<Ccnx>, uint32_t> m_dropTrace;
-
-  // Ptr<CcnxRoutingProtocol> m_routingProtocol;
 };
   
 } // Namespace ns3
