@@ -28,7 +28,6 @@
 using namespace std;
 
 namespace ns3 {
-namespace NDNabstraction {
 namespace Name {
 
 Components::Components ()
@@ -85,7 +84,6 @@ operator << (std::ostream &os, const Components &components)
   return os;
 }
 
-}
 }
 }
 
