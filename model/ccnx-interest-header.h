@@ -132,7 +132,7 @@ public:
    *
    * Creates a null header
    **/
-  InterestHeader ();
+  CcnxInterestHeader ();
 
   /**
    * \brief Set interest name

@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2009 University of Washington
  *
@@ -23,6 +23,7 @@
 #include <map>
 #include <ostream>
 
+#include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/name-components.h"
 
@@ -64,7 +65,7 @@ public:
   Ptr<CcnxFace> GetOutputFace (void) const;
 
 private:
-  Name::Components m_prefix;
+  Ptr<Name::Components> m_prefix;
   Ptr<CcnxFace> m_outputFace;
 };
 

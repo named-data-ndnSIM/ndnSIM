@@ -32,7 +32,7 @@ namespace ns3 {
 class Node;
 class NetDevice;
 class Packet;
-// class CcnxRoutingProtocol;
+class CcnxForwardingProtocol;
 
 /**
  * \ingroup internet
@@ -64,22 +64,22 @@ public:
   virtual ~Ccnx ();
 
   /**
-   * \brief Register a new routing protocol to be used by this Ccnx stack
+   * \brief Register a new forwarding protocol to be used by this Ccnx stack
    *
-   * This call will replace any routing protocol that has been previously 
-   * registered.  If you want to add multiple routing protocols, you must
-   * add them to a CcnxListRoutingProtocol directly.
+   * This call will replace any forwarding protocol that has been previously 
+   * registered.  If you want to add multiple forwarding protocols, you must
+   * add them to a CcnxListForwardingProtocol directly.
    * 
-   * \param routingProtocol smart pointer to CcnxRoutingProtocol object
+   * \param forwardingProtocol smart pointer to CcnxForwardingProtocol object
    */
-  // virtual void SetRoutingProtocol (Ptr<CcnxRoutingProtocol> routingProtocol) = 0;
+  virtual void SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol) = 0;
 
   /**
-   * \brief Get the routing protocol to be used by this Ccnx stack
+   * \brief Get the forwarding protocol to be used by this Ccnx stack
    * 
-   * \returns smart pointer to CcnxRoutingProtocol object, or null pointer if none
+   * \returns smart pointer to CcnxForwardingProtocol object, or null pointer if none
    */
-  // virtual Ptr<CcnxRoutingProtocol> GetRoutingProtocol (void) const = 0;
+  virtual Ptr<CcnxForwardingProtocol> GetForwardingProtocol (void) const = 0;
 
   /**
    * \param device device to add to the list of Ccnx interfaces
@@ -110,7 +110,7 @@ public:
    * \param face The face number of an Ccnx interface.
    * \returns The CcnxFace associated with the Ccnx face number.
    */
-  virtual Ptr<CcnxFace> GetFace (uint32_t face) = 0;
+  virtual Ptr<CcnxFace> GetFace (uint32_t face) const = 0;
 
   // /**
   //  * \param face CcnxFace object pointer 
@@ -120,14 +120,14 @@ public:
 
   /**
    * \param face The face number of an Ccnx face
-   * \param metric routing metric (cost) associated to the underlying 
+   * \param metric forwarding metric (cost) associated to the underlying 
    *          Ccnx interface
    */
   virtual void SetMetric (uint32_t face, uint16_t metric) = 0;
 
   /**
    * \param face The interface number of an Ccnx interface
-   * \returns routing metric (cost) associated to the underlying 
+   * \returns forwarding metric (cost) associated to the underlying 
    *          Ccnx interface
    */
   virtual uint16_t GetMetric (uint32_t face) const = 0;

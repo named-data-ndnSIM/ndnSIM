@@ -1,3 +1,4 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  *  ndnabstraction-helper.h
  *  XcodeProject
@@ -7,3 +8,6 @@
  *
  */
 
+namespace ns3 {
+
+}

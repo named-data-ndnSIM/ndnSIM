@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -100,7 +100,6 @@ private:
   // ? content
 };
 
-} // namespace NDNabstraction
 } // namespace ns3
 
 #endif // _CCNX_CONTENT_OBJECT_HEADER_H_

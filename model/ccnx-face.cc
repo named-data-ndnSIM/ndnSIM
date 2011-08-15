@@ -21,7 +21,6 @@
 
 #include "ccnx-face.h"
 
-#include "ns3/ccnx-address.h"
 #include "ns3/ccnx-l3-protocol.h"
 #include "ns3/net-device.h"
 #include "ns3/log.h"
@@ -50,10 +49,10 @@ CcnxFace::GetTypeId (void)
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
 CcnxFace::CcnxFace () 
-  : m_ifup (false),
-    m_metric (1),
-    m_node (0), 
-    m_device (0),
+  : m_ifup (false)
+  , m_metric (1)
+  , m_node (0)
+  , m_device (0)
 {
   NS_LOG_FUNCTION (this);
 }

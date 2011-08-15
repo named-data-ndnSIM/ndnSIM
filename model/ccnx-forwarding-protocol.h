@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2009 University of Washington
  *
@@ -22,10 +22,9 @@
 #include "ns3/callback.h"
 #include "ns3/object.h"
 #include "ns3/socket.h"
-#include "ccnx-header.h"
-#include "ns3/ccnx-interface-address.h"
-#include "ccnx.h"
 #include "ns3/output-stream-wrapper.h"
+
+#include "ccnx.h"
 
 namespace ns3 {
 
@@ -51,8 +50,8 @@ class CcnxForwardingProtocol : public Object
 public:
   static TypeId GetTypeId (void);
 
-  typedef Callback<void, Ptr<const Packet>, Ptr<CcnxRoute> > SendCallback;
-  typedef Callback<void, Ptr<const Packet>, Socket::SocketErrno > ErrorCallback;
+  typedef Callback<void, Ptr<Packet>, Ptr<CcnxRoute> > SendCallback;
+  typedef Callback<void, Ptr<Packet>/*, Socket::SocketErrno*/ > ErrorCallback;
 
   /**
    * \brief Query forwarding cache for an existing route, for an outbound packet
@@ -88,7 +87,7 @@ public:
    * \returns true if the CcnxForwardingProtocol takes responsibility for 
    *          forwarding or delivering the packet, false otherwise
    */ 
-  virtual bool RouteInput  (Ptr<const Packet> p, Ptr<const CcnxFace> iface, 
+  virtual bool RouteInput  (Ptr<Packet> p, Ptr<CcnxFace> iface, 
                             SendCallback ucb, ErrorCallback ecb) = 0;
 
   /**
@@ -106,6 +105,9 @@ public:
    */
   virtual void NotifyInterfaceDown (uint32_t interface) = 0;
 
+
+  // Should be modified to notify about new prefixes ?
+  
   /**
    * \param interface the index of the interface we are being notified about
    * \param address a new address being added to an interface
@@ -114,7 +116,7 @@ public:
    * a new address is added to an interface. Typically used to add a 'network route' on an
    * interface. Can be invoked on an up or down interface.
    */
-  virtual void NotifyAddAddress (uint32_t interface, CcnxInterfaceAddress address) = 0;
+  // virtual void NotifyAddAddress (uint32_t interface, CcnxInterfaceAddress address) = 0;
 
   /**
    * \param interface the index of the interface we are being notified about
@@ -124,7 +126,7 @@ public:
    * a new address is removed from an interface. Typically used to remove the 'network route' of an
    * interface. Can be invoked on an up or down interface.
    */
-  virtual void NotifyRemoveAddress (uint32_t interface, CcnxInterfaceAddress address) = 0;
+  // virtual void NotifyRemoveAddress (uint32_t interface, CcnxInterfaceAddress address) = 0;
 
   /**
    * \param ccnx the ccnx object this forwarding protocol is being associated with

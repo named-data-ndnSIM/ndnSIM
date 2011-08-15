@@ -1,3 +1,4 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; c-set-offset 'innamespace 0; -*- */
 /*
  *  ndnabstraction-helper.c
  *  XcodeProject

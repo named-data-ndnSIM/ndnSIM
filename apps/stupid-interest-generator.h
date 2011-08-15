@@ -1,3 +1,4 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 //
 //  ndn_stupidinterestgenerator.h
 //  Abstraction
@@ -19,7 +20,6 @@
 namespace ns3 
 {
 
-    
 //namespace NDNabstraction
 //{
     class Socket; //dynamic linking works in a somehow strange way

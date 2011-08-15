@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -20,6 +20,8 @@
  */
 
 #include "ccnx-content-object-header.h"
+
+#include "ns3/log.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxContentObjectHeader");
 

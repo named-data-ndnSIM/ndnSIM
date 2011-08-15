@@ -1,4 +1,4 @@
-// -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*-
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 //
 // Copyright (c) 2006 Georgia Tech Research Corporation
 //
@@ -26,19 +26,18 @@
 #include <stdint.h>
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
-#include "ns3/ccnx.h"
 #include "ns3/traced-callback.h"
+
+#include "ccnx.h"
 
 namespace ns3 {
 
 class Packet;
 class NetDevice;
-class CcnxInterface;
-class CcnxRoute;
 class Node;
-class Socket;
+class CcnxFace;
+class CcnxRoute;
 class CcnxForwardingProtocol;
-
 
 /**
  * \brief Implement the Ccnx layer.
@@ -96,7 +95,7 @@ public:
    * \param to lower layer address of the destination
    * \param packetType type of the packet (broadcast/multicast/unicast/otherhost)
    */
-  void Receive (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
+  void ReceiveFromLower (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
                  const Address &from,
                  const Address &to,
                  NetDevice::PacketType packetType);
@@ -104,7 +103,7 @@ public:
   /**
    * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
    */
-  void Receive (Ptr<CcnxFace> face, Ptr<const Packet> p);
+  void ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Packet> p);
   
   /**
    * \param packet packet to send
@@ -117,7 +116,7 @@ public:
 
   virtual uint32_t AddFace (Ptr<CcnxFace> face);
   virtual uint32_t GetNFaces (void) const;
-  virtual Ptr<CcnxFace> GetFace (uint32_t face);
+  virtual Ptr<CcnxFace> GetFace (uint32_t face) const;
 
   virtual void SetMetric (uint32_t i, uint16_t metric);
   virtual uint16_t GetMetric (uint32_t i) const;
@@ -144,24 +143,25 @@ private:
    */
   Ptr<CcnxFace> GetFaceForDevice (Ptr<const NetDevice> device) const;
   
-  void RouteInputError (Ptr<const Packet> p, const CcnxHeader & ipHeader, Socket::SocketErrno sockErrno);
+  void RouteInputError (Ptr<Packet> p);
+                        //, Socket::SocketErrno sockErrno);
 
 private:
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
   CcnxFaceList m_faces;
 
   Ptr<Node> m_node;
-  // Ptr<CcnxForwardingProtocol> m_forwardingProtocol;
+  Ptr<CcnxForwardingProtocol> m_forwardingProtocol;
 
-  TracedCallback<const CcnxHeader &, Ptr<const Packet>, uint32_t> m_sendOutgoingTrace;
-  TracedCallback<const CcnxHeader &, Ptr<const Packet>, uint32_t> m_unicastForwardTrace;
-  TracedCallback<const CcnxHeader &, Ptr<const Packet>, uint32_t> m_localDeliverTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_localDeliverTrace;
 
   // The following two traces pass a packet with an IP header
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>,  uint32_t> m_txTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, uint32_t> m_rxTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
   // <ip-header, payload, reason, ifindex> (ifindex not valid if reason is DROP_NO_ROUTE)
-  TracedCallback<const CcnxHeader &, Ptr<const Packet>, DropReason, Ptr<Ccnx>, uint32_t> m_dropTrace;
+  TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
 };
   
 } // Namespace ns3

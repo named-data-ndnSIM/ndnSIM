@@ -21,7 +21,6 @@
 
 #include "ccnx-local-face.h"
 
-#include "ns3/ccnx-address.h"
 #include "ns3/ccnx-l3-protocol.h"
 #include "ns3/net-device.h"
 #include "ns3/log.h"
@@ -70,16 +69,14 @@ CcnxLocalFace::DoDispose (void)
 void 
 CcnxLocalFace::SetDevice (Ptr<NetDevice> device)
 {
-  assert (false);
+  NS_ASSERT_MSG (false, "It is impossible to set device to LocalFace");
 }
 
 Ptr<NetDevice>
 CcnxLocalFace::GetDevice (void) const
 {
-  assert (false)
+  return 0;
 }
-
-
 
 void
 CcnxLocalFace::Send (Ptr<Packet> p)
