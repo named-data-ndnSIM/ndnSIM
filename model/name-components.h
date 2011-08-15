@@ -21,10 +21,10 @@
 #ifndef _NDN_NAME_COMPONENTS_H_
 #define _NDN_NAME_COMPONENTS_H_
 
+#include "ns3/simple-ref-count.h"
+
 #include <string>
 #include <list>
-
-#include <ns3/simple-ref-count.h>
 
 namespace ns3 {
 namespace NDNabstraction {

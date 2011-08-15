@@ -7,6 +7,7 @@
 //
 
 #include "stupid-interest-sink.h"
+
 #include "ns3/address.h"
 #include "ns3/address-utils.h"
 #include "ns3/log.h"
