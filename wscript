@@ -1,53 +1,36 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
+import os
+import Logs
+import Utils
+
 def build(bld):
-    module = bld.create_ns3_module('NDNabstraction', ['applications', 'core', 'network', 'internet', 'point-to-point'])
-    module.includes = '.'
-    module.source = [
-        'model/ccn/ccn_charbuf.cc',
-        'model/ccn/ccn_name_util.cc',
-        'model/ccn/ccn_coding.cc',
-        'model/ccn/ccn_indexbuf.cc',
-        'model/ccn/ccn_random.cc',
-        'model/ccn/ccn_buf_decoder.cc',
-        'model/ccn/ccn_buf_encoder.cc',
-        
-        'model/name-components.cc',
-        'model/interest-header.cc',
-        'model/content-object-header.cc',
+    module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point'])
+    module.find_sources_in_dirs (['model', 'model/ccn', 'apps', 'helper'],[],['.cc']);
 
-        'apps/stupid-interest-generator.cc',
-        'apps/stupid-interest-sink.cc',
-        ]
-
-    module_test = bld.create_ns3_module_test_library('NDNabstraction')
-    module_test.source = [
-        'test/ndnabstraction-basictest.cc',
-		]
+    tests = bld.create_ns3_module_test_library('NDNabstraction')
+    tests.find_sources_in_dirs( ['test'], [], ['.cc'] );
 
     headers = bld.new_task_gen('ns3header')
     headers.module = 'NDNabstraction'
-    headers.source = [
-        'model/ccn/ccn.h',
-        'model/ccn/ccn_charbuf.h',
-        'model/ccn/ccn_coding.h',
-        'model/ccn/ccn_name_util.h',
-        'model/ccn/ccn_indexbuf.h',
-        'model/ccn/ccn_random.h',
+    headers.find_sources_in_dirs( ['model', 'model/ccn', 'apps', 'helper'], [], ['.h'] );
 
-        # 'model/ndnabstraction-header.h',
-
-        'model/name-components.h',
-        'model/interest-header.h',
-        'model/content-object-header.h',
-
-        # 'helper/ndnabstraction-helper.h',
-        'helper/ndn_stupidinterestgenerator_helper.h',
-
-        'apps/stupid-interest-generator.h',
-        'apps/stupid-interest-sink.h'
-        ]
-
+    for path in ["examples"]:
+        anode = bld.path.find_dir (path)
+        if not anode or not anode.is_child_of(bld.srcnode):
+            raise Utils.WscriptError("Unable to use '%s' - either because \
+            it's not a relative path"", or it's not child of \
+            '%s'."%(name,bld.srcnode))
+        bld.rescan(anode)
+        for filename in bld.cache_dir_contents[anode.id]:
+            if filename.startswith('.') or not filename.endswith(".cc"):
+                continue
+            name = filename[:-len(".cc")]
+            obj = bld.create_ns3_program(name, ['NDNabstraction'])
+            obj.path = obj.path.find_dir (path)
+            obj.source = filename
+            obj.target = name
+            obj.name = obj.target
 
     if bld.env['ENABLE_OPENSSL']:
         module.uselib = 'OPENSSL'
@@ -56,8 +39,4 @@ def build(bld):
         bld.add_subdirs('examples')
 
     bld.ns3_python_bindings()
-    #bld.env['CXXFLAGS']=[filter(lambda x: x not in bld.env, sublist) for sublist in [['-Wall'], ['-Werror'], ['-Wextra']]]
-    # bld.env['CXXFLAGS']=[]
-    # bld.env['CFLAGS']=[]
     
-

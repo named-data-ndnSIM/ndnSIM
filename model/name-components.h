@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -27,7 +27,6 @@
 #include <list>
 
 namespace ns3 {
-namespace NDNabstraction {
 namespace Name {
 
 class Components : public SimpleRefCount<Components>
@@ -60,7 +59,6 @@ private:
 std::ostream & operator << (std::ostream &os, const Components &components);
 
 } // Namespace Name
-} // namespace NDNabstraction 
 } // namespace ns3
 
 #endif // _NDN_NAME_COMPONENTS_H_

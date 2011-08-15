@@ -19,8 +19,8 @@
  *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _INTEREST_HEADER_H_
-#define _INTEREST_HEADER_H_
+#ifndef _CCNX_INTEREST_HEADER_H_
+#define _CCNX_INTEREST_HEADER_H_
 
 #include "ns3/integer.h"
 #include "ns3/header.h"
@@ -32,8 +32,6 @@
 #include "name-components.h"
 
 namespace ns3
-{
-namespace NDNabstraction
 {
   
 /**
@@ -126,7 +124,7 @@ namespace NDNabstraction
    - InterestLifetime: not used if negative
    - Nonce: 32 bit random integer.  If value is 0, will not be serialized
  */
-class InterestHeader : public Header
+class CcnxInterestHeader : public Header
 {
 public:
   /**
@@ -134,7 +132,7 @@ public:
    *
    * Creates a null header
    **/
-  InterestHeader ();
+  CcnxInterestHeader ();
 
   /**
    * \brief Set interest name
@@ -221,7 +219,6 @@ private:
   uint32_t m_nonce; ///< Nonce. not used if zero
 };
 
-} // namespace NDNabstraction
 } // namespace ns3
 
-#endif // _INTEREST_HEADER_H_
+#endif // _CCNX_INTEREST_HEADER_H_

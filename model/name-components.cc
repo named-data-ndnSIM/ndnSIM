@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -28,7 +28,6 @@
 using namespace std;
 
 namespace ns3 {
-namespace NDNabstraction {
 namespace Name {
 
 Components::Components ()
@@ -85,7 +84,6 @@ operator << (std::ostream &os, const Components &components)
   return os;
 }
 
-}
 }
 }
 

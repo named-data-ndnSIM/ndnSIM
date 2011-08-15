@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -19,8 +19,8 @@
  *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CONTENT_OBJECT_HEADER_H_
-#define _CONTENT_OBJECT_HEADER_H_
+#ifndef _CCNX_CONTENT_OBJECT_HEADER_H_
+#define _CCNX_CONTENT_OBJECT_HEADER_H_
 
 #include "ns3/integer.h"
 #include "ns3/header.h"
@@ -32,8 +32,6 @@
 #include "name-components.h"
 
 namespace ns3
-{
-namespace NDNabstraction
 {
 
 /**
@@ -47,7 +45,7 @@ namespace NDNabstraction
  *  Simplifications:
  */
   
-class ContentObjectHeader : public Header
+class CcnxContentObjectHeader : public Header
 {
 public:
   /**
@@ -55,7 +53,7 @@ public:
    *
    * Creates a null header
    **/
-  ContentObjectHeader ();
+  CcnxContentObjectHeader ();
 
   /**
    * \brief Set interest name
@@ -102,7 +100,6 @@ private:
   // ? content
 };
 
-} // namespace NDNabstraction
 } // namespace ns3
 
-#endif // _CONTENT_OBJECT_HEADER_H_
+#endif // _CCNX_CONTENT_OBJECT_HEADER_H_
