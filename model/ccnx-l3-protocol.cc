@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 //
 // Copyright (c) 2006 Georgia Tech Research Corporation
 //
@@ -30,9 +30,14 @@
 #include "ns3/object-vector.h"
 #include "ns3/boolean.h"
 
+#include "ns3/ccnx-header-helper.h"
+
 #include "ccnx-face.h"
 #include "ccnx-route.h"
-#include "ccnx-forwarding-protocol.h"
+#include "ccnx-forwarding-strategy.h"
+#include "ccnx-interest-header.h"
+#include "ccnx-content-object-header.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("CcnxL3Protocol");
 
@@ -103,17 +108,17 @@ CcnxL3Protocol::NotifyNewAggregate ()
 }
 
 void
-CcnxL3Protocol::SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol)
+CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy)
 {
   NS_LOG_FUNCTION (this);
-  m_forwardingProtocol = forwardingProtocol;
-  m_forwardingProtocol->SetCcnx (this);
+  m_forwardingStrategy = forwardingStrategy;
+  m_forwardingStrategy->SetCcnx (this);
 }
 
-Ptr<CcnxForwardingProtocol>
-CcnxL3Protocol::GetForwardingProtocol (void) const
+Ptr<CcnxForwardingStrategy>
+CcnxL3Protocol::GetForwardingStrategy (void) const
 {
-  return m_forwardingProtocol;
+  return m_forwardingStrategy;
 }
 
 void 
@@ -127,7 +132,7 @@ CcnxL3Protocol::DoDispose (void)
     }
   m_faces.clear ();
   m_node = 0;
-  // m_forwardingProtocol = 0;
+  // m_forwardingStrategy = 0;
   Object::DoDispose ();
 }
 
@@ -196,30 +201,59 @@ CcnxL3Protocol::ReceiveFromLower ( Ptr<NetDevice> device, Ptr<const Packet> p, u
   Ptr<CcnxFace> ccnxFace = GetFaceForDevice (device);
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
-  ReceiveAndProcess (ccnxFace, packet);
+  try
+    {
+      Ptr<Header> header = CcnxHeaderHelper::CreateCorrectCcnxHeader (p);
+      ReceiveAndProcess (ccnxFace, header, packet);  // header should serve as overloaded method selector... not sure whether it works with this "smart" pointers...
+    }
+  catch (CcnxUnknownHeaderException)
+    {
+      NS_ASSERT_MSG (false, "Unknown CCNx header. Should not happen");
+    }
 }
 
-// Callback from higher level
-void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<Packet> packet)
+// Processing Interests
+void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<CcnxInterestHeader> header, Ptr<Packet> packet)
 {
-  if ( incomingFace->IsUp ())
+  if (incomingFace->IsUp ())
     {
       NS_LOG_LOGIC ("Dropping received packet -- interface is down");
       m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
-  
-  m_rxTrace (packet, m_node->GetObject<Ccnx> (), incomingFace);
 
-  NS_ASSERT_MSG (m_forwardingProtocol != 0, "Need a forwarding protocol object to process packets");
-  if (!m_forwardingProtocol->RouteInput (packet, incomingFace,
-                                      MakeCallback (&CcnxL3Protocol::Send, this),
-                                      MakeCallback (&CcnxL3Protocol::RouteInputError, this)
-                                      ))
+  NS_LOG_LOGIC ("Receiving interest from " << incomingFace);
+  // m_rxTrace (packet, m_node->GetObject<Ccnx> (), incomingFace);
+
+  // NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
+  // if (!m_forwardingStrategy->RouteInput (packet, incomingFace,
+  //                                     MakeCallback (&CcnxL3Protocol::Send, this),
+  //                                     MakeCallback (&CcnxL3Protocol::RouteInputError, this)
+  //                                     ))
+  //   {
+  //     NS_LOG_WARN ("No route found for forwarding packet.  Drop.");
+  //     m_dropTrace (packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), incomingFace);
+  //   }
+}
+
+// Processing ContentObjects
+void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<CcnxContentObjectHeader> header, Ptr<Packet> packet)
+{
+  if (incomingFace->IsUp ())
     {
-      NS_LOG_WARN ("No route found for forwarding packet.  Drop.");
-      m_dropTrace (packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), incomingFace);
+      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
+      m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
+      return;
     }
+
+  NS_LOG_LOGIC ("Receiving contentObject from " << incomingFace);
+}
+
+// fake method
+void
+CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p)
+{
+  NS_ASSERT_MSG (false, "This function should never be called");
 }
 
 
@@ -286,9 +320,9 @@ CcnxL3Protocol::SetUp (uint32_t i)
   Ptr<CcnxFace> interface = GetFace (i);
   interface->SetUp ();
 
-  if (m_forwardingProtocol != 0)
+  if (m_forwardingStrategy != 0)
     {
-      m_forwardingProtocol->NotifyInterfaceUp (i);
+      m_forwardingStrategy->NotifyInterfaceUp (i);
     }
 }
 
@@ -299,9 +333,9 @@ CcnxL3Protocol::SetDown (uint32_t ifaceIndex)
   Ptr<CcnxFace> interface = GetFace (ifaceIndex);
   interface->SetDown ();
 
-  if (m_forwardingProtocol != 0)
+  if (m_forwardingStrategy != 0)
     {
-      m_forwardingProtocol->NotifyInterfaceDown (ifaceIndex);
+      m_forwardingStrategy->NotifyInterfaceDown (ifaceIndex);
     }
 }
 

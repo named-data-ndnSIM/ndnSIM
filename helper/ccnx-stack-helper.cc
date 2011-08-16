@@ -66,7 +66,7 @@
 #include "ns3/callback.h"
 #include "ns3/node.h"
 #include "ns3/core-config.h"
-#include "ns3/ccnx-forwarding-protocol.h"
+#include "ns3/ccnx-forwarding-strategy.h"
 
 #include "ccnx-stack-helper.h"
 #include "ccnx-forwarding-helper.h"
@@ -216,8 +216,8 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
       // Set forwarding
       Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-      Ptr<CcnxForwardingProtocol> ccnxForwarding = m_forwarding->Create (node);
-      ccnx->SetForwardingProtocol (ccnxForwarding);
+      Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
+      ccnx->SetForwardingStrategy (ccnxForwarding);
     }
 }
 

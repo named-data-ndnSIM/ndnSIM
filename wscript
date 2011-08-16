@@ -6,14 +6,14 @@ import Utils
 
 def build(bld):
     module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point'])
-    module.find_sources_in_dirs (['model', 'model/ccn', 'apps', 'helper'],[],['.cc']);
+    module.find_sources_in_dirs (['model', 'apps', 'helper'],[],['.cc']);
 
     tests = bld.create_ns3_module_test_library('NDNabstraction')
     tests.find_sources_in_dirs( ['test'], [], ['.cc'] );
 
     headers = bld.new_task_gen('ns3header')
     headers.module = 'NDNabstraction'
-    headers.find_sources_in_dirs( ['model', 'model/ccn', 'apps', 'helper'], [], ['.h'] );
+    headers.find_sources_in_dirs( ['model', 'apps', 'helper'], [], ['.h'] );
 
     for path in ["examples"]:
         anode = bld.path.find_dir (path)

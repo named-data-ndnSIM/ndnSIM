@@ -20,7 +20,7 @@
 #include "ns3/node.h"
 #include "ns3/node-list.h"
 #include "ns3/simulator.h"
-#include "ns3/ccnx-forwarding-protocol.h"
+#include "ns3/ccnx-forwarding-strategy.h"
 #include "ccnx-forwarding-helper.h"
 
 namespace ns3 {
@@ -65,7 +65,7 @@ void
 CcnxForwardingHelper::Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
 {
   Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-  Ptr<CcnxForwardingProtocol> rp = ccnx->GetForwardingProtocol ();
+  Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
   NS_ASSERT (rp);
   rp->PrintForwardingTable (stream);
 }
@@ -74,7 +74,7 @@ void
 CcnxForwardingHelper::PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
 {
   Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-  Ptr<CcnxForwardingProtocol> rp = ccnx->GetForwardingProtocol ();
+  Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
   NS_ASSERT (rp);
   rp->PrintForwardingTable (stream);
   Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);

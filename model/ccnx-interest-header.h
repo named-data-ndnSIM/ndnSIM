@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -24,6 +24,7 @@
 
 #include "ns3/integer.h"
 #include "ns3/header.h"
+#include "ns3/nstime.h"
 
 #include <string>
 #include <vector>
@@ -121,10 +122,10 @@ namespace ns3
    - ChildSelector, AnswerOriginKind: 0 - false, 1 - true, -1 not set
    - Publisher* elements are not supported
    - Exclude: only simple name matching is supported (Bloom support has been deprecated in CCNx)
-   - InterestLifetime: not used if negative
+   - InterestLifetime: ?
    - Nonce: 32 bit random integer.  If value is 0, will not be serialized
  */
-class CcnxInterestHeader : public Header
+  class CcnxInterestHeader : public Header
 {
 public:
   /**
@@ -169,13 +170,13 @@ public:
   GetExclude () const;
 
   void
-  EnableChildSelector ();
+  SetChildSelector (bool value);
 
   bool
   IsEnabledChildSelector () const;
 
   void
-  EnableAnswerOriginKind ();
+  SetAnswerOriginKind (bool value);
 
   bool
   IsEnabledAnswerOriginKind () const;
@@ -187,9 +188,9 @@ public:
   GetScope () const;
 
   void
-  SetInterestLifetime (intmax_t lifetime);
+  SetInterestLifetime (Time time);
 
-  intmax_t
+  Time
   GetInterestLifetime () const;
 
   void
@@ -215,7 +216,7 @@ private:
   bool m_childSelector;    
   bool m_answerOriginKind; 
   int8_t m_scope;            ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
-  intmax_t m_interestLifetime; ///< InterestLifetime in 2^{-12} (0.000244140625 sec). not used if negative
+  Time  m_interestLifetime;
   uint32_t m_nonce; ///< Nonce. not used if zero
 };
 

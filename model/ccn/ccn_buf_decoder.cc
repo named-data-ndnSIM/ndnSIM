@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -18,41 +18,12 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-/*
- *  ccn_buf_decoder.cc
- *  Abstraction
- *
- *  Created by Ilya on 7/29/11.
- *  Copyright 2011 __MyCompanyName__. All rights reserved.
- *
- */
-
 #include <string.h>
 #include <stdlib.h>
 #include "ccn.h"
 #include "ccn_charbuf.h"
 #include "ccn_coding.h"
 #include "ccn_indexbuf.h"
-
-/**
- * @file ccn_buf_decoder.c
- * @brief Support for Interest and ContentObject decoding.
- * 
- * Part of the CCNx C Library.
- *
- * Copyright (C) 2008, 2009, 2010 Palo Alto Research Center, Inc.
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License version 2.1
- * as published by the Free Software Foundation.
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. You should have received
- * a copy of the GNU Lesser General Public License along with this library;
- * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
- * Fifth Floor, Boston, MA 02110-1301 USA.
- */
 
 
 struct ccn_buf_decoder *

@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2007 INRIA
  *
@@ -32,7 +32,7 @@ namespace ns3 {
 class Node;
 class NetDevice;
 class Packet;
-class CcnxForwardingProtocol;
+class CcnxForwardingStrategy;
 
 /**
  * \ingroup internet
@@ -68,18 +68,18 @@ public:
    *
    * This call will replace any forwarding protocol that has been previously 
    * registered.  If you want to add multiple forwarding protocols, you must
-   * add them to a CcnxListForwardingProtocol directly.
+   * add them to a CcnxListForwardingStrategy directly.
    * 
-   * \param forwardingProtocol smart pointer to CcnxForwardingProtocol object
+   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy object
    */
-  virtual void SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol) = 0;
+  virtual void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy) = 0;
 
   /**
    * \brief Get the forwarding protocol to be used by this Ccnx stack
    * 
-   * \returns smart pointer to CcnxForwardingProtocol object, or null pointer if none
+   * \returns smart pointer to CcnxForwardingStrategy object, or null pointer if none
    */
-  virtual Ptr<CcnxForwardingProtocol> GetForwardingProtocol (void) const = 0;
+  virtual Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const = 0;
 
   /**
    * \param device device to add to the list of Ccnx interfaces

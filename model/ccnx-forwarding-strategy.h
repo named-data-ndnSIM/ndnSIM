@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2009 University of Washington
  *
@@ -15,8 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef CCNX_FORWARDING_PROTOCOL_H
-#define CCNX_FORWARDING_PROTOCOL_H
+#ifndef CCNX_FORWARDING_STRATEGY_H
+#define CCNX_FORWARDING_STRATEGY_H
 
 #include "ns3/packet.h"
 #include "ns3/callback.h"
@@ -33,7 +33,7 @@ class CcnxFace;
 
 /**
  * \ingroup internet 
- * \defgroup ccnxForwarding CcnxForwardingProtocol 
+ * \defgroup ccnxForwarding CcnxForwardingStrategy 
  */
 /**
  * \ingroup ccnxForwarding
@@ -45,7 +45,7 @@ class CcnxFace;
  * Also defines the signatures of four callbacks used in RouteInput().
  *
  */
-class CcnxForwardingProtocol : public Object
+class CcnxForwardingStrategy : public Object
 {
 public:
   static TypeId GetTypeId (void);
@@ -75,7 +75,7 @@ public:
    * \brief Route an input packet (to be forwarded or locally delivered)
    *
    * This lookup is used in the forwarding process.  The packet is
-   * handed over to the CcnxForwardingProtocol, and will get forwarded onward
+   * handed over to the CcnxForwardingStrategy, and will get forwarded onward
    * by one of the callbacks.  The Linux equivalent is ip_route_input().
    * There are four valid outcomes, and a matching callbacks to handle each.
    *
@@ -84,7 +84,7 @@ public:
    * \param iface Pointer to ingress face
    * \param ucb Callback for the case in which the packet is to be forwarded
    * \param ecb Callback to call if there is an error in forwarding
-   * \returns true if the CcnxForwardingProtocol takes responsibility for 
+   * \returns true if the CcnxForwardingStrategy takes responsibility for 
    *          forwarding or delivering the packet, false otherwise
    */ 
   virtual bool RouteInput  (Ptr<Packet> p, Ptr<CcnxFace> iface, 
@@ -131,7 +131,7 @@ public:
   /**
    * \param ccnx the ccnx object this forwarding protocol is being associated with
    * 
-   * Typically, invoked directly or indirectly from ns3::Ccnx::SetForwardingProtocol
+   * Typically, invoked directly or indirectly from ns3::Ccnx::SetForwardingStrategy
    */
   virtual void SetCcnx (Ptr<Ccnx> ccnx);
 
@@ -143,4 +143,4 @@ protected:
 
 } //namespace ns3
 
-#endif /* CCNX_FORWARDING_PROTOCOL_H */
+#endif /* CCNX_FORWARDING_STRATEGY_H */

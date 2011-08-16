@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -105,9 +105,9 @@ CcnxInterestHeader::GetExclude () const
 }
 
 void
-CcnxInterestHeader::EnableChildSelector ()
+CcnxInterestHeader::SetChildSelector (bool value)
 {
-  m_childSelector = true;
+  m_childSelector = value;
 }
 
 bool
@@ -117,9 +117,9 @@ CcnxInterestHeader::IsEnabledChildSelector () const
 }
 
 void
-CcnxInterestHeader::EnableAnswerOriginKind ()
+CcnxInterestHeader::SetAnswerOriginKind (bool value)
 {
-  m_answerOriginKind = true;
+  m_answerOriginKind = value;
 }
 
 bool
@@ -141,12 +141,12 @@ CcnxInterestHeader::GetScope () const
 }
 
 void
-CcnxInterestHeader::SetInterestLifetime (intmax_t lifetime)
+CcnxInterestHeader::SetInterestLifetime (Time lifetime)
 {
   m_interestLifetime = lifetime;
 }
 
-intmax_t
+Time
 CcnxInterestHeader::GetInterestLifetime () const
 {
   return m_interestLifetime;

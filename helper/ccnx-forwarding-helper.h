@@ -26,14 +26,14 @@
 
 namespace ns3 {
 
-class CcnxForwardingProtocol;
+class CcnxForwardingStrategy;
 class Node;
 
 /**
- * \brief a factory to create ns3::CcnxForwardingProtocol objects
+ * \brief a factory to create ns3::CcnxForwardingStrategy objects
  *
  * For each new forwarding protocol created as a subclass of 
- * ns3::CcnxForwardingProtocol, you need to create a subclass of 
+ * ns3::CcnxForwardingStrategy, you need to create a subclass of 
  * ns3::CcnxForwardingHelper which can be used by 
  * ns3::InternetStackHelper::SetForwardingHelper and 
  * ns3::InternetStackHelper::Install.
@@ -59,7 +59,7 @@ public:
    * \param node the node within which the new forwarding protocol will run
    * \returns a newly-created forwarding protocol
    */
-  virtual Ptr<CcnxForwardingProtocol> Create (Ptr<Node> node) const = 0;
+  virtual Ptr<CcnxForwardingStrategy> Create (Ptr<Node> node) const = 0;
 
   /**
    * \brief prints the forwarding tables of all nodes at a particular time.
@@ -67,7 +67,7 @@ public:
    * \param stream The output stream object to use 
    *
    * This method calls the PrintForwardingTable() method of the 
-   * CcnxForwardingProtocol stored in the Ccnx object, for all nodes at the
+   * CcnxForwardingStrategy stored in the Ccnx object, for all nodes at the
    * specified time; the output format is forwarding protocol-specific.
    */
   void PrintForwardingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream) const;
@@ -78,7 +78,7 @@ public:
    * \param stream The output stream object to use
    *
    * This method calls the PrintForwardingTable() method of the 
-   * CcnxForwardingProtocol stored in the Ccnx object, for all nodes at the
+   * CcnxForwardingStrategy stored in the Ccnx object, for all nodes at the
    * specified time interval; the output format is forwarding protocol-specific.
    */
   void PrintForwardingTableAllEvery (Time printInterval, Ptr<OutputStreamWrapper> stream) const;
@@ -90,7 +90,7 @@ public:
    * \param stream The output stream object to use
    *
    * This method calls the PrintForwardingTable() method of the 
-   * CcnxForwardingProtocol stored in the Ccnx object, for the selected node 
+   * CcnxForwardingStrategy stored in the Ccnx object, for the selected node 
    * at the specified time; the output format is forwarding protocol-specific.
    */
   void PrintForwardingTableAt (Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
@@ -102,7 +102,7 @@ public:
    * \param stream The output stream object to use
    *
    * This method calls the PrintForwardingTable() method of the 
-   * CcnxForwardingProtocol stored in the Ccnx object, for the selected node 
+   * CcnxForwardingStrategy stored in the Ccnx object, for the selected node 
    * at the specified interval; the output format is forwarding protocol-specific.
    */
   void PrintForwardingTableEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;

@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -40,9 +40,13 @@ namespace ns3
  * Only few important fields are actually implemented in the simulation
  *
  *
- * NDN ContentObjectHeader and routines to serialize/deserialize
+ * ContentObjectHeader serializes/deserializes header up-to and including <Content> tags
+ * Necessary closing tags should be added using ContentObjectTail
  *
- *  Simplifications:
+ * This hacks are necessary to optimize memory use (i.e., virtual payload)
+ *
+ * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
+ * 
  */
   
 class CcnxContentObjectHeader : public Header
@@ -77,12 +81,6 @@ public:
 
   // ?
   // GetSignedInfo () const;
-
-  // void
-  // SetContent ();
-
-  // ?
-  // GetContent ();
   
   //////////////////////////////////////////////////////////////////
   
@@ -97,9 +95,27 @@ private:
   Ptr<Name::Components> m_name;
   // m_signature;
   // m_signedInfo;
-  // ? content
 };
 
+/**
+ * ContentObjectTail should always be 2 bytes, representing two closing tags:
+ * "</Content><ContentObject>"
+ */
+class CcnxContentObjectTail : public Header
+{
+public:
+  CcnxContentObjectTail ();
+  //////////////////////////////////////////////////////////////////
+  
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Print (std::ostream &os) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (Buffer::Iterator start) const;
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+};
+
+  
 } // namespace ns3
 
 #endif // _CCNX_CONTENT_OBJECT_HEADER_H_

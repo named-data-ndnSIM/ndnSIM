@@ -1,11 +1,11 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; c-set-offset 'innamespace 0; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 //
 //  ndn_stupidinterestgenerator_helper.cpp
 //  Abstraction
 //
 //  Created by Ilya Moiseenko on 05.08.11.
 //  Copyright 2011 UCLA. All rights reserved.
-//
+//w
 
 #include "ndn_stupidinterestgenerator_helper.h"
 #include "ns3/inet-socket-address.h"

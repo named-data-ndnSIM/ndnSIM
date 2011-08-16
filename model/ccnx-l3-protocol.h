@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 //
 // Copyright (c) 2006 Georgia Tech Research Corporation
 //
@@ -37,8 +37,11 @@ class NetDevice;
 class Node;
 class CcnxFace;
 class CcnxRoute;
-class CcnxForwardingProtocol;
-
+class CcnxForwardingStrategy;
+class Header;
+class CcnxInterestHeader;
+class CcnxContentObjectHeader;
+  
 /**
  * \brief Implement the Ccnx layer.
  * 
@@ -82,8 +85,8 @@ public:
 
   // functions defined in base class Ccnx
   
-  void SetForwardingProtocol (Ptr<CcnxForwardingProtocol> forwardingProtocol);
-  Ptr<CcnxForwardingProtocol> GetForwardingProtocol (void) const;
+  void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
+  Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const;
 
   /**
    * Lower layer calls this method after calling L3Demux::Lookup
@@ -102,8 +105,20 @@ public:
 
   /**
    * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
+   * 
+   * Processing Interest packets
    */
-  void ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Packet> p);
+  virtual void
+  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<CcnxInterestHeader> header, Ptr<Packet> p);
+
+  
+  /**
+   * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
+   * 
+   * Processing ContentObject packets
+   */
+  virtual void
+  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<CcnxContentObjectHeader> header, Ptr<Packet> p);
   
   /**
    * \param packet packet to send
@@ -146,12 +161,18 @@ private:
   void RouteInputError (Ptr<Packet> p);
                         //, Socket::SocketErrno sockErrno);
 
+  /**
+   * false function. should never be called. Just to trick C++ to compile
+   */
+  virtual void
+  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
+
 private:
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
   CcnxFaceList m_faces;
 
   Ptr<Node> m_node;
-  Ptr<CcnxForwardingProtocol> m_forwardingProtocol;
+  Ptr<CcnxForwardingStrategy> m_forwardingStrategy;
 
   TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
   TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;

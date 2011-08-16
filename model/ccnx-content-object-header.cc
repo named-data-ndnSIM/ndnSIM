@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -29,6 +29,7 @@ namespace ns3
 {
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxContentObjectHeader);
+NS_OBJECT_ENSURE_REGISTERED (CcnxContentObjectTail);
 
 TypeId
 CcnxContentObjectHeader::GetTypeId (void)
@@ -83,8 +84,63 @@ CcnxContentObjectHeader::GetInstanceTypeId (void) const
 void
 CcnxContentObjectHeader::Print (std::ostream &os) const
 {
-  os << "ContentObject: " << *m_name;
+  os << "<ContentObject><Name>" << *m_name << "</Name><Content>";
 }
 
-} // namespace ns3
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CcnxContentObjectTail::CcnxContentObjectTail ()
+{
+}
+
+TypeId
+CcnxContentObjectTail::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::CcnxContentObjectHeader")
+    .SetParent<Header> ()
+    .AddConstructor<CcnxContentObjectHeader> ()
+    ;
+  return tid;
+}
+
+TypeId
+CcnxContentObjectTail::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+void
+CcnxContentObjectTail::Print (std::ostream &os) const
+{
+  os << "</Content></ContentObject>";
+}
+
+uint32_t
+CcnxContentObjectTail::GetSerializedSize (void) const
+{
+  return 2;
+}
+
+void
+CcnxContentObjectTail::Serialize (Buffer::Iterator start) const
+{
+  Buffer::Iterator i = start;
+  i.WriteU8 (0x00); // </Content>
+  i.WriteU8 (0x00); // </ContentObject>
+}
+
+uint32_t
+CcnxContentObjectTail::Deserialize (Buffer::Iterator start)
+{
+  Buffer::Iterator i = start;
+  uint8_t __attribute__ ((unused)) closing_tag_content = i.ReadU8 ();
+  NS_ASSERT_MSG (closing_tag_content==0, "Should be closing tag </Content> (0x00)");
+
+  uint8_t __attribute__ ((unused)) closing_tag_content_object = i.ReadU8 ();
+  NS_ASSERT_MSG (closing_tag_content_object==0, "Should be closing tag </ContentObject> (0x00)");
+
+  return 2;
+}
+  
+} // namespace ns3

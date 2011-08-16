@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -48,6 +48,9 @@ public:
   // Deserialize (Buffer::Iterator start);
 
   void Print (std::ostream &os) const;
+
+  inline size_t
+  size () const;
   
 private:
   std::list<std::string> m_prefix;
@@ -58,6 +61,13 @@ private:
 
 std::ostream & operator << (std::ostream &os, const Components &components);
 
+size_t
+Components::size () const
+{
+  return m_prefix.size ();
+}
+  
+  
 } // Namespace Name
 } // namespace ns3
 

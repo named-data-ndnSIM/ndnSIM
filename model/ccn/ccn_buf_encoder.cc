@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -18,15 +18,6 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-/*
- *  ccn_buf_encoder.cc
- *  Abstraction
- *
- *  Created by Ilya on 7/29/11.
- *  Copyright 2011 __MyCompanyName__. All rights reserved.
- *
- */
-
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -36,34 +27,6 @@
 #include "ccn_charbuf.h"
 #include "ccn_coding.h"
 #include "ccn_indexbuf.h"
-
-/**
- * Append a ccnb start marker
- *
- * This forms the basic building block of ccnb-encoded data.
- * @param c is the buffer to append to.
- * @param val is the numval, intepreted according to tt (see enum ccn_tt).
- * @param tt is the type field.
- * @returns 0 for success or -1 for error.
- */
-int
-ccn_charbuf_append_tt(struct ccn_charbuf *c, size_t val, enum ccn_tt tt)
-{
-  unsigned char buf[1+8*((sizeof(val)+6)/7)];
-  unsigned char *p = &(buf[sizeof(buf)-1]);
-  int n = 1;
-  p[0] = (CCN_TT_HBIT & ~CCN_CLOSE) |
-  ((val & CCN_MAX_TINY) << CCN_TT_BITS) |
-  (CCN_TT_MASK & tt);
-  val >>= (7-CCN_TT_BITS);
-  while (val != 0) {
-    (--p)[0] = (((unsigned char)val) & ~CCN_TT_HBIT) | CCN_CLOSE;
-    n++;
-    val >>= 7;
-  }
-  return(ccn_charbuf_append(c, p, n));
-}
-
 
 /**
  * Encode and sign a ContentObject.
@@ -87,45 +50,7 @@ ccn_encode_ContentObject(struct ccn_charbuf *buf,
                          )
 {
     int res = 0;
-    //struct ccn_sigc *sig_ctx;
-    //struct ccn_signature *signature;
-    //size_t signature_size;
-    struct ccn_charbuf *content_header;
-    size_t closer_start;
     
-    content_header = ccn_charbuf_create();
-    res |= ccn_charbuf_append_tt(content_header, CCN_DTAG_Content, CCN_DTAG);
-    if (size != 0)
-        res |= ccn_charbuf_append_tt(content_header, size, CCN_BLOB);
-    closer_start = content_header->length;
-    res |= ccn_charbuf_append_closer(content_header);
-    if (res < 0)
-        return(-1);
-    //sig_ctx = ccn_sigc_create();
-    //if (sig_ctx == NULL)
-    //    return(-1);
-    //if (0 != ccn_sigc_init(sig_ctx, digest_algorithm))
-    //    return(-1);
-    //if (0 != ccn_sigc_update(sig_ctx, Name->buf, Name->length))
-    //    return(-1);
-    //if (0 != ccn_sigc_update(sig_ctx, SignedInfo->buf, SignedInfo->length))
-    //    return(-1);
-    //if (0 != ccn_sigc_update(sig_ctx, content_header->buf, closer_start))
-    //    return(-1);
-    //if (0 != ccn_sigc_update(sig_ctx, data, size))
-    //    return(-1);
-    //if (0 != ccn_sigc_update(sig_ctx, content_header->buf + closer_start,
-    //                         content_header->length - closer_start))
-    //    return(-1);
-    //signature = calloc(1, ccn_sigc_signature_max_size(sig_ctx, private_key));
-    //if (signature == NULL)
-    //    return(-1);
-    //res = ccn_sigc_final(sig_ctx, signature, &signature_size, private_key);
-    //if (0 != res) {
-    //    free(signature);
-    //    return(-1);
-    //}
-    //ccn_sigc_destroy(&sig_ctx);
     res |= ccn_charbuf_append_tt(buf, CCN_DTAG_ContentObject, CCN_DTAG);
     //res |= ccn_encode_Signature(buf, digest_algorithm,
     //                            NULL, 0, signature, signature_size);

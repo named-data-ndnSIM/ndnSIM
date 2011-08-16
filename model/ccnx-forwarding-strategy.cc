@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2009 University of Washington
  *
@@ -19,22 +19,22 @@
 #include "ns3/assert.h"
 
 #include "ccnx-route.h"
-#include "ccnx-forwarding-protocol.h"
+#include "ccnx-forwarding-strategy.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxForwardingProtocol);
+NS_OBJECT_ENSURE_REGISTERED (CcnxForwardingStrategy);
 
-TypeId CcnxForwardingProtocol::GetTypeId (void)
+TypeId CcnxForwardingStrategy::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxForwardingProtocol")
+  static TypeId tid = TypeId ("ns3::CcnxForwardingStrategy")
     .SetParent<Object> ()
   ;
   return tid;
 }
 
 void
-CcnxForwardingProtocol::SetCcnx (Ptr<Ccnx> ccnx)
+CcnxForwardingStrategy::SetCcnx (Ptr<Ccnx> ccnx)
 {
   m_ccnx = ccnx;
 }
