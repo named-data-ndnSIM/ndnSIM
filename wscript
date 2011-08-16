@@ -3,17 +3,37 @@
 import os
 import Logs
 import Utils
+import Options
+
+def set_options(opt):
+    opt.tool_options('boost')
+
+def configure(conf):
+    conf.check_tool('boost')
+    conf.env['BOOST'] = conf.check_boost(lib = '', # need only base
+                                         min_version='1.40.0' )
+    if not conf.env['BOOST']:
+        conf.report_optional_feature("ndn-abstract", "NDN abstraction", False,
+                                     "Required boost libraries not found")
+        conf.env['ENABLE_NDN_ABSTRACT']=False;
+        return
+    
+    conf.env['ENABLE_NDN_ABSTRACT']=True;
+
 
 def build(bld):
     module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point'])
-    module.find_sources_in_dirs (['model', 'apps', 'helper'],[],['.cc']);
-
     tests = bld.create_ns3_module_test_library('NDNabstraction')
-    tests.find_sources_in_dirs( ['test'], [], ['.cc'] );
-
     headers = bld.new_task_gen('ns3header')
     headers.module = 'NDNabstraction'
+
+    if not bld.env['ENABLE_NDN_ABSTRACT']:
+        return
+   
+    module.find_sources_in_dirs (['model', 'apps', 'helper'],[],['.cc']);
+    tests.find_sources_in_dirs( ['test'], [], ['.cc'] );
     headers.find_sources_in_dirs( ['model', 'apps', 'helper'], [], ['.h'] );
+
 
     for path in ["examples"]:
         anode = bld.path.find_dir (path)

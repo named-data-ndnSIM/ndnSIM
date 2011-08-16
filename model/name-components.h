@@ -37,6 +37,9 @@ public:
   ~Components ();
   
   Components& operator () (const std::string &s);
+
+  const std::list<std::string> &
+  GetComponents () const;
   
   // virtual uint32_t
   // GetSerializedSize (void) const;

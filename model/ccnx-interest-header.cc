@@ -26,6 +26,7 @@
 #include "ccnx-interest-header.h"
 
 #include "ns3/log.h"
+#include "ns3/ccnx-coding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxInterestHeader");
 
@@ -167,19 +168,22 @@ CcnxInterestHeader::GetNonce () const
 uint32_t
 CcnxInterestHeader::GetSerializedSize (void) const
 {
-  return 0;
+  // unfortunately, 2 serialization required...
+  Buffer tmp;
+  
+  return CcnxCodingHelper::Serialize (tmp.Begin(), *this);
 }
     
 void
 CcnxInterestHeader::Serialize (Buffer::Iterator start) const
 {
-  return;
+  CcnxCodingHelper::Serialize (start, *this);
 }
 
 uint32_t
 CcnxInterestHeader::Deserialize (Buffer::Iterator start)
 {
-  return 0;
+  return 0; // the most complicated part is here
 }
 
 TypeId
@@ -191,7 +195,23 @@ CcnxInterestHeader::GetInstanceTypeId (void) const
 void
 CcnxInterestHeader::Print (std::ostream &os) const
 {
-  os << "Interest: " << *m_name;
+  os << "<Interest><Name>" << *m_name << "</Name>";
+  if (m_minSuffixComponents>=0)
+    os << "<MinSuffixComponents>" << m_minSuffixComponents << "</MinSuffixComponents>";
+  if (m_maxSuffixComponents>=0)
+    os << "<MaxSuffixComponents>" << m_maxSuffixComponents << "</MaxSuffixComponents>";
+  if (m_exclude->size()>0)
+    os << "<Exclude>" << *m_exclude << "</Exclude>";
+  if (m_childSelector)
+    os << "<ChildSelector />";
+  if (m_answerOriginKind)
+    os << "<AnswerOriginKind />";
+  if (m_scope>=0)
+    os << "<Scope>" << m_scope << "</Scope>";
+  if (!m_interestLifetime.IsZero())
+    os << "<InterestLifetime>" << m_interestLifetime << "</InterestLifetime>";
+  if (m_nonce>0)
+    os << "<Nonce>" << m_nonce << "</Nonce>";
 }
 
 }

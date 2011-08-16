@@ -207,7 +207,7 @@ private:
   AppendCloser (Buffer::Iterator start);
 
   static size_t
-  AppendName (Buffer::Iterator start, const Name::Components &name);
+  AppendNameComponents (Buffer::Iterator start, const Name::Components &name);
 
   /**
    * Append a binary timestamp as a BLOB using the ccn binary

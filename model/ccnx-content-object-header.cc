@@ -22,6 +22,7 @@
 #include "ccnx-content-object-header.h"
 
 #include "ns3/log.h"
+#include "ns3/ccnx-coding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxContentObjectHeader");
 
@@ -60,19 +61,22 @@ CcnxContentObjectHeader::GetName () const
 uint32_t
 CcnxContentObjectHeader::GetSerializedSize (void) const
 {
-  return 0;
+  // Unfortunately, two serializations are required, unless we can pre-calculate header length... which is not trivial
+  Buffer tmp;
+  
+  return CcnxCodingHelper::Serialize (tmp.Begin(), *this);
 }
     
 void
 CcnxContentObjectHeader::Serialize (Buffer::Iterator start) const
 {
-  return;
+  CcnxCodingHelper::Serialize (start, *this);
 }
 
 uint32_t
 CcnxContentObjectHeader::Deserialize (Buffer::Iterator start)
 {
-  return 0;
+  return 0; // the most complicated part is here
 }
   
 TypeId

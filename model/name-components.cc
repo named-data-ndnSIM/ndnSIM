@@ -20,9 +20,6 @@
 
 #include "name-components.h"
 
-#include "ns3/ccn.h"
-#include "ns3/ccn_charbuf.h"
-
 #include <iostream>
 
 using namespace std;
@@ -49,6 +46,13 @@ Components::~Components ()
   // ccn_charbuf_destroy(&m_value);
 }
 
+const std::list<std::string> &
+Components::GetComponents () const
+{
+  return m_prefix;
+}
+
+  
 // const ccn_charbuf*
 // Components::GetName () const
 // {

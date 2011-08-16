@@ -25,6 +25,7 @@
 #include "ns3/ccnx-content-object-header.h"
 
 #include <sstream>
+#include <boost/foreach.hpp>
 
 namespace ns3 {
 
@@ -75,9 +76,15 @@ CcnxCodingHelper::CcnxCodingHelper::AppendCloser (Buffer::Iterator start)
 }
 
 size_t
-CcnxCodingHelper::AppendName (Buffer::Iterator start, const Name::Components &name)
+CcnxCodingHelper::AppendNameComponents (Buffer::Iterator start, const Name::Components &name)
 {
-  return 0;
+  size_t written = 0;
+  BOOST_FOREACH (const std::string &component, name.GetComponents())
+    {
+      written += AppendTaggedBlob (start, CCN_DTAG_Component,
+                                   reinterpret_cast<const uint8_t*>(component.c_str()), component.size());
+    }
+  return written;
 }
 
 size_t
@@ -130,7 +137,7 @@ CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &i
   written += AppendBlockHeader (start, CCN_DTAG_Interest, CCN_DTAG); // <Interest>
   
   written += AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG); // <Name>
-  written += AppendName (start, interest.GetName());                // <Component>...</Component>...
+  written += AppendNameComponents (start, interest.GetName());                // <Component>...</Component>...
   written += AppendCloser (start);                               // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
@@ -148,7 +155,7 @@ CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &i
   if (interest.GetExclude().size() > 0)
     {
       written += AppendBlockHeader (start, CCN_DTAG_Exclude, CCN_DTAG); // <Exclude>
-      written += AppendName (start, interest.GetExclude());                // <Component>...</Component>...
+      written += AppendNameComponents (start, interest.GetExclude());                // <Component>...</Component>...
       written += AppendCloser (start);                                  // </Exclude>
     }
   if (interest.IsEnabledChildSelector())
@@ -201,7 +208,9 @@ CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHead
   written += AppendTaggedBlob (start, CCN_DTAG_SignatureBits, 0, 0);      // <SignatureBits />
   written += AppendCloser (start);                                    // </Signature>  
 
-  written += AppendName (start, contentObject.GetName()); // <Name><Component>...</Component>...</Name>
+  written += AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);    // <Name>
+  written += AppendNameComponents (start, contentObject.GetName()); //   <Component>...</Component>...
+  written += AppendCloser (start);                                  // </Name>  
 
   // fake signature
   written += AppendBlockHeader (start, CCN_DTAG_SignedInfo, CCN_DTAG); // <SignedInfo>
