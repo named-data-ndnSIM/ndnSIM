@@ -5,7 +5,7 @@ import Logs
 import Utils
 
 def build(bld):
-    module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point'])
+    module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point','topology-read','visualizer'])
     module.find_sources_in_dirs (['model', 'apps', 'helper'],[],['.cc']);
 
     tests = bld.create_ns3_module_test_library('NDNabstraction')
