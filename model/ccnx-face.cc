@@ -151,7 +151,7 @@ CcnxFace::Send (Ptr<Packet> packet)
     }
 
   m_device->Send (packet, m_device->GetBroadcast (), 
-                  CcnxL3Protocol::PROT_NUMBER);
+                  CcnxL3Protocol::ETHERNET_FRAME_TYPE);
 }
 
 std::ostream& operator<< (std::ostream& os, CcnxFace const& face)

@@ -1,8 +1,29 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
+/*
+ * Copyright (c) 2011 University of California, Los Angeles
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ */
 
 #include "ccnx-face-container.h"
-#include "ns3/node-list.h"
-#include "ns3/names.h"
+// #include "ns3/node-list.h"
+// #include "ns3/names.h"
+#include <algorithm>
+
+#include "ns3/ccnx-face.h"
 
 namespace ns3 {
 
@@ -10,13 +31,26 @@ CcnxFaceContainer::CcnxFaceContainer ()
 {
 }
 
-void
-CcnxFaceContainer::Add (CcnxFaceContainer other)
+CcnxFaceContainer::CcnxFaceContainer (const CcnxFaceContainer &other)
 {
-  for (FaceVector::const_iterator i = other.m_faces.begin (); i != other.m_faces.end (); i++)
-    {
-      m_faces.push_back (*i);
-    }
+  AddAll (other);
+}
+
+CcnxFaceContainer&
+CcnxFaceContainer::operator= (const CcnxFaceContainer &other)
+{
+  m_faces.clear ();
+  AddAll (other);
+
+  return *this;
+}
+
+  
+void
+CcnxFaceContainer::AddAll (const CcnxFaceContainer &other)
+{
+  m_faces.insert (m_faces.end (),
+                  other.m_faces.begin (), other.m_faces.end ());
 }
 
 CcnxFaceContainer::Iterator
@@ -37,44 +71,27 @@ CcnxFaceContainer::GetN (void) const
   return m_faces.size ();
 }
 
-// CcnxAddress
-// CcnxFaceContainer::GetAddress (uint32_t i, uint32_t j) const
-// {
-//   Ptr<Ccnx> ccnx = m_faces[i].first;
-//   uint32_t face = m_faces[i].second;
-//   return ccnx->GetAddress (face, j).GetLocal ();
-// }
-
 void 
-CcnxFaceContainer::SetMetric (uint32_t i, uint16_t metric)
+CcnxFaceContainer::SetMetricToAll (uint16_t metric)
 {
-  Ptr<Ccnx> ccnx = m_faces[i].first;
-  uint32_t face = m_faces[i].second;
-  ccnx->SetMetric (face, metric);
+  for (FaceContainer::iterator it=m_faces.begin ();
+       it != m_faces.end ();
+       it++)
+    {
+      (*it)->SetMetric (metric);
+    }
 }
 
 void 
-CcnxFaceContainer::Add (Ptr<Ccnx> ccnx, uint32_t face)
+CcnxFaceContainer::Add (const Ptr<CcnxFace> &face)
 {
-  m_faces.push_back (std::make_pair (ccnx, face));
+  m_faces.push_back (face);
 }
 
-void CcnxFaceContainer::Add (std::pair<Ptr<Ccnx>, uint32_t> a)
+Ptr<CcnxFace>
+CcnxFaceContainer::Get (CcnxFaceContainer::Iterator i) const
 {
-  Add (a.first, a.second);
-}
-
-void 
-CcnxFaceContainer::Add (std::string ccnxName, uint32_t face)
-{
-  Ptr<Ccnx> ccnx = Names::Find<Ccnx> (ccnxName);
-  m_faces.push_back (std::make_pair (ccnx, face));
-}
-
-std::pair<Ptr<Ccnx>, uint32_t>
-CcnxFaceContainer::Get (uint32_t i) const
-{
-  return m_faces[i];
+  return *i;
 }
 
 

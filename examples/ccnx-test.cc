@@ -14,6 +14,8 @@ NS_LOG_COMPONENT_DEFINE ("CcnxTest");
 int 
 main (int argc, char *argv[])
 {
+  LogComponentEnable ("CcnxTest", LOG_ALL);
+  
   Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
   Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
   
@@ -31,24 +33,27 @@ main (int argc, char *argv[])
   // Ipv4ListRoutingHelper list;
   // list.Add (staticRouting, 1);
 
+  NS_LOG_INFO ("Create channels.");
+  PointToPointHelper p2p;
+  p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
+  NetDeviceContainer nd = p2p.Install (n);
+
+  NS_LOG_INFO ("Installing NDN stack");
   CcnxStackHelper ccnx;
-  ccnx.Install (c);
+
+  // ? set up forwarding
+  
+  //  ccnx.Install (c);
   
   //Add static routing
   // InternetStackHelper internet;
   // internet.SetRoutingHelper (list); // has effect on the next Install ()
   // internet.Install (c);
   
-  // We create the channels first without any IP addressing information
-  // NS_LOG_INFO ("Create channels.");
-  // PointToPointHelper p2p;
-  // p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  // p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
-  // NetDeviceContainer nd = p2p.Install (n);
-  
   // Create the OnOff application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s from n0 to n4
-  NS_LOG_INFO ("Create Applications.");
+  // NS_LOG_INFO ("Create Applications.");
   
   // std::string sendsizeattr = "SendSize";
   // //flow2 7-->2
@@ -70,5 +75,5 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
   
-	return 0;
+  return 0;
 }

@@ -115,7 +115,7 @@ Udata::Udata (Buffer::Iterator &start, uint32_t length)
   // this is actually the way Read method is implemented in network/src/buffer.cc
   for (uint32_t i = 0; i < length; i++)
     {
-      m_udata.append (reinterpret_cast<const char*>(start.ReadU8 ()));
+      m_udata.push_back (start.ReadU8 ());
     }
 }
 
@@ -125,7 +125,7 @@ Tag::Tag (Buffer::Iterator &start, uint32_t length)
   m_tag.reserve (length+2); // extra byte for potential \0 at the end
   for (uint32_t i = 0; i < (length+1); i++)
     {
-      m_tag.append (reinterpret_cast<const char*>(start.ReadU8 ()));
+      m_tag.push_back (start.ReadU8 ());
     }
   
   while (!start.IsEnd () && start.PeekU8 ()!=Ccnx::CCN_CLOSE)
@@ -144,7 +144,7 @@ Attr::Attr (Buffer::Iterator &start, uint32_t length)
   m_attr.reserve (length+2); // extra byte for potential \0 at the end
   for (uint32_t i = 0; i < (length+1); i++)
     {
-      m_attr.append (reinterpret_cast<const char*>(start.ReadU8 ()));
+      m_attr.push_back (start.ReadU8 ());
     }
   m_value = DynamicCast<Udata> (Block::ParseBlock (start));
   if (m_value == 0)

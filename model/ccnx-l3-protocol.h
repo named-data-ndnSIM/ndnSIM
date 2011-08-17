@@ -1,22 +1,22 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
-//
-// Copyright (c) 2006 Georgia Tech Research Corporation
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License version 2 as
-// published by the Free Software Foundation;
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// Author: 
-//
+/*
+ * Copyright (c) 2011 University of California, Los Angeles
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ */
 
 #ifndef CCNX_L3_PROTOCOL_H
 #define CCNX_L3_PROTOCOL_H
@@ -43,10 +43,10 @@ class CcnxInterestHeader;
 class CcnxContentObjectHeader;
   
 /**
- * \brief Implement the Ccnx layer.
+ * \ingroup ccnx
+ * \brief Actual implementation of the Ccnx network layer
  * 
- * This is the actual implementation of IP.  It contains APIs to send and
- * receive packets at the IP layer, as well as APIs for IP routing.
+ * \todo This description is incorrect. Should be changed accordingly
  *
  * This class contains two distinct groups of trace sources.  The
  * trace sources 'Rx' and 'Tx' are called, respectively, immediately
@@ -61,9 +61,20 @@ class CcnxContentObjectHeader;
 class CcnxL3Protocol : public Ccnx
 {
 public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
   static TypeId GetTypeId (void);
-  static const uint16_t PROT_NUMBER;
 
+  static const uint16_t ETHERNET_FRAME_TYPE; ///< \brief Ethernet Frame Type of CCNx
+  static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of CCNx
+  static const uint16_t UDP_PORT;            ///< \brief UDP port of CCNx
+
+  /**
+   * \brief Default constructor. Creates an empty stack without forwarding strategy set
+   */
   CcnxL3Protocol();
   virtual ~CcnxL3Protocol ();
 
@@ -78,16 +89,35 @@ public:
     DROP_CONGESTION, /**< Congestion detected */
     DROP_NO_ROUTE,   /**< No route to host */
     DROP_INTERFACE_DOWN,   /**< Interface is down so can not send packet */
-    DROP_ROUTE_ERROR,   /**< Route error */
   };
 
+  /**
+   * \brief Assigns node to the CCNx stack
+   *
+   * \param node Simulation node
+   */
   void SetNode (Ptr<Node> node);
 
+  ////////////////////////////////////////////////////////////////////
   // functions defined in base class Ccnx
   
   void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const;
 
+  virtual void Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face);
+
+  virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
+  virtual uint32_t GetNFaces (void) const;
+  virtual Ptr<CcnxFace> GetFace (uint32_t face) const;
+
+  virtual void SetMetric (uint32_t i, uint16_t metric);
+  virtual uint16_t GetMetric (uint32_t i) const;
+  virtual uint16_t GetMtu (uint32_t i) const;
+  virtual bool IsUp (uint32_t i) const;
+  virtual void SetUp (uint32_t i);
+  virtual void SetDown (uint32_t i);
+
+protected:
   /**
    * Lower layer calls this method after calling L3Demux::Lookup
    *
@@ -119,29 +149,10 @@ public:
    */
   virtual void
   ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<CcnxContentObjectHeader> header, Ptr<Packet> p);
-  
-  /**
-   * \param packet packet to send
-   * \param route route entry
-   *
-   * Higher-level layers call this method to send a packet
-   * down the stack to the MAC and PHY layers.
-   */
-  virtual void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route);
-
-  virtual uint32_t AddFace (Ptr<CcnxFace> face);
-  virtual uint32_t GetNFaces (void) const;
-  virtual Ptr<CcnxFace> GetFace (uint32_t face) const;
-
-  virtual void SetMetric (uint32_t i, uint16_t metric);
-  virtual uint16_t GetMetric (uint32_t i) const;
-  virtual uint16_t GetMtu (uint32_t i) const;
-  virtual bool IsUp (uint32_t i) const;
-  virtual void SetUp (uint32_t i);
-  virtual void SetDown (uint32_t i);
 
 protected:
   virtual void DoDispose (void);
+
   /**
    * This function will notify other components connected to the node that a new stack member is now connected
    * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
@@ -149,20 +160,16 @@ protected:
   virtual void NotifyNewAggregate ();
 
 private:
-  // friend class CcnxL3ProtocolTestCase;
-  CcnxL3Protocol(const CcnxL3Protocol &);
-  CcnxL3Protocol &operator = (const CcnxL3Protocol &);
+  CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
+  CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
   /**
    * Helper function to get CcnxFace from NetDevice
    */
   Ptr<CcnxFace> GetFaceForDevice (Ptr<const NetDevice> device) const;
-  
-  void RouteInputError (Ptr<Packet> p);
-                        //, Socket::SocketErrno sockErrno);
 
   /**
-   * false function. should never be called. Just to trick C++ to compile
+   * \brief Fake function. should never be called. Just to trick C++ to compile
    */
   virtual void
   ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
@@ -174,15 +181,15 @@ private:
   Ptr<Node> m_node;
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy;
 
-  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_localDeliverTrace;
+  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
+  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;
+  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_localDeliverTrace;
 
-  // The following two traces pass a packet with an IP header
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
-  // <ip-header, payload, reason, ifindex> (ifindex not valid if reason is DROP_NO_ROUTE)
-  TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
+  // // The following two traces pass a packet with an IP header
+  // TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
+  // TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
+  // // <ip-header, payload, reason, ifindex> (ifindex not valid if reason is DROP_NO_ROUTE)
+  // TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
 };
   
 } // Namespace ns3

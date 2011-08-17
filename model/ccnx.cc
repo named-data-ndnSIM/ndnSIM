@@ -37,12 +37,4 @@ Ccnx::GetTypeId (void)
   return tid;
 }
 
-Ccnx::Ccnx ()
-{
-}
-
-Ccnx::~Ccnx ()
-{
-}
-
 } // namespace ns3

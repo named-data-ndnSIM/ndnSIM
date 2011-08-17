@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2007 INRIA
+ * Copyright (c) 2011 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: 
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
-#ifndef CCNX_H
-#define CCNX_H
 
-#include <stdint.h>
+#ifndef _CCNX_H_
+#define _CCNX_H_
+
 #include "ns3/object.h"
 #include "ns3/socket.h"
 #include "ns3/callback.h"
 
-#include "ccnx-route.h"
+#include "ccnx-face.h"
 
 namespace ns3 {
 
@@ -35,76 +35,87 @@ class Packet;
 class CcnxForwardingStrategy;
 
 /**
- * \ingroup internet
- * \defgroup ccnx Ccnx
+ * \defgroup ccnx NDN abstraction
+ *
+ * This is an abstract implementation of NDN protocol
  */
 /**
  * \ingroup ccnx
- * \brief Access to the Ccnx forwarding table, interfaces, and configuration
+ * \brief Interface to manage Ccnx stack
  *
  * This class defines the API to manipulate the following aspects of
- * the Ccnx implementation:
- * -# register a NetDevice for use by the Ccnx layer (basically, to
- * create Ccnx-related state such as addressing and neighbor cache that 
- * is associated with a NetDevice)
- * -# manipulate the status of the NetDevice from the Ccnx perspective, 
- * such as marking it as Up or Down, 
- // * -# adding, deleting, and getting addresses associated to the Ccnx 
- // * interfaces.
- * -# exporting Ccnx configuration attributes
+ * the Ccnx stack implementation:
+ * -# register a face (CcnxFace-derived object) for use by the Ccnx
+ *    layer
+ * -# register forwarding strategy (CcnxForwardingStrategy-derived
+ *    object) to use by Ccnx stack
+ * -# export Ccnx configuration attributes
  * 
- * Each NetDevice has conceptually a single Ccnx interface associated
- * with it.
+ * Each CcnxFace-derived object has conceptually a single Ccnx
+ * interface associated with it.
+ *
+ * In addition, this class defines CCNx packet coding constants
+ *
+ * \see CcnxFace, CcnxForwardingStrategy
  */
 class Ccnx : public Object
 {
 public:
-  static TypeId GetTypeId (void);
-  Ccnx ();
-  virtual ~Ccnx ();
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
 
   /**
-   * \brief Register a new forwarding protocol to be used by this Ccnx stack
+   * \brief Register a new forwarding strategy to be used by this Ccnx
+   * stack
    *
-   * This call will replace any forwarding protocol that has been previously 
-   * registered.  If you want to add multiple forwarding protocols, you must
-   * add them to a CcnxListForwardingStrategy directly.
+   * This call will replace any forwarding strategy that has been
+   * previously registered.
    * 
-   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy object
+   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy
+   * object
    */
   virtual void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy) = 0;
 
   /**
-   * \brief Get the forwarding protocol to be used by this Ccnx stack
+   * \brief Get the forwarding strategy being used by this Ccnx stack
    * 
-   * \returns smart pointer to CcnxForwardingStrategy object, or null pointer if none
+   * \returns smart pointer to CcnxForwardingStrategy object, or null
+   * pointer if none
    */
   virtual Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const = 0;
 
   /**
-   * \param device device to add to the list of Ccnx interfaces
-   *        which can be used as output interfaces during packet forwarding.
-   * \returns the index of the Ccnx interface added.
+   * \brief Add face to CCNx stack
    *
-   * Once a device has been added, it can never be removed: if you want
-   * to disable it, you can invoke Ccnx::SetDown which will
-   * make sure that it is never used during packet forwarding.
+   * \param face smart pointer to CcnxFace-derived object
+   * (CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace) \returns the
+   * index of the Ccnx interface added.
+   * 
+   * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace
    */
-  virtual uint32_t AddFace (Ptr<CcnxFace> face) = 0;
+  virtual uint32_t AddFace (const Ptr<CcnxFace> &face) = 0;
 
   /**
-   * \returns the number of interfaces added by the user.
+   * \brief Get current number of faces added to CCNx stack
+   *
+   * \returns the number of faces
    */
   virtual uint32_t GetNFaces (void) const = 0;
 
   /**
-   * \param packet packet to send
-   * \param route route entry
+   * \brief Send a packet to a specified face
    *
-   * Higher-level layers call this method to send a packet
-   * down the stack to the MAC and PHY layers.
+   * \param packet fully prepared CCNx packet to send
+   * \param face face where to send this packet
+   *
+   * Higher-level layers (forwarding strategy in particular) call this
+   * method to send a packet down the stack to the MAC and PHY layers.
    */
-  // virtual void Send (Ptr<Packet> packet, Ptr<CcnxRoute> route) = 0;
+  virtual void Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face) = 0;
 
   /**
    * \param face The face number of an Ccnx interface.
@@ -112,59 +123,9 @@ public:
    */
   virtual Ptr<CcnxFace> GetFace (uint32_t face) const = 0;
 
-  // /**
-  //  * \param face CcnxFace object pointer 
-  //  * \returns The interface number of an Ccnx face or -1 if not found.
-  //  */
-  // virtual int32_t GetFaceForDevice (Ptr<const CcnxFace> face) const = 0;
-
-  /**
-   * \param face The face number of an Ccnx face
-   * \param metric forwarding metric (cost) associated to the underlying 
-   *          Ccnx interface
-   */
-  virtual void SetMetric (uint32_t face, uint16_t metric) = 0;
-
-  /**
-   * \param face The interface number of an Ccnx interface
-   * \returns forwarding metric (cost) associated to the underlying 
-   *          Ccnx interface
-   */
-  virtual uint16_t GetMetric (uint32_t face) const = 0;
-
-  /**
-   * \param face Interface number of Ccnx interface
-   * \returns the Maximum Transmission Unit (in bytes) associated
-   *          to the underlying Ccnx interface
-   */
-  virtual uint16_t GetMtu (uint32_t face) const = 0;
-
-  /**
-   * \param face Interface number of Ccnx interface
-   * \returns true if the underlying interface is in the "up" state,
-   *          false otherwise.
-   */
-  virtual bool IsUp (uint32_t face) const = 0;
-
-  /**
-   * \param face Interface number of Ccnx interface
-   * 
-   * Set the interface into the "up" state. In this state, it is
-   * considered valid during Ccnx forwarding.
-   */
-  virtual void SetUp (uint32_t face) = 0;
-
-  /**
-   * \param face Interface number of Ccnx interface
-   *
-   * Set the interface into the "down" state. In this state, it is
-   * ignored during Ccnx forwarding.
-   */
-  virtual void SetDown (uint32_t face) = 0;
-
 public:
-    /**
-   * Type tag for a ccnb start marker.
+   /**
+   * \brief Type tag for a ccnb start marker.
    *
    * \see http://www.ccnx.org/releases/latest/doc/technical/DTAG.html
    */
@@ -179,16 +140,11 @@ public:
     CCN_NO_TOKEN    /**< should not occur in encoding */
   };
 
-  /** CCN_CLOSE terminates composites */
+  /** \brief CCN_CLOSE terminates composites */
   enum {CCN_CLOSE = 0};
 
-  // enum ccn_ext_subtype {
-  //   /* skip smallest values for now */
-  //   CCN_PROCESSING_INSTRUCTIONS = 16 /* <?name:U value:U?> */
-  // };
-
   /**
-   * DTAG identifies ccnb-encoded elements.
+   * \brief DTAG identifies ccnb-encoded elements.
    *
    * \see http://www.ccnx.org/releases/latest/doc/technical/DTAG.html
    */
@@ -288,30 +244,8 @@ public:
     CCN_DTAG_SequenceNumber = 256,
     CCN_DTAG_CCNProtocolDataUnit = 17702112
   };
-
-  /**
-   * The decoder state is one of these, possibly with some
-   * additional bits set for internal use.  A complete parse
-   * ends up in state 0 or an error state.  Not all possible
-   * error states are listed here.
-   */
-  enum ccn_decoder_state {
-    CCN_DSTATE_INITIAL = 0,
-    CCN_DSTATE_NEWTOKEN,
-    CCN_DSTATE_NUMVAL,
-    CCN_DSTATE_UDATA,
-    CCN_DSTATE_TAGNAME,
-    CCN_DSTATE_ATTRNAME,
-    CCN_DSTATE_BLOB,
-    /* All error states are negative */
-    CCN_DSTATE_ERR_OVERFLOW = -1,
-    CCN_DSTATE_ERR_ATTR     = -2,       
-    CCN_DSTATE_ERR_CODING   = -3,
-    CCN_DSTATE_ERR_NEST     = -4, 
-    CCN_DSTATE_ERR_BUG      = -5
-  };
 };
 
 } // namespace ns3 
 
-#endif /* CCNX_H */
+#endif /* _CCNX_H_ */
