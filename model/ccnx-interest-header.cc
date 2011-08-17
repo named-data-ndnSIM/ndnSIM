@@ -26,7 +26,8 @@
 #include "ccnx-interest-header.h"
 
 #include "ns3/log.h"
-#include "ns3/ccnx-coding-helper.h"
+#include "ns3/ccnx-encoding-helper.h"
+#include "ns3/ccnx-decoding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxInterestHeader");
 
@@ -171,19 +172,19 @@ CcnxInterestHeader::GetSerializedSize (void) const
   // unfortunately, 2 serialization required...
   Buffer tmp;
   
-  return CcnxCodingHelper::Serialize (tmp.Begin(), *this);
+  return CcnxEncodingHelper::Serialize (tmp.Begin(), *this);
 }
     
 void
 CcnxInterestHeader::Serialize (Buffer::Iterator start) const
 {
-  CcnxCodingHelper::Serialize (start, *this);
+  CcnxEncodingHelper::Serialize (start, *this);
 }
 
 uint32_t
 CcnxInterestHeader::Deserialize (Buffer::Iterator start)
 {
-  return 0; // the most complicated part is here
+  return CcnxDecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
 }
 
 TypeId

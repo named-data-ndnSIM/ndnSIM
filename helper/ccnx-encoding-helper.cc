@@ -18,7 +18,7 @@
  * Author: 
  */
 
-#include "ccnx-coding-helper.h"
+#include "ccnx-encoding-helper.h"
 
 #include "ns3/name-components.h"
 #include "ns3/ccnx-interest-header.h"
@@ -35,17 +35,17 @@ namespace ns3 {
 #define CCN_TT_HBIT ((unsigned char)(1 << 7))
 
 size_t
-CcnxCodingHelper::AppendBlockHeader (Buffer::Iterator start, size_t val, enum ccn_tt tt)
+CcnxEncodingHelper::AppendBlockHeader (Buffer::Iterator start, size_t val, Ccnx::ccn_tt tt)
 {
   unsigned char buf[1+8*((sizeof(val)+6)/7)];
   unsigned char *p = &(buf[sizeof(buf)-1]);
   size_t n = 1;
-  p[0] = (CCN_TT_HBIT & ~CCN_CLOSE) |
+  p[0] = (CCN_TT_HBIT & ~Ccnx::CCN_CLOSE) |
   ((val & CCN_MAX_TINY) << CCN_TT_BITS) |
   (CCN_TT_MASK & tt);
   val >>= (7-CCN_TT_BITS);
   while (val != 0) {
-    (--p)[0] = (((unsigned char)val) & ~CCN_TT_HBIT) | CCN_CLOSE;
+    (--p)[0] = (((unsigned char)val) & ~CCN_TT_HBIT) | Ccnx::CCN_CLOSE;
     n++;
     val >>= 7;
   }
@@ -54,13 +54,13 @@ CcnxCodingHelper::AppendBlockHeader (Buffer::Iterator start, size_t val, enum cc
 }
 
 size_t
-CcnxCodingHelper::AppendNumber (Buffer::Iterator start, uint32_t number)
+CcnxEncodingHelper::AppendNumber (Buffer::Iterator start, uint32_t number)
 {
   std::ostringstream os;
   os << number;
 
   size_t written = 0;
-  written += AppendBlockHeader (start, os.str().size(), CCN_UDATA);
+  written += AppendBlockHeader (start, os.str().size(), Ccnx::CCN_UDATA);
   written += os.str().size();
   start.Write (reinterpret_cast<const unsigned char*>(os.str().c_str()), os.str().size());
 
@@ -69,26 +69,26 @@ CcnxCodingHelper::AppendNumber (Buffer::Iterator start, uint32_t number)
 
   
 size_t
-CcnxCodingHelper::CcnxCodingHelper::AppendCloser (Buffer::Iterator start)
+CcnxEncodingHelper::CcnxEncodingHelper::AppendCloser (Buffer::Iterator start)
 {
-  start.WriteU8 (CCN_CLOSE);
+  start.WriteU8 (Ccnx::CCN_CLOSE);
   return 1;
 }
 
 size_t
-CcnxCodingHelper::AppendNameComponents (Buffer::Iterator start, const Name::Components &name)
+CcnxEncodingHelper::AppendNameComponents (Buffer::Iterator start, const Name::Components &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())
     {
-      written += AppendTaggedBlob (start, CCN_DTAG_Component,
+      written += AppendTaggedBlob (start, Ccnx::CCN_DTAG_Component,
                                    reinterpret_cast<const uint8_t*>(component.c_str()), component.size());
     }
   return written;
 }
 
 size_t
-CcnxCodingHelper::AppendTimestampBlob (Buffer::Iterator start, Time time)
+CcnxEncodingHelper::AppendTimestampBlob (Buffer::Iterator start, Time time)
 {
   // the original function implements Markers... thought not sure what are these markers for...
 
@@ -98,7 +98,7 @@ CcnxCodingHelper::AppendTimestampBlob (Buffer::Iterator start, Time time)
   for (;  required_bytes < 7 && ts != 0; ts >>= 8) // not more than 6 bytes?
      required_bytes++;
   
-  size_t len = AppendBlockHeader(start, required_bytes, CCN_BLOB);
+  size_t len = AppendBlockHeader(start, required_bytes, Ccnx::CCN_BLOB);
 
   // write part with seconds
   ts = time.ToInteger (Time::S) >> 4;
@@ -114,13 +114,13 @@ CcnxCodingHelper::AppendTimestampBlob (Buffer::Iterator start, Time time)
 }
 
 size_t
-CcnxCodingHelper::AppendTaggedBlob (Buffer::Iterator start, ccn_dtag dtag,
+CcnxEncodingHelper::AppendTaggedBlob (Buffer::Iterator start, Ccnx::ccn_dtag dtag,
                   const uint8_t *data, size_t size)
 {
-  size_t written = AppendBlockHeader (start, dtag, CCN_DTAG);
+  size_t written = AppendBlockHeader (start, dtag, Ccnx::CCN_DTAG);
   if (size>0)
     {
-      written += AppendBlockHeader (start, size, CCN_BLOB);
+      written += AppendBlockHeader (start, size, Ccnx::CCN_BLOB);
       start.Write (data, size);
       written += size;
     }
@@ -131,61 +131,61 @@ CcnxCodingHelper::AppendTaggedBlob (Buffer::Iterator start, ccn_dtag dtag,
 
 
 size_t
-CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &interest)
+CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &interest)
 {
   size_t written = 0;
-  written += AppendBlockHeader (start, CCN_DTAG_Interest, CCN_DTAG); // <Interest>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Interest, Ccnx::CCN_DTAG); // <Interest>
   
-  written += AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG); // <Name>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Name, Ccnx::CCN_DTAG); // <Name>
   written += AppendNameComponents (start, interest.GetName());                // <Component>...</Component>...
   written += AppendCloser (start);                               // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
     {
-      written += AppendBlockHeader (start, CCN_DTAG_MinSuffixComponents, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_MinSuffixComponents, Ccnx::CCN_DTAG);
       written += AppendNumber (start, interest.GetMinSuffixComponents ());
       written += AppendCloser (start);
     }
   if (interest.GetMaxSuffixComponents() >= 0)
     {
-      written += AppendBlockHeader (start, CCN_DTAG_MaxSuffixComponents, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_MaxSuffixComponents, Ccnx::CCN_DTAG);
       written += AppendNumber (start, interest.GetMaxSuffixComponents ());
       written += AppendCloser (start);
     }
   if (interest.GetExclude().size() > 0)
     {
-      written += AppendBlockHeader (start, CCN_DTAG_Exclude, CCN_DTAG); // <Exclude>
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Exclude, Ccnx::CCN_DTAG); // <Exclude>
       written += AppendNameComponents (start, interest.GetExclude());                // <Component>...</Component>...
       written += AppendCloser (start);                                  // </Exclude>
     }
   if (interest.IsEnabledChildSelector())
     {
-      written += AppendBlockHeader (start, CCN_DTAG_ChildSelector, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_ChildSelector, Ccnx::CCN_DTAG);
       written += AppendNumber (start, 1);
       written += AppendCloser (start);
     }
   if (interest.IsEnabledAnswerOriginKind())
     {
-      written += AppendBlockHeader (start, CCN_DTAG_AnswerOriginKind, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_AnswerOriginKind, Ccnx::CCN_DTAG);
       written += AppendNumber (start, 1);
       written += AppendCloser (start);
     }
   if (interest.GetScope() >= 0)
     {
-      written += AppendBlockHeader (start, CCN_DTAG_Scope, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Scope, Ccnx::CCN_DTAG);
       written += AppendNumber (start, interest.GetScope ());
       written += AppendCloser (start);
     }
   if (!interest.GetInterestLifetime().IsZero())
     {
-      written += AppendBlockHeader (start, CCN_DTAG_InterestLifetime, CCN_DTAG);
+      written += AppendBlockHeader (start, Ccnx::CCN_DTAG_InterestLifetime, Ccnx::CCN_DTAG);
       written += AppendTimestampBlob (start, interest.GetInterestLifetime());
       written += AppendCloser (start);
     }
   if (interest.GetNonce()>0)
     {
       uint32_t nonce = interest.GetNonce();
-      written += AppendTaggedBlob (start, CCN_DTAG_Nonce,
+      written += AppendTaggedBlob (start, Ccnx::CCN_DTAG_Nonce,
                                    reinterpret_cast<const uint8_t*>(&nonce),
                                    sizeof(nonce));
     }
@@ -195,35 +195,35 @@ CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &i
 }
 
 size_t
-CcnxCodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject)
+CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject)
 {
   size_t written = 0;
-  written += AppendBlockHeader (start, CCN_DTAG_ContentObject, CCN_DTAG); // <ContentObject>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_ContentObject, Ccnx::CCN_DTAG); // <ContentObject>
 
   // fake signature
-  written += AppendBlockHeader (start, CCN_DTAG_Signature, CCN_DTAG); // <Signature>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Signature, Ccnx::CCN_DTAG); // <Signature>
   // Signature ::= DigestAlgorithm? 
   //               Witness?         
   //               SignatureBits   
-  written += AppendTaggedBlob (start, CCN_DTAG_SignatureBits, 0, 0);      // <SignatureBits />
+  written += AppendTaggedBlob (start, Ccnx::CCN_DTAG_SignatureBits, 0, 0);      // <SignatureBits />
   written += AppendCloser (start);                                    // </Signature>  
 
-  written += AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);    // <Name>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Name, Ccnx::CCN_DTAG);    // <Name>
   written += AppendNameComponents (start, contentObject.GetName()); //   <Component>...</Component>...
   written += AppendCloser (start);                                  // </Name>  
 
   // fake signature
-  written += AppendBlockHeader (start, CCN_DTAG_SignedInfo, CCN_DTAG); // <SignedInfo>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_SignedInfo, Ccnx::CCN_DTAG); // <SignedInfo>
   // SignedInfo ::= PublisherPublicKeyDigest
   //                Timestamp
   //                Type?
   //                FreshnessSeconds?
   //                FinalBlockID?
   //                KeyLocator?
-  written += AppendTaggedBlob (start, CCN_DTAG_PublisherPublicKeyDigest, 0, 0); // <PublisherPublicKeyDigest />
+  written += AppendTaggedBlob (start, Ccnx::CCN_DTAG_PublisherPublicKeyDigest, 0, 0); // <PublisherPublicKeyDigest />
   written += AppendCloser (start);                                     // </SignedInfo>
 
-  written += AppendBlockHeader (start, CCN_DTAG_Content, CCN_DTAG); // <Content>
+  written += AppendBlockHeader (start, Ccnx::CCN_DTAG_Content, Ccnx::CCN_DTAG); // <Content>
 
   // there is no closing tag !!!
   return written;

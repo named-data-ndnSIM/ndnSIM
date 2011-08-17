@@ -36,7 +36,11 @@ public:
   Components (const std::string &s);
   ~Components ();
   
-  Components& operator () (const std::string &s);
+  inline void
+  Add (const std::string &s);
+       
+  Components&
+  operator () (const std::string &s);
 
   const std::list<std::string> &
   GetComponents () const;
@@ -68,6 +72,12 @@ size_t
 Components::size () const
 {
   return m_prefix.size ();
+}
+  
+void
+Components::Add (const std::string &s)
+{
+  (*this) (s);
 }
   
   

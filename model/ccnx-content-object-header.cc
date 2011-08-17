@@ -22,7 +22,8 @@
 #include "ccnx-content-object-header.h"
 
 #include "ns3/log.h"
-#include "ns3/ccnx-coding-helper.h"
+#include "ns3/ccnx-encoding-helper.h"
+#include "ns3/ccnx-decoding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxContentObjectHeader");
 
@@ -64,19 +65,19 @@ CcnxContentObjectHeader::GetSerializedSize (void) const
   // Unfortunately, two serializations are required, unless we can pre-calculate header length... which is not trivial
   Buffer tmp;
   
-  return CcnxCodingHelper::Serialize (tmp.Begin(), *this);
+  return CcnxEncodingHelper::Serialize (tmp.Begin(), *this);
 }
     
 void
 CcnxContentObjectHeader::Serialize (Buffer::Iterator start) const
 {
-  CcnxCodingHelper::Serialize (start, *this);
+  CcnxEncodingHelper::Serialize (start, *this);
 }
 
 uint32_t
 CcnxContentObjectHeader::Deserialize (Buffer::Iterator start)
 {
-  return 0; // the most complicated part is here
+  return CcnxDecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
 }
   
 TypeId
@@ -101,7 +102,7 @@ CcnxContentObjectTail::CcnxContentObjectTail ()
 TypeId
 CcnxContentObjectTail::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxContentObjectHeader")
+  static TypeId tid = TypeId ("ns3::CcnxContentObjectTail")
     .SetParent<Header> ()
     .AddConstructor<CcnxContentObjectHeader> ()
     ;
@@ -139,10 +140,10 @@ CcnxContentObjectTail::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   uint8_t __attribute__ ((unused)) closing_tag_content = i.ReadU8 ();
-  NS_ASSERT_MSG (closing_tag_content==0, "Should be closing tag </Content> (0x00)");
+  NS_ASSERT_MSG (closing_tag_content==0, "Should be a closing tag </Content> (0x00)");
 
   uint8_t __attribute__ ((unused)) closing_tag_content_object = i.ReadU8 ();
-  NS_ASSERT_MSG (closing_tag_content_object==0, "Should be closing tag </ContentObject> (0x00)");
+  NS_ASSERT_MSG (closing_tag_content_object==0, "Should be a closing tag </ContentObject> (0x00)");
 
   return 2;
 }
