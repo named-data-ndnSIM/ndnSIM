@@ -22,7 +22,8 @@ def configure(conf):
 
 
 def build(bld):
-    module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point'])
+    module = bld.create_ns3_module ('NDNabstraction', ['applications', 'core', 'network', 'point-to-point','topology-read','visualizer'])
+
     tests = bld.create_ns3_module_test_library('NDNabstraction')
     headers = bld.new_task_gen('ns3header')
     headers.module = 'NDNabstraction'
