@@ -97,7 +97,7 @@ CcnxContentObjectTail::CcnxContentObjectTail ()
 TypeId
 CcnxContentObjectTail::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxContentObjectHeader")
+  static TypeId tid = TypeId ("ns3::CcnxContentObjectTail")
     .SetParent<Header> ()
     .AddConstructor<CcnxContentObjectHeader> ()
     ;
