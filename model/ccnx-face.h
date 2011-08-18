@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: 
+ * Authors: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
+
 #ifndef CCNX_FACE_H
 #define CCNX_FACE_H
 
-#include <list>
 #include <ostream>
 
 #include "ns3/ptr.h"
@@ -28,12 +28,15 @@
 
 namespace ns3 {
 
-class NetDevice;
 class Packet;
 class Node;
 
 /**
  * \ingroup ccnx
+ * \defgroup ccnx-face
+ */
+/**
+ * \ingroup ccnx-face
  * \brief Virtual class defining CCNx face
  *
  * This class defines basic functionality of CCNx face. Face is core
@@ -51,7 +54,7 @@ public:
    * \param face Face from which packet has been received
    * \param packet Received packet
    */
-  typedef Callback<void,Ptr<CcnxFace>,Ptr<Packet> > ProtocolHandler;
+  typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<Packet>& > ProtocolHandler;
   
   /**
    * \brief Interface ID
@@ -73,7 +76,7 @@ public:
    *
    * This method should call protocol-dependent registration function
    */
-  void RegisterProtocolHandler (ProtocolHandler handler) = 0;
+  virtual void RegisterProtocolHandler (ProtocolHandler handler) = 0;
   
   /**
    * \brief Send packet on a face
@@ -131,21 +134,59 @@ public:
    */
   virtual bool IsDown () const;
 
+  /**
+   * \brief Set node Id
+   *
+   * Id is purely informative and should not be used for any other purpose
+   *
+   * \param id id to set
+   */
+  inline void
+  SetId (uint32_t id);
+
+  /**
+   * \brief Get node Id
+   *
+   * Id is purely informative and should not be used for any other purpose
+   *
+   * \returns id id to set
+   */
+  inline uint32_t
+  GetId () const;
+
+  bool
+  operator== (const CcnxFace &face) const;
+  
 protected:
   virtual void DoDispose (void);
 
 private:
-  CcnxFace (const CcnxFace &) {} ///< Disabled copy constructor
-  CcnxFace& operator= (const CcnxFace &) {} ///< Disabled copy operator
+  CcnxFace (const CcnxFace &); ///< \brief Disabled copy constructor
+  CcnxFace& operator= (const CcnxFace &); ///< \brief Disabled copy operator
   
 protected:
-  bool m_ifup;
-  uint32_t m_id; ///< id of the interface in the CCNx stack (per-node uniqueness)
-  uint16_t m_metric;
-  Ptr<Node> m_node;
+  uint16_t m_metric; ///< \brief Routing/forwarding metric
+  Ptr<Node> m_node; ///< \brief Smart pointer to Node
+  ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
+
+private:
+  bool m_ifup; ///< \brief flag indicating that the interface is UP 
+  uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
 };
 
-std::ostream& operator<< (std::ostream& os, CcnxFace const& face);
+std::ostream& operator<< (std::ostream& os, const CcnxFace &face);
+
+void
+CcnxFace::SetId (uint32_t id)
+{
+  m_id = id;
+}
+
+uint32_t
+CcnxFace::GetId () const
+{
+  return m_id;
+}
 
 } // namespace ns3
 

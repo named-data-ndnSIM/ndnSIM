@@ -21,8 +21,6 @@
 
 #include "ccnx-local-face.h"
 
-#include "ns3/ccnx-l3-protocol.h"
-#include "ns3/net-device.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
@@ -39,16 +37,11 @@ TypeId
 CcnxLocalFace::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
-    .SetParent<Object> ()
+    .SetParent<CcnxFace> ()
   ;
   return tid;
 }
 
-/** 
- * By default, Ccnx interface are created in the "down" state
- *  with no IP addresses.  Before becoming useable, the user must 
- * invoke SetUp on them once an Ccnx address and mask have been set.
- */
 CcnxLocalFace::CcnxLocalFace () 
 {
   NS_LOG_FUNCTION (this);
@@ -66,16 +59,10 @@ CcnxLocalFace::DoDispose (void)
   CcnxFace::DoDispose ();
 }
 
-void 
-CcnxLocalFace::SetDevice (Ptr<NetDevice> device)
+void
+CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  NS_ASSERT_MSG (false, "It is impossible to set device to LocalFace");
-}
-
-Ptr<NetDevice>
-CcnxLocalFace::GetDevice (void) const
-{
-  return 0;
+  m_protocolHandler = handler;
 }
 
 void
@@ -91,7 +78,7 @@ CcnxLocalFace::Send (Ptr<Packet> p)
   //                 CcnxL3Protocol::PROT_NUMBER);
 }
 
-std::ostream& operator<< (std::ostream& os, CcnxLocalFace const& localFace)
+std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace)
 {
   os << "dev=local";
   return os;

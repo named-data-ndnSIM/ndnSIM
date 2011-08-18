@@ -38,6 +38,7 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
+#include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxL3Protocol");
 
@@ -140,12 +141,12 @@ CcnxL3Protocol::DoDispose (void)
 uint32_t 
 CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 {
-  NS_LOG_FUNCTION (this << *face);
+  NS_LOG_FUNCTION (this << &face);
 
   face->SetNode (m_node);
   face->SetId (m_faceCounter); // sets a unique ID of the face. This ID serves only informational purposes
 
-  face->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this));
+  face->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::Receive, this));
   // if (face->GetDevice() != 0)
   //   {
   //     m_node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this), 
@@ -157,13 +158,13 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
   return m_faceCounter;
 }
 
-
 Ptr<CcnxFace>
 CcnxL3Protocol::GetFace (uint32_t index) const
 {
-  if (index < m_faces.size ())
+  BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces) // this function is not supposed to be called often, so linear search is fine
     {
-      return m_faces[index];
+      if (face->GetId () == index)
+        return face;
     }
   return 0;
 }
@@ -174,39 +175,17 @@ CcnxL3Protocol::GetNFaces (void) const
   return m_faces.size ();
 }
 
-Ptr<CcnxFace>
-CcnxL3Protocol::GetFaceForDevice (Ptr<const NetDevice> device) const
-{
-  for (CcnxFaceList::const_iterator i = m_faces.begin (); 
-       i != m_faces.end (); 
-       i++)
-    {
-      if ((*i)->GetDevice () == device)
-        {
-          return *i;
-        }
-    }
-
-  NS_ASSERT_MSG (false, "Should never get to this place" );
-  return 0;
-}
-
 // Callback from lower layer
 void 
-CcnxL3Protocol::ReceiveFromLower ( Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol, const Address &from,
-                          const Address &to, NetDevice::PacketType packetType)
+CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<Packet> &p)
 {
-  NS_LOG_FUNCTION (this << &device << p << protocol <<  from);
-
-  NS_LOG_LOGIC ("Packet from " << from << " received on node " <<  m_node->GetId ());
-
-  Ptr<CcnxFace> ccnxFace = GetFaceForDevice (device);
+  NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
   try
     {
       Ptr<Header> header = CcnxHeaderHelper::CreateCorrectCcnxHeader (p);
-      ReceiveAndProcess (ccnxFace, header, packet);  // header should serve as overloaded method selector... not sure whether it works with this "smart" pointers...
+      ReceiveAndProcess (face, header, packet);  // header should serve as overloaded method selector... not sure whether it works with this "smart" pointers...
     }
   catch (CcnxUnknownHeaderException)
     {
@@ -215,7 +194,9 @@ CcnxL3Protocol::ReceiveFromLower ( Ptr<NetDevice> device, Ptr<const Packet> p, u
 }
 
 // Processing Interests
-void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<CcnxInterestHeader> header, Ptr<Packet> packet)
+void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
+                                        const Ptr<CcnxInterestHeader> &header,
+                                        const Ptr<Packet> &packet)
 {
   if (incomingFace->IsUp ())
     {
@@ -239,7 +220,9 @@ void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<CcnxInte
 }
 
 // Processing ContentObjects
-void CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> incomingFace, Ptr<CcnxContentObjectHeader> header, Ptr<Packet> packet)
+void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
+                                        const Ptr<CcnxContentObjectHeader> &header,
+                                        const Ptr<Packet> &packet)
 {
   if (incomingFace->IsUp ())
     {
@@ -260,7 +243,7 @@ CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<P
 
 
 void
-CcnxL3Protocol::Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face)
+CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
 {
   // NS_LOG_FUNCTION (this << "packet: " << packet << ", route: "<< route);
   
@@ -285,60 +268,5 @@ CcnxL3Protocol::Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face)
   //   }
 }
 
-
-void 
-CcnxL3Protocol::SetMetric (uint32_t i, uint16_t metric)
-{
-  NS_LOG_FUNCTION (this << i << metric);
-  Ptr<CcnxFace> face = GetFace (i);
-  face->SetMetric (metric);
-}
-
-uint16_t
-CcnxL3Protocol::GetMetric (uint32_t i) const
-{
-  Ptr<const CcnxFace> face = GetFace (i);
-  return face->GetMetric ();
-}
-
-uint16_t 
-CcnxL3Protocol::GetMtu (uint32_t i) const
-{
-  Ptr<CcnxFace> face = GetFace (i);
-  return face->GetDevice ()->GetMtu ();
-}
-
-bool 
-CcnxL3Protocol::IsUp (uint32_t i) const
-{
-  Ptr<CcnxFace> interface = GetFace (i);
-  return interface->IsUp ();
-}
-
-void 
-CcnxL3Protocol::SetUp (uint32_t i)
-{
-  NS_LOG_FUNCTION (this << i);
-  Ptr<CcnxFace> interface = GetFace (i);
-  interface->SetUp ();
-
-  if (m_forwardingStrategy != 0)
-    {
-      m_forwardingStrategy->NotifyInterfaceUp (i);
-    }
-}
-
-void 
-CcnxL3Protocol::SetDown (uint32_t ifaceIndex)
-{
-  NS_LOG_FUNCTION (this << ifaceIndex);
-  Ptr<CcnxFace> interface = GetFace (ifaceIndex);
-  interface->SetDown ();
-
-  if (m_forwardingStrategy != 0)
-    {
-      m_forwardingStrategy->NotifyInterfaceDown (ifaceIndex);
-    }
-}
 
 } //namespace ns3

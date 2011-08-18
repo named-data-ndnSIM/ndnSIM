@@ -15,18 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: 
+ * Authors: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
-#ifndef CCNX_LOCAL_FACE_H
-#define CCNX_LOCAL_FACE_H
+
+#ifndef CCNX_NET_DEVICE_FACE_H
+#define CCNX_NET_DEVICE_FACE_H
 
 #include "ccnx-face.h"
+#include "ns3/net-device.h"
 
 namespace ns3 {
 
+class Address;
+  
 /**
  * \ingroup ccnx-face
- * \brief Implementation of application CCNx face
+ * \brief Implementation of layer-2 (Ethernet) CCNx face
  *
  * This class defines basic functionality of CCNx face. Face is core
  * component responsible for actual delivery of data packet to and
@@ -34,7 +38,7 @@ namespace ns3 {
  *
  * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
-class CcnxLocalFace  : public CcnxFace
+class CcnxNetDeviceFace  : public CcnxFace
 {
 public:
   /**
@@ -47,9 +51,9 @@ public:
   /**
    * \brief Default constructor
    */
-  CcnxLocalFace ();
-  virtual ~CcnxLocalFace();
-  
+  CcnxNetDeviceFace ();
+  virtual ~CcnxNetDeviceFace();
+
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
   
@@ -59,18 +63,41 @@ public:
 
   ////////////////////////////////////////////////////////////////////
 
-  /// \todo Need methods to implement application hooks
+  /**
+   * \brief Associate NetDevice object with face
+   *
+   * \param node smart pointer to a NetDevice object
+   */
+  void SetNetDevice (Ptr<NetDevice> node);
+
+  /**
+   * \brief Get NetDevice associated with the face
+   *
+   * \returns smart pointer to NetDevice associated with the face
+   */
+  Ptr<NetDevice> GetNetDevice () const;
   
 protected:
-  virtual void DoDispose (void);
+  virtual void DoDispose ();
 
 private:
-  CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor
-  CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
+  CcnxNetDeviceFace (const CcnxNetDeviceFace &); ///< \brief Disabled copy constructor
+  CcnxNetDeviceFace& operator= (const CcnxNetDeviceFace &); ///< \brief Disabled copy operator
+
+  // callback
+  void ReceiveFromNetDevice (Ptr<NetDevice> device,
+                             Ptr<const Packet> p,
+                             uint16_t protocol,
+                             const Address &from,
+                             const Address &to,
+                             NetDevice::PacketType packetType);
+
+private:
+  Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
 };
 
-std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);
+std::ostream& operator<< (std::ostream& os, const CcnxNetDeviceFace &face);
 
 } // namespace ns3
 
-#endif
+#endif //CCNX_NET_DEVICE_FACE_H

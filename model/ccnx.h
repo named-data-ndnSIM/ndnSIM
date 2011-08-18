@@ -69,44 +69,6 @@ public:
   static TypeId GetTypeId ();
 
   /**
-   * \brief Register a new forwarding strategy to be used by this Ccnx
-   * stack
-   *
-   * This call will replace any forwarding strategy that has been
-   * previously registered.
-   * 
-   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy
-   * object
-   */
-  virtual void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy) = 0;
-
-  /**
-   * \brief Get the forwarding strategy being used by this Ccnx stack
-   * 
-   * \returns smart pointer to CcnxForwardingStrategy object, or null
-   * pointer if none
-   */
-  virtual Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const = 0;
-
-  /**
-   * \brief Add face to CCNx stack
-   *
-   * \param face smart pointer to CcnxFace-derived object
-   * (CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace) \returns the
-   * index of the Ccnx interface added.
-   * 
-   * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace
-   */
-  virtual uint32_t AddFace (const Ptr<CcnxFace> &face) = 0;
-
-  /**
-   * \brief Get current number of faces added to CCNx stack
-   *
-   * \returns the number of faces
-   */
-  virtual uint32_t GetNFaces (void) const = 0;
-
-  /**
    * \brief Send a packet to a specified face
    *
    * \param face face where to send this packet
@@ -115,7 +77,8 @@ public:
    * Higher-level layers (forwarding strategy in particular) call this
    * method to send a packet down the stack to the MAC and PHY layers.
    */
-  virtual void Send (const Ptr<CcnxFace> &face, Ptr<Packet> packet) = 0;
+  virtual void
+  Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet) = 0;
 
   /**
    * \brief Lower layers calls this method after demultiplexing
@@ -126,13 +89,57 @@ public:
    * \param face face from which packet came from
    * \param p the packet
    */
-  void ReceiveFromLower (const Ptr<Face> &device, Ptr<const Packet> p);
+  virtual void
+  Receive (const Ptr<CcnxFace> &device, const Ptr<Packet> &p) = 0;
+
+  /**
+   * \brief Register a new forwarding strategy to be used by this Ccnx
+   * stack
+   *
+   * This call will replace any forwarding strategy that has been
+   * previously registered.
+   * 
+   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy
+   * object
+   */
+  virtual void
+  SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy) = 0;
+
+  /**
+   * \brief Get the forwarding strategy being used by this Ccnx stack
+   * 
+   * \returns smart pointer to CcnxForwardingStrategy object, or null
+   * pointer if none
+   */
+  virtual Ptr<CcnxForwardingStrategy>
+  GetForwardingStrategy (void) const = 0;
+
+  /**
+   * \brief Add face to CCNx stack
+   *
+   * \param face smart pointer to CcnxFace-derived object
+   * (CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace) \returns the
+   * index of the Ccnx interface added.
+   * 
+   * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxUdpFace
+   */
+  virtual uint32_t
+  AddFace (const Ptr<CcnxFace> &face) = 0;
+
+  /**
+   * \brief Get current number of faces added to CCNx stack
+   *
+   * \returns the number of faces
+   */
+  virtual uint32_t
+  GetNFaces (void) const = 0;
 
   /**
    * \param face The face number of an Ccnx interface.
    * \returns The CcnxFace associated with the Ccnx face number.
    */
-  virtual Ptr<CcnxFace> GetFace (uint32_t face) const = 0;
+  virtual Ptr<CcnxFace>
+  GetFace (uint32_t face) const = 0;
 
 public:
    /**

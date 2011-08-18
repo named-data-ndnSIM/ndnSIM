@@ -15,18 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author:
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  *
  */
 
 #include "ccnx-face.h"
 
-#include "ns3/ccnx-l3-protocol.h"
-#include "ns3/net-device.h"
 #include "ns3/log.h"
-#include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/pointer.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
@@ -49,10 +45,10 @@ CcnxFace::GetTypeId (void)
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
 CcnxFace::CcnxFace () 
-  : m_ifup (false)
-  , m_metric (1)
+  : m_metric (1)
   , m_node (0)
-  , m_device (0)
+  , m_ifup (false)
+  , m_id ((uint32_t)-1)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -62,12 +58,21 @@ CcnxFace::~CcnxFace ()
   NS_LOG_FUNCTION_NOARGS ();
 }
 
+CcnxFace::CcnxFace (const CcnxFace &)
+{
+}
+
+CcnxFace& CcnxFace::operator= (const CcnxFace &)
+{
+  return *this;
+}
+
+  
 void
 CcnxFace::DoDispose (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_node = 0;
-  m_device = 0;
   Object::DoDispose ();
 }
 
@@ -75,18 +80,6 @@ void
 CcnxFace::SetNode (Ptr<Node> node)
 {
   m_node = node;
-}
-
-void 
-CcnxFace::SetDevice (Ptr<NetDevice> device)
-{
-  m_device = device;
-}
-
-Ptr<NetDevice>
-CcnxFace::GetDevice (void) const
-{
-  return m_device;
 }
 
 void
@@ -136,27 +129,16 @@ CcnxFace::SetDown (void)
   m_ifup = false;
 }
 
-void
-CcnxFace::Send (Ptr<Packet> packet)
+bool
+CcnxFace::operator== (const CcnxFace &face) const
 {
-  NS_ASSERT_MSG (packet->GetSize () <= GetDevice ()->GetMtu (), 
-                 "Packet size " << packet->GetSize () << " exceeds device MTU "
-                                << GetDevice ()->GetMtu ()
-                                << " for Ccnx; fragmentation not supported");
-
-  NS_LOG_FUNCTION (*packet);
-  if (!IsUp ())
-    {
-      return;
-    }
-
-  m_device->Send (packet, m_device->GetBroadcast (), 
-                  CcnxL3Protocol::ETHERNET_FRAME_TYPE);
+  return (m_node->GetId () == face.m_node->GetId ()) &&
+    (m_id == face.m_id);
 }
 
-std::ostream& operator<< (std::ostream& os, CcnxFace const& face)
+std::ostream& operator<< (std::ostream& os, const CcnxFace &face)
 {
-  os << "dev=" << face.GetDevice ()->GetIfIndex ();
+  os << "id=" << face.GetId ();
   return os;
 }
 

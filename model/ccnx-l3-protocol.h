@@ -66,7 +66,7 @@ public:
    *
    * \return interface ID
    */
-  static TypeId GetTypeId (void);
+  static TypeId GetTypeId ();
 
   static const uint16_t ETHERNET_FRAME_TYPE; ///< \brief Ethernet Frame Type of CCNx
   static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of CCNx
@@ -102,21 +102,14 @@ public:
   // functions defined in base class Ccnx
   
   void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
-  Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const;
+  Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
 
-  virtual void Send (const Ptr<CcnxFace> &face, Ptr<Packet> packet);
-  virtual void ReceiveFromLower (const Ptr<Face> &device, Ptr<const Packet> p);
+  virtual void Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet);
+  virtual void Receive (const Ptr<CcnxFace> &device, const Ptr<Packet> &p);
 
   virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
-  virtual uint32_t GetNFaces (void) const;
+  virtual uint32_t GetNFaces () const;
   virtual Ptr<CcnxFace> GetFace (uint32_t face) const;
-
-  virtual void SetMetric (uint32_t i, uint16_t metric);
-  virtual uint16_t GetMetric (uint32_t i) const;
-  virtual uint16_t GetMtu (uint32_t i) const;
-  virtual bool IsUp (uint32_t i) const;
-  virtual void SetUp (uint32_t i);
-  virtual void SetDown (uint32_t i);
 
 protected:
   /**
@@ -125,7 +118,9 @@ protected:
    * Processing Interest packets
    */
   virtual void
-  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<CcnxInterestHeader> header, Ptr<Packet> p);
+  ReceiveAndProcess (const Ptr<CcnxFace> &face,
+                     const Ptr<CcnxInterestHeader> &header,
+                     const Ptr<Packet> &p);
 
   
   /**
@@ -134,7 +129,9 @@ protected:
    * Processing ContentObject packets
    */
   virtual void
-  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<CcnxContentObjectHeader> header, Ptr<Packet> p);
+  ReceiveAndProcess (const Ptr<CcnxFace> &face,
+                     const Ptr<CcnxContentObjectHeader> &header,
+                     const Ptr<Packet> &p);
 
 protected:
   virtual void DoDispose (void);
@@ -148,11 +145,6 @@ protected:
 private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
-
-  /**
-   * Helper function to get CcnxFace from NetDevice
-   */
-  Ptr<CcnxFace> GetFaceForDevice (Ptr<const NetDevice> device) const;
 
   /**
    * \brief Fake function. should never be called. Just to trick C++ to compile
