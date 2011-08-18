@@ -109,13 +109,24 @@ public:
   /**
    * \brief Send a packet to a specified face
    *
-   * \param packet fully prepared CCNx packet to send
    * \param face face where to send this packet
+   * \param packet fully prepared CCNx packet to send
    *
    * Higher-level layers (forwarding strategy in particular) call this
    * method to send a packet down the stack to the MAC and PHY layers.
    */
-  virtual void Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face) = 0;
+  virtual void Send (const Ptr<CcnxFace> &face, Ptr<Packet> packet) = 0;
+
+  /**
+   * \brief Lower layers calls this method after demultiplexing
+   *
+   * Lower-layer-dependent implementation of CcnxFace will do actual work
+   * to set up demultiplexing and call this function as a callback
+   *
+   * \param face face from which packet came from
+   * \param p the packet
+   */
+  void ReceiveFromLower (const Ptr<Face> &device, Ptr<const Packet> p);
 
   /**
    * \param face The face number of an Ccnx interface.

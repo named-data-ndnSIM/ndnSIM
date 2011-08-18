@@ -1,22 +1,22 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
-//
-// Copyright (c) 2006 Georgia Tech Research Corporation
-//
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License version 2 as
-// published by the Free Software Foundation;
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// Author: 
-//
+/*
+ * Copyright (c) 2011 University of California, Los Angeles
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ */
 
 #include "ccnx-l3-protocol.h"
 
@@ -72,6 +72,7 @@ CcnxL3Protocol::GetTypeId (void)
 }
 
 CcnxL3Protocol::CcnxL3Protocol()
+: m_faceCounter (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -141,18 +142,19 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 {
   NS_LOG_FUNCTION (this << *face);
 
-  // Ptr<Node> node = GetObject<Node> (); ///< \todo not sure why this thing should be called...
   face->SetNode (m_node);
+  face->SetId (m_faceCounter); // sets a unique ID of the face. This ID serves only informational purposes
 
-  if (face->GetDevice() != 0)
-    {
-      m_node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this), 
-                                       CcnxL3Protocol::ETHERNET_FRAME_TYPE, face->GetDevice(), true/*promiscuous mode*/);
-    }
+  face->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this));
+  // if (face->GetDevice() != 0)
+  //   {
+  //     m_node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this), 
+  //                                      CcnxL3Protocol::ETHERNET_FRAME_TYPE, face->GetDevice(), true/*promiscuous mode*/);
+  //   }
 
-  uint32_t index = m_faces.size ();
   m_faces.push_back (face);
-  return index;
+  m_faceCounter ++;
+  return m_faceCounter;
 }
 
 

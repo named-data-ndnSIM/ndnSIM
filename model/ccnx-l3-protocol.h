@@ -104,7 +104,8 @@ public:
   void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy (void) const;
 
-  virtual void Send (Ptr<Packet> packet, const Ptr<CcnxFace> &face);
+  virtual void Send (const Ptr<CcnxFace> &face, Ptr<Packet> packet);
+  virtual void ReceiveFromLower (const Ptr<Face> &device, Ptr<const Packet> p);
 
   virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
   virtual uint32_t GetNFaces (void) const;
@@ -118,21 +119,6 @@ public:
   virtual void SetDown (uint32_t i);
 
 protected:
-  /**
-   * Lower layer calls this method after calling L3Demux::Lookup
-   *
-   * \param device network device
-   * \param p the packet
-   * \param protocol lower layer protocol value
-   * \param from lower layer address of the correspondant
-   * \param to lower layer address of the destination
-   * \param packetType type of the packet (broadcast/multicast/unicast/otherhost)
-   */
-  void ReceiveFromLower (Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
-                 const Address &from,
-                 const Address &to,
-                 NetDevice::PacketType packetType);
-
   /**
    * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
    * 
@@ -175,6 +161,7 @@ private:
   ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
 
 private:
+  uint32_t m_faceCounter; ///< counter of faces. Increased every time a new face is added to the stack
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
   CcnxFaceList m_faces;
 

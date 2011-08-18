@@ -33,88 +33,116 @@ class Packet;
 class Node;
 
 /**
- * \brief The Ccnx representation of a network face
+ * \ingroup ccnx
+ * \brief Virtual class defining CCNx face
  *
- * This class roughly corresponds to the struct in_device
- * of Linux; the main purpose is to provide address-family
- * specific information (addresses) about an face.
+ * This class defines basic functionality of CCNx face. Face is core
+ * component responsible for actual delivery of data packet to and
+ * from CCNx stack
  *
- * By default, Ccnx face are created in the "down" state
- * no IP addresses.  Before becoming useable, the user must 
- * add an address of some type and invoke Setup on them.
+ * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
 class CcnxFace  : public Object
 {
 public:
+  /**
+   * \brief Ccnx protocol hanler
+   *
+   * \param face Face from which packet has been received
+   * \param packet Received packet
+   */
+  typedef Callback<void,Ptr<CcnxFace>,Ptr<Packet> > ProtocolHandler;
+  
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
   static TypeId GetTypeId (void);
 
+  /**
+   * \brief Default constructor
+   */
   CcnxFace ();
   virtual ~CcnxFace();
 
-  virtual void SetNode (Ptr<Node> node); 
-  virtual void SetDevice (Ptr<NetDevice> device);
-
+  ////////////////////////////////////////////////////////////////////
+  
   /**
-   * \returns the underlying NetDevice. This method cannot return zero.
-   */
-  virtual Ptr<NetDevice> GetDevice (void) const;
-
-  /**
-   * \param metric configured routing metric (cost) of this face
+   * \brief Register callback to call when new packet arrives on the face
    *
-   * Note:  This is synonymous to the Metric value that ifconfig prints
-   * out.  It is used by ns-3 global routing, but other routing daemons
-   * choose to ignore it. 
+   * This method should call protocol-dependent registration function
+   */
+  void RegisterProtocolHandler (ProtocolHandler handler) = 0;
+  
+  /**
+   * \brief Send packet on a face
+   *
+   * \param p smart pointer to a packet to send
+   */ 
+  virtual void Send (Ptr<Packet> p) = 0;
+
+  ////////////////////////////////////////////////////////////////////
+
+  /**
+   * \brief Associate Node object with face
+   *
+   * \param node smart pointer to a Node object
+   */
+  virtual void SetNode (Ptr<Node> node);
+
+  /**
+   * \brief Assign routing/forwarding metric with face
+   *
+   * \param metric configured routing metric (cost) of this face
    */
   virtual void SetMetric (uint16_t metric);
 
   /**
-   * \returns configured routing metric (cost) of this face
+   * \brief Get routing/forwarding metric assigned to the face
    *
-   * Note:  This is synonymous to the Metric value that ifconfig prints
-   * out.  It is used by ns-3 global routing, but other routing daemons 
-   * may choose to ignore it. 
+   * \returns configured routing/forwarding metric (cost) of this face
    */
   virtual uint16_t GetMetric (void) const;
 
   /**
-   * These are IP face states and may be distinct from 
-   * NetDevice states, such as found in real implementations
-   * (where the device may be down but IP face state is still up).
+   * These are face states and may be distinct from actual lower-layer
+   * device states, such as found in real implementations (where the
+   * device may be down but ccnx face state is still up).
    */
+  
   /**
-   * \returns true if this face is enabled, false otherwise.
+   * \brief Enable this face
    */
-  virtual bool IsUp (void) const;
+  virtual void SetUp ();
 
   /**
-   * \returns true if this face is disabled, false otherwise.
-   */
-  virtual bool IsDown (void) const;
-
-  /**
-   * Enable this face
-   */
-  virtual void SetUp (void);
-
-  /**
-   * Disable this face
+   * \brief Disable this face
    */
   virtual void SetDown (void);
 
   /**
-   * \param p packet to send
-   */ 
-  virtual void Send (Ptr<Packet> p);
+   * \brief Returns true if this face is enabled, false otherwise.
+   */
+  virtual bool IsUp () const;
+
+  /**
+   * \brief Returns true if this face is disabled, false otherwise.
+   */
+  virtual bool IsDown () const;
 
 protected:
   virtual void DoDispose (void);
 
 private:
+  CcnxFace (const CcnxFace &) {} ///< Disabled copy constructor
+  CcnxFace& operator= (const CcnxFace &) {} ///< Disabled copy operator
+  
+protected:
   bool m_ifup;
+  uint32_t m_id; ///< id of the interface in the CCNx stack (per-node uniqueness)
   uint16_t m_metric;
   Ptr<Node> m_node;
-  Ptr<NetDevice> m_device;
 };
 
 std::ostream& operator<< (std::ostream& os, CcnxFace const& face);
