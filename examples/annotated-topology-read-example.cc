@@ -141,7 +141,7 @@ int main (int argc, char *argv[])
         //NS_LOG_INFO("2");
         
         Ptr<PointToPointNetDevice> device2 = nd2->GetDevice(nd2->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-`
+
         if(device2==NULL)
             NS_LOG_INFO("device2 = 0");
         

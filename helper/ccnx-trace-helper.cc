@@ -48,13 +48,13 @@ PcapHelperForCcnx::EnablePcapCcnx (std::string prefix, std::string ccnxName, uin
   EnablePcapCcnx (prefix, ccnx, interface, explicitFilename);
 }
 
+  /// \todo This call is broken
 void 
 PcapHelperForCcnx::EnablePcapCcnx (std::string prefix, CcnxFaceContainer c)
 {
   for (CcnxFaceContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-      std::pair<Ptr<Ccnx>, uint32_t> pair = *i;
-      EnablePcapCcnx (prefix, pair.first, pair.second, false);
+      // EnablePcapCcnx (prefix, (*i)->GetCcnx (), 0,false);
     }
 }
 
@@ -178,14 +178,13 @@ AsciiTraceHelperForCcnx::EnableAsciiCcnx (Ptr<OutputStreamWrapper> stream, CcnxF
 
 //
 // Private API
-//
+// \todo This method is broken
 void 
 AsciiTraceHelperForCcnx::EnableAsciiCcnxImpl (Ptr<OutputStreamWrapper> stream, std::string prefix, CcnxFaceContainer c)
 {
   for (CcnxFaceContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-      std::pair<Ptr<Ccnx>, uint32_t> pair = *i;
-      EnableAsciiCcnxInternal (stream, prefix, pair.first, pair.second, false);
+      // EnableAsciiCcnxInternal (stream, prefix, pair.first, pair.second, false);
     }
 }
 
