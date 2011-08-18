@@ -19,8 +19,7 @@
  */
 
 #include "ccnx-face-container.h"
-// #include "ns3/node-list.h"
-// #include "ns3/names.h"
+
 #include <algorithm>
 
 #include "ns3/ccnx-face.h"
@@ -46,6 +45,12 @@ CcnxFaceContainer::operator= (const CcnxFaceContainer &other)
 }
 
   
+void
+CcnxFaceContainer::AddAll (Ptr<CcnxFaceContainer> other)
+{
+  AddAll (*other);
+}
+
 void
 CcnxFaceContainer::AddAll (const CcnxFaceContainer &other)
 {

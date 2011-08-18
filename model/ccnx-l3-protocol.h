@@ -105,7 +105,7 @@ public:
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
 
   virtual void Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet);
-  virtual void Receive (const Ptr<CcnxFace> &device, const Ptr<Packet> &p);
+  virtual void Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
 
   virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
   virtual uint32_t GetNFaces () const;
@@ -113,7 +113,7 @@ public:
 
 protected:
   /**
-   * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
+   * \brief Actual processing of incoming CCNx interests
    * 
    * Processing Interest packets
    */
@@ -124,7 +124,7 @@ protected:
 
   
   /**
-   * Actual processing of incoming CCNx packets. Also processing packets coming from local apps
+   * \brief Actual processing of incoming CCNx content objects
    * 
    * Processing ContentObject packets
    */
@@ -153,12 +153,12 @@ private:
   ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
 
 private:
-  uint32_t m_faceCounter; ///< counter of faces. Increased every time a new face is added to the stack
+  uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
-  CcnxFaceList m_faces;
+  CcnxFaceList m_faces; ///< \brief list of faces that belongs to ccnx stack on this node
 
-  Ptr<Node> m_node;
-  Ptr<CcnxForwardingStrategy> m_forwardingStrategy;
+  Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
+  Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
   // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
   // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;

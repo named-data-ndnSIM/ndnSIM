@@ -90,7 +90,7 @@ public:
    * \param p the packet
    */
   virtual void
-  Receive (const Ptr<CcnxFace> &device, const Ptr<Packet> &p) = 0;
+  Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p) = 0;
 
   /**
    * \brief Register a new forwarding strategy to be used by this Ccnx

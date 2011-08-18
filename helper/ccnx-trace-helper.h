@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Authors: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #ifndef CCNX_TRACE_HELPER_H
@@ -27,6 +29,8 @@
 namespace ns3 {
 
 /**
+ * \ingroup ccnx-helpers
+ *
  * @brief Base class providing common user-level pcap operations for helpers
  * representing Ccnx protocols .
  */
@@ -119,6 +123,8 @@ public:
 };
 
 /**
+ * \ingroup ccnx-helpers
+ *
  * @brief Base class providing common user-level ascii trace operations for 
  * helpers representing Ccnx protocols .
  */

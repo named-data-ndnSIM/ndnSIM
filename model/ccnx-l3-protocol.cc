@@ -155,7 +155,7 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 
   m_faces.push_back (face);
   m_faceCounter ++;
-  return m_faceCounter;
+  return face->GetId ();
 }
 
 Ptr<CcnxFace>
@@ -177,7 +177,7 @@ CcnxL3Protocol::GetNFaces (void) const
 
 // Callback from lower layer
 void 
-CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<Packet> &p)
+CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
   NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
 

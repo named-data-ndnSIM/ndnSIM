@@ -1,4 +1,4 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 UCLA
  *
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: 
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 /**
@@ -67,7 +67,10 @@
 #include "ns3/node.h"
 #include "ns3/core-config.h"
 #include "ns3/ccnx-forwarding-strategy.h"
+#include "ns3/ccnx-net-device-face.h"
+#include "ns3/ccnx-l3-protocol.h"
 
+#include "ccnx-face-container.h"
 #include "ccnx-stack-helper.h"
 #include "ccnx-forwarding-helper.h"
 
@@ -175,19 +178,21 @@ CcnxStackHelper::SetCcnxStackInstall (bool enable)
   m_ccnxEnabled = enable;
 }
 
-void 
+Ptr<CcnxFaceContainer>
 CcnxStackHelper::Install (NodeContainer c) const
 {
+  Ptr<CcnxFaceContainer> faces = Create<CcnxFaceContainer> ();
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-      Install (*i);
+      faces->AddAll (Install (*i));
     }
+  return faces;
 }
 
-void 
+Ptr<CcnxFaceContainer>
 CcnxStackHelper::InstallAll (void) const
 {
-  Install (NodeContainer::GetGlobal ());
+  return Install (NodeContainer::GetGlobal ());
 }
 
 void
@@ -199,10 +204,11 @@ CcnxStackHelper::CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::
   node->AggregateObject (protocol);
 }
 
-void
+Ptr<CcnxFaceContainer>
 CcnxStackHelper::Install (Ptr<Node> node) const
 {
-  NS_ASSERT_MSG (m_forwarding, "CcnxForwarding should be set prior calling Install() method");
+  // NS_ASSERT_MSG (m_forwarding, "SetForwardingHelper() should be set prior calling Install() method");
+  Ptr<CcnxFaceContainer> faces = Create<CcnxFaceContainer> ();
   
   if (m_ccnxEnabled)
     {
@@ -210,22 +216,32 @@ CcnxStackHelper::Install (Ptr<Node> node) const
         {
           NS_FATAL_ERROR ("CcnxStackHelper::Install (): Installing " 
                           "a CcnxStack to a node with an existing Ccnx object");
-          return;
+          return 0;
         }
 
       CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
       // Set forwarding
       Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-      Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
-      ccnx->SetForwardingStrategy (ccnxForwarding);
+      for (uint32_t index=0; index < node->GetNDevices (); index++)
+        {
+          Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
+          uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
+          NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcxnNetDeviceFace as face #" << face_id);
+
+          faces->Add (face);
+        }
+      // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
+      // ccnx->SetForwardingStrategy (ccnxForwarding);
     }
+
+  return faces;
 }
 
-void
+Ptr<CcnxFaceContainer>
 CcnxStackHelper::Install (std::string nodeName) const
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
-  Install (node);
+  return Install (node);
 }
 
 static void

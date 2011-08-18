@@ -2,9 +2,7 @@
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
-#include "ns3/applications-module.h"
 #include "ns3/NDNabstraction-module.h"
 
 using namespace ns3;
@@ -15,18 +13,23 @@ int
 main (int argc, char *argv[])
 {
   LogComponentEnable ("CcnxTest", LOG_ALL);
+  LogComponentEnable ("CcnxStackHelper", LOG_ALL);
   
-  Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
-  Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
+  // Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
+  // Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
+
+  Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("10Mbps"));
+  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
   
   CommandLine cmd;
   cmd.Parse (argc, argv);
   
   // Here, we will explicitly create seven nodes. 
   NodeContainer c;
-  c.Create (2);
+  c.Create (3);
   
-  NodeContainer n = NodeContainer (c.Get (0), c.Get (2));
+  NodeContainer n1 = NodeContainer (c.Get (0), c.Get (1));
+  NodeContainer n2 = NodeContainer (c.Get (1), c.Get (2));
   
   // Ipv4StaticRoutingHelper staticRouting;
   
@@ -35,16 +38,16 @@ main (int argc, char *argv[])
 
   NS_LOG_INFO ("Create channels.");
   PointToPointHelper p2p;
-  p2p.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
-  p2p.SetChannelAttribute ("Delay", StringValue ("1ms"));
-  NetDeviceContainer nd = p2p.Install (n);
+  // NetDeviceContainer nd =
+  p2p.Install (n1);
+  p2p.Install (n2);
 
   NS_LOG_INFO ("Installing NDN stack");
   CcnxStackHelper ccnx;
+  Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
   // ? set up forwarding
   
-  //  ccnx.Install (c);
   
   //Add static routing
   // InternetStackHelper internet;

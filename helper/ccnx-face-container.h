@@ -23,20 +23,24 @@
 
 #include <stdint.h>
 #include <vector>
-#include "ns3/ccnx.h"
+
+#include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
 
 namespace ns3 {
 
+class CcnxFace;
+
 /**
- * \ingroup ccnx
+ * \ingroup ccnx-helpers
  * \brief A pool for CCNx faces
  * 
  * Provides tools to perform basic manipulation on faces, such as
  * setting metrics and states on faces
  *
- * \see Ccnx
+ * \see CcnxStackHelper
  */
-class CcnxFaceContainer
+class CcnxFaceContainer : public SimpleRefCount<CcnxFaceContainer>
 {
 private:
   typedef std::vector<Ptr<CcnxFace> > FaceContainer;
@@ -64,6 +68,13 @@ public:
    */
   CcnxFaceContainer& operator= (const CcnxFaceContainer &other);
   
+  /**
+   * \brief Add all entries from other container
+   *
+   * \param other smart pointer to a container
+   */
+  void AddAll (Ptr<CcnxFaceContainer> other);
+
   /**
    * \brief Add all entries from other container
    *

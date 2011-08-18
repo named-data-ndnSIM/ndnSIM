@@ -21,12 +21,9 @@
 #ifndef CCNX_STACK_HELPER_H
 #define CCNX_STACK_HELPER_H
 
-#include "ns3/node-container.h"
-#include "ns3/net-device-container.h"
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
 #include "ns3/object-factory.h"
-#include "ns3/ccnx-l3-protocol.h"
 
 #include "ccnx-trace-helper.h"
 
@@ -34,8 +31,14 @@ namespace ns3 {
 
 class Node;
 class CcnxForwardingHelper;
+class CcnxFaceContainer;
 
 /**
+ * \ingroup ccnx
+ * \defgroup ccnx-helpers Helpers
+ */
+/**
+ * \ingroup ccnx-helpers
  * \brief Adding CCNx functionality to existing Nodes.
  *
  * This helper enables pcap and ascii tracing of events in the ccnx stack
@@ -55,25 +58,27 @@ class CcnxStackHelper : public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
 {
 public:
   /**
-   * Create a new CcnxStackHelper which <empty> forwarding by default.
+   * \brief Create a new CcnxStackHelper which <empty> forwarding by default.
    *
    * \todo set non-empty default forwarding
    */
   CcnxStackHelper ();
 
   /**
-   * Destroy the CcnxStackHelper
+   * \brief Destroy the CcnxStackHelper
    */
   virtual ~CcnxStackHelper ();
   CcnxStackHelper (const CcnxStackHelper &);
   CcnxStackHelper &operator = (const CcnxStackHelper &o);
 
   /**
-   * Return helper internal state to that of a newly constructed one
+   * \brief Return helper internal state to that of a newly constructed one
    */
   void Reset ();
 
   /**
+   * Set forwarding strategy helper
+   *
    * \param forwarding a new forwarding helper
    *
    * Set the forwarding helper to use during Install. The forwarding helper is
@@ -81,50 +86,68 @@ public:
    * ns3::CcnxFrProtocol per node. This forwarding object is then associated to
    * a single ns3::Ccnx object through its ns3::Ccnx::SetforwardingProtocol.
    */
-  void SetForwardingHelper (const CcnxForwardingHelper &forwarding);
+  void
+  SetForwardingHelper (const CcnxForwardingHelper &forwarding);
 
   /**
-   * Install CCNx stack on the node
+   * \brief Install CCNx stack on the node
    *
    * This method will assert if called on a node that already has Ccnx object
    * installed on it
    * 
    * \param nodeName The name of the node on which to install the stack.
+   *
+   * \returns list of installed faces in the form of a smart pointer
+   * to CcnxFaceContainer object
    */
-  void Install (std::string nodeName) const;
+  Ptr<CcnxFaceContainer>
+  Install (std::string nodeName) const;
 
   /**
-   * Install CCNx stack on the node
+   * \brief Install CCNx stack on the node
    *
    * This method will assert if called on a node that already has Ccnx object
    * installed on it
    * 
    * \param node The node on which to install the stack.
+   *
+   * \returns list of installed faces in the form of a smart pointer
+   * to CcnxFaceContainer object
    */
-  void Install (Ptr<Node> node) const;
+  Ptr<CcnxFaceContainer>
+  Install (Ptr<Node> node) const;
 
   /**
-   * Install CCNx stack on each node in the input container
+   * \brief Install CCNx stack on each node in the input container
    *
    * The program will assert if this method is called on a container with a node
    * that already has an ccnx object aggregated to it.
    * 
    * \param c NodeContainer that holds the set of nodes on which to install the
    * new stacks.
+   *
+   * \returns list of installed faces in the form of a smart pointer
+   * to CcnxFaceContainer object
    */
-  void Install (NodeContainer c) const;
+  Ptr<CcnxFaceContainer>
+  Install (NodeContainer c) const;
 
   /**
-   * Install CCNx stack on all nodes in the simulation
+   * \brief Install CCNx stack on all nodes in the simulation
+   *
+   * \returns list of installed faces in the form of a smart pointer
+   * to CcnxFaceContainer object
    */
-  void 
+  Ptr<CcnxFaceContainer>
   InstallAll () const;
 
   /**
    * \brief Enable/disable ccnx stack install.
+   *
    * \param enable enable state
    */
-  void SetCcnxStackInstall (bool enable);
+  void
+  SetCcnxStackInstall (bool enable);
 
 private:
   /**

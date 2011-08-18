@@ -36,6 +36,10 @@ class Address;
  * component responsible for actual delivery of data packet to and
  * from CCNx stack
  *
+ * CcnxNetDevice face is permanently associated with one NetDevice
+ * object and this object cannot be changed for the lifetime of the
+ * face
+ *
  * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
 class CcnxNetDeviceFace  : public CcnxFace
@@ -49,9 +53,12 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * \brief Default constructor
+   * \brief Constructor
+   *
+   * \param netDevice a smart pointer to NetDevice object to which
+   * this face will be associate
    */
-  CcnxNetDeviceFace ();
+  CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice);
   virtual ~CcnxNetDeviceFace();
 
   ////////////////////////////////////////////////////////////////////
@@ -62,13 +69,6 @@ public:
   virtual void Send (Ptr<Packet> p);
 
   ////////////////////////////////////////////////////////////////////
-
-  /**
-   * \brief Associate NetDevice object with face
-   *
-   * \param node smart pointer to a NetDevice object
-   */
-  void SetNetDevice (Ptr<NetDevice> node);
 
   /**
    * \brief Get NetDevice associated with the face
@@ -84,7 +84,7 @@ private:
   CcnxNetDeviceFace (const CcnxNetDeviceFace &); ///< \brief Disabled copy constructor
   CcnxNetDeviceFace& operator= (const CcnxNetDeviceFace &); ///< \brief Disabled copy operator
 
-  // callback
+  /// \brief callback from lower layers
   void ReceiveFromNetDevice (Ptr<NetDevice> device,
                              Ptr<const Packet> p,
                              uint16_t protocol,

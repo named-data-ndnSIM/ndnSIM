@@ -30,13 +30,11 @@ class CcnxForwardingStrategy;
 class Node;
 
 /**
+ * \ingroup ccnx-helpers
+ *
  * \brief a factory to create ns3::CcnxForwardingStrategy objects
  *
- * For each new forwarding protocol created as a subclass of 
- * ns3::CcnxForwardingStrategy, you need to create a subclass of 
- * ns3::CcnxForwardingHelper which can be used by 
- * ns3::InternetStackHelper::SetForwardingHelper and 
- * ns3::InternetStackHelper::Install.
+ * \todo Document this class
  */
 class CcnxForwardingHelper
 {
@@ -53,7 +51,7 @@ public:
    * This method is mainly for internal use by the other helpers;
    * clients are expected to free the dynamic memory allocated by this method
    */
-  virtual CcnxForwardingHelper* Copy (void) const = 0;
+  virtual CcnxForwardingHelper* Copy () const = 0;
 
   /**
    * \param node the node within which the new forwarding protocol will run

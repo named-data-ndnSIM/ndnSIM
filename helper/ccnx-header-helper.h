@@ -30,7 +30,9 @@ class Header;
 class Packet;
 
 /**
- * Class implementing functionality to detect CCNx packet type and
+ * \ingroup ccnx-helpers
+ *
+ * \brief Class implementing functionality to detect CCNx packet type and
  * create the corresponding object
  *
  * CCNx doesn't really have a header, so we need this class to
@@ -68,6 +70,15 @@ public:
   CreateCorrectCcnxHeader (Ptr<const Packet> packet);
 };
 
+  /**
+   * \ingroup ccnx
+   * \defgroup ccnx-exceptions Exceptions
+   */
+  /**
+   * \ingroup ccnx-exceptions
+   * \brief Exception thrown if CCNx stack receives unrecognized
+   * message type
+   */
 class CcnxUnknownHeaderException {};
 
 } // namespace ns3

@@ -44,14 +44,14 @@ CcnxNetDeviceFace::GetTypeId ()
 }
 
 /** 
- * By default, Ccnx face are created in the "down" state
- *  with no IP addresses.  Before becoming useable, the user must 
- * invoke SetUp on them once an Ccnx address and mask have been set.
+ * By default, Ccnx face are created in the "down" state.  Before
+ * becoming useable, the user must invoke SetUp on the face
  */
-CcnxNetDeviceFace::CcnxNetDeviceFace () 
-  : m_netDevice (0)
+CcnxNetDeviceFace::CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice) 
 {
   NS_LOG_FUNCTION (this);
+
+  m_netDevice = netDevice;
 }
 
 CcnxNetDeviceFace::~CcnxNetDeviceFace ()
@@ -75,12 +75,6 @@ CcnxNetDeviceFace::DoDispose (void)
   NS_LOG_FUNCTION_NOARGS ();
   m_netDevice = 0;
   Object::DoDispose ();
-}
-
-void 
-CcnxNetDeviceFace::SetNetDevice (Ptr<NetDevice> netDevice)
-{
-  m_netDevice = netDevice;
 }
 
 Ptr<NetDevice>
@@ -127,7 +121,7 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
                                          const Address &to,
                                          NetDevice::PacketType packetType)
 {
-  // bla bla bla
+  m_protocolHandler (Ptr<CcnxFace>(this), p);
 }
 
 

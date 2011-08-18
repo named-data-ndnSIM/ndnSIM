@@ -31,9 +31,10 @@ namespace ns3 {
 class Packet;
 class Node;
 
+  
 /**
  * \ingroup ccnx
- * \defgroup ccnx-face
+ * \defgroup ccnx-face Faces
  */
 /**
  * \ingroup ccnx-face
@@ -54,7 +55,7 @@ public:
    * \param face Face from which packet has been received
    * \param packet Received packet
    */
-  typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<Packet>& > ProtocolHandler;
+  typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
   
   /**
    * \brief Interface ID
