@@ -21,42 +21,62 @@
 #ifndef __ANNOTATED_TOPOLOGY_READER_H__
 #define __ANNOTATED_TOPOLOGY_READER_H__
 
-#include "ns3/nstime.h"
 #include "ns3/topology-reader.h"
+#include "ns3/nstime.h"
+#include "ns3/log.h"
+#include "ns3/net-device-container.h"
+#include "ns3/point-to-point-helper.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/drop-tail-queue.h"
+#include "ns3/string.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
+#include <string>
+#include <fstream>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
 
 namespace ns3 
 {
+    
+/**
+* \brief This class reads annotated topology and apply settings to the corresponding nodes and links
+* Input File Format
+* 1st line is     NumberOfNodes    TAB     NumberofLinks
+* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS    TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
+*
+*/
+class AnnotatedTopologyReader : public TopologyReader
+{
+public:
+    typedef std::list< Link >::iterator LinksIterator;
+    static TypeId GetTypeId (void);
+        
+    AnnotatedTopologyReader ();
+    virtual ~AnnotatedTopologyReader ();
+        
+        
     /**
-     * Input File Format
-     * 1st line is     NumberOfNodes    TAB     NumberofLinks
-     * Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS    TAB    DelayMiliseconds   TAB   QueueSizeInPackets1     TAB    QueueSizeInPackets2 
-     *
+    * \brief Main annotated topology reading function.
+    *
+    * This method opens an input stream and reads topology file with annotations.
+    *
+    * \return the container of the nodes created (or empty container if there was an error)
+    */
+    virtual NodeContainer Read (void);
+    
+    /**
+     * \brief This method applies setting to corresponding nodes and links
+     * NetDeviceContainer must be allocated
+     * NodeContainer from Read method
      */
-    class AnnotatedTopologyReader : public TopologyReader
-    {
-    public:
-        typedef std::list< Link >::iterator LinksIterator;
-        static TypeId GetTypeId (void);
+    void ApplySettings(NetDeviceContainer *ndc, NodeContainer* nc);
         
-        AnnotatedTopologyReader ();
-        virtual ~AnnotatedTopologyReader ();
-        
-        /**
-         * \brief Main topology reading function.
-         *
-         * This method opens an input stream and reads the Orbis-format file.
-         * Every row represents a topology link (the ids of a couple of nodes),
-         * so the input file is read line by line to figure out how many links
-         * and nodes are in the topology.
-         *
-         * \return the container of the nodes created (or empty container if there was an error)
-         */
-        virtual NodeContainer Read (void);
-        
-    private:
-        AnnotatedTopologyReader (const AnnotatedTopologyReader&);
-        AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
-    };
+private:
+    AnnotatedTopologyReader (const AnnotatedTopologyReader&);
+    AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
+};
 }
 
 
