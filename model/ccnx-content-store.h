@@ -291,7 +291,7 @@ private:
   CcnxContentStore& operator= (const CcnxContentStore &o); ///< Disabled copy operator
  
 private:
-  int                         m_maxSize; ///< \brief maximum number of entries in cache \internal
+  size_t m_maxSize; ///< \brief maximum number of entries in cache \internal
   // string_key_hash_t<CsEntry>  m_contentStore;     ///< \brief actual content store \internal
 
   /**

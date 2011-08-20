@@ -126,6 +126,8 @@ CcnxContentStore::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> pa
   if (it == m_contentStore.end ())
     { // add entry to the top
       m_contentStore.get<mru> ().push_front (CcnxContentStoreEntry (header, packet));
+      if (m_contentStore.size () > m_maxSize)
+        m_contentStore.get<mru> ().pop_back ();
     }
   else
     {
