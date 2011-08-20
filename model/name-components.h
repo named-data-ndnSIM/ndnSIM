@@ -24,6 +24,7 @@
 #include "ns3/simple-ref-count.h"
 
 #include <string>
+#include <algorithm>
 #include <list>
 
 namespace ns3 {
@@ -58,6 +59,12 @@ public:
 
   inline size_t
   size () const;
+
+  inline bool
+  operator== (const Components &prefix) const;
+
+  inline bool
+  operator< (const Components &prefix) const;
   
 private:
   std::list<std::string> m_prefix;
@@ -79,8 +86,20 @@ Components::Add (const std::string &s)
 {
   (*this) (s);
 }
-  
-  
+
+bool
+Components::operator== (const Components &prefix) const
+{
+  return std::equal (m_prefix.begin (), m_prefix.end (), prefix.m_prefix.begin ());
+}
+
+bool
+Components::operator< (const Components &prefix) const
+{
+  return std::lexicographical_compare (m_prefix.begin (), m_prefix.end (),
+                                       prefix.m_prefix.begin (), prefix.m_prefix.end ());
+}
+
 } // Namespace Name
 } // namespace ns3
 

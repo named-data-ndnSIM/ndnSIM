@@ -37,6 +37,7 @@ TypeId
 CcnxLocalFace::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxFace> ()
   ;
   return tid;

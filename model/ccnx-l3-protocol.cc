@@ -37,6 +37,7 @@
 #include "ccnx-forwarding-strategy.h"
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
+#include "ccnx-content-store.h"
 
 #include <boost/foreach.hpp>
 
@@ -53,6 +54,7 @@ CcnxL3Protocol::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxL3Protocol")
     .SetParent<Ccnx> ()
+    .SetGroupName ("Ccnx")
     .AddConstructor<CcnxL3Protocol> ()
     // .AddTraceSource ("Tx", "Send ccnx packet to outgoing interface.",
     //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_txTrace))
@@ -179,6 +181,12 @@ CcnxL3Protocol::GetNFaces (void) const
 void 
 CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
+  if (face->IsUp ())
+    {
+      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
+      // m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
+      return;
+    }
   NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
@@ -198,16 +206,11 @@ void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
                                         const Ptr<CcnxInterestHeader> &header,
                                         const Ptr<Packet> &packet)
 {
-  if (incomingFace->IsUp ())
-    {
-      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-      // m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
-      return;
-    }
-
-  NS_LOG_LOGIC ("Receiving interest from " << incomingFace);
+  NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
   // m_rxTrace (packet, m_node->GetObject<Ccnx> (), incomingFace);
 
+  /// \todo Processing of Interest packets
+  
   // NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
   // if (!m_forwardingStrategy->RouteInput (packet, incomingFace,
   //                                     MakeCallback (&CcnxL3Protocol::Send, this),
@@ -224,14 +227,9 @@ void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
                                         const Ptr<CcnxContentObjectHeader> &header,
                                         const Ptr<Packet> &packet)
 {
-  if (incomingFace->IsUp ())
-    {
-      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-      // m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
-      return;
-    }
+  NS_LOG_LOGIC ("Receiving contentObject from " << &incomingFace);
 
-  NS_LOG_LOGIC ("Receiving contentObject from " << incomingFace);
+  /// \todo Processing of ContentObject packets
 }
 
 // fake method
@@ -245,27 +243,21 @@ CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<P
 void
 CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
 {
-  // NS_LOG_FUNCTION (this << "packet: " << packet << ", route: "<< route);
-  
-  // if (route == 0)
-  //   {
-  //     NS_LOG_WARN ("No route to host.  Drop.");
-  //     // m_dropTrace (packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), 0);
-  //     return;
-  //   }
-  // Ptr<CcnxFace> outFace = route->GetOutputFace ();
+  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face); //
 
-  // if (outFace->IsUp ())
-  //   {
-  //     NS_LOG_LOGIC ("Sending via face " << *outFace);
-  //     // m_txTrace (packet, m_node->GetObject<Ccnx> (), outFace);
-  //     outFace->Send (packet);
-  //   }
-  // else
-  //   {
-  //     NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << *outFace);
-  //     // m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), outFace);
-  //   }
+  NS_ASSERT_MSG (face != 0, "Face should never be NULL");
+
+  if (face->IsUp ())
+    {
+      NS_LOG_LOGIC ("Sending via face " << &face); //
+      m_txTrace (packet, m_node->GetObject<Ccnx> (), face);
+      face->Send (packet);
+    }
+  else
+    {
+      NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << &face);
+      m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
+    }
 }
 
 

@@ -16,88 +16,135 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #include "ccnx-content-store.h"
 #include "ns3/log.h"
-
+#include "ns3/packet.h"
+#include "ns3/ccnx-interest-header.h"
+#include "ns3/ccnx-content-object-header.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxContentStore");
 
 namespace ns3
 {
-        
-CcnxContentStore::CcnxContentStore( int maxSize )
-    : m_maxSize(maxSize) { }
+
+NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
+
+using namespace __ccnx_private;
+
+TypeId 
+CcnxContentStore::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::CcnxContentStore")
+    .SetGroupName ("Ccnx")
+    .SetParent<Object> ()
+    .AddConstructor<CcnxContentStore> ()
+    .AddAttribute ("Size",
+                   "Maximum number of packets that content storage can hold",
+                   UintegerValue (100),
+                   MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
+                                         &CcnxContentStore::GetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+    ;
+
+  return tid;
+}
+
+CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
+
+CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+  : m_header (header)
+{
+  m_packet = packet->Copy ();
+  m_packet->RemoveHeader (*header);
+  m_packet->RemoveTrailer (m_tail);
+}
+
+Ptr<Packet>
+CcnxContentStoreEntry::GetFullyFormedCcnxPacket () const
+{
+  Ptr<Packet> packet = m_packet->Copy ();
+  packet->AddHeader (*m_header);
+  packet->AddTrailer (m_tail);
+  return packet;
+}
+
+// /// Disabled copy constructor
+// CcnxContentStoreEntry::CcnxContentStoreEntry (const CcnxContentStoreEntry &o)
+// {
+// }
+
+// /// Disables copy operator
+// CcnxContentStoreEntry& CcnxContentStoreEntry::operator= (const CcnxContentStoreEntry &o)
+// {
+//   return *this;
+// }
+
+
+
+CcnxContentStore::CcnxContentStore( )
+  : m_maxSize(100) { } // this value shouldn't matter, NS-3 should call SetSize with default value specified in AddAttribute earlier
         
 CcnxContentStore::~CcnxContentStore( ) 
-    { }
+{ }
 
-//Find corresponding CS entry for the given content name
-CsEntry* 
-CcnxContentStore::Lookup(const string prefix )
+/// Disabled copy constructor
+CcnxContentStore::CcnxContentStore (const CcnxContentStore &o)
 {
-    CriticalSection section(m_csMutex);
-        
-    CsEntry *result = &(m_contentStore.at(prefix));
-    
-    if(result != NULL)
-        Promote (*result);
-        
-    return result;
+}
+
+/// Disables copy operator
+CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
+{
+  return *this;
+}
+
+
+Ptr<Packet>
+CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
+{
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<hash> ().find (interest->GetName ());
+  if (it != m_contentStore.end ())
+    {
+      // promote entry to the top
+      m_contentStore.get<mru> ().relocate (m_contentStore.get<mru> ().begin (),
+                                           m_contentStore.project<mru> (it));
+
+      // return fully formed CCNx packet
+      return it->GetFullyFormedCcnxPacket ();
+    }
+  return 0;
 }   
     
-//move the given CS entry to the head of the list
 void 
-CcnxContentStore::Promote(CsEntry &ce )
+CcnxContentStore::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
-    // should not lock mutex. Otherwise deadlocks will be welcome
-    if( m_LRU.front() == &ce ) return;
-        
-    //assert( *(ce.lruPosition)==&ce ); // should point to the same object
-        
-    // swaping positions in _lru
-    m_LRU.erase( ce.lruPosition );
-    m_LRU.push_front( &ce );
-    ce.lruPosition = m_LRU.begin( );
-        
-    //assert( *(ce.lruPosition)==&ce ); // should point to the same object
-}
-    
-//Add entry to content store, if content store is full, use LRU replacement
-void 
-CcnxContentStore::Add( const string contentName, int contentSize )
-{
-    CriticalSection section(m_csMutex);
-        
-    m_contentStore.erase(m_contentStore.find(contentName));
-    
-    if((int)m_contentStore.size() == m_maxSize )
-    {
-        CsEntry *entry = m_LRU.back();
-        m_contentStore.erase(m_contentStore.find(entry->contentName));
-        m_LRU.pop_back( );
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<hash> ().find (header->GetName ());
+  if (it == m_contentStore.end ())
+    { // add entry to the top
+      m_contentStore.get<mru> ().push_front (CcnxContentStoreEntry (header, packet));
     }
-        
-    CsEntry ce;
-    ce.contentName = contentName;
-    ce.contentSize = contentSize;
-    
-    m_contentStore[contentName] = ce;
-    
-    CsEntry *ce_in_hash = &(m_contentStore.at(contentName));
-    m_LRU.push_front( ce_in_hash );
-    ce_in_hash->lruPosition = m_LRU.begin( );
-}
-    
-void 
-CcnxContentStore::Dump()
-{
-    CriticalSection section(m_csMutex);
-        
-    BOOST_FOREACH(string_key_hash_t<CsEntry>::value_type i, m_contentStore) 
+  else
     {
-        NS_LOG_INFO ("Key = " << i.first << " Value = " << i.second.contentName);
+      // promote entry to the top
+      m_contentStore.get<mru> ().relocate (m_contentStore.get<mru> ().begin (),
+                                           m_contentStore.project<mru> (it));
     }
 }
+    
+void 
+CcnxContentStore::Print() const
+{
+  for( DUMP_INDEX::type::iterator it=m_contentStore.get<DUMP_INDEX_TAG> ().begin ();
+       it != m_contentStore.get<DUMP_INDEX_TAG> ().end ();
+       it++
+       )
+    {
+      NS_LOG_INFO (it->GetName ());
+    }
 }
+
+} // namespace ns3

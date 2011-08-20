@@ -40,6 +40,7 @@ TypeId
 CcnxInterestHeader::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxInterestHeader")
+    .SetGroupName ("Ccnx")
     .SetParent<Header> ()
     .AddConstructor<CcnxInterestHeader> ()
     ;

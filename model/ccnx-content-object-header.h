@@ -24,6 +24,7 @@
 
 #include "ns3/integer.h"
 #include "ns3/header.h"
+#include "ns3/trailer.h"
 
 #include <string>
 #include <vector>
@@ -101,7 +102,7 @@ private:
  * ContentObjectTail should always be 2 bytes, representing two closing tags:
  * "</Content><ContentObject>"
  */
-class CcnxContentObjectTail : public Header
+class CcnxContentObjectTail : public Trailer
 {
 public:
   CcnxContentObjectTail ();

@@ -41,7 +41,8 @@ class CcnxForwardingStrategy;
 class Header;
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
-  
+class CcnxContentStore;
+
 /**
  * \ingroup ccnx
  * \brief Actual implementation of the Ccnx network layer
@@ -160,15 +161,25 @@ private:
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
-  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_sendOutgoingTrace;
-  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_unicastForwardTrace;
-  // TracedCallback<Ptr<const Packet>, Ptr<const CcnxFace> > m_localDeliverTrace;
+  Ptr<CcnxContentStore> m_contentStore;
+  
+  /**
+   * \brief Trace of transmitted packets, including all headers
+   * \internal
+   */
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
 
-  // // The following two traces pass a packet with an IP header
-  // TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
-  // TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
-  // // <ip-header, payload, reason, ifindex> (ifindex not valid if reason is DROP_NO_ROUTE)
-  // TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
+  /**
+   * \brief Trace of received packets, including all headers
+   * \internal
+   */
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
+
+  /**
+   * \brief Trace of dropped packets, including reason and all headers
+   * \internal
+   */
+  TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
 };
   
 } // Namespace ns3

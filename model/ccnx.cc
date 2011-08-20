@@ -32,6 +32,7 @@ TypeId
 Ccnx::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::Ccnx")
+    .SetGroupName ("Ccnx")
     .SetParent<Object> ()
   ;
   return tid;

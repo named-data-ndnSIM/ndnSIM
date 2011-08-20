@@ -28,6 +28,7 @@ NS_OBJECT_ENSURE_REGISTERED (CcnxForwardingStrategy);
 TypeId CcnxForwardingStrategy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxForwardingStrategy")
+    .SetGroupName ("Ccnx")
     .SetParent<Object> ()
   ;
   return tid;

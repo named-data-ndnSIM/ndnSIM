@@ -37,6 +37,7 @@ TypeId
 CcnxContentObjectHeader::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxContentObjectHeader")
+    .SetGroupName ("Ccnx")
     .SetParent<Header> ()
     .AddConstructor<CcnxContentObjectHeader> ()
     ;

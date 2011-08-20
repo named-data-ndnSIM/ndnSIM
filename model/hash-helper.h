@@ -18,48 +18,50 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef ccnx_hash_helper_h
-#define ccnx_hash_helper_h
+#ifndef CCNX_HASH_HELPER_H
+#define CCNX_HASH_HELPER_H
 
 #include <string>
-#include <boost/unordered_map.hpp>
-#include <boost/functional/hash.hpp>
 #include <boost/foreach.hpp>
+#include "name-components.h"
 
-//size of content store
-#define NDN_CONTENT_STORE_SIZE 100
-//maximum length of content name
-#define NDN_MAX_NAME_LENGTH 30
-
-//using namespace std;
-
-#define KEY(x)		x->first
-#define VALUE(x)	x->second
-
-
-/*template<typename T> 
-struct hash : public std::unary_function<T, std::size_t> {
-    std::size_t operator()(T const&) const;
-};*/
-
-struct string_hash : public std::unary_function<std::string, std::size_t>
+namespace ns3
 {
-	inline std::size_t operator( )( std::string str ) const
-	{
-        std::size_t hash = str.size() + 23;
-		for( std::string::const_iterator it = str.begin( ); it!=str.end(); it++ )
-		{
-			hash = ((hash << 6) ^ (hash >> 27)) + static_cast<std::size_t>( *it );
-		}
-		
-		return boost::hash_value(hash); //hash;
-	}
-};
 
-// A collision-chaining hash table mapping strings to ints.
-template<typename Value>
-class string_key_hash_t : public boost::unordered_map<std::string,Value, string_hash, std::equal_to<std::string>,std::allocator<std::string> >
+/**
+ * \ingroup ccnx-helpers
+ * \brief Helper providing hash value for the name prefix
+ *
+ * The whole prefix is considered as a long string with '/' delimiters
+ *
+ * \todo Testing is required to determine if this hash function
+ * actually provides good hash results
+ */
+struct CcnxPrefixHash : public std::unary_function<Name::Components, std::size_t>
 {
+  std::size_t
+  operator() (const Name::Components &prefix) const
+  {
+    std::size_t hash = 23;
+    BOOST_FOREACH (const std::string &str, prefix.GetComponents ())
+      {
+        hash += str.size ();
+        hash = ((hash << 6) ^ (hash >> 27)) + '/';
+        BOOST_FOREACH (char c, str)
+          {
+            hash = ((hash << 6) ^ (hash >> 27)) + c;
+          }
+      }
+    return hash;
+  }
 };
+  
+// // A collision-chaining hash table mapping strings to ints.
+// template<typename Value>
+// class string_key_hash_t : public boost::unordered_map<std::string,Value, string_hash, std::equal_to<std::string>,std::allocator<std::string> >
+// {
+// };
 
-#endif
+} // namespace ns3
+
+#endif // CCNX_HASH_HELPER_H
