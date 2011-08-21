@@ -18,29 +18,31 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#ifndef _CCNB_PARSER_VOID_NO_ARGU_DEPTH_FIRST_VISITOR_H_
+#define _CCNB_PARSER_VOID_NO_ARGU_DEPTH_FIRST_VISITOR_H_
+
+#include "ccnb-parser-void-no-argu-visitor.h"
 
 namespace ns3 {
-
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
+namespace CcnbParser {
 
 /**
- * \brief Helper class to decode ccnb formatted CCNx message
+ * \ingrou ccnx-ccnb
+ * \brief Depth-first visitor that takes no arguments and returns nothing
  */
-class CcnxDecodingHelper
+class VoidNoArguDepthFirstVisitor : public VoidNoArguVisitor
 {
 public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
-
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
+  virtual void visit (Blob& );
+  virtual void visit (Udata&);
+  virtual void visit (Tag&  );
+  virtual void visit (Attr& );
+  virtual void visit (Dtag& );
+  virtual void visit (Dattr&);
+  virtual void visit (Ext&  );
 };
 
-} // namespace ns3
+}
+}
 
-#endif // _CCNX_DECODING_HELPER_H_
+#endif // _CCNB_PARSER_VOID_NO_ARGU_DEPTH_FIRST_VISITOR_H_

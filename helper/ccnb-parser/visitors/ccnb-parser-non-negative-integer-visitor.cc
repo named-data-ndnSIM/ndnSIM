@@ -18,29 +18,34 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-non-negative-integer-visitor.h"
+
+#include "ns3/ccnb-parser-blob.h"
+#include "ns3/ccnb-parser-udata.h"
+#include <sstream>
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+boost::any
+NonNegativeIntegerVisitor::visit (Blob &n) //to throw parsing error
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  // Buffer n.m_blob;
+  throw CcnxDecodingException ();
+}
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
+boost::any
+NonNegativeIntegerVisitor::visit (Udata &n)
+{
+  // std::string n.m_udata;
+  std::istringstream is (n.m_udata);
+  int32_t value;
+  is >> value;
+  if (value<0) // value should be non-negative
+    throw CcnxDecodingException ();
 
-} // namespace ns3
+  return static_cast<uint32_t> (value);
+}
 
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}

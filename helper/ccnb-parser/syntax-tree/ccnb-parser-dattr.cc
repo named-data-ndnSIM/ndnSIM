@@ -18,29 +18,19 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-dattr.h"
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+// dictionary attributes are not used (yet?) in CCNx 
+Dattr::Dattr (Buffer::Iterator &start, uint32_t dattr)
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  m_dattr = dattr;
+  m_value = DynamicCast<Udata> (Block::ParseBlock (start));
+  if (m_value == 0)
+    throw CcnxDecodingException (); // "ATTR must be followed by UDATA field"
+}
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
-
-} // namespace ns3
-
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}

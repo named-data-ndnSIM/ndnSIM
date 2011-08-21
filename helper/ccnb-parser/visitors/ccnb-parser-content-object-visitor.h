@@ -18,29 +18,33 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#ifndef _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_
+#define _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_
+
+#include "ccnb-parser-void-depth-first-visitor.h"
 
 namespace ns3 {
-
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
+namespace CcnbParser {
 
 /**
- * \brief Helper class to decode ccnb formatted CCNx message
+ * \ingroup ccnx-ccnb
+ * \brief Visitor that fills fields in CcnxContentObjectHeader
+ *
+ * Usage example:
+ * \code
+ *   Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+ *   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
+ *   ContentObjectVisitor visitor;
+ *   root->accept (visitor, *header); 
+ * \endcode
  */
-class CcnxDecodingHelper
+class ContentObjectVisitor : public VoidDepthFirstVisitor
 {
 public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
-
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader&*/);
 };
 
-} // namespace ns3
+}
+}
 
-#endif // _CCNX_DECODING_HELPER_H_
+#endif // _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_

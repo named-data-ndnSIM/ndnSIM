@@ -18,29 +18,28 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#ifndef _CCNB_PARSER_NON_NEGATIVE_INTEGER_VISITOR_H_
+#define _CCNB_PARSER_NON_NEGATIVE_INTEGER_VISITOR_H_
+
+#include "ccnb-parser-no-argu-depth-first-visitor.h"
 
 namespace ns3 {
-
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
+namespace CcnbParser {
 
 /**
- * \brief Helper class to decode ccnb formatted CCNx message
+ * \ingroup ccnx-ccnb
+ * \brief Visitor to obtain non-negative integer value from UDATA block
+ *
+ * Will return empty boost::any() if called on anything except UDATA block
  */
-class CcnxDecodingHelper
+class NonNegativeIntegerVisitor : public NoArguDepthFirstVisitor
 {
 public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
-
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
+  virtual boost::any visit (Blob &n); ///< Throws an exception if BLOB object is encountered
+  virtual boost::any visit (Udata &n);
 };
 
-} // namespace ns3
+}
+}
 
-#endif // _CCNX_DECODING_HELPER_H_
+#endif // _CCNB_PARSER_NON_NEGATIVE_INTEGER_VISITOR_H_

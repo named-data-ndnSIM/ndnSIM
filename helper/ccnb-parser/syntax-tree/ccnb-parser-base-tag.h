@@ -18,29 +18,34 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#ifndef _CCNB_PARSER_BASE_TAG_H_
+#define _CCNB_PARSER_BASE_TAG_H_
+
+#include "ccnb-parser-block.h"
+#include <list>
 
 namespace ns3 {
-
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
+namespace CcnbParser {
 
 /**
- * \brief Helper class to decode ccnb formatted CCNx message
+ * \ingroup ccnx-ccnb
+ * \brief Virtual base class providing a common storage for TAG
+ * and DTAG ccnb-encoded blocks
+ *
+ * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
  */
-class CcnxDecodingHelper
+class BaseTag : public Block
 {
 public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  std::list<Ptr<Block> > m_attrs;      ///< \brief List of attributes, associated with this tag
+  std::list<Ptr<Block> > m_nestedTags; ///< \brief List of nested tags
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
+protected:
+  /**
+   * \brief Default constructor
+   */
+  BaseTag() { }
 };
 
-} // namespace ns3
+#endif // _CCNB_PARSER_BASE_TAG_H_
 
-#endif // _CCNX_DECODING_HELPER_H_

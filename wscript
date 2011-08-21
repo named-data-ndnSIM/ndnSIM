@@ -34,10 +34,15 @@ def build(bld):
         conf.env['MODULES_NOT_BUILT'].append('NDNabstraction')
         return
    
-    module.find_sources_in_dirs (['model', 'apps', 'helper'],[],['.cc']);
+    module.find_sources_in_dirs (['model', 'apps', 'helper',
+                                   'helper/ccnb-parser',
+                                   'helper/ccnb-parser/visitors',
+                                   'helper/ccnb-parser/syntax-tree'],[],['.cc']);
     tests.find_sources_in_dirs( ['test'], [], ['.cc'] );
-    headers.find_sources_in_dirs( ['model', 'apps', 'helper'], [], ['.h'] );
-
+    headers.find_sources_in_dirs( ['model', 'apps', 'helper',
+                                   'helper/ccnb-parser',
+                                   'helper/ccnb-parser/visitors',
+                                   'helper/ccnb-parser/syntax-tree'], [], ['.h'] );
 
     if True or bld.env['ENABLE_EXAMPLES']:
         for path in ["examples"]:
@@ -45,7 +50,7 @@ def build(bld):
             if not anode or not anode.is_child_of(bld.srcnode):
                 raise Utils.WscriptError("Unable to use '%s' - either because \
                 it's not a relative path"", or it's not child of \
-                '%s'."%(name,bld.srcnode))
+               '%s'."%(name,bld.srcnode))
             bld.rescan(anode)
             for filename in bld.cache_dir_contents[anode.id]:
                 if filename.startswith('.') or not filename.endswith(".cc"):

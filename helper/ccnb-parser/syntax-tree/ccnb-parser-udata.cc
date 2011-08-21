@@ -18,29 +18,25 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-udata.h"
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+Udata::Udata (Buffer::Iterator &start, uint32_t length)
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  // Ideally, the code should look like this. Unfortunately, we don't have normal compatible iterators
+  // Buffer::Iterator realStart = start;
+  // start.Next (length); // advancing forward
+  // m_udata.assign (realStart, start/*actually, it is the end*/);
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
+  m_udata.reserve (length+1); //just in case we will need \0 at the end later
+  // this is actually the way Read method is implemented in network/src/buffer.cc
+  for (uint32_t i = 0; i < length; i++)
+    {
+      m_udata.push_back (start.ReadU8 ());
+    }
+}
 
-} // namespace ns3
-
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}

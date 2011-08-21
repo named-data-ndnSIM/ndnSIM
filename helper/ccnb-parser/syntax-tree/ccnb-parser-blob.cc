@@ -18,29 +18,15 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-blob.h"
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+Blob::Blob (Buffer::Iterator &start, uint32_t length)
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  start.Read (m_blob.Begin (), length);
+}
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
-
-} // namespace ns3
-
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}

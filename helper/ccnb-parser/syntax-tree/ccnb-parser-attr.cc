@@ -18,29 +18,23 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-attr.h"
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+// length length in octets of UTF-8 encoding of tag name - 1 (minimum tag name length is 1) 
+Attr::Attr (Buffer::Iterator &start, uint32_t length)
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  m_attr.reserve (length+2); // extra byte for potential \0 at the end
+  for (uint32_t i = 0; i < (length+1); i++)
+    {
+      m_attr.push_back (start.ReadU8 ());
+    }
+  m_value = DynamicCast<Udata> (Block::ParseBlock (start));
+  if (m_value == 0)
+    throw CcnxDecodingException (); // "ATTR must be followed by UDATA field"
+}
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
-
-} // namespace ns3
-
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}

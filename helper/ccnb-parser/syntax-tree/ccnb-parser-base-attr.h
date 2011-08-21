@@ -18,29 +18,29 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#ifndef _CCNB_PARSER_BASE_ATTR_H_
+#define _CCNB_PARSER_BASE_ATTR_H_
+
+#include "ccnb-parser-block.h"
+#include "ccnb-parser-udata.h"
 
 namespace ns3 {
-
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
+namespace CcnbParser {
 
 /**
- * \brief Helper class to decode ccnb formatted CCNx message
+ * \ingroup ccnx-ccnb
+ * \brief Virtual base class providing a common storage for ATTR
+ * and DATTR ccnb-encoded blocks
+ *
+ * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
  */
-class CcnxDecodingHelper
+class BaseAttr : public Block
 {
 public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
-
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
+  Ptr<Udata> m_value; ///< \brief Value of the attribute
 };
 
-} // namespace ns3
+}
+}
 
-#endif // _CCNX_DECODING_HELPER_H_
+#endif // _CCNB_PARSER_BASE_ATTR_H_

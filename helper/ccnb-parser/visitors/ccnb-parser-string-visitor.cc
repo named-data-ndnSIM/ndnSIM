@@ -18,29 +18,24 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_DECODING_HELPER_H_
-#define _CCNX_DECODING_HELPER_H_
+#include "ccnb-parser-string-visitor.h"
 
 namespace ns3 {
+namespace CcnbParser {
 
-class CcnxInterestHeader;
-class CcnxContentObjectHeader;
-
-/**
- * \brief Helper class to decode ccnb formatted CCNx message
- */
-class CcnxDecodingHelper
+boost::any
+StringVisitor::visit (Blob &n) 
 {
-public:
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  // Buffer n.m_blob;
+  throw CcnxDecodingException ();
+}
 
-  static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-  
-private:
-};
+boost::any
+StringVisitor::visit (Udata &n)
+{
+  // std::string n.m_udata;
+  return n.m_udata;
+}
 
-} // namespace ns3
-
-#endif // _CCNX_DECODING_HELPER_H_
+}
+}
