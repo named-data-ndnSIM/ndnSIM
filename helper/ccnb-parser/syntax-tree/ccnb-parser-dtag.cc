@@ -19,7 +19,9 @@
  */
 
 #include "ccnb-parser-dtag.h"
-#include "ns3/ccnb-parser-common.h"
+
+#include "ccnb-parser-base-attr.h"
+#include "ccnb-parser-base-tag.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -35,7 +37,7 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
    * content (including virtual payload) will be stored in Packet
    * buffer
    */
-  if (dtag == Ccnx::CCN_DTAG_Content)
+  if (dtag == CCN_DTAG_Content)
     return; // hack #1. Do not process nesting block for <Content>
   
   // parse attributes until first nested block reached
@@ -55,17 +57,17 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
   while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
     {
       // hack #2. Stop processing nested blocks if last block was <Content>
-      if (m_dtag == Ccnx::CCN_DTAG_ContentObject && // we are in <ContentObject>
-          DynamicCast<Dtag> (m_nestedBlocks.back())!=0 && // last block is DTAG
-          DynamicCast<Dtag> (m_nestedBlocks.back())->m_dtag == CCN_DTAG_Content) 
+      if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>
+          DynamicCast<Dtag> (m_nestedTags.back())!=0 && // last block is DTAG
+          DynamicCast<Dtag> (m_nestedTags.back())->m_dtag == CCN_DTAG_Content) 
         {
           return; 
         }
 
-      m_nestedBlocks.push_back (Block::ParseBlock (start));
+      m_nestedTags.push_back (Block::ParseBlock (start));
     }
   if (start.IsEnd ())
-      throw CcnxDecodingException ();
+      throw CcnbDecodingException ();
 
   start.ReadU8 (); // read CCN_CLOSE
 }

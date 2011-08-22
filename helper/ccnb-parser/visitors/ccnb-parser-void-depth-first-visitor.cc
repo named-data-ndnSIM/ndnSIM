@@ -55,7 +55,7 @@ VoidDepthFirstVisitor::visit (Tag &n, boost::any param)
     {
       block->accept (*this, param);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this, param);
     }
@@ -71,7 +71,7 @@ VoidDepthFirstVisitor::visit (Dtag &n, boost::any param)
     {
       block->accept (*this, param);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this, param);
     }

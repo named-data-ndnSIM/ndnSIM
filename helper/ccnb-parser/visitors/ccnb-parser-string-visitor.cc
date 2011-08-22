@@ -19,6 +19,7 @@
  */
 
 #include "ccnb-parser-string-visitor.h"
+#include "ns3/ccnb-parser-udata.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -27,7 +28,7 @@ boost::any
 StringVisitor::visit (Blob &n) 
 {
   // Buffer n.m_blob;
-  throw CcnxDecodingException ();
+  throw CcnbDecodingException ();
 }
 
 boost::any

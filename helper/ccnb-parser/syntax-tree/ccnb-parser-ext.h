@@ -21,7 +21,7 @@
 #ifndef _CCNB_PARSER_EXT_H_
 #define _CCNB_PARSER_EXT_H_
 
-#include "ccnb-parser-ext.h"
+#include "ccnb-parser-block.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -45,10 +45,10 @@ public:
    */
   Ext (Buffer::Iterator &start, uint32_t extSubtype);
 
-  virtual void accept( Visitor &v )                           { v.visit( *this ); }
-  virtual void accept( GJVoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
-  virtual boost::any accept( GJNoArguVisitor &v )             { return v.visit( *this ); }
-  virtual boost::any accept( GJVisitor &v, boost::any param ) { return v.visit( *this, param ); }
+  virtual void accept( VoidNoArguVisitor &v )               { v.visit( *this ); }
+  virtual void accept( VoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
+  virtual boost::any accept( NoArguVisitor &v )             { return v.visit( *this ); }
+  virtual boost::any accept( Visitor &v, boost::any param ) { return v.visit( *this, param ); }
 
   uint64_t m_extSubtype; ///< \brief Extension type
 };

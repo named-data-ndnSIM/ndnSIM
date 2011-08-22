@@ -19,6 +19,7 @@
  */
 
 #include "ccnb-parser-attr.h"
+#include "ns3/ccnb-parser-common.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -33,7 +34,7 @@ Attr::Attr (Buffer::Iterator &start, uint32_t length)
     }
   m_value = DynamicCast<Udata> (Block::ParseBlock (start));
   if (m_value == 0)
-    throw CcnxDecodingException (); // "ATTR must be followed by UDATA field"
+    throw CcnbDecodingException (); // "ATTR must be followed by UDATA field"
 }
 
 }

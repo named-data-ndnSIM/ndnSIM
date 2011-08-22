@@ -18,10 +18,11 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNB_PARSER_BLOCK_H_
-#define _CCNB_PARSER_BLOCK_H_
+#ifndef _CCNB_PARSER_BLOB_H_
+#define _CCNB_PARSER_BLOB_H_
 
 #include "ccnb-parser-block.h"
+#include "ns3/buffer.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -45,10 +46,10 @@ public:
    */
   Blob (Buffer::Iterator &start, uint32_t length);
   
-  virtual void accept( Visitor &v )                           { v.visit( *this ); }
-  virtual void accept( GJVoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
-  virtual boost::any accept( GJNoArguVisitor &v )             { return v.visit( *this ); }
-  virtual boost::any accept( GJVisitor &v, boost::any param ) { return v.visit( *this, param ); }
+  virtual void accept( VoidNoArguVisitor &v )               { v.visit( *this ); }
+  virtual void accept( VoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
+  virtual boost::any accept( NoArguVisitor &v )             { return v.visit( *this ); }
+  virtual boost::any accept( Visitor &v, boost::any param ) { return v.visit( *this, param ); }
 
   Buffer m_blob; ///< \brief field holding a parsed BLOB value of the block
 };
@@ -56,4 +57,4 @@ public:
 }
 }
 
-#endif // _CCNB_PARSER_BLOCK_H_
+#endif // _CCNB_PARSER_BLOB_H_

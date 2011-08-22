@@ -20,6 +20,15 @@
 
 #include "ccnb-parser-interest-visitor.h"
 
+#include "ns3/ccnb-parser-block.h"
+#include "ns3/ccnb-parser-dtag.h"
+#include "ns3/name-components.h"
+#include "ns3/assert.h"
+
+#include "ns3/ccnx-interest-header.h"
+
+#include <boost/foreach.hpp>
+
 namespace ns3 {
 namespace CcnbParser {
 
@@ -31,7 +40,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
   // std::list<Ptr<Block> > n.m_nestedBlocks;
 
   static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
-  static NameComponentsVisitor     m_nameComponentsVisitor;
+  static NameComponentsVisitor     nameComponentsVisitor;
   
   CcnxInterestHeader &interest = boost::any_cast<CcnxInterestHeader&> (param);
   
@@ -39,7 +48,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
     {
     case CCN_DTAG_Interest:
       // process nested blocks
-      BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+      BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
         {
           block->accept (*this, param);
         }
@@ -49,7 +58,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         // process name components
         Ptr<Name::Components> name = Create<Name::Components> ();
         
-        BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
             block->accept (nameComponentsVisitor, *name);
           }
@@ -57,20 +66,20 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         break;
       }
     case CCN_DTAG_MinSuffixComponents:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
       interest.SetMinSuffixComponents (
                boost::any_cast<uint32_t> (
-                                          (*n.m_nestedBlocks.begin())->accept(
+                                          (*n.m_nestedTags.begin())->accept(
                                                                            nonNegativeIntegerVisitor
                                                                            )));
       break;
     case CCN_DTAG_MaxSuffixComponents:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
       interest.SetMaxSuffixComponents (
                boost::any_cast<uint32_t> (
-                                          (*n.m_nestedBlocks.begin())->accept(
+                                          (*n.m_nestedTags.begin())->accept(
                                                                            nonNegativeIntegerVisitor
                                                                            )));
       break;
@@ -79,7 +88,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         // process exclude components
         Ptr<Name::Components> exclude = Create<Name::Components> ();
         
-        BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
             block->accept (nameComponentsVisitor, *exclude);
           }
@@ -87,42 +96,42 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         break;
       }
     case CCN_DTAG_ChildSelector:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
 
       interest.SetChildSelector (
                1 == boost::any_cast<uint32_t> (
-                                          (*n.m_nestedBlocks.begin())->accept(
+                                          (*n.m_nestedTags.begin())->accept(
                                                                            nonNegativeIntegerVisitor
                                                                            )));
       break;
     case CCN_DTAG_AnswerOriginKind:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
       interest.SetAnswerOriginKind (
                1 == boost::any_cast<uint32_t> (
-                                          (*n.m_nestedBlocks.begin())->accept(
+                                          (*n.m_nestedTags.begin())->accept(
                                                                            nonNegativeIntegerVisitor
                                                                            )));
       break;
     case CCN_DTAG_Scope: 
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
       interest.SetScope (
                boost::any_cast<uint32_t> (
-                                          (*n.m_nestedBlocks.begin())->accept(
+                                          (*n.m_nestedTags.begin())->accept(
                                                                            nonNegativeIntegerVisitor
                                                                            )));
       break;
     case CCN_DTAG_InterestLifetime:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
 
       /// \todo Decode InterestLifetime
       break;
     case CCN_DTAG_Nonce:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
 
       /// \todo Decode Nonce
       break;

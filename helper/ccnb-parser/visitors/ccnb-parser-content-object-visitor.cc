@@ -26,6 +26,10 @@
 #include "ns3/name-components.h"
 #include "ns3/assert.h"
 
+#include "ns3/ccnx-content-object-header.h"
+
+#include <boost/foreach.hpp>
+
 namespace ns3 {
 namespace CcnbParser {
 
@@ -35,7 +39,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
-  static NameComponentsVisitor m_nameComponentsVisitor;
+  static NameComponentsVisitor nameComponentsVisitor;
   
   CcnxContentObjectHeader &contentObject = boost::any_cast<CcnxContentObjectHeader&> (param);
   
@@ -43,7 +47,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
     {
     case CCN_DTAG_ContentObject:
       // process nested blocks
-      BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+      BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
         {
           block->accept (*this, param);
         }
@@ -53,7 +57,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
         // process name components
         Ptr<Name::Components> name = Create<Name::Components> ();
         
-        BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
             block->accept (nameComponentsVisitor, *name);
           }
@@ -66,7 +70,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
       break;
     case CCN_DTAG_Content: // !!! HACK
       // This hack was necessary for memory optimizations (i.e., content is virtual payload)
-      NS_ASSERT_MSG (n.m_nestedBlocks.size() == 0, "Parser should have stopped just after processing <Content> tag");
+      NS_ASSERT_MSG (n.m_nestedTags.size() == 0, "Parser should have stopped just after processing <Content> tag");
       break;
     }
 }

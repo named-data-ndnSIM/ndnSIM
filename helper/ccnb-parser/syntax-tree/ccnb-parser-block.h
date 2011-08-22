@@ -56,10 +56,10 @@ public:
   static Ptr<Block>
   ParseBlock (Buffer::Iterator &start);
   
-  virtual void accept (VoidNoArguVisitor &v )               =0; ///< \brief Method to dispatch VoidNoArguVisitor
-  virtual void accept (VoidVisitor &v, boost::any param)    =0; ///< \brief Method to dispatch VoidVisitor
-  virtual boost::any accept (NoArguVisitor &v )             =0; ///< \brief Method to dispatch NoArguVisitor 
-  virtual boost::any accept (Visitor &v, boost::any param ) =0; ///< \brief Method to dispatch Visitor
+  virtual void accept( VoidNoArguVisitor &v )               = 0;
+  virtual void accept( VoidVisitor &v, boost::any param )   = 0;
+  virtual boost::any accept( NoArguVisitor &v )             = 0;
+  virtual boost::any accept( Visitor &v, boost::any param ) = 0;
 };
 
 }

@@ -21,6 +21,9 @@
 #ifndef _CCNX_DECODING_HELPER_H_
 #define _CCNX_DECODING_HELPER_H_
 
+#include <cstring>
+#include "ns3/buffer.h"
+
 namespace ns3 {
 
 class CcnxInterestHeader;

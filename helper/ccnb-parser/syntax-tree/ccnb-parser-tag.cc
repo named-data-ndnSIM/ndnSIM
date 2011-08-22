@@ -19,7 +19,8 @@
  */
 
 #include "ccnb-parser-tag.h"
-#include "ns3/ccnb-parser-common.h"
+
+#include "ccnb-parser-base-attr.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -53,7 +54,7 @@ Tag::Tag (Buffer::Iterator &start, uint32_t length)
     }
   
   if (start.IsEnd ()) //should not be the end
-      throw CcnxDecodingException ();
+      throw CcnbDecodingException ();
 
   start.ReadU8 (); // read CCN_CLOSE
 }

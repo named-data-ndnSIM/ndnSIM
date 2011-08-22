@@ -19,7 +19,14 @@
  */
 
 #include "ccnb-parser-block.h"
-#include "ns3/ccnb-parser-common.h"
+
+#include "ccnb-parser-blob.h"
+#include "ccnb-parser-udata.h"
+#include "ccnb-parser-tag.h"
+#include "ccnb-parser-dtag.h"
+#include "ccnb-parser-attr.h"
+#include "ccnb-parser-dattr.h"
+#include "ccnb-parser-ext.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -61,7 +68,7 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
     case CCN_EXT:
       return Create<Ext> (start, value);
     default:
-      throw CcnxDecodingException ();
+      throw CcnbDecodingException ();
     }
 }
 

@@ -23,7 +23,7 @@
 
 #include <sys/types.h>
 
-#include "ns3/ccnx.h"
+#include "ns3/ccnb-parser-common.h"
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/buffer.h"
@@ -50,7 +50,7 @@ public:
 
 private:
   static size_t
-  AppendBlockHeader (Buffer::Iterator start, size_t value, Ccnx::ccn_tt block_type);
+  AppendBlockHeader (Buffer::Iterator start, size_t value, CcnbParser::ccn_tt block_type);
 
   static size_t
   AppendNumber (Buffer::Iterator start, uint32_t number);
@@ -86,7 +86,7 @@ private:
    * @returns written length
    */
   static size_t
-  AppendTaggedBlob (Buffer::Iterator start, Ccnx::ccn_dtag dtag,
+  AppendTaggedBlob (Buffer::Iterator start, CcnbParser::ccn_dtag dtag,
                     const uint8_t *data, size_t size);
   
 };

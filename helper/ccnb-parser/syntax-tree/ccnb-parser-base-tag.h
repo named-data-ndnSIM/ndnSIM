@@ -47,5 +47,8 @@ protected:
   BaseTag() { }
 };
 
+}
+}
+
 #endif // _CCNB_PARSER_BASE_TAG_H_
 

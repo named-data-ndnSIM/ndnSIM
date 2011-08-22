@@ -34,21 +34,21 @@ namespace ns3 {
 namespace CcnbParser {
 
 boost::any
-GJDepthFirstVisitor::visit (Blob &n, boost::any param)
+DepthFirstVisitor::visit (Blob &n, boost::any param)
 {
   // Buffer n.m_blob;
   return n.m_blob;
 }
  
 boost::any
-GJDepthFirstVisitor::visit (Udata &n, boost::any param)
+DepthFirstVisitor::visit (Udata &n, boost::any param)
 {
   // std::string n.m_udata;
   return n.m_udata;
 }
  
 boost::any
-GJDepthFirstVisitor::visit (Tag &n, boost::any param)
+DepthFirstVisitor::visit (Tag &n, boost::any param)
 {
   // std::string n.m_tag;
   // std::list<Ptr<Block> > n.m_attrs;
@@ -57,7 +57,7 @@ GJDepthFirstVisitor::visit (Tag &n, boost::any param)
     {
       block->accept (*this, param);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this, param);
     }
@@ -65,7 +65,7 @@ GJDepthFirstVisitor::visit (Tag &n, boost::any param)
 }
 
 boost::any
-GJDepthFirstVisitor::visit (Dtag &n, boost::any param)
+DepthFirstVisitor::visit (Dtag &n, boost::any param)
 {
   // std::string n.m_tag;
   // std::list<Ptr<Block> > n.m_attrs;
@@ -74,7 +74,7 @@ GJDepthFirstVisitor::visit (Dtag &n, boost::any param)
     {
       block->accept (*this, param);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this, param);
     }
@@ -82,7 +82,7 @@ GJDepthFirstVisitor::visit (Dtag &n, boost::any param)
 }
 
 boost::any
-GJDepthFirstVisitor::visit (Attr &n, boost::any param)
+DepthFirstVisitor::visit (Attr &n, boost::any param)
 {
   // std::string n.m_attr;
   // Ptr<Udata> n.m_value;
@@ -90,7 +90,7 @@ GJDepthFirstVisitor::visit (Attr &n, boost::any param)
 }
 
 boost::any
-GJDepthFirstVisitor::visit (Dattr &n, boost::any param)
+DepthFirstVisitor::visit (Dattr &n, boost::any param)
 {
   // uint32_t n.m_dattr;
   // Ptr<Udata> n.m_value;
@@ -98,7 +98,7 @@ GJDepthFirstVisitor::visit (Dattr &n, boost::any param)
 }
  
 boost::any
-GJDepthFirstVisitor::visit (Ext &n, boost::any param)
+DepthFirstVisitor::visit (Ext &n, boost::any param)
 {
   // uint64_t n.m_extSubtype;
   return n.m_extSubtype;

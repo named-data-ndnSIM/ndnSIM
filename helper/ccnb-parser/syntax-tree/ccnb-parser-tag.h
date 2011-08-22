@@ -46,10 +46,10 @@ public:
    */
   Tag (Buffer::Iterator &start, uint32_t length);
 
-  virtual void accept( Visitor &v )                           { v.visit( *this ); }
-  virtual void accept( GJVoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
-  virtual boost::any accept( GJNoArguVisitor &v )             { return v.visit( *this ); }
-  virtual boost::any accept( GJVisitor &v, boost::any param ) { return v.visit( *this, param ); }
+  virtual void accept( VoidNoArguVisitor &v )               { v.visit( *this ); }
+  virtual void accept( VoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
+  virtual boost::any accept( NoArguVisitor &v )             { return v.visit( *this ); }
+  virtual boost::any accept( Visitor &v, boost::any param ) { return v.visit( *this, param ); }
 
   std::string m_tag; ///< \brief Name of TAG block
 };

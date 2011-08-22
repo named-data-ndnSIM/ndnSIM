@@ -55,7 +55,7 @@ VoidNoArguDepthFirstVisitor::visit (Tag &n)
     {
       block->accept (*this);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this);
     }
@@ -71,7 +71,7 @@ VoidNoArguDepthFirstVisitor::visit (Dtag &n)
     {
       block->accept (*this);
     }
-  BOOST_FOREACH (Ptr<Block> block, n.m_nestedBlocks)
+  BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
     {
       block->accept (*this);
     }

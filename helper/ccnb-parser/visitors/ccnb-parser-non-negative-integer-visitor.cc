@@ -31,7 +31,7 @@ boost::any
 NonNegativeIntegerVisitor::visit (Blob &n) //to throw parsing error
 {
   // Buffer n.m_blob;
-  throw CcnxDecodingException ();
+  throw CcnbDecodingException ();
 }
 
 boost::any
@@ -42,7 +42,7 @@ NonNegativeIntegerVisitor::visit (Udata &n)
   int32_t value;
   is >> value;
   if (value<0) // value should be non-negative
-    throw CcnxDecodingException ();
+    throw CcnbDecodingException ();
 
   return static_cast<uint32_t> (value);
 }

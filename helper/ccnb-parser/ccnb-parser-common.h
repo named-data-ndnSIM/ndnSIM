@@ -43,6 +43,14 @@ class Dtag;
 class Dattr;
 class Ext;
 
+
+/**
+ * \brief Exception thrown if there is a parsing error
+ *
+ * \todo inherit this class from some exception class and provide meaningful error messages
+ */
+class CcnbDecodingException {};
+
 /**
  * \brief Type tag for a ccnb start marker.
  *
@@ -164,15 +172,7 @@ enum ccn_dtag {
   CCN_DTAG_CCNProtocolDataUnit = 17702112
 };
 
-/**
- * \brief Exception thrown if there is a parsing error
- *
- * \todo inherit this class from some exception class and provide meaningful error messages
- */
-class CcnbDecodingException {};
-
 } // namespace CcnxParser
-
 } // namespace ns3
 
 #endif // _CCNB_PARSER_COMMON_H_

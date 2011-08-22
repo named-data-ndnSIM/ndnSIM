@@ -39,10 +39,10 @@ NameComponentsVisitor::visit (Dtag &n, boost::any param/*should be Name::Compone
   switch (n.m_dtag)
     {
     case CCN_DTAG_Component:
-      if (n.m_nestedBlocks.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnxDecodingException ();
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
       components.Add (
-                      boost::any_cast<std::string> ((*n.m_nestedBlocks.begin())->accept(
+                      boost::any_cast<std::string> ((*n.m_nestedTags.begin())->accept(
                                                                                         stringVisitor
                                                                                         )));
       break;

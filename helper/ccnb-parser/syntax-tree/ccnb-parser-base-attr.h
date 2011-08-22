@@ -21,7 +21,6 @@
 #ifndef _CCNB_PARSER_BASE_ATTR_H_
 #define _CCNB_PARSER_BASE_ATTR_H_
 
-#include "ccnb-parser-block.h"
 #include "ccnb-parser-udata.h"
 
 namespace ns3 {

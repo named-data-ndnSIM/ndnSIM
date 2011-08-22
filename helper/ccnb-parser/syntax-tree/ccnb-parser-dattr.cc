@@ -29,7 +29,7 @@ Dattr::Dattr (Buffer::Iterator &start, uint32_t dattr)
   m_dattr = dattr;
   m_value = DynamicCast<Udata> (Block::ParseBlock (start));
   if (m_value == 0)
-    throw CcnxDecodingException (); // "ATTR must be followed by UDATA field"
+    throw CcnbDecodingException (); // "ATTR must be followed by UDATA field"
 }
 
 }
