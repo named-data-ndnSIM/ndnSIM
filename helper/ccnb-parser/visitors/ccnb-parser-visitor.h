@@ -21,7 +21,7 @@
 #ifndef _CCNB_PARSER_VISITOR_H_
 #define _CCNB_PARSER_VISITOR_H_
 
-#include "ns3/ccnb-parser-commoh.h"
+#include "ns3/ccnb-parser-common.h"
 #include <boost/any.hpp>
 
 namespace ns3 {

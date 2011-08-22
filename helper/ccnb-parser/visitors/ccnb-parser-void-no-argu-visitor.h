@@ -21,7 +21,7 @@
 #ifndef _CCNB_PARSER_VOID_NO_ARGU_VISITOR_H_
 #define _CCNB_PARSER_VOID_NO_ARGU_VISITOR_H_
 
-#include "ns3/ccnb-parser-commoh.h"
+#include <ns3/ccnb-parser-common.h>
 
 namespace ns3 {
 namespace CcnbParser {
