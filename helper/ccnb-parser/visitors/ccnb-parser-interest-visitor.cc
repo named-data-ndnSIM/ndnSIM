@@ -24,8 +24,13 @@
 #include "ns3/ccnb-parser-dtag.h"
 #include "ns3/name-components.h"
 #include "ns3/assert.h"
+#include "ns3/nstime.h"
 
 #include "ns3/ccnx-interest-header.h"
+#include "ccnb-parser-name-components-visitor.h"
+#include "ccnb-parser-non-negative-integer-visitor.h"
+#include "ccnb-parser-timestamp-visitor.h"
+#include "ccnb-parser-nonce-visitor.h"
 
 #include <boost/foreach.hpp>
 
@@ -41,6 +46,8 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
 
   static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
   static NameComponentsVisitor     nameComponentsVisitor;
+  static TimestampVisitor          timestampVisitor;
+  static NonceVisitor              nonceVisitor;
   
   CcnxInterestHeader &interest = boost::any_cast<CcnxInterestHeader&> (param);
   
@@ -127,13 +134,21 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
 
-      /// \todo Decode InterestLifetime
+      interest.SetInterestLifetime (
+               boost::any_cast<Time> (
+                                          (*n.m_nestedTags.begin())->accept(
+                                                                           timestampVisitor
+                                                                           )));
       break;
     case CCN_DTAG_Nonce:
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
 
-      /// \todo Decode Nonce
+      interest.SetNonce (
+               boost::any_cast<uint32_t> (
+                                          (*n.m_nestedTags.begin())->accept(
+                                                                           nonceVisitor
+                                                                           )));
       break;
     }
 }

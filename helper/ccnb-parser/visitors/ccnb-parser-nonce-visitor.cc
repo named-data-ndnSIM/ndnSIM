@@ -18,33 +18,28 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNB_PARSER_INTEREST_VISITOR_H_
-#define _CCNB_PARSER_INTEREST_VISITOR_H_
-
-#include "ccnb-parser-void-depth-first-visitor.h"
+#include "ccnb-parser-nonce-visitor.h"
+#include "ns3/ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
-/**
- * \ingroup ccnx-ccnb
- * \brief Visitor that fills fields in CcnxInterestHeader
- *
- * Usage example:
- * \code
- *   Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
- *   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
- *   InterestVisitor visitor;
- *   root->accept (visitor, *header); 
- * \endcode
- */
-class InterestVisitor : public VoidDepthFirstVisitor
+boost::any
+NonceVisitor::visit (Blob &n) 
 {
-public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&*/);
-};
+  // Buffer n.m_blob;
+  if (n.m_blob.GetSize ()<4)
+    throw CcnbDecodingException ();
+     
+  return boost::any (n.m_blob.Begin ().ReadU32 ());
+}
+
+boost::any
+NonceVisitor::visit (Udata &n)
+{
+  // std::string n.m_udata;
+  throw CcnbDecodingException ();
+}
 
 }
 }
-
-#endif // _CCNB_PARSER_INTEREST_VISITOR_H_

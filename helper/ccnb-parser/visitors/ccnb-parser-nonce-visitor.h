@@ -18,33 +18,31 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNB_PARSER_INTEREST_VISITOR_H_
-#define _CCNB_PARSER_INTEREST_VISITOR_H_
+#ifndef _CCNB_PARSER_NONCE_VISITOR_H_
+#define _CCNB_PARSER_NONCE_VISITOR_H_
 
-#include "ccnb-parser-void-depth-first-visitor.h"
+#include "ccnb-parser-no-argu-depth-first-visitor.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
 /**
  * \ingroup ccnx-ccnb
- * \brief Visitor that fills fields in CcnxInterestHeader
+ * \brief Visitor to obtain nonce value from BLOB block
  *
- * Usage example:
- * \code
- *   Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
- *   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
- *   InterestVisitor visitor;
- *   root->accept (visitor, *header); 
- * \endcode
+ * Note, only first 32 bits will be actually parsed into nonce. If
+ * original Nonce contains more, the rest will be ignored
+ *
+ * Will return empty boost::any() if called on anything except BLOB block
  */
-class InterestVisitor : public VoidDepthFirstVisitor
+class NonceVisitor : public NoArguDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&*/);
+  virtual boost::any visit (Blob &n); 
+  virtual boost::any visit (Udata &n); ///< Throws parsing error if BLOB object is encountered
 };
 
 }
 }
 
-#endif // _CCNB_PARSER_INTEREST_VISITOR_H_
+#endif // _CCNB_PARSER_NONCE_VISITOR_H_
