@@ -39,7 +39,6 @@ NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyReadingExample");
 
 int main (int argc, char *argv[])
 {
-    //Packet::EnablePrinting();
     GlobalValue::Bind ("SimulatorImplementationType", StringValue
                        ("ns3::VisualSimulatorImpl"));
     
@@ -55,17 +54,18 @@ int main (int argc, char *argv[])
     // ------------------------------------------------------------
     // -- Read topology data.
     // --------------------------------------------
+    
+    
+    Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
+    reader->SetFileName (input);
+    
     NodeContainer nodes;
-    
-    Ptr<AnnotatedTopologyReader> inFile = CreateObject<AnnotatedTopologyReader> ();
-    inFile->SetFileName (input);
-    
-    if (inFile != 0)
+    if (reader != 0)
     {
-        nodes = inFile->Read ();
+        nodes = reader->Read ();
     }
     
-    if (inFile->LinksSize () == 0)
+    if (reader->LinksSize () == 0)
     {
         NS_LOG_ERROR ("Problems reading the topology file. Failing.");
         return -1;
@@ -89,106 +89,25 @@ int main (int argc, char *argv[])
     Ipv4AddressHelper address;
     address.SetBase ("10.0.0.0", "255.255.255.252");
     
-    int totlinks = inFile->LinksSize ();
+    int totlinks = reader->LinksSize ();
     
+    
+    ///*** applying settings
     NS_LOG_INFO ("creating node containers");
     NodeContainer* nc = new NodeContainer[totlinks];
     TopologyReader::ConstLinksIterator iter;
     int i = 0;
-    for ( iter = inFile->LinksBegin (); iter != inFile->LinksEnd (); iter++, i++ )
+    for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
     {
         nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
     }
     
-    NS_LOG_INFO ("creating net device containers");
-    ObjectFactory m_queueFactory;
-    m_queueFactory.SetTypeId("ns3::DropTailQueue");
-    //m_queueFactory.Set("Mode",
     NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-    PointToPointHelper p2p;
-    TopologyReader::ConstLinksIterator iter2;
-    i = 0;
-    for ( iter2 = inFile->LinksBegin (); iter2 != inFile->LinksEnd (); iter2++, i++ )
-    {
-        std::string dataRate = iter2->GetAttribute("DataRate");
-        NS_LOG_INFO("dataRate = "<<dataRate);
-        dataRate += "Kbps";
-        std::string delay = iter2->GetAttribute("Delay");
-        NS_LOG_INFO("delay = "<<delay);
-        delay += "ms";
-        p2p.SetDeviceAttribute("DataRate", StringValue(dataRate));
-        p2p.SetChannelAttribute("Delay", StringValue(delay));
-        p2p.SetQueue("ns3::DropTailQueue","MaxPackets",StringValue("100"));
-        ndc[i] = p2p.Install(nc[i]);
-        
-        NodeContainer twoNodes = nc[i];
-        
-        
-        Ptr<Node> nd = twoNodes.Get(0);
-        if(nd==NULL)
-            NS_LOG_INFO("nd = null");
-        Ptr<Node> nd2 = twoNodes.Get(1);
-        if(nd2==NULL)
-            NS_LOG_INFO("nd2 = null");
-        //NS_LOG_INFO("1");
-        NS_LOG_INFO("#netdevices = " << nd->GetNDevices());
-        NS_LOG_INFO("#netdevices = " << nd2->GetNDevices());
-
-        Ptr<PointToPointNetDevice> device = nd->GetDevice(nd->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-        if(device==NULL)
-            NS_LOG_INFO("device = 0");
-        
-        //NS_LOG_INFO("2");
-        
-        Ptr<PointToPointNetDevice> device2 = nd2->GetDevice(nd2->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-
-        if(device2==NULL)
-            NS_LOG_INFO("device2 = 0");
-        
-        PointerValue tmp1;
-        device->GetAttribute ("TxQueue", tmp1);
-        //NS_LOG_INFO("2.5");
-        Ptr<Object> txQueue1 = tmp1.GetObject ();
-        
-        PointerValue tmp2;
-        device2->GetAttribute ("TxQueue", tmp2);
-        Ptr<Object> txQueue2 = tmp2.GetObject ();
-        //NS_LOG_INFO("3");
-        Ptr<DropTailQueue> dtq1 = txQueue1->GetObject <DropTailQueue> ();
-        NS_ASSERT (dtq1 != 0);
-        
-        Ptr<DropTailQueue> dtq2 = txQueue2->GetObject <DropTailQueue> ();
-        NS_ASSERT (dtq2 != 0);
-        
-        std::string queuesize1 = iter2->GetAttribute("QueueSizeNode1");
-        std::string queuesize2 = iter2->GetAttribute("QueueSizeNode2");
-        //NS_LOG_INFO("4");
-        txQueue1->SetAttribute("MaxPackets", UintegerValue (atoi(queuesize1.c_str())));
-        txQueue2->SetAttribute("MaxPackets", UintegerValue (atoi(queuesize2.c_str())));
-        
-        UintegerValue limit;
-        txQueue1->GetAttribute ("MaxPackets", limit);
-        NS_LOG_INFO ("txQueue1 limit changed: " << limit.Get () << " packets");
-        
-        txQueue2->GetAttribute ("MaxPackets", limit);
-        NS_LOG_INFO ("txQueue2 limit changed: " << limit.Get () << " packets");
-        
+    reader->ApplySettings(ndc,nc);
+    ///*** settings applied
     
-        /* //bauman way of doing things
-        m_queueFactory.Set("MaxPackets",StringValue(iter2->GetAttribute("QueueSizeNode1")));
-        NS_LOG_INFO("2.5");
-        Ptr<DropTailQueue> queue = m_queueFactory.Create<DropTailQueue>();
-        queue->SetMode(ns3::DropTailQueue::PACKETS);
-        NS_LOG_INFO("2,8");
-        device->SetQueue(queue);
-        NS_LOG_INFO("3");
-        m_queueFactory.Set("MaxPackets", StringValue(iter2->GetAttribute("QueueSizeNode2")));
-        
-        Ptr<DropTailQueue> queue2 = m_queueFactory.Create<DropTailQueue>();
-        queue2->SetMode(ns3::DropTailQueue::PACKETS);
-        device2->SetQueue(queue2);
-        */
-    }
+    
+    
     
     // it creates little subnets, one for each couple of nodes.
     NS_LOG_INFO ("creating ipv4 interfaces");
@@ -198,57 +117,6 @@ int main (int argc, char *argv[])
         ipic[i] = address.Assign (ndc[i]);
         address.NewNetwork ();
     }
-    
-    
-    
-    
-    
-    
-    /*
-    NS_LOG_INFO ("Create Applications.");
-    uint16_t port = 9;   // Discard port (RFC 863)
-    
-    std::string sendsizeattr = "SendSize";
-    //flow2 7-->2
-    BulkSendHelper bulksend0 ("ns3::TcpSocketFactory", InetSocketAddress (ipic[1].GetAddress (0), port));
-    //bulksend0.SetAttribute(sendsizeattr, AttributeValue(ConstantVariable(2560)));
-    bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
-    ApplicationContainer apps = bulksend0.Install(nc[6]);
-    apps.Start(Seconds (1.0));
-    apps.Stop(Seconds (10.0));
-    
-    // Create a packet sink to receive these packets
-    PacketSinkHelper sink0 ("ns3::UdpSocketFactory", InetSocketAddress(Ipv4Address::GetAny (), port));
-    apps = sink0.Install(nc[1]);
-    apps.Start(Seconds(0.0));
-    apps.Stop(Seconds(20.0));
-    
-    //flow1 1-->6
-    BulkSendHelper bulksend ("ns3::TcpSocketFactory", InetSocketAddress (ipic[5].GetAddress (1), port));
-    //bulksend.SetAttribute(sendsizeattr, AttributeValue( ConstantVariable(2560)));
-    bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
-    apps = bulksend.Install (nc[0]);
-    apps.Start (Seconds (6.0));
-    apps.Stop (Seconds (20.0));
-    
-    // Create a packet sink to receive these packets
-    PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
-    apps = sink.Install (nc[5]);
-    apps.Start(Seconds(0.0));
-    apps.Stop(Seconds(20.0));
-    
-    AsciiTraceHelper ascii;
-    p2p.EnableAsciiAll (ascii.CreateFileStream ("annotated-topology-read.tr"));
-    p2p.EnablePcapAll ("annotated-topology-read");
-    
-    */
-    
-    
-    
-    
-    
-    
-    
     
     // ------------------------------------------------------------
     // -- Run the simulation
@@ -265,6 +133,4 @@ int main (int argc, char *argv[])
     NS_LOG_INFO ("Done.");
     
     return 0;
-    
-    // end main
 }
