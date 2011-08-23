@@ -47,11 +47,11 @@ public:
   /**
    * \param dest Destination CcnxAddress
    */
-  void SetPrefix (const Ptr<Name::Components> &dest);
+  void SetPrefix (const Ptr<CcnxNameComponents> &dest);
   /**
    * \return Destination CcnxAddress of the route
    */
-  const Name::Components& GetPrefix (void) const;
+  const CcnxNameComponents& GetPrefix (void) const;
 
   /**
    * Equivalent in Linux to dst_entry.dev
@@ -65,7 +65,7 @@ public:
   Ptr<CcnxFace> GetOutputFace (void) const;
 
 private:
-  Ptr<Name::Components> m_prefix;
+  Ptr<CcnxNameComponents> m_prefix;
   Ptr<CcnxFace> m_outputFace;
 };
 

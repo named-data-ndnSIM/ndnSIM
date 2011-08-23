@@ -138,12 +138,12 @@ public:
   /**
    * \brief Set interest name
    *
-   * Sets name of the interest. For example, SetName( Name::Components("prefix")("postfix") );
+   * Sets name of the interest. For example, SetName( CcnxNameComponents("prefix")("postfix") );
    **/
   void
-  SetName (const Ptr<Name::Components> &name);
+  SetName (const Ptr<CcnxNameComponents> &name);
 
-  const Name::Components&
+  const CcnxNameComponents&
   GetName () const;
 
   void
@@ -161,12 +161,12 @@ public:
   /**
    * \brief Set exclude filer
    *
-   * For example, SetExclude (Name::Components("exclude1")("exclude2")("exclude3"))
+   * For example, SetExclude (CcnxNameComponents("exclude1")("exclude2")("exclude3"))
    **/
   void
-  SetExclude (const Ptr<Name::Components> &exclude);
+  SetExclude (const Ptr<CcnxNameComponents> &exclude);
 
-  const Name::Components&
+  const CcnxNameComponents&
   GetExclude () const;
 
   void
@@ -209,10 +209,10 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  Ptr<Name::Components> m_name;
+  Ptr<CcnxNameComponents> m_name;
   int32_t m_minSuffixComponents; ///< minimum suffix components. not used if negative
   int32_t m_maxSuffixComponents; ///< maximum suffix components. not used if negative
-  Ptr<Name::Components> m_exclude; ///< exclude filter
+  Ptr<CcnxNameComponents> m_exclude; ///< exclude filter
   bool m_childSelector;    
   bool m_answerOriginKind; 
   int8_t m_scope;            ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood

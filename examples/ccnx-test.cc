@@ -52,7 +52,7 @@ main (int argc, char *argv[])
   Ptr<CcnxRit> rit = CreateObject<CcnxRit> ();
 
   CcnxInterestHeader header;
-  Ptr<Name::Components> testname = Create<Name::Components> ();
+  Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
   (*testname) ("test") ("test2");
   header.SetName (testname);
   header.SetNonce (1);

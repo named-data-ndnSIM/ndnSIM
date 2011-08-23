@@ -60,12 +60,12 @@ CcnxInterestHeader::CcnxInterestHeader ()
 }
 
 void
-CcnxInterestHeader::SetName (const Ptr<Name::Components> &name)
+CcnxInterestHeader::SetName (const Ptr<CcnxNameComponents> &name)
 {
   m_name = name;
 }
 
-const Name::Components&
+const CcnxNameComponents&
 CcnxInterestHeader::GetName () const
 {
   return *m_name;
@@ -96,12 +96,12 @@ CcnxInterestHeader::GetMaxSuffixComponents () const
 }
 
 void
-CcnxInterestHeader::SetExclude (const Ptr<Name::Components> &exclude)
+CcnxInterestHeader::SetExclude (const Ptr<CcnxNameComponents> &exclude)
 {
   m_exclude = exclude;
 }
 
-const Name::Components&
+const CcnxNameComponents&
 CcnxInterestHeader::GetExclude () const
 {
   return *m_exclude;

@@ -31,20 +31,19 @@
 #include "ns3/object.h"
 
 namespace ns3 {
-namespace Name {
 
-class Components : public Object
+class CcnxNameComponents : public Object
 
 {
 public:
-  Components ();
-  Components (const std::string &s);
-  ~Components ();
+  CcnxNameComponents ();
+  CcnxNameComponents (const std::string &s);
+  ~CcnxNameComponents ();
   
   inline void
   Add (const std::string &s);
        
-  Components&
+  CcnxNameComponents&
   operator () (const std::string &s);
 
   const std::list<std::string> &
@@ -65,10 +64,10 @@ public:
   size () const;
 
   inline bool
-  operator== (const Components &prefix) const;
+  operator== (const CcnxNameComponents &prefix) const;
 
   inline bool
-  operator< (const Components &prefix) const;
+  operator< (const CcnxNameComponents &prefix) const;
   
 private:
   std::list<std::string> m_prefix;
@@ -77,22 +76,22 @@ private:
   typedef std::list<std::string>::const_iterator const_iterator;
 };
 
-std::ostream & operator << (std::ostream &os, const Components &components);
+std::ostream & operator << (std::ostream &os, const CcnxNameComponents &components);
 
 size_t
-Components::size () const
+CcnxNameComponents::size () const
 {
   return m_prefix.size ();
 }
   
 void
-Components::Add (const std::string &s)
+CcnxNameComponents::Add (const std::string &s)
 {
   (*this) (s);
 }
 
 bool
-Components::operator== (const Components &prefix) const
+CcnxNameComponents::operator== (const CcnxNameComponents &prefix) const
 {
   if (m_prefix.size () != prefix.m_prefix.size ())
     return false;
@@ -101,7 +100,7 @@ Components::operator== (const Components &prefix) const
 }
 
 bool
-Components::operator< (const Components &prefix) const
+CcnxNameComponents::operator< (const CcnxNameComponents &prefix) const
 {
   return std::lexicographical_compare (m_prefix.begin (), m_prefix.end (),
                                        prefix.m_prefix.begin (), prefix.m_prefix.end ());
@@ -110,12 +109,11 @@ Components::operator< (const Components &prefix) const
     
 /**
 * \class ns3::ComponentsValue
-* \brief hold objects of type ns3::Name::Components
+* \brief hold objects of type ns3:CcnxNameComponents
 */
-ATTRIBUTE_VALUE_DEFINE (Components);
-ATTRIBUTE_ACCESSOR_DEFINE (Components);
-ATTRIBUTE_CHECKER_DEFINE (Components);
-} // Namespace Name
+ATTRIBUTE_VALUE_DEFINE (CcnxNameComponents);
+ATTRIBUTE_ACCESSOR_DEFINE (CcnxNameComponents);
+ATTRIBUTE_CHECKER_DEFINE (CcnxNameComponents);
 } // namespace ns3
 
 #endif // _NDN_NAME_COMPONENTS_H_

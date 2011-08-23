@@ -37,14 +37,14 @@ CcnxInterestSender::GetTypeId (void)
                    TimeValue (Seconds (0.1)),
                    MakeTimeAccessor (&CcnxInterestSender::m_offTime),
                    MakeTimeChecker ())
-    /*.AddAttribute ("NameComponents","CcnxName of the Interest (use Name::Components)",
-                   Name::ComponentsValue(Name::Components()),
-                   Name::MakeComponentsAccessor(&CcnxInterestSender::m_interestName),
-                   Name::MakeComponentsChecker())*/
-    .AddAttribute ("NameComponents","CcnxName of the Interest (use Name::Components)",
-                   PointerValue (CreateObject<Name::Components> ()),
+    /*.AddAttribute ("NameComponents","CcnxName of the Interest (use CcnxNameComponents)",
+                   CcnxNameComponentsValue(CcnxNameComponents()),
+                   MakeCcnxNameComponentsAccessor(&CcnxInterestSender::m_interestName),
+                   MakeCcnxNameComponentsChecker())*/
+    .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
+                   PointerValue (CreateObject<CcnxNameComponents> ()),
                    MakePointerAccessor (&CcnxInterestSender::m_interestName),
-                   MakePointerChecker<Name::Components> ())
+                   MakePointerChecker<CcnxNameComponents> ())
     .AddAttribute ("LifeTime", "LifeTime fo interest packet",
                    TimeValue (Seconds (4.0)),
                    MakeTimeAccessor (&CcnxInterestSender::m_interestLifeTime),
@@ -61,14 +61,14 @@ CcnxInterestSender::GetTypeId (void)
                    BooleanValue(false),
                    MakeBooleanAccessor(&CcnxInterestSender::m_childSelector),
                    MakeBooleanChecker())
-    /*.AddAttribute ("Exclude","only simple name matching is supported (use Name::Components)",
-                   Name::ComponentsValue(Name::Components()),
-                   Name::MakeComponentsAccessor(&CcnxInterestSender::m_exclude),
-                   Name::MakeComponentsChecker())*/
-    .AddAttribute ("Exclude", "only simple name matching is supported (use Name::Components)",
-                   PointerValue (CreateObject<Name::Components> ()),
+    /*.AddAttribute ("Exclude","only simple name matching is supported (use CcnxNameComponents)",
+                   CcnxNameComponentsValue(CcnxNameComponents()),
+                   MakeCcnxNameComponentsAccessor(&CcnxInterestSender::m_exclude),
+                   MakeCcnxNameComponentsChecker())*/
+    .AddAttribute ("Exclude", "only simple name matching is supported (use CcnxNameComponents)",
+                   PointerValue (CreateObject<CcnxNameComponents> ()),
                    MakePointerAccessor (&CcnxInterestSender::m_exclude),
-                   MakePointerChecker<Name::Components> ())
+                   MakePointerChecker<CcnxNameComponents> ())
     .AddAttribute ("Initial Nonce", "If 0 then nonce is not used",
                    UintegerValue(1),
                    MakeUintegerAccessor(&CcnxInterestSender::m_initialNonce),
@@ -143,11 +143,11 @@ CcnxInterestSender::SendPacket ()
     uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
     CcnxInterestHeader interestHeader;
     interestHeader.SetNonce(randomNonce);
-    //const Ptr<Name::Components> name = Create<Name::Components>(m_interestName);
+    //const Ptr<CcnxNameComponents> name = Create<CcnxNameComponents>(m_interestName);
     interestHeader.SetName(m_interestName);
     interestHeader.SetInterestLifetime(m_interestLifeTime);
     interestHeader.SetChildSelector(m_childSelector);
-    //const Ptr<Name::Components> exclude = Create<Name::Components>(m_exclude);
+    //const Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents>(m_exclude);
     interestHeader.SetExclude(m_exclude);
     interestHeader.SetMaxSuffixComponents(m_maxSuffixComponents);
     interestHeader.SetMinSuffixComponents(m_minSuffixComponents);

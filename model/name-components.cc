@@ -25,15 +25,14 @@
 using namespace std;
 
 namespace ns3 {
-namespace Name {
 
-Components::Components ()
+CcnxNameComponents::CcnxNameComponents ()
 {
   // m_value = ccn_charbuf_create ();
   // ccn_name_init(m_value);
 }
 
-Components::Components (const string &s)
+CcnxNameComponents::CcnxNameComponents (const string &s)
 {
   // m_value = ccn_charbuf_create ();
   // ccn_name_init(m_value);
@@ -41,13 +40,13 @@ Components::Components (const string &s)
   m_prefix.push_back (s);
 }
 
-Components::~Components ()
+CcnxNameComponents::~CcnxNameComponents ()
 {
   // ccn_charbuf_destroy(&m_value);
 }
 
 const std::list<std::string> &
-Components::GetComponents () const
+CcnxNameComponents::GetComponents () const
 {
   return m_prefix;
 }
@@ -59,8 +58,8 @@ Components::GetComponents () const
 //   return m_value;
 // }
 
-Components&
-Components::operator () (const string &s)
+CcnxNameComponents&
+CcnxNameComponents::operator () (const string &s)
 {
   // ccn_name_append_str (m_value,s.c_str());
   m_prefix.push_back (s);
@@ -73,7 +72,7 @@ Components::operator () (const string &s)
 // }
 
 void
-Components::Print (std::ostream &os) const
+CcnxNameComponents::Print (std::ostream &os) const
 {
   for (const_iterator i=m_prefix.begin(); i!=m_prefix.end(); i++)
     {
@@ -82,12 +81,10 @@ Components::Print (std::ostream &os) const
 }
   
 std::ostream &
-operator << (std::ostream &os, const Components &components)
+operator << (std::ostream &os, const CcnxNameComponents &components)
 {
   components.Print (os);
   return os;
-}
-
 }
 }
 

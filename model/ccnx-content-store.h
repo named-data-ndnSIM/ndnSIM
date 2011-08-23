@@ -73,7 +73,7 @@ public:
    * \brief Get prefix of the stored entry
    * \returns prefix of the stored entry
    */
-  inline const Name::Components&
+  inline const CcnxNameComponents&
   GetName () const;
 
   /**
@@ -142,7 +142,7 @@ struct CcnxContentStoreContainer
       boost::multi_index::hashed_unique<
         boost::multi_index::tag<__ccnx_private_content_store::hash>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const Name::Components&,
+                                          const CcnxNameComponents&,
                                           &CcnxContentStoreEntry::GetName>,
         CcnxPrefixHash>,
       boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private_content_store::mru> >
@@ -151,7 +151,7 @@ struct CcnxContentStoreContainer
       boost::multi_index::ordered_unique<
         boost::multi_index::tag<__ccnx_private_content_store::ordered>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const Name::Components&,
+                                          const CcnxNameComponents&,
                                           &CcnxContentStoreEntry::GetName>
           >
 #endif
@@ -271,7 +271,7 @@ operator<< (std::ostream &os, const CcnxContentStore &cs)
   return os;
 }
 
-const Name::Components&
+const CcnxNameComponents&
 CcnxContentStoreEntry::GetName () const
 {
   return m_header->GetName ();

@@ -55,7 +55,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
     case CCN_DTAG_Name:
       {
         // process name components
-        Ptr<Name::Components> name = Create<Name::Components> ();
+        Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {

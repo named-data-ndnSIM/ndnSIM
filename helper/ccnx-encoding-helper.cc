@@ -76,7 +76,7 @@ CcnxEncodingHelper::CcnxEncodingHelper::AppendCloser (Buffer::Iterator start)
 }
 
 size_t
-CcnxEncodingHelper::AppendNameComponents (Buffer::Iterator start, const Name::Components &name)
+CcnxEncodingHelper::AppendNameComponents (Buffer::Iterator start, const CcnxNameComponents &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())

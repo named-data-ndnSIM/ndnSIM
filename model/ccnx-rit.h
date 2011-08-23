@@ -49,11 +49,11 @@ class CcnxInterestHeader;
  */
 struct CcnxRitEntry
 {
-  Name::Components m_prefix; ///< \brief Prefix of the recently satisfied interest
+  CcnxNameComponents m_prefix; ///< \brief Prefix of the recently satisfied interest
   uint32_t m_nonce; ///< \brief Nonce of the recently satisfied interest
   Time m_expireTime;  ///< \brief Time when the record should be removed
 
-  CcnxRitEntry (const Name::Components &prefix, uint32_t nonce, const Time &timeout)
+  CcnxRitEntry (const CcnxNameComponents &prefix, uint32_t nonce, const Time &timeout)
     : m_prefix (prefix)
     , m_nonce (nonce)
     , m_expireTime (timeout)

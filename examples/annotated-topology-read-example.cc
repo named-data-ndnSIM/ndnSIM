@@ -30,7 +30,7 @@
 #include "ns3/ipv4-list-routing-helper.h"
 #include "ns3/annotated-topology-reader.h"
 #include <list>
-#include "ns3/visualizer-module.h"
+//#include "ns3/visualizer-module.h"
 
 using namespace ns3;
 using namespace std;
@@ -107,7 +107,7 @@ int main (int argc, char *argv[])
     ///*** settings applied
     
     
-    
+     
     
     // it creates little subnets, one for each couple of nodes.
     NS_LOG_INFO ("creating ipv4 interfaces");

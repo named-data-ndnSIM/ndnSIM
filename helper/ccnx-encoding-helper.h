@@ -30,7 +30,7 @@
 
 namespace ns3 {
 
-namespace Name{ class Components; }
+class CcnxNameComponents;
 
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
@@ -59,7 +59,7 @@ private:
   AppendCloser (Buffer::Iterator start);
 
   static size_t
-  AppendNameComponents (Buffer::Iterator start, const Name::Components &name);
+  AppendNameComponents (Buffer::Iterator start, const CcnxNameComponents &name);
 
   /**
    * Append a binary timestamp as a BLOB using the ccn binary

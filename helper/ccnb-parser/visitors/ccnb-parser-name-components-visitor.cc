@@ -28,13 +28,13 @@ namespace ns3 {
 namespace CcnbParser {
 
 void
-NameComponentsVisitor::visit (Dtag &n, boost::any param/*should be Name::Components&*/)
+NameComponentsVisitor::visit (Dtag &n, boost::any param/*should be CcnxNameComponents&*/)
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
   static StringVisitor stringVisitor; 
  
-  Name::Components &components = boost::any_cast<Name::Components&> (param);
+  CcnxNameComponents &components = boost::any_cast<CcnxNameComponents&> (param);
 
   switch (n.m_dtag)
     {

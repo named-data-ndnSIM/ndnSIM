@@ -63,12 +63,12 @@ public:
   /**
    * \brief Set interest name
    *
-   * Sets name of the interest. For example, SetName( Name::Components("prefix")("postfix") );
+   * Sets name of the interest. For example, SetName( CcnxNameComponents("prefix")("postfix") );
    **/
   void
-  SetName (const Ptr<Name::Components> &name);
+  SetName (const Ptr<CcnxNameComponents> &name);
 
-  const Name::Components&
+  const CcnxNameComponents&
   GetName () const;
 
   // void
@@ -93,7 +93,7 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  Ptr<Name::Components> m_name;
+  Ptr<CcnxNameComponents> m_name;
   // m_signature;
   // m_signedInfo;
 };

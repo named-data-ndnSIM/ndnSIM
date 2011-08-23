@@ -29,12 +29,12 @@ CcnxRoute::CcnxRoute ()
 }
 
 void
-CcnxRoute::SetPrefix (const Ptr<Name::Components> &prefix)
+CcnxRoute::SetPrefix (const Ptr<CcnxNameComponents> &prefix)
 {
   m_prefix = prefix;
 }
 
-const Name::Components&
+const CcnxNameComponents&
 CcnxRoute::GetPrefix (void) const
 {
   return *m_prefix;

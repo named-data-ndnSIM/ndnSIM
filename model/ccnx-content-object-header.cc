@@ -49,12 +49,12 @@ CcnxContentObjectHeader::CcnxContentObjectHeader ()
 }
 
 void
-CcnxContentObjectHeader::SetName (const Ptr<Name::Components> &name)
+CcnxContentObjectHeader::SetName (const Ptr<CcnxNameComponents> &name)
 {
   m_name = name;
 }
 
-const Name::Components&
+const CcnxNameComponents&
 CcnxContentObjectHeader::GetName () const
 {
   return *m_name;

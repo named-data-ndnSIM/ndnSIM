@@ -37,10 +37,10 @@ namespace ns3
  * \todo Testing is required to determine if this hash function
  * actually provides good hash results
  */
-struct CcnxPrefixHash : public std::unary_function<Name::Components, std::size_t>
+struct CcnxPrefixHash : public std::unary_function<CcnxNameComponents, std::size_t>
 {
   std::size_t
-  operator() (const Name::Components &prefix) const
+  operator() (const CcnxNameComponents &prefix) const
   {
     std::size_t hash = 23;
     BOOST_FOREACH (const std::string &str, prefix.GetComponents ())

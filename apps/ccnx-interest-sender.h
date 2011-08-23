@@ -59,12 +59,12 @@ private:
         
     //Time m_onTime;
     Time m_offTime;
-    Ptr<Name::Components> m_interestName;
+    Ptr<CcnxNameComponents> m_interestName;
     Time m_interestLifeTime;
     int32_t m_minSuffixComponents;
     int32_t m_maxSuffixComponents;
     bool m_childSelector;
-    Ptr<Name::Components> m_exclude;
+    Ptr<CcnxNameComponents> m_exclude;
     uint32_t m_initialNonce;
     
     //EventId         m_startStopEvent;     // Event id for next start or stop event
@@ -78,12 +78,12 @@ private:
     void Construct (Ptr<Node> n,
                     std::string tid,
                     const Time& offtime,
-                    Ptr<Name::Components> nameComponents,
+                    Ptr<CcnxNameComponents> nameComponents,
                     const Time& lifetime,
                     const int32_t& minSuffixComponents,
                     const int32_t& maxSuffixComponents,
                     const bool childSelector,
-                    Ptr<Name::Components> exclude,
+                    Ptr<CcnxNameComponents> exclude,
                     const uint32_t& initialNonce
                     );
     

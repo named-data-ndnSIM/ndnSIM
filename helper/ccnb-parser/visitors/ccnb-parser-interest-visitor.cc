@@ -63,7 +63,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
     case CCN_DTAG_Name:
       {
         // process name components
-        Ptr<Name::Components> name = Create<Name::Components> ();
+        Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
@@ -93,7 +93,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
     case CCN_DTAG_Exclude:
       {
         // process exclude components
-        Ptr<Name::Components> exclude = Create<Name::Components> ();
+        Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
