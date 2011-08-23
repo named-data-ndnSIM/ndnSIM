@@ -125,7 +125,7 @@ namespace ns3
    - InterestLifetime: ?
    - Nonce: 32 bit random integer.  If value is 0, will not be serialized
  */
-  class CcnxInterestHeader : public Header
+class CcnxInterestHeader : public Header
 {
 public:
   /**

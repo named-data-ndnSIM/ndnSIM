@@ -33,7 +33,7 @@ namespace ns3
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
 
-using namespace __ccnx_private;
+using namespace __ccnx_private_content_store;
 
 TypeId 
 CcnxContentStore::GetTypeId (void)
@@ -54,6 +54,51 @@ CcnxContentStore::GetTypeId (void)
 }
 
 CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
+
+//////////////////////////////////////////////////////////////////////
+// Helper classes
+//////////////////////////////////////////////////////////////////////
+/**
+ * \ingroup ccnx
+ * \brief Typedef for hash index of content store container
+ */
+struct CcnxContentStoreByPrefix
+{
+  typedef
+  CcnxContentStoreContainer::type::index<hash>::type
+  type;
+};
+
+/**
+ * \ingroup ccnx
+ * \brief Typedef for MRU index of content store container
+ */
+struct CcnxContentStoreByMru
+{
+  typedef
+  CcnxContentStoreContainer::type::index<mru>::type
+  type;
+};
+
+#ifdef _DEBUG
+#define DUMP_INDEX_TAG ordered
+#define DUMP_INDEX     CcnxContentStoreOrderedPrefix
+/**
+ * \ingroup ccnx
+ * \brief Typedef for ordered index of content store container
+ */
+struct CcnxContentStoreOrderedPrefix
+{
+  typedef
+  CcnxContentStoreContainer::type::index<ordered>::type
+  type;
+};
+#else
+#define DUMP_INDEX_TAG mru
+#define DUMP_INDEX     CcnxContentStoreByMru
+#endif
+
+//////////////////////////////////////////////////////////////////////
 
 CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
   : m_header (header)

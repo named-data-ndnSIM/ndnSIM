@@ -94,6 +94,9 @@ Components::Add (const std::string &s)
 bool
 Components::operator== (const Components &prefix) const
 {
+  if (m_prefix.size () != prefix.m_prefix.size ())
+    return false;
+  
   return std::equal (m_prefix.begin (), m_prefix.end (), prefix.m_prefix.begin ());
 }
 

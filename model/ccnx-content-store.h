@@ -110,8 +110,11 @@ private:
   static CcnxContentObjectTail m_tail; ///< \internal for optimization purposes
 };
 
-/// \brief Private namespace for CCNx implementation
-namespace __ccnx_private
+/**
+ * \ingroup ccnx
+ * \brief Private namespace for CCNx content store implementation
+ */
+namespace __ccnx_private_content_store
 {
 class hash {}; ///< tag for Boost.Multiindex container (hashed prefix)
 class mru {}; ///< tag for Boost.Multiindex container (most recent used index)
@@ -137,16 +140,16 @@ struct CcnxContentStoreContainer
     CcnxContentStoreEntry,
     boost::multi_index::indexed_by<
       boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private::hash>,
+        boost::multi_index::tag<__ccnx_private_content_store::hash>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
                                           const Name::Components&,
                                           &CcnxContentStoreEntry::GetName>,
         CcnxPrefixHash>,
-      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private::mru> >
+      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private_content_store::mru> >
 #ifdef _DEBUG
       ,
       boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private::ordered>,
+        boost::multi_index::tag<__ccnx_private_content_store::ordered>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
                                           const Name::Components&,
                                           &CcnxContentStoreEntry::GetName>
@@ -156,46 +159,6 @@ struct CcnxContentStoreContainer
     > type;
 };
 
-/**
- * \ingroup ccnx
- * \brief Typedef for hash index of content store container
- */
-struct CcnxContentStoreByPrefix
-{
-  typedef
-  CcnxContentStoreContainer::type::index<__ccnx_private::hash>::type
-  type;
-};
-
-/**
- * \ingroup ccnx
- * \brief Typedef for MRU index of content store container
- */
-struct CcnxContentStoreByMru
-{
-  typedef
-  CcnxContentStoreContainer::type::index<__ccnx_private::mru>::type
-  type;
-};
-
-#ifdef _DEBUG
-#define DUMP_INDEX_TAG ordered
-#define DUMP_INDEX     CcnxContentStoreOrderedPrefix
-/**
- * \ingroup ccnx
- * \brief Typedef for ordered index of content store container
- */
-struct CcnxContentStoreOrderedPrefix
-{
-  typedef
-  CcnxContentStoreContainer::type::index<__ccnx_private::ordered>::type
-  type;
-};
-#else
-#define DUMP_INDEX_TAG mru
-#define DUMP_INDEX     CcnxContentStoreByMru
-#endif
-  
 /**
  * \ingroup ccnx
  * \brief NDN content store entry

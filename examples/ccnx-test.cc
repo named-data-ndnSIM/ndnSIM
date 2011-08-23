@@ -14,6 +14,7 @@ main (int argc, char *argv[])
 {
   LogComponentEnable ("CcnxTest", LOG_ALL);
   LogComponentEnable ("CcnxStackHelper", LOG_ALL);
+  LogComponentEnable ("CcnxRit", LOG_ALL);
   
   // Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
   // Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
@@ -46,6 +47,29 @@ main (int argc, char *argv[])
   CcnxStackHelper ccnx;
   Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
+  // test RIT
+  NS_LOG_INFO ("Creating RIT");
+  Ptr<CcnxRit> rit = CreateObject<CcnxRit> ();
+
+  CcnxInterestHeader header;
+  Ptr<Name::Components> testname = Create<Name::Components> ();
+  (*testname) ("test") ("test2");
+  header.SetName (testname);
+  header.SetNonce (1);
+
+  rit->SetRecentlySatisfied (header);
+
+  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+
+  (*testname) ("test3"); // should have a side effect of changing name in the packet
+  rit->SetRecentlySatisfied (header);
+
+  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+
+  header.SetNonce (2);
+  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+
+  // rit->SetRecentlySatisfied (header);
   // ? set up forwarding
   
   
