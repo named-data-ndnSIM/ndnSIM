@@ -22,15 +22,19 @@
 #define _NDN_NAME_COMPONENTS_H_
 
 #include "ns3/simple-ref-count.h"
+#include "ns3/attribute.h"
+#include "ns3/attribute-helper.h"
 
 #include <string>
 #include <algorithm>
 #include <list>
+#include "ns3/object.h"
 
 namespace ns3 {
 namespace Name {
 
-class Components : public SimpleRefCount<Components>
+class Components : public Object
+
 {
 public:
   Components ();
@@ -100,6 +104,14 @@ Components::operator< (const Components &prefix) const
                                        prefix.m_prefix.begin (), prefix.m_prefix.end ());
 }
 
+    
+/**
+* \class ns3::ComponentsValue
+* \brief hold objects of type ns3::Name::Components
+*/
+ATTRIBUTE_VALUE_DEFINE (Components);
+ATTRIBUTE_ACCESSOR_DEFINE (Components);
+ATTRIBUTE_CHECKER_DEFINE (Components);
 } // Namespace Name
 } // namespace ns3
 
