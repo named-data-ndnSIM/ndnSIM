@@ -37,6 +37,10 @@ CcnxInterestSender::GetTypeId (void)
                    TimeValue (Seconds (0.1)),
                    MakeTimeAccessor (&CcnxInterestSender::m_offTime),
                    MakeTimeChecker ())
+    .AddAttribute ("Face","Local face to be used",
+                   PointerValue (CreateObject<CcnxLocalFace> ()),
+                   MakePointerAccessor (&CcnxInterestSender::m_face),
+                   MakePointerChecker<CcnxLocalFace> ())
     /*.AddAttribute ("NameComponents","CcnxName of the Interest (use CcnxNameComponents)",
                    CcnxNameComponentsValue(CcnxNameComponents()),
                    MakeCcnxNameComponentsAccessor(&CcnxInterestSender::m_interestName),
@@ -130,7 +134,7 @@ CcnxInterestSender::ScheduleNextTx ()
 {
     NS_LOG_FUNCTION_NOARGS ();
         
-    Time nextTime = Seconds(m_offTime); //send now
+    Time nextTime = Seconds(m_offTime);
     m_sendEvent = Simulator::Schedule (nextTime, &CcnxInterestSender::SendPacket, this);
 }
     

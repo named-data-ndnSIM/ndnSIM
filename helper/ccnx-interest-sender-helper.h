@@ -31,6 +31,7 @@
 #include "ns3/application-container.h"
 #include "ns3/name-components.h"
 #include "ns3/pointer.h"
+#include "ns3/ccnx-local-face.h"
 
 namespace ns3 
 {    
@@ -65,7 +66,7 @@ public:
      * will be installed.
      * \returns Container of Ptr to the applications installed.
      */
-    ApplicationContainer Install (NodeContainer c) const;
+    ApplicationContainer Install (NodeContainer c);
         
     /**
      * Install an ns3::CcnxInterestSender on the node configured with all the 
@@ -74,7 +75,7 @@ public:
      * \param node The node on which an CcnxInterestSender will be installed.
      * \returns Container of Ptr to the applications installed.
      */
-    ApplicationContainer Install (Ptr<Node> node) const;
+    ApplicationContainer Install (Ptr<Node> node);
         
     /**
      * Install an ns3::CcnxInterestSender on the node configured with all the 
@@ -83,7 +84,7 @@ public:
      * \param nodeName The node on which an CcnxInterestSender will be installed.
      * \returns Container of Ptr to the applications installed.
      */
-    ApplicationContainer Install (std::string nodeName) const;
+    ApplicationContainer Install (std::string nodeName);
         
 private:
     /**
@@ -94,7 +95,7 @@ private:
      * \param node The node on which an CcnxInterestSender will be installed.
      * \returns Ptr to the application installed.
     */
-    Ptr<Application> InstallPriv (Ptr<Node> node) const;
+    Ptr<Application> InstallPriv (Ptr<Node> node);
     ObjectFactory m_factory;
 };    
 }

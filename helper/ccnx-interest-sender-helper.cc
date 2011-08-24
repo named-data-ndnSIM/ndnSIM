@@ -40,20 +40,20 @@ CcnxInterestSenderHelper::SetAttribute (std::string name, const AttributeValue &
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (Ptr<Node> node) const
+CcnxInterestSenderHelper::Install (Ptr<Node> node)
 {
     return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (std::string nodeName) const
+CcnxInterestSenderHelper::Install (std::string nodeName)
 {
     Ptr<Node> node = Names::Find<Node> (nodeName);
     return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (NodeContainer c) const
+CcnxInterestSenderHelper::Install (NodeContainer c)
 {
     ApplicationContainer apps;
     for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -65,8 +65,13 @@ CcnxInterestSenderHelper::Install (NodeContainer c) const
 }
     
 Ptr<Application>
-CcnxInterestSenderHelper::InstallPriv (Ptr<Node> node) const
+CcnxInterestSenderHelper::InstallPriv (Ptr<Node> node)
 {
+    Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
+    localFace->SetNode(node);
+    localFace->SetUp();
+    m_factory.Set ("Face", PointerValue (localFace));
+    
     Ptr<Application> app = m_factory.Create<Application> ();
     node->AddApplication (app);
         

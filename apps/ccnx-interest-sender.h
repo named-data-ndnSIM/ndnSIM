@@ -78,6 +78,7 @@ private:
     void Construct (Ptr<Node> n,
                     std::string tid,
                     const Time& offtime,
+                    Ptr<CcnxLocalFace> face,
                     Ptr<CcnxNameComponents> nameComponents,
                     const Time& lifetime,
                     const int32_t& minSuffixComponents,
