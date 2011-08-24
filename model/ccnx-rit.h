@@ -23,7 +23,7 @@
 
 #include <list>
 #include "ns3/nstime.h"
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 #include "ns3/object.h"
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"

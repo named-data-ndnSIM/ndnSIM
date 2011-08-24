@@ -29,7 +29,7 @@
 #include "ns3/net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/application-container.h"
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 #include "ns3/pointer.h"
 #include "ns3/ccnx-local-face.h"
 

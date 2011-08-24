@@ -25,7 +25,7 @@
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 
 namespace ns3 {
   

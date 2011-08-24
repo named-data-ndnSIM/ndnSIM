@@ -27,7 +27,7 @@
 #include "ns3/simulator.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-local-face.h"
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 #include "ns3/packet.h"
 #include "ns3/boolean.h"
 #include "ns3/integer.h"

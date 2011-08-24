@@ -23,7 +23,7 @@
 
 #include <string>
 #include <boost/foreach.hpp>
-#include "name-components.h"
+#include "ccnx-name-components.h"
 
 namespace ns3
 {

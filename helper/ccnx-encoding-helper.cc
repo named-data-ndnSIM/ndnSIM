@@ -20,7 +20,7 @@
 
 #include "ccnx-encoding-helper.h"
 
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
 

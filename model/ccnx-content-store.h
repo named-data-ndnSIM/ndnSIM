@@ -38,7 +38,7 @@
 #include "hash-helper.h"
 #include "ccnx-content-object-header.h"
 #include "ccnx-interest-header.h"
-#include "name-components.h"
+#include "ccnx-name-components.h"
 
 namespace  ns3
 {

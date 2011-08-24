@@ -30,7 +30,7 @@
 #include <vector>
 #include <list>
 
-#include "name-components.h"
+#include "ccnx-name-components.h"
 
 namespace ns3
 {

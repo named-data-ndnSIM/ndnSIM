@@ -23,7 +23,7 @@
 
 #include "ns3/ccnb-parser-block.h"
 #include "ns3/ccnb-parser-dtag.h"
-#include "ns3/name-components.h"
+#include "ns3/ccnx-name-components.h"
 #include "ns3/assert.h"
 
 #include "ns3/ccnx-content-object-header.h"
