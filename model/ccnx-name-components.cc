@@ -29,6 +29,10 @@ namespace ns3 {
 
 ATTRIBUTE_HELPER_CPP (CcnxNameComponents);
 
+CcnxNameComponents::CcnxNameComponents (/* root */)
+{
+}
+
 CcnxNameComponents::CcnxNameComponents (const string &s)
 {
   m_prefix.push_back (s);
