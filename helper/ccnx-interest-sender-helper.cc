@@ -30,7 +30,7 @@ namespace ns3
 CcnxInterestSenderHelper::CcnxInterestSenderHelper (Ptr<CcnxNameComponents> interestName)
 {
     m_factory.SetTypeId ("ns3::CcnxInterestSender");
-    m_factory.Set ("InterestName", PointerValue (interestName));
+    m_factory.Set ("InterestName", CcnxNameComponentsValue (*interestName));
 }
     
 void 

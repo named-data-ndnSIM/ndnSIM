@@ -19,6 +19,7 @@
  */
 
 #include "ccnx-name-components.h"
+#include <boost/foreach.hpp>
 
 #include <iostream>
 
@@ -26,31 +27,41 @@ using namespace std;
 
 namespace ns3 {
 
-CcnxNameComponents::CcnxNameComponents ()
-{
-  // m_value = ccn_charbuf_create ();
-  // ccn_name_init(m_value);
-}
+ATTRIBUTE_HELPER_CPP (CcnxNameComponents);
 
 CcnxNameComponents::CcnxNameComponents (const string &s)
 {
-  // m_value = ccn_charbuf_create ();
-  // ccn_name_init(m_value);
-  // (*this) (s);
   m_prefix.push_back (s);
 }
 
-CcnxNameComponents::~CcnxNameComponents ()
+CcnxNameComponents::CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
 {
-  // ccn_charbuf_destroy(&m_value);
+  BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)
+    {
+      Add (component.get ());
+    }
 }
-
+  
 const std::list<std::string> &
 CcnxNameComponents::GetComponents () const
 {
   return m_prefix;
 }
 
+std::list<boost::reference_wrapper<const std::string> >
+CcnxNameComponents::GetSubComponents (size_t num) const
+{
+  NS_ASSERT_MSG (1<=num && num<=m_prefix.size (), "Invalid number of subcomponents requested");
+  
+  std::list<boost::reference_wrapper<const std::string> > subComponents;
+  std::list<std::string>::const_iterator component = m_prefix.begin();
+  for (size_t i=0; i<num; i++, component++)
+    {
+      subComponents.push_back (boost::ref (*component));
+    }
+    
+  return subComponents;
+}
   
 // const ccn_charbuf*
 // Components::GetName () const
@@ -86,5 +97,27 @@ operator << (std::ostream &os, const CcnxNameComponents &components)
   components.Print (os);
   return os;
 }
+
+std::istream &
+operator >> (std::istream &is, CcnxNameComponents &components)
+{
+  istream_iterator<char> eos; // end of stream
+
+  std::string component = "";
+  for (istream_iterator<char> it (is); it != eos; it++)
+    {
+      if (*it == '/')
+        {
+          if (component != "")
+            components.Add (component);
+          component = "";
+        }
+      else
+        component.push_back (*it);
+    }
+
+  return is;
+}
+
 }
 

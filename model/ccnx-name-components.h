@@ -30,15 +30,19 @@
 #include <list>
 #include "ns3/object.h"
 
+#include <boost/ref.hpp>
+
 namespace ns3 {
 
-class CcnxNameComponents : public Object
-
+class CcnxNameComponents : public SimpleRefCount<CcnxNameComponents>
 {
 public:
+  /**
+   * \brief Creates a prefix with zero components (can be looked as root "/")
+   */
   CcnxNameComponents ();
   CcnxNameComponents (const std::string &s);
-  ~CcnxNameComponents ();
+  CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
   
   inline void
   Add (const std::string &s);
@@ -48,6 +52,13 @@ public:
 
   const std::list<std::string> &
   GetComponents () const;
+
+  /**
+   * \brief Get subcomponents of the name, starting with first component
+   * \param num Number of components to return. Valid value is in range [1, GetComponents ().size ()]
+   */
+  std::list<boost::reference_wrapper<const std::string> >
+  GetSubComponents (size_t num) const;
   
   // virtual uint32_t
   // GetSerializedSize (void) const;
@@ -76,8 +87,22 @@ private:
   typedef std::list<std::string>::const_iterator const_iterator;
 };
 
-std::ostream & operator << (std::ostream &os, const CcnxNameComponents &components);
+/**
+ * \brief Print out name components separated by slashes, e.g., /first/second/third
+ */
+std::ostream &
+operator << (std::ostream &os, const CcnxNameComponents &components);
 
+/**
+ * \brief Read components from input and add them to components. Will read input stream till eof
+ *
+ * \todo Check that NS-3 doesn't give unlimited input streams... Otherwise it would be disaster
+ *
+ * Substrings separated by slashes will become separate components
+ */
+std::istream &
+operator >> (std::istream &is, CcnxNameComponents &components);
+  
 size_t
 CcnxNameComponents::size () const
 {
@@ -111,9 +136,7 @@ CcnxNameComponents::operator< (const CcnxNameComponents &prefix) const
 * \class ns3::ComponentsValue
 * \brief hold objects of type ns3:CcnxNameComponents
 */
-ATTRIBUTE_VALUE_DEFINE (CcnxNameComponents);
-ATTRIBUTE_ACCESSOR_DEFINE (CcnxNameComponents);
-ATTRIBUTE_CHECKER_DEFINE (CcnxNameComponents);
+ATTRIBUTE_HELPER_HEADER (CcnxNameComponents);
 } // namespace ns3
 
 #endif // _NDN_NAME_COMPONENTS_H_

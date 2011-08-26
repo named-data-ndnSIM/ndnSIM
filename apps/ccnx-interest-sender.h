@@ -59,12 +59,13 @@ private:
         
     //Time m_onTime;
     Time m_offTime;
-    Ptr<CcnxNameComponents> m_interestName;
+    CcnxNameComponents m_interestName;
+  
     Time m_interestLifeTime;
     int32_t m_minSuffixComponents;
     int32_t m_maxSuffixComponents;
     bool m_childSelector;
-    Ptr<CcnxNameComponents> m_exclude;
+    CcnxNameComponents m_exclude;
     uint32_t m_initialNonce;
     
     //EventId         m_startStopEvent;     // Event id for next start or stop event

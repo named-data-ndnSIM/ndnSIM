@@ -155,8 +155,21 @@ public:
   inline uint32_t
   GetId () const;
 
+  /**
+   * \brief Compare two faces. Only two faces on the same node could be compared.
+   *
+   * Internal index is used for comparison.
+   */
   bool
   operator== (const CcnxFace &face) const;
+
+  /**
+   * \brief Compare two faces. Only two faces on the same node could be compared.
+   *
+   * Internal index is used for comparison.
+   */
+  bool
+  operator< (const CcnxFace &face) const;
   
 protected:
   virtual void DoDispose (void);

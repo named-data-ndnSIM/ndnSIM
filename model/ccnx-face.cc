@@ -23,6 +23,7 @@
 
 #include "ns3/log.h"
 #include "ns3/node.h"
+#include "ns3/assert.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
@@ -133,8 +134,17 @@ CcnxFace::SetDown (void)
 bool
 CcnxFace::operator== (const CcnxFace &face) const
 {
-  return (m_node->GetId () == face.m_node->GetId ()) &&
-    (m_id == face.m_id);
+  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (), "Faces of different nodes should not be compared to each other");
+
+  return (m_id == face.m_id);
+}
+
+bool
+CcnxFace::operator< (const CcnxFace &face) const
+{
+  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (), "Faces of different nodes should not be compared to each other");
+
+  return (m_id < face.m_id);
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face)

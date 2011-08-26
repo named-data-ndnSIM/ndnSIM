@@ -75,8 +75,7 @@ CcnxLocalFace::Send (Ptr<Packet> p)
       return;
     }
 
-  // m_device->Send (p, m_device->GetBroadcast (), 
-  //                 CcnxL3Protocol::PROT_NUMBER);
+  
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace)
