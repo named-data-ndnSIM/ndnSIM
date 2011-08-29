@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author:
+ * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+            Ilya Moiseenko <iliamo@cs.ucla.edu>
  *
  */
 
@@ -29,7 +30,8 @@
 
 NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 
-namespace ns3 {
+namespace ns3 
+{
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxLocalFace);
 
@@ -77,6 +79,13 @@ CcnxLocalFace::Send (Ptr<Packet> p)
 
   // m_device->Send (p, m_device->GetBroadcast (), 
   //                 CcnxL3Protocol::PROT_NUMBER);
+}
+    
+void
+CcnxLocalFace::Receive (Ptr<Packet> p)
+{
+    //ypedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
+    m_protocolHandler ((const Ptr<CcnxFace>)this,(const Ptr<Packet>)p);
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace)
