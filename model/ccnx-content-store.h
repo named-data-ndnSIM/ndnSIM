@@ -23,6 +23,7 @@
 
 #include "ns3/object.h"
 #include "ns3/ptr.h"
+#include "ns3/packet.h"
 
 #include <list>
 #include <string>
@@ -42,8 +43,6 @@
 
 namespace  ns3
 {
-class Packet;
-
 /**
  * \ingroup ccnx
  * \brief NDN content store entry
