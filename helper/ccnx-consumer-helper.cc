@@ -18,7 +18,7 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ccnx-interest-sender-helper.h"
+#include "ccnx-consumer-helper.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/packet-socket-address.h"
 #include "ns3/string.h"
@@ -27,52 +27,55 @@
 namespace ns3 
 {
     
-CcnxInterestSenderHelper::CcnxInterestSenderHelper (Ptr<CcnxNameComponents> interestName)
+CcnxConsumerHelper::CcnxConsumerHelper (Ptr<CcnxNameComponents> interestName)
 {
     m_factory.SetTypeId ("ns3::CcnxConsumer");
     m_factory.Set ("InterestName", PointerValue (interestName));
 }
     
 void 
-CcnxInterestSenderHelper::SetAttribute (std::string name, const AttributeValue &value)
+CcnxConsumerHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
     m_factory.Set (name, value);
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (Ptr<Node> node)
+CcnxConsumerHelper::Install (Ptr<Node> node)
 {
     return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (std::string nodeName)
+CcnxConsumerHelper::Install (std::string nodeName)
 {
     Ptr<Node> node = Names::Find<Node> (nodeName);
     return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxInterestSenderHelper::Install (NodeContainer c)
+CcnxConsumerHelper::Install (NodeContainer c)
 {
     ApplicationContainer apps;
     for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
         apps.Add (InstallPriv (*i));
     }
-        
+    
     return apps;
 }
     
 Ptr<Application>
-CcnxInterestSenderHelper::InstallPriv (Ptr<Node> node)
+CcnxConsumerHelper::InstallPriv (Ptr<Node> node)
 {
-    Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
+    Ptr<CcnxLocalFace> localFace = CreateObject<CcnxLocalFace> ();
     localFace->SetNode(node);
-    localFace->SetUp();
-    m_factory.Set ("Face", PointerValue (localFace));
     
-    Ptr<Application> app = m_factory.Create<Application> ();
+    m_factory.Set ("Face", PointerValue (localFace));
+    Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();
+        
+    localFace->RegisterProtocolHandler (MakeCallback (&CcnxConsumer::HandlePacket, app));
+    localFace->SetUp();
+        
     node->AddApplication (app);
         
     return app;
