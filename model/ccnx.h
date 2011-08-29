@@ -26,6 +26,7 @@
 #include "ns3/callback.h"
 
 #include "ccnx-face.h"
+#include "ccnx-content-store.h"
 
 namespace ns3 {
 
@@ -140,6 +141,8 @@ public:
    */
   virtual Ptr<CcnxFace>
   GetFace (uint32_t face) const = 0;
+    
+  Ptr<CcnxContentStore> m_contentStore;
 };
 
 } // namespace ns3 
