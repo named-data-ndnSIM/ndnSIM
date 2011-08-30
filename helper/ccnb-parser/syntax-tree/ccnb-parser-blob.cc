@@ -25,6 +25,7 @@ namespace CcnbParser {
 
 Blob::Blob (Buffer::Iterator &start, uint32_t length)
 {
+  m_blob = Buffer (length);
   start.Read (m_blob.Begin (), length);
 }
 

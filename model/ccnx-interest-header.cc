@@ -171,7 +171,8 @@ uint32_t
 CcnxInterestHeader::GetSerializedSize (void) const
 {
   // unfortunately, 2 serialization required...
-  Buffer tmp;
+  /// \todo This is totally wrong. Need to do some simple packet buffer estimation
+  Buffer tmp(2048);
   
   return CcnxEncodingHelper::Serialize (tmp.Begin(), *this);
 }

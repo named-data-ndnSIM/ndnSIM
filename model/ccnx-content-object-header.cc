@@ -64,7 +64,8 @@ uint32_t
 CcnxContentObjectHeader::GetSerializedSize (void) const
 {
   // Unfortunately, two serializations are required, unless we can pre-calculate header length... which is not trivial
-  Buffer tmp;
+  /// \todo This is totally wrong. Need to do some simple packet buffer estimation
+  Buffer tmp(2048);
   
   return CcnxEncodingHelper::Serialize (tmp.Begin(), *this);
 }
