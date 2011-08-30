@@ -15,14 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: 
+ * Authors:     Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+                Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
+
 #ifndef CCNX_LOCAL_FACE_H
 #define CCNX_LOCAL_FACE_H
 
 #include "ccnx-face.h"
 
-namespace ns3 {
+namespace ns3 
+{
 
 /**
  * \ingroup ccnx-face
@@ -56,6 +59,8 @@ public:
   virtual void RegisterProtocolHandler (ProtocolHandler handler);
 
   virtual void Send (Ptr<Packet> p);
+
+  void Receive (Ptr<Packet> p);
 
   ////////////////////////////////////////////////////////////////////
 

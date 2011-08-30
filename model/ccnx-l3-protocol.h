@@ -41,7 +41,7 @@ class CcnxForwardingStrategy;
 class Header;
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
-class CcnxContentStore;
+//class CcnxContentStore;
 
 /**
  * \ingroup ccnx
@@ -161,7 +161,7 @@ private:
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
-  Ptr<CcnxContentStore> m_contentStore;
+  //Ptr<CcnxContentStore> m_contentStore;
   
   /**
    * \brief Trace of transmitted packets, including all headers

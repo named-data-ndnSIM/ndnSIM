@@ -30,11 +30,6 @@
 
 NS_LOG_COMPONENT_DEFINE ("CcnxHeaderHelper");
 
-#define INTEREST_BYTE0 0x01
-#define INTEREST_BYTE1 0xD2
-
-#define CONTENT_OBJECT_BYTE0 0x04
-#define CONTENT_OBJECT_BYTE1 0x82
 
 namespace ns3
 {
