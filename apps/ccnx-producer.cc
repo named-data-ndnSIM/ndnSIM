@@ -119,7 +119,7 @@ CcnxProducer::CancelEvents ()
 {
     NS_LOG_FUNCTION_NOARGS ();
         
-    Simulator::Cancel (m_sendEvent);
+    // Simulator::Cancel (m_sendEvent);
 }
     
 /*void 

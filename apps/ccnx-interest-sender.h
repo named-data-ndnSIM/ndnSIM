@@ -44,63 +44,63 @@ class Socket;
 class CcnxInterestSender: public Application
 {
 public: 
-    static TypeId GetTypeId (void);
+  static TypeId GetTypeId (void);
         
-    CcnxInterestSender ();
+  CcnxInterestSender ();
         
-    virtual ~CcnxInterestSender ();
+  virtual ~CcnxInterestSender ();
         
 protected:
-    virtual void DoDispose (void);
+  virtual void DoDispose (void);
 private:
-    // inherited from Application base class.
-    virtual void StartApplication (void);    // Called at time specified by Start
-    virtual void StopApplication (void);     // Called at time specified by Stop
+  // inherited from Application base class.
+  virtual void StartApplication (void);    // Called at time specified by Start
+  virtual void StopApplication (void);     // Called at time specified by Stop
         
-    //Time m_onTime;
-    Time m_offTime;
-    CcnxNameComponents m_interestName;
+  //Time m_onTime;
+  Time m_offTime;
+  CcnxNameComponents m_interestName;
   
-    Time m_interestLifeTime;
-    int32_t m_minSuffixComponents;
-    int32_t m_maxSuffixComponents;
-    bool m_childSelector;
-    CcnxNameComponents m_exclude;
-    uint32_t m_initialNonce;
+  Time m_interestLifeTime;
+  int32_t m_minSuffixComponents;
+  int32_t m_maxSuffixComponents;
+  bool m_childSelector;
+  CcnxNameComponents m_exclude;
+  uint32_t m_initialNonce;
     
-    //EventId         m_startStopEvent;     // Event id for next start or stop event
-    EventId         m_sendEvent;    // Eventid of pending "send packet" event
-    TypeId          m_tid;
-    Ptr<CcnxLocalFace> m_face;
+  //EventId         m_startStopEvent;     // Event id for next start or stop event
+  EventId         m_sendEvent;    // Eventid of pending "send packet" event
+  TypeId          m_tid;
+  Ptr<CcnxLocalFace> m_face;
         
-    //helpers
-    void CancelEvents ();
+  //helpers
+  void CancelEvents ();
         
-    void Construct (Ptr<Node> n,
-                    std::string tid,
-                    const Time& offtime,
-                    Ptr<CcnxLocalFace> face,
-                    Ptr<CcnxNameComponents> nameComponents,
-                    const Time& lifetime,
-                    const int32_t& minSuffixComponents,
-                    const int32_t& maxSuffixComponents,
-                    const bool childSelector,
-                    Ptr<CcnxNameComponents> exclude,
-                    const uint32_t& initialNonce
-                    );
+  void Construct (Ptr<Node> n,
+                  std::string tid,
+                  const Time& offtime,
+                  Ptr<CcnxLocalFace> face,
+                  Ptr<CcnxNameComponents> nameComponents,
+                  const Time& lifetime,
+                  const int32_t& minSuffixComponents,
+                  const int32_t& maxSuffixComponents,
+                  const bool childSelector,
+                  Ptr<CcnxNameComponents> exclude,
+                  const uint32_t& initialNonce
+                  );
     
-    // Event handlers
-    void StartSending ();
-    void StopSending ();
-    void SendPacket ();
+  // Event handlers
+  void StartSending ();
+  void StopSending ();
+  void SendPacket ();
         
 private:
-    void ScheduleNextTx ();
-    //void ScheduleStartEvent ();
-    //void ScheduleStopEvent ();
-    void ConnectionSucceeded (Ptr<Socket>);
-    void ConnectionFailed (Ptr<Socket>);
-    void Ignore (Ptr<Socket>);
+  void ScheduleNextTx ();
+  //void ScheduleStartEvent ();
+  //void ScheduleStopEvent ();
+  void ConnectionSucceeded (Ptr<Socket>);
+  void ConnectionFailed (Ptr<Socket>);
+  void Ignore (Ptr<Socket>);
         
 };
 }

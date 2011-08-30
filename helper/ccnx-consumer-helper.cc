@@ -30,7 +30,7 @@ namespace ns3
 CcnxConsumerHelper::CcnxConsumerHelper (Ptr<CcnxNameComponents> interestName)
 {
     m_factory.SetTypeId ("ns3::CcnxConsumer");
-    m_factory.Set ("InterestName", PointerValue (interestName));
+    m_factory.Set ("InterestName", CcnxNameComponentsValue (*interestName));
 }
     
 void 
