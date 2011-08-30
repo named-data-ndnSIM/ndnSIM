@@ -24,12 +24,14 @@
 #include "hash-helper.h"
 #include "ccnx-face.h"
 #include "ns3/nstime.h"
+#include "ns3/simple-ref-count.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/random_access_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
@@ -45,6 +47,7 @@ const uint8_t NDN_FIB_RED = 3;
 
 class i_face {};
 class i_metric {};
+class i_nth {};
 class i_prefix {};
 }
 
@@ -78,6 +81,9 @@ public:
   bool
   operator< (const CcnxFibFaceMetric &m) const { return *m_face < *(m.m_face); } // return identity of the face
 
+  Ptr<CcnxFace>
+  GetFace () const { return m_face; }
+  
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric);
 public:
@@ -101,6 +107,8 @@ public:
  * Currently, there are 2 indexes:
  * - by face (used to find record and update metric)
  * - by metric (face ranking)
+ * - random access index (for fast lookup on nth face). Order is
+ *   maintained manually to be equal to the 'by metric' order
  */
 struct CcnxFibFaceMetricContainer
 {
@@ -121,6 +129,11 @@ struct CcnxFibFaceMetricContainer
           boost::multi_index::member<CcnxFibFaceMetric,uint8_t,&CcnxFibFaceMetric::m_status>,
           boost::multi_index::member<CcnxFibFaceMetric,uint32_t,&CcnxFibFaceMetric::m_routingCost>
         >
+      >,
+
+      // To optimize nth candidate selection (sacrifice a little bit space to gain speed)
+      boost::multi_index::random_access<
+        boost::multi_index::tag<__ccnx_private_fib::i_nth>
       >
     >
    > type;
@@ -131,7 +144,7 @@ struct CcnxFibFaceMetricContainer
  * \brief Structure for FIB table entry, holding indexed list of
  *        available faces and their respective metrics
  */
-class CcnxFibEntry
+class CcnxFibEntry : public SimpleRefCount<CcnxFibEntry>
 {
 public:
   /**
@@ -153,8 +166,14 @@ public:
    * \brief Get prefix for the FIB entry
    */
   const CcnxNameComponents&
-  GetName () const { return *m_prefix; }
+  GetPrefix () const { return *m_prefix; }
 
+  /**
+   * \brief Find "best route" candidate, skipping `skip' first candidates (modulo # of faces)
+   */
+  Ptr<CcnxFace>
+  FindBestCandidate (int skip = 0);
+	
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);
 
@@ -185,7 +204,7 @@ struct CcnxFibEntryContainer
         boost::multi_index::tag<__ccnx_private_fib::i_prefix>,
         boost::multi_index::const_mem_fun<CcnxFibEntry,
                                           const CcnxNameComponents&,
-                                          &CcnxFibEntry::GetName>,
+                                          &CcnxFibEntry::GetPrefix>,
         CcnxPrefixHash>
 
       // other indexes?

@@ -89,7 +89,19 @@ CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, uint8_t status)
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (), "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record, ChangeStatus (status));
+
+  // reordering random access index same way as by metric index
+  m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
 }
+
+
+Ptr<CcnxFace>
+CcnxFibEntry::FindBestCandidate (int skip/* = 0*/)
+{
+  skip = skip % m_faces.size();
+  return m_faces.get<i_nth> () [skip].GetFace ();
+}
+
 
 CcnxFib::CcnxFib (Ptr<Ccnx> node)
   : m_node (node)

@@ -204,4 +204,3 @@ private:
 } // namespace ns3
 
 #endif // _CCNX_RIT_H_
-
