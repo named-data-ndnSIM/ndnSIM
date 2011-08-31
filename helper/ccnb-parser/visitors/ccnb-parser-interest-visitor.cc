@@ -39,7 +39,7 @@ namespace CcnbParser {
 
 // We don't care about any other fields
 void
-InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&*/)
+InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader* */)
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
@@ -49,7 +49,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
   static TimestampVisitor          timestampVisitor;
   static NonceVisitor              nonceVisitor;
   
-  CcnxInterestHeader &interest = boost::any_cast<CcnxInterestHeader&> (param);
+  CcnxInterestHeader &interest = *(boost::any_cast<CcnxInterestHeader*> (param));
   
   switch (n.m_dtag)
     {
@@ -67,7 +67,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
-            block->accept (nameComponentsVisitor, *name);
+            block->accept (nameComponentsVisitor, &(*name));
           }
         interest.SetName (name);
         break;
@@ -97,7 +97,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
-            block->accept (nameComponentsVisitor, *exclude);
+            block->accept (nameComponentsVisitor, &(*exclude));
           }
         interest.SetExclude (exclude);
         break;

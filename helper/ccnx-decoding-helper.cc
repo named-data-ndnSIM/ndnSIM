@@ -30,25 +30,25 @@
 namespace ns3 {
 
 size_t
-CcnxDecodingHelper::Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest)
+CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxInterestHeader &interest)
 {
   static CcnbParser::InterestVisitor interestVisitor;
 
   Buffer::Iterator i = start;
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
-  root->accept (interestVisitor, interest);
+  root->accept (interestVisitor, &interest);
 
   return i.GetDistanceFrom (start);
 }
 
 size_t
-CcnxDecodingHelper::Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject)
+CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxContentObjectHeader &contentObject)
 {
   static CcnbParser::ContentObjectVisitor contentObjectVisitor;
 
   Buffer::Iterator i = start;
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
-  root->accept (contentObjectVisitor, contentObject);
+  root->accept (contentObjectVisitor, &contentObject);
 
   return i.GetDistanceFrom (start);
 }

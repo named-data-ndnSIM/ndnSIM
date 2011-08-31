@@ -36,10 +36,10 @@ class CcnxDecodingHelper
 {
 public:
   static size_t
-  Deserialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
+  Deserialize (Buffer::Iterator start, CcnxInterestHeader &interest);
 
   static size_t
-  Deserialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
+  Deserialize (Buffer::Iterator start, CcnxContentObjectHeader &contentObject);
   
 private:
 };

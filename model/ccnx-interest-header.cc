@@ -54,7 +54,7 @@ CcnxInterestHeader::CcnxInterestHeader ()
   , m_childSelector (false)
   , m_answerOriginKind (false)
   , m_scope (-1)
-  , m_interestLifetime (-1)
+  , m_interestLifetime (Seconds (0))
   , m_nonce (0)
 {
 }
@@ -68,6 +68,7 @@ CcnxInterestHeader::SetName (const Ptr<CcnxNameComponents> &name)
 const CcnxNameComponents&
 CcnxInterestHeader::GetName () const
 {
+  if (m_name==0) throw CcnxInterestHeaderException();
   return *m_name;
 }
 
@@ -101,9 +102,16 @@ CcnxInterestHeader::SetExclude (const Ptr<CcnxNameComponents> &exclude)
   m_exclude = exclude;
 }
 
+bool
+CcnxInterestHeader::IsEnabledExclude () const
+{
+  return m_exclude!=0;
+}
+
 const CcnxNameComponents&
 CcnxInterestHeader::GetExclude () const
 {
+  if (m_exclude==0) throw CcnxInterestHeaderException();
   return *m_exclude;
 }
 
@@ -170,17 +178,16 @@ CcnxInterestHeader::GetNonce () const
 uint32_t
 CcnxInterestHeader::GetSerializedSize (void) const
 {
-  // unfortunately, 2 serialization required...
-  /// \todo This is totally wrong. Need to do some simple packet buffer estimation
-  Buffer tmp(2048);
-  
-  return CcnxEncodingHelper::Serialize (tmp.Begin(), *this);
+  // unfortunately, we don't know exact header size in advance
+  return CcnxEncodingHelper::GetSerializedSize (*this);
 }
     
 void
 CcnxInterestHeader::Serialize (Buffer::Iterator start) const
 {
-  CcnxEncodingHelper::Serialize (start, *this);
+  size_t size = CcnxEncodingHelper::Serialize (start, *this);
+  
+  NS_LOG_INFO ("Serialize size = " << size);
 }
 
 uint32_t
@@ -198,23 +205,24 @@ CcnxInterestHeader::GetInstanceTypeId (void) const
 void
 CcnxInterestHeader::Print (std::ostream &os) const
 {
-  os << "<Interest><Name>" << *m_name << "</Name>";
-  if (m_minSuffixComponents>=0)
-    os << "<MinSuffixComponents>" << m_minSuffixComponents << "</MinSuffixComponents>";
-  if (m_maxSuffixComponents>=0)
-    os << "<MaxSuffixComponents>" << m_maxSuffixComponents << "</MaxSuffixComponents>";
-  if (m_exclude->size()>0)
-    os << "<Exclude>" << *m_exclude << "</Exclude>";
-  if (m_childSelector)
-    os << "<ChildSelector />";
-  if (m_answerOriginKind)
-    os << "<AnswerOriginKind />";
-  if (m_scope>=0)
-    os << "<Scope>" << m_scope << "</Scope>";
-  if (!m_interestLifetime.IsZero())
-    os << "<InterestLifetime>" << m_interestLifetime << "</InterestLifetime>";
-  if (m_nonce>0)
-    os << "<Nonce>" << m_nonce << "</Nonce>";
+  os << "<Interest>\n  <Name>" << GetName () << "</Name>\n";
+  if (GetMinSuffixComponents () >= 0)
+    os << "  <MinSuffixComponents>" << GetMinSuffixComponents () << "</MinSuffixComponents>\n";
+  if (GetMaxSuffixComponents () >= 0)
+    os << "  <MaxSuffixComponents>" << m_maxSuffixComponents << "</MaxSuffixComponents>\n";
+  if (IsEnabledExclude () && GetExclude ().size()>0)
+    os << "  <Exclude>" << GetExclude () << "</Exclude>\n";
+  if (IsEnabledChildSelector ())
+    os << "  <ChildSelector />\n";
+  if (IsEnabledAnswerOriginKind ())
+    os << "  <AnswerOriginKind />\n";
+  if (GetScope () >= 0)
+    os << "  <Scope>" << GetScope () << "</Scope>\n";
+  if ( !GetInterestLifetime ().IsZero() )
+    os << "  <InterestLifetime>" << GetInterestLifetime () << "</InterestLifetime>\n";
+  if (GetNonce ()>0)
+    os << "  <Nonce>" << GetNonce () << "</Nonce>\n";
+  os << "</Interest>";
 }
 
 }

@@ -28,10 +28,13 @@ namespace CcnbParser {
 Attr::Attr (Buffer::Iterator &start, uint32_t length)
 {
   m_attr.reserve (length+2); // extra byte for potential \0 at the end
-  for (uint32_t i = 0; i < (length+1); i++)
+  uint32_t i = 0;
+  for (; !start.IsEnd () && i < (length+1); i++)
     {
       m_attr.push_back (start.ReadU8 ());
     }
+  if (i < (length+1) && start.IsEnd ())
+    throw CcnbDecodingException ();
   m_value = DynamicCast<Udata> (Block::ParseBlock (start));
   if (m_value == 0)
     throw CcnbDecodingException (); // "ATTR must be followed by UDATA field"

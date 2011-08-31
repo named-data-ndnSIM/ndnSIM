@@ -41,7 +41,7 @@ namespace CcnbParser {
 class ContentObjectVisitor : public VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader&*/);
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader* */);
 };
 
 }

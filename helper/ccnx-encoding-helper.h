@@ -46,20 +46,35 @@ public:
   Serialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
 
   static size_t
+  GetSerializedSize (const CcnxInterestHeader &interest);
+
+  static size_t
   Serialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
 
+  static size_t
+  GetSerializedSize (const CcnxContentObjectHeader &contentObject);
+  
 private:
   static size_t
-  AppendBlockHeader (Buffer::Iterator start, size_t value, CcnbParser::ccn_tt block_type);
+  AppendBlockHeader (Buffer::Iterator &start, size_t value, CcnbParser::ccn_tt block_type);
 
   static size_t
-  AppendNumber (Buffer::Iterator start, uint32_t number);
+  EstimateBlockHeader (size_t value);
 
   static size_t
-  AppendCloser (Buffer::Iterator start);
+  AppendNumber (Buffer::Iterator &start, uint32_t number);
 
   static size_t
-  AppendNameComponents (Buffer::Iterator start, const CcnxNameComponents &name);
+  EstimateNumber (uint32_t number);
+
+  static size_t
+  AppendCloser (Buffer::Iterator &start);
+
+  static size_t
+  AppendNameComponents (Buffer::Iterator &start, const CcnxNameComponents &name);
+
+  static size_t
+  EstimateNameComponents (const CcnxNameComponents &name);
 
   /**
    * Append a binary timestamp as a BLOB using the ccn binary
@@ -71,7 +86,10 @@ private:
    * @returns written length
    */
   static size_t
-  AppendTimestampBlob (Buffer::Iterator start, Time time);
+  AppendTimestampBlob (Buffer::Iterator &start, const Time &time);
+
+  static size_t
+  EstimateTimestampBlob (const Time &time);
 
   /**
    * Append a tagged BLOB
@@ -86,9 +104,11 @@ private:
    * @returns written length
    */
   static size_t
-  AppendTaggedBlob (Buffer::Iterator start, CcnbParser::ccn_dtag dtag,
+  AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
                     const uint8_t *data, size_t size);
   
+  static size_t
+  EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size);
 };
 
 } // namespace ns3

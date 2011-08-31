@@ -35,13 +35,13 @@ namespace CcnbParser {
 
 // We don't really care about any other fields
 void
-ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader&*/)
+ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader* */)
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
   static NameComponentsVisitor nameComponentsVisitor;
   
-  CcnxContentObjectHeader &contentObject = boost::any_cast<CcnxContentObjectHeader&> (param);
+  CcnxContentObjectHeader &contentObject = *(boost::any_cast<CcnxContentObjectHeader*> (param));
   
   switch (n.m_dtag)
     {
@@ -59,7 +59,7 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
-            block->accept (nameComponentsVisitor, *name);
+            block->accept (nameComponentsVisitor, &(*name));
           }
         contentObject.SetName (name);
         break;

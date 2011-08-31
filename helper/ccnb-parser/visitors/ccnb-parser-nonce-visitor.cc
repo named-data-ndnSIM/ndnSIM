@@ -28,10 +28,10 @@ boost::any
 NonceVisitor::visit (Blob &n) 
 {
   // Buffer n.m_blob;
-  if (n.m_blob.GetSize ()<4)
+  if (n.m_blobSize < 4)
     throw CcnbDecodingException ();
      
-  return boost::any (n.m_blob.Begin ().ReadU32 ());
+  return boost::any (*(reinterpret_cast<uint32_t*> (n.m_blob)));
 }
 
 boost::any

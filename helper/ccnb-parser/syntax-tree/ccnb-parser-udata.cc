@@ -32,10 +32,14 @@ Udata::Udata (Buffer::Iterator &start, uint32_t length)
 
   m_udata.reserve (length+1); //just in case we will need \0 at the end later
   // this is actually the way Read method is implemented in network/src/buffer.cc
-  for (uint32_t i = 0; i < length; i++)
+  uint32_t i = 0;
+  for (; !start.IsEnd () && i < length; i++)
     {
       m_udata.push_back (start.ReadU8 ());
     }
+
+  if (i < length && start.IsEnd ())
+    throw CcnbDecodingException ();
 }
 
 }

@@ -166,6 +166,9 @@ public:
   void
   SetExclude (const Ptr<CcnxNameComponents> &exclude);
 
+  bool
+  IsEnabledExclude () const;
+  
   const CcnxNameComponents&
   GetExclude () const;
 
@@ -219,6 +222,8 @@ private:
   Time  m_interestLifetime;
   uint32_t m_nonce; ///< Nonce. not used if zero
 };
+
+class CcnxInterestHeaderException {};
 
 } // namespace ns3
 

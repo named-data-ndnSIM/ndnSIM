@@ -41,7 +41,7 @@ namespace CcnbParser {
 class InterestVisitor : public VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterestHeader&*/);
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterestHeader* */);
 };
 
 }

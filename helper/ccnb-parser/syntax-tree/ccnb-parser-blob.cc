@@ -18,15 +18,30 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ccnb-parser-blob.h"
+#include "ns3/ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
 Blob::Blob (Buffer::Iterator &start, uint32_t length)
 {
-  m_blob = Buffer (length);
-  start.Read (m_blob.Begin (), length);
+  m_blobSize = length;
+  m_blob = new char[length];
+  if (m_blob == 0 )
+    throw CcnbDecodingException (); // memory problem
+
+  uint32_t i = 0;
+  for (; !start.IsEnd () && i < length; i++)
+    {
+      m_blob[i] = start.ReadU8 ();
+    }
+  if (i < length && start.IsEnd ())
+    throw CcnbDecodingException ();
+}
+
+Blob::~Blob ()
+{
+  delete [] m_blob;
 }
 
 }

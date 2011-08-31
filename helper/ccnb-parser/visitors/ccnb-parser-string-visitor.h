@@ -35,7 +35,7 @@ namespace CcnbParser {
 class StringVisitor : public NoArguDepthFirstVisitor
 {
 public:
-  virtual boost::any visit (Blob &n); ///< Throws parsing error if BLOB object is encountered
+  virtual boost::any visit (Blob &n);
   virtual boost::any visit (Udata &n);
 };
 

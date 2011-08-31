@@ -22,7 +22,6 @@
 #define _CCNB_PARSER_BLOB_H_
 
 #include "ccnb-parser-block.h"
-#include "ns3/buffer.h"
 
 namespace ns3 {
 namespace CcnbParser {
@@ -45,13 +44,15 @@ public:
    * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
    */
   Blob (Buffer::Iterator &start, uint32_t length);
+  ~Blob ();
   
   virtual void accept( VoidNoArguVisitor &v )               { v.visit( *this ); }
   virtual void accept( VoidVisitor &v, boost::any param )   { v.visit( *this, param ); }
   virtual boost::any accept( NoArguVisitor &v )             { return v.visit( *this ); }
   virtual boost::any accept( Visitor &v, boost::any param ) { return v.visit( *this, param ); }
 
-  Buffer m_blob; ///< \brief field holding a parsed BLOB value of the block
+  char* m_blob; ///< \brief field holding a parsed BLOB value of the block
+  uint32_t  m_blobSize;
 };
 
 }

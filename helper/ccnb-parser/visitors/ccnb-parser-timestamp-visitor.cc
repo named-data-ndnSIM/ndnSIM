@@ -30,26 +30,27 @@ boost::any/*Time*/
 TimestampVisitor::visit (Blob &n) 
 {
   // Buffer n.m_blob;
-  if (n.m_blob.GetSize ()<2)
+  if (n.m_blobSize < 2)
     throw CcnbDecodingException ();
 
-  Buffer::Iterator start = n.m_blob.Begin ();
+  const char *start = n.m_blob;
   
   intmax_t seconds = 0;
   intmax_t nanoseconds = 0;
 
-  for (uint32_t i=0; i < n.m_blob.GetSize ()-2; i++)
+  for (uint32_t i=0; i < n.m_blobSize-2; i++)
     {
-      seconds = (seconds << 8) | start.ReadU8 ();
+      seconds = (seconds << 8) | (uint8_t)start[i];
     }
-  uint8_t combo = start.ReadU8 (); // 4 most significant bits hold 4 least significant bits of number of seconds
-  seconds = (seconds << 8) | (combo >> 4);
+  uint8_t combo = start[n.m_blobSize-2]; // 4 most significant bits hold 4 least significant bits of number of seconds
+  seconds = (seconds << 4) | (combo >> 4);
+  std::cout << std::hex << (int) start[n.m_blobSize-2] << "\n";
 
   nanoseconds = combo & 0x0F; /*00001111*/ // 4 least significant bits hold 4 most significant bits of number of
-  nanoseconds = (nanoseconds << 8) | start.ReadU8 ();
-  nanoseconds = (intmax_t) ((nanoseconds / 4096.0/*2^12*/) * 1000000000 /*up-convert nanoseconds*/);
+  nanoseconds = (nanoseconds << 8) | start[n.m_blobSize-1];
+  nanoseconds = (intmax_t) ((nanoseconds / 4096.0/*2^12*/) * 1000000 /*up-convert useconds*/);
 
-  return boost::any (Time::FromInteger (seconds, Time::S) + Time::FromInteger (nanoseconds, Time::NS));
+  return boost::any (Time::FromInteger (seconds, Time::S) + Time::FromInteger (nanoseconds, Time::US));
 }
 
 boost::any

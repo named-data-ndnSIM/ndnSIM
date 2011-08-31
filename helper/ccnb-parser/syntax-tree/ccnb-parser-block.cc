@@ -42,31 +42,38 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
 
   // We will have problems if length field is more than 32 bits. Though it's really impossible
   uint8_t byte = 0;
-  while (!(byte & CCN_TT_HBIT))
+  while (!start.IsEnd() && !(byte & CCN_TT_HBIT))
     {
       value <<= 8;
       value += byte;
       byte = start.ReadU8 ();
     }
+  if (start.IsEnd())
+    CcnbDecodingException ();
+  
   value <<= 4;
   value += ( (byte&(~CCN_TT_HBIT)) >> 3);
 
+  /**
+   * Huh. After fighting with NS-3, it became apparent that Create<T>(...) construct
+   * doesn't work with references.  Just simply doesn't work.  wtf?
+   */
   switch (byte & CCN_TT_MASK)
     {
     case CCN_BLOB:
-      return Create<Blob> (start, value);
+      return Ptr<Blob> (new Blob(start, value));
     case CCN_UDATA:
-      return Create<Udata> (start, value);
+      return Ptr<Udata> (new Udata(start, value));
     case CCN_TAG:
-      return Create<Tag> (start, value);
+      return Ptr<Tag> (new Tag(start, value));
     case CCN_ATTR:
-      return Create<Attr> (start, value);
+      return Ptr<Attr> (new Attr(start, value));
     case CCN_DTAG:
-      return Create<Dtag> (start, value);
+      return Ptr<Dtag> (new Dtag(start, value));
     case CCN_DATTR:
-      return Create<Dattr> (start, value);
+      return Ptr<Dattr> (new Dattr(start, value));
     case CCN_EXT:
-      return Create<Ext> (start, value);
+      return Ptr<Ext> (new Ext(start, value));
     default:
       throw CcnbDecodingException ();
     }

@@ -18,23 +18,27 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ccnb-parser-tag.h"
+#include "ccnb-parser-dtag.h"
 
 #include "ccnb-parser-base-attr.h"
+#include "ccnb-parser-base-tag.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
-Tag::Tag (Buffer::Iterator &start, uint32_t length)
+Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
 {
-  m_tag.reserve (length+2); // extra byte for potential \0 at the end
-  uint32_t i = 0;
-  for (; !start.IsEnd () && i < (length+1); i++)
-    {
-      m_tag.push_back (start.ReadU8 ());
-    }
-  if (i < (length+1) && start.IsEnd ())
-    throw CcnbDecodingException ();
+  m_dtag = dtag;
+
+  /**
+   * Hack
+   *
+   * Stop processing after encountering <Content> dtag.  Actual
+   * content (including virtual payload) will be stored in Packet
+   * buffer
+   */
+  if (dtag == CCN_DTAG_Content)
+    return; // hack #1. Do not process nesting block for <Content>
   
   // parse attributes until first nested block reached
   while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
@@ -52,11 +56,17 @@ Tag::Tag (Buffer::Iterator &start, uint32_t length)
   // parse the rest of nested blocks
   while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
     {
-      Ptr<Block> block = Block::ParseBlock (start);
-	  m_nestedTags.push_back (block);
+      // hack #2. Stop processing nested blocks if last block was <Content>
+      if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>
+          DynamicCast<Dtag> (m_nestedTags.back())!=0 && // last block is DTAG
+          DynamicCast<Dtag> (m_nestedTags.back())->m_dtag == CCN_DTAG_Content) 
+        {
+          return; 
+        }
+
+      m_nestedTags.push_back (Block::ParseBlock (start));
     }
-  
-  if (start.IsEnd ()) //should not be the end
+  if (start.IsEnd ())
       throw CcnbDecodingException ();
 
   start.ReadU8 (); // read CCN_CLOSE

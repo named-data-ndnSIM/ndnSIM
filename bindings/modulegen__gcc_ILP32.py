@@ -1571,6 +1571,16 @@ def register_Ns3CcnxEncodingHelper_methods(root_module, cls):
     cls.add_constructor([])
     ## ccnx-encoding-helper.h (module 'NDNabstraction'): ns3::CcnxEncodingHelper::CcnxEncodingHelper(ns3::CcnxEncodingHelper const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxEncodingHelper const &', 'arg0')])
+    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::GetSerializedSize(ns3::CcnxInterestHeader const & interest) [member function]
+    cls.add_method('GetSerializedSize', 
+                   'size_t', 
+                   [param('ns3::CcnxInterestHeader const &', 'interest')], 
+                   is_static=True)
+    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::GetSerializedSize(ns3::CcnxContentObjectHeader const & contentObject) [member function]
+    cls.add_method('GetSerializedSize', 
+                   'size_t', 
+                   [param('ns3::CcnxContentObjectHeader const &', 'contentObject')], 
+                   is_static=True)
     ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::Serialize(ns3::Buffer::Iterator start, ns3::CcnxInterestHeader const & interest) [member function]
     cls.add_method('Serialize', 
                    'size_t', 
@@ -7852,7 +7862,9 @@ def register_Ns3CcnbParserBlob_methods(root_module, cls):
                    [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
                    is_virtual=True)
     ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::m_blob [variable]
-    cls.add_instance_attribute('m_blob', 'ns3::Buffer', is_const=False)
+    cls.add_instance_attribute('m_blob', 'char *', is_const=False)
+    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::m_blobSize [variable]
+    cls.add_instance_attribute('m_blobSize', 'uint32_t', is_const=False)
     return
 
 def register_Ns3CcnbParserDattr_methods(root_module, cls):
