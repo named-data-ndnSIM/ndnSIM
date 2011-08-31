@@ -1,3 +1,23 @@
+/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2011 University of California, Los Angeles
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ */
+
 #include "ns3/test.h"
 #include "ns3/annotated-topology-reader.h"
 #include "ns3/ccnx-interest-header.h"
@@ -11,7 +31,12 @@
 #include "ns3/buffer.h"
 #include "ns3/log.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 using namespace ns3;
+using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("InterestHeaderSerializationTest");
 
@@ -45,13 +70,24 @@ InterestHeaderSerializationTest::DoRun(void)
 {
     //ReportStart();
     //SetVerbose(true);
+    std::ostringstream msgStream;
+    msgStream << "Preved!";
+    
+    //NS_TEST_EXPECT_MSG_NE (true,false, "DIRECTORY = " <<NS_TEST_SOURCEDIR);
+    
+    /*ReportTestFailure ("DIRECTORY = ",  NS_TEST_SOURCEDIR, 
+                            "", "", 
+                            "", 0);*/
+    string str = NS_TEST_SOURCEDIR;
+    //str += "/hahaha";
+    //CreateDataDirFilename(str);
     NS_LOG_INFO ("Test started");
     uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
     Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
     (*testname) ("test") ("test2");
     
     Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
-    (*testname) ("exclude") ("exclude2");
+    (*exclude) ("exclude") ("exclude2");
     
     Time lifetime = Seconds(4.0);
     bool child = true;
@@ -74,11 +110,11 @@ InterestHeaderSerializationTest::DoRun(void)
     Buffer buf(size);
     Buffer::Iterator iter = buf.Begin ();
     //interestHeader.
-    //interestHeader.Serialize(iter);
+    interestHeader.Serialize(iter);
 
     iter = buf.Begin ();
     CcnxInterestHeader target;
-    //target.Deserialize(iter);
+    target.Deserialize(iter);
     
     /*if(target.GetNonce() == randomNonce)
     {
@@ -87,13 +123,13 @@ InterestHeaderSerializationTest::DoRun(void)
     }*/
     NS_TEST_ASSERT_MSG_EQ (target.GetNonce(), randomNonce, "Interest Header nonce deserialization failed");
     
-    //NS_TEST_ASSERT_MSG_EQ (target.GetName(), testname, "Interest Header name deserialization failed");
+    NS_TEST_ASSERT_MSG_EQ (target.GetName(), *testname, "Interest Header name deserialization failed");
     
     NS_TEST_ASSERT_MSG_EQ (target.GetInterestLifetime(), lifetime, "Interest Header lifetime deserialization failed");
     
-    //NS_TEST_ASSERT_MSG_EQ (target.GetChildSelector(), child, "Interest Header childselector deserialization failed");
+    NS_TEST_ASSERT_MSG_EQ (target.IsEnabledChildSelector(), child, "Interest Header childselector deserialization failed");
     
-    //NS_TEST_ASSERT_MSG_EQ (target.GetExclude(), exclude, "Interest Header exclude deserialization failed");
+    NS_TEST_ASSERT_MSG_EQ (target.GetExclude(), *exclude, "Interest Header exclude deserialization failed");
     
     NS_TEST_ASSERT_MSG_EQ (target.GetMaxSuffixComponents(), (int)maxSuffixComponents, "Interest Header maxSuffixComponents deserialization failed");
     
@@ -109,6 +145,7 @@ public:
 InterestHeaderSerializationTestSuite::InterestHeaderSerializationTestSuite ()
 : TestSuite ("interest-header-serialization-test-suite", UNIT)
 {
+    SetDataDir (NS_TEST_SOURCEDIR);
     AddTestCase (new InterestHeaderSerializationTest);
 }
 
