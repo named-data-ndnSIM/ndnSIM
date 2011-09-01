@@ -103,8 +103,7 @@ CcnxFibEntry::FindBestCandidate (int skip/* = 0*/)
 }
 
 
-CcnxFib::CcnxFib (Ptr<Ccnx> node)
-  : m_node (node)
+CcnxFib::CcnxFib ()
 {
 }
 
@@ -127,7 +126,7 @@ CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {
-  os << "Node " << fib.m_node->GetObject<Node> ()->GetId () << "\n";
+  // os << "Node " << fib.m_node->GetObject<Node> ()->GetId () << "\n";
   os << "  Dest prefix      Interfaces(Costs)                  \n";
   os << "+-------------+--------------------------------------+\n";
   

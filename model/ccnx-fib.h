@@ -194,7 +194,7 @@ private:
  * Currently, there is only one index
  * - by prefix hash, which is used to perform prefix match
  */
-struct CcnxFibEntryContainer
+struct CcnxFibEntryContainer 
 {
   typedef boost::multi_index::multi_index_container<
     CcnxFibEntry,
@@ -221,9 +221,9 @@ class CcnxFib
 public:
   /**
    * \brief Constructor
-   * \param node smart pointer to Ccnx stack associated with particular node
    */
-  CcnxFib (Ptr<Ccnx> node);
+  CcnxFib ();
+   // * \param node smart pointer to Ccnx stack associated with particular node
 
   // // Invalidate entries in FIB
   // // Will leave FIB records in hash, but assign metric=NETWORK_UNREACHABLE
@@ -279,9 +279,10 @@ public:
   // void resetProbing();    //reset needsProbing field for every FibEntry
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
-
+  CcnxFib(const CcnxFib&) {} ; ///< \brief copy constructor is disabled
+  
 private:
-  Ptr<Ccnx> m_node;
+  // Ptr<Ccnx> m_node;
 
   CcnxFibEntryContainer::type m_fib;
 };

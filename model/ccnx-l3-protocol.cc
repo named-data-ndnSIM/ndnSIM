@@ -37,7 +37,6 @@
 #include "ccnx-forwarding-strategy.h"
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
-#include "ccnx-content-store.h"
 
 #include <boost/foreach.hpp>
 
@@ -111,20 +110,6 @@ CcnxL3Protocol::NotifyNewAggregate ()
   Object::NotifyNewAggregate ();
 }
 
-void
-CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy)
-{
-  NS_LOG_FUNCTION (this);
-  m_forwardingStrategy = forwardingStrategy;
-  m_forwardingStrategy->SetCcnx (this);
-}
-
-Ptr<CcnxForwardingStrategy>
-CcnxL3Protocol::GetForwardingStrategy (void) const
-{
-  return m_forwardingStrategy;
-}
-
 void 
 CcnxL3Protocol::DoDispose (void)
 {
@@ -140,6 +125,20 @@ CcnxL3Protocol::DoDispose (void)
   Object::DoDispose ();
 }
 
+void
+CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy)
+{
+  NS_LOG_FUNCTION (this);
+  m_forwardingStrategy = forwardingStrategy;
+  m_forwardingStrategy->SetCcnx (this);
+}
+
+Ptr<CcnxForwardingStrategy>
+CcnxL3Protocol::GetForwardingStrategy (void) const
+{
+  return m_forwardingStrategy;
+}
+
 uint32_t 
 CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 {
@@ -148,12 +147,8 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
   face->SetNode (m_node);
   face->SetId (m_faceCounter); // sets a unique ID of the face. This ID serves only informational purposes
 
+  // ask face to register in lower-layer stack
   face->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::Receive, this));
-  // if (face->GetDevice() != 0)
-  //   {
-  //     m_node->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::ReceiveFromLower, this), 
-  //                                      CcnxL3Protocol::ETHERNET_FRAME_TYPE, face->GetDevice(), true/*promiscuous mode*/);
-  //   }
 
   m_faces.push_back (face);
   m_faceCounter ++;
@@ -184,7 +179,7 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
   if (face->IsUp ())
     {
       NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-      // m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropTrace (p, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
       return;
     }
   NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
@@ -192,8 +187,24 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
   try
     {
-      Ptr<Header> header = CcnxHeaderHelper::CreateCorrectCcnxHeader (p);
-      ReceiveAndProcess (face, header, packet);  // header should serve as overloaded method selector... not sure whether it works with this "smart" pointers...
+      CcnxHeaderHelper::Type type = CcnxHeaderHelper::CreateCorrectCcnxHeader (p);
+      switch (type)
+        {
+        case CcnxHeaderHelper::INTEREST:
+          {
+            Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
+            OnInterest (face, header, packet);  
+            break;
+          }
+        case CcnxHeaderHelper::CONTENT_OBJECT:
+          {
+            Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+            OnData (face, header, packet);  
+            break;
+          }
+        }
+      
+      // exception will be thrown if packet is not recognized
     }
   catch (CcnxUnknownHeaderException)
     {
@@ -202,12 +213,17 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 }
 
 // Processing Interests
-void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
-                                        const Ptr<CcnxInterestHeader> &header,
-                                        const Ptr<Packet> &packet)
+void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
+                                 Ptr<CcnxInterestHeader> &header,
+                                 Ptr<Packet> &packet)
 {
   NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
-  // m_rxTrace (packet, m_node->GetObject<Ccnx> (), incomingFace);
+  m_receivedInterestsTrace (packet, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  
+  // dangerous place. Trying to deserialize header
+  packet->RemoveHeader (*header);
+
+  NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
   /// \todo Processing of Interest packets
   
@@ -223,20 +239,20 @@ void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
 }
 
 // Processing ContentObjects
-void CcnxL3Protocol::ReceiveAndProcess (const Ptr<CcnxFace> &incomingFace,
-                                        const Ptr<CcnxContentObjectHeader> &header,
-                                        const Ptr<Packet> &packet)
+void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
+                             Ptr<CcnxContentObjectHeader> &header,
+                             Ptr<Packet> &packet)
 {
+  static CcnxContentObjectTail contentObjectTrailer; //there is no data in this object
+  
   NS_LOG_LOGIC ("Receiving contentObject from " << &incomingFace);
+  m_receivedDataTrace (packet, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
 
+  // dangerous place. Trying to deserialize header
+  packet->RemoveHeader (*header);
+  packet->RemoveTrailer (contentObjectTrailer);
+  
   /// \todo Processing of ContentObject packets
-}
-
-// fake method
-void
-CcnxL3Protocol::ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p)
-{
-  NS_ASSERT_MSG (false, "This function should never be called");
 }
 
 
@@ -250,7 +266,7 @@ CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
   if (face->IsUp ())
     {
       NS_LOG_LOGIC ("Sending via face " << &face); //
-      m_txTrace (packet, m_node->GetObject<Ccnx> (), face);
+      // m_txTrace (packet, m_node->GetObject<Ccnx> (), face);
       face->Send (packet);
     }
   else

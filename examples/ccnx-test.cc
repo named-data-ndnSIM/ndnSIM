@@ -47,27 +47,27 @@ main (int argc, char *argv[])
   CcnxStackHelper ccnx;
   Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
-  // test RIT
-  NS_LOG_INFO ("Creating RIT");
-  Ptr<CcnxRit> rit = CreateObject<CcnxRit> ();
+  // // test RIT
+  // NS_LOG_INFO ("Creating RIT");
+  // Ptr<CcnxRit> rit = CreateObject<CcnxRit> ();
 
-  CcnxInterestHeader header;
-  Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
-  (*testname) ("test") ("test2");
-  header.SetName (testname);
-  header.SetNonce (1);
+  // CcnxInterestHeader header;
+  // Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
+  // (*testname) ("test") ("test2");
+  // header.SetName (testname);
+  // header.SetNonce (1);
 
-  rit->SetRecentlySatisfied (header);
+  // rit->SetRecentlySatisfied (header);
 
-  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
 
-  (*testname) ("test3"); // should have a side effect of changing name in the packet
-  rit->SetRecentlySatisfied (header);
+  // (*testname) ("test3"); // should have a side effect of changing name in the packet
+  // rit->SetRecentlySatisfied (header);
 
-  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
 
-  header.SetNonce (2);
-  NS_LOG_INFO (rit->WasRecentlySatisfied (header));
+  // header.SetNonce (2);
+  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
 
   // rit->SetRecentlySatisfied (header);
   // ? set up forwarding

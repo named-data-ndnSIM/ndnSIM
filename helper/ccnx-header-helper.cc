@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxHeaderHelper");
 namespace ns3
 {
 
-Ptr<Header>
+CcnxHeaderHelper::Type
 CcnxHeaderHelper::CreateCorrectCcnxHeader (Ptr<const Packet> packet)
 {
   uint8_t type[2];
@@ -43,11 +43,11 @@ CcnxHeaderHelper::CreateCorrectCcnxHeader (Ptr<const Packet> packet)
   
   if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
     {
-      return Create<CcnxInterestHeader> ();
+      return CcnxHeaderHelper::INTEREST;
     }
   else if (type[0] == CONTENT_OBJECT_BYTE0 && type[1] == CONTENT_OBJECT_BYTE1)
     {
-      return Create<CcnxContentObjectHeader> ();
+      return CcnxHeaderHelper::CONTENT_OBJECT;
     }
 
   throw CcnxUnknownHeaderException();

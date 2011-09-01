@@ -50,6 +50,7 @@ class Packet;
 class CcnxHeaderHelper
 {
 public:
+  enum Type {INTEREST, CONTENT_OBJECT};
 
   /**
    * Static function to create an appropriate CCNx header
@@ -72,7 +73,7 @@ public:
    * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
    */
   
-  static Ptr<Header>
+  static Type
   CreateCorrectCcnxHeader (Ptr<const Packet> packet);
 };
 

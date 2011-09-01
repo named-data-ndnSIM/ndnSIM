@@ -28,6 +28,11 @@
 #include "ns3/net-device.h"
 #include "ns3/traced-callback.h"
 
+#include "ccnx-content-store.h"
+#include "ccnx-rit.h"
+#include "ccnx-pit.h"
+#include "ccnx-fib.h"
+
 #include "ccnx.h"
 
 namespace ns3 {
@@ -41,8 +46,7 @@ class CcnxForwardingStrategy;
 class Header;
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
-//class CcnxContentStore;
-
+  
 /**
  * \ingroup ccnx
  * \brief Actual implementation of the Ccnx network layer
@@ -119,9 +123,9 @@ protected:
    * Processing Interest packets
    */
   virtual void
-  ReceiveAndProcess (const Ptr<CcnxFace> &face,
-                     const Ptr<CcnxInterestHeader> &header,
-                     const Ptr<Packet> &p);
+  OnInterest (const Ptr<CcnxFace> &face,
+              Ptr<CcnxInterestHeader> &header,
+              Ptr<Packet> &p);
 
   
   /**
@@ -130,9 +134,9 @@ protected:
    * Processing ContentObject packets
    */
   virtual void
-  ReceiveAndProcess (const Ptr<CcnxFace> &face,
-                     const Ptr<CcnxContentObjectHeader> &header,
-                     const Ptr<Packet> &p);
+  OnData (const Ptr<CcnxFace> &face,
+          Ptr<CcnxContentObjectHeader> &header,
+          Ptr<Packet> &p);
 
 protected:
   virtual void DoDispose (void);
@@ -147,11 +151,11 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  /**
-   * \brief Fake function. should never be called. Just to trick C++ to compile
-   */
-  virtual void
-  ReceiveAndProcess (Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
+  // /**
+  //  * \brief Fake function. should never be called. Just to trick C++ to compile
+  //  */
+  // virtual void
+  // ReceiveAndProcess (const Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
 
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
@@ -161,20 +165,18 @@ private:
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
-  //Ptr<CcnxContentStore> m_contentStore;
+  CcnxRit m_rit; ///< \brief RIT (recently interest table)
+  CcnxPit m_pit; ///< \brief PIT (pending interest table)
+  CcnxFib m_fib; ///< \brief FIB
   
-  /**
-   * \brief Trace of transmitted packets, including all headers
-   * \internal
-   */
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_txTrace;
+  CcnxContentStore m_contentStore; ///< \brief Content store (for caching purposes only)
+  
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
 
-  /**
-   * \brief Trace of received packets, including all headers
-   * \internal
-   */
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_rxTrace;
-
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
+  
   /**
    * \brief Trace of dropped packets, including reason and all headers
    * \internal
