@@ -46,6 +46,7 @@ namespace CcnbParser {
 class Block : public SimpleRefCount<Block>
 {
 public:
+  // static int counter;
   /**
    * \brief Parsing stream (recursively) and creating a parsed BLOCK
    * object

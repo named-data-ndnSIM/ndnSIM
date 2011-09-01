@@ -185,7 +185,7 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHe
 
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Content, CcnbParser::CCN_DTAG); // <Content>
 
-  // there is no closing tag !!!
+  // there are no closing tags !!!
   return written;
 }
 
@@ -220,7 +220,7 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxContentObjectHeader &contentObj
 
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Content); // <Content>
 
-  // there is no closing tag !!!
+  // there are no closing tags !!!
   return written;
 }
 
@@ -377,7 +377,10 @@ CcnxEncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_d
 size_t
 CcnxEncodingHelper::EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size)
 {
-  return EstimateBlockHeader (dtag) + EstimateBlockHeader (size) + size + 1;
+  if (size>0)
+    return EstimateBlockHeader (dtag) + EstimateBlockHeader (size) + size + 1;
+  else
+    return EstimateBlockHeader (dtag) + 1;
 }
 
 

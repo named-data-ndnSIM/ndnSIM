@@ -36,8 +36,11 @@ const uint8_t CCN_TT_MASK = ((1 << CCN_TT_BITS) - 1);
 const uint8_t CCN_MAX_TINY= ((1 << (7-CCN_TT_BITS)) - 1);
 const uint8_t CCN_TT_HBIT = ((uint8_t)(1 << 7));
 
+// int Block::counter = 0;
+
 Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
 {
+  // std::cout << "<< pos: " << counter << "\n";
   uint32_t value = 0;
 
   // We will have problems if length field is more than 32 bits. Though it's really impossible
@@ -47,6 +50,7 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
       value <<= 8;
       value += byte;
       byte = start.ReadU8 ();
+      // Block::counter ++;
     }
   if (start.IsEnd())
     CcnbDecodingException ();

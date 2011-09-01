@@ -116,6 +116,7 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 };
 
+class CcnxContentObjectHeaderException {};
   
 } // namespace ns3
 

@@ -57,6 +57,7 @@ CcnxContentObjectHeader::SetName (const Ptr<CcnxNameComponents> &name)
 const CcnxNameComponents&
 CcnxContentObjectHeader::GetName () const
 {
+  if (m_name==0) throw CcnxContentObjectHeaderException();
   return *m_name;
 }
 
@@ -88,9 +89,8 @@ CcnxContentObjectHeader::GetInstanceTypeId (void) const
 void
 CcnxContentObjectHeader::Print (std::ostream &os) const
 {
-  os << "<ContentObject><Name>" << *m_name << "</Name><Content>";
+  os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -102,8 +102,8 @@ TypeId
 CcnxContentObjectTail::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxContentObjectTail")
-    .SetParent<Header> ()
-    .AddConstructor<CcnxContentObjectHeader> ()
+    .SetParent<Trailer> ()
+    .AddConstructor<CcnxContentObjectTail> ()
     ;
   return tid;
 }
@@ -130,6 +130,8 @@ void
 CcnxContentObjectTail::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
+  i.Prev (2); // Trailer interface requires us to go backwards
+  
   i.WriteU8 (0x00); // </Content>
   i.WriteU8 (0x00); // </ContentObject>
 }
@@ -138,6 +140,8 @@ uint32_t
 CcnxContentObjectTail::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
+  i.Prev (2); // Trailer interface requires us to go backwards
+
   uint8_t __attribute__ ((unused)) closing_tag_content = i.ReadU8 ();
   NS_ASSERT_MSG (closing_tag_content==0, "Should be a closing tag </Content> (0x00)");
 

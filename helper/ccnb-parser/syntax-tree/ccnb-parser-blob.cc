@@ -37,6 +37,7 @@ Blob::Blob (Buffer::Iterator &start, uint32_t length)
     }
   if (i < length && start.IsEnd ())
     throw CcnbDecodingException ();
+  // Block::counter += length;
 }
 
 Blob::~Blob ()

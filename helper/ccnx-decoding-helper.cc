@@ -27,6 +27,8 @@
 #include "ns3/ccnb-parser-content-object-visitor.h"
 #include "ns3/ccnb-parser-block.h"
 
+#include "ns3/ccnb-parser-dtag.h"
+
 namespace ns3 {
 
 size_t

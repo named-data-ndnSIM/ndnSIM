@@ -29,7 +29,7 @@ namespace CcnbParser {
 Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
 {
   m_dtag = dtag;
-
+  // std::cout << m_dtag << ", position: " << Block::counter << "\n";  
   /**
    * Hack
    *
@@ -66,10 +66,21 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
 
       m_nestedTags.push_back (Block::ParseBlock (start));
     }
+
+  // hack #3. Stop processing when last tag was <ContentObject>
+  if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>
+      DynamicCast<Dtag> (m_nestedTags.back())!=0 && // last block is DTAG
+      DynamicCast<Dtag> (m_nestedTags.back())->m_dtag == CCN_DTAG_Content) 
+    {
+      return; 
+    }
+
   if (start.IsEnd ())
       throw CcnbDecodingException ();
 
   start.ReadU8 (); // read CCN_CLOSE
+  // std::cout << "closer, position = " << Block::counter << "\n";
+  // Block::counter ++;
 }
 
 }

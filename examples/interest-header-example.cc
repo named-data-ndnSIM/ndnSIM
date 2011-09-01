@@ -20,8 +20,13 @@ int
 main (int argc, char *argv[])
 {
 	LogComponentEnable ("InterestHeaderExample", LOG_ALL);
+	LogComponentEnable ("Packet", LOG_ALL);
 	
     NS_LOG_INFO ("Test started");
+
+	Packet::EnablePrinting ();
+	Packet::EnableChecking (); 
+	Packet packet (0);
 
     CcnxInterestHeader interestHeader;
 	
@@ -48,32 +53,17 @@ main (int argc, char *argv[])
 	UniformVariable random(1, std::numeric_limits<uint32_t>::max ());
     uint32_t randomNonce = static_cast<uint32_t> (random.GetValue());
     interestHeader.SetNonce(randomNonce);
-	NS_LOG_INFO ("Source: \n" <<interestHeader);
+	NS_LOG_INFO ("Source: \n" << interestHeader);
     
-    uint32_t size = interestHeader.GetSerializedSize();
-    NS_LOG_INFO ("GetSerializedSize = " << size);
-    //uint32_t size = 5;
-    //NS_TEST_ASSERT_MSG_EQ (false, true, "GetSize = " << size);
-    
-    Buffer buf;
-	buf.AddAtStart (size);
-    Buffer::Iterator iter = buf.Begin ();
-    //interestHeader.
-    interestHeader.Serialize(iter);
+	packet.AddHeader (interestHeader);
+	NS_LOG_INFO ("Deserialized packet: " << packet);
 
-	std::ofstream of( "/tmp/file" );
-	of.write (reinterpret_cast<const char*> (buf.PeekData ()), size);
-	of.close ();
-
-	NS_LOG_INFO ("start = " << buf.GetCurrentStartOffset () << " " <<
-				 "end = " << buf.GetCurrentEndOffset ());	
+	NS_LOG_INFO ("Removing and deserializing individual headers");
 	
-    iter = buf.Begin ();
     CcnxInterestHeader target;
-	NS_LOG_INFO ("Trying to deserialize");
-	std::cout << "\n";
-	size = target.Deserialize (iter);
-	buf.RemoveAtEnd (size);
-	NS_LOG_INFO ("Deserialized size = " << size);
+	packet.RemoveHeader (target);
+
 	NS_LOG_INFO ("Target: \n" << target);
+
+	return 0;
 }
