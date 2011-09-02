@@ -28,7 +28,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
+// NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
 
 using namespace __ccnx_private;
 
@@ -50,22 +50,22 @@ using namespace __ccnx_private;
 //   return count;
 // }
 
-TypeId 
-CcnxPit::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::CcnxPit")
-    .SetGroupName ("Ccnx")
-    .SetParent<Object> ()
-    .AddConstructor<CcnxPit> ()
-    .AddAttribute ("CleanupTimeout",
-                   "Timeout defining how frequent RIT should be cleaned up",
-                   TimeValue (Seconds (1)),
-                   MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
-                   MakeTimeChecker ())
-    ;
+// TypeId 
+// CcnxPit::GetTypeId ()
+// {
+//   static TypeId tid = TypeId ("ns3::CcnxPit")
+//     .SetGroupName ("Ccnx")
+//     .SetParent<Object> ()
+//     .AddConstructor<CcnxPit> ()
+//     .AddAttribute ("CleanupTimeout",
+//                    "Timeout defining how frequent RIT should be cleaned up",
+//                    TimeValue (Seconds (1)),
+//                    MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
+//                    MakeTimeChecker ())
+//     ;
 
-  return tid;
-}
+//   return tid;
+// }
 
 CcnxPit::CcnxPit ()
 {
@@ -94,11 +94,11 @@ void CcnxPit::CleanExpired ()
   NS_LOG_LOGIC ("Cleaning PIT");
   Time now = Simulator::Now ();
   
-  while( !m_pit.empty() )
+  while( !empty() )
     {
-      if( m_pit.get<i_timestamp> ().front ().GetExpireTime () <= now ) // is the record stale?
+      if( get<i_timestamp> ().front ().GetExpireTime () <= now ) // is the record stale?
         {
-         m_pit.get<i_timestamp> ().pop_front( );
+          get<i_timestamp> ().pop_front( );
         }
       else
         break; // nothing else to do. All later records will not be stale
@@ -113,9 +113,9 @@ const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
   CcnxPitEntryContainer::type::iterator entry =
-    m_pit.get<i_prefix> ().find (header.GetName ());
+    get<i_prefix> ().find (header.GetName ());
 
-  if (entry != m_pit.end ())
+  if (entry != end ())
     throw CcnxPitEntryNotFound();
 
   return *entry;
@@ -125,7 +125,7 @@ const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxInterestHeader &header) const
 {
   CcnxPitEntryContainer::type::iterator entry =
-    m_pit.get<i_prefix> ().find (header.GetName ());
+    get<i_prefix> ().find (header.GetName ());
 
   // if (entry != m_pit.end ())
   //   entry = m_pit.insert (m_pit.end (), CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ())));

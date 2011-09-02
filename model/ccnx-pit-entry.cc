@@ -22,6 +22,8 @@
 #include "ccnx-name-components.h"
 #include "ccnx-fib.h"
 
+#include "ns3/simulator.h"
+
 namespace ns3
 {
 
@@ -98,15 +100,21 @@ CcnxPitEntry::AddIncoming::operator() (CcnxPitEntry &entry)
 }
 
 void
+CcnxPitEntry::DeleteIncoming::operator() (CcnxPitEntry &entry)
+{
+  entry.m_incoming.erase (m_face);
+}
+
+void
 CcnxPitEntry::AddOutgoing::operator() (CcnxPitEntry &entry)
 {
   entry.m_outgoing.insert (CcnxPitEntryOutgoingFace (m_face));
 }
 
 void
-CcnxPitEntry::DeleteIncoming::operator() (CcnxPitEntry &entry)
+CcnxPitEntry::DeleteOutgoing::operator() (CcnxPitEntry &entry)
 {
-  entry.m_incoming.erase (m_face);
+  entry.m_outgoing.erase (m_face);
 }
 
 void
@@ -115,5 +123,33 @@ CcnxPitEntry::ClearIncoming::operator() (CcnxPitEntry &entry)
   entry.m_incoming.clear ();
 }
 
+CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
+  : m_face (face)
+  , m_status (status)
+{
+}
+
+void
+CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
+{
+  entry.m_fib->UpdateStatus (m_face, m_status);
+}
+
+void
+CcnxPitEntry::EstimateRttAndRemoveFace::operator() (CcnxPitEntry &entry)
+{
+  // similar to Karn's Algorithm, we don't use RTT measurements for retx packets
+  if (m_outFace->m_retxNum>0)
+    return;
+
+  CcnxFibFaceMetricContainer::type::iterator metric = entry.m_fib->m_faces.find (m_outFace->m_face);
+  NS_ASSERT_MSG (metric != entry.m_fib->m_faces.end (),
+                 "Something wrong. Cannot find entry for the face in FIB");
+
+  Time rtt = Simulator::Now() - m_outFace->m_sendTime;
+  entry.m_fib->m_faces.modify (metric, CcnxFibFaceMetric::UpdateRtt (rtt));
+
+  entry.m_outgoing.erase (m_outFace);
+}
 
 }  

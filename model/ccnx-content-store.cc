@@ -31,27 +31,27 @@ NS_LOG_COMPONENT_DEFINE ("CcnxContentStore");
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
+// NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
 
-using namespace __ccnx_private_content_store;
+using namespace __ccnx_private;
 
-TypeId 
-CcnxContentStore::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::CcnxContentStore")
-    .SetGroupName ("Ccnx")
-    .SetParent<Object> ()
-    .AddConstructor<CcnxContentStore> ()
-    .AddAttribute ("Size",
-                   "Maximum number of packets that content storage can hold",
-                   UintegerValue (100),
-                   MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
-                                         &CcnxContentStore::GetMaxSize),
-                   MakeUintegerChecker<uint32_t> ())
-    ;
+// TypeId 
+// CcnxContentStore::GetTypeId (void)
+// {
+//   static TypeId tid = TypeId ("ns3::CcnxContentStore")
+//     .SetGroupName ("Ccnx")
+//     .SetParent<Object> ()
+//     .AddConstructor<CcnxContentStore> ()
+//     .AddAttribute ("Size",
+//                    "Maximum number of packets that content storage can hold",
+//                    UintegerValue (100),
+//                    MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
+//                                          &CcnxContentStore::GetMaxSize),
+//                    MakeUintegerChecker<uint32_t> ())
+//     ;
 
-  return tid;
-}
+//   return tid;
+// }
 
 CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
 
@@ -65,7 +65,7 @@ CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
 struct CcnxContentStoreByPrefix
 {
   typedef
-  CcnxContentStoreContainer::type::index<hash>::type
+  CcnxContentStoreContainer::type::index<i_prefix>::type
   type;
 };
 
@@ -76,12 +76,12 @@ struct CcnxContentStoreByPrefix
 struct CcnxContentStoreByMru
 {
   typedef
-  CcnxContentStoreContainer::type::index<mru>::type
+  CcnxContentStoreContainer::type::index<i_mru>::type
   type;
 };
 
 #ifdef _DEBUG
-#define DUMP_INDEX_TAG ordered
+#define DUMP_INDEX_TAG i_ordered
 #define DUMP_INDEX     CcnxContentStoreOrderedPrefix
 /**
  * \ingroup ccnx
@@ -90,11 +90,11 @@ struct CcnxContentStoreByMru
 struct CcnxContentStoreOrderedPrefix
 {
   typedef
-  CcnxContentStoreContainer::type::index<ordered>::type
+  CcnxContentStoreContainer::type::index<i_ordered>::type
   type;
 };
 #else
-#define DUMP_INDEX_TAG mru
+#define DUMP_INDEX_TAG i_mru
 #define DUMP_INDEX     CcnxContentStoreByMru
 #endif
 
@@ -151,12 +151,12 @@ CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
 Ptr<Packet>
 CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
-  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<hash> ().find (interest->GetName ());
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (interest->GetName ());
   if (it != m_contentStore.end ())
     {
       // promote entry to the top
-      m_contentStore.get<mru> ().relocate (m_contentStore.get<mru> ().begin (),
-                                           m_contentStore.project<mru> (it));
+      m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
+                                           m_contentStore.project<i_mru> (it));
 
       // return fully formed CCNx packet
       return it->GetFullyFormedCcnxPacket ();
@@ -167,18 +167,18 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 void 
 CcnxContentStore::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
-  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<hash> ().find (header->GetName ());
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (header->GetName ());
   if (it == m_contentStore.end ())
     { // add entry to the top
-      m_contentStore.get<mru> ().push_front (CcnxContentStoreEntry (header, packet));
+      m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, packet));
       if (m_contentStore.size () > m_maxSize)
-        m_contentStore.get<mru> ().pop_back ();
+        m_contentStore.get<i_mru> ().pop_back ();
     }
   else
     {
       // promote entry to the top
-      m_contentStore.get<mru> ().relocate (m_contentStore.get<mru> ().begin (),
-                                           m_contentStore.project<mru> (it));
+      m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
+                                           m_contentStore.project<i_mru> (it));
     }
 }
     

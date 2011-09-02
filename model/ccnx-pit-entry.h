@@ -44,7 +44,7 @@ class CcnxNameComponents;
 
 namespace __ccnx_private
 {
-class i_face {};
+// class i_face {};
 }
 
 /**
@@ -62,7 +62,7 @@ struct CcnxPitEntryIncomingFaceContainer
       // For fast access to elements using CcnxFace
       boost::multi_index::ordered_unique<
         boost::multi_index::tag<__ccnx_private::i_face>,
-        boost::multi_index::identity<CcnxPitEntryIncomingFace>
+        boost::multi_index::member<CcnxPitEntryIncomingFace, Ptr<CcnxFace>, &CcnxPitEntryIncomingFace::m_face>
       >
     >
    > type;
@@ -83,7 +83,7 @@ struct CcnxPitEntryOutgoingFaceContainer
       // For fast access to elements using CcnxFace
       boost::multi_index::ordered_unique<
         boost::multi_index::tag<__ccnx_private::i_face>,
-        boost::multi_index::identity<CcnxPitEntryOutgoingFace>
+        boost::multi_index::member<CcnxPitEntryOutgoingFace, Ptr<CcnxFace>, &CcnxPitEntryOutgoingFace::m_face>
       >
     >
    > type;
@@ -137,6 +137,18 @@ public:
   };
 
   /**
+   * \brief Unary function to delete incoming interest for the interface
+   * \param face face that should be removed from the list of incoming interests
+   */
+  struct DeleteIncoming
+  {
+    DeleteIncoming (Ptr<CcnxFace> face) : m_face (face) {}
+    void operator() (CcnxPitEntry &entry);
+  private:
+    Ptr<CcnxFace> m_face;
+  };
+
+  /**
    * \brief Unary function to add outgoing interest to PIT entry
    *
    * \param outgoingFace smart pointer to the face of the outgoing interest
@@ -155,9 +167,9 @@ public:
    * \brief Unary function to delete incoming interest for the interface
    * \param face face that should be removed from the list of incoming interests
    */
-  struct DeleteIncoming
+  struct DeleteOutgoing
   {
-    DeleteIncoming (Ptr<CcnxFace> face) : m_face (face) {}
+    DeleteOutgoing (Ptr<CcnxFace> face) : m_face (face) {}
     void operator() (CcnxPitEntry &entry);
   private:
     Ptr<CcnxFace> m_face;
@@ -168,8 +180,33 @@ public:
    */
   struct ClearIncoming
   {
-    ClearIncoming ();
+    ClearIncoming () {};
     void operator() (CcnxPitEntry &entry);
+  };
+
+  /**
+   * \brief Unary function to update FIB status
+   */
+  struct UpdateFibStatus
+  {
+    UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status);
+    void operator() (CcnxPitEntry &entry);
+  private:
+    Ptr<CcnxFace> m_face;
+    CcnxFibFaceMetric::Status m_status;
+  };
+
+  /**
+   * \brief Unary function to estimate RTT and update smoothed RTT value in FIB
+   * \param outFace iterator of the outgoing face entry
+   */
+  struct EstimateRttAndRemoveFace
+  {
+    EstimateRttAndRemoveFace (CcnxPitEntryOutgoingFaceContainer::type::iterator outFace)
+      : m_outFace (outFace) { };
+    void operator() (CcnxPitEntry &entry);
+  private:
+    CcnxPitEntryOutgoingFaceContainer::type::iterator m_outFace;
   };
 
   const CcnxNameComponents &
@@ -181,7 +218,7 @@ public:
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
   
-private:
+public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
   Ptr<CcnxFibEntry> m_fib; ///< \brief FIB entry related to this prefix
   

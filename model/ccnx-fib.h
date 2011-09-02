@@ -23,6 +23,7 @@
 
 #include "hash-helper.h"
 #include "ccnx-face.h"
+#include "ccnx.h"
 #include "ns3/nstime.h"
 #include "ns3/simple-ref-count.h"
 
@@ -39,19 +40,6 @@
 
 namespace ns3 {
 
-namespace __ccnx_private_fib
-{
-const uint8_t NDN_FIB_GREEN = 1; ///< \brief 
-const uint8_t NDN_FIB_YELLOW = 2;
-const uint8_t NDN_FIB_RED = 3;
-
-class i_face {};
-class i_metric {};
-class i_nth {};
-class i_prefix {};
-}
-
-class Ccnx;
 class CcnxInterestHeader;
 
 /**
@@ -61,6 +49,10 @@ class CcnxInterestHeader;
 class CcnxFibFaceMetric
 {
 public:
+  enum Status { NDN_FIB_GREEN = 1,
+                NDN_FIB_YELLOW = 2,
+                NDN_FIB_RED = 3 };
+public:
   /**
    * \brief Metric constructor
    *
@@ -69,7 +61,7 @@ public:
    */
   CcnxFibFaceMetric (Ptr<CcnxFace> face, int cost)
     : m_face (face)
-    , m_status (__ccnx_private_fib::NDN_FIB_YELLOW)
+    , m_status (NDN_FIB_YELLOW)
     , m_routingCost (cost)
     , m_sRtt   (Seconds (0))
     , m_rttVar (Seconds (0))
@@ -79,20 +71,35 @@ public:
    * \brief Comparison operator used by boost::multi_index::identity<>
    */
   bool
-  operator< (const CcnxFibFaceMetric &m) const { return *m_face < *(m.m_face); } // return identity of the face
+  operator< (const CcnxFibFaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+
+  bool
+  operator< (const Ptr<CcnxFace> &face) const { return *m_face < *face; } 
 
   Ptr<CcnxFace>
   GetFace () const { return m_face; }
+
+  /**
+   * \brief Unary function to recalculate smoothed RTT and RTT variation
+   * \param rttSample RTT sample
+   */
+  struct UpdateRtt
+  {
+    UpdateRtt (const Time &rttSample) : m_rttSample (rttSample) {};
+    void operator() (CcnxFibFaceMetric &entry);
+  private:
+    const Time &m_rttSample;
+  };
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric);
 public:
   Ptr<CcnxFace> m_face; ///< Face
   
-  uint8_t m_status;		///< \brief Status of the next hop: 
-						///<		- #__ccnx_private_fib::NDN_FIB_GREEN
-						///<		- #__ccnx_private_fib::NDN_FIB_YELLOW
-						///<		- #__ccnx_private_fib::NDN_FIB_RED
+  Status m_status;		///< \brief Status of the next hop: 
+						///<		- NDN_FIB_GREEN
+						///<		- NDN_FIB_YELLOW
+						///<		- NDN_FIB_RED
   
   uint32_t m_routingCost; ///< \brief routing protocol cost (interpretation of the value depends on the underlying routing protocol)
 
@@ -117,23 +124,23 @@ struct CcnxFibFaceMetricContainer
     boost::multi_index::indexed_by<
       // For fast access to elements using CcnxFace
       boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private_fib::i_face>,
-        boost::multi_index::identity<CcnxFibFaceMetric>
+        boost::multi_index::tag<__ccnx_private::i_face>,
+        boost::multi_index::member<CcnxFibFaceMetric,Ptr<CcnxFace>,&CcnxFibFaceMetric::m_face>
       >,
 
       // List of available faces ordered by (status, m_routingCost)
       boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<__ccnx_private_fib::i_metric>,
+        boost::multi_index::tag<__ccnx_private::i_metric>,
         boost::multi_index::composite_key<
           CcnxFibFaceMetric,
-          boost::multi_index::member<CcnxFibFaceMetric,uint8_t,&CcnxFibFaceMetric::m_status>,
+          boost::multi_index::member<CcnxFibFaceMetric,CcnxFibFaceMetric::Status,&CcnxFibFaceMetric::m_status>,
           boost::multi_index::member<CcnxFibFaceMetric,uint32_t,&CcnxFibFaceMetric::m_routingCost>
         >
       >,
 
       // To optimize nth candidate selection (sacrifice a little bit space to gain speed)
       boost::multi_index::random_access<
-        boost::multi_index::tag<__ccnx_private_fib::i_nth>
+        boost::multi_index::tag<__ccnx_private::i_nth>
       >
     >
    > type;
@@ -160,7 +167,7 @@ public:
    * \brief Update status of FIB next hop
    */
   void
-  UpdateStatus (Ptr<CcnxFace> face, uint8_t status);
+  UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status);
 
   /**
    * \brief Get prefix for the FIB entry
@@ -177,7 +184,7 @@ public:
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);
 
-private:
+public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the FIB entry
   CcnxFibFaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
@@ -201,7 +208,7 @@ struct CcnxFibEntryContainer
     boost::multi_index::indexed_by<
       // For fast access to elements using CcnxFace
       boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private_fib::i_prefix>,
+        boost::multi_index::tag<__ccnx_private::i_prefix>,
         boost::multi_index::const_mem_fun<CcnxFibEntry,
                                           const CcnxNameComponents&,
                                           &CcnxFibEntry::GetPrefix>,
@@ -269,9 +276,6 @@ public:
 
   // // Update Fib from IP routing table
   // void updateFibFromIpRouting( );
-
-  // // Update the status for all FIB records for the specified interface
-  // void updateInterfaceStatus( int interface, int status );
 
   // void dump( );
   // void dump( const FibIterator &fib );

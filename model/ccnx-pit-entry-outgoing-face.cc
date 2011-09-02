@@ -27,7 +27,7 @@ namespace ns3 {
 CcnxPitEntryOutgoingFace::CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face)
   : m_face (face)
   , m_sendTime (Simulator::Now ())
-  // , m_retxNum (0)
+  , m_retxNum (0)
   // , m_nonce (nonce)
   // , m_outstanding (true)
   // , m_waitingInVain (false)

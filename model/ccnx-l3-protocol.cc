@@ -179,7 +179,7 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
   if (face->IsUp ())
     {
       NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-      m_dropTrace (p, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
+      // m_dropTrace (p, INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
       return;
     }
   NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
@@ -193,13 +193,25 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
         case CcnxHeaderHelper::INTEREST:
           {
             Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
-            OnInterest (face, header, packet);  
+
+            // Deserialization. Exception may be thrown
+            packet->RemoveHeader (*header);
+            NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
+            
+            OnInterest (face, header, p/*original packet*/);  
             break;
           }
         case CcnxHeaderHelper::CONTENT_OBJECT:
           {
             Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
-            OnData (face, header, packet);  
+            
+            static CcnxContentObjectTail contentObjectTrailer; //there is no data in this object
+
+            // Deserialization. Exception may be thrown
+            packet->RemoveHeader (*header);
+            packet->RemoveTrailer (contentObjectTrailer);
+
+            OnData (face, header, packet/*payload*/, p/*original packet*/);  
             break;
           }
         }
@@ -215,15 +227,11 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 // Processing Interests
 void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  Ptr<CcnxInterestHeader> &header,
-                                 Ptr<Packet> &packet)
+                                 const Ptr<const Packet> &packet)
 {
   NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
-  m_receivedInterestsTrace (packet, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
   
-  // dangerous place. Trying to deserialize header
-  packet->RemoveHeader (*header);
-
-  NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
   /// \todo Processing of Interest packets
   
@@ -241,20 +249,71 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 // Processing ContentObjects
 void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                              Ptr<CcnxContentObjectHeader> &header,
-                             Ptr<Packet> &packet)
+                             Ptr<Packet> &payload,
+                             const Ptr<const Packet> &packet)
 {
-  static CcnxContentObjectTail contentObjectTrailer; //there is no data in this object
   
   NS_LOG_LOGIC ("Receiving contentObject from " << &incomingFace);
-  m_receivedDataTrace (packet, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  m_receivedDataTrace (header, payload, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
 
-  // dangerous place. Trying to deserialize header
-  packet->RemoveHeader (*header);
-  packet->RemoveTrailer (contentObjectTrailer);
+  // 1. Lookup PIT entry
+  try
+    {
+      const CcnxPitEntry &pitEntry = m_pit.Lookup (*header);
+
+      // Note that with MultiIndex we need to modify entries indirectly
   
-  /// \todo Processing of ContentObject packets
-}
+      // Update metric status for the incoming interface in the corresponding FIB entry 
+      m_pit.modify (m_pit.iterator_to (pitEntry),
+                    CcnxPitEntry::UpdateFibStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
+  
+      // Add or update entry in the content store
+      m_contentStore.Add (header, payload);
 
+      CcnxPitEntryOutgoingFaceContainer::type::iterator
+        out = pitEntry.m_outgoing.find (incomingFace);
+  
+      // If we have sent interest for this data via this face, then update stats.
+      if (out != pitEntry.m_outgoing.end ())
+        {
+          m_pit.modify (m_pit.iterator_to (pitEntry), CcnxPitEntry::EstimateRttAndRemoveFace(out));
+          // face will be removed in the above call
+        }
+      else
+        {
+          NS_LOG_WARN ("Node "<< m_node->GetId() <<
+                          ". PIT entry for "<< header->GetName ()<<" is valid, "
+                          "but outgoing entry for interface "<< incomingFace <<" doesn't exist\n");
+        }
+
+      //satisfy all pending incoming Interests
+      BOOST_FOREACH (const CcnxPitEntryIncomingFace &interest, pitEntry.m_incoming)
+        {
+          if (interest.m_face == incomingFace) continue; 
+
+          // may not work either because of 'const' thing
+          interest.m_face->Send (packet->Copy ()); // unfortunately, we have to copy packet... 
+          m_transmittedDataTrace (header, payload, FORWARDED, m_node->GetObject<Ccnx> (), interest.m_face);
+        }
+
+      m_pit.modify (m_pit.iterator_to (pitEntry), CcnxPitEntry::ClearIncoming()); // satisfy all incoming interests
+
+      if( pitEntry.m_outgoing.size()==0 ) // remove PIT when all outgoing interests are "satisfied"
+        {
+          m_pit.erase (m_pit.iterator_to (pitEntry));
+        }
+
+    }
+  catch (CcnxPitEntryNotFound)
+    {
+      // 2. Drop data packet if PIT entry is not found
+      //    (unsolicited data packets should not "poison" content store)
+      
+      //drop dulicated or not requested data packet
+      m_droppeddDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
+      return; // do not process unsoliced data packets
+    }
+}
 
 void
 CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
@@ -272,7 +331,7 @@ CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
   else
     {
       NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << &face);
-      m_dropTrace (packet, DROP_INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
+      // m_dropTrace (packet, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
     }
 }
 

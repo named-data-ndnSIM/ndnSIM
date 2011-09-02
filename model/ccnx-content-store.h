@@ -36,6 +36,7 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
+#include "ccnx.h"
 #include "hash-helper.h"
 #include "ccnx-content-object-header.h"
 #include "ccnx-interest-header.h"
@@ -111,19 +112,6 @@ private:
 
 /**
  * \ingroup ccnx
- * \brief Private namespace for CCNx content store implementation
- */
-namespace __ccnx_private_content_store
-{
-class hash {}; ///< tag for Boost.Multiindex container (hashed prefix)
-class mru {}; ///< tag for Boost.Multiindex container (most recent used index)
-#ifdef _DEBUG
-class ordered {}; ///< tag for Boost.MultiIndex container (ordered by prefix)
-#endif
-};
-
-/**
- * \ingroup ccnx
  * \brief Typedef for content store container implemented as a Boost.MultiIndex container
  *
  * - First index (tag<prefix>) is a unique hash index based on NDN prefix of the stored content.
@@ -139,16 +127,16 @@ struct CcnxContentStoreContainer
     CcnxContentStoreEntry,
     boost::multi_index::indexed_by<
       boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private_content_store::hash>,
+        boost::multi_index::tag<__ccnx_private::i_prefix>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
                                           const CcnxNameComponents&,
                                           &CcnxContentStoreEntry::GetName>,
         CcnxPrefixHash>,
-      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private_content_store::mru> >
+      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private::i_mru> >
 #ifdef _DEBUG
       ,
       boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private_content_store::ordered>,
+        boost::multi_index::tag<__ccnx_private::i_ordered>,
         boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
                                           const CcnxNameComponents&,
                                           &CcnxContentStoreEntry::GetName>
@@ -162,19 +150,9 @@ struct CcnxContentStoreContainer
  * \ingroup ccnx
  * \brief NDN content store entry
  */
-class CcnxContentStore : public Object
+class CcnxContentStore
 {
 public:
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId GetTypeId ();
-  
-  // typedef string_key_hash_t<CsEntry>::iterator CsIterator;
-  // typedef string_key_hash_t<CsEntry>::iterator CsRangeIterator;
-
   /**
    * Default constructor
    */

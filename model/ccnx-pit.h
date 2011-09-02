@@ -52,7 +52,7 @@ class CcnxInterestHeader;
  */
 namespace __ccnx_private
 {
-class i_prefix{}; ///< tag for prefix hash
+// class i_prefix{}; ///< tag for prefix hash
 class i_timestamp {}; ///< tag for timestamp-ordered records (for cleanup optimization)  
 };
 
@@ -100,16 +100,9 @@ struct CcnxPitEntryContainer
  * \ingroup ccnx
  * \brief Class implementing Pending Interests Table
  */
-class CcnxPit : public Object
+class CcnxPit : public CcnxPitEntryContainer::type
 {
 public:
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId GetTypeId ();
-
   /**
    * \brief PIT constructor
    */
@@ -175,8 +168,6 @@ private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPit &fib);
   
 private:
-  CcnxPitEntryContainer::type m_pit; ///< \brief Container for PIT entries
-
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
 

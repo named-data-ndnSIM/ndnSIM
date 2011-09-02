@@ -186,6 +186,6 @@ CcnxProducer::HandlePacket(const Ptr<CcnxFace> &face, const Ptr<const Packet> &p
 void 
 CcnxProducer::AddContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
-    m_ccnx->m_contentStore->Add (header, packet);
+    // m_ccnx->m_contentStore->Add (header, packet);
 }
 }

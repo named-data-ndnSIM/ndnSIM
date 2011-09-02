@@ -89,11 +89,23 @@ public:
    */
   enum DropReason 
   {
-    /** \todo  Fill reasons from QualNet code */
-    DROP_DUPLICATE_INTEREST=1,  /**< Duplicate Interest */
+    NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest 
+    NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject (duplicate?)
+    // INTERFACE_DOWN,          ///< \brief Interface is down
+
     DROP_CONGESTION, /**< Congestion detected */
     DROP_NO_ROUTE,   /**< No route to host */
-    DROP_INTERFACE_DOWN,   /**< Interface is down so can not send packet */
+  };
+
+  /**
+   * \enum DropReason
+   * \brief Description of where content object was originated
+   */
+  enum ContentObjectSource
+  {
+    APPLICATION,
+    FORWARDED,
+    CACHED
   };
 
   /**
@@ -118,25 +130,33 @@ public:
 
 protected:
   /**
-   * \brief Actual processing of incoming CCNx interests
+   * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
    * 
    * Processing Interest packets
+   * @param face    incoming face
+   * @param header  deserialized Interest header
+   * @param packet  original packet
    */
   virtual void
   OnInterest (const Ptr<CcnxFace> &face,
               Ptr<CcnxInterestHeader> &header,
-              Ptr<Packet> &p);
+              const Ptr<const Packet> &p);
 
   
   /**
    * \brief Actual processing of incoming CCNx content objects
    * 
    * Processing ContentObject packets
+   * @param face    incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload data packet payload
+   * @param packet  original packet
    */
   virtual void
   OnData (const Ptr<CcnxFace> &face,
           Ptr<CcnxContentObjectHeader> &header,
-          Ptr<Packet> &p);
+          Ptr<Packet> &payload,
+          const Ptr<const Packet> &packet);
 
 protected:
   virtual void DoDispose (void);
@@ -171,17 +191,31 @@ private:
   
   CcnxContentStore m_contentStore; ///< \brief Content store (for caching purposes only)
   
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 DropReason,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
 
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
-  TracedCallback<Ptr<const Packet>, Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                 Ptr<const Packet>,/*payload*/
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                 Ptr<const Packet>,/*payload*/
+                 ContentObjectSource,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                 Ptr<const Packet>,/*payload*/
+                 DropReason,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppeddDataTrace;
   
   /**
    * \brief Trace of dropped packets, including reason and all headers
    * \internal
    */
-  TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
+  // TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
 };
   
 } // Namespace ns3

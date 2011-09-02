@@ -58,7 +58,7 @@ class CcnxStackHelper : public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
 {
 public:
   /**
-   * \brief Create a new CcnxStackHelper which <empty> forwarding by default.
+   * \brief Create a new CcnxStackHelper with empty forwarding by default.
    *
    * \todo set non-empty default forwarding
    */

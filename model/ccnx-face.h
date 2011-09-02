@@ -190,6 +190,12 @@ private:
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);
 
+inline bool
+operator < (const Ptr<CcnxFace> &lhs, const Ptr<CcnxFace> &rhs)
+{
+  return *lhs < *rhs;
+}
+
 void
 CcnxFace::SetId (uint32_t id)
 {

@@ -25,15 +25,27 @@
 #include "ns3/socket.h"
 #include "ns3/callback.h"
 
-#include "ccnx-face.h"
-#include "ccnx-content-store.h"
-
 namespace ns3 {
 
 class Node;
 class NetDevice;
 class Packet;
 class CcnxForwardingStrategy;
+class CcnxFace;
+
+/**
+ * \internal
+ * \brief Private namespace for CCNx content store implementation
+ */
+namespace __ccnx_private
+{
+class i_face {};
+class i_metric {};
+class i_nth {};
+class i_prefix {};
+class i_ordered {}; ///< tag for Boost.MultiIndex container (ordered by prefix)
+class i_mru {};
+}
 
 /**
  * \defgroup ccnx NDN abstraction
@@ -141,8 +153,6 @@ public:
    */
   virtual Ptr<CcnxFace>
   GetFace (uint32_t face) const = 0;
-    
-  Ptr<CcnxContentStore> m_contentStore;
 };
 
 } // namespace ns3 

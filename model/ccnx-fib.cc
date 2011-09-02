@@ -25,6 +25,11 @@
 #include "ccnx-interest-header.h"
 
 #include "ns3/node.h"
+#include "ns3/assert.h"
+
+#define NDN_RTO_ALPHA 0.125
+#define NDN_RTO_BETA 0.25
+#define NDN_RTO_K 4
 
 //#define NDN_DEBUG_OSPF	0
 //#define NDN_DEBUG_OSPF_NODES 0
@@ -36,7 +41,7 @@ namespace ns3 {
 //////////////////////////////////////////////////////////////////////
 // Helpers
 //////////////////////////////////////////////////////////////////////
-namespace __ccnx_private_fib {
+namespace __ccnx_private {
 
 struct CcnxFibFaceMetricByFace
 {
@@ -46,46 +51,67 @@ struct CcnxFibFaceMetricByFace
 
 struct ChangeStatus
 {
-  ChangeStatus (uint8_t status) : m_status (status) { }
+  ChangeStatus (CcnxFibFaceMetric::Status status) : m_status (status) { }
   void operator() (CcnxFibFaceMetric &entry)
   {
     entry.m_status = m_status;
   }
 private:
-  uint8_t m_status;
+  CcnxFibFaceMetric::Status m_status;
 };
 
 
-struct SearchByFace {
-  /**
-   * \brief To perform effective searches by CcnxFace
-   */
-  bool
-  operator() (const CcnxFibFaceMetric &m, const Ptr<CcnxFace> &face) const
-  {
-    return *(m.m_face) < *face;
-  } 
+// struct SearchByFace {
+//   /**
+//    * \brief To perform effective searches by CcnxFace
+//    */
+//   bool
+//   operator() (const CcnxFibFaceMetric &m, const Ptr<CcnxFace> &face) const
+//   {
+//     return *(m.m_face) < *face;
+//   } 
 
-  /**
-   * \brief To perform effective searches by CcnxFace
-   */
-  bool
-  operator() (const Ptr<CcnxFace> &face, const CcnxFibFaceMetric &m) const
-  {
-    return *face < *(m.m_face);
-  } 
-};
+//   /**
+//    * \brief To perform effective searches by CcnxFace
+//    */
+//   bool
+//   operator() (const Ptr<CcnxFace> &face, const CcnxFibFaceMetric &m) const
+//   {
+//     return *face < *(m.m_face);
+//   } 
+// };
 
 }
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-using namespace __ccnx_private_fib;
+using namespace __ccnx_private;
 
 void
-CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, uint8_t status)
+CcnxFibFaceMetric::UpdateRtt::operator() (CcnxFibFaceMetric &entry)
 {
-  CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face, SearchByFace());
+  // const Time & this->m_rttSample
+  
+  //update srtt and rttvar (RFC 2988)
+  if (entry.m_sRtt.IsZero ())
+    {
+      //first RTT measurement
+      NS_ASSERT_MSG (entry.m_rttVar.IsZero (), "SRTT is zero, but variation is not");
+      
+      entry.m_sRtt = m_rttSample;
+      entry.m_rttVar = Time (entry.m_sRtt / 2.0);
+    }
+  else
+    {
+      entry.m_rttVar = Time ((1 - NDN_RTO_BETA) * entry.m_rttVar + NDN_RTO_BETA * Abs(entry.m_sRtt - m_rttSample));
+      entry.m_sRtt = Time ((1 - NDN_RTO_ALPHA) * entry.m_sRtt + NDN_RTO_ALPHA * m_rttSample);
+    }
+}
+
+void
+CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
+{
+  CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (), "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record, ChangeStatus (status));
@@ -157,7 +183,6 @@ std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry)
 std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric)
 {
   static const std::string statusString[] = {"","g","y","r"};
-  NS_ASSERT_MSG (1<=metric.m_status && metric.m_status<=3, "Status can be only GREEN, YELLOW, or RED");
 
   os << metric.m_face << "(" << metric.m_routingCost << ","<< statusString [metric.m_status] << ")";
   return os;
