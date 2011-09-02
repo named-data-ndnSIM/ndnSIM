@@ -43,14 +43,8 @@ NS_LOG_COMPONENT_DEFINE ("InterestHeaderSerializationTest");
 class InterestHeaderSerializationTest : public TestCase
 {
 public:
-    //static const uint32_t N_RUNS = 5;
-    //static const uint32_t N_BINS = 50;
-    //static const uint32_t N_MEASUREMENTS = 1000000;
-    
     InterestHeaderSerializationTest ();
     virtual ~InterestHeaderSerializationTest ();
-    
-    //double ChiSquaredTest (UniformVariable &u);
     
 private:
     virtual void DoRun (void);
@@ -68,20 +62,8 @@ InterestHeaderSerializationTest::~InterestHeaderSerializationTest ()
 void
 InterestHeaderSerializationTest::DoRun(void)
 {
-    //ReportStart();
-    //SetVerbose(true);
-    std::ostringstream msgStream;
-    msgStream << "Preved!";
+    Packet packet (0);
     
-    //NS_TEST_EXPECT_MSG_NE (true,false, "DIRECTORY = " <<NS_TEST_SOURCEDIR);
-    
-    /*ReportTestFailure ("DIRECTORY = ",  NS_TEST_SOURCEDIR, 
-                            "", "", 
-                            "", 0);*/
-    string str = NS_TEST_SOURCEDIR;
-    //str += "/hahaha";
-    //CreateDataDirFilename(str);
-    NS_LOG_INFO ("Test started");
     uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
     Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
     (*testname) ("test") ("test2");
@@ -104,23 +86,14 @@ InterestHeaderSerializationTest::DoRun(void)
     interestHeader.SetMaxSuffixComponents(maxSuffixComponents);
     interestHeader.SetMinSuffixComponents(minSuffixComponents);
 
-    uint32_t size = interestHeader.GetSerializedSize();
-    //uint32_t size = 5;
-    NS_TEST_ASSERT_MSG_EQ (false, true, "GetSize = " << size);
-    Buffer buf(size);
-    Buffer::Iterator iter = buf.Begin ();
-    //interestHeader.
-    interestHeader.Serialize(iter);
-
-    iter = buf.Begin ();
+    //serialization
+    packet.AddHeader (interestHeader);
+	
+	//deserialization
     CcnxInterestHeader target;
-    target.Deserialize(iter);
+	packet.RemoveHeader (target);
+
     
-    /*if(target.GetNonce() == randomNonce)
-    {
-        
-        ReportCaseFailure();
-    }*/
     NS_TEST_ASSERT_MSG_EQ (target.GetNonce(), randomNonce, "Interest Header nonce deserialization failed");
     
     NS_TEST_ASSERT_MSG_EQ (target.GetName(), *testname, "Interest Header name deserialization failed");
