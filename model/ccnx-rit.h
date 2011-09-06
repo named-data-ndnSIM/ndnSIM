@@ -116,7 +116,7 @@ struct CcnxRitContainer
  * of the available memory).  Entries are removed after preconfigured
  * amount of time (RitTimeout, default is 1 second).
  */
-class CcnxRit : public Object
+class CcnxRit : public CcnxRitContainer::type, public Object
 {
 public:
   /**
@@ -197,8 +197,6 @@ private:
   Time    m_ritTimeout; ///< \brief Configurable timeout of RIT entries
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent; ///< \brief Cleanup event
-  
-  CcnxRitContainer::type m_rit; ///< \brief Actual RIT container
 };
 
 } // namespace ns3

@@ -21,7 +21,6 @@
 #include "ccnx-l3-protocol.h"
 
 #include "ns3/packet.h"
-#include "ns3/net-device.h"
 #include "ns3/node.h"
 #include "ns3/log.h"
 #include "ns3/callback.h"
@@ -77,6 +76,10 @@ CcnxL3Protocol::CcnxL3Protocol()
 : m_faceCounter (0)
 {
   NS_LOG_FUNCTION (this);
+  
+  m_rit = CreateObject<CcnxRit> ();
+  m_pit = CreateObject<CcnxPit> ();
+  m_contentStore = CreateObject<CcnxContentStore> ();
 }
 
 CcnxL3Protocol::~CcnxL3Protocol ()
@@ -130,7 +133,7 @@ CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStr
 {
   NS_LOG_FUNCTION (this);
   m_forwardingStrategy = forwardingStrategy;
-  m_forwardingStrategy->SetCcnx (this);
+  // m_forwardingStrategy->SetCcnx (this);
 }
 
 Ptr<CcnxForwardingStrategy>
@@ -171,6 +174,24 @@ CcnxL3Protocol::GetNFaces (void) const
 {
   return m_faces.size ();
 }
+
+void
+CcnxL3Protocol::TransmittedDataTrace (Ptr<Packet> packet,
+                                      ContentObjectSource type,
+                                      Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
+{
+  // a "small" inefficiency for logging purposes
+  Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+  static CcnxContentObjectTail tail;
+  packet->RemoveHeader (*header);
+  packet->RemoveTrailer (tail);
+      
+  m_transmittedDataTrace (header, packet/*payload*/, type, ccnx, face);
+  
+  packet->AddHeader (*header);
+  packet->AddTrailer (tail);
+}
+
 
 // Callback from lower layer
 void 
@@ -231,18 +252,58 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 {
   NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
   m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
-  
 
-  /// \todo Processing of Interest packets
+  if (m_rit->WasRecentlySatisfied (*header))
+    {
+      m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST,
+                               m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+      // loop?
+      return;
+    }
+  m_rit->SetRecentlySatisfied (*header); 
+
+  Ptr<Packet> contentObject = m_contentStore->Lookup (header);
+  if (contentObject != 0)
+    {
+      TransmittedDataTrace (contentObject, CACHED,
+                            m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+      incomingFace->Send (contentObject);
+      return;
+    }
   
-  // NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
-  // if (!m_forwardingStrategy->RouteInput (packet, incomingFace,
-  //                                     MakeCallback (&CcnxL3Protocol::Send, this),
-  //                                     MakeCallback (&CcnxL3Protocol::RouteInputError, this)
-  //                                     ))
+  CcnxPitEntry pitEntry = m_pit->Lookup (*header);
+
+  CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
+  
+  // suppress interest if 
+  if (pitEntry.m_incoming.size () == 0 || // new PIT entry
+      inFace ==pitEntry.m_incoming.end ()) // existing entry, but interest received via different face
+    {
+      m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
+                               m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+      return;
+    }
+
+  NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
+
+  /*bool propagated = */m_forwardingStrategy->
+    PropagateInterest (incomingFace, header, packet,
+                       MakeCallback (&CcnxL3Protocol::SendInterest, this)
+                       );
+
+  // // If interest wasn't propagated further (probably, a limit is reached),
+  // // prune and delete PIT entry if there are no outstanding interests.
+  // // Stop processing otherwise.
+  // if( !propagated && pitEntry.numberOfPromisingInterests()==0 )
   //   {
-  //     NS_LOG_WARN ("No route found for forwarding packet.  Drop.");
-  //     m_dropTrace (packet, DROP_NO_ROUTE, m_node->GetObject<Ccnx> (), incomingFace);
+  //     //		printf( "Node %d. Pruning after unsuccessful try to forward an interest\n", _node->nodeId );
+
+  //     BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry.m_incoming)
+  //       {
+  //         // send prune
+  //       }
+  //     m_pit->erase (m_pit->iterator_to (pitEntry));
   //   }
 }
 
@@ -259,16 +320,16 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
   // 1. Lookup PIT entry
   try
     {
-      const CcnxPitEntry &pitEntry = m_pit.Lookup (*header);
+      const CcnxPitEntry &pitEntry = m_pit->Lookup (*header);
 
       // Note that with MultiIndex we need to modify entries indirectly
   
       // Update metric status for the incoming interface in the corresponding FIB entry 
-      m_pit.modify (m_pit.iterator_to (pitEntry),
+      m_pit->modify (m_pit->iterator_to (pitEntry),
                     CcnxPitEntry::UpdateFibStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
       // Add or update entry in the content store
-      m_contentStore.Add (header, payload);
+      m_contentStore->Add (header, payload);
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator
         out = pitEntry.m_outgoing.find (incomingFace);
@@ -276,7 +337,7 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       // If we have sent interest for this data via this face, then update stats.
       if (out != pitEntry.m_outgoing.end ())
         {
-          m_pit.modify (m_pit.iterator_to (pitEntry), CcnxPitEntry::EstimateRttAndRemoveFace(out));
+          m_pit->modify (m_pit->iterator_to (pitEntry), CcnxPitEntry::EstimateRttAndRemoveFace(out));
           // face will be removed in the above call
         }
       else
@@ -296,11 +357,11 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           m_transmittedDataTrace (header, payload, FORWARDED, m_node->GetObject<Ccnx> (), interest.m_face);
         }
 
-      m_pit.modify (m_pit.iterator_to (pitEntry), CcnxPitEntry::ClearIncoming()); // satisfy all incoming interests
+      m_pit->modify (m_pit->iterator_to (pitEntry), CcnxPitEntry::ClearIncoming()); // satisfy all incoming interests
 
       if( pitEntry.m_outgoing.size()==0 ) // remove PIT when all outgoing interests are "satisfied"
         {
-          m_pit.erase (m_pit.iterator_to (pitEntry));
+          m_pit->erase (m_pit->iterator_to (pitEntry));
         }
 
     }
@@ -310,18 +371,42 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       //    (unsolicited data packets should not "poison" content store)
       
       //drop dulicated or not requested data packet
-      m_droppeddDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
+      m_droppedDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
       return; // do not process unsoliced data packets
     }
 }
 
 void
-CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
+CcnxL3Protocol::SendInterest (const Ptr<CcnxFace> &face,
+                              const Ptr<CcnxInterestHeader> &header,
+                              const Ptr<Packet> &packet)
 {
-  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face); //
-
+  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face);
   NS_ASSERT_MSG (face != 0, "Face should never be NULL");
 
+  if (face->IsUp ())
+    {
+      NS_LOG_LOGIC ("Sending via face " << &face); //
+      m_transmittedInterestsTrace (header, m_node->GetObject<Ccnx> (), face);
+      face->Send (packet);
+    }
+  else
+    {
+      NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << &face);
+      m_droppedInterestsTrace (header, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
+    }
+}
+
+void
+CcnxL3Protocol::SendContentObject (const Ptr<CcnxFace> &face,
+                                   const Ptr<CcnxContentObjectHeader> &header,
+                                   const Ptr<Packet> &packet)
+{
+  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face);
+  NS_ASSERT_MSG (face != 0, "Face should never be NULL");
+
+  NS_ASSERT_MSG (false, "Should not be called for now");
+  
   if (face->IsUp ())
     {
       NS_LOG_LOGIC ("Sending via face " << &face); //
@@ -334,6 +419,5 @@ CcnxL3Protocol::Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet)
       // m_dropTrace (packet, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
     }
 }
-
 
 } //namespace ns3

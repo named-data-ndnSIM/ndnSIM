@@ -89,9 +89,10 @@ public:
    */
   enum DropReason 
   {
-    NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest 
+    NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest
+    NDN_SUPPRESSED_INTEREST, ///< \brief Suppressed Interest
     NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject (duplicate?)
-    // INTERFACE_DOWN,          ///< \brief Interface is down
+    INTERFACE_DOWN,          ///< \brief Interface is down
 
     DROP_CONGESTION, /**< Congestion detected */
     DROP_NO_ROUTE,   /**< No route to host */
@@ -121,7 +122,12 @@ public:
   void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
 
-  virtual void Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet);
+  virtual void SendInterest (const Ptr<CcnxFace> &face,
+                             const Ptr<CcnxInterestHeader> &header,
+                             const Ptr<Packet> &packet);
+  virtual void SendContentObject (const Ptr<CcnxFace> &face,
+                                  const Ptr<CcnxContentObjectHeader> &header,
+                                  const Ptr<Packet> &packet);
   virtual void Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
 
   virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
@@ -177,6 +183,14 @@ private:
   // virtual void
   // ReceiveAndProcess (const Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
 
+  /**
+   * \brief A helper function
+   */
+  void TransmittedDataTrace (Ptr<Packet>,
+                             ContentObjectSource,
+                             Ptr<Ccnx>, Ptr<const CcnxFace>);
+  
+  
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
@@ -185,11 +199,9 @@ private:
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
-  CcnxRit m_rit; ///< \brief RIT (recently interest table)
-  CcnxPit m_pit; ///< \brief PIT (pending interest table)
-  CcnxFib m_fib; ///< \brief FIB
-  
-  CcnxContentStore m_contentStore; ///< \brief Content store (for caching purposes only)
+  Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
+  Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
+  Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
   
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
@@ -209,7 +221,7 @@ private:
   TracedCallback<Ptr<const CcnxContentObjectHeader>,
                  Ptr<const Packet>,/*payload*/
                  DropReason,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppeddDataTrace;
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
   
   /**
    * \brief Trace of dropped packets, including reason and all headers

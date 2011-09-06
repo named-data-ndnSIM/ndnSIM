@@ -35,23 +35,23 @@ namespace ns3
 
 using namespace __ccnx_private;
 
-// TypeId 
-// CcnxContentStore::GetTypeId (void)
-// {
-//   static TypeId tid = TypeId ("ns3::CcnxContentStore")
-//     .SetGroupName ("Ccnx")
-//     .SetParent<Object> ()
-//     .AddConstructor<CcnxContentStore> ()
-//     .AddAttribute ("Size",
-//                    "Maximum number of packets that content storage can hold",
-//                    UintegerValue (100),
-//                    MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
-//                                          &CcnxContentStore::GetMaxSize),
-//                    MakeUintegerChecker<uint32_t> ())
-//     ;
+TypeId 
+CcnxContentStore::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::CcnxContentStore")
+    .SetGroupName ("Ccnx")
+    .SetParent<Object> ()
+    .AddConstructor<CcnxContentStore> ()
+    .AddAttribute ("Size",
+                   "Maximum number of packets that content storage can hold",
+                   UintegerValue (100),
+                   MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
+                                         &CcnxContentStore::GetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+    ;
 
-//   return tid;
-// }
+  return tid;
+}
 
 CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
 

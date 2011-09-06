@@ -126,9 +126,9 @@ bool
 CcnxRit::WasRecentlySatisfied (const CcnxInterestHeader &header)
 {
   std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
-    entries = m_rit.get<nonce> ().equal_range (header.GetNonce ());
+    entries = get<nonce> ().equal_range (header.GetNonce ());
   
-  if (entries.first == m_rit.end ())
+  if (entries.first == end ())
     return false;
 
   // check all entries if the name of RIT entry matches the name of interest
@@ -147,11 +147,11 @@ CcnxRit::SetRecentlySatisfied (const CcnxInterestHeader &header)
 {
   NS_ASSERT_MSG (!WasRecentlySatisfied (header), "Duplicate recent interest should not be added to RIT");
   
-  m_rit.get<timestamp> ().push_back (
-                                     CcnxRitEntry(header.GetName (),
-                                                  header.GetNonce (),
-                                                  Simulator::Now ()+m_ritTimeout)
-                                     );
+  get<timestamp> ().push_back (
+                               CcnxRitEntry(header.GetName (),
+                                            header.GetNonce (),
+                                            Simulator::Now ()+m_ritTimeout)
+                               );
 }
 
 
@@ -163,11 +163,11 @@ void CcnxRit::CleanExpired ()
   uint32_t count = 0;
 #endif
   
-  while( !m_rit.empty() )
+  while( !empty() )
     {
-      if( m_rit.get<timestamp> ().front ().m_expireTime <= now ) // is the record stale?
+      if( get<timestamp> ().front ().m_expireTime <= now ) // is the record stale?
         {
-         m_rit.get<timestamp> ().pop_front( );
+         get<timestamp> ().pop_front( );
 #ifdef _DEBUG
          count++;
 #endif

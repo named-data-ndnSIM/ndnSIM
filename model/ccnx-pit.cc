@@ -50,22 +50,22 @@ using namespace __ccnx_private;
 //   return count;
 // }
 
-// TypeId 
-// CcnxPit::GetTypeId ()
-// {
-//   static TypeId tid = TypeId ("ns3::CcnxPit")
-//     .SetGroupName ("Ccnx")
-//     .SetParent<Object> ()
-//     .AddConstructor<CcnxPit> ()
-//     .AddAttribute ("CleanupTimeout",
-//                    "Timeout defining how frequent RIT should be cleaned up",
-//                    TimeValue (Seconds (1)),
-//                    MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
-//                    MakeTimeChecker ())
-//     ;
+TypeId 
+CcnxPit::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::CcnxPit")
+    .SetGroupName ("Ccnx")
+    .SetParent<Object> ()
+    .AddConstructor<CcnxPit> ()
+    .AddAttribute ("CleanupTimeout",
+                   "Timeout defining how frequent RIT should be cleaned up",
+                   TimeValue (Seconds (1)),
+                   MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
+                   MakeTimeChecker ())
+    ;
 
-//   return tid;
-// }
+  return tid;
+}
 
 CcnxPit::CcnxPit ()
 {
@@ -122,13 +122,13 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 }
 
 const CcnxPitEntry&
-CcnxPit::Lookup (const CcnxInterestHeader &header) const
+CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
   CcnxPitEntryContainer::type::iterator entry =
     get<i_prefix> ().find (header.GetName ());
 
-  // if (entry != m_pit.end ())
-  //   entry = m_pit.insert (m_pit.end (), CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ())));
+  if (entry != end ())
+    entry = insert (end (), CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ())));
 
   return *entry;
 }

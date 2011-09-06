@@ -29,55 +29,55 @@ CcnxForwardingHelper::~CcnxForwardingHelper ()
 {
 }
 
-void
-CcnxForwardingHelper::PrintForwardingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream) const
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printTime, &CcnxForwardingHelper::Print, this, node, stream);
-    }
-}
+// void
+// CcnxForwardingHelper::PrintForwardingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream) const
+// {
+//   for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
+//     {
+//       Ptr<Node> node = NodeList::GetNode (i);
+//       Simulator::Schedule (printTime, &CcnxForwardingHelper::Print, this, node, stream);
+//     }
+// }
 
-void
-CcnxForwardingHelper::PrintForwardingTableAllEvery (Time printInterval, Ptr<OutputStreamWrapper> stream) const
-{
-  for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
-    {
-      Ptr<Node> node = NodeList::GetNode (i);
-      Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
-    }
-}
+// void
+// CcnxForwardingHelper::PrintForwardingTableAllEvery (Time printInterval, Ptr<OutputStreamWrapper> stream) const
+// {
+//   for (uint32_t i = 0; i < NodeList::GetNNodes (); i++)
+//     {
+//       Ptr<Node> node = NodeList::GetNode (i);
+//       Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
+//     }
+// }
 
-void
-CcnxForwardingHelper::PrintForwardingTableAt (Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
-{
-  Simulator::Schedule (printTime, &CcnxForwardingHelper::Print, this, node, stream);
-}
+// void
+// CcnxForwardingHelper::PrintForwardingTableAt (Time printTime, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
+// {
+//   Simulator::Schedule (printTime, &CcnxForwardingHelper::Print, this, node, stream);
+// }
 
-void
-CcnxForwardingHelper::PrintForwardingTableEvery (Time printInterval,Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
-{
-  Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
-}
+// void
+// CcnxForwardingHelper::PrintForwardingTableEvery (Time printInterval,Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
+// {
+//   Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
+// }
 
-void
-CcnxForwardingHelper::Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
-{
-  Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-  Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
-  NS_ASSERT (rp);
-  rp->PrintForwardingTable (stream);
-}
+// void
+// CcnxForwardingHelper::Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
+// {
+//   Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
+//   Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
+//   NS_ASSERT (rp);
+//   rp->PrintForwardingTable (stream);
+// }
 
-void
-CcnxForwardingHelper::PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
-{
-  Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-  Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
-  NS_ASSERT (rp);
-  rp->PrintForwardingTable (stream);
-  Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
-}
+// void
+// CcnxForwardingHelper::PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const
+// {
+//   Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
+//   Ptr<CcnxForwardingStrategy> rp = ccnx->GetForwardingStrategy ();
+//   NS_ASSERT (rp);
+//   rp->PrintForwardingTable (stream);
+//   Simulator::Schedule (printInterval, &CcnxForwardingHelper::PrintEvery, this, printInterval, node, stream);
+// }
 
 } // namespace ns3

@@ -32,6 +32,8 @@ class NetDevice;
 class Packet;
 class CcnxForwardingStrategy;
 class CcnxFace;
+class CcnxContentObjectHeader;
+class CcnxInterestHeader;
 
 /**
  * \internal
@@ -82,16 +84,34 @@ public:
   static TypeId GetTypeId ();
 
   /**
-   * \brief Send a packet to a specified face
+   * \brief Send an Interest packet to a specified face
    *
    * \param face face where to send this packet
+   * \param header Interest header
    * \param packet fully prepared CCNx packet to send
    *
    * Higher-level layers (forwarding strategy in particular) call this
    * method to send a packet down the stack to the MAC and PHY layers.
    */
   virtual void
-  Send (const Ptr<CcnxFace> &face, const Ptr<Packet> &packet) = 0;
+  SendInterest (const Ptr<CcnxFace> &face,
+                const Ptr<CcnxInterestHeader> &header,
+                const Ptr<Packet> &packet) = 0;
+
+  /**
+   * \brief Send a ContentObject packet to a specified face
+   *
+   * \param face face where to send this packet
+   * \param header ContentObject header
+   * \param packet fully prepared CCNx packet to send
+   *
+   * Higher-level layers (forwarding strategy in particular) call this
+   * method to send a packet down the stack to the MAC and PHY layers.
+   */
+  virtual void
+  SendContentObject (const Ptr<CcnxFace> &face,
+                     const Ptr<CcnxContentObjectHeader> &header,
+                     const Ptr<Packet> &packet) = 0;
 
   /**
    * \brief Lower layers calls this method after demultiplexing

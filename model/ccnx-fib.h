@@ -223,9 +223,16 @@ struct CcnxFibEntryContainer
  * \ingroup ccnx
  * \brief Class implementing FIB functionality
  */
-class CcnxFib
+class CcnxFib : public Object
 {
 public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
+
   /**
    * \brief Constructor
    */

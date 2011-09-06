@@ -21,6 +21,7 @@
 #ifndef _CCNX_PIT_H_
 #define	_CCNX_PIT_H_
 
+#include "ns3/object.h"
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 
@@ -100,9 +101,16 @@ struct CcnxPitEntryContainer
  * \ingroup ccnx
  * \brief Class implementing Pending Interests Table
  */
-class CcnxPit : public CcnxPitEntryContainer::type
+class CcnxPit : public CcnxPitEntryContainer::type, public Object
 {
 public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
+
   /**
    * \brief PIT constructor
    */
@@ -123,7 +131,7 @@ public:
    * \returns const reference to Pit entry. If record does not exist, it will be created
    */
   const CcnxPitEntry&
-  Lookup (const CcnxInterestHeader &header) const;
+  Lookup (const CcnxInterestHeader &header);
   
   // remove a PIT entry
   //void erase (const string &contentName);

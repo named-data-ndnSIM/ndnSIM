@@ -34,10 +34,10 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
   return tid;
 }
 
-void
-CcnxForwardingStrategy::SetCcnx (Ptr<Ccnx> ccnx)
+CcnxForwardingStrategy::CcnxForwardingStrategy ()
 {
-  m_ccnx = ccnx;
+  m_fib = CreateObject<CcnxFib> ();
 }
+
 
 } //namespace ns3

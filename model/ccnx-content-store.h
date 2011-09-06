@@ -150,9 +150,16 @@ struct CcnxContentStoreContainer
  * \ingroup ccnx
  * \brief NDN content store entry
  */
-class CcnxContentStore
+class CcnxContentStore : public Object
 {
 public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
+
   /**
    * Default constructor
    */

@@ -87,6 +87,18 @@ private:
 
 using namespace __ccnx_private;
 
+TypeId 
+CcnxFib::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::CcnxFib")
+    .SetParent<Object> ()
+    .SetGroupName ("Ccnx")
+    .AddConstructor<CcnxFib> ()
+
+  ;
+  return tid;
+}
+
 void
 CcnxFibFaceMetric::UpdateRtt::operator() (CcnxFibFaceMetric &entry)
 {
