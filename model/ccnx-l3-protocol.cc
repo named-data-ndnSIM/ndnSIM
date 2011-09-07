@@ -60,10 +60,10 @@ CcnxL3Protocol::GetTypeId (void)
     //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_rxTrace))
     // .AddTraceSource ("Drop", "Drop ccnx packet",
     //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_dropTrace))
-    .AddAttribute ("InterfaceList", "The set of Ccnx interfaces associated to this Ccnx stack.",
-                   ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&CcnxL3Protocol::m_faces),
-                   MakeObjectVectorChecker<CcnxFace> ())
+    // .AddAttribute ("InterfaceList", "The set of Ccnx interfaces associated to this Ccnx stack.",
+    //                ObjectVectorValue (),
+    //                MakeObjectVectorAccessor (&CcnxL3Protocol::m_faces),
+    //                MakeObjectVectorChecker<CcnxFace> ())
 
     // .AddTraceSource ("SendOutgoing", "A newly-generated packet by this node is about to be queued for transmission",
     //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_sendOutgoingTrace))
@@ -91,6 +91,10 @@ void
 CcnxL3Protocol::SetNode (Ptr<Node> node)
 {
   m_node = node;
+  m_fib = m_node->GetObject<CcnxFib> ();
+  NS_ASSERT_MSG (m_fib != 0, "FIB should be created and aggregated to a node before calling Ccnx::SetNode");
+
+  m_pit->SetFib (m_fib);
 }
 
 /*
@@ -158,6 +162,16 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
   return face->GetId ();
 }
 
+void
+CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
+{
+  // ask face to register in lower-layer stack
+  face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ());
+  CcnxFaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
+  NS_ASSERT_MSG (face_it != m_faces.end (), "Attempt to remove face that doesn't exist");
+  m_faces.erase (face_it);
+}
+
 Ptr<CcnxFace>
 CcnxL3Protocol::GetFace (uint32_t index) const
 {
@@ -197,18 +211,18 @@ CcnxL3Protocol::TransmittedDataTrace (Ptr<Packet> packet,
 void 
 CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
-  if (face->IsUp ())
+  if (!face->IsUp ())
     {
       NS_LOG_LOGIC ("Dropping received packet -- interface is down");
       // m_dropTrace (p, INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
       return;
     }
-  NS_LOG_LOGIC ("Packet from face " << &face << " received on node " <<  m_node->GetId ());
+  NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
   try
     {
-      CcnxHeaderHelper::Type type = CcnxHeaderHelper::CreateCorrectCcnxHeader (p);
+      CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
       switch (type)
         {
         case CcnxHeaderHelper::INTEREST:
@@ -276,14 +290,14 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
   
-  // suppress interest if 
-  if (pitEntry.m_incoming.size () == 0 || // new PIT entry
-      inFace ==pitEntry.m_incoming.end ()) // existing entry, but interest received via different face
-    {
-      m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
-                               m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
-      return;
-    }
+  // // suppress interest if 
+  // if (pitEntry.m_incoming.size () != 0 && // not a new PIT entry and
+  //     inFace != pitEntry.m_incoming.end ()) // existing entry, but interest received via different face
+  //   {
+  //     m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
+  //                              m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  //     return;
+  //   }
 
   NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
 
@@ -324,9 +338,9 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 
       // Note that with MultiIndex we need to modify entries indirectly
   
-      // Update metric status for the incoming interface in the corresponding FIB entry 
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                    CcnxPitEntry::UpdateFibStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
+      // Update metric status for the incoming interface in the corresponding FIB entry
+      m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
+                     CcnxFibEntry::UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
       // Add or update entry in the content store
       m_contentStore->Add (header, payload);
@@ -337,7 +351,8 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       // If we have sent interest for this data via this face, then update stats.
       if (out != pitEntry.m_outgoing.end ())
         {
-          m_pit->modify (m_pit->iterator_to (pitEntry), CcnxPitEntry::EstimateRttAndRemoveFace(out));
+          m_pit->modify (m_pit->iterator_to (pitEntry),
+                         CcnxPitEntry::EstimateRttAndRemoveFace(out, m_fib));
           // face will be removed in the above call
         }
       else

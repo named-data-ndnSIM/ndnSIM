@@ -100,24 +100,24 @@ public:
   /**
    * \brief PIT entry constructor
    * \param prefix Prefix of the PIT entry
-   * \param fib A FIB entry associated with the PIT entry
+   * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix);
+  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const CcnxFibEntry &fibEntry);
   
   // // Get number of outgoing interests that we're expecting data from
   // inline size_t numberOfPromisingInterests( ) const; 
 
-  /**
-   * \brief Unary function to set or update FIB entry with this PIT entry
-   * \param fib smart pointer to FIB entry
-   */
-  struct SetFibEntry
-  {
-    SetFibEntry (Ptr<CcnxFibEntry> fib);
-    void operator() (CcnxPitEntry &entry);
-  private:
-    Ptr<CcnxFibEntry> m_fib;
-  };
+  // /**
+  //  * \brief Unary function to set or update FIB entry with this PIT entry
+  //  * \param fib smart pointer to FIB entry
+  //  */
+  // struct SetFibEntry
+  // {
+  //   SetFibEntry (Ptr<CcnxFibEntry> fib);
+  //   void operator() (CcnxPitEntry &entry);
+  // private:
+  //   Ptr<CcnxFibEntry> m_fib;
+  // };
   
   /**
    * \brief Unary Function to add incoming interest to the PIT entry
@@ -202,11 +202,12 @@ public:
    */
   struct EstimateRttAndRemoveFace
   {
-    EstimateRttAndRemoveFace (CcnxPitEntryOutgoingFaceContainer::type::iterator outFace)
-      : m_outFace (outFace) { };
+    EstimateRttAndRemoveFace (CcnxPitEntryOutgoingFaceContainer::type::iterator outFace, Ptr<CcnxFib> fib)
+      : m_outFace (outFace), m_fib (fib) { };
     void operator() (CcnxPitEntry &entry);
   private:
     CcnxPitEntryOutgoingFaceContainer::type::iterator m_outFace;
+    Ptr<CcnxFib> m_fib;
   };
 
   const CcnxNameComponents &
@@ -220,7 +221,7 @@ private:
   
 public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
-  Ptr<CcnxFibEntry> m_fib; ///< \brief FIB entry related to this prefix
+  const CcnxFibEntry &m_fibEntry; ///< \brief FIB entry related to this prefix
   
   CcnxPitEntryIncomingFaceContainer::type m_incoming; ///< \brief container for incoming interests
   CcnxPitEntryOutgoingFaceContainer::type m_outgoing; ///< \brief container for outgoing interests

@@ -27,6 +27,10 @@
 namespace ns3 
 {
 
+class CcnxInterestHeader;
+class CcnxContentObjectHeader;
+class Packet;
+
 /**
  * \ingroup ccnx-face
  * \brief Implementation of application CCNx face
@@ -40,12 +44,9 @@ namespace ns3
 class CcnxLocalFace  : public CcnxFace
 {
 public:
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId GetTypeId (void);
+  typedef Callback<void,const Ptr<const CcnxInterestHeader> &> InterestHandler;
+  typedef Callback<void,const Ptr<const CcnxContentObjectHeader> &,
+                        const Ptr<const Packet> &> ContentObjectHandler;
 
   /**
    * \brief Default constructor
@@ -55,23 +56,49 @@ public:
   
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
-  
-  virtual void RegisterProtocolHandler (ProtocolHandler handler);
 
-  virtual void Send (Ptr<Packet> p);
+  /**
+   * \brief This method should be called to establish link with lower layers
+   */
+  virtual void
+  RegisterProtocolHandler (ProtocolHandler handler);
 
-  void Receive (Ptr<Packet> p);
+  /**
+   * \brief This method will be called by lower layers to send data to *application*
+   */
+  virtual void
+  Send (Ptr<Packet> p);
 
+  virtual std::ostream&
+  Print (std::ostream &os) const;
   ////////////////////////////////////////////////////////////////////
 
-  /// \todo Need methods to implement application hooks
-  
-protected:
-  virtual void DoDispose (void);
+   /**
+   * \brief This method will be called by higher layers to send data to *ccnx stack*
+   */
+  void ReceiveFromApplication (Ptr<Packet> p);
 
+  /**
+   * \brief Set callback to application
+   *
+   * \param onInterest InterestHandler to be called when interest arrives on the face. Will be disabled if 0
+   */
+  void SetInterestHandler (InterestHandler onInterest);
+
+    /**
+   * \brief Set callback to application
+   *
+   * \param onContentObject ContentObjectHandler to be called when data arrives. Will be disabled if 0
+   */
+  void SetContentObjectHandler (ContentObjectHandler onContentObject);
+ 
 private:
   CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor
   CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
+
+private:
+  InterestHandler m_onInterest;
+  ContentObjectHandler m_onContentObject;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);

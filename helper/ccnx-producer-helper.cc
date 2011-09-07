@@ -72,11 +72,9 @@ CcnxProducerHelper::Install (NodeContainer c)
 Ptr<Application>
 CcnxProducerHelper::InstallPriv (Ptr<Node> node)
 {
-    Ptr<CcnxLocalFace> localFace = CreateObject<CcnxLocalFace> ();
+    Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
     localFace->SetNode(node);
-    
-    
-    
+        
     //CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
     ObjectFactory factory;
     factory.SetTypeId("ns3::CcnxL3Protocol");
@@ -92,7 +90,7 @@ CcnxProducerHelper::InstallPriv (Ptr<Node> node)
         return 0;
     }
 
-    m_factory.Set ("Face", PointerValue (localFace));
+    // m_factory.Set ("Face", PointerValue (localFace));
     m_factory.Set ("Ccnx", PointerValue (ccnx));
     Ptr<CcnxProducer> app = m_factory.Create<CcnxProducer> ();
 

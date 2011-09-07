@@ -109,13 +109,22 @@ void CcnxPit::CleanExpired ()
                                         &CcnxPit::CleanExpired, this); 
 }
 
+void
+CcnxPit::SetFib (Ptr<CcnxFib> fib)
+{
+  m_fib = fib;
+}
+
+
 const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   CcnxPitEntryContainer::type::iterator entry =
     get<i_prefix> ().find (header.GetName ());
 
-  if (entry != end ())
+  if (entry == end ())
     throw CcnxPitEntryNotFound();
 
   return *entry;
@@ -124,12 +133,23 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+  NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
+
   CcnxPitEntryContainer::type::iterator entry =
     get<i_prefix> ().find (header.GetName ());
 
-  if (entry != end ())
-    entry = insert (end (), CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ())));
-
+  CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
+  if (fibEntry == m_fib->end ())
+    {
+      NS_LOG_WARN ("FIB entry wasn't found. Creating an empty record");
+      fibEntry = m_fib->insert (m_fib->end (), CcnxFibEntry (header.GetName ()));
+    }
+  
+  if (entry == end ())
+    entry = insert (end (),
+                    CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
+                                  *fibEntry));
   return *entry;
 }
 

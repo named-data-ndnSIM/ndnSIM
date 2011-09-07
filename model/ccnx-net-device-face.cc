@@ -32,17 +32,17 @@ NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxNetDeviceFace);
+// NS_OBJECT_ENSURE_REGISTERED (CcnxNetDeviceFace);
 
-TypeId 
-CcnxNetDeviceFace::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::CcnxNetDeviceFace")
-    .SetGroupName ("Ccnx")
-    .SetParent<CcnxFace> ()
-  ;
-  return tid;
-}
+// TypeId 
+// CcnxNetDeviceFace::GetTypeId ()
+// {
+//   static TypeId tid = TypeId ("ns3::CcnxNetDeviceFace")
+//     .SetGroupName ("Ccnx")
+//     .SetParent<CcnxFace> ()
+//   ;
+//   return tid;
+// }
 
 /** 
  * By default, Ccnx face are created in the "down" state.  Before
@@ -67,15 +67,6 @@ CcnxNetDeviceFace::CcnxNetDeviceFace (const CcnxNetDeviceFace &)
 CcnxNetDeviceFace& CcnxNetDeviceFace::operator= (const CcnxNetDeviceFace &)
 {
   return *this;
-}
-
-  
-void
-CcnxNetDeviceFace::DoDispose (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_netDevice = 0;
-  Object::DoDispose ();
 }
 
 Ptr<NetDevice>
@@ -126,11 +117,11 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 }
 
 
-std::ostream& operator<< (std::ostream& os, const CcnxNetDeviceFace &face)
+std::ostream&
+CcnxNetDeviceFace::Print (std::ostream& os) const
 {
-  return operator<< (os, static_cast<const CcnxFace&> (face)); // just call parent class for now
-  // os << "id=" << face.GetId ();
-  // return os;
+  os << "dev=net(" << GetId () << ")";
+  return os;
 }
 
 }; // namespace ns3

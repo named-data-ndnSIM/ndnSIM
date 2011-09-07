@@ -24,7 +24,8 @@
 #include <ostream>
 
 #include "ns3/ptr.h"
-#include "ns3/object.h"
+#include "ns3/simple-ref-count.h"
+#include "ns3/callback.h"
 
 namespace ns3 {
 
@@ -46,7 +47,7 @@ class Node;
  *
  * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
-class CcnxFace  : public Object
+class CcnxFace  : public SimpleRefCount<CcnxFace>
 {
 public:
   /**
@@ -57,12 +58,12 @@ public:
    */
   typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
   
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId GetTypeId (void);
+  // /**
+  //  * \brief Interface ID
+  //  *
+  //  * \return interface ID
+  //  */
+  // static TypeId GetTypeId (void);
 
   /**
    * \brief Default constructor
@@ -95,19 +96,19 @@ public:
    */
   virtual void SetNode (Ptr<Node> node);
 
-  /**
-   * \brief Assign routing/forwarding metric with face
-   *
-   * \param metric configured routing metric (cost) of this face
-   */
-  virtual void SetMetric (uint16_t metric);
+  // /**
+  //  * \Brief Assign routing/forwarding metric with face
+  //  *
+  //  * \param metric configured routing metric (cost) of this face
+  //  */
+  // virtual void SetMetric (uint16_t metric);
 
-  /**
-   * \brief Get routing/forwarding metric assigned to the face
-   *
-   * \returns configured routing/forwarding metric (cost) of this face
-   */
-  virtual uint16_t GetMetric (void) const;
+  // /**
+  //  * \brief Get routing/forwarding metric assigned to the face
+  //  *
+  //  * \returns configured routing/forwarding metric (cost) of this face
+  //  */
+  // virtual uint16_t GetMetric (void) const;
 
   /**
    * These are face states and may be distinct from actual lower-layer
@@ -134,6 +135,9 @@ public:
    * \brief Returns true if this face is disabled, false otherwise.
    */
   virtual bool IsDown () const;
+
+  virtual std::ostream&
+  Print (std::ostream &os) const;
 
   /**
    * \brief Set node Id
@@ -171,15 +175,15 @@ public:
   bool
   operator< (const CcnxFace &face) const;
   
-protected:
-  virtual void DoDispose (void);
+// protected:
+//   virtual void DoDispose (void);
 
 private:
   CcnxFace (const CcnxFace &); ///< \brief Disabled copy constructor
   CcnxFace& operator= (const CcnxFace &); ///< \brief Disabled copy operator
   
 protected:
-  uint16_t m_metric; ///< \brief Routing/forwarding metric
+  // uint16_t m_metric; ///< \brief Routing/forwarding metric
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
 

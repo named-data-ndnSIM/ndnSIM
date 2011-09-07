@@ -41,7 +41,7 @@ class CcnxForwardingStrategy : public Object
 public:
   static TypeId GetTypeId (void);
 
-  CcnxForwardingStrategy ();
+  CcnxForwardingStrategy (Ptr<CcnxFib> fib);
 
   typedef
   Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>

@@ -151,6 +151,7 @@ CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
 Ptr<Packet>
 CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
+  NS_LOG_FUNCTION_NOARGS ();
   CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (interest->GetName ());
   if (it != m_contentStore.end ())
     {
@@ -167,6 +168,7 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 void 
 CcnxContentStore::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
+  NS_LOG_FUNCTION_NOARGS ();
   CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (header->GetName ());
   if (it == m_contentStore.end ())
     { // add entry to the top

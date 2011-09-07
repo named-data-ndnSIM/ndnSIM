@@ -74,7 +74,7 @@ public:
    */
   
   static Type
-  CreateCorrectCcnxHeader (Ptr<const Packet> packet);
+  GetCcnxHeaderType (Ptr<const Packet> packet);
 };
 
   /**

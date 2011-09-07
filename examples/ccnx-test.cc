@@ -12,72 +12,59 @@ NS_LOG_COMPONENT_DEFINE ("CcnxTest");
 int 
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("CcnxTest", LOG_ALL);
-  LogComponentEnable ("CcnxStackHelper", LOG_ALL);
-  LogComponentEnable ("CcnxRit", LOG_ALL);
+  // LogComponentEnable ("CcnxTest", LOG_ALL);
+  // LogComponentEnable ("CcnxStackHelper", LOG_ALL);
+  // LogComponentEnable ("CcnxRit", LOG_ALL);
   
   // Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
   // Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
 
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("10Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
-  
+
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
   CommandLine cmd;
   cmd.Parse (argc, argv);
   
   // Here, we will explicitly create seven nodes. 
   NodeContainer c;
   c.Create (3);
+  Names::Add ("1", c.Get (0));
+  Names::Add ("2", c.Get (1));
+  Names::Add ("3", c.Get (2));
   
-  NodeContainer n1 = NodeContainer (c.Get (0), c.Get (1));
-  NodeContainer n2 = NodeContainer (c.Get (1), c.Get (2));
+  // NodeContainer n1 = NodeContainer ("1") ("2");
+  // NodeContainer n2 = NodeContainer ("2") ("3");
   
-  // Ipv4StaticRoutingHelper staticRouting;
-  
-  // Ipv4ListRoutingHelper list;
-  // list.Add (staticRouting, 1);
-
   NS_LOG_INFO ("Create channels.");
   PointToPointHelper p2p;
-  // NetDeviceContainer nd =
-  p2p.Install (n1);
-  p2p.Install (n2);
+  p2p.Install ("1", "2");
+  p2p.Install ("2", "3");
 
   NS_LOG_INFO ("Installing NDN stack");
   CcnxStackHelper ccnx;
   Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
-  // // test RIT
-  // NS_LOG_INFO ("Creating RIT");
-  // Ptr<CcnxRit> rit = CreateObject<CcnxRit> ();
-
-  // CcnxInterestHeader header;
-  // Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
-  // (*testname) ("test") ("test2");
-  // header.SetName (testname);
-  // header.SetNonce (1);
-
-  // rit->SetRecentlySatisfied (header);
-
-  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
-
-  // (*testname) ("test3"); // should have a side effect of changing name in the packet
-  // rit->SetRecentlySatisfied (header);
-
-  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
-
-  // header.SetNonce (2);
-  // NS_LOG_INFO (rit->WasRecentlySatisfied (header));
-
-  // rit->SetRecentlySatisfied (header);
-  // ? set up forwarding
+  CcnxConsumerHelper helper ("/3");
+  ApplicationContainer app = helper.Install ("1");
+  app.Start (Seconds (1.0));
+  app.Stop (Seconds (1.05));
   
-  
-  //Add static routing
-  // InternetStackHelper internet;
-  // internet.SetRoutingHelper (list); // has effect on the next Install ()
-  // internet.Install (c);
-  
+  /**
+   * \brief Add forwarding entry in FIB
+   *
+   * \param node Node
+   * \param prefix Routing prefix
+   * \param face Face index
+   * \param metric Routing metric
+   */
+  ccnx.AddRoute ("1", "/3", 0, 1);
+  ccnx.AddRoute ("2", "/3", 1, 1);
+  ccnx.AddRoute ("2", "/3", 0, 10000);
+  NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
+  NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
+
   // Create the OnOff application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s from n0 to n4
   // NS_LOG_INFO ("Create Applications.");

@@ -37,10 +37,11 @@ CcnxInterestSender::GetTypeId (void)
                    TimeValue (Seconds (0.1)),
                    MakeTimeAccessor (&CcnxInterestSender::m_offTime),
                    MakeTimeChecker ())
-    .AddAttribute ("Face","Local face to be used",
-                   PointerValue (CreateObject<CcnxLocalFace> ()),
-                   MakePointerAccessor (&CcnxInterestSender::m_face),
-                   MakePointerChecker<CcnxLocalFace> ())
+    // Alex: this is incorrect. SetNode call is not called if face is created using this accessor
+    // .AddAttribute ("Face","Local face to be used",
+    //                PointerValue (CreateObject<CcnxLocalFace> ()),
+    //                MakePointerAccessor (&CcnxInterestSender::m_face),
+    //                MakePointerChecker<CcnxLocalFace> ())
     .AddAttribute ("NameComponents","CcnxName of the Interest (use CcnxNameComponents)",
                    CcnxNameComponentsValue (CcnxNameComponents (/* root */)),
                    MakeCcnxNameComponentsAccessor (&CcnxInterestSender::m_interestName),

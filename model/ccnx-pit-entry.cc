@@ -67,9 +67,9 @@ namespace ns3
 // };
 
 
-CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix)
+CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const CcnxFibEntry &fibEntry)
   : m_prefix (prefix)
-  , m_fib (0)
+  , m_fibEntry (fibEntry)
   // , m_expireTime (?)
   , m_timerExpired (false)
   , m_counterExpirations (0)
@@ -82,16 +82,16 @@ CcnxPitEntry::GetPrefix () const
   return *m_prefix;
 }
 
-CcnxPitEntry::SetFibEntry::SetFibEntry (Ptr<CcnxFibEntry> fib)
-  : m_fib (fib)
-{
-}
+// CcnxPitEntry::SetFibEntry::SetFibEntry (Ptr<CcnxFibEntry> fib)
+//   : m_fib (fib)
+// {
+// }
 
-void
-CcnxPitEntry::SetFibEntry::operator() (CcnxPitEntry &entry)
-{
-  entry.m_fib = m_fib;
-}
+// void
+// CcnxPitEntry::SetFibEntry::operator() (CcnxPitEntry &entry)
+// {
+//   entry.m_fib = m_fib;
+// }
 
 void
 CcnxPitEntry::AddIncoming::operator() (CcnxPitEntry &entry)
@@ -132,7 +132,8 @@ CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceM
 void
 CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
 {
-  entry.m_fib->UpdateStatus (m_face, m_status);
+  NS_ASSERT_MSG (false, "Broken");
+  // entry.m_fib->UpdateStatus (m_face, m_status);
 }
 
 void
@@ -142,12 +143,9 @@ CcnxPitEntry::EstimateRttAndRemoveFace::operator() (CcnxPitEntry &entry)
   if (m_outFace->m_retxNum>0)
     return;
 
-  CcnxFibFaceMetricContainer::type::iterator metric = entry.m_fib->m_faces.find (m_outFace->m_face);
-  NS_ASSERT_MSG (metric != entry.m_fib->m_faces.end (),
-                 "Something wrong. Cannot find entry for the face in FIB");
-
-  Time rtt = Simulator::Now() - m_outFace->m_sendTime;
-  entry.m_fib->m_faces.modify (metric, CcnxFibFaceMetric::UpdateRtt (rtt));
+  m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
+                CcnxFibEntry::UpdateFaceRtt (m_outFace->m_face,
+                                             Simulator::Now() - m_outFace->m_sendTime));
 
   entry.m_outgoing.erase (m_outFace);
 }

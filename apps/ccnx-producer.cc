@@ -34,10 +34,11 @@ CcnxProducer::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::CcnxProducer")
     .SetParent<Application> ()
     .AddConstructor<CcnxProducer> ()
-    .AddAttribute ("Face","Local face to be used",
-                    PointerValue (CreateObject<CcnxLocalFace> ()),
-                    MakePointerAccessor (&CcnxProducer::m_face),
-                    MakePointerChecker<CcnxLocalFace> ())
+    // Alex: this is incorrect. SetNode call is not called if face is created using this accessor
+    // .AddAttribute ("Face","Local face to be used",
+    //                 PointerValue (CreateObject<CcnxLocalFace> ()),
+    //                 MakePointerAccessor (&CcnxProducer::m_face),
+    //                 MakePointerChecker<CcnxLocalFace> ())
     .AddAttribute ("Ccnx","Ccnx is needed to access ContentStore",
                    PointerValue (NULL),
                    MakePointerAccessor (&CcnxProducer::m_ccnx),

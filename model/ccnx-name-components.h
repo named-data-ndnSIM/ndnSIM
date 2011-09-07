@@ -41,7 +41,7 @@ public:
    * \brief Creates a prefix with zero components (can be looked as root "/")
    */
   CcnxNameComponents ();
-  CcnxNameComponents (const std::string &s);
+  // CcnxNameComponents (const std::string &s);
   CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
   
   inline void

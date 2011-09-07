@@ -76,16 +76,16 @@ CcnxFaceContainer::GetN (void) const
   return m_faces.size ();
 }
 
-void 
-CcnxFaceContainer::SetMetricToAll (uint16_t metric)
-{
-  for (FaceContainer::iterator it=m_faces.begin ();
-       it != m_faces.end ();
-       it++)
-    {
-      (*it)->SetMetric (metric);
-    }
-}
+// void 
+// CcnxFaceContainer::SetMetricToAll (uint16_t metric)
+// {
+//   for (FaceContainer::iterator it=m_faces.begin ();
+//        it != m_faces.end ();
+//        it++)
+//     {
+//       (*it)->SetMetric (metric);
+//     }
+// }
 
 void 
 CcnxFaceContainer::Add (const Ptr<CcnxFace> &face)

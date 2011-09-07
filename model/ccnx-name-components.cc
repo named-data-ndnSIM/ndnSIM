@@ -20,10 +20,13 @@
 
 #include "ccnx-name-components.h"
 #include <boost/foreach.hpp>
+#include "ns3/log.h"
 
 #include <iostream>
 
 using namespace std;
+
+NS_LOG_COMPONENT_DEFINE ("CcnxNameComponents");
 
 namespace ns3 {
 
@@ -33,10 +36,10 @@ CcnxNameComponents::CcnxNameComponents (/* root */)
 {
 }
 
-CcnxNameComponents::CcnxNameComponents (const string &s)
-{
-  m_prefix.push_back (s);
-}
+// CcnxNameComponents::CcnxNameComponents (const string &s)
+// {
+//   m_prefix.push_back (s);
+// }
 
 CcnxNameComponents::CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
 {
@@ -106,19 +109,21 @@ std::istream &
 operator >> (std::istream &is, CcnxNameComponents &components)
 {
   istream_iterator<char> eos; // end of stream
-
+  
   std::string component = "";
   for (istream_iterator<char> it (is); it != eos; it++)
     {
       if (*it == '/')
         {
           if (component != "")
-            components.Add (component);
+              components.Add (component);
           component = "";
         }
       else
         component.push_back (*it);
     }
+  if (component != "")
+      components.Add (component);
 
   return is;
 }

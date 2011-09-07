@@ -27,10 +27,13 @@
 namespace ns3 
 {
     
-CcnxConsumerHelper::CcnxConsumerHelper (Ptr<CcnxNameComponents> interestName)
+CcnxConsumerHelper::CcnxConsumerHelper (const std::string &prefix)
 {
     m_factory.SetTypeId ("ns3::CcnxConsumer");
-    m_factory.Set ("InterestName", CcnxNameComponentsValue (*interestName));
+    
+    CcnxNameComponentsValue prefixValue;
+    prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+    m_factory.Set ("InterestName", prefixValue);
 }
     
 void 
@@ -67,17 +70,10 @@ CcnxConsumerHelper::Install (NodeContainer c)
 Ptr<Application>
 CcnxConsumerHelper::InstallPriv (Ptr<Node> node)
 {
-    Ptr<CcnxLocalFace> localFace = CreateObject<CcnxLocalFace> ();
-    localFace->SetNode(node);
-    
-    m_factory.Set ("Face", PointerValue (localFace));
-    Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();
-        
-    localFace->RegisterProtocolHandler (MakeCallback (&CcnxConsumer::HandlePacket, app));
-    localFace->SetUp();
-        
+    Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();        
     node->AddApplication (app);
         
     return app;
 }
+
 }

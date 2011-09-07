@@ -38,69 +38,70 @@
 namespace ns3 
 {    
 /**
-* \brief A helper to make it easier to instantiate an ns3::CcnxConsumer Application
-* on a set of nodes.
-*/
+ * \brief A helper to make it easier to instantiate an ns3::CcnxConsumer Application
+ * on a set of nodes.
+ */
     
 class CcnxConsumerHelper
 {        
 public:
 
-/**
-* Create an CcnxConsumerHelper to make it easier to work with CcnxConsumer Apps
-*
-*/
-CcnxConsumerHelper (Ptr<CcnxNameComponents> interestName);
+  /**
+   * \brief Create an CcnxConsumerHelper to make it easier to work with CcnxConsumer Apps
+   *
+   * \param prefix Prefix which will be requested by the consumer applications
+   */
+  CcnxConsumerHelper (const std::string &prefix);
         
-/**
-* Helper function used to set the underlying application attributes.
-*
-* \param name the name of the application attribute to set
-* \param value the value of the application attribute to set
-*/
-void SetAttribute (std::string name, const AttributeValue &value);
+  /**
+   * \brief Helper function used to set the underlying application attributes.
+   *
+   * \param name the name of the application attribute to set
+   * \param value the value of the application attribute to set
+   */
+  void SetAttribute (std::string name, const AttributeValue &value);
         
-/**
-* Install an ns3::CcnxConsumer on each node of the input container
-* configured with all the attributes set with SetAttribute.
-*
-* \param c NodeContainer of the set of nodes on which an CcnxConsumer 
-* will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (NodeContainer c);
+  /**
+   * Install an ns3::CcnxConsumer on each node of the input container
+   * configured with all the attributes set with SetAttribute.
+   *
+   * \param c NodeContainer of the set of nodes on which an CcnxConsumer 
+   * will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (NodeContainer c);
         
-/**
-* Install an ns3::CcnxConsumer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param node The node on which an CcnxConsumer will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (Ptr<Node> node);
+  /**
+   * Install an ns3::CcnxConsumer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param node The node on which an CcnxConsumer will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (Ptr<Node> node);
         
-/**
-* Install an ns3::CcnxConsumer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param nodeName The node on which an CcnxConsumer will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (std::string nodeName);
+  /**
+   * Install an ns3::CcnxConsumer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param nodeName The node on which an CcnxConsumer will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (std::string nodeName);
         
 private:
-/**
-* \internal
-* Install an ns3::CcnxConsumer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param node The node on which an CcnxConsumer will be installed.
-* \returns Ptr to the application installed.
-*/
-Ptr<Application> InstallPriv (Ptr<Node> node);
-ObjectFactory m_factory;
+  /**
+   * \internal
+   * Install an ns3::CcnxConsumer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param node The node on which an CcnxConsumer will be installed.
+   * \returns Ptr to the application installed.
+   */
+  Ptr<Application> InstallPriv (Ptr<Node> node);
+  ObjectFactory m_factory;
+};
 
-};    
 }
 
 #endif

@@ -69,6 +69,7 @@
 #include "ns3/ccnx-forwarding-strategy.h"
 #include "ns3/ccnx-net-device-face.h"
 #include "ns3/ccnx-l3-protocol.h"
+#include "ns3/ccnx-fib.h"
 
 #include "ccnx-face-container.h"
 #include "ccnx-stack-helper.h"
@@ -112,37 +113,15 @@ static FaceFileMapCcnx g_faceFileMapCcnx; /**< A mapping of Ccnx/face pairs to p
 static FaceStreamMapCcnx g_faceStreamMapCcnx; /**< A mapping of Ccnx/face pairs to ascii streams */
 
 CcnxStackHelper::CcnxStackHelper ()
-  : m_forwarding (0)
-  , m_ccnxEnabled (true)
 {
-  Initialize ();
-}
-
-// private method called by both constructor and Reset ()
-void
-CcnxStackHelper::Initialize ()
-{
-  // CcnxStaticForwardingHelper staticForwarding;
-  // CcnxGlobalForwardingHelper globalForwarding;
-  // CcnxListForwardingHelper listForwarding;
-  // listForwarding.Add (staticForwarding, 0);
-  // listForwarding.Add (globalForwarding, -10);
-  // SetForwardingHelper (listForwarding);
 }
 
 CcnxStackHelper::~CcnxStackHelper ()
 {
-  if (m_forwarding)
-    {
-      delete m_forwarding;
-      m_forwarding = 0;
-    }
 }
 
 CcnxStackHelper::CcnxStackHelper (const CcnxStackHelper &o)
 {
-  m_forwarding = o.m_forwarding->Copy ();
-  m_ccnxEnabled = o.m_ccnxEnabled;
 }
 
 CcnxStackHelper &
@@ -152,30 +131,14 @@ CcnxStackHelper::operator = (const CcnxStackHelper &o)
     {
       return *this;
     }
-  m_forwarding = o.m_forwarding->Copy ();
   return *this;
-}
-
-void
-CcnxStackHelper::Reset (void)
-{
-  delete m_forwarding;
-  m_forwarding = 0;
-  m_ccnxEnabled = true;
-  Initialize ();
 }
 
 void 
 CcnxStackHelper::SetForwardingHelper (const CcnxForwardingHelper &forwarding)
 {
-  delete m_forwarding;
-  m_forwarding = forwarding.Copy ();
-}
-
-void
-CcnxStackHelper::SetCcnxStackInstall (bool enable)
-{
-  m_ccnxEnabled = enable;
+  // delete m_forwarding;
+  // m_forwarding = forwarding.Copy ();
 }
 
 Ptr<CcnxFaceContainer>
@@ -195,14 +158,14 @@ CcnxStackHelper::InstallAll (void) const
   return Install (NodeContainer::GetGlobal ());
 }
 
-void
-CcnxStackHelper::CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId)
-{
-  ObjectFactory factory;
-  factory.SetTypeId (typeId);
-  Ptr<Object> protocol = factory.Create <Object> ();
-  node->AggregateObject (protocol);
-}
+// void
+// CcnxStackHelper::CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId)
+// {
+//   ObjectFactory factory;
+//   factory.SetTypeId (typeId);
+//   Ptr<Object> protocol = factory.Create <Object> ();
+//   node->AggregateObject (protocol);
+// }
 
 Ptr<CcnxFaceContainer>
 CcnxStackHelper::Install (Ptr<Node> node) const
@@ -210,29 +173,30 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   // NS_ASSERT_MSG (m_forwarding, "SetForwardingHelper() should be set prior calling Install() method");
   Ptr<CcnxFaceContainer> faces = Create<CcnxFaceContainer> ();
   
-  if (m_ccnxEnabled)
+  if (node->GetObject<Ccnx> () != 0)
     {
-      if (node->GetObject<Ccnx> () != 0)
-        {
-          NS_FATAL_ERROR ("CcnxStackHelper::Install (): Installing " 
-                          "a CcnxStack to a node with an existing Ccnx object");
-          return 0;
-        }
-
-      CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
-      // Set forwarding
-      Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-      for (uint32_t index=0; index < node->GetNDevices (); index++)
-        {
-          Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
-          uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
-          NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcxnNetDeviceFace as face #" << face_id);
-
-          faces->Add (face);
-        }
-      // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
-      // ccnx->SetForwardingStrategy (ccnxForwarding);
+      NS_FATAL_ERROR ("CcnxStackHelper::Install (): Installing " 
+                      "a CcnxStack to a node with an existing Ccnx object");
+      return 0;
     }
+
+  Ptr<CcnxFib> fib = CreateObject<CcnxFib> ();
+  node->AggregateObject (fib);
+
+  Ptr<Ccnx> ccnx = CreateObject<CcnxL3Protocol> ();
+  node->AggregateObject (ccnx);
+
+  for (uint32_t index=0; index < node->GetNDevices (); index++)
+    {
+      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
+      face->SetNode (node);
+      uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
+      NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcxnNetDeviceFace as face #" << face_id);
+
+      faces->Add (face);
+    }
+  // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
+  // ccnx->SetForwardingStrategy (ccnxForwarding);
 
   return faces;
 }
@@ -243,6 +207,26 @@ CcnxStackHelper::Install (std::string nodeName) const
   Ptr<Node> node = Names::Find<Node> (nodeName);
   return Install (node);
 }
+
+
+void
+CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
+{
+  NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
+  
+  Ptr<Node> node = Names::Find<Node> (nodeName);
+  NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
+  
+  Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
+  Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
+  Ptr<CcnxFace> face = ccnx->GetFace (faceId);
+  NS_ASSERT_MSG (node != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
+
+  CcnxNameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+  fib->Add (prefixValue.Get (), face, metric);
+}
+
 
 static void
 CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)
@@ -285,12 +269,6 @@ void
 CcnxStackHelper::EnablePcapCcnxInternal (std::string prefix, Ptr<Ccnx> ccnx, uint32_t face, bool explicitFilename)
 {
   NS_LOG_FUNCTION (prefix << ccnx << face);
-
-  if (!m_ccnxEnabled)
-    {
-      NS_LOG_INFO ("Call to enable Ccnx pcap tracing but Ccnx not enabled");
-      return;
-    }
 
   //
   // We have to create a file and a mapping from protocol/face to file 
@@ -412,12 +390,6 @@ CcnxStackHelper::EnableAsciiCcnxInternal (
   uint32_t face,
   bool explicitFilename)
 {
-  if (!m_ccnxEnabled)
-    {
-      NS_LOG_INFO ("Call to enable Ccnx ascii tracing but Ccnx not enabled");
-      return;
-    }
-
   //
   // Our trace sinks are going to use packet printing, so we have to 
   // make sure that is turned on.

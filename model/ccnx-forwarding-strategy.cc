@@ -34,9 +34,9 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
   return tid;
 }
 
-CcnxForwardingStrategy::CcnxForwardingStrategy ()
+CcnxForwardingStrategy::CcnxForwardingStrategy (Ptr<CcnxFib> fib)
 {
-  m_fib = CreateObject<CcnxFib> ();
+  m_fib = fib;
 }
 
 

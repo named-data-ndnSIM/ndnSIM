@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
-            Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  *
  */
 
@@ -26,26 +26,32 @@
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/pointer.h"
-#include "ns3/assert.h" 
+#include "ns3/assert.h"
+
+#include "ns3/ccnx-header-helper.h"
+#include "ccnx-interest-header.h"
+#include "ccnx-content-object-header.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 
 namespace ns3 
 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxLocalFace);
+// NS_OBJECT_ENSURE_REGISTERED (CcnxLocalFace);
 
-TypeId 
-CcnxLocalFace::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::CcnxLocalFace")
-    .SetGroupName ("Ccnx")
-    .SetParent<CcnxFace> ()
-  ;
-  return tid;
-}
+// TypeId 
+// CcnxLocalFace::GetTypeId (void)
+// {
+//   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
+//     .SetGroupName ("Ccnx")
+//     .SetParent<CcnxFace> ()
+//   ;
+//   return tid;
+// }
 
 CcnxLocalFace::CcnxLocalFace () 
+  : m_onInterest (0)
+  , m_onContentObject (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -56,16 +62,21 @@ CcnxLocalFace::~CcnxLocalFace ()
 }
 
 void
-CcnxLocalFace::DoDispose (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  CcnxFace::DoDispose ();
-}
-
-void
 CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
   m_protocolHandler = handler;
+}
+
+void
+CcnxLocalFace::SetInterestHandler (InterestHandler onInterest)
+{
+  m_onInterest = onInterest;
+}
+
+void
+CcnxLocalFace::SetContentObjectHandler (ContentObjectHandler onContentObject)
+{
+  m_onContentObject = onContentObject;
 }
 
 void
@@ -77,19 +88,47 @@ CcnxLocalFace::Send (Ptr<Packet> p)
       return;
     }
 
-  
-}
-    
-void
-CcnxLocalFace::Receive (Ptr<Packet> p)
-{
-    //ypedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
-    m_protocolHandler ((const Ptr<CcnxFace>)this,(const Ptr<Packet>)p);
+  try
+    {
+      CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
+      switch (type)
+        {
+        case CcnxHeaderHelper::INTEREST:
+          if (!m_onInterest.IsNull ())
+            {
+              Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
+              p->RemoveHeader (*header);
+              m_onInterest (header);
+            }
+          break;
+        case CcnxHeaderHelper::CONTENT_OBJECT:
+          if (!m_onContentObject.IsNull ())
+            {
+              static CcnxContentObjectTail tail;
+              Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+              p->RemoveHeader (*header);
+              p->RemoveTrailer (tail);
+              m_onContentObject (header, p/*payload*/);
+            }
+          break;
+        }
+    }
+  catch (CcnxUnknownHeaderException)
+    {
+      NS_LOG_ERROR ("Unknown header type");
+    }
 }
 
-std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace)
+// propagate interest down to ccnx stack
+void
+CcnxLocalFace::ReceiveFromApplication (Ptr<Packet> p)
 {
-  os << "dev=local";
+  m_protocolHandler (Ptr<CcnxFace>(this), p);
+}
+
+std::ostream& CcnxLocalFace::Print (std::ostream& os) const
+{
+  os << "dev=local(" << GetId() << ")";
   return os;
 }
 

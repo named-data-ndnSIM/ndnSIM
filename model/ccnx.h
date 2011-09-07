@@ -168,11 +168,18 @@ public:
   GetNFaces (void) const = 0;
 
   /**
+   * \brief Get face by face index
    * \param face The face number of an Ccnx interface.
    * \returns The CcnxFace associated with the Ccnx face number.
    */
   virtual Ptr<CcnxFace>
   GetFace (uint32_t face) const = 0;
+
+  /**
+   * \brief Remove face from ccnx stack (remove callbacks)
+   */
+  virtual void
+  RemoveFace (Ptr<CcnxFace> face) = 0;
 };
 
 } // namespace ns3 

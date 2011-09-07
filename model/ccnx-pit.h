@@ -164,6 +164,11 @@ public:
    */
   Time GetCleanupTimeout () const;
 
+  /**
+   * \brief Set FIB table
+   */
+  void SetFib (Ptr<CcnxFib> fib);
+
 public:
   // PitBucket				 maxBucketsPerInterface; // maximum number of buckets. Automatically computed based on link capacity
   // // averaging over 1 second (bandwidth * 1second)
@@ -179,6 +184,7 @@ private:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
 
+  Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
   // PitBucket	m_bucketsPerInterface;	///< \brief pending interface counter per interface
 };
 

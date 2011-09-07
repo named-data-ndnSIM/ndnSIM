@@ -130,10 +130,18 @@ public:
                                   const Ptr<Packet> &packet);
   virtual void Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
 
-  virtual uint32_t AddFace (const Ptr<CcnxFace> &face);
-  virtual uint32_t GetNFaces () const;
-  virtual Ptr<CcnxFace> GetFace (uint32_t face) const;
+  virtual uint32_t
+  AddFace (const Ptr<CcnxFace> &face);
+  
+  virtual uint32_t
+  GetNFaces () const;
+  
+  virtual Ptr<CcnxFace>
+  GetFace (uint32_t face) const;
 
+  virtual void
+  RemoveFace (Ptr<CcnxFace> face);
+  
 protected:
   /**
    * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
@@ -201,6 +209,7 @@ private:
 
   Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
+  Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
   
   TracedCallback<Ptr<const CcnxInterestHeader>,

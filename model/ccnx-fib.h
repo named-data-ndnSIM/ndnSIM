@@ -26,6 +26,7 @@
 #include "ccnx.h"
 #include "ns3/nstime.h"
 #include "ns3/simple-ref-count.h"
+#include "ns3/node.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -101,7 +102,7 @@ public:
 						///<		- NDN_FIB_YELLOW
 						///<		- NDN_FIB_RED
   
-  uint32_t m_routingCost; ///< \brief routing protocol cost (interpretation of the value depends on the underlying routing protocol)
+  int32_t m_routingCost; ///< \brief routing protocol cost (interpretation of the value depends on the underlying routing protocol)
 
   Time m_sRtt;         ///< \brief smoothed round-trip time
   Time m_rttVar;       ///< \brief round-trip time variation
@@ -134,7 +135,7 @@ struct CcnxFibFaceMetricContainer
         boost::multi_index::composite_key<
           CcnxFibFaceMetric,
           boost::multi_index::member<CcnxFibFaceMetric,CcnxFibFaceMetric::Status,&CcnxFibFaceMetric::m_status>,
-          boost::multi_index::member<CcnxFibFaceMetric,uint32_t,&CcnxFibFaceMetric::m_routingCost>
+          boost::multi_index::member<CcnxFibFaceMetric,int32_t,&CcnxFibFaceMetric::m_routingCost>
         >
       >,
 
@@ -158,16 +159,52 @@ public:
    * \brief Constructor
    * \param prefix Prefix for the FIB entry
    */
-  CcnxFibEntry (Ptr<CcnxNameComponents> prefix)
-    : m_prefix (prefix)
-    , m_needsProbing (false)
+  CcnxFibEntry (const CcnxNameComponents &prefix)
+  : m_prefix (Create<CcnxNameComponents> (prefix))
+  , m_needsProbing (false)
   { }
 	
   /**
-   * \brief Update status of FIB next hop
+   * \brief Unary function to update status of FIB next hop
    */
-  void
-  UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status);
+  struct UpdateStatus
+  {
+    UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
+      : m_face (face), m_status (status) {}
+    void operator () (CcnxFibEntry &entry);
+  private:
+    Ptr<CcnxFace> m_face;
+    CcnxFibFaceMetric::Status m_status;
+  };
+
+  /**
+   * \brief Unary function to add or update routing metric of FIB next hop
+   *
+   * Initial status of the next hop is set to YELLOW
+   */
+  struct AddOrUpdateRoutingMetric
+  {
+    AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
+      : m_face (face), m_metric (metric) {}
+    void operator () (CcnxFibEntry &entry);
+  private:
+    Ptr<CcnxFace> m_face;
+    int32_t m_metric;
+  };
+
+  /**
+   * \brief Unary function to recalculate smoothed RTT and RTT variation
+   * \param rttSample RTT sample
+   */
+  struct UpdateFaceRtt
+  {
+    UpdateFaceRtt (Ptr<CcnxFace> face, const Time &rttSample)
+      : m_face (face), m_rttSample (rttSample) {};
+    void operator() (CcnxFibEntry &entry);
+  private:
+    Ptr<CcnxFace> m_face;
+    const Time &m_rttSample;
+  };
 
   /**
    * \brief Get prefix for the FIB entry
@@ -223,7 +260,7 @@ struct CcnxFibEntryContainer
  * \ingroup ccnx
  * \brief Class implementing FIB functionality
  */
-class CcnxFib : public Object
+class CcnxFib : public Object, public CcnxFibEntryContainer::type
 {
 public:
   /**
@@ -256,23 +293,24 @@ public:
    * \param interest Interest packet header
    * \returns If entry found a pair <valid_iterator, true> will be returned, otherwise <invalid_iterator, false>
    */
-  std::pair<CcnxFibEntryContainer::type::iterator, bool>
+  CcnxFibEntryContainer::type::iterator
   LongestPrefixMatch (const CcnxInterestHeader &interest) const;
   
   /**
-   * Update FIB entry
+   * \brief Add or update FIB entry
+   *
    * If the entry exists, metric will be updated. Otherwise, new entry will be created
    *
    * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
    *
-   * @param name				Prefix
-   * @param interfaceIndex	Forwarding interface
-   * @param metric			Routing metric
-   * @param nextHop			Nexthop node address (IPv4)
-   * @return true if a new entry created, false otherwise
+   * @param name	Prefix
+   * @param face	Forwarding face
+   * @param metric	Routing metric
    */
-  // bool update( const string &name, int interfaceIndex, int metric, NodeAddress nextHop );
-  // bool update( NodeAddress nodeId, int interfaceIndex, int metric, NodeAddress nextHop );
+  CcnxFibEntryContainer::type::iterator
+  Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
+  // bool update( const string &name, int interfaceIndex, int metric);
+  // bool update( NodeAddress nodeId, int interfaceIndex, int metric);
   // Bool update( NodeAddress nodeId, int metric, NodeAddress nextHop );
 
   // // Update Fib from OSPF routing table (through a hack in OSPF algorithm)
@@ -288,14 +326,18 @@ public:
   // void dump( const FibIterator &fib );
 
   // void resetProbing();    //reset needsProbing field for every FibEntry
+
+protected:
+  // inherited from Object class
+  virtual void NotifyNewAggregate ();
+  virtual void DoDispose ();
+  
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
   CcnxFib(const CcnxFib&) {} ; ///< \brief copy constructor is disabled
   
 private:
-  // Ptr<Ccnx> m_node;
-
-  CcnxFibEntryContainer::type m_fib;
+  Ptr<Node> m_node;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

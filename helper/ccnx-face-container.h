@@ -26,10 +26,9 @@
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
+#include "ns3/ccnx-face.h"
 
 namespace ns3 {
-
-class CcnxFace;
 
 /**
  * \ingroup ccnx-helpers
@@ -105,12 +104,12 @@ public:
    */
   uint32_t GetN () const;
 
-  /**
-   * \brief Set a metric for all faces in the container
-   *
-   * \param metric value of metric to assign to all faces in the container
-   */
-  void SetMetricToAll (uint16_t metric);
+  // /**
+  //  * \brief Set a metric for all faces in the container
+  //  *
+  //  * \param metric value of metric to assign to all faces in the container
+  //  */
+  // void SetMetricToAll (uint16_t metric);
 
   /**
    * Add an entry to the container

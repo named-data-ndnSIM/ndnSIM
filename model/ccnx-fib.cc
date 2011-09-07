@@ -26,6 +26,7 @@
 
 #include "ns3/node.h"
 #include "ns3/assert.h"
+#include "ns3/names.h"
 
 #define NDN_RTO_ALPHA 0.125
 #define NDN_RTO_BETA 0.25
@@ -60,6 +61,16 @@ private:
   CcnxFibFaceMetric::Status m_status;
 };
 
+struct ChangeMetric
+{
+  ChangeMetric (int32_t metric) : m_metric (metric) { }
+  void operator() (CcnxFibFaceMetric &entry)
+  {
+    entry.m_routingCost = m_metric;
+  }
+private:
+  int32_t m_metric;
+};
 
 // struct SearchByFace {
 //   /**
@@ -121,18 +132,45 @@ CcnxFibFaceMetric::UpdateRtt::operator() (CcnxFibFaceMetric &entry)
 }
 
 void
-CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
+CcnxFibEntry::UpdateStatus::operator () (CcnxFibEntry &entry)
 {
-  CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
-  NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (), "Update status can be performed only on existing faces of CcxnFibEntry");
+  CcnxFibFaceMetricByFace::type::iterator record = entry.m_faces.get<i_face> ().find (m_face);
+  NS_ASSERT_MSG (record != entry.m_faces.get<i_face> ().end (),
+                 "Update status can be performed only on existing faces of CcxnFibEntry");
 
-  m_faces.modify (record, ChangeStatus (status));
+  entry.m_faces.modify (record, ChangeStatus (m_status));
 
   // reordering random access index same way as by metric index
-  m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
+  entry.m_faces.get<i_nth> ().rearrange (entry.m_faces.get<i_metric> ().begin ());
 }
 
+void
+CcnxFibEntry::AddOrUpdateRoutingMetric::operator () (CcnxFibEntry &entry)
+{
+  CcnxFibFaceMetricByFace::type::iterator record = entry.m_faces.get<i_face> ().find (m_face);
+  if (record == entry.m_faces.get<i_face> ().end ())
+    {
+      entry.m_faces.insert (CcnxFibFaceMetric (m_face, m_metric));
+    }
+  else
+    {
+      entry.m_faces.modify (record, ChangeMetric (m_metric));
+    }
+  
+  // reordering random access index same way as by metric index
+  entry.m_faces.get<i_nth> ().rearrange (entry.m_faces.get<i_metric> ().begin ());
+}
 
+void
+CcnxFibEntry::UpdateFaceRtt::operator() (CcnxFibEntry &entry)
+{
+  CcnxFibFaceMetricContainer::type::iterator metric = entry.m_faces.find (m_face);
+  NS_ASSERT_MSG (metric != entry.m_faces.end (),
+                 "Something wrong. Cannot find entry for the face in FIB");
+
+  entry.m_faces.modify (metric, CcnxFibFaceMetric::UpdateRtt (m_rttSample));
+}
+    
 Ptr<CcnxFace>
 CcnxFibEntry::FindBestCandidate (int skip/* = 0*/)
 {
@@ -145,7 +183,23 @@ CcnxFib::CcnxFib ()
 {
 }
 
-std::pair<CcnxFibEntryContainer::type::iterator, bool>
+void
+CcnxFib::NotifyNewAggregate ()
+{
+  if (m_node == 0)
+      m_node = this->GetObject<Node>();
+  Object::NotifyNewAggregate ();
+}
+
+void 
+CcnxFib::DoDispose (void)
+{
+  m_node = 0;
+  Object::DoDispose ();
+}
+
+
+CcnxFibEntryContainer::type::iterator
 CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
   const CcnxNameComponents &name = interest.GetName ();
@@ -154,22 +208,38 @@ CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
        componentsCount--)
     {
       CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount));
-      CcnxFibEntryContainer::type::iterator match = m_fib.find (subPrefix);
-      if (match != m_fib.end())
-        return std::pair<CcnxFibEntryContainer::type::iterator, bool> (match,true);
+      CcnxFibEntryContainer::type::iterator match = find (subPrefix);
+      if (match != end())
+        return match;
     }
   
-  return std::pair<CcnxFibEntryContainer::type::iterator, bool> (m_fib.end(),false);
+  return end ();
+}
+
+
+CcnxFibEntryContainer::type::iterator
+CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric)
+{
+// CcnxFibFaceMetric
+  CcnxFibEntryContainer::type::iterator entry = find (prefix);
+  if (entry == end ())
+    {
+      entry = insert (end (), CcnxFibEntry (prefix));
+      // insert new
+    }
+  modify (entry, CcnxFibEntry::AddOrUpdateRoutingMetric (face, metric));
+
+  return entry;
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {
-  // os << "Node " << fib.m_node->GetObject<Node> ()->GetId () << "\n";
+  os << "Node " << Names::FindName (fib.m_node) << "\n";
   os << "  Dest prefix      Interfaces(Costs)                  \n";
   os << "+-------------+--------------------------------------+\n";
   
-  for (CcnxFibEntryContainer::type::iterator entry = fib.m_fib.begin ();
-       entry != fib.m_fib.end ();
+  for (CcnxFibEntryContainer::type::iterator entry = fib.begin ();
+       entry != fib.end ();
        entry++)
     {
       os << *entry << "\n";
@@ -179,12 +249,14 @@ std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 
 std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry)
 {
-  os << entry.m_prefix << "\t";
-  for (CcnxFibFaceMetricByFace::type::iterator metric = entry.m_faces.get<i_face> ().begin ();
-       metric != entry.m_faces.get<i_face> ().end ();
+  os << *entry.m_prefix << "\t";
+  
+  for (CcnxFibFaceMetricContainer::type::index<i_nth>::type::iterator metric =
+         entry.m_faces.get<i_nth> ().begin ();
+       metric != entry.m_faces.get<i_nth> ().end ();
        metric++)
     {
-      if (metric != entry.m_faces.get<i_face> ().begin ())
+      if (metric != entry.m_faces.get<i_nth> ().begin ())
         os << ", ";
 
       os << *metric;
@@ -196,7 +268,7 @@ std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric)
 {
   static const std::string statusString[] = {"","g","y","r"};
 
-  os << metric.m_face << "(" << metric.m_routingCost << ","<< statusString [metric.m_status] << ")";
+  os << *metric.m_face << "(" << metric.m_routingCost << ","<< statusString [metric.m_status] << ")";
   return os;
 }
 

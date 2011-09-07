@@ -72,11 +72,6 @@ public:
   CcnxStackHelper &operator = (const CcnxStackHelper &o);
 
   /**
-   * \brief Return helper internal state to that of a newly constructed one
-   */
-  void Reset ();
-
-  /**
    * Set forwarding strategy helper
    *
    * \param forwarding a new forwarding helper
@@ -142,12 +137,15 @@ public:
   InstallAll () const;
 
   /**
-   * \brief Enable/disable ccnx stack install.
+   * \brief Add forwarding entry in FIB
    *
-   * \param enable enable state
+   * \param nodeName Node name
+   * \param prefix Routing prefix
+   * \param faceId Face index
+   * \param metric Routing metric
    */
   void
-  SetCcnxStackInstall (bool enable);
+  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
 
 private:
   /**
@@ -179,14 +177,10 @@ private:
                                         uint32_t interface,
                                         bool explicitFilename);
 
-  void Initialize (void);
-  ObjectFactory m_tcpFactory;
-  const CcnxForwardingHelper *m_forwarding;
-
-  /**
-   * \internal
-   */
-  static void CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId);
+  // /**
+  //  * \internal
+  //  */
+  // static void CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId);
 
   /**
    * \internal
@@ -202,11 +196,6 @@ private:
    * \internal
    */
   bool AsciiHooked (Ptr<Ccnx> ccnx);
-
-  /**
-   * \brief Ccnx install state (enabled/disabled) ?
-   */
-  bool m_ccnxEnabled;
 };
 
 } // namespace ns3

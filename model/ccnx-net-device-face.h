@@ -45,12 +45,12 @@ class Address;
 class CcnxNetDeviceFace  : public CcnxFace
 {
 public:
-  /**
-   * \brief Interface ID
-   *
-   * \return interface ID
-   */
-  static TypeId GetTypeId (void);
+  // /**
+  //  * \brief Interface ID
+  //  *
+  //  * \return interface ID
+  //  */
+  // static TypeId GetTypeId (void);
 
   /**
    * \brief Constructor
@@ -64,10 +64,14 @@ public:
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
   
-  virtual void RegisterProtocolHandler (ProtocolHandler handler);
+  virtual void
+  RegisterProtocolHandler (ProtocolHandler handler);
 
-  virtual void Send (Ptr<Packet> p);
+  virtual void
+  Send (Ptr<Packet> p);
 
+  virtual std::ostream&
+  Print (std::ostream &os) const;
   ////////////////////////////////////////////////////////////////////
 
   /**
@@ -76,9 +80,6 @@ public:
    * \returns smart pointer to NetDevice associated with the face
    */
   Ptr<NetDevice> GetNetDevice () const;
-  
-protected:
-  virtual void DoDispose ();
 
 private:
   CcnxNetDeviceFace (const CcnxNetDeviceFace &); ///< \brief Disabled copy constructor
@@ -95,8 +96,6 @@ private:
 private:
   Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
 };
-
-std::ostream& operator<< (std::ostream& os, const CcnxNetDeviceFace &face);
 
 } // namespace ns3
 

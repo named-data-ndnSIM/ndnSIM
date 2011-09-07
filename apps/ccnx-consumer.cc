@@ -19,6 +19,11 @@
  */
 
 #include "ccnx-consumer.h"
+#include "ns3/ptr.h"
+#include "ns3/ccnx-local-face.h"
+#include "ns3/ccnx.h"
+#include "ns3/callback.h"
+#include "ns3/ccnx-content-object-header.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumer");
 
@@ -31,49 +36,45 @@ TypeId
 CcnxConsumer::GetTypeId (void)
 {
     static TypeId tid = TypeId ("ns3::CcnxConsumer")
-    .SetParent<Application> ()
-    .AddConstructor<CcnxConsumer> ()
-    .AddAttribute ("OffTime", "Time interval between packets",
-                    TimeValue (Seconds (0.1)),
-                    MakeTimeAccessor (&CcnxConsumer::m_offTime),
-                    MakeTimeChecker ())
-    .AddAttribute ("Face","Local face to be used",
-                    PointerValue (CreateObject<CcnxLocalFace> ()),
-                    MakePointerAccessor (&CcnxConsumer::m_face),
-                    MakePointerChecker<CcnxLocalFace> ())
-    .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
-                    CcnxNameComponentsValue (CcnxNameComponents ()),
-                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
-                    MakeCcnxNameComponentsChecker ())
-    .AddAttribute ("LifeTime", "LifeTime fo interest packet",
-                    TimeValue (Seconds (4.0)),
-                    MakeTimeAccessor (&CcnxConsumer::m_interestLifeTime),
-                    MakeTimeChecker ())
-    .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",
-                    IntegerValue(-1),
-                    MakeIntegerAccessor(&CcnxConsumer::m_minSuffixComponents),
-                    MakeIntegerChecker<int32_t>())
-    .AddAttribute ("MaxSuffixComponents", "MaxSuffixComponents",
-                    IntegerValue(-1),
-                    MakeIntegerAccessor(&CcnxConsumer::m_maxSuffixComponents),
-                    MakeIntegerChecker<int32_t>())
-    .AddAttribute ("ChildSelector", "ChildSelector",
-                    BooleanValue(false),
-                    MakeBooleanAccessor(&CcnxConsumer::m_childSelector),
-                    MakeBooleanChecker())
-    .AddAttribute ("Exclude", "only simple name matching is supported (use CcnxNameComponents)",
-                   CcnxNameComponentsValue (CcnxNameComponents ()),
-                   MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_exclude),
-                   MakeCcnxNameComponentsChecker ())
-    .AddAttribute ("Initial Nonce", "If 0 then nonce is not used",
-                    UintegerValue(1),
-                    MakeUintegerAccessor(&CcnxConsumer::m_initialNonce),
-                    MakeUintegerChecker<uint32_t>())
-    .AddTraceSource ("InterestTrace", "Interests that were sent",
-                     MakeTraceSourceAccessor (&CcnxConsumer::m_interestsTrace))
-    .AddTraceSource ("ContentObjectTrace", "ContentObjects that were received",
-                     MakeTraceSourceAccessor (&CcnxConsumer::m_contentObjectsTrace))
-    ;
+      .SetParent<Application> ()
+      .AddConstructor<CcnxConsumer> ()
+      .AddAttribute ("OffTime", "Time interval between packets",
+                     TimeValue (Seconds (0.1)),
+                     MakeTimeAccessor (&CcnxConsumer::m_offTime),
+                     MakeTimeChecker ())
+      .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
+                     CcnxNameComponentsValue (),
+                     MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
+                     MakeCcnxNameComponentsChecker ())
+      .AddAttribute ("LifeTime", "LifeTime fo interest packet",
+                     TimeValue (Seconds (0)),
+                     MakeTimeAccessor (&CcnxConsumer::m_interestLifeTime),
+                     MakeTimeChecker ())
+      .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",
+                     IntegerValue(-1),
+                     MakeIntegerAccessor(&CcnxConsumer::m_minSuffixComponents),
+                     MakeIntegerChecker<int32_t>())
+      .AddAttribute ("MaxSuffixComponents", "MaxSuffixComponents",
+                     IntegerValue(-1),
+                     MakeIntegerAccessor(&CcnxConsumer::m_maxSuffixComponents),
+                     MakeIntegerChecker<int32_t>())
+      .AddAttribute ("ChildSelector", "ChildSelector",
+                     BooleanValue(false),
+                     MakeBooleanAccessor(&CcnxConsumer::m_childSelector),
+                     MakeBooleanChecker())
+      .AddAttribute ("Exclude", "only simple name matching is supported (use CcnxNameComponents)",
+                     CcnxNameComponentsValue (),
+                     MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_exclude),
+                     MakeCcnxNameComponentsChecker ())
+      .AddAttribute ("Initial Nonce", "If 0 then nonce is not used",
+                     UintegerValue(1),
+                     MakeUintegerAccessor(&CcnxConsumer::m_initialNonce),
+                     MakeUintegerChecker<uint32_t>())
+      .AddTraceSource ("InterestTrace", "Interests that were sent",
+                       MakeTraceSourceAccessor (&CcnxConsumer::m_interestsTrace))
+      .AddTraceSource ("ContentObjectTrace", "ContentObjects that were received",
+                       MakeTraceSourceAccessor (&CcnxConsumer::m_contentObjectsTrace))
+      ;
 
     return tid;
 }
@@ -101,7 +102,24 @@ void
 CcnxConsumer::StartApplication () // Called at time specified by Start
 {
     NS_LOG_FUNCTION_NOARGS ();
-    ScheduleNextTx();
+
+    NS_ASSERT_MSG (m_face == 0, "Face should not exist");
+    m_face = Create<CcnxLocalFace> ();
+
+    // step 1. Set up forwarding from face to application
+    m_face->SetNode (GetNode ());
+    m_face->SetContentObjectHandler (MakeCallback (&CcnxConsumer::OnContentObject, this));
+
+    // step 2. Set up forwarding to and from ccnx
+    NS_ASSERT_MSG (GetNode ()->GetObject<Ccnx> () !=0,
+                   "Ccnx stack should be installed on the node " << GetNode ());
+    GetNode ()->GetObject<Ccnx> ()->AddFace (m_face);
+
+    // step 3. Enable face
+    m_face->SetUp ();
+
+    // Send first packet immediately
+    m_sendEvent = Simulator::Schedule (Seconds(0.0), &CcnxConsumer::SendPacket, this);
 }
     
 void 
@@ -110,6 +128,17 @@ CcnxConsumer::StopApplication () // Called at time specified by Stop
     NS_LOG_FUNCTION_NOARGS ();
         
     CancelEvents ();
+
+    // step 1. Disable face
+    m_face->SetDown ();
+
+    // step 2. Remove face from ccnx stack
+    GetNode ()->GetObject<Ccnx> ()->RemoveFace (m_face);
+
+    // step 3. Disable callbacks
+    m_face->SetContentObjectHandler (MakeNullCallback<void,
+                                                      const Ptr<const CcnxContentObjectHeader> &,
+                                                      const Ptr<const Packet> &> ());
 }
     
 void 
@@ -118,15 +147,6 @@ CcnxConsumer::CancelEvents ()
     NS_LOG_FUNCTION_NOARGS ();
         
     Simulator::Cancel (m_sendEvent);
-}
-    
-void 
-CcnxConsumer::ScheduleNextTx ()
-{
-    NS_LOG_FUNCTION_NOARGS ();
-        
-    Time nextTime = Seconds(m_offTime);
-    m_sendEvent = Simulator::Schedule (nextTime, &CcnxConsumer::SendPacket, this);
 }
     
 void
@@ -145,32 +165,28 @@ CcnxConsumer::SendPacket ()
     interestHeader.SetMaxSuffixComponents(m_maxSuffixComponents);
     interestHeader.SetMinSuffixComponents(m_minSuffixComponents);
         
+    NS_LOG_INFO ("Interest: \n" << interestHeader);
+
     Ptr<Packet> packet = Create<Packet> ();
     packet->AddHeader (interestHeader);
         
-    m_face->Receive(packet);
-        
-    ScheduleNextTx();
+    m_face->ReceiveFromApplication (packet);
+
+    m_sendEvent = Simulator::Schedule (Seconds(m_offTime), &CcnxConsumer::SendPacket, this);
 }
     
+// void
+// CcnxConsumer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
+// {
+// }
+
 void
-CcnxConsumer::HandlePacket(const Ptr<CcnxFace> &face, const Ptr<const Packet> &packet)
+CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
+                               const Ptr<const Packet> &payload)
 {
-    uint8_t type[2];
-    uint32_t read = packet->CopyData (type,2);
-    if (read!=2)
-    {
-        NS_LOG_INFO ("Unknown CcnxPacket");
-        return;
-    }
-    
-    if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
-    {
-        m_interestsTrace(face,packet);
-    }
-    else if (type[0] == CONTENT_OBJECT_BYTE0 && type[1] == CONTENT_OBJECT_BYTE1)
-    {
-        m_contentObjectsTrace(face,packet);
-    }
+  // do stuff
+  NS_LOG_FUNCTION ("Received contentObject " << contentObject );
 }
+
+
 }

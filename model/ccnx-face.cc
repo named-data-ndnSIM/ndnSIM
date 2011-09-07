@@ -29,17 +29,17 @@ NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxFace);
+// NS_OBJECT_ENSURE_REGISTERED (CcnxFace);
 
-TypeId 
-CcnxFace::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::CcnxFace")
-    .SetGroupName ("Ccnx")
-    .SetParent<Object> ()
-  ;
-  return tid;
-}
+// TypeId 
+// CcnxFace::GetTypeId (void)
+// {
+//   static TypeId tid = TypeId ("ns3::CcnxFace")
+//     .SetGroupName ("Ccnx")
+//     .SetParent<Object> ()
+//   ;
+//   return tid;
+// }
 
 /** 
  * By default, Ccnx face are created in the "down" state
@@ -47,8 +47,8 @@ CcnxFace::GetTypeId (void)
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
 CcnxFace::CcnxFace () 
-  : m_metric (1)
-  , m_node (0)
+  // : m_metric (1)
+  : m_node (0)
   , m_ifup (false)
   , m_id ((uint32_t)-1)
 {
@@ -70,13 +70,13 @@ CcnxFace& CcnxFace::operator= (const CcnxFace &)
 }
 
   
-void
-CcnxFace::DoDispose (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_node = 0;
-  Object::DoDispose ();
-}
+// void
+// CcnxFace::DoDispose (void)
+// {
+//   NS_LOG_FUNCTION_NOARGS ();
+//   m_node = 0;
+//   Object::DoDispose ();
+// }
 
 void 
 CcnxFace::SetNode (Ptr<Node> node)
@@ -84,19 +84,19 @@ CcnxFace::SetNode (Ptr<Node> node)
   m_node = node;
 }
 
-void
-CcnxFace::SetMetric (uint16_t metric)
-{
-  NS_LOG_FUNCTION (metric);
-  m_metric = metric;
-}
+// void
+// CcnxFace::SetMetric (uint16_t metric)
+// {
+//   NS_LOG_FUNCTION (metric);
+//   m_metric = metric;
+// }
 
-uint16_t
-CcnxFace::GetMetric (void) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_metric;
-}
+// uint16_t
+// CcnxFace::GetMetric (void) const
+// {
+//   NS_LOG_FUNCTION_NOARGS ();
+//   return m_metric;
+// }
 
 /**
  * These are face states and may be distinct from 
@@ -147,9 +147,16 @@ CcnxFace::operator< (const CcnxFace &face) const
   return (m_id < face.m_id);
 }
 
+std::ostream&
+CcnxFace::Print (std::ostream &os) const
+{
+  os << "id=" << GetId ();
+  return os;
+}
+
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face)
 {
-  os << "id=" << face.GetId ();
+  face.Print (os);
   return os;
 }
 
