@@ -291,7 +291,7 @@ public:
    * \todo Implement exclude filters
    *
    * \param interest Interest packet header
-   * \returns If entry found a pair <valid_iterator, true> will be returned, otherwise <invalid_iterator, false>
+   * \returns If entry found a valid iterator will be returned, otherwise end ()
    */
   CcnxFibEntryContainer::type::iterator
   LongestPrefixMatch (const CcnxInterestHeader &interest) const;

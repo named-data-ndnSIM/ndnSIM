@@ -106,8 +106,6 @@ public:
 private:
   Ptr<CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
   Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
-
-  static CcnxContentObjectTail m_tail; ///< \internal for optimization purposes
 };
 
 /**

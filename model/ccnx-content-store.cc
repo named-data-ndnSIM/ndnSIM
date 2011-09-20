@@ -53,8 +53,6 @@ CcnxContentStore::GetTypeId (void)
   return tid;
 }
 
-CcnxContentObjectTail CcnxContentStoreEntry::m_tail;
-
 //////////////////////////////////////////////////////////////////////
 // Helper classes
 //////////////////////////////////////////////////////////////////////
@@ -103,17 +101,21 @@ struct CcnxContentStoreOrderedPrefix
 CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
   : m_header (header)
 {
+  static CcnxContentObjectTail tail; ///< \internal for optimization purposes
+
   m_packet = packet->Copy ();
   m_packet->RemoveHeader (*header);
-  m_packet->RemoveTrailer (m_tail);
+  m_packet->RemoveTrailer (tail);
 }
 
 Ptr<Packet>
 CcnxContentStoreEntry::GetFullyFormedCcnxPacket () const
 {
+  static CcnxContentObjectTail tail; ///< \internal for optimization purposes
+
   Ptr<Packet> packet = m_packet->Copy ();
   packet->AddHeader (*m_header);
-  packet->AddTrailer (m_tail);
+  packet->AddTrailer (tail);
   return packet;
 }
 

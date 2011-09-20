@@ -123,9 +123,12 @@ CcnxPitEntry::ClearIncoming::operator() (CcnxPitEntry &entry)
   entry.m_incoming.clear ();
 }
 
-CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
+CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face,
+                                                CcnxFibFaceMetric::Status status,
+                                                Ptr<CcnxFib> fib)
   : m_face (face)
   , m_status (status)
+  , m_fib (fib)
 {
 }
 
@@ -133,7 +136,8 @@ void
 CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
 {
   NS_ASSERT_MSG (false, "Broken");
-  // entry.m_fib->UpdateStatus (m_face, m_status);
+  m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
+                 CcnxFibEntry::UpdateStatus (m_face, m_status));
 }
 
 void

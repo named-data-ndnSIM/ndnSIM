@@ -189,11 +189,12 @@ public:
    */
   struct UpdateFibStatus
   {
-    UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status);
+    UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status, Ptr<CcnxFib> fib);
     void operator() (CcnxPitEntry &entry);
   private:
     Ptr<CcnxFace> m_face;
     CcnxFibFaceMetric::Status m_status;
+    Ptr<CcnxFib> m_fib;
   };
 
   /**
