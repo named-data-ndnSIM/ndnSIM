@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 /**
@@ -57,7 +57,6 @@
 #include "ns3/log.h"
 #include "ns3/object.h"
 #include "ns3/names.h"
-#include "ns3/ccnx.h"
 #include "ns3/packet-socket-factory.h"
 #include "ns3/config.h"
 #include "ns3/simulator.h"
@@ -112,10 +111,17 @@ typedef std::map<FacePairCcnx, Ptr<OutputStreamWrapper> > FaceStreamMapCcnx;
 static FaceFileMapCcnx g_faceFileMapCcnx; /**< A mapping of Ccnx/face pairs to pcap files */
 static FaceStreamMapCcnx g_faceStreamMapCcnx; /**< A mapping of Ccnx/face pairs to ascii streams */
 
+    
 CcnxStackHelper::CcnxStackHelper ()
+    : m_forwardingHelper (Ccnx::NDN_FLOODING)
 {
 }
-
+    
+CcnxStackHelper::CcnxStackHelper (Ccnx::ForwardingStrategy strategy)
+    : m_forwardingHelper (strategy)
+{
+}
+    
 CcnxStackHelper::~CcnxStackHelper ()
 {
 }
@@ -135,10 +141,10 @@ CcnxStackHelper::operator = (const CcnxStackHelper &o)
 }
 
 void 
-CcnxStackHelper::SetForwardingHelper (const CcnxForwardingHelper &forwarding)
+CcnxStackHelper::SetForwardingStrategy (Ccnx::ForwardingStrategy strategy)
 {
-  // delete m_forwarding;
-  // m_forwarding = forwarding.Copy ();
+  CcnxForwardingHelper newForwardingHelper (strategy);
+  m_forwardingHelper = newForwardingHelper;
 }
 
 Ptr<CcnxFaceContainer>
@@ -191,11 +197,15 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
       face->SetNode (node);
       uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
-      NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcxnNetDeviceFace as face #" << face_id);
+      NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
 
+      face->SetUp ();
       faces->Add (face);
     }
-  // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
+    
+    m_forwardingHelper.SetForwarding(ccnx);
+  
+    // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
   // ccnx->SetForwardingStrategy (ccnxForwarding);
 
   return faces;

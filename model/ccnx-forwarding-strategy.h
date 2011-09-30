@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2009 University of Washington
+ * Copyright (c) 2011 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 #ifndef CCNX_FORWARDING_STRATEGY_H
 #define CCNX_FORWARDING_STRATEGY_H
@@ -41,8 +42,10 @@ class CcnxForwardingStrategy : public Object
 public:
   static TypeId GetTypeId (void);
 
-  CcnxForwardingStrategy (Ptr<CcnxFib> fib);
-
+  CcnxForwardingStrategy ();
+    
+  void SetCcnx(Ptr<Ccnx> ccnx);
+    
   typedef
   Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>
   SendCallback;
@@ -51,9 +54,10 @@ public:
                                    Ptr<CcnxInterestHeader> &header,
                                    const Ptr<const Packet> &packet,
                                    SendCallback ucb) = 0;
-
-private:
-  Ptr<CcnxFib> m_fib; ///< \brief FIB  
+  Ptr<Ccnx> GetCcnx();
+    
+private:  
+  Ptr<Ccnx> m_ccnx;
 };
 
 } //namespace ns3

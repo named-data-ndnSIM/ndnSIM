@@ -78,6 +78,7 @@ CcnxNetDeviceFace::GetNetDevice () const
 void
 CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
+  NS_LOG_FUNCTION(this);
   NS_ASSERT_MSG (m_netDevice != 0, "CcnxNetDeviceFace needs to be assigned NetDevice first");
   
   m_protocolHandler = handler;

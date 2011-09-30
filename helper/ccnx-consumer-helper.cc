@@ -19,10 +19,8 @@
  */
 
 #include "ccnx-consumer-helper.h"
-#include "ns3/inet-socket-address.h"
-#include "ns3/packet-socket-address.h"
-#include "ns3/string.h"
-#include "ns3/names.h"
+
+NS_LOG_COMPONENT_DEFINE ("CcnxConsumerHelper");
 
 namespace ns3 
 {

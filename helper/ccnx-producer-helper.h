@@ -36,6 +36,9 @@
 #include "ns3/ccnx-producer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ccnx-stack-helper.h"
+#include "ns3/log.h"
+#include "ns3/string.h"
+#include "ns3/names.h"
 
 namespace ns3 
 {    

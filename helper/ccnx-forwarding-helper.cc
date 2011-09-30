@@ -1,6 +1,6 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2008 INRIA
+ * Copyright (c) 2011 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,8 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
+ * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
+
 #include "ns3/node.h"
 #include "ns3/node-list.h"
 #include "ns3/simulator.h"
@@ -25,10 +26,36 @@
 
 namespace ns3 {
 
-CcnxForwardingHelper::~CcnxForwardingHelper ()
+CcnxForwardingHelper::CcnxForwardingHelper()
 {
+    m_strategy = Ccnx::NDN_FLOODING;
+}
+    
+CcnxForwardingHelper::CcnxForwardingHelper(Ccnx::ForwardingStrategy strategy)
+{
+    m_strategy = strategy;
 }
 
+CcnxForwardingHelper::~CcnxForwardingHelper ()
+{
+   
+}
+
+void 
+CcnxForwardingHelper::SetForwarding(Ptr<Ccnx> ccnx) const
+{
+    if(m_strategy == Ccnx::NDN_FLOODING)
+    {
+        Ptr<CcnxFloodingStrategy> ccnxForwarding = CreateObject<CcnxFloodingStrategy> ();
+        ccnxForwarding->SetCcnx(ccnx);
+        ccnx->SetForwardingStrategy (ccnxForwarding);
+    }
+    else if(m_strategy == Ccnx::NDN_BESTROUTE)
+    {}
+    else if (m_strategy == Ccnx::NDN_RANKING)
+    {}
+}
+    
 // void
 // CcnxForwardingHelper::PrintForwardingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream) const
 // {

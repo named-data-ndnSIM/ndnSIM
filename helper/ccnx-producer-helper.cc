@@ -19,8 +19,8 @@
  */
 
 #include "ccnx-producer-helper.h"
-#include "ns3/string.h"
-#include "ns3/names.h"
+
+NS_LOG_COMPONENT_DEFINE ("CcnxProducerHelper");
 
 namespace ns3 
 {
@@ -40,6 +40,7 @@ CcnxProducerHelper::SetAttribute (std::string name, const AttributeValue &value)
 ApplicationContainer
 CcnxProducerHelper::Install (Ptr<Node> node)
 {
+    NS_LOG_FUNCTION(this);
     return ApplicationContainer (InstallPriv (node));
 }
     
@@ -72,6 +73,7 @@ CcnxProducerHelper::Install (NodeContainer c)
 Ptr<Application>
 CcnxProducerHelper::InstallPriv (Ptr<Node> node)
 {
+    NS_LOG_INFO ("InstallPriv started");
     Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
     localFace->SetNode(node);
         

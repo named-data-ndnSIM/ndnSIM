@@ -34,6 +34,9 @@
 #include "ns3/ccnx-local-face.h"
 #include "ns3/callback.h"
 #include "ns3/ccnx-consumer.h"
+#include "ns3/log.h"
+#include "ns3/string.h"
+#include "ns3/names.h"
 
 namespace ns3 
 {    

@@ -1,6 +1,6 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2008 INRIA
+ * Copyright (c) 2011 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,18 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
+ * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
+
 #ifndef CCNX_FORWARDING_HELPER_H
 #define CCNX_FORWARDING_HELPER_H
 
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/output-stream-wrapper.h"
+#include "ns3/ccnx.h"
+#include "ns3/ccnx-flooding-strategy.h"
 
 namespace ns3 {
 
-class CcnxForwardingStrategy;
 class Node;
 
 /**
@@ -39,26 +41,27 @@ class Node;
 class CcnxForwardingHelper
 {
 public:
+    
+  /*
+   * \brief Default constructor, which sets NDN_FLOODING forwarding strategy
+   */
+  CcnxForwardingHelper();
+  
+  /*
+   * \brief This constructor sets a specified forwarding strategy 
+   */
+  CcnxForwardingHelper(Ccnx::ForwardingStrategy strategy);
+  
   /*
    * Destroy an instance of an CcnxForwardingHelper
    */
-  virtual ~CcnxForwardingHelper ();
+  ~CcnxForwardingHelper ();
 
-  /**
-   * \brief virtual constructor
-   * \returns pointer to clone of this CcnxForwardingHelper 
-   * 
-   * This method is mainly for internal use by the other helpers;
-   * clients are expected to free the dynamic memory allocated by this method
+  /*
+   * \brief creates a specified ForwardingStrategy object and binds it to Ccnx
    */
-  virtual CcnxForwardingHelper* Copy () const = 0;
-
-  /**
-   * \param node the node within which the new forwarding protocol will run
-   * \returns a newly-created forwarding protocol
-   */
-  virtual Ptr<CcnxForwardingStrategy> Create (Ptr<Node> node) const = 0;
-
+  void SetForwarding(Ptr<Ccnx> ccnx) const;
+    
   /**
    * \brief prints the forwarding tables of all nodes at a particular time.
    * \param printTime the time at which the forwarding table is supposed to be printed.
@@ -106,6 +109,7 @@ public:
   void PrintForwardingTableEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
 
 private:
+  Ccnx::ForwardingStrategy m_strategy;
   void Print (Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
   void PrintEvery (Time printInterval, Ptr<Node> node, Ptr<OutputStreamWrapper> stream) const;
 };

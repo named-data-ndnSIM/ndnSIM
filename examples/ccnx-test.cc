@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   CcnxConsumerHelper helper ("/3");
   ApplicationContainer app = helper.Install ("1");
   app.Start (Seconds (1.0));
-  app.Stop (Seconds (1.05));
+  app.Stop (Seconds (10.05));
   
   /**
    * \brief Add forwarding entry in FIB

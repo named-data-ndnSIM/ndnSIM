@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: 
+ * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu> 
  */
 
 #ifndef CCNX_STACK_HELPER_H
@@ -26,11 +27,12 @@
 #include "ns3/object-factory.h"
 
 #include "ccnx-trace-helper.h"
+#include "ns3/ccnx-forwarding-helper.h"
+#include "ns3/ccnx.h"
 
 namespace ns3 {
 
 class Node;
-class CcnxForwardingHelper;
 class CcnxFaceContainer;
 
 /**
@@ -58,11 +60,14 @@ class CcnxStackHelper : public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
 {
 public:
   /**
-   * \brief Create a new CcnxStackHelper with empty forwarding by default.
-   *
-   * \todo set non-empty default forwarding
+   * \brief Create a new CcnxStackHelper with a default NDN_FLOODING forwarding stategy
    */
-  CcnxStackHelper ();
+  CcnxStackHelper();
+  
+  /**
+   * \brief Create a new CcnxStackHelper with a specified forwarding strategy
+   */
+  CcnxStackHelper (Ccnx::ForwardingStrategy);
 
   /**
    * \brief Destroy the CcnxStackHelper
@@ -82,7 +87,7 @@ public:
    * a single ns3::Ccnx object through its ns3::Ccnx::SetforwardingProtocol.
    */
   void
-  SetForwardingHelper (const CcnxForwardingHelper &forwarding);
+  SetForwardingStrategy (Ccnx::ForwardingStrategy strategy);
 
   /**
    * \brief Install CCNx stack on the node
@@ -148,6 +153,8 @@ public:
   AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
 
 private:
+   CcnxForwardingHelper m_forwardingHelper;
+    
   /**
    * @brief Enable pcap output the indicated Ccnx and interface pair.
    * @internal
