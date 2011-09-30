@@ -171,8 +171,8 @@ CcnxConsumer::SendPacket ()
     packet->AddHeader (interestHeader);
         
     m_face->ReceiveFromApplication (packet);
-
-    m_sendEvent = Simulator::Schedule (Seconds(m_offTime), &CcnxConsumer::SendPacket, this);
+    NS_LOG_INFO("time = " << m_offTime);
+    m_sendEvent = Simulator::Schedule (m_offTime, &CcnxConsumer::SendPacket, this);
 }
     
 // void
