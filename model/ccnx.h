@@ -76,6 +76,13 @@ class i_mru {};
 class Ccnx : public Object
 {
 public:
+    enum ForwardingStrategy
+    { 
+        NDN_FLOODING = 1,
+        NDN_BESTROUTE = 2,
+        NDN_RANKING = 3 
+    };
+    
   /**
    * \brief Interface ID
    *
