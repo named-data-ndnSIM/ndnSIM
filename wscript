@@ -54,7 +54,11 @@ def build(bld):
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
-    # if True or bld.env['ENABLE_EXAMPLES']:
+    if True or bld.env['ENABLE_EXAMPLES']:
+        obj = bld.create_ns3_program('ccnx-test',
+                                 ['NDNabstraction', 'internet'])
+        obj.source = 'examples/ccnx-test.cc'
+
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
     #         if not anode or not anode.is_child_of(bld.srcnode):
