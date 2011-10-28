@@ -45,7 +45,9 @@ CcnxFloodingStrategy::CcnxFloodingStrategy ()
     
     
 bool
-CcnxFloodingStrategy::PropagateInterest  (const Ptr<CcnxFace> &incomingFace,
+CcnxFloodingStrategy::PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry, 
+                                          CcnxFibEntryContainer::type::iterator fibEntry,
+                                          const Ptr<CcnxFace> &incomingFace,
                                           Ptr<CcnxInterestHeader> &header,
                                           const Ptr<const Packet> &packet,
                                           SendCallback ucb)
@@ -53,19 +55,33 @@ CcnxFloodingStrategy::PropagateInterest  (const Ptr<CcnxFace> &incomingFace,
     //CcnxFibEntryContainer::type::iterator fibEntryArray = GetFib()->LongestPrefixMatch(*header);
     NS_LOG_FUNCTION(this);
     
-    CcnxFibEntryContainer::type::iterator fibEntryArray = GetCcnx()->GetObject<CcnxFib>()->LongestPrefixMatch(*header);
-    NS_LOG_INFO(*fibEntryArray);
+    //CcnxFibEntryContainer::type::iterator fibEntryArray = GetCcnx()->GetObject<CcnxFib>()->LongestPrefixMatch(*header);
+    NS_LOG_INFO(*fibEntry);
     
     int count = 0;
-    for(CcnxFibFaceMetricContainer::type::iterator face = fibEntryArray->m_faces.begin ();
-        face != fibEntryArray->m_faces.end ();
+    for(CcnxFibFaceMetricContainer::type::iterator face = fibEntry->m_faces.begin ();
+        face != fibEntry->m_faces.end ();
         face++)
     {
         if(face->m_face == incomingFace)
             continue;
+        NS_LOG_INFO ("JUST before try add outgoing");
+        //Add new outgoing interest to pit entry
+		// If PIT entry cannot be created (limit reached or interest already sent), nothing will be forwarded
+		//if( _pit.add(VALUE(info.pe), PitOutgoingInterest( *iface, getSimTime(_node), pkt->nonce )) )
+		//{
+        //GetPit()->Add(*header,fibEntry,face->m_face);
+        //GetPit()->modify (GetPit()->end (), CcnxPitEntry::AddOutgoing(face->m_face));
+        bool tryResult = GetPit ()->TryAddOutgoing (pitEntry, face->m_face);
+        if ( tryResult == false )
+        {NS_LOG_INFO("false");
+            continue;
+        }
+        else
+            NS_LOG_INFO("true");
         
         NS_LOG_INFO("count="<<count);
-        ucb (face->m_face,  header, packet->Copy());
+        ucb (face->m_face, header, packet->Copy());
         count++;
     }
     

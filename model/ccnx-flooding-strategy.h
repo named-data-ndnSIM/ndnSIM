@@ -49,7 +49,9 @@ public:
         
     CcnxFloodingStrategy ();
           
-    bool PropagateInterest  (const Ptr<CcnxFace> &incomingFace,
+    bool PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry,
+                             CcnxFibEntryContainer::type::iterator fibEntry,
+                             const Ptr<CcnxFace> &incomingFace,
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet,
                              SendCallback ucb);
