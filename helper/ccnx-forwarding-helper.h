@@ -26,6 +26,7 @@
 #include "ns3/output-stream-wrapper.h"
 #include "ns3/ccnx.h"
 #include "ns3/ccnx-flooding-strategy.h"
+#include "ns3/ccnx-pit.h"
 
 namespace ns3 {
 
@@ -58,9 +59,9 @@ public:
   ~CcnxForwardingHelper ();
 
   /*
-   * \brief creates a specified ForwardingStrategy object and binds it to Ccnx
+   * \brief creates a specified ForwardingStrategy object and binds it to Pit
    */
-  void SetForwarding(Ptr<Ccnx> ccnx) const;
+  void SetForwarding(Ptr<Ccnx> ccnx, Ptr<CcnxPit> pit) const;
     
   /**
    * \brief prints the forwarding tables of all nodes at a particular time.

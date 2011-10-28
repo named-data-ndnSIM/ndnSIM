@@ -42,12 +42,13 @@ CcnxForwardingHelper::~CcnxForwardingHelper ()
 }
 
 void 
-CcnxForwardingHelper::SetForwarding(Ptr<Ccnx> ccnx) const
+CcnxForwardingHelper::SetForwarding(Ptr<Ccnx> ccnx, Ptr<CcnxPit> pit) const
 {
     if(m_strategy == Ccnx::NDN_FLOODING)
     {
         Ptr<CcnxFloodingStrategy> ccnxForwarding = CreateObject<CcnxFloodingStrategy> ();
-        ccnxForwarding->SetCcnx(ccnx);
+        //ccnxForwarding->SetCcnx(ccnx);
+        ccnxForwarding->SetPit(pit);
         ccnx->SetForwardingStrategy (ccnxForwarding);
     }
     else if(m_strategy == Ccnx::NDN_BESTROUTE)
