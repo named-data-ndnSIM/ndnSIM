@@ -28,6 +28,7 @@
 #include "ns3/net-device.h"
 #include "ns3/traced-callback.h"
 
+#include "ns3/ccnx-producer-helper.h"
 #include "ccnx-content-store.h"
 #include "ccnx-rit.h"
 #include "ccnx-pit.h"
@@ -46,7 +47,8 @@ class CcnxForwardingStrategy;
 class Header;
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
-  
+
+    
 /**
  * \ingroup ccnx
  * \brief Actual implementation of the Ccnx network layer
@@ -92,6 +94,7 @@ public:
     NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest
     NDN_SUPPRESSED_INTEREST, ///< \brief Suppressed Interest
     NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject (duplicate?)
+    NDN_PIT_TIMER_EXPIRED,
     INTERFACE_DOWN,          ///< \brief Interface is down
 
     DROP_CONGESTION, /**< Congestion detected */
@@ -142,6 +145,7 @@ public:
   virtual void
   RemoveFace (Ptr<CcnxFace> face);
   
+  Ptr<CcnxPit> GetPit();
 protected:
   /**
    * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload

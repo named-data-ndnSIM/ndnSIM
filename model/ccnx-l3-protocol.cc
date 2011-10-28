@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "ccnx-l3-protocol.h"
@@ -265,60 +266,329 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  const Ptr<const Packet> &packet)
 {
   NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
-  m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> (), incomingFace);
 
+  // Lookup of Pit and Fib entries for this Interest 
+  CcnxFibEntryContainer::type::iterator fibEntry;
+  CcnxPitEntryContainer::type::iterator pitEntry = m_pit->Lookup (*header, fibEntry);  
+    
+  // No matter is it duplicate or not, if it is a NACK message, remove all possible incoming
+  // entries for this interface (NACK means that neighbor gave up trying and there is no
+  // point of sending data in this direction)
+  if ((header->IsNack()) && (pitEntry != m_pit->end ()))
+    {
+      //m_pit->erase (pitEntry);
+        m_pit->modify(pitEntry, CcnxPitEntry::DeleteIncoming(incomingFace));
+    }
+    
+    
   if (m_rit->WasRecentlySatisfied (*header))
     {
+      // duplicate interests (same nonce) from applications are just ignored
+      if (incomingFace->IsLocal() == true) 
+          return;
+        
+      // Update metric status for the incoming interface in the corresponding FIB entry
+      if (fibEntry != m_fib->end())
+        m_fib->modify (m_fib->iterator_to (pitEntry->m_fibEntry),
+                       CcnxFibEntry::UpdateStatus(incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+      
+      //Trace duplicate interest  
       m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST,
-                               m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+                               m_node->GetObject<Ccnx> (), incomingFace);
+        
+      bool isMine = false;
+      TypeId tid = TypeId ("ns3::CcnxProducer");
+      for(uint32_t i=0; i<m_node->GetNApplications();i++)
+        {
+            Ptr<Application> app = m_node->GetApplication(i);
+            if(app->GetTypeId() == tid)
+              {
+                if((DynamicCast<CcnxProducer>(app))->GetPrefix () == header->GetName ())
+                {
+                    isMine = true;
+                    break;
+                }
+              }
+        }
+    
+      Ptr<Packet> contentObject = m_contentStore->Lookup (header);
+      if ((isMine == true) || (contentObject != NULL))
+        {
+            //never respond with NACK to NACK
+            if(header->IsNack () )
+                return;
+            
+            // always return a duplicate packet
+            header->SetNack(true);
+            //Trace duplicate interest  
+            m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST,
+                                     m_node->GetObject<Ccnx> (), incomingFace);
+
+            SendInterest(incomingFace, header, packet->Copy());
+			
+			return;
+        }  
+           
+        
+      // check PIT.  or there is no outgoing entry for this interface,
+      // silently drop the duplicate packet
+        
+      // If no entry found, silently drop
+      if( pitEntry == m_pit->end() ) 
+        return;
+        
+      // If PIT entry timed out, silently drop
+      if( pitEntry->m_timerExpired == true ) 
+        return;
+        
       // loop?
-      return;
+        
+      // Check if there is no outgoing entry for the interface or different nonce
+      // (i.e., got a duplicate packet, but we haven't sent interest to this
+      // interface)
+      //
+      // This case means that there is a loop in the network.
+      // So, prune this link, but do not remove PIT entry
+        
+      // Alex, check this condition!!
+      if(pitEntry->m_outgoing.size () == 0)
+        {
+            //never respond with NACK to NACK
+            if(header->IsNack () )
+                return;
+            
+            // always return a duplicate packet
+            header->SetNack(true);
+            //Trace duplicate interest  
+            m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST,
+                                     m_node->GetObject<Ccnx> (), incomingFace);
+
+            SendInterest(incomingFace, header, packet->Copy());
+            return;
+        }
+      
+        
+        // At this point:
+		// - there is a non-expired PIT entry,
+		// - there is an outgoing interest to the interface, and
+		// - a nonce in outgoing entry is equal to a nonce in the received duplicate packet
+        
+		// Should perform:
+		// Cleaning outgoing entry
+		// If there are no outgoing interests and available interfaces left (pe->availableInterfaces),
+		// prune all incoming interests, otherwise allow forwarding of the interest
+		if( header->IsNack () )
+		{
+			if( header->IsCongested () == false )
+                m_pit->LeakBucket(incomingFace,1);
+            
+            m_pit->modify(pitEntry, CcnxPitEntry::DeleteOutgoing(incomingFace));
+        }
+		else
+		{
+			//poit->waitingInVain = true;
+		}
+
+        
+        // prune all incoming interests
+        if((pitEntry->m_outgoing.size() ==0) && (pitEntry->m_fibEntry.m_faces.size() == 0))
+        {
+            BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry->m_incoming)
+            {
+                if(face.m_face->IsLocal() == false)
+                {
+                  // check all entries if the name of RIT entry matches the name of interest
+                  for (CcnxRitByNonce::type::iterator it = m_rit->begin(); it != m_rit->end(); it++)
+                  {
+                    if (it->m_prefix == pitEntry->GetPrefix() )
+                      {
+                        
+                        header->SetNonce(it->m_nonce);
+                        header->SetNack(true);
+                        SendInterest(face.m_face, header, packet->Copy());
+                        break;
+                      }
+                  }
+                }
+             }
+            
+            // Finally, remote the PIT entry
+            m_pit->erase (pitEntry);
+            
+            return; // stop processing
+        }
+        
+      if(pitEntry->m_fibEntry.m_faces.size() == 0)  
+        return;
     }
+    
+  // Otherwise,
+  // propagate the interest
+  //
+  // method `propagateInterest' can/should try different interface
+  // from `availableInterfaces' list
+    
   m_rit->SetRecentlySatisfied (*header); 
 
+  NS_LOG_INFO("Cache Lookup for " << header->GetName());
   Ptr<Packet> contentObject = m_contentStore->Lookup (header);
-  if (contentObject != 0)
+  if (contentObject != NULL)
     {
+      NS_LOG_INFO("Found in cache");
+        
       TransmittedDataTrace (contentObject, CACHED,
-                            m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+                            m_node->GetObject<Ccnx> (), incomingFace);
       incomingFace->Send (contentObject);
       return;
     }
   
-  CcnxPitEntry pitEntry = m_pit->Lookup (*header);
+  // Data is not in cache
 
-  CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
-  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
+  CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry->m_incoming.find (incomingFace);
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry->m_outgoing.find (incomingFace);
+    
+  if ((pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false))
+    {
+        //CcnxFibFaceMetricContainer::type m_faces;
+        //pitEntry->m_fibEntry->m_faces
+        
+        // If we're expecting data from the interface we got the interest from ("producer" asks us for "his own" data)
+        // Give up this interface, but keep a small hope when the returned packet doesn't have PRUNE status
+        if( inFace->m_face == outFace->m_face )
+        {
+            if( header->IsCongested() == true )
+            {
+                m_pit->LeakBucket(incomingFace, 1);
+                m_pit->modify (pitEntry, CcnxPitEntry::DeleteOutgoing(outFace->m_face));
+            }
+            //else
+            //    poit->waitingInVain = true;
+            
+            // Update metric status for the incoming interface in the corresponding FIB entry
+            if(fibEntry != m_fib->end())
+                m_fib->modify(m_fib->iterator_to (pitEntry->m_fibEntry),
+                              CcnxFibEntry::UpdateStatus(incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+        }
+    }
+
+    
+  if((pitEntry->m_outgoing.size() == 0) && (pitEntry->m_fibEntry.m_faces.size() == 0))
+      // prune all incoming interests
+    {
+        
+        for(CcnxPitEntryContainer::type::iterator iter = m_pit->begin();
+            iter != m_pit->end(); 
+            iter++)
+        {
+            /*for(CcnxPitEntryIncomingFaceContainer::type::iterator face = iter->m_incoming.begin();
+                face != iter->m_incoming.end();
+                face++)*/
+            BOOST_FOREACH (const CcnxPitEntryIncomingFace face, iter->m_incoming)
+            {
+              if(face.m_face->IsLocal() == true)
+                {
+                    //returnInterestToApp( pkt, -piit->interfaceIndex );
+                    //continue;
+                }
+                
+                // check all entries if the name of RIT entry matches the name of interest
+                for (CcnxRitByNonce::type::iterator it = m_rit->begin(); it != m_rit->end(); it++)
+              {
+                if (it->m_prefix == iter->GetPrefix() )
+                  {
+                    header->SetNonce(it->m_nonce);
+                    header->SetNack(true);
+                    SendInterest(face.m_face, header, packet->Copy());
+                  }
+              }
+            }
+
+        }
+            
+        m_pit->erase(pitEntry);
+        
+        return; // there is nothing else to do
+    }
+
+    // Suppress this interest only if we're still expecting data from some other interface
+    if( pitEntry->m_outgoing.size() > 0 ) 
+    {
+        return; //ok. Now we can suppress this interest
+    }
+    
+    
+    // Prune and delete PIT entry if there are no available interfaces to propagate interest
+    if( pitEntry->m_fibEntry.m_faces.size() == 0)
+    {
+        //if no match is found in the FIB, drop packet
+        //printf( "Node %d: cannot process Interest packet %s (no interfaces left)\n", _node->nodeId, pkt->contentName );
+		
+        if(incomingFace->IsLocal() == false)
+        {
+            header->SetNack(true);
+            m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
+                                     m_node->GetObject<Ccnx> (), incomingFace);
+            SendInterest(incomingFace, header, packet->Copy());
+        }
+        
+        m_pit->erase(pitEntry);
+        
+    }
+
+    
+    
+    // otherwise, try one of the available interfaces
+    
+  // suppress interest if 
+  /*if (pitEntry->m_incoming.size () != 0 && // not a new PIT entry and
+      inFace != pitEntry->m_incoming.end ()) // existing entry, but interest received via different face
+    {
+      m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
+                                m_node->GetObject<Ccnx> (), incomingFace);
+      return;
+    }*/
+    
+    
+    //just in case of bug
+    header->SetNack(false);
+    header->SetCongested(false);
   
-  // // suppress interest if 
-  // if (pitEntry.m_incoming.size () != 0 && // not a new PIT entry and
-  //     inFace != pitEntry.m_incoming.end ()) // existing entry, but interest received via different face
-  //   {
-  //     m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST,
-  //                              m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
-  //     return;
-  //   }
+      NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
 
-  NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
-
-  /*bool propagated = */m_forwardingStrategy->
-    PropagateInterest (incomingFace, header, packet,
+      m_pit->modify (pitEntry, CcnxPitEntry::AddIncoming(incomingFace));
+    
+      bool propagated = m_forwardingStrategy->
+        PropagateInterest (pitEntry, fibEntry,incomingFace, header, packet,
                        MakeCallback (&CcnxL3Protocol::SendInterest, this)
                        );
 
-  // // If interest wasn't propagated further (probably, a limit is reached),
-  // // prune and delete PIT entry if there are no outstanding interests.
-  // // Stop processing otherwise.
-  // if( !propagated && pitEntry.numberOfPromisingInterests()==0 )
-  //   {
-  //     //		printf( "Node %d. Pruning after unsuccessful try to forward an interest\n", _node->nodeId );
-
-  //     BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry.m_incoming)
-  //       {
-  //         // send prune
-  //       }
-  //     m_pit->erase (m_pit->iterator_to (pitEntry));
-  //   }
+      // If interest wasn't propagated further (probably, a limit is reached),
+      // prune and delete PIT entry if there are no outstanding interests.
+      // Stop processing otherwise.
+      if( (!propagated) && (pitEntry->m_outgoing.size() == 0))
+        {
+          BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry->m_incoming)
+            {
+                
+                
+                header->SetNack(true);
+                header->SetCongested(true);
+                SendInterest (face.m_face, header, packet->Copy());
+                
+                m_droppedInterestsTrace (header, DROP_CONGESTION,
+                                         m_node->GetObject<Ccnx> (), incomingFace);
+            }
+      
+          m_pit->erase (pitEntry);
+        }
+    /*}
+  else
+    {
+      m_droppedInterestsTrace (header, NDN_PIT_TIMER_EXPIRED,
+                                 m_node->GetObject<Ccnx> (), incomingFace);
+      return;
+    }*/
 }
 
 // Processing ContentObjects
@@ -327,7 +597,7 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                              Ptr<Packet> &payload,
                              const Ptr<const Packet> &packet)
 {
-  
+    
   NS_LOG_LOGIC ("Receiving contentObject from " << &incomingFace);
   m_receivedDataTrace (header, payload, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
 
@@ -343,6 +613,7 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                      CcnxFibEntry::UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
       // Add or update entry in the content store
+      NS_LOG_INFO("Cached " << header->GetName());
       m_contentStore->Add (header, payload);
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator
@@ -435,4 +706,9 @@ CcnxL3Protocol::SendContentObject (const Ptr<CcnxFace> &face,
     }
 }
 
+Ptr<CcnxPit>
+CcnxL3Protocol::GetPit()
+{
+    return m_pit;
+}
 } //namespace ns3
