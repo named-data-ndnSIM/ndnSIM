@@ -132,6 +132,12 @@ CcnxFace::SetDown (void)
 }
 
 bool
+CcnxFace::IsLocal() const
+{
+    return m_isLocal;
+}
+
+bool
 CcnxFace::operator== (const CcnxFace &face) const
 {
   NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (), "Faces of different nodes should not be compared to each other");

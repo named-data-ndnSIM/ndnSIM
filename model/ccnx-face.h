@@ -136,6 +136,11 @@ public:
    */
   virtual bool IsDown () const;
 
+  /**
+   * \brief Return true for LocalFace, otherwise false
+   */
+  virtual bool IsLocal () const;
+  
   virtual std::ostream&
   Print (std::ostream &os) const;
 
@@ -186,10 +191,11 @@ protected:
   // uint16_t m_metric; ///< \brief Routing/forwarding metric
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
-
+  bool m_isLocal;
 private:
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
   uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
+  
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);
