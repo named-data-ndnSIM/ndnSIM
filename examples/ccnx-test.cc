@@ -50,6 +50,11 @@ main (int argc, char *argv[])
   ApplicationContainer app = helper.Install ("1");
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.05));
+    
+  CcnxProducerHelper helper2 ("/3",120);
+  ApplicationContainer app2 = helper2.Install("3");
+  app2.Start(Seconds(0.0));
+  app2.Stop(Seconds(15.0));
   
   /**
    * \brief Add forwarding entry in FIB
