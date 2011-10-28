@@ -201,6 +201,18 @@ public:
 
   uint32_t
   GetNonce () const;
+    
+  void
+  SetNack (bool isNack);
+    
+  bool
+  IsNack () const;
+    
+  void
+  SetCongested (bool IsCongested);
+    
+  bool
+  IsCongested () const;
 
   //////////////////////////////////////////////////////////////////
   
@@ -221,6 +233,8 @@ private:
   int8_t m_scope;            ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
   Time  m_interestLifetime;
   uint32_t m_nonce; ///< Nonce. not used if zero
+  bool m_nack; ///< is Negative ACK
+  bool m_congested; ///< NACK because of congestion 
 };
 
 class CcnxInterestHeaderException {};
