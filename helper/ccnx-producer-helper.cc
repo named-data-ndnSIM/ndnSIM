@@ -25,10 +25,15 @@ NS_LOG_COMPONENT_DEFINE ("CcnxProducerHelper");
 namespace ns3 
 {
     
-CcnxProducerHelper::CcnxProducerHelper (uint32_t storeCapacity)
+CcnxProducerHelper::CcnxProducerHelper (const std::string &prefix, uint32_t virtualPayloadSize)
 {
     m_factory.SetTypeId ("ns3::CcnxProducer");
-    m_factory.Set ("Capacity", UintegerValue (storeCapacity));
+    
+    CcnxNameComponentsValue prefixValue;
+    prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+    m_factory.Set ("Prefix", prefixValue);
+    
+    m_factory.Set ("PayloadSize", UintegerValue (virtualPayloadSize));
 }
     
 void 
@@ -43,7 +48,7 @@ CcnxProducerHelper::Install (Ptr<Node> node)
     NS_LOG_FUNCTION(this);
     return ApplicationContainer (InstallPriv (node));
 }
-    
+
 ApplicationContainer
 CcnxProducerHelper::Install (std::string nodeName)
 {
@@ -74,7 +79,10 @@ Ptr<Application>
 CcnxProducerHelper::InstallPriv (Ptr<Node> node)
 {
     NS_LOG_INFO ("InstallPriv started");
-    Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
+    Ptr<CcnxProducer> app = m_factory.Create<CcnxProducer> ();        
+    node->AddApplication (app);
+
+    /*Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
     localFace->SetNode(node);
         
     //CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
@@ -100,7 +108,7 @@ CcnxProducerHelper::InstallPriv (Ptr<Node> node)
     localFace->RegisterProtocolHandler (MakeCallback (&CcnxProducer::HandlePacket, app));
     localFace->SetUp();
         
-    node->AddApplication (app);
+    node->AddApplication (app);*/
         
     return app;
 }

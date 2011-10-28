@@ -54,7 +54,7 @@ public:
 * Create an CcnxProducerHelper to make it easier to work with CcnxProducer applications
 *
 */
-CcnxProducerHelper (uint32_t storeCapacity);
+CcnxProducerHelper (const std::string &prefix, uint32_t virtualPayloadSize);
         
 /**
 * Helper function used to set the underlying application attributes.
