@@ -104,8 +104,8 @@ CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> heade
   static CcnxContentObjectTail tail; ///< \internal for optimization purposes
 
   m_packet = packet->Copy ();
-  m_packet->RemoveHeader (*header);
-  m_packet->RemoveTrailer (tail);
+  //m_packet->RemoveHeader (*header);//causes bug
+  //m_packet->RemoveTrailer (tail);
 }
 
 Ptr<Packet>
