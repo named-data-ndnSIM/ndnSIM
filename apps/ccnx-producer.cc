@@ -34,44 +34,18 @@ CcnxProducer::GetTypeId (void)
     static TypeId tid = TypeId ("ns3::CcnxProducer")
     .SetParent<Application> ()
     .AddConstructor<CcnxProducer> ()
-    // Alex: this is incorrect. SetNode call is not called if face is created using this accessor
-    // .AddAttribute ("Face","Local face to be used",
-    //                 PointerValue (CreateObject<CcnxLocalFace> ()),
-    //                 MakePointerAccessor (&CcnxProducer::m_face),
-    //                 MakePointerChecker<CcnxLocalFace> ())
-    .AddAttribute ("Ccnx","Ccnx is needed to access ContentStore",
-                   PointerValue (NULL),
-                   MakePointerAccessor (&CcnxProducer::m_ccnx),
-                   MakePointerChecker<Ccnx> ())
-
-        /*.AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
-                       PointerValue (CreateObject<CcnxNameComponents> ()),
-                       MakePointerAccessor (&CcnxConsumer::m_interestName),
-                       MakePointerChecker<CcnxNameComponents> ())
-        .AddAttribute ("LifeTime", "LifeTime fo interest packet",
-                       TimeValue (Seconds (4.0)),
-                       MakeTimeAccessor (&CcnxConsumer::m_interestLifeTime),
-                       MakeTimeChecker ())
-        .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",
-                       IntegerValue(-1),
-                       MakeIntegerAccessor(&CcnxConsumer::m_minSuffixComponents),
-                       MakeIntegerChecker<int32_t>())
-        .AddAttribute ("MaxSuffixComponents", "MaxSuffixComponents",
-                       IntegerValue(-1),
-                       MakeIntegerAccessor(&CcnxConsumer::m_maxSuffixComponents),
-                       MakeIntegerChecker<int32_t>())
-        .AddAttribute ("ChildSelector", "ChildSelector",
-                       BooleanValue(false),
-                       MakeBooleanAccessor(&CcnxConsumer::m_childSelector),
-                       MakeBooleanChecker())
-        .AddAttribute ("Exclude", "only simple name matching is supported (use CcnxNameComponents)",
-                       PointerValue (CreateObject<CcnxNameComponents> ()),
-                       MakePointerAccessor (&CcnxConsumer::m_exclude),
-                       MakePointerChecker<CcnxNameComponents> ())*/
-    .AddAttribute ("Capacity", "Capacity of the ContentStore",
+    /*.AddAttribute ("Capacity", "Capacity of the ContentStore",
                     UintegerValue(100),
                     MakeUintegerAccessor(&CcnxProducer::m_storeCapacity),
-                    MakeUintegerChecker<uint32_t>())
+                    MakeUintegerChecker<uint32_t>())*/
+    .AddAttribute ("Prefix","Prefix, for which producer has the data",
+                   CcnxNameComponentsValue (),
+                   MakeCcnxNameComponentsAccessor (&CcnxProducer::m_prefix),
+                   MakeCcnxNameComponentsChecker ())
+    .AddAttribute ("PayloadSize", "Virtual payload size for Content packets",
+                   UintegerValue(100),
+                   MakeUintegerAccessor(&CcnxProducer::m_virtualPayloadSize),
+                   MakeUintegerChecker<uint32_t>())
     .AddTraceSource ("InterestTrace", "Interests that were received",
                     MakeTraceSourceAccessor (&CcnxProducer::m_interestsTrace))
     .AddTraceSource ("ContentObjectTrace", "ContentObjects that were sent",
@@ -104,15 +78,58 @@ void
 CcnxProducer::StartApplication () // Called at time specified by Start
 {
     NS_LOG_FUNCTION_NOARGS ();
-//    ScheduleNextTx();
+    
+    NS_ASSERT_MSG (m_face == 0, "Face should not exist");
+    m_face = Create<CcnxLocalFace> ();
+    
+    // step 1. Set up forwarding from face to application
+    m_face->SetNode (GetNode ());
+    m_face->SetInterestHandler (MakeCallback (&CcnxProducer::OnInterest, this));
+    
+    // step 2. Set up forwarding to and from ccnx
+    NS_ASSERT_MSG (GetNode ()->GetObject<Ccnx> () !=0,
+                   "Ccnx stack should be installed on the node " << GetNode ());
+    GetNode ()->GetObject<Ccnx> ()->AddFace (m_face);
+    //Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
+    GetNode ()->GetObject<Ccnx> ()->GetObject<CcnxFib> ()->Add(m_prefix, m_face, 0);
+    // step 3. Enable face
+    m_face->SetUp ();
 }
     
 void 
 CcnxProducer::StopApplication () // Called at time specified by Stop
 {
     NS_LOG_FUNCTION_NOARGS ();
+}
+    
+void
+CcnxProducer::OnInterest(const Ptr<const CcnxInterestHeader> &interest)
+{
+    NS_LOG_FUNCTION (this);
+    
+    
+    
+    //Ptr<Packet> data = Lookup (interest);
+    
+    
+    
+    Ptr<Packet> incomingPacket = Create<Packet>(m_virtualPayloadSize);
+    incomingPacket->AddHeader (*interest);
+    m_interestsTrace(m_face,incomingPacket);
+    
+   
+
+    static CcnxContentObjectTail tail; ///< \internal for optimization purposes
+    Ptr<Packet> outgoingPacket = Create<Packet> (m_virtualPayloadSize);
+    Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader>();
+    header->SetName(Create<CcnxNameComponents>(interest->GetName()));
+    outgoingPacket->AddHeader(*header);
+    outgoingPacket->AddTrailer (tail);
+    
+    m_contentObjectsTrace(m_face,outgoingPacket);
         
-    CancelEvents ();
+    m_face->ReceiveFromApplication(outgoingPacket);
+   
 }
     
 void 
@@ -122,48 +139,26 @@ CcnxProducer::CancelEvents ()
         
     // Simulator::Cancel (m_sendEvent);
 }
-    
-/*void 
-CcnxProducer::ScheduleNextTx ()
+  
+CcnxNameComponents
+CcnxProducer::GetPrefix() const
 {
-        NS_LOG_FUNCTION_NOARGS ();
-        
-        Time nextTime = Seconds(m_offTime);
-        m_sendEvent = Simulator::Schedule (nextTime, &CcnxConsumer::SendPacket, this);
-    }
-    */
+  return m_prefix;
+}
     
-/*void
-CcnxConsumer::SendPacket ()
-    {
-        NS_LOG_FUNCTION_NOARGS ();
-        NS_LOG_INFO ("Sending Interest at " << Simulator::Now ());
-        
-        uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
-        CcnxInterestHeader interestHeader;
-        interestHeader.SetNonce(randomNonce);
-        interestHeader.SetName(m_interestName);
-        interestHeader.SetInterestLifetime(m_interestLifeTime);
-        interestHeader.SetChildSelector(m_childSelector);
-        interestHeader.SetExclude(m_exclude);
-        interestHeader.SetMaxSuffixComponents(m_maxSuffixComponents);
-        interestHeader.SetMinSuffixComponents(m_minSuffixComponents);
-        
-        Ptr<Packet> packet = Create<Packet> ();
-        packet->AddHeader (interestHeader);
-        
-        m_face->Receive(packet);
-        
-        ScheduleNextTx();
-    }*/
-    
-uint32_t
+/*uint32_t
 CcnxProducer::GetStoreCapacity()
 {
-    return m_storeCapacity;
+  return m_storeCapacity;
 }
     
 void
+CcnxProducer::SetStoreCapacity(uint32_t capacity)
+{
+  m_storeCapacity = capacity;
+}
+  */  
+/*void
 CcnxProducer::HandlePacket(const Ptr<CcnxFace> &face, const Ptr<const Packet> &packet)
 {
     uint8_t type[2];
@@ -182,11 +177,41 @@ CcnxProducer::HandlePacket(const Ptr<CcnxFace> &face, const Ptr<const Packet> &p
     {
         m_contentObjectsTrace(face,packet);
     }
-}
+}*/
+    
+/*Ptr<Packet>
+CcnxProducer::Lookup (Ptr<const CcnxInterestHeader> interest)
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  DataStoreContainer::type::iterator it = m_availableData.get<i_prefix> ().find (interest->GetName ());
+        
+  if (it != m_availableData.end ())
+  {
+    // return fully formed CCNx packet
+    return it->GetFullyFormedCcnxPacket ();
+  }
+    
+  return 0;
+}   
     
 void 
-CcnxProducer::AddContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxProducer::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
-    // m_ccnx->m_contentStore->Add (header, packet);
-}
+  NS_LOG_FUNCTION_NOARGS ();
+  DataStoreContainer::type::iterator it = m_availableData.get<i_prefix> ().find (header->GetName ());
+        
+  if (it == m_availableData.end ())
+  { // add entry to the top
+    m_availableData.get<i_mru> ().push_front (DataStoreEntry (header, packet));
+            
+    if (m_availableData.size () > m_storeCapacity)
+      m_availableData.get<i_mru> ().pop_back ();
+  }
+  else
+  {
+    // promote entry to the top
+    //m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
+      //                                             m_contentStore.project<i_mru> (it));
+  }
+}*/
 }
