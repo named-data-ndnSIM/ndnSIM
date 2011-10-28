@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu> 
  */
 
 /**
@@ -189,9 +190,11 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxFib> fib = CreateObject<CcnxFib> ();
   node->AggregateObject (fib);
 
-  Ptr<Ccnx> ccnx = CreateObject<CcnxL3Protocol> ();
+  Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
+  Ptr<CcnxPit> pit = ccnx->GetPit();
+    
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
@@ -199,11 +202,28 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
 
+      // Setup bucket filtering
+      // Assume that we know average data packet size, and this size is equal default size
+      // Set maximum buckets (averaging over 1 second)
+      Ptr<PointToPointNetDevice> device = node->GetDevice(index)->GetObject<PointToPointNetDevice> ();
+      DataRateValue dataRate;
+      device->GetAttribute ("DataRate", dataRate);
+      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () / 8 / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader)); 
+      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * dataRate.Get().GetBitRate () / 8 / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      
+    
       face->SetUp ();
       faces->Add (face);
     }
     
-    m_forwardingHelper.SetForwarding(ccnx);
+/*    
+    // Assume that we know average data packet size, and this size is equal default size
+    // Set maximum buckets (averaging over 1 second)
+    _pit.maxBucketsPerInterface[*it] = 0.1*_node->macData[*it]->bandwidth / 8 / (NDN_DEFAULT_DATA_SIZE+sizeof(NdnPacket));
+    _pit.leakSize[*it] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * _node->macData[*it]->bandwidth/8 / (NDN_DEFAULT_DATA_SIZE+sizeof(NdnPacket));
+
+  */  
+    m_forwardingHelper.SetForwarding (ccnx, pit);
   
     // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
   // ccnx->SetForwardingStrategy (ccnxForwarding);

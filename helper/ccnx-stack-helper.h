@@ -25,10 +25,12 @@
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
 #include "ns3/object-factory.h"
-
+#include "ns3/point-to-point-net-device.h"
 #include "ccnx-trace-helper.h"
 #include "ns3/ccnx-forwarding-helper.h"
 #include "ns3/ccnx.h"
+#include "ns3/data-rate.h"
+#include "ns3/ccnx-interest-header.h"
 
 namespace ns3 {
 
