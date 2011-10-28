@@ -275,15 +275,17 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // No matter is it duplicate or not, if it is a NACK message, remove all possible incoming
   // entries for this interface (NACK means that neighbor gave up trying and there is no
   // point of sending data in this direction)
+    NS_LOG_INFO("Before (header->IsNack()) && (pitEntry != m_pit->end ())");
   if ((header->IsNack()) && (pitEntry != m_pit->end ()))
     {
       //m_pit->erase (pitEntry);
         m_pit->modify(pitEntry, CcnxPitEntry::DeleteIncoming(incomingFace));
     }
     
-    
+    NS_LOG_INFO("Before WasRecentlySatisfied");
   if (m_rit->WasRecentlySatisfied (*header))
     {
+        NS_LOG_INFO("Entering WasRecentlySatisfied");
       // duplicate interests (same nonce) from applications are just ignored
       if (incomingFace->IsLocal() == true) 
           return;
@@ -429,6 +431,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // method `propagateInterest' can/should try different interface
   // from `availableInterfaces' list
     
+  NS_LOG_INFO("Before SetRecentlySatisfied");
   m_rit->SetRecentlySatisfied (*header); 
 
   NS_LOG_INFO("Cache Lookup for " << header->GetName());
@@ -444,21 +447,28 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
   
   // Data is not in cache
-
+  NS_LOG_INFO("Before inFace and OutFace");
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry->m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry->m_outgoing.find (incomingFace);
     
+     NS_LOG_INFO("Before (pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false)");
   if ((pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false))
     {
-        //CcnxFibFaceMetricContainer::type m_faces;
-        //pitEntry->m_fibEntry->m_faces
+        NS_LOG_INFO("Entering (pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false)");
+        
+        if(inFace->m_face == NULL)
+            NS_LOG_INFO("in face is null");
+        if(outFace->m_face == NULL)
+            NS_LOG_INFO("outface is null");
         
         // If we're expecting data from the interface we got the interest from ("producer" asks us for "his own" data)
         // Give up this interface, but keep a small hope when the returned packet doesn't have PRUNE status
-        if( inFace->m_face == outFace->m_face )
+        if( outFace != pitEntry->m_outgoing.end())
         {
+            NS_LOG_INFO("Entering outFace != pitEntry->m_outgoing.end()");
             if( header->IsCongested() == true )
             {
+                NS_LOG_INFO("Entering header->IsCongested() == true");
                 m_pit->LeakBucket(incomingFace, 1);
                 m_pit->modify (pitEntry, CcnxPitEntry::DeleteOutgoing(outFace->m_face));
             }
@@ -472,7 +482,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
         }
     }
 
-    
+  NS_LOG_INFO("Before (pitEntry->m_outgoing.size() == 0) && (pitEntry->m_fibEntry.m_faces.size() == 0)");
   if((pitEntry->m_outgoing.size() == 0) && (pitEntry->m_fibEntry.m_faces.size() == 0))
       // prune all incoming interests
     {
