@@ -56,22 +56,7 @@ CcnxRit::GetTypeId (void)
 
   return tid;
 }
-
-
-//////////////////////////////////////////////////////////////////////
-// Helper classes
-//////////////////////////////////////////////////////////////////////
-/**
- * \ingroup ccnx
- * \brief Typedef for nonce hash index of RIT container
- */
-struct CcnxRitByNonce
-{
-  typedef
-  CcnxRitContainer::type::index<nonce>::type
-  type;
-};
-
+    
 // /**
 //  * \ingroup ccnx
 //  * \brief Typedef for prefix hash index of RIT container
@@ -126,7 +111,7 @@ bool
 CcnxRit::WasRecentlySatisfied (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION_NOARGS ();
-  std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
+    std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
     entries = get<nonce> ().equal_range (header.GetNonce ());
   
   if (entries.first == end ())

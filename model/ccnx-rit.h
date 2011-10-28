@@ -104,6 +104,7 @@ struct CcnxRitContainer
     > type;
 };
 
+    
 
 /**
  * \ingroup ccnx
@@ -197,6 +198,20 @@ private:
   Time    m_ritTimeout; ///< \brief Configurable timeout of RIT entries
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent; ///< \brief Cleanup event
+};
+  
+//////////////////////////////////////////////////////////////////////
+// Helper classes
+//////////////////////////////////////////////////////////////////////
+/**
+ * \ingroup ccnx
+ * \brief Typedef for nonce hash index of RIT container
+ */
+struct CcnxRitByNonce
+{
+  typedef
+  CcnxRitContainer::type::index<__ccnx_private_rit::nonce>::type
+  type;
 };
 
 } // namespace ns3
