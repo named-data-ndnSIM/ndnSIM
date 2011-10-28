@@ -53,6 +53,7 @@ CcnxNetDeviceFace::CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice)
   NS_LOG_FUNCTION (this);
 
   m_netDevice = netDevice;
+  m_isLocal = false;
 }
 
 CcnxNetDeviceFace::~CcnxNetDeviceFace ()
@@ -62,6 +63,7 @@ CcnxNetDeviceFace::~CcnxNetDeviceFace ()
 
 CcnxNetDeviceFace::CcnxNetDeviceFace (const CcnxNetDeviceFace &)
 {
+    m_isLocal = false;
 }
 
 CcnxNetDeviceFace& CcnxNetDeviceFace::operator= (const CcnxNetDeviceFace &)
