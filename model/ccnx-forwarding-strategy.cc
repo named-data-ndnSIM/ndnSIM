@@ -42,15 +42,15 @@ CcnxForwardingStrategy::CcnxForwardingStrategy ()
 }
 
 void
-CcnxForwardingStrategy::SetCcnx(Ptr<Ccnx> ccnx)
+CcnxForwardingStrategy::SetPit(Ptr<CcnxPit> pit)
 {
-    m_ccnx = ccnx;
+    m_pit = pit;
 }
     
-Ptr<Ccnx>
-CcnxForwardingStrategy::GetCcnx()
+Ptr<CcnxPit>
+CcnxForwardingStrategy::GetPit()
 {
-    return m_ccnx;
+    return m_pit;
 }
     
 } //namespace ns3

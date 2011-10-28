@@ -27,6 +27,8 @@
 
 #include "ccnx.h"
 #include "ccnx-fib.h"
+#include "ccnx-pit.h"
+#include "ccnx-pit-entry.h"
 
 namespace ns3 {
 
@@ -44,20 +46,22 @@ public:
 
   CcnxForwardingStrategy ();
     
-  void SetCcnx(Ptr<Ccnx> ccnx);
+  void SetPit(Ptr<CcnxPit> pit);
     
   typedef
   Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>
   SendCallback;
 
-  virtual bool PropagateInterest  (const Ptr<CcnxFace> &incomingFace,
+  virtual bool PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry, 
+                                   CcnxFibEntryContainer::type::iterator fibEntry,
+                                   const Ptr<CcnxFace> &incomingFace,
                                    Ptr<CcnxInterestHeader> &header,
                                    const Ptr<const Packet> &packet,
                                    SendCallback ucb) = 0;
-  Ptr<Ccnx> GetCcnx();
+  Ptr<CcnxPit> GetPit();
     
 private:  
-  Ptr<Ccnx> m_ccnx;
+  Ptr<CcnxPit> m_pit;
 };
 
 } //namespace ns3
