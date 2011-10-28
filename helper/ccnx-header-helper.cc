@@ -40,6 +40,7 @@ CcnxHeaderHelper::GetCcnxHeaderType (Ptr<const Packet> packet)
 {
   uint8_t type[2];
   uint32_t read=packet->CopyData (type,2);
+
   if (read!=2) throw CcnxUnknownHeaderException();
 
   if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
