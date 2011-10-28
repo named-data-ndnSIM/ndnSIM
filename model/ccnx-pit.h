@@ -36,8 +36,9 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
-
+#include <map>
 #include <iostream>
+#include <algorithm>
 
 namespace ns3 {
 
@@ -90,8 +91,8 @@ struct CcnxPitEntryContainer
 // typedef std::map<int,int> PitCounter;
 // typedef std::map<int,int>::iterator PitCounterIterator;
 
-// typedef std::map<int,double> PitBucket;
-// typedef std::map<int,double>::iterator PitBucketIterator;
+ typedef std::map<int,double> PitBucket;
+ typedef std::map<int,double>::iterator PitBucketIterator;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,11 @@ public:
    */
   CcnxPit ();
 
+  /*CcnxPitEntryContainer::type::iterator
+  Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face);*/
+  
+  bool
+    TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face);
   /**
    * \brief Find corresponding PIT entry for the given content name
    * \param prefix Prefix for which to lookup the entry
@@ -130,8 +136,8 @@ public:
    * \param prefix Prefix for which to lookup the entry
    * \returns const reference to Pit entry. If record does not exist, it will be created
    */
-  const CcnxPitEntry&
-  Lookup (const CcnxInterestHeader &header);
+  CcnxPitEntryContainer::type::iterator
+  Lookup (const CcnxInterestHeader &header,CcnxFibEntryContainer::type::iterator &outFibEntry);
   
   // remove a PIT entry
   //void erase (const string &contentName);
@@ -142,11 +148,11 @@ public:
   //	// Check if there are any interfaces that we haven't sent data to yet
   //	bool areFreeInterfaces( PitEntry &pe, int interface );
 
-  // // Periodically generate pre-calculated number of tokens (leak buckets)
-  // void LeakBuckets( );
+  // Periodically generate pre-calculated number of tokens (leak buckets)
+  void LeakBuckets( );
 	
-  // // Selectively leak a bucket
-  // void LeakBucket (Ptr<CcnxFace> face, int amount);
+  // Selectively leak a bucket
+  void LeakBucket (Ptr<CcnxFace> face, int amount);
 	
   /**
    * \brief Set cleanup timeout
@@ -170,9 +176,9 @@ public:
   void SetFib (Ptr<CcnxFib> fib);
 
 public:
-  // PitBucket				 maxBucketsPerInterface; // maximum number of buckets. Automatically computed based on link capacity
+   PitBucket				 maxBucketsPerFace; // maximum number of buckets. Automatically computed based on link capacity
   // // averaging over 1 second (bandwidth * 1second)
-  // PitBucket				 leakSize;				 // size of a periodic bucket leak
+   PitBucket				 leakSize;				 // size of a periodic bucket leak
 	
 private:
   /** \brief Remove expired records from PIT */
@@ -185,7 +191,7 @@ private:
   EventId m_cleanupEvent;   ///< \brief Cleanup event
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
-  // PitBucket	m_bucketsPerInterface;	///< \brief pending interface counter per interface
+  PitBucket	m_bucketsPerFace;	///< \brief pending interface counter per face
 };
 
 ///////////////////////////////////////////////////////////////////////////////
