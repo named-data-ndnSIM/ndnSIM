@@ -154,10 +154,13 @@ CcnxConsumer::SendPacket ()
 {
     NS_LOG_FUNCTION_NOARGS ();
     NS_LOG_INFO ("Sending Interest at " << Simulator::Now ());
-        
-    uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
+    
+    UniformVariable rand(1, std::numeric_limits<uint32_t>::max ());
+    uint32_t randomNonce = rand.GetValue();
+    
     CcnxInterestHeader interestHeader;
     interestHeader.SetNonce(randomNonce);
+    
     interestHeader.SetName(Create<CcnxNameComponents> (m_interestName));
     interestHeader.SetInterestLifetime(m_interestLifeTime);
     interestHeader.SetChildSelector(m_childSelector);
@@ -171,6 +174,9 @@ CcnxConsumer::SendPacket ()
     packet->AddHeader (interestHeader);
         
     m_face->ReceiveFromApplication (packet);
+    
+    m_interestsTrace (m_face,packet);
+    
     NS_LOG_INFO("time = " << m_offTime);
     m_sendEvent = Simulator::Schedule (m_offTime, &CcnxConsumer::SendPacket, this);
 }
@@ -186,6 +192,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 {
   // do stuff
   NS_LOG_FUNCTION ("Received contentObject " << contentObject );
+    NS_LOG_INFO ("Preved!");
+  m_contentObjectsTrace (m_face,payload);
 }
 
 
