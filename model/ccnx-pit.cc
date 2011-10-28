@@ -115,6 +115,43 @@ CcnxPit::SetFib (Ptr<CcnxFib> fib)
   m_fib = fib;
 }
 
+/*CcnxPitEntryContainer::type::iterator
+CcnxPit::Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face)
+{
+    if( m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] )
+	{
+        //		printf( "DEBUG: bucket overflow. Should not forward anything to interface %d\n", interest.interfaceIndex );
+		return end();
+	}
+    
+    CcnxPitEntryContainer::type::iterator entry = insert (end (),
+                    CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
+                                *fibEntry));
+    return entry;
+}*/
+
+    
+    
+bool
+CcnxPit::TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face)
+{
+    NS_LOG_INFO ("Face has " << m_bucketsPerFace[face->GetId()] << " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
+    
+    if((face->IsLocal() == false) 
+       && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
+	{
+		return false;
+	}
+    
+    m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
+	
+    NS_LOG_INFO(this->size());
+    NS_LOG_INFO("before modify");
+    NS_LOG_INFO(pitEntry->GetPrefix());
+    modify (pitEntry, CcnxPitEntry::AddOutgoing(face));
+    NS_LOG_INFO("after modify");
+    return true;
+}
 
 const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
@@ -130,8 +167,8 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
   return *entry;
 }
 
-const CcnxPitEntry&
-CcnxPit::Lookup (const CcnxInterestHeader &header)
+CcnxPitEntryContainer::type::iterator
+CcnxPit::Lookup (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator &outFibEntry)
 {
   NS_LOG_FUNCTION_NOARGS ();
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
@@ -147,10 +184,33 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
     }
   
   if (entry == end ())
-    entry = insert (end (),
+  {
+      NS_LOG_INFO("entry == end");
+      NS_LOG_INFO(this->size());
+        entry = insert (end (),
                     CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
                                   *fibEntry));
-  return *entry;
+      NS_LOG_INFO(this->size());
+  }
+  outFibEntry = fibEntry;
+  return entry;
+}
+
+void 
+CcnxPit::LeakBuckets( )
+{
+    for( PitBucketIterator it=m_bucketsPerFace.begin(); 
+        it != m_bucketsPerFace.end();
+        it++ )
+    {
+        it->second = std::max( 0.0, it->second - leakSize[it->first] );
+    }
+}
+    
+void 
+CcnxPit::LeakBucket(Ptr<CcnxFace> face, int amount )
+{
+    m_bucketsPerFace[face->GetId()] = std::max( 0.0, m_bucketsPerFace[face->GetId()] - amount );
 }
 
 
