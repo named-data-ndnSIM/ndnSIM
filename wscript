@@ -55,9 +55,12 @@ def build(bld):
     tests.source = bld.path.ant_glob('test/*.cc');
 
     if True or bld.env['ENABLE_EXAMPLES']:
-        obj = bld.create_ns3_program('ccnx-test',
-                                 ['NDNabstraction', 'internet'])
+        obj = bld.create_ns3_program('ccnx-test', ['NDNabstraction', 'internet'])
         obj.source = 'examples/ccnx-test.cc'
+        
+        obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/ccnx-routing-simple.cc'
+        
 
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
