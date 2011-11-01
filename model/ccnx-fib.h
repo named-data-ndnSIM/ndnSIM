@@ -216,7 +216,7 @@ public:
    * \brief Find "best route" candidate, skipping `skip' first candidates (modulo # of faces)
    */
   Ptr<CcnxFace>
-  FindBestCandidate (int skip = 0);
+    FindBestCandidate (int skip = 0) const;
 	
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);

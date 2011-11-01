@@ -172,7 +172,7 @@ CcnxFibEntry::UpdateFaceRtt::operator() (CcnxFibEntry &entry)
 }
     
 Ptr<CcnxFace>
-CcnxFibEntry::FindBestCandidate (int skip/* = 0*/)
+CcnxFibEntry::FindBestCandidate (int skip/* = 0*/) const
 {
   skip = skip % m_faces.size();
   return m_faces.get<i_nth> () [skip].GetFace ();
@@ -231,6 +231,7 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
 
   return entry;
 }
+    
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {
