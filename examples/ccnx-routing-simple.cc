@@ -24,6 +24,7 @@
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/applications-module.h"
 
 using namespace ns3;
 
@@ -55,21 +56,28 @@ int main (int argc, char *argv[])
   InternetStackHelper stack;
 
   Ipv4GlobalRoutingHelper ipv4RoutingHelper;
-  // Ptr<Ipv4RoutingHelper> ipv4RoutingHelper = stack.GetRoutingHelper ();
   stack.SetRoutingHelper (ipv4RoutingHelper);
 
   PointToPointGridHelper grid (nNodes, nNodes, p2p);
   grid.InstallStack (stack);
-
-  // // Create router nodes, initialize routing database and set up the routing
-  // // tables in the nodes.
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   
   grid.AssignIpv4Addresses (
                             Ipv4AddressHelper("10.1.0.0", "255.255.255.0"),
                             Ipv4AddressHelper("10.2.0.0", "255.255.255.0")
                             );
 
+  // // Create router nodes, initialize routing database and set up the routing
+  // // tables in the nodes.
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+
+  // testing ip routing
+  UdpEchoClientHelper client (Ipv4Address ("10.2.1.1"), 1029);
+  client.SetAttribute ("MaxPackets", UintegerValue (1));
+  client.SetAttribute ("Interval", TimeValue (Seconds(1.0)));
+  client.SetAttribute ("PacketSize", UintegerValue (100));
+  client.Install (grid.GetNode (0,0));
+  // bla
+  
   // apps.Stop (Seconds(150.0));
 
   Simulator::ScheduleWithContext (grid.GetNode (0,0)->GetId (),
@@ -77,7 +85,8 @@ int main (int argc, char *argv[])
 
   // Trace routing tables 
   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("routes.log", std::ios::out);
-  ipv4RoutingHelper.PrintRoutingTableAllEvery (Seconds (10), routingStream);
+  *routingStream->GetStream () << "Node (1,1)\n";
+  ipv4RoutingHelper.PrintRoutingTableAt (Seconds (20), grid.GetNode (1,1), routingStream);
 
   Simulator::Stop (Seconds(160.0));
   Simulator::Run ();
