@@ -279,11 +279,16 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   if ((header->IsNack()) && (pitEntry != m_pit->end ()))
     {
       //m_pit->erase (pitEntry);
+        NS_LOG_INFO("TRUE");
         m_pit->modify(pitEntry, CcnxPitEntry::DeleteIncoming(incomingFace));
     }
     
     NS_LOG_INFO("Before WasRecentlySatisfied");
-  if (m_rit->WasRecentlySatisfied (*header))
+    if (m_rit->WasRecentlySatisfied (*header))
+    {
+        return;
+    }
+  /*if (m_rit->WasRecentlySatisfied (*header))
     {
         NS_LOG_INFO("Entering WasRecentlySatisfied");
       // duplicate interests (same nonce) from applications are just ignored
@@ -300,11 +305,12 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                m_node->GetObject<Ccnx> (), incomingFace);
         
       bool isMine = false;
-      TypeId tid = TypeId ("ns3::CcnxProducer");
+      //TypeId tid = TypeId ("ns3::CcnxProducer");
       for(uint32_t i=0; i<m_node->GetNApplications();i++)
         {
             Ptr<Application> app = m_node->GetApplication(i);
-            if(app->GetTypeId() == tid)
+            NS_LOG_INFO("ApplicationName = " << app->GetTypeId().GetName());
+            if(app->GetTypeId().GetName() == "ns3::CcnxProducer")
               {
                 if((DynamicCast<CcnxProducer>(app))->GetPrefix () == header->GetName ())
                 {
@@ -423,7 +429,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
         
       if(pitEntry->m_fibEntry.m_faces.size() == 0)  
         return;
-    }
+    }*/
     
   // Otherwise,
   // propagate the interest

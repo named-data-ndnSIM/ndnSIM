@@ -194,40 +194,38 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   node->AggregateObject (ccnx);
 
   Ptr<CcnxPit> pit = ccnx->GetPit();
-    
+    NS_LOG_INFO("NODE #"<<node->GetNDevices());
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
+        Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
+        if(device == 0)
+            continue;
+        
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
       face->SetNode (node);
       uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
-
       // Setup bucket filtering
       // Assume that we know average data packet size, and this size is equal default size
       // Set maximum buckets (averaging over 1 second)
-      Ptr<PointToPointNetDevice> device = node->GetDevice(index)->GetObject<PointToPointNetDevice> ();
+      
       DataRateValue dataRate;
       device->GetAttribute ("DataRate", dataRate);
-      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () / 8 / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader)); 
+      NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
+      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () / 8 /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
       pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * dataRate.Get().GetBitRate () / 8 / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
-      
-    
+      NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
+        
+        
+      if(face->IsLocal()==true)
+        NS_LOG_INFO("Face #" << face_id << " is turned on");
       face->SetUp ();
       faces->Add (face);
     }
     
-/*    
-    // Assume that we know average data packet size, and this size is equal default size
-    // Set maximum buckets (averaging over 1 second)
-    _pit.maxBucketsPerInterface[*it] = 0.1*_node->macData[*it]->bandwidth / 8 / (NDN_DEFAULT_DATA_SIZE+sizeof(NdnPacket));
-    _pit.leakSize[*it] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * _node->macData[*it]->bandwidth/8 / (NDN_DEFAULT_DATA_SIZE+sizeof(NdnPacket));
-
-  */  
-    m_forwardingHelper.SetForwarding (ccnx, pit);
+  m_forwardingHelper.SetForwarding (ccnx, pit);
   
-    // Ptr<CcnxForwardingStrategy> ccnxForwarding = m_forwarding->Create (node);
-  // ccnx->SetForwardingStrategy (ccnxForwarding);
-
   return faces;
 }
 
@@ -256,8 +254,25 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
   prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
   fib->Add (prefixValue.Get (), face, metric);
 }
-
-
+/*
+void
+CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
+{
+    NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
+    
+  NS_ASSERT_MSG (node != 0, "Node does not exist");
+        
+  Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
+  Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
+  Ptr<CcnxFace> face = ccnx->GetFace (faceId);
+  NS_ASSERT_MSG (node != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
+        
+  CcnxNameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+  fib->Add (prefixValue.Get (), face, metric);
+}
+*/
+    
 static void
 CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)
 {

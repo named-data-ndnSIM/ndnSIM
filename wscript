@@ -61,6 +61,8 @@ def build(bld):
         obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/ccnx-routing-simple.cc'
         
+        obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/ccnx-grid.cc'
 
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
