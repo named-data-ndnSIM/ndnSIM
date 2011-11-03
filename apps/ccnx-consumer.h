@@ -89,6 +89,8 @@ private:
   EventId         m_sendEvent;    // Eventid of pending "send packet" event
   TypeId          m_tid;
   Ptr<CcnxLocalFace> m_face;
+    
+  uint32_t m_seq;
 };
 
 } // namespace ns3

@@ -22,6 +22,7 @@
 #include "ns3/node-list.h"
 #include "ns3/simulator.h"
 #include "ns3/ccnx-forwarding-strategy.h"
+#include "ns3/ccnx-bestroute-strategy.h"
 #include "ccnx-forwarding-helper.h"
 
 namespace ns3 {
@@ -52,7 +53,12 @@ CcnxForwardingHelper::SetForwarding(Ptr<Ccnx> ccnx, Ptr<CcnxPit> pit) const
         ccnx->SetForwardingStrategy (ccnxForwarding);
     }
     else if(m_strategy == Ccnx::NDN_BESTROUTE)
-    {}
+    {
+        Ptr<CcnxBestRouteStrategy> ccnxForwarding = CreateObject<CcnxBestRouteStrategy> ();
+        //ccnxForwarding->SetCcnx(ccnx);
+        ccnxForwarding->SetPit(pit);
+        ccnx->SetForwardingStrategy (ccnxForwarding);
+    }
     else if (m_strategy == Ccnx::NDN_RANKING)
     {}
 }

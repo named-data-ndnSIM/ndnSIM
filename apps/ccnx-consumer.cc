@@ -39,7 +39,7 @@ CcnxConsumer::GetTypeId (void)
       .SetParent<Application> ()
       .AddConstructor<CcnxConsumer> ()
       .AddAttribute ("OffTime", "Time interval between packets",
-                     TimeValue (Seconds (0.1)),
+                     TimeValue (Seconds (0.001)),
                      MakeTimeAccessor (&CcnxConsumer::m_offTime),
                      MakeTimeChecker ())
       .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
@@ -80,6 +80,7 @@ CcnxConsumer::GetTypeId (void)
 }
     
 CcnxConsumer::CcnxConsumer ()
+    : m_seq (0)
 {
     NS_LOG_FUNCTION_NOARGS ();
 }
@@ -161,7 +162,12 @@ CcnxConsumer::SendPacket ()
     CcnxInterestHeader interestHeader;
     interestHeader.SetNonce(randomNonce);
     
-    interestHeader.SetName(Create<CcnxNameComponents> (m_interestName));
+    Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> (m_interestName);
+    std::ostringstream os;
+    os << m_seq++;
+    (*name) (os.str ());
+    
+    interestHeader.SetName (name);
     interestHeader.SetInterestLifetime(m_interestLifeTime);
     interestHeader.SetChildSelector(m_childSelector);
     interestHeader.SetExclude(Create<CcnxNameComponents> (m_exclude));

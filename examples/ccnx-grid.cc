@@ -28,6 +28,9 @@
 #include <iostream>
 #include <sstream>
 
+#include "ns3/visualizer-module.h"
+#include "ns3/ccnx.h"
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
@@ -35,9 +38,12 @@ NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
 int 
 main (int argc, char *argv[])
 {
+    GlobalValue::Bind ("SimulatorImplementationType", StringValue
+                       ("ns3::VisualSimulatorImpl"));
+    
     uint32_t n = 3;
     
-    Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("10Mbps"));
+    Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
     Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
     
     Packet::EnableChecking();
@@ -53,6 +59,7 @@ main (int argc, char *argv[])
     stack.SetRoutingHelper (ipv4RoutingHelper);
     
     PointToPointGridHelper grid (n, n, p2p);
+    grid.BoundingBox(100,100,200,200);
     grid.InstallStack (stack);
     
     // // Create router nodes, initialize routing database and set up the routing
@@ -81,19 +88,19 @@ main (int argc, char *argv[])
             NS_LOG_INFO("Eventual name is " << ss.str());
         }
     }
-    CcnxStackHelper ccnx;
+    CcnxStackHelper ccnx(Ccnx::NDN_BESTROUTE);
     Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
     NS_LOG_INFO ("Installing Applications");
     CcnxConsumerHelper helper ("/3");
-    ApplicationContainer app = helper.Install ("1");
+    ApplicationContainer app = helper.Install (grid.GetNode (0,0));
     app.Start (Seconds (1.0));
-    app.Stop (Seconds (10.05));
+    app.Stop (Seconds (1000.05));
     
     CcnxProducerHelper helper2 ("/3",120);
-    ApplicationContainer app2 = helper2.Install("9");
+    ApplicationContainer app2 = helper2.Install(grid.GetNode (2,2));
     app2.Start(Seconds(0.0));
-    app2.Stop(Seconds(15.0));
+    app2.Stop(Seconds(1500.0));
     
     /**
      * \brief Add forwarding entry in FIB
@@ -135,7 +142,7 @@ main (int argc, char *argv[])
     
     
     
-    Simulator::Stop (Seconds (20));
+    Simulator::Stop (Seconds (2000));
     
     NS_LOG_INFO ("Run Simulation.");
     Simulator::Run ();
