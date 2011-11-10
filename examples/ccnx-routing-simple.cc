@@ -55,10 +55,11 @@ int main (int argc, char *argv[])
   PointToPointHelper p2p;
   InternetStackHelper stack;
 
-  Ipv4GlobalRoutingHelper ipv4RoutingHelper;
+  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
   stack.SetRoutingHelper (ipv4RoutingHelper);
 
   PointToPointGridHelper grid (nNodes, nNodes, p2p);
+  grid.BoundingBox(100,100,270,270);
   grid.InstallStack (stack);
   
   grid.AssignIpv4Addresses (
@@ -66,9 +67,15 @@ int main (int argc, char *argv[])
                             Ipv4AddressHelper("10.2.0.0", "255.255.255.0")
                             );
 
+  for (uint32_t i=0; i<nNodes; i++)
+    for (uint32_t j=0; j<nNodes; j++)
+      grid.GetNode (i,j)->GetObject<GlobalRouter> ()->InjectRoute (Ipv4Address(grid.GetNode (i,j)->GetId ()),
+                                                                   Ipv4Mask("255.255.255.255"));
+
   // // Create router nodes, initialize routing database and set up the routing
   // // tables in the nodes.
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  // Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
 
   // testing ip routing
   UdpEchoClientHelper client (Ipv4Address ("10.2.1.1"), 1029);
@@ -77,6 +84,7 @@ int main (int argc, char *argv[])
   client.SetAttribute ("PacketSize", UintegerValue (100));
   client.Install (grid.GetNode (0,0));
   // bla
+
   
   // apps.Stop (Seconds(150.0));
 
