@@ -28,6 +28,10 @@
 
 #include <iomanip>
 
+#ifndef UINT32_MAX
+# define UINT32_MAX     (4294967295U)
+#endif
+
 NS_LOG_COMPONENT_DEFINE ("Ipv4GlobalRoutingUnorderedNexthops");
 
 namespace ns3 {
