@@ -5,6 +5,8 @@ import Logs
 import Utils
 import Options
 
+from waflib.Errors import WafError
+
 def options(opt):
     opt.tool_options('boost', tooldir=["waf-tools"])
 
