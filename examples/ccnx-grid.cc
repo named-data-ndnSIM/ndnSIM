@@ -28,7 +28,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "ns3/visualizer-module.h"
+// #include "ns3/visualizer-module.h"
 #include "ns3/ccnx.h"
 
 using namespace ns3;
@@ -38,8 +38,8 @@ NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
 int 
 main (int argc, char *argv[])
 {
-    GlobalValue::Bind ("SimulatorImplementationType", StringValue
-                       ("ns3::VisualSimulatorImpl"));
+    // GlobalValue::Bind ("SimulatorImplementationType", StringValue
+    //                    ("ns3::VisualSimulatorImpl"));
     
     uint32_t n = 3;
     

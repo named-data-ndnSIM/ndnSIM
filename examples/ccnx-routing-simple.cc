@@ -55,7 +55,8 @@ int main (int argc, char *argv[])
   PointToPointHelper p2p;
   InternetStackHelper stack;
 
-  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+  // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingUnorderedNexthops");
   stack.SetRoutingHelper (ipv4RoutingHelper);
 
   PointToPointGridHelper grid (nNodes, nNodes, p2p);
@@ -75,8 +76,9 @@ int main (int argc, char *argv[])
   // // Create router nodes, initialize routing database and set up the routing
   // // tables in the nodes.
   // Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-  Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
-
+  // Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
+  Ipv4GlobalRoutingHelper::PopulateRandomRoutingTables (5);
+  
   // testing ip routing
   UdpEchoClientHelper client (Ipv4Address ("10.2.1.1"), 1029);
   client.SetAttribute ("MaxPackets", UintegerValue (1));
