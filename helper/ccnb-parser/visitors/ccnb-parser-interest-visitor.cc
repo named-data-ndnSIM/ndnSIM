@@ -150,6 +150,25 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                                                                            nonceVisitor
                                                                            )));
       break;
+    
+            
+    case NDN_DTAG_Nack:
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
+            
+      interest.SetNack (
+              1 == boost::any_cast<uint32_t> (
+                      (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
+      break;
+            
+    case NDN_DTAG_Congested:
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
+            
+      interest.SetCongested (
+              1 == boost::any_cast<uint32_t> (
+                      (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
+      break;
     }
 }
 

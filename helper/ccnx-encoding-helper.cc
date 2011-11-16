@@ -88,6 +88,19 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
                                    reinterpret_cast<const uint8_t*>(&nonce),
                                    sizeof(nonce));
     }
+    
+  if (interest.IsNack ())
+    {
+      written += AppendBlockHeader (start, CcnbParser::NDN_DTAG_Nack, CcnbParser::CCN_DTAG);
+      written += AppendNumber (start, 1);
+      written += AppendCloser (start);
+    }
+  if (interest.IsCongested ())
+    {
+      written += AppendBlockHeader (start, CcnbParser::NDN_DTAG_Congested, CcnbParser::CCN_DTAG);
+      written += AppendNumber (start, 1);
+      written += AppendCloser (start);
+    }
   written += AppendCloser (start); // </Interest>
 
   return written;
