@@ -28,8 +28,13 @@ def configure(conf):
 
 
 def build(bld):
-    module = bld.create_ns3_module ('NDNabstraction', ['core', 'network', 'point-to-point',
-                                                       'topology-read','internet','applications','visualizer'])
+    deps = ['core', 'network', 'point-to-point',
+            'topology-read','internet','applications',
+            'point-to-point-layout']
+    if bld.env['ENABLE_PYTHON_BINDINGS']:
+        deps.append ('visualizer')
+
+    module = bld.create_ns3_module ('NDNabstraction', deps)
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
     tests = bld.create_ns3_module_test_library('NDNabstraction')
