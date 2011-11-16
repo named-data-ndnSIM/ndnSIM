@@ -27,7 +27,7 @@ def configure(conf):
 
 def build(bld):
     module = bld.create_ns3_module ('NDNabstraction', ['core', 'network', 'point-to-point',
-                                                       'topology-read','internet','applications'])
+                                                       'topology-read','internet','applications','visualizer'])
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
     tests = bld.create_ns3_module_test_library('NDNabstraction')
@@ -63,6 +63,12 @@ def build(bld):
         
         obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/ccnx-grid.cc'
+
+        obj = bld.create_ns3_program('syntactic-topology', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/syntactic-topology-ndnabstraction.cc'
+
+        obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/annotated-topology-read-example.cc'
 
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
