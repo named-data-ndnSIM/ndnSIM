@@ -284,6 +284,25 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   NS_LOG_LOGIC ("Receiving interest from " << &incomingFace);
   m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> (), incomingFace);
 
+    
+    if( header->IsNack () )
+    {
+        NS_LOG_INFO("============");
+        NS_LOG_INFO("NACK");
+        NS_LOG_INFO("==========");
+        /*if( header->IsCongested () == false )
+            m_pit->LeakBucket(incomingFace,1);
+        
+        
+        m_droppedInterestsTrace (header, DROP_CONGESTION,
+                                 m_node->GetObject<Ccnx> (), incomingFace);
+        
+        m_pit->modify(pitEntry, CcnxPitEntry::DeleteOutgoing(incomingFace));*/
+    }
+
+    
+    
+    
   // Lookup of Pit and Fib entries for this Interest 
   CcnxFibEntryContainer::type::iterator fibEntry;
   CcnxPitEntryContainer::type::iterator pitEntry = m_pit->Lookup (*header, fibEntry);  
@@ -300,19 +319,21 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
     
     NS_LOG_INFO("Before WasRecentlySatisfied");
-    if (m_rit->WasRecentlySatisfied (*header))
+    /*if (m_rit->WasRecentlySatisfied (*header))
     {
         return;
-    }
-  /*if (m_rit->WasRecentlySatisfied (*header))
+    }*/
+  if (m_rit->WasRecentlySatisfied (*header))
     {
+        NS_LOG_INFO("------------");
         NS_LOG_INFO("Entering WasRecentlySatisfied");
+        NS_LOG_INFO("------------");
       // duplicate interests (same nonce) from applications are just ignored
       if (incomingFace->IsLocal() == true) 
           return;
         
       // Update metric status for the incoming interface in the corresponding FIB entry
-      if (fibEntry != m_fib->end())
+      /*if (fibEntry != m_fib->end())
         m_fib->modify (m_fib->iterator_to (pitEntry->m_fibEntry),
                        CcnxFibEntry::UpdateStatus(incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
       
@@ -444,8 +465,11 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
         }
         
       if(pitEntry->m_fibEntry.m_faces.size() == 0)  
+        return;*/
         return;
-    }*/
+    }
+    
+    
     
   // Otherwise,
   // propagate the interest
@@ -482,10 +506,12 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
             NS_LOG_INFO("in face is null");
         if(outFace->m_face == NULL)
             NS_LOG_INFO("outface is null");
+        if(outFace == pitEntry->m_outgoing.end())
+            NS_LOG_INFO("OUTFACE = END");
         
         // If we're expecting data from the interface we got the interest from ("producer" asks us for "his own" data)
         // Give up this interface, but keep a small hope when the returned packet doesn't have PRUNE status
-        if( outFace != pitEntry->m_outgoing.end())
+        if(outFace != pitEntry->m_outgoing.end()) // this is correct
         {
             NS_LOG_INFO("Entering outFace != pitEntry->m_outgoing.end()");
             if( header->IsCongested() == true )
@@ -598,13 +624,13 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     // If interest wasn't propagated further (probably, a limit is reached),
     // prune and delete PIT entry if there are no outstanding interests.
     // Stop processing otherwise.
-    if( (!propagated) && (pitEntry->m_outgoing.size() == 0))
+    if( (!propagated) && (pitEntry->m_outgoing.size() == 0)) // this line works
       {
         BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry->m_incoming)
           {
             header->SetNack(true);
             header->SetCongested(true);
-              NS_LOG_INFO("Sending CONGESTION packet");
+            NS_LOG_INFO("Sending CONGESTION packet");
             SendInterest (face.m_face, header, packet->Copy());
                 
             m_droppedInterestsTrace (header, DROP_CONGESTION,
@@ -741,5 +767,13 @@ Ptr<CcnxPit>
 CcnxL3Protocol::GetPit()
 {
     return m_pit;
+}
+
+void
+CcnxL3Protocol::ScheduleLeakage()
+{
+    m_pit->LeakBuckets();
+    Time interval = MilliSeconds (NDN_INTEREST_RESET_PERIOD);
+    Simulator::Schedule (interval, &CcnxL3Protocol::ScheduleLeakage, this);
 }
 } //namespace ns3

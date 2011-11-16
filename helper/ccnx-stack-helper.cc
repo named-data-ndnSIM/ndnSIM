@@ -233,7 +233,9 @@ CcnxStackHelper::Install (Ptr<Node> node) const
     }
     
   m_forwardingHelper.SetForwarding (ccnx, pit);
-  
+
+  ccnx->ScheduleLeakage ();
+    
   return faces;
 }
 

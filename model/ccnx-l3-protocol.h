@@ -27,6 +27,8 @@
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
 #include "ns3/traced-callback.h"
+#include "ns3/nstime.h"
+#include "ns3/simulator.h"
 
 #include "ns3/ccnx-producer-helper.h"
 #include "ccnx-content-store.h"
@@ -149,6 +151,8 @@ public:
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
   
   Ptr<CcnxPit> GetPit();
+  
+  void ScheduleLeakage();
 protected:
   /**
    * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
