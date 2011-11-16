@@ -22,133 +22,108 @@
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/NDNabstraction-module.h"
-#include <ns3/point-to-point-grid.h>
+#include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
 
 #include <iostream>
 #include <sstream>
 
-// #include "ns3/visualizer-module.h"
-#include "ns3/ccnx.h"
-
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
 
+uint32_t nGrid = 3;
+
+void PrintTime ()
+{
+  NS_LOG_INFO (Simulator::Now ());
+
+  Simulator::Schedule (Seconds (10.0), PrintTime);
+}
+
 int 
 main (int argc, char *argv[])
 {
-    // GlobalValue::Bind ("SimulatorImplementationType", StringValue
-    //                    ("ns3::VisualSimulatorImpl"));
+  Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
+  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
     
-    uint32_t n = 3;
-    
-    Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
-    Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
-    
-    Packet::EnableChecking();
-    Packet::EnablePrinting();
-    CommandLine cmd;
-    cmd.Parse (argc, argv);
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
 
-    PointToPointHelper p2p;
-    InternetStackHelper stack;
+  CommandLine cmd;
+  cmd.AddValue ("nGrid", "Number of grid nodes", nGrid);
+  cmd.Parse (argc, argv);
+
+  PointToPointHelper p2p;
+
+  InternetStackHelper stack;
+  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+  stack.SetRoutingHelper (ipv4RoutingHelper);
     
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper;
-    // Ptr<Ipv4RoutingHelper> ipv4RoutingHelper = stack.GetRoutingHelper ();
-    stack.SetRoutingHelper (ipv4RoutingHelper);
+  PointToPointGridHelper grid (nGrid, nGrid, p2p);
+  grid.BoundingBox(100,100,200,200);
+
+  // Install CCNx stack
+  NS_LOG_INFO ("Installing CCNx stack");
+  CcnxStackHelper ccnxHelper(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
+  ccnxHelper.InstallAll ();
+
+  // Install IP stack (necessary to populate FIB)
+  NS_LOG_INFO ("Installing IP stack");
+  grid.InstallStack (stack);
+  grid.AssignIpv4Addresses (
+                            Ipv4AddressHelper("10.1.0.0", "255.255.255.0"),
+                            Ipv4AddressHelper("10.2.0.0", "255.255.255.0")
+                            );
+
+  Ptr<Node> producer = grid.GetNode (nGrid-1, nGrid-1);
+  NodeContainer consumerNodes;
+  consumerNodes.Add (grid.GetNode (0,0));
+  
+  // Populate FIB based on IPv4 global routing controller
+  ccnxHelper.InstallFakeGlobalRoutes ();
+  ccnxHelper.InstallRouteTo (producer);
+
+  NS_LOG_INFO ("Installing Applications");
+  std::ostringstream prefix;
+  prefix << "/" << producer->GetId ();
+  
+  CcnxConsumerHelper consumerHelper (prefix.str ());
+  ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
+  
+  consumers.Start (Seconds (0));
+  consumers.Stop (Seconds (2000));
     
-    PointToPointGridHelper grid (n, n, p2p);
-    grid.BoundingBox(100,100,200,200);
-    grid.InstallStack (stack);
-    
-    // // Create router nodes, initialize routing database and set up the routing
-    // // tables in the nodes.
-    Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-    
-    grid.AssignIpv4Addresses (
-                              Ipv4AddressHelper("10.1.0.0", "255.255.255.0"),
-                              Ipv4AddressHelper("10.2.0.0", "255.255.255.0")
-                              );
-    
-    NS_LOG_INFO ("Installing NDN stack");
-    NodeContainer c;
-    
-    for(uint32_t i=0; i<n; i++)
+  CcnxProducerHelper producerHelper (prefix.str (),120);
+  ApplicationContainer producers = producerHelper.Install (producer);
+  
+  producers.Start(Seconds(0.0));
+  producers.Stop(Seconds(2000.0));
+
+  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
+  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
     {
-        for(uint32_t j=0; j<n; j++)
-        {
-            NS_LOG_INFO ("Adding node i="<<i << " j=" << j);
-            c.Add(grid.GetNode(i,j));
-            
-            int nodeCount = i*n+j+1;
-            std::stringstream ss;
-            ss<<nodeCount;
-            Names::Add (ss.str(), c.Get (c.GetN()-1));
-            NS_LOG_INFO("Eventual name is " << ss.str());
-        }
+      *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
+
+      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
+      NS_ASSERT_MSG (fib != 0, "Fire alarm");
+      *routingStream->GetStream () << *fib << "\n\n";
     }
-    CcnxStackHelper ccnx(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
-    Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
-    NS_LOG_INFO ("Installing Applications");
-    CcnxConsumerHelper helper ("/3");
-    ApplicationContainer app = helper.Install (grid.GetNode (0,0));
-    app.Start (Seconds (1.0));
-    app.Stop (Seconds (1000.05));
+  Simulator::Schedule (Seconds (10.0), PrintTime);
+  
+  // NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
+  // NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
     
-    CcnxProducerHelper helper2 ("/3",120);
-    ApplicationContainer app2 = helper2.Install(grid.GetNode (2,2));
-    app2.Start(Seconds(0.0));
-    app2.Stop(Seconds(1500.0));
+  Simulator::Stop (Seconds (2000));
     
-    /**
-     * \brief Add forwarding entry in FIB
-     *
-     * \param node Node
-     * \param prefix Routing prefix
-     * \param face Face index
-     * \param metric Routing metric
-     */
+  NS_LOG_INFO ("Run Simulation.");
+  Simulator::Run ();
+  Simulator::Destroy ();
+  NS_LOG_INFO ("Done!");
     
-    //2x2 works
-    /*ccnx.AddRoute ("1", "/3", 0, 1);
-    ccnx.AddRoute ("1", "/3", 1, 1);
-    
-    ccnx.AddRoute ("2", "/3", 1, 1);
-    ccnx.AddRoute ("3", "/3", 1, 1);
-    */
-    
-    //3x3
-    
-    ccnx.AddRoute ("1", "/3", 0, 1);
-    ccnx.AddRoute ("1", "/3", 1, 1);
-    
-    ccnx.AddRoute ("2", "/3", 1, 1);
-    
-    ccnx.AddRoute ("3", "/3", 1, 1);
-    
-    ccnx.AddRoute ("4", "/3", 2, 1);
-    
-    ccnx.AddRoute ("6", "/3", 2, 1);
-    
-    ccnx.AddRoute ("7", "/3", 1, 1);
-    
-    ccnx.AddRoute ("8", "/3", 1, 1);
-    
-    
-    NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
-    NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
-    
-    
-    
-    Simulator::Stop (Seconds (2000));
-    
-    NS_LOG_INFO ("Run Simulation.");
-    Simulator::Run ();
-    Simulator::Destroy ();
-    NS_LOG_INFO ("Done!");
-    
-    return 0;
-
+  return 0;
 }
