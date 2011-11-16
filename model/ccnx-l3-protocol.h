@@ -144,6 +144,9 @@ public:
 
   virtual void
   RemoveFace (Ptr<CcnxFace> face);
+
+  virtual Ptr<CcnxFace>
+  GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
   
   Ptr<CcnxPit> GetPit();
 protected:

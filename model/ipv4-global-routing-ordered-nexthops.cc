@@ -108,8 +108,7 @@ Ipv4GlobalRoutingOrderedNexthops::AddRouteTo (Ipv4Address dest,
 Ptr<Ipv4Route>
 Ipv4GlobalRoutingOrderedNexthops::LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  NS_LOG_LOGIC ("Looking for route for destination " << dest);
+  NS_LOG_FUNCTION (this << dest << oif);
 
   Ipv4AddressTrieMap::const_iterator longest_prefix_map = m_routes.longest_prefix_match (dest);
   if (longest_prefix_map == m_routes.end ())
@@ -133,6 +132,21 @@ Ipv4GlobalRoutingOrderedNexthops::LookupGlobal (Ipv4Address dest, Ptr<NetDevice>
   rtentry->SetOutputDevice (m_ipv4->GetNetDevice (entry.GetInterface ()));
   return rtentry;
 }
+
+const Ptr<Ipv4GlobalRoutingOrderedNexthops::EntryContainer>
+Ipv4GlobalRoutingOrderedNexthops::Lookup (Ipv4Address dest)
+{
+  NS_LOG_FUNCTION (this << dest);
+  
+  Ipv4AddressTrieMap::const_iterator longest_prefix_map = m_routes.longest_prefix_match (dest);
+  if (longest_prefix_map == m_routes.end ())
+    {
+      return 0;
+    }
+
+  return longest_prefix_map->second;
+}
+
 
 void
 Ipv4GlobalRoutingOrderedNexthops::DeleteRoutes ()

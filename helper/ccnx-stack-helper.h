@@ -153,10 +153,46 @@ public:
    */
   void
   AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
-/*
+
+  /**
+   * \brief Add forwarding entry in FIB
+   *
+   * \param node   Node
+   * \param prefix Routing prefix
+   * \param face   Face
+   * \param metric Routing metric
+   */
   void
-  AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric);
-  */  
+  AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric);
+  
+
+  /**
+   * \brief Install fake IPv4 routes that could be used to find nexthops for CCNx routes
+   *
+   * This method adds fake routes to all nodes, where each route is /32 and IPv4 address equal to node number.
+   * For example, node 5 will have direct route to 0.0.0.5.
+   */
+  void
+  InstallFakeGlobalRoutes ();
+
+  /**
+   * \brief Installs CCNx route to `node` based on fake IPv4 routes
+   *
+   * Actual route is "/<nodeId>"
+   *
+   * \param node Pointer to a node, which should be reached from all other nodes
+   */
+  void
+  InstallRouteTo (Ptr<Node> node);
+
+  /**
+   * \brief Installs CCNx route to all nodes based on fake IPv4 routes
+   *
+   * \see InstallRouteTo
+   */
+  void
+  InstallRoutesToAll ();
+  
 private:
    CcnxForwardingHelper m_forwardingHelper;
     

@@ -38,6 +38,8 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
+#include "ccnx-net-device-face.h"
+
 #include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxL3Protocol");
@@ -179,6 +181,20 @@ CcnxL3Protocol::GetFace (uint32_t index) const
   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces) // this function is not supposed to be called often, so linear search is fine
     {
       if (face->GetId () == index)
+        return face;
+    }
+  return 0;
+}
+
+Ptr<CcnxFace>
+CcnxL3Protocol::GetFaceByNetDevice (Ptr<NetDevice> netDevice) const
+{
+  BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces) // this function is not supposed to be called often, so linear search is fine
+    {
+      Ptr<CcnxNetDeviceFace> netDeviceFace = DynamicCast<CcnxNetDeviceFace> (face);
+      if (netDeviceFace == 0) continue;
+
+      if (netDeviceFace->GetNetDevice () == netDevice)
         return face;
     }
   return 0;

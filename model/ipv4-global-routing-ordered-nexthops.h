@@ -47,7 +47,7 @@ namespace ns3 {
  */
 class Ipv4GlobalRoutingOrderedNexthops : public Ipv4GlobalRouting
 {
-private:
+public:
   class i_iface {};
   class i_metric {};
   class i_index {};
@@ -108,6 +108,9 @@ public:
                            uint32_t metric=0);
 
   virtual void DeleteRoutes ();
+
+  const Ptr<EntryContainer>
+  Lookup (Ipv4Address dest);
 
 protected:
   virtual Ptr<Ipv4Route> LookupGlobal (Ipv4Address dest, Ptr<NetDevice> oif = 0);

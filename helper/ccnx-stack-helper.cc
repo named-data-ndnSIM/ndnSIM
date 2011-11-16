@@ -70,6 +70,12 @@
 #include "ns3/ccnx-net-device-face.h"
 #include "ns3/ccnx-l3-protocol.h"
 #include "ns3/ccnx-fib.h"
+#include "ns3/node-list.h"
+#include "ns3/ipv4.h"
+#include "ns3/ipv4-routing-helper.h"
+#include "ns3/ipv4-global-routing-ordered-nexthops.h"
+#include "ns3/global-router-interface.h"
+#include "ns3/ipv4-global-routing-helper.h"
 
 #include "ccnx-face-container.h"
 #include "ccnx-stack-helper.h"
@@ -77,6 +83,7 @@
 
 #include <limits>
 #include <map>
+#include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxStackHelper");
 
@@ -238,21 +245,30 @@ CcnxStackHelper::Install (std::string nodeName) const
 
 
 void
+CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric)
+{
+  Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
+
+  CcnxNameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+  fib->Add (prefixValue.Get (), face, metric);
+}
+
+void
 CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
 {
   NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
   
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
-  
-  Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
-  Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
-  Ptr<CcnxFace> face = ccnx->GetFace (faceId);
-  NS_ASSERT_MSG (node != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
 
-  CcnxNameComponentsValue prefixValue;
-  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
-  fib->Add (prefixValue.Get (), face, metric);
+  Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
+  NS_ASSERT_MSG (ccnx != 0, "Ccnx stack should be installed on the node");
+
+  Ptr<CcnxFace> face = ccnx->GetFace (faceId);
+  NS_ASSERT_MSG (face != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
+
+  AddRoute (node, prefix, face, metric);
 }
 /*
 void
@@ -523,5 +539,90 @@ CcnxStackHelper::EnableAsciiCcnxInternal (
 
   g_faceStreamMapCcnx[std::make_pair (ccnx, face)] = stream;
 }
+
+void
+CcnxStackHelper::InstallFakeGlobalRoutes ()
+{
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node ++)
+    {
+      NS_ASSERT_MSG ((*node)->GetObject<Ipv4> () != 0,
+                     "InternetStack should be installed on all nodes");
+
+      NS_ASSERT_MSG (Ipv4RoutingHelper::GetRouting<Ipv4GlobalRoutingOrderedNexthops>
+                     (
+                      (*node)->GetObject<Ipv4> ()->GetRoutingProtocol ()
+                     ),
+                     "InternetStack should have Ipv4GlobalRoutingOrderedNexthops as routing protocol");
+      // Example:
+      //
+      // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingUnorderedNexthops");
+      // stack.SetRoutingHelper (ipv4RoutingHelper);
+      //
+      
+      Ptr<GlobalRouter> globalRouter = (*node)->GetObject<GlobalRouter> ();
+      if (globalRouter == 0) continue;
+
+      globalRouter->InjectRoute (Ipv4Address((*node)->GetId ()), Ipv4Mask("255.255.255.255"));
+    }
+
+  Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
+}
+
+void
+CcnxStackHelper::InstallRouteTo (Ptr<Node> destNode)
+{
+  std::ostringstream destPrefix;
+  destPrefix << "/" << destNode->GetId ();
+
+  Ipv4Address destIpv4 = Ipv4Address(destNode->GetId ());
+  
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node ++)
+    {
+      if (destNode == *node) continue;
+      
+      Ptr<Ccnx> ccnx = (*node)->GetObject<Ccnx> ();
+      NS_ASSERT_MSG (ccnx != 0, "CCNx stack should be installed on all nodes");
+
+      Ptr<Ipv4> ipv4 = (*node)->GetObject<Ipv4> ();
+      NS_ASSERT_MSG (ipv4 != 0,
+                     "InternetStack should be installed on all nodes");
+      
+      Ptr<Ipv4GlobalRoutingOrderedNexthops> routing =
+        Ipv4RoutingHelper::GetRouting<Ipv4GlobalRoutingOrderedNexthops> (ipv4->GetRoutingProtocol ());
+      NS_ASSERT_MSG (routing != 0, "Ipv4GlobalRoutingOrderedNexthops should be used in InternetStack");
+
+      Ptr<Ipv4GlobalRoutingOrderedNexthops::EntryContainer>
+        routes = routing->Lookup (destIpv4);
+
+      NS_ASSERT_MSG (routes != 0, "Should not happen... Call the developer");
+
+      BOOST_FOREACH (const Ipv4RoutingTableEntry &entry, *routes)
+        {
+          Ptr<NetDevice> netDevice = ipv4->GetNetDevice (entry.GetInterface ());
+          NS_ASSERT_MSG (netDevice != 0, "Should never happen. Call the popos");
+          
+          Ptr<CcnxFace> face = ccnx->GetFaceByNetDevice (netDevice);
+          NS_ASSERT_MSG (face != 0, "Definitely should never happen. Call the president");
+            
+          AddRoute (*node, destPrefix.str(), face, entry.GetMetric ());
+        }
+    }
+}
+
+void
+CcnxStackHelper::InstallRoutesToAll ()
+{
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node ++)
+    {
+      InstallRouteTo (*node);
+    }
+}
+
 
 } // namespace ns3

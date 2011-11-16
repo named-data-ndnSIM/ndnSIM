@@ -192,6 +192,12 @@ public:
    */
   virtual void
   RemoveFace (Ptr<CcnxFace> face) = 0;
+
+  /**
+   * Get face for NetDevice
+   */
+  virtual Ptr<CcnxFace>
+  GetFaceByNetDevice (Ptr<NetDevice> netDevice) const = 0;
 };
 
 } // namespace ns3 
