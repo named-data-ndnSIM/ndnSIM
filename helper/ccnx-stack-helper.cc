@@ -194,12 +194,13 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   node->AggregateObject (ccnx);
 
   Ptr<CcnxPit> pit = ccnx->GetPit();
-    NS_LOG_INFO("NODE #"<<node->GetNDevices());
+  NS_LOG_INFO("NODE->GetNDevices()="<<node->GetNDevices());
+    
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
-        Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
-        if(device == 0)
-            continue;
+      Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
+      if(device == 0)
+        continue;
         
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
       face->SetNode (node);
@@ -240,6 +241,7 @@ CcnxStackHelper::Install (std::string nodeName) const
 void
 CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
 {
+    NS_LOG_FUNCTION(this << nodeName << prefix << faceId << metric);
   NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
   
   Ptr<Node> node = Names::Find<Node> (nodeName);
@@ -248,30 +250,32 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
   Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
   Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
   Ptr<CcnxFace> face = ccnx->GetFace (faceId);
-  NS_ASSERT_MSG (node != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
+  NS_ASSERT_MSG (face != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
 
   CcnxNameComponentsValue prefixValue;
   prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
   fib->Add (prefixValue.Get (), face, metric);
 }
-/*
+
 void
 CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
 {
-    NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
+    NS_LOG_FUNCTION(this << node << prefix << faceId << metric);
+    NS_LOG_LOGIC ("[" << node->GetId () << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
     
   NS_ASSERT_MSG (node != 0, "Node does not exist");
         
   Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
   Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
   Ptr<CcnxFace> face = ccnx->GetFace (faceId);
-  NS_ASSERT_MSG (node != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
+  NS_ASSERT_MSG (face != NULL, "Face with ID [" << faceId << "] does not exist on node [" << node->GetId () << "]");
         
   CcnxNameComponentsValue prefixValue;
   prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+     NS_ASSERT_MSG (face != NULL, "Face with ID [" << faceId << "] does not exist on node [" << node->GetId () << "]");
   fib->Add (prefixValue.Get (), face, metric);
 }
-*/
+
     
 static void
 CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)

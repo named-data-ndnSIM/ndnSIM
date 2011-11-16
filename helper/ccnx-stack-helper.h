@@ -153,10 +153,10 @@ public:
    */
   void
   AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
-/*
+
   void
   AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric);
-  */  
+    
 private:
    CcnxForwardingHelper m_forwardingHelper;
     
