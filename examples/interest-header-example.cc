@@ -53,6 +53,9 @@ main (int argc, char *argv[])
 	UniformVariable random(1, std::numeric_limits<uint32_t>::max ());
     uint32_t randomNonce = static_cast<uint32_t> (random.GetValue());
     interestHeader.SetNonce(randomNonce);
+    
+    interestHeader.SetNack(true);
+    interestHeader.SetCongested(true);
 	NS_LOG_INFO ("Source: \n" << interestHeader);
     
 	packet.AddHeader (interestHeader);

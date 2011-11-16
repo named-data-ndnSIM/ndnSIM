@@ -234,6 +234,8 @@ CcnxInterestHeader::Print (std::ostream &os) const
   os << "<Interest>\n  <Name>" << GetName () << "</Name>\n";
   if (IsNack ())
     os << "  <NACK />\n";
+  if(IsCongested())
+    os << "  <CONGESTED />\n";
   if (GetMinSuffixComponents () >= 0)
     os << "  <MinSuffixComponents>" << GetMinSuffixComponents () << "</MinSuffixComponents>\n";
   if (GetMaxSuffixComponents () >= 0)
