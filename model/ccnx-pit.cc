@@ -137,13 +137,13 @@ CcnxPit::TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<Ccnx
 {
     NS_LOG_INFO ("Face has " << m_bucketsPerFace[face->GetId()] << " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
     
-    /*if((face->IsLocal() == false) 
+    if((face->IsLocal() == false) 
        && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
 	{
 		return false;
-	}*/
+	}
     
-    //m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
+    m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
 	
     NS_LOG_INFO(this->size());
     NS_LOG_INFO("before modify");

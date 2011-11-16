@@ -201,12 +201,13 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   node->AggregateObject (ccnx);
 
   Ptr<CcnxPit> pit = ccnx->GetPit();
-    NS_LOG_INFO("NODE #"<<node->GetNDevices());
+  NS_LOG_INFO("NODE->GetNDevices()="<<node->GetNDevices());
+    
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
-        Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
-        if(device == 0)
-            continue;
+      Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
+      if(device == 0)
+        continue;
         
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
       face->SetNode (node);
@@ -261,7 +262,7 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
   
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
-
+  
   Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
   NS_ASSERT_MSG (ccnx != 0, "Ccnx stack should be installed on the node");
 
@@ -288,7 +289,7 @@ CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, 
   fib->Add (prefixValue.Get (), face, metric);
 }
 */
-    
+
 static void
 CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)
 {

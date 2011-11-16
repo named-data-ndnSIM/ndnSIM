@@ -586,34 +586,33 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     header->SetNack(false);
     header->SetCongested(false);
   
-      NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
+    NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
 
-      m_pit->modify (pitEntry, CcnxPitEntry::AddIncoming(incomingFace));
+    m_pit->modify (pitEntry, CcnxPitEntry::AddIncoming(incomingFace));
     
-      bool propagated = m_forwardingStrategy->
-        PropagateInterest (pitEntry, fibEntry,incomingFace, header, packet,
-                       MakeCallback (&CcnxL3Protocol::SendInterest, this)
-                       );
+    bool propagated = m_forwardingStrategy->
+                      PropagateInterest (pitEntry, fibEntry,incomingFace, header, packet,
+                                         MakeCallback (&CcnxL3Protocol::SendInterest, this)
+                                        );
 
-      // If interest wasn't propagated further (probably, a limit is reached),
-      // prune and delete PIT entry if there are no outstanding interests.
-      // Stop processing otherwise.
-      if( (!propagated) && (pitEntry->m_outgoing.size() == 0))
-        {
-          BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry->m_incoming)
-            {
+    // If interest wasn't propagated further (probably, a limit is reached),
+    // prune and delete PIT entry if there are no outstanding interests.
+    // Stop processing otherwise.
+    if( (!propagated) && (pitEntry->m_outgoing.size() == 0))
+      {
+        BOOST_FOREACH (const CcnxPitEntryIncomingFace face, pitEntry->m_incoming)
+          {
+            header->SetNack(true);
+            header->SetCongested(true);
+              NS_LOG_INFO("Sending CONGESTION packet");
+            SendInterest (face.m_face, header, packet->Copy());
                 
-                
-                header->SetNack(true);
-                header->SetCongested(true);
-                SendInterest (face.m_face, header, packet->Copy());
-                
-                m_droppedInterestsTrace (header, DROP_CONGESTION,
+            m_droppedInterestsTrace (header, DROP_CONGESTION,
                                          m_node->GetObject<Ccnx> (), incomingFace);
-            }
+          }
       
           m_pit->erase (pitEntry);
-        }
+      }
     /*}
   else
     {

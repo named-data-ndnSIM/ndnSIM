@@ -88,7 +88,7 @@ main (int argc, char *argv[])
             NS_LOG_INFO("Eventual name is " << ss.str());
         }
     }
-    CcnxStackHelper ccnx(Ccnx::NDN_BESTROUTE);
+    CcnxStackHelper ccnx(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
     Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
     NS_LOG_INFO ("Installing Applications");
@@ -147,7 +147,7 @@ main (int argc, char *argv[])
     NS_LOG_INFO ("Run Simulation.");
     Simulator::Run ();
     Simulator::Destroy ();
-    NS_LOG_INFO ("Done.");
+    NS_LOG_INFO ("Done!");
     
     return 0;
 
