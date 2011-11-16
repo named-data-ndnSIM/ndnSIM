@@ -211,7 +211,7 @@ CcnxInterestHeader::GetSerializedSize (void) const
 void
 CcnxInterestHeader::Serialize (Buffer::Iterator start) const
 {
-  size_t size = CcnxEncodingHelper::Serialize (start, *this);
+  size_t size __attribute__ ((__unused__)) = CcnxEncodingHelper::Serialize (start, *this);
   
   NS_LOG_INFO ("Serialize size = " << size);
 }
