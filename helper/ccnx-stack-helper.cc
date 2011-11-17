@@ -220,9 +220,9 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       DataRateValue dataRate;
       device->GetAttribute ("DataRate", dataRate);
       NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
-      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () / 8 /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
       NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
-      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * dataRate.Get().GetBitRate () / 8 / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
       NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
         
         
