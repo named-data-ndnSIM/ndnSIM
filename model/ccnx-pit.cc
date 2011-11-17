@@ -140,6 +140,7 @@ CcnxPit::TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<Ccnx
     if((face->IsLocal() == false) 
        && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
 	{
+        NS_LOG_INFO("********LIMIT**************");
 		return false;
 	}
     

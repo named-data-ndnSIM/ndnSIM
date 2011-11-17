@@ -59,8 +59,8 @@ CcnxBestRouteStrategy::PropagateInterest (CcnxPitEntryContainer::type::iterator 
                                           const Ptr<const Packet> &packet,
                                           SendCallback ucb)
 {
-  NS_LOG_FUNCTION(this);
-  NS_LOG_INFO(*fibEntry);
+  //NS_LOG_FUNCTION(this);
+  //NS_LOG_INFO(*fibEntry);
     
   Ptr<CcnxFace> bestFace = fibEntry->FindBestCandidate(0);
    
@@ -73,7 +73,21 @@ CcnxBestRouteStrategy::PropagateInterest (CcnxPitEntryContainer::type::iterator 
       bool tryResult = GetPit ()->TryAddOutgoing (pitEntry, bestFace);
       if (tryResult == false)
       {
-        return false;
+          NS_LOG_INFO("!!!!!!!!!!!!!Trying different face!!!!!!!!!!!!!!!!");
+          for(uint32_t i = 1; i<fibEntry->m_faces.size(); i++ )
+          {
+            bestFace = fibEntry->FindBestCandidate(i);
+            tryResult = GetPit ()->TryAddOutgoing (pitEntry, bestFace);
+            if(tryResult == true)
+              break;
+              NS_LOG_INFO("Trying different face");
+          }
+          
+          if(tryResult == false)
+          {
+              NS_LOG_INFO("FAILURE");
+              return false;
+          }
       }
           
       ucb (bestFace, header, packet->Copy());
