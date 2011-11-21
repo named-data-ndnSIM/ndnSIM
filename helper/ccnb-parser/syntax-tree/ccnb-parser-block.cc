@@ -28,6 +28,10 @@
 #include "ccnb-parser-dattr.h"
 #include "ccnb-parser-ext.h"
 
+#include "ns3/log.h"
+
+NS_LOG_COMPONENT_DEFINE ("CcnbParserBlock");
+
 namespace ns3 {
 namespace CcnbParser {
 
@@ -40,6 +44,8 @@ const uint8_t CCN_TT_HBIT = ((uint8_t)(1 << 7));
 
 Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
 {
+  NS_LOG_DEBUG (">");
+
   // std::cout << "<< pos: " << counter << "\n";
   uint32_t value = 0;
 
@@ -57,7 +63,7 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
   
   value <<= 4;
   value += ( (byte&(~CCN_TT_HBIT)) >> 3);
-
+  
   /**
    * Huh. After fighting with NS-3, it became apparent that Create<T>(...) construct
    * doesn't work with references.  Just simply doesn't work.  wtf?
@@ -81,6 +87,11 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
     default:
       throw CcnbDecodingException ();
     }
+}
+
+Block::~Block ()
+{
+  NS_LOG_DEBUG ("<");
 }
 
 }

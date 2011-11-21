@@ -44,7 +44,6 @@ TimestampVisitor::visit (Blob &n)
     }
   uint8_t combo = start[n.m_blobSize-2]; // 4 most significant bits hold 4 least significant bits of number of seconds
   seconds = (seconds << 4) | (combo >> 4);
-  std::cout << std::hex << (int) start[n.m_blobSize-2] << "\n";
 
   nanoseconds = combo & 0x0F; /*00001111*/ // 4 least significant bits hold 4 most significant bits of number of
   nanoseconds = (nanoseconds << 8) | start[n.m_blobSize-1];

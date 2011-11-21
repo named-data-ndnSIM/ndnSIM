@@ -40,6 +40,9 @@ public:
   std::list<Ptr<Block> > m_attrs;      ///< \brief List of attributes, associated with this tag
   std::list<Ptr<Block> > m_nestedTags; ///< \brief List of nested tags
 
+public:
+  virtual ~BaseTag () { }
+  
 protected:
   /**
    * \brief Default constructor

@@ -56,6 +56,8 @@ public:
    */
   static Ptr<Block>
   ParseBlock (Buffer::Iterator &start);
+
+  virtual ~Block ();
   
   virtual void accept( VoidNoArguVisitor &v )               = 0;
   virtual void accept( VoidVisitor &v, boost::any param )   = 0;

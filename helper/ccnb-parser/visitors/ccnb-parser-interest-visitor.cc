@@ -34,6 +34,10 @@
 
 #include <boost/foreach.hpp>
 
+#include "ns3/log.h"
+
+NS_LOG_COMPONENT_DEFINE ("CcnbParserInterestVisitor");
+
 namespace ns3 {
 namespace CcnbParser {
 
@@ -50,10 +54,12 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
   static NonceVisitor              nonceVisitor;
   
   CcnxInterestHeader &interest = *(boost::any_cast<CcnxInterestHeader*> (param));
-  
+
   switch (n.m_dtag)
     {
     case CCN_DTAG_Interest:
+      NS_LOG_DEBUG ("Interest");
+  
       // process nested blocks
       BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
         {
@@ -62,6 +68,8 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
       break;
     case CCN_DTAG_Name:
       {
+        NS_LOG_DEBUG ("Name");
+
         // process name components
         Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
         
@@ -73,6 +81,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
         break;
       }
     case CCN_DTAG_MinSuffixComponents:
+      NS_LOG_DEBUG ("MinSuffixComponents");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
       interest.SetMinSuffixComponents (
@@ -82,6 +91,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                                                                            )));
       break;
     case CCN_DTAG_MaxSuffixComponents:
+      NS_LOG_DEBUG ("MaxSuffixComponents");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
       interest.SetMaxSuffixComponents (
@@ -92,6 +102,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
       break;
     case CCN_DTAG_Exclude:
       {
+        NS_LOG_DEBUG ("Exclude");
         // process exclude components
         Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
         
@@ -103,6 +114,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
         break;
       }
     case CCN_DTAG_ChildSelector:
+      NS_LOG_DEBUG ("ChildSelector");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
 
@@ -113,6 +125,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                                                                            )));
       break;
     case CCN_DTAG_AnswerOriginKind:
+      NS_LOG_DEBUG ("AnswerOriginKind");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
       interest.SetAnswerOriginKind (
@@ -122,6 +135,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                                                                            )));
       break;
     case CCN_DTAG_Scope: 
+      NS_LOG_DEBUG ("Scope");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
       interest.SetScope (
@@ -131,16 +145,18 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                                                                            )));
       break;
     case CCN_DTAG_InterestLifetime:
+      NS_LOG_DEBUG ("InterestLifetime");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
 
       interest.SetInterestLifetime (
                boost::any_cast<Time> (
-                                          (*n.m_nestedTags.begin())->accept(
-                                                                           timestampVisitor
-                                                                           )));
+                                      (*n.m_nestedTags.begin())->accept(
+                                                                        timestampVisitor
+                                                                        )));
       break;
     case CCN_DTAG_Nonce:
+      NS_LOG_DEBUG ("Nonce");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
 
@@ -153,6 +169,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
     
             
     case NDN_DTAG_Nack:
+      NS_LOG_DEBUG ("Nack");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
             
@@ -162,6 +179,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
       break;
             
     case NDN_DTAG_Congested:
+      NS_LOG_DEBUG ("Congested");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
             
