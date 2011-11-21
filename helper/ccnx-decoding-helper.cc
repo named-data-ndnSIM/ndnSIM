@@ -29,6 +29,10 @@
 
 #include "ns3/ccnb-parser-dtag.h"
 
+#include "ns3/log.h"
+
+NS_LOG_COMPONENT_DEFINE ("CcnxDecodingHelper");
+
 namespace ns3 {
 
 size_t
@@ -40,7 +44,8 @@ CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxInterestHeader &int
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
   root->accept (interestVisitor, &interest);
 
-  root = 0;
+  NS_LOG_DEBUG ("refs: " << root->GetReferenceCount ());
+  NS_LOG_DEBUG ("refs: " << DynamicCast<CcnbParser::BaseTag> (root)->m_nestedTags.front ()->GetReferenceCount ());
   
   return i.GetDistanceFrom (start);
 }
