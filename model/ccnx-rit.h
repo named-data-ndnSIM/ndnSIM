@@ -188,6 +188,11 @@ public:
    */
   Time GetCleanupTimeout () const;
 
+protected:
+  // inherited from Object class                                                                                                                                                        
+  virtual void NotifyNewAggregate ();
+  virtual void DoDispose ();
+
 private:
   /**
    * \brief Periodic even to clean up stalled entries

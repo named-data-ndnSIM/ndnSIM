@@ -133,10 +133,12 @@ CcnxL3Protocol::DoDispose (void)
   m_node = 0;
 
   // Force delete on objects
+  m_forwardingStrategy = 0; // there is a reference to PIT stored in here
   m_rit = 0;
   m_pit = 0;
   m_contentStore = 0;
-  
+  m_fib = 0;
+
   // m_forwardingStrategy = 0;
   Object::DoDispose ();
 }

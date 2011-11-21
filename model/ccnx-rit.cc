@@ -86,6 +86,20 @@ CcnxRit::~CcnxRit( )
 }
 
 void
+CcnxRit::NotifyNewAggregate ()
+{
+}
+
+void
+CcnxRit::DoDispose ()
+{
+  if (m_cleanupEvent.IsRunning ())
+    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events                                                                                                                     
+
+  clear ();
+}
+
+void
 CcnxRit::SetRitTimeout (const Time &timeout)
 {
   m_ritTimeout = timeout;

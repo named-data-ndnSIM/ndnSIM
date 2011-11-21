@@ -61,6 +61,20 @@ CcnxPit::~CcnxPit ()
   clear ();
 }
 
+void 
+CcnxPit::NotifyNewAggregate ()
+{
+}
+
+void 
+CcnxPit::DoDispose ()
+{
+  if (m_cleanupEvent.IsRunning ())
+    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
+
+  clear ();
+}
+
 void
 CcnxPit::SetCleanupTimeout (const Time &timeout)
 {

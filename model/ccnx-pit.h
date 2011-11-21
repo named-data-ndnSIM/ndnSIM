@@ -180,6 +180,11 @@ public:
    */
   void SetFib (Ptr<CcnxFib> fib);
 
+protected:
+  // inherited from Object class                                                                                                                                                        
+  virtual void NotifyNewAggregate ();
+  virtual void DoDispose ();
+
 public:
    PitBucket				 maxBucketsPerFace; // maximum number of buckets. Automatically computed based on link capacity
   // // averaging over 1 second (bandwidth * 1second)

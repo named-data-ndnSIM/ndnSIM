@@ -199,6 +199,7 @@ void
 CcnxFib::DoDispose (void)
 {
   m_node = 0;
+  clear ();
   Object::DoDispose ();
 }
 
