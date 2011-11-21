@@ -131,6 +131,12 @@ CcnxL3Protocol::DoDispose (void)
     }
   m_faces.clear ();
   m_node = 0;
+
+  // Force delete on objects
+  m_rit = 0;
+  m_pit = 0;
+  m_contentStore = 0;
+  
   // m_forwardingStrategy = 0;
   Object::DoDispose ();
 }
@@ -497,14 +503,14 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry->m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry->m_outgoing.find (incomingFace);
     
-     NS_LOG_INFO("Before (pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false)");
+  NS_LOG_INFO("Before (pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false)");
   if ((pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false))
     {
         NS_LOG_INFO("Entering (pitEntry != m_pit->end()) && (pitEntry->m_timerExpired == false)");
         
-        if(inFace->m_face == NULL)
+        if(inFace->m_face == 0)
             NS_LOG_INFO("in face is null");
-        if(outFace->m_face == NULL)
+        if(outFace->m_face == 0)
             NS_LOG_INFO("outface is null");
         if(outFace == pitEntry->m_outgoing.end())
             NS_LOG_INFO("OUTFACE = END");

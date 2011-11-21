@@ -40,6 +40,8 @@ CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxInterestHeader &int
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
   root->accept (interestVisitor, &interest);
 
+  root = 0;
+  
   return i.GetDistanceFrom (start);
 }
 

@@ -39,7 +39,7 @@ CcnxConsumer::GetTypeId (void)
       .SetParent<Application> ()
       .AddConstructor<CcnxConsumer> ()
       .AddAttribute ("OffTime", "Time interval between packets",
-                     TimeValue (Seconds (0.001)),
+                     TimeValue (Seconds (0.1)),
                      MakeTimeAccessor (&CcnxConsumer::m_offTime),
                      MakeTimeChecker ())
       .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
@@ -178,7 +178,8 @@ CcnxConsumer::SendPacket ()
 
     Ptr<Packet> packet = Create<Packet> ();
     packet->AddHeader (interestHeader);
-        
+
+    NS_LOG_INFO ("Packet: " << packet);
     m_face->ReceiveFromApplication (packet);
     
     m_interestsTrace (m_face,packet);

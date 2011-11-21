@@ -28,27 +28,9 @@ NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
 namespace ns3 {
 
-// NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
+NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
 
 using namespace __ccnx_private;
-
-// size_t
-// PitEntry::numberOfPromisingInterests(e_pi ) const
-// {
-//   size_t count = 0;
-
-//   BOOST_FOREACH (const CcnxPitOutgoingInterest &interest, m_outgoingInterests)
-//     {
-//     }
-//   for( PitOutgoingConstIterator i = outgoingInterests.begin();
-// 	   i!=outgoingInterests.end();
-// 	   i++ )
-// 	{
-// 	  if( !i->waitingInVain ) count++;
-// 	}
-
-//   return count;
-// }
 
 TypeId 
 CcnxPit::GetTypeId ()
@@ -69,6 +51,14 @@ CcnxPit::GetTypeId ()
 
 CcnxPit::CcnxPit ()
 {
+}
+
+CcnxPit::~CcnxPit ()
+{
+  if (m_cleanupEvent.IsRunning ())
+    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
+
+  clear ();
 }
 
 void

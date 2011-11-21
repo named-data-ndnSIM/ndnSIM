@@ -28,7 +28,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "ns3/visualizer-module.h"
 #include "ns3/ccnx.h"
 
 
@@ -39,9 +38,6 @@ NS_LOG_COMPONENT_DEFINE ("SyncTopologyNDNabstraction");
 int 
 main (int argc, char *argv[])
 {
-  GlobalValue::Bind ("SimulatorImplementationType", StringValue
-                       ("ns3::VisualSimulatorImpl"));
-    
   // Set up some default values for the simulation.  Use the 
   
   Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));

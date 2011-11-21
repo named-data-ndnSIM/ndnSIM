@@ -65,19 +65,19 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
   switch (byte & CCN_TT_MASK)
     {
     case CCN_BLOB:
-      return Ptr<Blob> (new Blob(start, value));
+      return Ptr<Blob> (new Blob(start, value), false);
     case CCN_UDATA:
-      return Ptr<Udata> (new Udata(start, value));
+      return Ptr<Udata> (new Udata(start, value), false);
     case CCN_TAG:
-      return Ptr<Tag> (new Tag(start, value));
+      return Ptr<Tag> (new Tag(start, value), false);
     case CCN_ATTR:
-      return Ptr<Attr> (new Attr(start, value));
+      return Ptr<Attr> (new Attr(start, value), false);
     case CCN_DTAG:
-      return Ptr<Dtag> (new Dtag(start, value));
+      return Ptr<Dtag> (new Dtag(start, value), false);
     case CCN_DATTR:
-      return Ptr<Dattr> (new Dattr(start, value));
+      return Ptr<Dattr> (new Dattr(start, value), false);
     case CCN_EXT:
-      return Ptr<Ext> (new Ext(start, value));
+      return Ptr<Ext> (new Ext(start, value), false);
     default:
       throw CcnbDecodingException ();
     }

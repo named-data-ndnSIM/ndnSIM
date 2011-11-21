@@ -117,6 +117,11 @@ public:
    */
   CcnxPit ();
 
+  /**
+   * \brief Destructor
+   */
+  virtual ~CcnxPit ();
+
   /*CcnxPitEntryContainer::type::iterator
   Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face);*/
   
@@ -191,7 +196,7 @@ private:
   EventId m_cleanupEvent;   ///< \brief Cleanup event
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
-  PitBucket	m_bucketsPerFace;	///< \brief pending interface counter per face
+  PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face
 };
 
 ///////////////////////////////////////////////////////////////////////////////

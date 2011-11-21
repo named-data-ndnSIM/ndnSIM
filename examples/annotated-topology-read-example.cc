@@ -30,7 +30,6 @@
 #include "ns3/ipv4-list-routing-helper.h"
 #include "ns3/annotated-topology-reader.h"
 #include <list>
-#include "ns3/visualizer-module.h"
 #include "ns3/ccnx.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/NDNabstraction-module.h"
@@ -42,8 +41,6 @@ NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyExample");
 
 int main (int argc, char *argv[])
 {
-    GlobalValue::Bind ("SimulatorImplementationType", StringValue
-                       ("ns3::VisualSimulatorImpl"));
     Packet::EnableChecking();
     Packet::EnablePrinting();
     string input ("/Users/iliamo/ns3-abstract-ndn/ns-3.11/src/NDNabstraction/examples/simpletopology.txt");

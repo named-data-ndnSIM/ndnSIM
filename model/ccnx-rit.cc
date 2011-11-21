@@ -75,7 +75,15 @@ CcnxRit::CcnxRit( )
 {
 }
 
-CcnxRit::~CcnxRit( ) { }
+CcnxRit::~CcnxRit( )
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  
+  if (m_cleanupEvent.IsRunning ())
+    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
+
+  clear ();
+}
 
 void
 CcnxRit::SetRitTimeout (const Time &timeout)
@@ -111,7 +119,7 @@ bool
 CcnxRit::WasRecentlySatisfied (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION_NOARGS ();
-    std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
+  std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
     entries = get<nonce> ().equal_range (header.GetNonce ());
   
   if (entries.first == end ())
