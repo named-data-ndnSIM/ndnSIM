@@ -94,6 +94,7 @@ public:
    * \return interface ID
    */
   static TypeId GetTypeId ();
+  virtual ~Ccnx ();
 
   /**
    * \brief Send an Interest packet to a specified face

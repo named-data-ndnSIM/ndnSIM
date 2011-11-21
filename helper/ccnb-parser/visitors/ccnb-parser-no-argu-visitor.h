@@ -44,6 +44,8 @@ public:
   virtual boost::any visit (Dtag& )=0; ///< \brief Method accepting DTAG block  
   virtual boost::any visit (Dattr&)=0; ///< \brief Method accepting DATTR block 
   virtual boost::any visit (Ext&  )=0; ///< \brief Method accepting EXT block
+
+  virtual ~NoArguVisitor () { }
 };
   
 }

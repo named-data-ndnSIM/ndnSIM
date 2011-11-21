@@ -44,6 +44,8 @@ public:
   virtual boost::any visit (Dtag&,  boost::any)=0; ///< \brief Method accepting DTAG block  
   virtual boost::any visit (Dattr&, boost::any)=0; ///< \brief Method accepting DATTR block 
   virtual boost::any visit (Ext&,   boost::any)=0; ///< \brief Method accepting EXT block
+
+  virtual ~Visitor () { }
 };                                                
                                                   
 }                                                 

@@ -45,19 +45,22 @@ public:
   static TypeId GetTypeId (void);
 
   CcnxForwardingStrategy ();
+  virtual ~CcnxForwardingStrategy ();
     
-  void SetPit(Ptr<CcnxPit> pit);
+  void
+  SetPit (Ptr<CcnxPit> pit);
     
   typedef
   Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>
   SendCallback;
 
-  virtual bool PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry, 
-                                   CcnxFibEntryContainer::type::iterator fibEntry,
-                                   const Ptr<CcnxFace> &incomingFace,
-                                   Ptr<CcnxInterestHeader> &header,
-                                   const Ptr<const Packet> &packet,
-                                   SendCallback ucb) = 0;
+  virtual bool
+  PropagateInterest (CcnxPitEntryContainer::type::iterator pitEntry, 
+                     CcnxFibEntryContainer::type::iterator fibEntry,
+                     const Ptr<CcnxFace> &incomingFace,
+                     Ptr<CcnxInterestHeader> &header,
+                     const Ptr<const Packet> &packet,
+                     SendCallback ucb) = 0;
   Ptr<CcnxPit> GetPit();
     
 private:  

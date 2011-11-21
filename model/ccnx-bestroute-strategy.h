@@ -45,16 +45,17 @@ class CcnxInterestHeader;
 class CcnxBestRouteStrategy : public CcnxForwardingStrategy
 {
 public:
-    static TypeId GetTypeId (void);
+  static TypeId GetTypeId (void);
         
-    CcnxBestRouteStrategy ();
+  CcnxBestRouteStrategy ();
         
-    bool PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry,
-                             CcnxFibEntryContainer::type::iterator fibEntry,
-                             const Ptr<CcnxFace> &incomingFace,
-                             Ptr<CcnxInterestHeader> &header,
-                             const Ptr<const Packet> &packet,
-                             SendCallback ucb);
+  virtual bool
+  PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry,
+                      CcnxFibEntryContainer::type::iterator fibEntry,
+                      const Ptr<CcnxFace> &incomingFace,
+                      Ptr<CcnxInterestHeader> &header,
+                      const Ptr<const Packet> &packet,
+                      SendCallback ucb);
 };
 
 } //namespace ns3

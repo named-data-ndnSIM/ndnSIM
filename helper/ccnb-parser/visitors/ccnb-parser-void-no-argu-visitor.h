@@ -43,6 +43,8 @@ public:
   virtual void visit (Dtag& )=0; ///< \brief Method accepting DTAG block
   virtual void visit (Dattr&)=0; ///< \brief Method accepting DATTR block
   virtual void visit (Ext&  )=0; ///< \brief Method accepting EXT block
+
+  virtual ~VoidNoArguVisitor () { }
 };
   
 }

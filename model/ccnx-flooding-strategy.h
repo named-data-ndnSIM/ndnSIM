@@ -18,7 +18,6 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-
 #ifndef CCNX_FLOODING_STRATEGY_H
 #define CCNX_FLOODING_STRATEGY_H
 
@@ -38,23 +37,24 @@ class CcnxFace;
 class CcnxInterestHeader;
     
 /**
-* \ingroup ccnx
-* \brief Flooding strategy
-*/
+ * \ingroup ccnx
+ * \brief Flooding strategy
+ */
 
 class CcnxFloodingStrategy : public CcnxForwardingStrategy
 {
 public:
-    static TypeId GetTypeId (void);
+  static TypeId GetTypeId (void);
         
-    CcnxFloodingStrategy ();
-          
-    bool PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry,
-                             CcnxFibEntryContainer::type::iterator fibEntry,
-                             const Ptr<CcnxFace> &incomingFace,
-                             Ptr<CcnxInterestHeader> &header,
-                             const Ptr<const Packet> &packet,
-                             SendCallback ucb);
+  CcnxFloodingStrategy ();
+
+  virtual bool
+  PropagateInterest (CcnxPitEntryContainer::type::iterator pitEntry,
+                     CcnxFibEntryContainer::type::iterator fibEntry,
+                     const Ptr<CcnxFace> &incomingFace,
+                     Ptr<CcnxInterestHeader> &header,
+                     const Ptr<const Packet> &packet,
+                     SendCallback ucb);
 };
     
 } //namespace ns3

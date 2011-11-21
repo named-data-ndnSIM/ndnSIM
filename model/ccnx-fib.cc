@@ -198,6 +198,7 @@ CcnxFib::NotifyNewAggregate ()
 void 
 CcnxFib::DoDispose (void)
 {
+  clear ();
   m_node = 0;
   clear ();
   Object::DoDispose ();

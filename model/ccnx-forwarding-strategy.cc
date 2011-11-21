@@ -41,6 +41,10 @@ CcnxForwardingStrategy::CcnxForwardingStrategy ()
 {
 }
 
+CcnxForwardingStrategy::~CcnxForwardingStrategy ()
+{
+}
+
 void
 CcnxForwardingStrategy::SetPit(Ptr<CcnxPit> pit)
 {

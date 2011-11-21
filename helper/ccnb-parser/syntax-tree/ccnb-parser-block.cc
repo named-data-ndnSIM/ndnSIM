@@ -44,8 +44,6 @@ const uint8_t CCN_TT_HBIT = ((uint8_t)(1 << 7));
 
 Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
 {
-  NS_LOG_DEBUG (">");
-
   // std::cout << "<< pos: " << counter << "\n";
   uint32_t value = 0;
 
@@ -91,7 +89,6 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
 
 Block::~Block ()
 {
-  NS_LOG_DEBUG ("<");
 }
 
 }
