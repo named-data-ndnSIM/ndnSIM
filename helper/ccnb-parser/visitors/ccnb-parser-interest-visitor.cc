@@ -168,26 +168,15 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
       break;
     
             
-    case NDN_DTAG_Nack:
+    case CCN_DTAG_Nack:
       NS_LOG_DEBUG ("Nack");
       if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
         throw CcnbDecodingException ();
             
       interest.SetNack (
-              1 == boost::any_cast<uint32_t> (
-                      (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
+               boost::any_cast<uint32_t> (
+                                          (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
       break;
-            
-    case NDN_DTAG_Congested:
-      NS_LOG_DEBUG ("Congested");
-      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
-        throw CcnbDecodingException ();
-            
-      interest.SetCongested (
-              1 == boost::any_cast<uint32_t> (
-                      (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
-      break;
-    }
 }
 
 } // namespace CcnbParser

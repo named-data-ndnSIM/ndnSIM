@@ -39,6 +39,7 @@
 #include <map>
 #include <iostream>
 #include <algorithm>
+#include <boost/tuple/tuple.hpp>
 
 namespace ns3 {
 
@@ -126,7 +127,8 @@ public:
   Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face);*/
   
   bool
-    TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face);
+  TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face);
+  
   /**
    * \brief Find corresponding PIT entry for the given content name
    * \param prefix Prefix for which to lookup the entry
@@ -139,10 +141,14 @@ public:
   /**
    * \brief Find corresponding PIT entry for the given content name
    * \param prefix Prefix for which to lookup the entry
-   * \returns const reference to Pit entry. If record does not exist, it will be created
+   * \returns a tuple:
+   * get<0>: `const CcnxPitEntry&`: a valid PIT entry (if record does not exist, it will be created)
+   * get<1>: `bool`: true if a new entry was created
+   * get<2>: `bool`: true if a PIT entry exists and Nonce that present in header has been already seen
+   * 
    */
-  CcnxPitEntryContainer::type::iterator
-  Lookup (const CcnxInterestHeader &header,CcnxFibEntryContainer::type::iterator &outFibEntry);
+  boost::tuple<const CcnxPitEntry&, bool, bool>
+  Lookup (const CcnxInterestHeader &header);
   
   // remove a PIT entry
   //void erase (const string &contentName);
@@ -175,6 +181,11 @@ public:
    */
   Time GetCleanupTimeout () const;
 
+  Time GetPitEntryPruningTimeout () const
+  {
+    return m_PitEntryPruningTimout;
+  }
+  
   /**
    * \brief Set FIB table
    */
@@ -199,6 +210,7 @@ private:
 private:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
+  Time    m_PitEntryPruningTimout;
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
   PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face

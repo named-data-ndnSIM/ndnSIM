@@ -29,18 +29,6 @@ NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
 
-// NS_OBJECT_ENSURE_REGISTERED (CcnxFace);
-
-// TypeId 
-// CcnxFace::GetTypeId (void)
-// {
-//   static TypeId tid = TypeId ("ns3::CcnxFace")
-//     .SetGroupName ("Ccnx")
-//     .SetParent<Object> ()
-//   ;
-//   return tid;
-// }
-
 /** 
  * By default, Ccnx face are created in the "down" state
  *  with no IP addresses.  Before becoming useable, the user must 
@@ -68,15 +56,6 @@ CcnxFace& CcnxFace::operator= (const CcnxFace &)
 {
   return *this;
 }
-
-  
-// void
-// CcnxFace::DoDispose (void)
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//   m_node = 0;
-//   Object::DoDispose ();
-// }
 
 void 
 CcnxFace::SetNode (Ptr<Node> node)
@@ -132,15 +111,10 @@ CcnxFace::SetDown (void)
 }
 
 bool
-CcnxFace::IsLocal() const
-{
-    return m_isLocal;
-}
-
-bool
 CcnxFace::operator== (const CcnxFace &face) const
 {
-  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (), "Faces of different nodes should not be compared to each other");
+  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
+                 "Faces of different nodes should not be compared to each other");
 
   return (m_id == face.m_id);
 }
@@ -148,7 +122,8 @@ CcnxFace::operator== (const CcnxFace &face) const
 bool
 CcnxFace::operator< (const CcnxFace &face) const
 {
-  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (), "Faces of different nodes should not be compared to each other");
+  NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
+                 "Faces of different nodes should not be compared to each other");
 
   return (m_id < face.m_id);
 }

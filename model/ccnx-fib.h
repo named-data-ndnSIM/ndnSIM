@@ -81,16 +81,11 @@ public:
   GetFace () const { return m_face; }
 
   /**
-   * \brief Unary function to recalculate smoothed RTT and RTT variation
+   * \brief Recalculate smoothed RTT and RTT variation
    * \param rttSample RTT sample
    */
-  struct UpdateRtt
-  {
-    UpdateRtt (const Time &rttSample) : m_rttSample (rttSample) {};
-    void operator() (CcnxFibFaceMetric &entry);
-  private:
-    const Time &m_rttSample;
-  };
+  void
+  UpdateRtt (const Time &rttSample);
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric);
@@ -98,9 +93,9 @@ public:
   Ptr<CcnxFace> m_face; ///< Face
   
   Status m_status;		///< \brief Status of the next hop: 
-						///<		- NDN_FIB_GREEN
-						///<		- NDN_FIB_YELLOW
-						///<		- NDN_FIB_RED
+				///<		- NDN_FIB_GREEN
+				///<		- NDN_FIB_YELLOW
+				///<		- NDN_FIB_RED
   
   int32_t m_routingCost; ///< \brief routing protocol cost (interpretation of the value depends on the underlying routing protocol)
 
@@ -165,46 +160,17 @@ public:
   { }
 	
   /**
-   * \brief Unary function to update status of FIB next hop
+   * \brief Update status of FIB next hop
+   * \param status Status to set on the FIB entry
    */
-  struct UpdateStatus
-  {
-    UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
-      : m_face (face), m_status (status) {}
-    void operator () (CcnxFibEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-    CcnxFibFaceMetric::Status m_status;
-  };
+  void UpdateStatus (const CcnxFace &face, CcnxFibFaceMetric::Status status);
 
-  /**
-   * \brief Unary function to add or update routing metric of FIB next hop
-   *
-   * Initial status of the next hop is set to YELLOW
-   */
-  struct AddOrUpdateRoutingMetric
-  {
-    AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
-      : m_face (face), m_metric (metric) {}
-    void operator () (CcnxFibEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-    int32_t m_metric;
-  };
-
-  /**
-   * \brief Unary function to recalculate smoothed RTT and RTT variation
-   * \param rttSample RTT sample
-   */
-  struct UpdateFaceRtt
-  {
-    UpdateFaceRtt (Ptr<CcnxFace> face, const Time &rttSample)
-      : m_face (face), m_rttSample (rttSample) {};
-    void operator() (CcnxFibEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-    const Time &m_rttSample;
-  };
+  // /**
+  //  * \brief Add or update routing metric of FIB next hop
+  //  *
+  //  * Initial status of the next hop is set to YELLOW
+  //  */
+  // void AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric);
 
   /**
    * \brief Get prefix for the FIB entry
@@ -276,15 +242,6 @@ public:
   CcnxFib ();
    // * \param node smart pointer to Ccnx stack associated with particular node
 
-  // // Invalidate entries in FIB
-  // // Will leave FIB records in hash, but assign metric=NETWORK_UNREACHABLE
-  // void invalidate( );
-
-  // //Find corresponding FIB entry for the given content name
-  // //Longest match is performed
-  // FibIterator lookup( const string &name );
-  // bool isValid( const FibIterator &it ) { return it!=_fib.end(); }
-
   /**
    * \brief Perform longest prefix match
    *
@@ -309,21 +266,6 @@ public:
    */
   CcnxFibEntryContainer::type::iterator
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
-  // bool update( const string &name, int interfaceIndex, int metric);
-  // bool update( NodeAddress nodeId, int interfaceIndex, int metric);
-  // Bool update( NodeAddress nodeId, int metric, NodeAddress nextHop );
-
-  // // Update Fib from OSPF routing table (through a hack in OSPF algorithm)
-  // void updateFibFromOSPFv2( int interface );
-
-  // // Update Fib from BGP routing table (using info from RibIn)
-  // void updateFibFromBGP( );
-
-  // // Update Fib from IP routing table
-  // void updateFibFromIpRouting( );
-
-  // void dump( );
-  // void dump( const FibIterator &fib );
 
   // void resetProbing();    //reset needsProbing field for every FibEntry
 

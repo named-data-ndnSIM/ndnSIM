@@ -150,7 +150,7 @@ CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
 }
 
 
-Ptr<Packet>
+boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader> >
 CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -162,9 +162,9 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
                                            m_contentStore.project<i_mru> (it));
 
       // return fully formed CCNx packet
-      return it->GetFullyFormedCcnxPacket ();
+      return boost::make_tuple (it->GetFullyFormedCcnxPacket (), it->GetHeader ());
     }
-  return 0;
+  return boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader> > (0, 0);
 }   
     
 void 

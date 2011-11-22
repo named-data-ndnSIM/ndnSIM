@@ -78,7 +78,7 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
   if (!interest.GetInterestLifetime().IsZero())
     {
       written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_InterestLifetime, CcnbParser::CCN_DTAG);
-      written += AppendTimestampBlob (start, interest.GetInterestLifetime());
+      written += AppendTimestampBlob (start, interest.GetInterestLifetime ());
       written += AppendCloser (start);
     }
   if (interest.GetNonce()>0)
@@ -89,16 +89,10 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
                                    sizeof(nonce));
     }
     
-  if (interest.IsNack ())
+  if (interest.GetNack ()>0)
     {
-      written += AppendBlockHeader (start, CcnbParser::NDN_DTAG_Nack, CcnbParser::CCN_DTAG);
-      written += AppendNumber (start, 1);
-      written += AppendCloser (start);
-    }
-  if (interest.IsCongested ())
-    {
-      written += AppendBlockHeader (start, CcnbParser::NDN_DTAG_Congested, CcnbParser::CCN_DTAG);
-      written += AppendNumber (start, 1);
+      written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Nack, CcnbParser::CCN_DTAG);
+      written += AppendNumber (start, interest.GetNack ());
       written += AppendCloser (start);
     }
   written += AppendCloser (start); // </Interest>

@@ -35,6 +35,7 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include "ccnx.h"
 #include "hash-helper.h"
@@ -173,7 +174,7 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  Ptr<Packet>
+  boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader> >
   Lookup (Ptr<const CcnxInterestHeader> interest);
             
   /**

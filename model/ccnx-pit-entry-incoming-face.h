@@ -44,7 +44,7 @@ public:
    * \param face face of the incoming interest
    * \param lifetime lifetime of the incoming interest
    */
-  CcnxPitEntryIncomingFace (Ptr<CcnxFace> face);
+  CcnxPitEntryIncomingFace (Ptr<CcnxFace> face, Time arrivalTime);
 
   bool operator== (const CcnxPitEntryIncomingFace &dst) { return *m_face==*(dst.m_face); }
   bool operator== (Ptr<CcnxFace> face) { return *m_face==*face; }

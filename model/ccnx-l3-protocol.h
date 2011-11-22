@@ -152,7 +152,7 @@ public:
   
   Ptr<CcnxPit> GetPit();
   
-  void ScheduleLeakage();
+  // void ScheduleLeakage();
 protected:
   /**
    * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
@@ -167,6 +167,18 @@ protected:
               Ptr<CcnxInterestHeader> &header,
               const Ptr<const Packet> &p);
 
+  /**
+   * \brief Processing of incoming CCNx NACKs. Note, these packets, like interests, do not have payload
+   * 
+   * Processing NACK packets
+   * @param face    incoming face
+   * @param header  deserialized Interest header
+   * @param packet  original packet
+   */
+  virtual void
+  OnNack (const Ptr<CcnxFace> &face,
+          Ptr<CcnxInterestHeader> &header,
+          const Ptr<const Packet> &p);
   
   /**
    * \brief Actual processing of incoming CCNx content objects
@@ -196,12 +208,6 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  // /**
-  //  * \brief Fake function. should never be called. Just to trick C++ to compile
-  //  */
-  // virtual void
-  // ReceiveAndProcess (const Ptr<CcnxFace> face, Ptr<Header> header, Ptr<Packet> p);
-
   /**
    * \brief A helper function
    */
@@ -218,7 +224,7 @@ private:
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 
-  Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
+  // Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)

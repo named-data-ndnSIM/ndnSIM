@@ -26,13 +26,15 @@
 
 NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
+using namespace boost::tuples;
+
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
 
 using namespace __ccnx_private;
 
-TypeId 
+TypeId
 CcnxPit::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::CcnxPit")
@@ -43,6 +45,11 @@ CcnxPit::GetTypeId ()
                    "Timeout defining how frequent RIT should be cleaned up",
                    TimeValue (Seconds (1)),
                    MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
+                   MakeTimeChecker ())
+    .AddAttribute ("PitEntryPruningTimout",
+                   "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
+                   StringValue ("100ms"),
+                   MakeTimeAccessor (&CcnxPit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
     ;
 
@@ -83,7 +90,7 @@ CcnxPit::SetCleanupTimeout (const Time &timeout)
     m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
 
   // schedule even with new timeout
-  m_cleanupEvent = Simulator::Schedule (Simulator::Now () + m_cleanupTimeout,
+  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
                                         &CcnxPit::CleanExpired, this); 
 }
 
@@ -95,21 +102,25 @@ CcnxPit::GetCleanupTimeout () const
 
 void CcnxPit::CleanExpired ()
 {
-  NS_LOG_LOGIC ("Cleaning PIT");
+  NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
   Time now = Simulator::Now ();
-  
+
+  uint32_t count = 0;
   while( !empty() )
     {
       if( get<i_timestamp> ().front ().GetExpireTime () <= now ) // is the record stale?
         {
           get<i_timestamp> ().pop_front( );
+          count ++;
         }
       else
         break; // nothing else to do. All later records will not be stale
     }
-  
+
+  // NS_LOG_LOGIC ("Cleaned " << count << " records. Total: " << size ());
   // schedule next even
-  m_cleanupEvent = Simulator::Schedule (Simulator::Now () + m_cleanupTimeout,
+  
+  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
                                         &CcnxPit::CleanExpired, this); 
 }
 
@@ -120,48 +131,46 @@ CcnxPit::SetFib (Ptr<CcnxFib> fib)
 }
 
 /*CcnxPitEntryContainer::type::iterator
-CcnxPit::Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face)
-{
-    if( m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] )
-	{
-        //		printf( "DEBUG: bucket overflow. Should not forward anything to interface %d\n", interest.interfaceIndex );
-		return end();
-	}
+  CcnxPit::Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face)
+  {
+  if( m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] )
+  {
+  //		printf( "DEBUG: bucket overflow. Should not forward anything to interface %d\n", interest.interfaceIndex );
+  return end();
+  }
     
-    CcnxPitEntryContainer::type::iterator entry = insert (end (),
-                    CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
-                                *fibEntry));
-    return entry;
-}*/
+  CcnxPitEntryContainer::type::iterator entry = insert (end (),
+  CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
+  *fibEntry));
+  return entry;
+  }*/
 
-    
-    
 bool
-CcnxPit::TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face)
+CcnxPit::TryAddOutgoing (CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face)
 {
-    NS_LOG_INFO ("Face has " << m_bucketsPerFace[face->GetId()] << " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
+  NS_LOG_INFO ("Face has " << m_bucketsPerFace[face->GetId()] << " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
     
-    if((face->IsLocal() == false) 
-       && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
-	{
-        NS_LOG_INFO("********LIMIT**************");
-		return false;
-	}
+  if((face->IsLocal() == false) 
+     && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
+    {
+      NS_LOG_INFO("********LIMIT**************");
+      return false;
+    }
     
-    m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
+  m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
 	
-    NS_LOG_INFO(this->size());
-    NS_LOG_INFO("before modify");
-    NS_LOG_INFO(pitEntry->GetPrefix());
-    modify (pitEntry, CcnxPitEntry::AddOutgoing(face));
-    NS_LOG_INFO("after modify");
-    return true;
+  NS_LOG_INFO(this->size());
+  NS_LOG_INFO("before modify");
+  NS_LOG_INFO(pitEntry->GetPrefix());
+  modify (pitEntry, CcnxPitEntry::AddOutgoing(face));
+  NS_LOG_INFO("after modify");
+  return true;
 }
 
 const CcnxPitEntry&
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
 
   CcnxPitEntryContainer::type::iterator entry =
     get<i_prefix> ().find (header.GetName ());
@@ -172,50 +181,65 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
   return *entry;
 }
 
-CcnxPitEntryContainer::type::iterator
-CcnxPit::Lookup (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator &outFibEntry)
+std::pair<CcnxPitEntryContainer::type::iterator,std::pair<bool, bool> >
+CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION_NOARGS ();
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
 
+  bool isDuplicate = false;
+  bool isNew = true;
+
   CcnxPitEntryContainer::type::iterator entry =
     get<i_prefix> ().find (header.GetName ());
 
-  CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
-  if (fibEntry == m_fib->end ())
-    {
-      NS_LOG_WARN ("FIB entry wasn't found. Creating an empty record");
-      fibEntry = m_fib->insert (m_fib->end (), CcnxFibEntry (header.GetName ()));
-    }
-  
   if (entry == end ())
-  {
-      NS_LOG_INFO("entry == end");
-      NS_LOG_INFO(this->size());
-        entry = insert (end (),
-                    CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
-                                  *fibEntry));
-      NS_LOG_INFO(this->size());
-  }
-  outFibEntry = fibEntry;
-  return entry;
+    {
+      CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
+      NS_ASSERT_MSG (fibEntry != m_fib->end (),
+                     "There should be at least default route set");
+
+      entry = insert (end (),
+                      CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
+                                    Simulator::Now () +
+                                    (header.GetInterestLifetime ().IsZero ()?DEFAULT_INTEREST_LIFETIME:
+                                                                             header.GetInterestLifetime ())
+                                    *fibEntry));
+
+      // isDuplicate = false; // redundant
+      // isNew = true; // also redundant
+    }
+  else
+    {
+      isNew = false;
+      isDuplicate = entry->IsNonceSeen (header->GetNonce ());
+    }
+
+  if (!isDuplicate)
+    {
+      modify (entry, boost::bind(&CcnxPitEntry::AddSeenNonce, boost::lambda::_1, header->GetNonce ()));
+    }
+
+  return make_tuple (cref(*entry), isNew, isDuplicate);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+
 void 
-CcnxPit::LeakBuckets( )
+CcnxPit::LeakBuckets ()
 {
-    for( PitBucketIterator it=m_bucketsPerFace.begin(); 
-        it != m_bucketsPerFace.end();
-        it++ )
+  for (PitBucketIterator it = m_bucketsPerFace.begin(); 
+       it != m_bucketsPerFace.end();
+       it++)
     {
-        it->second = std::max( 0.0, it->second - leakSize[it->first] );
+      it->second = std::max (0.0, it->second - leakSize[it->first]);
     }
 }
     
 void 
-CcnxPit::LeakBucket(Ptr<CcnxFace> face, int amount )
+CcnxPit::LeakBucket (Ptr<CcnxFace> face, int amount)
 {
-    m_bucketsPerFace[face->GetId()] = std::max( 0.0, m_bucketsPerFace[face->GetId()] - amount );
+  m_bucketsPerFace[face->GetId()] = std::max (0.0, m_bucketsPerFace[face->GetId()] - amount);
 }
 
 

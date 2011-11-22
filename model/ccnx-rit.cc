@@ -119,7 +119,7 @@ CcnxRit::SetCleanupTimeout (const Time &timeout)
     m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
 
   // schedule even with new timeout
-  m_cleanupEvent = Simulator::Schedule (Simulator::Now () + m_cleanupTimeout,
+  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
                                         &CcnxRit::CleanExpired, this); 
 }
 
@@ -132,7 +132,7 @@ CcnxRit::GetCleanupTimeout () const
 bool
 CcnxRit::WasRecentlySatisfied (const CcnxInterestHeader &header)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   std::pair<CcnxRitByNonce::type::iterator,CcnxRitByNonce::type::iterator>
     entries = get<nonce> ().equal_range (header.GetNonce ());
   
@@ -153,7 +153,7 @@ CcnxRit::WasRecentlySatisfied (const CcnxInterestHeader &header)
 void
 CcnxRit::SetRecentlySatisfied (const CcnxInterestHeader &header)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  // NS_LOG_FUNCTION_NOARGS ();
   NS_ASSERT_MSG (!WasRecentlySatisfied (header), "Duplicate recent interest should not be added to RIT");
   
   get<timestamp> ().push_back (
@@ -166,30 +166,21 @@ CcnxRit::SetRecentlySatisfied (const CcnxInterestHeader &header)
 
 void CcnxRit::CleanExpired ()
 {
-  // NS_LOG_LOGIC ("Cleaning RIT");
+  NS_LOG_LOGIC ("Cleaning RIT, total: " << size ());
   Time now = Simulator::Now ();
-// #ifdef _DEBUG
-//   uint32_t count = 0;
-// #endif
   
   while( !empty() )
     {
       if( get<timestamp> ().front ().m_expireTime <= now ) // is the record stale?
         {
          get<timestamp> ().pop_front( );
-// #ifdef _DEBUG
-//          count++;
-// #endif
         }
       else
         break; // nothing else to do. All later records will not be stale
     }
-// #ifdef _DEBUG
-//   NS_LOG_DEBUG (count << " records cleaned");
-// #endif
   
   // schedule next even
-  m_cleanupEvent = Simulator::Schedule (Simulator::Now () + m_cleanupTimeout,
+  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
                                         &CcnxRit::CleanExpired, this); 
 }
 

@@ -33,6 +33,7 @@ using namespace ns3;
 NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
 
 uint32_t nGrid = 3;
+Time finishTime = Seconds (20.0); 
 
 void PrintTime ()
 {
@@ -46,13 +47,14 @@ main (int argc, char *argv[])
 {
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
-  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("100ms"));
+  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1ms"));
     
   Packet::EnableChecking();
   Packet::EnablePrinting();
 
   CommandLine cmd;
   cmd.AddValue ("nGrid", "Number of grid nodes", nGrid);
+  cmd.AddValue ("finish", "Finish time", finishTime);
   cmd.Parse (argc, argv);
 
   PointToPointHelper p2p;
@@ -82,8 +84,8 @@ main (int argc, char *argv[])
   consumerNodes.Add (grid.GetNode (0,0));
   
   // Populate FIB based on IPv4 global routing controller
-  // ccnxHelper.InstallFakeGlobalRoutes ();
-  // ccnxHelper.InstallRouteTo (producer);
+  ccnxHelper.InstallFakeGlobalRoutes ();
+  ccnxHelper.InstallRouteTo (producer);
 
   NS_LOG_INFO ("Installing Applications");
   std::ostringstream prefix;
@@ -93,13 +95,13 @@ main (int argc, char *argv[])
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   consumers.Start (Seconds (0.0));
-  consumers.Stop (Seconds (20.0));
+  consumers.Stop (finishTime);
     
   CcnxProducerHelper producerHelper (prefix.str (),120);
   ApplicationContainer producers = producerHelper.Install (producer);
   
   producers.Start(Seconds(0.0));
-  producers.Stop(Seconds(20.0));
+  producers.Stop(finishTime);
 
   NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
@@ -119,7 +121,7 @@ main (int argc, char *argv[])
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
     
-  Simulator::Stop (Seconds (100));
+  Simulator::Stop (finishTime);
     
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();

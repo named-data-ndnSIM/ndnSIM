@@ -34,6 +34,7 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <set>
 
 #include <iostream>
 
@@ -102,127 +103,42 @@ public:
    * \param prefix Prefix of the PIT entry
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const CcnxFibEntry &fibEntry);
+  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &expireTime, const CcnxFibEntry &fibEntry);
   
   // // Get number of outgoing interests that we're expecting data from
   // inline size_t numberOfPromisingInterests( ) const; 
-
-  // /**
-  //  * \brief Unary function to set or update FIB entry with this PIT entry
-  //  * \param fib smart pointer to FIB entry
-  //  */
-  // struct SetFibEntry
-  // {
-  //   SetFibEntry (Ptr<CcnxFibEntry> fib);
-  //   void operator() (CcnxPitEntry &entry);
-  // private:
-  //   Ptr<CcnxFibEntry> m_fib;
-  // };
-  
-  /**
-   * \brief Unary Function to add incoming interest to the PIT entry
-   *
-   * \param incomingFace smart pointer to the face of the incoming interest
-   * \returns const iterator to a newly added or updated
-   * CcnxPitIncomingInterest entry
-   */
-  struct AddIncoming
-  {
-    AddIncoming (Ptr<CcnxFace> incomingFace) : m_face (incomingFace) {}
-    void operator() (CcnxPitEntry &entry);
-    
-  private:
-    Ptr<CcnxFace> m_face;
-    Time m_lifeTime;
-  };
-
-  /**
-   * \brief Unary function to delete incoming interest for the interface
-   * \param face face that should be removed from the list of incoming interests
-   */
-  struct DeleteIncoming
-  {
-    DeleteIncoming (Ptr<CcnxFace> face) : m_face (face) {}
-    void operator() (CcnxPitEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-  };
-
-  /**
-   * \brief Unary function to add outgoing interest to PIT entry
-   *
-   * \param outgoingFace smart pointer to the face of the outgoing interest
-   * \returns const iterator to a newly added or updated
-   * CcnxPitOutgoingInterest entry
-   */
-  struct AddOutgoing
-  {
-    AddOutgoing (Ptr<CcnxFace> outgoingFace) : m_face (outgoingFace) {}
-    void operator() (CcnxPitEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-  };
-
-  /**
-   * \brief Unary function to delete incoming interest for the interface
-   * \param face face that should be removed from the list of incoming interests
-   */
-  struct DeleteOutgoing
-  {
-    DeleteOutgoing (Ptr<CcnxFace> face) : m_face (face) {}
-    void operator() (CcnxPitEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-  };
-
-  /**
-   * \brief Unary function to remove all incoming interests
-   */
-  struct ClearIncoming
-  {
-    ClearIncoming () {};
-    void operator() (CcnxPitEntry &entry);
-  };
-
-  /**
-   * \brief Unary function to update FIB status
-   */
-  struct UpdateFibStatus
-  {
-    UpdateFibStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status, Ptr<CcnxFib> fib);
-    void operator() (CcnxPitEntry &entry);
-  private:
-    Ptr<CcnxFace> m_face;
-    CcnxFibFaceMetric::Status m_status;
-    Ptr<CcnxFib> m_fib;
-  };
-
-  /**
-   * \brief Unary function to estimate RTT and update smoothed RTT value in FIB
-   * \param outFace iterator of the outgoing face entry
-   */
-  struct EstimateRttAndRemoveFace
-  {
-    EstimateRttAndRemoveFace (CcnxPitEntryOutgoingFaceContainer::type::iterator outFace, Ptr<CcnxFib> fib)
-      : m_outFace (outFace), m_fib (fib) { };
-    void operator() (CcnxPitEntry &entry);
-  private:
-    CcnxPitEntryOutgoingFaceContainer::type::iterator m_outFace;
-    Ptr<CcnxFib> m_fib;
-  };
 
   const CcnxNameComponents &
   GetPrefix () const;
 
   const Time &
-  GetExpireTime () const { return m_expireTime; }
+  GetExpireTime () const
+  { return m_expireTime; }
 
+  void
+  SetExpireTime (const Time &expireTime)
+  {
+    m_expireTime = expireTime;
+  }
+  
+  bool
+  IsNonceSeen (uint32_t nonce) const
+  { return m_seenNonces.find (nonce) != m_seenNonces.end (); }
+
+  void
+  AddSeenNonce (uint32_t nonce)
+  { m_seenNonces.insert (nonce); }
+
+  void
+  AddIncoming (const CcnxFace &face);
+  
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
   
 public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
   const CcnxFibEntry &m_fibEntry; ///< \brief FIB entry related to this prefix
+  std::set<uint32_t> m_seenNonces; ///< \brief map of nonces that were seen for this prefix
   
   CcnxPitEntryIncomingFaceContainer::type m_incoming; ///< \brief container for incoming interests
   CcnxPitEntryOutgoingFaceContainer::type m_outgoing; ///< \brief container for outgoing interests
@@ -231,7 +147,6 @@ public:
   bool m_timerExpired;       ///< \brief flag indicating that PIT timer has expired
   int  m_counterExpirations; ///< \brief whether timer is expired (+ number of times timer expired)
 };
-
 
 } // namespace ns3
 

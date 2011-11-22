@@ -23,6 +23,7 @@
 #include "ns3/ccnx-local-face.h"
 #include "ns3/ccnx.h"
 #include "ns3/callback.h"
+#include "ns3/string.h"
 #include "ns3/ccnx-content-object-header.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumer");
@@ -39,15 +40,15 @@ CcnxConsumer::GetTypeId (void)
       .SetParent<Application> ()
       .AddConstructor<CcnxConsumer> ()
       .AddAttribute ("OffTime", "Time interval between packets",
-                     TimeValue (Seconds (0.1)),
+                     StringValue ("100ms"),
                      MakeTimeAccessor (&CcnxConsumer::m_offTime),
                      MakeTimeChecker ())
       .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
-                     CcnxNameComponentsValue (),
+                     StringValue ("/"),
                      MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
                      MakeCcnxNameComponentsChecker ())
       .AddAttribute ("LifeTime", "LifeTime fo interest packet",
-                     TimeValue (Seconds (0)),
+                     StringValue ("2s"),
                      MakeTimeAccessor (&CcnxConsumer::m_interestLifeTime),
                      MakeTimeChecker ())
       .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",

@@ -43,9 +43,6 @@ CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxInterestHeader &int
   Buffer::Iterator i = start;
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
   root->accept (interestVisitor, &interest);
-
-  NS_LOG_DEBUG ("refs: " << root->GetReferenceCount ());
-  NS_LOG_DEBUG ("refs: " << DynamicCast<CcnbParser::BaseTag> (root)->m_nestedTags.front ()->GetReferenceCount ());
   
   return i.GetDistanceFrom (start);
 }

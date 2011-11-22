@@ -57,13 +57,6 @@ public:
    * \param packet Received packet
    */
   typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
-  
-  // /**
-  //  * \brief Interface ID
-  //  *
-  //  * \return interface ID
-  //  */
-  // static TypeId GetTypeId (void);
 
   /**
    * \brief Default constructor
@@ -135,11 +128,6 @@ public:
    * \brief Returns true if this face is disabled, false otherwise.
    */
   virtual bool IsDown () const;
-
-  /**
-   * \brief Return true for LocalFace, otherwise false
-   */
-  virtual bool IsLocal () const;
   
   virtual std::ostream&
   Print (std::ostream &os) const;
@@ -179,9 +167,6 @@ public:
    */
   bool
   operator< (const CcnxFace &face) const;
-  
-// protected:
-//   virtual void DoDispose (void);
 
 private:
   CcnxFace (const CcnxFace &); ///< \brief Disabled copy constructor
@@ -191,11 +176,10 @@ protected:
   // uint16_t m_metric; ///< \brief Routing/forwarding metric
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
-  bool m_isLocal;
+
 private:
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
-  uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
-  
+  uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)  
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);

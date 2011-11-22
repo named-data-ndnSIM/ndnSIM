@@ -56,8 +56,7 @@ CcnxInterestHeader::CcnxInterestHeader ()
   , m_scope (-1)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
-  , m_nack (false)
-  , m_congested (false)
+  , m_nackType (NORMAL_INTEREST)
 {
 }
 
@@ -178,27 +177,15 @@ CcnxInterestHeader::GetNonce () const
 }
 
 void
-CcnxInterestHeader::SetNack (bool isNack)
+CcnxInterestHeader::SetNack (uint32_t nackType)
 {
-  m_nack = isNack;
+  m_nackType = nackType;
 }
-    
-bool
+
+uint32_t
 CcnxInterestHeader::IsNack () const
 {
   return m_nack;
-}
- 
-void
-CcnxInterestHeader::SetCongested (bool IsCongested)
-{
-  m_congested = IsCongested;
-}
-    
-bool
-CcnxInterestHeader::IsCongested () const
-{
-  return m_congested;
 }
 
 uint32_t
@@ -232,10 +219,23 @@ void
 CcnxInterestHeader::Print (std::ostream &os) const
 {
   os << "<Interest>\n  <Name>" << GetName () << "</Name>\n";
-  if (IsNack ())
-    os << "  <NACK />\n";
-  if(IsCongested())
-    os << "  <CONGESTED />\n";
+  if (GetNack ()>0)
+    {
+      os << "  <NACK>";
+      switch (GetNack ())
+        {
+        case NACK_LOOP:
+          os << "loop";
+          break;
+        case NACK_CONGESTION:
+          os << "congestion";
+          break;
+        default:
+          os << "unknown";
+          break;
+        }
+      os << "</NACK>\n";
+    }
   if (GetMinSuffixComponents () >= 0)
     os << "  <MinSuffixComponents>" << GetMinSuffixComponents () << "</MinSuffixComponents>\n";
   if (GetMaxSuffixComponents () >= 0)

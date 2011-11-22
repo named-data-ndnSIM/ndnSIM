@@ -27,50 +27,12 @@
 namespace ns3
 {
 
-// struct SearchByFace
-// {
-//   /**
-//    * \brief To perform effective searches by CcnxFace
-//    */
-//   bool
-//   operator() (const CcnxPitIncomingInterest &m, const Ptr<CcnxFace> &face) const
-//   {
-//     return *(m.m_face) < *face;
-//   } 
-
-//   /**
-//    * \brief To perform effective searches by CcnxFace
-//    */
-//   bool
-//   operator() (const Ptr<CcnxFace> &face, const CcnxPitIncomingInterest &m) const
-//   {
-//     return *face < *(m.m_face);
-//   } 
-
-//   /**
-//    * \brief To perform effective searches by CcnxFace
-//    */
-//   bool
-//   operator() (const CcnxPitOutgoingInterest &m, const Ptr<CcnxFace> &face) const
-//   {
-//     return *(m.m_face) < *face;
-//   } 
-
-//   /**
-//    * \brief To perform effective searches by CcnxFace
-//    */
-//   bool
-//   operator() (const Ptr<CcnxFace> &face, const CcnxPitOutgoingInterest &m) const
-//   {
-//     return *face < *(m.m_face);
-//   } 
-// };
-
-
-CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const CcnxFibEntry &fibEntry)
+CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
+                            const Time &expireTime,
+                            const CcnxFibEntry &fibEntry)
   : m_prefix (prefix)
   , m_fibEntry (fibEntry)
-  // , m_expireTime (?)
+  , m_expireTime (expireTime)
   , m_timerExpired (false)
   , m_counterExpirations (0)
 {
@@ -82,76 +44,42 @@ CcnxPitEntry::GetPrefix () const
   return *m_prefix;
 }
 
-// CcnxPitEntry::SetFibEntry::SetFibEntry (Ptr<CcnxFibEntry> fib)
-//   : m_fib (fib)
+// void
+// CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
+// {
+//   m_incoming.insert (CcnxPitEntryIncomingFace (face,     )
+// }
+
+
+// CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face,
+//                                                 CcnxFibFaceMetric::Status status,
+//                                                 Ptr<CcnxFib> fib)
+//   : m_face (face)
+//   , m_status (status)
+//   , m_fib (fib)
 // {
 // }
 
 // void
-// CcnxPitEntry::SetFibEntry::operator() (CcnxPitEntry &entry)
+// CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
 // {
-//   entry.m_fib = m_fib;
+//   NS_ASSERT_MSG (false, "Broken");
+//   m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
+//                  CcnxFibEntry::UpdateStatus (m_face, m_status));
 // }
 
-void
-CcnxPitEntry::AddIncoming::operator() (CcnxPitEntry &entry)
-{
-  entry.m_incoming.insert (CcnxPitEntryIncomingFace (m_face));
-}
+// void
+// CcnxPitEntry::EstimateRttAndRemoveFace::operator() (CcnxPitEntry &entry)
+// {
+//   // similar to Karn's Algorithm, we don't use RTT measurements for retx packets
+//   if (m_outFace->m_retxNum>0)
+//     return;
 
-void
-CcnxPitEntry::DeleteIncoming::operator() (CcnxPitEntry &entry)
-{
-  entry.m_incoming.erase (m_face);
-}
+//   m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
+//                 CcnxFibEntry::UpdateFaceRtt (m_outFace->m_face,
+//                                              Simulator::Now() - m_outFace->m_sendTime));
 
-void
-CcnxPitEntry::AddOutgoing::operator() (CcnxPitEntry &entry)
-{
-  entry.m_outgoing.insert (CcnxPitEntryOutgoingFace (m_face));
-}
-
-void
-CcnxPitEntry::DeleteOutgoing::operator() (CcnxPitEntry &entry)
-{
-  entry.m_outgoing.erase (m_face);
-}
-
-void
-CcnxPitEntry::ClearIncoming::operator() (CcnxPitEntry &entry)
-{
-  entry.m_incoming.clear ();
-}
-
-CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face,
-                                                CcnxFibFaceMetric::Status status,
-                                                Ptr<CcnxFib> fib)
-  : m_face (face)
-  , m_status (status)
-  , m_fib (fib)
-{
-}
-
-void
-CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
-{
-  NS_ASSERT_MSG (false, "Broken");
-  m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
-                 CcnxFibEntry::UpdateStatus (m_face, m_status));
-}
-
-void
-CcnxPitEntry::EstimateRttAndRemoveFace::operator() (CcnxPitEntry &entry)
-{
-  // similar to Karn's Algorithm, we don't use RTT measurements for retx packets
-  if (m_outFace->m_retxNum>0)
-    return;
-
-  m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
-                CcnxFibEntry::UpdateFaceRtt (m_outFace->m_face,
-                                             Simulator::Now() - m_outFace->m_sendTime));
-
-  entry.m_outgoing.erase (m_outFace);
-}
+//   entry.m_outgoing.erase (m_outFace);
+// }
 
 }  
