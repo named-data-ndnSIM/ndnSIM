@@ -25,7 +25,6 @@
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/pointer.h"
 #include "ns3/assert.h"
 
 #include "ns3/ccnx-header-helper.h"
@@ -37,23 +36,13 @@ NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 namespace ns3 
 {
 
-// NS_OBJECT_ENSURE_REGISTERED (CcnxLocalFace);
-
-// TypeId 
-// CcnxLocalFace::GetTypeId (void)
-// {
-//   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
-//     .SetGroupName ("Ccnx")
-//     .SetParent<CcnxFace> ()
-//   ;
-//   return tid;
-// }
-
-CcnxLocalFace::CcnxLocalFace () 
-  : m_onInterest (0)
-  , m_onContentObject (0)
+CcnxLocalFace::CcnxLocalFace (Ptr<CcnxApp> app)
+  : CcnxFace (app->GetObject<Node> ())
+  , m_app (app)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << app);
+  
+  NS_ASSERT (app != 0);
 }
 
 CcnxLocalFace::~CcnxLocalFace ()
@@ -64,30 +53,17 @@ CcnxLocalFace::~CcnxLocalFace ()
 void
 CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  m_protocolHandler = handler;
-}
+  NS_LOG_FUNCTION (this << handler);
 
-void
-CcnxLocalFace::SetInterestHandler (InterestHandler onInterest)
-{
-  m_onInterest = onInterest;
-}
+  CcnxFace::RegisterProtocolHandler (handler);
 
-void
-CcnxLocalFace::SetContentObjectHandler (ContentObjectHandler onContentObject)
-{
-  m_onContentObject = onContentObject;
+  app->RegisterProtocolHandler (MakeCallback (&CcnxFace::Receive, this));
 }
     
 void
-CcnxLocalFace::Send (Ptr<Packet> p)
+CcnxLocalFace::SendImpl (Ptr<Packet> p)
 {
-  NS_LOG_FUNCTION("Local face send");
-  NS_LOG_FUNCTION (*p);
-  if (!IsUp ())
-    {
-      return;
-    }
+  NS_LOG_FUNCTION (this << p);
 
   try
     {
@@ -99,7 +75,7 @@ CcnxLocalFace::Send (Ptr<Packet> p)
             {
               Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
               p->RemoveHeader (*header);
-              m_onInterest (header);
+              app->OnInterest (header);
             }
           break;
         case CcnxHeaderHelper::CONTENT_OBJECT:
@@ -109,7 +85,7 @@ CcnxLocalFace::Send (Ptr<Packet> p)
               Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
               p->RemoveHeader (*header);
               p->RemoveTrailer (tail);
-              m_onContentObject (header, p/*payload*/);
+              app->OnContentObject (header, p/*payload*/);
             }
           break;
         }
@@ -118,13 +94,6 @@ CcnxLocalFace::Send (Ptr<Packet> p)
     {
       NS_LOG_ERROR ("Unknown header type");
     }
-}
-
-// propagate interest down to ccnx stack
-void
-CcnxLocalFace::ReceiveFromApplication (Ptr<Packet> p)
-{
-  m_protocolHandler (Ptr<CcnxFace>(this), p);
 }
 
 std::ostream& CcnxLocalFace::Print (std::ostream& os) const

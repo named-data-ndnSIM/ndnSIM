@@ -216,6 +216,27 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
   return entry;
 }
     
+void
+CcnxFib::Delete (const CcnxNameComponents &prefix, Ptr<CcnxFace> face)
+{
+  NS_LOG_FUNCTION (this << prefix << face);
+
+  CcnxFibEntryContainer::type::iterator entry = find (prefix);
+  if (entry == end ())
+    return;
+
+  modify (entry,
+          bind (&CcnxFibEntry::RemoveFace, _1, face));
+  if (entry->m_faces.size () == 0)
+    {
+      erase (entry);
+    }
+}
+
+void
+CcnxFib::DeleteFromAll (Ptr<CcnxFace> face)
+{
+}
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {

@@ -277,7 +277,19 @@ public:
   CcnxFibEntryContainer::type::iterator
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
-  // void resetProbing();    //reset needsProbing field for every FibEntry
+  /**
+   * @brief Remove reference to a face from the entry for `prefix`. If entry had only this face, the whole
+   * entry will be removed
+   */
+  void
+  Delete (const CcnxNameComponents &prefix, Ptr<CcnxFace> face);
+
+  /**
+   * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
+   * this FIB entry will be removed.
+   */
+  void
+  DeleteFromAll (Ptr<CcnxFace> face);
 
 protected:
   // inherited from Object class

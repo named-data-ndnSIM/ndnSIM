@@ -50,8 +50,7 @@ public:
   PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packet,
-                     SendCallback sendCallback);
+                     const Ptr<const Packet> &packet);
 };
     
 } //namespace ns3

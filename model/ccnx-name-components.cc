@@ -69,25 +69,6 @@ CcnxNameComponents::GetSubComponents (size_t num) const
     
   return subComponents;
 }
-  
-// const ccn_charbuf*
-// Components::GetName () const
-// {
-//   return m_value;
-// }
-
-CcnxNameComponents&
-CcnxNameComponents::operator () (const string &s)
-{
-  // ccn_name_append_str (m_value,s.c_str());
-  m_prefix.push_back (s);
-  return *this;
-}
-
-// Components::operator const unsigned char* ()
-// {
-//   return m_value->buf;
-// }
 
 void
 CcnxNameComponents::Print (std::ostream &os) const

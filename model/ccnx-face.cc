@@ -34,9 +34,12 @@ namespace ns3 {
  *  with no IP addresses.  Before becoming useable, the user must 
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
-CcnxFace::CcnxFace () 
-  // : m_metric (1)
-  : m_node (0)
+CcnxFace::CcnxFace (Ptr<Node> node) 
+  : m_node (Ptr<Node> node)
+  , m_bucket (0.0)
+  , m_bucketMax (-1.0)
+  , m_bucketLeak (0.0)
+  , m_protocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
 {
@@ -57,10 +60,53 @@ CcnxFace& CcnxFace::operator= (const CcnxFace &)
   return *this;
 }
 
-void 
-CcnxFace::SetNode (Ptr<Node> node)
+void
+CcnxFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  m_node = node;
+  m_protocolHandler = handler;
+}
+
+bool
+CcnxFace::SendWithLimit (Ptr<Packet> packet)
+{
+  /// \todo Implement tracing, if requested
+  
+  if (!IsUp ())
+    return false;
+
+  if (m_bucketMax > 0)
+    {
+      if (m_bucket+1.0 > m_bucketMax)
+        return false;
+      
+      m_bucket += 1.0;
+    }
+
+  SendImpl (packet);
+  return true;
+}
+
+bool
+CcnxFace::SendWithoutLimits (Ptr<Packet> packet)
+{
+  /// \todo Implement tracing, if requested
+
+  if (!IsUp ())
+    return false;
+
+  SendImpl (packet);
+  return true;
+}
+
+bool
+CcnxFace::Receive (Ptr<const Packet> packet)
+{
+  /// \todo Implement tracing, if requested
+
+  if (!IsUp ())
+    return false;
+
+  m_protocolHandler (this, packet);
 }
 
 // void
@@ -89,25 +135,11 @@ CcnxFace::IsUp (void) const
   return m_ifup;
 }
 
-bool 
-CcnxFace::IsDown (void) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  return !m_ifup;
-}
-
 void 
-CcnxFace::SetUp (void)
+CcnxFace::SetUp (bool up/* = true*/)
 {
   NS_LOG_FUNCTION_NOARGS ();
-  m_ifup = true;
-}
-
-void 
-CcnxFace::SetDown (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_ifup = false;
+  m_ifup = up;
 }
 
 bool

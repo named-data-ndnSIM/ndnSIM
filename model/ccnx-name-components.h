@@ -43,12 +43,14 @@ public:
   CcnxNameComponents ();
   // CcnxNameComponents (const std::string &s);
   CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
-  
+
+  template<class T>
   inline void
-  Add (const std::string &s);
-       
-  CcnxNameComponents&
-  operator () (const std::string &s);
+  Add (const T &value);
+  
+  template<class T>
+  inline CcnxNameComponents&
+  operator () (const T &value);
 
   const std::list<std::string> &
   GetComponents () const;
@@ -108,11 +110,29 @@ CcnxNameComponents::size () const
 {
   return m_prefix.size ();
 }
-  
-void
-CcnxNameComponents::Add (const std::string &s)
+
+template<class T>
+CcnxNameComponents&
+CcnxNameComponents::operator () (const T &value)
 {
-  (*this) (s);
+  Add (value);
+  return *this;
+}
+
+template<class T>
+void
+CcnxNameComponents::Add (const T &value)
+{
+  std::ostringstream os;
+  os << value;
+  m_prefix.push_back (os.str ());
+}
+
+template<class T=std::string>
+void
+CcnxNameComponents::Add (const T &string)
+{
+  m_prefix.push_back (string);
 }
 
 bool

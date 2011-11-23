@@ -21,76 +21,45 @@
 #ifndef CCNX_CONSUMER_H
 #define CCNX_CONSUMER_H
 
-#include "ns3/application.h"
-#include "ns3/log.h"
-#include "ns3/random-variable.h"
-#include "ns3/nstime.h"
-#include "ns3/event-id.h"
-#include "ns3/ptr.h"
-#include "ns3/simulator.h"
-#include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-local-face.h"
-#include "ns3/ccnx-name-components.h"
-#include "ns3/packet.h"
-#include "ns3/boolean.h"
-#include "ns3/integer.h"
-#include "ns3/uinteger.h"
-#include "ns3/pointer.h"
-#include "ns3/traced-callback.h"
-#include "ns3/ccnx-header-helper.h"
-
-#include "ns3/packet.h"
-#include "ns3/header.h"
+#include "ccnx-app.h"
 
 namespace ns3 
 {
 
-class CcnxConsumer: public Application
+class CcnxConsumer: public CcnxApp
 {
 public: 
   static TypeId GetTypeId ();
         
   CcnxConsumer ();
-  virtual ~CcnxConsumer ();
 
   void OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                         const Ptr<const Packet> &payload);
-        
+
 protected:
-  virtual void DoDispose (void);
+  // from CcnxApp
+  virtual void
+  StartApplication ();
+
+  virtual void
+  StopApplication ();
   
 private:
-  // inherited from Application base class.
-  virtual void StartApplication (void);    // Called at time specified by Start
-  virtual void StopApplication (void);     // Called at time specified by Stop
-        
   //helpers
-  void CancelEvents ();
-
-  // Event handlers
-  // void StartSending ();
-  // void StopSending ();
   void SendPacket ();
-  //typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
      
 private:
-  TracedCallback<const Ptr<CcnxFace>&,const Ptr<const Packet>& > m_interestsTrace;
-  TracedCallback<const Ptr<CcnxFace>&,const Ptr<const Packet>& > m_contentObjectsTrace;
+  UniformVariable m_rand;
+  uint32_t        m_seq;
+  EventId         m_sendEvent; // Eventid of pending "send packet" event
 
-  Time m_offTime;
+  Time               m_offTime;
   CcnxNameComponents m_interestName;
-  Time m_interestLifeTime;
-  int32_t m_minSuffixComponents;
-  int32_t m_maxSuffixComponents;
-  bool m_childSelector;
+  Time               m_interestLifeTime;
+  int32_t            m_minSuffixComponents;
+  int32_t            m_maxSuffixComponents;
+  bool               m_childSelector;
   CcnxNameComponents m_exclude;
-  uint32_t m_initialNonce;
-        
-  EventId         m_sendEvent;    // Eventid of pending "send packet" event
-  TypeId          m_tid;
-  Ptr<CcnxLocalFace> m_face;
-    
-  uint32_t m_seq;
 };
 
 } // namespace ns3

@@ -22,7 +22,6 @@
 #define _CCNX_H_
 
 #include "ns3/object.h"
-#include "ns3/socket.h"
 #include "ns3/callback.h"
 
 namespace ns3 {
@@ -80,13 +79,13 @@ class i_mru {};
 class Ccnx : public Object
 {
 public:
-    enum ForwardingStrategy
+  enum ForwardingStrategy
     { 
-        NDN_FLOODING = 1,
-        NDN_BESTROUTE = 2,
-        NDN_RANKING = 3 
+      NDN_FLOODING = 1,
+      NDN_BESTROUTE = 2,
+      NDN_RANKING = 3 
     };
-    
+
   /**
    * \brief Interface ID
    *
@@ -95,47 +94,47 @@ public:
   static TypeId GetTypeId ();
   virtual ~Ccnx ();
 
-  /**
-   * \brief Send an Interest packet to a specified face
-   *
-   * \param face face where to send this packet
-   * \param header Interest header
-   * \param packet fully prepared CCNx packet to send
-   *
-   * Higher-level layers (forwarding strategy in particular) call this
-   * method to send a packet down the stack to the MAC and PHY layers.
-   */
-  virtual void
-  SendInterest (const Ptr<CcnxFace> &face,
-                const Ptr<const CcnxInterestHeader> &header,
-                const Ptr<Packet> &packet) = 0;
+  // /**
+  //  * \brief Send an Interest packet to a specified face
+  //  *
+  //  * \param face face where to send this packet
+  //  * \param header Interest header
+  //  * \param packet fully prepared CCNx packet to send
+  //  *
+  //  * Higher-level layers (forwarding strategy in particular) call this
+  //  * method to send a packet down the stack to the MAC and PHY layers.
+  //  */
+  // virtual void
+  // SendInterest (const Ptr<CcnxFace> &face,
+  //               const Ptr<const CcnxInterestHeader> &header,
+  //               const Ptr<Packet> &packet) = 0;
 
-  /**
-   * \brief Send a ContentObject packet to a specified face
-   *
-   * \param face face where to send this packet
-   * \param header ContentObject header
-   * \param packet fully prepared CCNx packet to send
-   *
-   * Higher-level layers (forwarding strategy in particular) call this
-   * method to send a packet down the stack to the MAC and PHY layers.
-   */
-  virtual void
-  SendContentObject (const Ptr<CcnxFace> &face,
-                     const Ptr<const CcnxContentObjectHeader> &header,
-                     const Ptr<Packet> &packet) = 0;
+  // /**
+  //  * \brief Send a ContentObject packet to a specified face
+  //  *
+  //  * \param face face where to send this packet
+  //  * \param header ContentObject header
+  //  * \param packet fully prepared CCNx packet to send
+  //  *
+  //  * Higher-level layers (forwarding strategy in particular) call this
+  //  * method to send a packet down the stack to the MAC and PHY layers.
+  //  */
+  // virtual void
+  // SendContentObject (const Ptr<CcnxFace> &face,
+  //                    const Ptr<const CcnxContentObjectHeader> &header,
+  //                    const Ptr<Packet> &packet) = 0;
 
-  /**
-   * \brief Lower layers calls this method after demultiplexing
-   *
-   * Lower-layer-dependent implementation of CcnxFace will do actual work
-   * to set up demultiplexing and call this function as a callback
-   *
-   * \param face face from which packet came from
-   * \param p the packet
-   */
-  virtual void
-  Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p) = 0;
+  // /**
+  //  * \brief Lower layers calls this method after demultiplexing
+  //  *
+  //  * Lower-layer-dependent implementation of CcnxFace will do actual work
+  //  * to set up demultiplexing and call this function as a callback
+  //  *
+  //  * \param face face from which packet came from
+  //  * \param p the packet
+  //  */
+  // virtual void
+  // Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p) = 0;
 
   /**
    * \brief Register a new forwarding strategy to be used by this Ccnx

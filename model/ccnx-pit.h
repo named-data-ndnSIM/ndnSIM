@@ -92,9 +92,8 @@ struct CcnxPitEntryContainer
 // typedef std::map<int,int> PitCounter;
 // typedef std::map<int,int>::iterator PitCounterIterator;
 
- typedef std::map<int,double> PitBucket;
- typedef std::map<int,double>::iterator PitBucketIterator;
-
+typedef std::map<int,double> PitBucket;
+typedef std::map<int,double>::iterator PitBucketIterator;
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -122,17 +121,6 @@ public:
    * \brief Destructor
    */
   virtual ~CcnxPit ();
-
-  /**
-   * @brief Try to add outgoing entry to PIT entry.
-   * Will fail if there were too much (other) interests forwarded to this face
-   *
-   * @param pitEntry PIT entry
-   * @param face     face
-   * @returns false if rate limit is imposed and no outgoing entry was created. True otherwise
-   */
-  bool
-  TryAddOutgoing(const CcnxPitEntry &pitEntry, Ptr<CcnxFace> face);
   
   /**
    * \brief Find corresponding PIT entry for the given content name
@@ -155,21 +143,25 @@ public:
   boost::tuple<const CcnxPitEntry&, bool, bool>
   Lookup (const CcnxInterestHeader &header);
   
-  // remove a PIT entry
-  //void erase (const string &contentName);
-	
-  // Reset pending state in outgoing interests
-  // void resetPendingState( PitEntry &pe );
+  Time GetPitEntryPruningTimeout () const
+  {
+    return m_PitEntryPruningTimout;
+  }
+  
+  /**
+   * \brief Set FIB table
+   */
+  void SetFib (Ptr<CcnxFib> fib);
 
-  //	// Check if there are any interfaces that we haven't sent data to yet
-  //	bool areFreeInterfaces( PitEntry &pe, int interface );
+protected:
+  // inherited from Object class                                                                                                                                                        
+  virtual void NotifyNewAggregate ();
+  virtual void DoDispose ();
+  	
+private:
+  /** \brief Remove expired records from PIT */
+  void CleanExpired ();
 
-  // Periodically generate pre-calculated number of tokens (leak buckets)
-  void LeakBuckets( );
-	
-  // Selectively leak a bucket
-  void LeakBucket (Ptr<CcnxFace> face, int amount);
-	
   /**
    * \brief Set cleanup timeout
    *
@@ -186,40 +178,26 @@ public:
    */
   Time GetCleanupTimeout () const;
 
-  Time GetPitEntryPruningTimeout () const
-  {
-    return m_PitEntryPruningTimout;
-  }
-  
-  /**
-   * \brief Set FIB table
-   */
-  void SetFib (Ptr<CcnxFib> fib);
-
-protected:
-  // inherited from Object class                                                                                                                                                        
-  virtual void NotifyNewAggregate ();
-  virtual void DoDispose ();
-
-public:
-   PitBucket				 maxBucketsPerFace; // maximum number of buckets. Automatically computed based on link capacity
-  // // averaging over 1 second (bandwidth * 1second)
-   PitBucket				 leakSize;				 // size of a periodic bucket leak
-	
-private:
-  /** \brief Remove expired records from PIT */
-  void CleanExpired ();
-
   friend std::ostream& operator<< (std::ostream& os, const CcnxPit &fib);
   
 private:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
+
+  // configuration variables. Check implementation of GetTypeId for more details
   Time    m_PitEntryPruningTimout;
-  Time    m_PitEntryDefaultLifetime; 
+  Time    m_PitEntryDefaultLifetime;
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
-  PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face
+  // PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face
+
+  // /**
+  //  * \brief maximum number of buckets. Automatically computed based on link capacity
+  //  * averaging over 1 second (bandwidth * 1second)
+  //  */
+  // PitBucket    maxBucketsPerFace;
+  
+  // PitBucket    leakSize; ///< size of a periodic bucket leak
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -108,36 +108,84 @@ public:
   // // Get number of outgoing interests that we're expecting data from
   // inline size_t numberOfPromisingInterests( ) const; 
 
-  const CcnxNameComponents &
-  GetPrefix () const;
+  // const CcnxNameComponents &
+  // GetPrefix () const;
 
+  /**
+   * @brief Get current expiration time of the record
+   *
+   * @returns current expiration time of the record
+   */
   const Time &
   GetExpireTime () const
   { return m_expireTime; }
 
+  /**
+   * @brief Set expiration time on record as `expireTime` (absolute time)
+   *
+   * @param expireTime absolute simulation time of when the record should expire
+   */
   void
   SetExpireTime (const Time &expireTime)
   {
     m_expireTime = expireTime;
   }
   
+  /**
+   * @brief Check if nonce `nonce` for the same prefix has already been seen
+   *
+   * @param nonce Nonce to check
+   */
   bool
   IsNonceSeen (uint32_t nonce) const
   { return m_seenNonces.find (nonce) != m_seenNonces.end (); }
 
+  /**
+   * @brief Add `nonce` to the list of seen nonces
+   *
+   * @param nonce nonce to add to the list of seen nonces
+   *
+   * All nonces are stored for the lifetime of the PIT entry
+   */
   void
   AddSeenNonce (uint32_t nonce)
   { m_seenNonces.insert (nonce); }
 
+  /**
+   * @brief Add `face` to the list of incoming faces
+   *
+   * @param face Face to add to the list of incoming faces
+   * @returns iterator to the added entry
+   */
   CcnxPitEntryIncomingFaceContainer::type::iterator
   AddIncoming (Ptr<CcnxFace> face);
 
+  /**
+   * @brief Clear all incoming faces either after all of them were satisfied or NACKed
+   */
   void
   ClearIncoming ()
   { m_incoming.clear (); }
 
+  /**
+   * @brief Add `face` to the list of outgoing faces
+   *
+   * @param face Face to add to the list of outgoing faces
+   * @returns iterator to the added entry
+   */
   CcnxPitEntryOutgoingFaceContainer::type::iterator
   AddOutgoing (Ptr<CcnxFace> face);
+
+  /**
+   * @brief Remove all references to face.
+   * 
+   * This method should be called before face is completely removed from the stack.
+   * Face is removed from the lists of incoming and outgoing faces
+   */
+  void
+  RemoveAllReferencesToFace (Ptr<CcnxFace> face);
+
+protected:
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);

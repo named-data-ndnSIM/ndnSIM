@@ -24,14 +24,12 @@
 #include <ostream>
 
 #include "ns3/ptr.h"
-#include "ns3/simple-ref-count.h"
-#include "ns3/callback.h"
+#include "ns3/ccnx.h"
 
 namespace ns3 {
 
 class Packet;
 class Node;
-
   
 /**
  * \ingroup ccnx
@@ -54,14 +52,14 @@ public:
    * \brief Ccnx protocol hanler
    *
    * \param face Face from which packet has been received
-   * \param packet Received packet
+   * \param packet Original packet
    */
   typedef Callback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>& > ProtocolHandler;
 
   /**
    * \brief Default constructor
    */
-  CcnxFace ();
+  CcnxFace (Ptr<Node> node);
   virtual ~CcnxFace();
 
   ////////////////////////////////////////////////////////////////////
@@ -71,23 +69,43 @@ public:
    *
    * This method should call protocol-dependent registration function
    */
-  virtual void RegisterProtocolHandler (ProtocolHandler handler) = 0;
+  virtual void
+  RegisterProtocolHandler (ProtocolHandler handler);
   
   /**
-   * \brief Send packet on a face
+   * \brief Send packet on a face with regard Interest limits
+   *
+   * This method will be called by lower layers to send data to device or application
    *
    * \param p smart pointer to a packet to send
+   *
+   * @return false if either limit is reached or face is down
    */ 
-  virtual void Send (Ptr<Packet> p) = 0;
-
-  ////////////////////////////////////////////////////////////////////
+  bool
+  SendWithLimit (Ptr<Packet> p);
 
   /**
-   * \brief Associate Node object with face
+   * \brief Send content packet on a face without regard to limits
    *
-   * \param node smart pointer to a Node object
+   * This method will be called by lower layers to send data to device or application
+   *
+   * !!! The only difference between this call and SendInterest is that the former check Interest limit !!!
+   *
+   * \param p smart pointer to a packet to send
+   *
+   * @return false if face is down
+   */ 
+  bool
+  SendWithoutLimits (Ptr<Packet> p);
+
+  /**
+   * \brief Receive packet from application or another node and forward it to the CCNx stack
+   *
+   * \todo The only reason for this call is to handle tracing, if requested
    */
-  virtual void SetNode (Ptr<Node> node);
+  void
+  Receive (Ptr<const Packet> p);
+  ////////////////////////////////////////////////////////////////////
 
   // /**
   //  * \Brief Assign routing/forwarding metric with face
@@ -110,24 +128,16 @@ public:
    */
   
   /**
-   * \brief Enable this face
+   * \brief Enable or disable this face
    */
-  virtual void SetUp ();
-
-  /**
-   * \brief Disable this face
-   */
-  virtual void SetDown (void);
+  virtual void
+  SetUp (bool up = true);
 
   /**
    * \brief Returns true if this face is enabled, false otherwise.
    */
-  virtual bool IsUp () const;
-
-  /**
-   * \brief Returns true if this face is disabled, false otherwise.
-   */
-  virtual bool IsDown () const;
+  virtual bool
+  IsUp () const;
   
   virtual std::ostream&
   Print (std::ostream &os) const;
@@ -153,6 +163,22 @@ public:
   GetId () const;
 
   /**
+   * @brief Set maximum value for Interest allowance
+   *
+   * @param bucket maximum value for Interest allowance. If < 0, then limit will be disabled
+   */
+  inline void
+  SetBucketMax (double bucket);
+
+  /**
+   * @brief Leak the Interest allowance bucket by (1/interval) * m_bucketMax amount
+   *
+   * @param interval Time interval with which the bucket is leaked
+   */
+  inline void
+  LeakBucket (const Time &interval);
+  
+  /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
    *
    * Internal index is used for comparison.
@@ -168,6 +194,15 @@ public:
   bool
   operator< (const CcnxFace &face) const;
 
+protected:
+  /**
+   * \brief Send packet on a face (actual implementation)
+   *
+   * \param p smart pointer to a packet to send
+   */
+  virtual void
+  SendImpl (Ptr<Packet> p) = 0;  
+
 private:
   CcnxFace (const CcnxFace &); ///< \brief Disabled copy constructor
   CcnxFace& operator= (const CcnxFace &); ///< \brief Disabled copy operator
@@ -175,9 +210,13 @@ private:
 protected:
   // uint16_t m_metric; ///< \brief Routing/forwarding metric
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
-  ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
 
+  double m_bucket; ///< \brief Value representing current size of the Interest allowance for this face
+  double m_bucketMax;  ///< \brief Maximum Interest allowance for this face
+  double m_bucketLeak; ///< \brief Normalized amount that should be leaked every second
+  
 private:
+  ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
   uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)  
 };
@@ -201,6 +240,20 @@ CcnxFace::GetId () const
 {
   return m_id;
 }
+
+void
+CcnxFace::SetBucketMax (double bucket)
+{
+  m_bucketMax = bucket;
+}
+
+void
+CcnxFace::LeakBucket (const Time &interval)
+{
+  const double leak = m_bucketLeak * 1.0 / interval.ToDouble (Time::S);
+  m_bucket -= std::max (0, m_bucket-leak); 
+}
+
 
 } // namespace ns3
 

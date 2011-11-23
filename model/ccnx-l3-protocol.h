@@ -127,13 +127,12 @@ public:
   void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
 
-  virtual void SendInterest (const Ptr<CcnxFace> &face,
-                             const Ptr<const CcnxInterestHeader> &header,
-                             const Ptr<Packet> &packet);
-  virtual void SendContentObject (const Ptr<CcnxFace> &face,
-                                  const Ptr<const CcnxContentObjectHeader> &header,
-                                  const Ptr<Packet> &packet);
-  virtual void Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
+  // virtual void SendInterest (const Ptr<CcnxFace> &face,
+  //                            const Ptr<const CcnxInterestHeader> &header,
+  //                            const Ptr<Packet> &packet);
+  // virtual void SendContentObject (const Ptr<CcnxFace> &face,
+  //                                 const Ptr<const CcnxContentObjectHeader> &header,
+  //                                 const Ptr<Packet> &packet);
 
   virtual uint32_t
   AddFace (const Ptr<CcnxFace> &face);
@@ -153,7 +152,10 @@ public:
   Ptr<CcnxPit> GetPit();
   
   // void ScheduleLeakage();
-protected:
+private:
+  void
+  Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
+
   /**
    * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
    * 
@@ -162,7 +164,7 @@ protected:
    * @param header  deserialized Interest header
    * @param packet  original packet
    */
-  virtual void
+  void
   OnInterest (const Ptr<CcnxFace> &face,
               Ptr<CcnxInterestHeader> &header,
               const Ptr<const Packet> &p);
@@ -175,7 +177,7 @@ protected:
    * @param header  deserialized Interest header
    * @param packet  original packet
    */
-  virtual void
+  void
   OnNack (const Ptr<CcnxFace> &face,
           Ptr<CcnxInterestHeader> &header,
           const Ptr<const Packet> &p);
@@ -189,7 +191,7 @@ protected:
    * @param payload data packet payload
    * @param packet  original packet
    */
-  virtual void
+  void
   OnData (const Ptr<CcnxFace> &face,
           Ptr<CcnxContentObjectHeader> &header,
           Ptr<Packet> &payload,
@@ -208,14 +210,17 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  /**
-   * \brief A helper function
-   */
-  void TransmittedDataTrace (Ptr<Packet>,
-                             ContentObjectSource,
-                             Ptr<Ccnx>, Ptr<const CcnxFace>);
+  /// \brief Set buckets leak interval
+  void
+  SetBucketLeakInterval (Time interval);
+
+  /// \brief Get buckets leak interval
+  Time
+  GetBucketLeakInterval () const;
   
-  
+  /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
+  void LeakBuckets( );
+
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
@@ -228,32 +233,29 @@ private:
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 DropReason,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
 
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                 Ptr<const Packet>,/*payload*/
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                 Ptr<const Packet>,/*payload*/
-                 ContentObjectSource,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                 Ptr<const Packet>,/*payload*/
-                 DropReason,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
+  Time    m_bucketLeakInterval;
+  EventId m_bucketLeakEvent;
   
-  /**
-   * \brief Trace of dropped packets, including reason and all headers
-   * \internal
-   */
-  // TracedCallback<Ptr<const Packet>, DropReason, Ptr<const Ccnx>, Ptr<const CcnxFace> > m_dropTrace;
+  // TracedCallback<Ptr<const CcnxInterestHeader>,
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+  // TracedCallback<Ptr<const CcnxInterestHeader>,
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  // TracedCallback<Ptr<const CcnxInterestHeader>,
+  //                DropReason,
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
+
+  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  //                Ptr<const Packet>,/*payload*/
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  //                Ptr<const Packet>,/*payload*/
+  //                ContentObjectSource,
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
+  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  //                Ptr<const Packet>,/*payload*/
+  //                DropReason,
+  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
 };
   
 } // Namespace ns3

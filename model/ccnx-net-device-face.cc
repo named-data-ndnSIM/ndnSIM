@@ -36,11 +36,13 @@ namespace ns3 {
  * By default, Ccnx face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face
  */
-CcnxNetDeviceFace::CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice) 
+CcnxNetDeviceFace::CcnxNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice)
+  : CcnxFace (node)
+  , m_netDevice (netDevice)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << netDevice);
 
-  m_netDevice = netDevice;
+  NS_ASSERT_MSG (m_netDevice != 0, "CcnxNetDeviceFace needs to be assigned a valid NetDevice");
 }
 
 CcnxNetDeviceFace::~CcnxNetDeviceFace ()
@@ -66,11 +68,10 @@ CcnxNetDeviceFace::GetNetDevice () const
 void
 CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  NS_LOG_FUNCTION(this);
-  NS_ASSERT_MSG (m_netDevice != 0, "CcnxNetDeviceFace needs to be assigned NetDevice first");
-  
-  m_protocolHandler = handler;
+  NS_LOG_FUNCTION (this << handler);
 
+  CcnxFace::RegisterProtocolHandler (handler);
+  
   m_node->RegisterProtocolHandler (MakeCallback (&CcnxNetDeviceFace::ReceiveFromNetDevice, this),
                                    CcnxL3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
 }
@@ -78,16 +79,12 @@ CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 void
 CcnxNetDeviceFace::Send (Ptr<Packet> packet)
 {
+  NS_LOG_FUNCTION (this << packet);
+  
   NS_ASSERT_MSG (packet->GetSize () <= m_netDevice->GetMtu (), 
                  "Packet size " << packet->GetSize () << " exceeds device MTU "
                  << m_netDevice->GetMtu ()
                  << " for Ccnx; fragmentation not supported");
-
-  NS_LOG_FUNCTION (*packet);
-  if (!IsUp ())
-    {
-      return;
-    }
 
   m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
                      CcnxL3Protocol::ETHERNET_FRAME_TYPE);
@@ -102,7 +99,7 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
                                          const Address &to,
                                          NetDevice::PacketType packetType)
 {
-  m_protocolHandler (Ptr<CcnxFace>(this), p);
+  Receive (p);
 }
 
 

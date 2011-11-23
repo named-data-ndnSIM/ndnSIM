@@ -61,20 +61,11 @@ CcnxL3Protocol::GetTypeId (void)
     .SetParent<Ccnx> ()
     .SetGroupName ("Ccnx")
     .AddConstructor<CcnxL3Protocol> ()
-    // .AddTraceSource ("Tx", "Send ccnx packet to outgoing interface.",
-    //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_txTrace))
-    // .AddTraceSource ("Rx", "Receive ccnx packet from incoming interface.",
-    //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_rxTrace))
-    // .AddTraceSource ("Drop", "Drop ccnx packet",
-    //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_dropTrace))
-    // .AddAttribute ("InterfaceList", "The set of Ccnx interfaces associated to this Ccnx stack.",
-    //                ObjectVectorValue (),
-    //                MakeObjectVectorAccessor (&CcnxL3Protocol::m_faces),
-    //                MakeObjectVectorChecker<CcnxFace> ())
-
-    // .AddTraceSource ("SendOutgoing", "A newly-generated packet by this node is about to be queued for transmission",
-    //                  MakeTraceSourceAccessor (&CcnxL3Protocol::m_sendOutgoingTrace))
-
+    .AddAttribute ("BucketLeakInterval",
+                   "Interval to leak buckets",
+                   StringValue ("10ms"),
+                   MakeTimeAccessor (&CcnxPit::GetBucketLeakInterval, &CcnxPit::SetBucketLeakInterval),
+                   MakeTimeChecker ())
   ;
   return tid;
 }
@@ -128,6 +119,9 @@ CcnxL3Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
 
+  if (m_bucketLeakEvent.IsRunning ())
+    m_bucketLeakEvent.Cancel ();
+  
   for (CcnxFaceList::iterator i = m_faces.begin (); i != m_faces.end (); ++i)
     {
       *i = 0;
@@ -171,7 +165,7 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
   face->RegisterProtocolHandler (MakeCallback (&CcnxL3Protocol::Receive, this));
 
   m_faces.push_back (face);
-  m_faceCounter ++;
+  m_faceCounter++;
   return face->GetId ();
 }
 
@@ -180,6 +174,27 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
 {
   // ask face to register in lower-layer stack
   face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ());
+
+  // just to be on a safe side. Do the process in two steps
+  list<CcnxPitEntryContainer::type::iterator> entriesToRemoves; 
+  BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
+    {
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind (CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
+
+      // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
+      // Thus, we have to remove the whole PIT entry
+      if (m_pit->m_fibEntry.size () == 1 &&
+          m_pit->m_fibEntry.m_faces.begin ()->m_face == face)
+        {
+          entriesToRemoves.push_back (m_pit->iterator_to (pitEntry));
+        }
+    }
+  BOOST_FOREACH (CcnxPitEntryContainer::type::iterator entry, entriesToRemoves)
+    {
+      m_pit->erase (entry);
+    }
+
   CcnxFaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
   NS_ASSERT_MSG (face_it != m_faces.end (), "Attempt to remove face that doesn't exist");
   m_faces.erase (face_it);
@@ -215,24 +230,6 @@ CcnxL3Protocol::GetNFaces (void) const
 {
   return m_faces.size ();
 }
-
-void
-CcnxL3Protocol::TransmittedDataTrace (Ptr<Packet> packet,
-                                      ContentObjectSource type,
-                                      Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-{
-  // a "small" inefficiency for logging purposes
-  Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
-  static CcnxContentObjectTail tail;
-  packet->RemoveHeader (*header);
-  packet->RemoveTrailer (tail);
-      
-  m_transmittedDataTrace (header, packet/*payload*/, type, ccnx, face);
-  
-  packet->AddHeader (*header);
-  packet->AddTrailer (tail);
-}
-
 
 // Callback from lower layer
 void 
@@ -333,7 +330,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &face,
   //               {
   //                 header->SetNonce(it->m_nonce);
   //                 header->SetNack(true);
-  //                 SendInterest(face.m_face, header, packet->Copy());
+  //                 face.m_face->SendWithoutLimit (packet->Copy());
   //               }
   //           }
   //       }
@@ -376,7 +373,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       Ptr<Packet> packet = Create<Packet> ();
       packet->AddHeader (*header);
 
-      SendInterest (incomingFace, header, packet);
+      incomingFace->SendWithoutLimit (packet);
       
       // //Trace duplicate interest  
       // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
@@ -384,19 +381,17 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
 
   Ptr<Packet> contentObject;
-  Ptr<const CcnxContentObjectHeader> contentObjectHeader;
+  Ptr<const CcnxContentObjectHeader> contentObjectHeader; // unused for now
   tie (contentObject, contentObjectHeader) = m_contentStore->Lookup (header);
   if (contentObject != 0)
     {
-      // NS_ASSERT_MSG (pitEntry.m_incoming.size () == 0,
-      //                "Something strange. Data is cached, but size of incoming interests is not zero...");
       NS_ASSERT (contentObjectHeader != 0);
       
       NS_LOG_LOGIC("Found in cache");
         
       // TransmittedDataTrace (contentObject, CACHED,
       //                       m_node->GetObject<Ccnx> (), incomingFace);
-      SendContentObject (incomingFace, contentObjectHeader, contentObject);
+      incomingFace->SendWithoutLimit (contentObject);
 
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -454,9 +449,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
   
   bool propagated = m_forwardingStrategy->
-    PropagateInterest (pitEntry, incomingFace, header, packet,
-                       MakeCallback (&CcnxL3Protocol::SendInterest, this)
-                       );
+    PropagateInterest (pitEntry, incomingFace, header, packet);
 
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
@@ -469,7 +462,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
-          SendInterest (incoming.m_face, header, packet->Copy ());
+          incoming.m_face->SendWithoutLimit (packet->Copy ());
 
           // m_droppedInterestsTrace (header, DROP_CONGESTION,
           //                          m_node->GetObject<Ccnx> (), incomingFace);
@@ -537,7 +530,7 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
           if (incoming.m_face != incomingFace)
-            SendContentObject (incoming.m_face, header, packet->Copy ());
+            incoming.m_face->SendWithoutLimit (packet->Copy ());
 
           // successfull forwarded data trace
         }
@@ -562,59 +555,33 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-CcnxL3Protocol::SendInterest (const Ptr<CcnxFace> &face,
-                              const Ptr<const CcnxInterestHeader> &header,
-                              const Ptr<Packet> &packet)
+CcnxL3Protocol::SetBucketLeakInterval (Time interval)
 {
-  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face);
-  NS_ASSERT_MSG (face != 0, "Face should never be NULL");
+  m_bucketLeakInterval = interval;
+  
+  if (m_bucketLeakEvent.IsRunning ())
+    m_bucketLeakEvent.Cancel ();
 
-  if (face->IsUp ())
-    {
-      NS_LOG_LOGIC ("Sending via face " << &face); //
-      // m_transmittedInterestsTrace (header, m_node->GetObject<Ccnx> (), face);
-      face->Send (packet);
-    }
-  else
-    {
-      NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << &face);
-      // m_droppedInterestsTrace (header, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
-    }
+  m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
+                                           &CcnxL3Protocol::LeakBuckets, this);
 }
 
-void
-CcnxL3Protocol::SendContentObject (const Ptr<CcnxFace> &face,
-                                   const Ptr<const CcnxContentObjectHeader> &header,
-                                   const Ptr<Packet> &packet)
+Time
+CcnxL3Protocol::GetBucketLeakInterval () const
 {
-  NS_LOG_FUNCTION (this << "packet: " << &packet << ", face: "<< &face);
-  NS_ASSERT_MSG (face != 0, "Face should never be NULL");
-
-  if (face->IsUp ())
-    {
-      NS_LOG_LOGIC ("Sending via face " << &face); //
-      // m_txTrace (packet, m_node->GetObject<Ccnx> (), face);
-      face->Send (packet);
-    }
-  else
-    {
-      NS_LOG_LOGIC ("Dropping -- outgoing interface is down: " << &face);
-      // m_dropTrace (packet, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
-    }
+  return m_bucketLeakInterval;
 }
 
-Ptr<CcnxPit>
-CcnxL3Protocol::GetPit()
+void 
+CcnxPit::LeakBuckets ()
 {
-    return m_pit;
+  BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
+    {
+      face->LeakBucket (m_bucketLeakInterval);
+    }
+
+  m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
+                                           &CcnxL3Protocol::LeakBuckets, this);
 }
 
-// void
-// CcnxL3Protocol::ScheduleLeakage()
-// {
-//     m_pit->LeakBuckets();
-//     Time interval = MilliSeconds (NDN_INTEREST_RESET_PERIOD);
-    
-//     Simulator::Schedule (interval, &CcnxL3Protocol::ScheduleLeakage, this);
-// }
 } //namespace ns3

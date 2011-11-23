@@ -48,7 +48,7 @@ CcnxPit::GetTypeId ()
     .AddConstructor<CcnxPit> ()
     .AddAttribute ("CleanupTimeout",
                    "Timeout defining how frequent RIT should be cleaned up",
-                   TimeValue (Seconds (1)),
+                   StringValue ("1s"),
                    MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
                    MakeTimeChecker ())
     .AddAttribute ("PitEntryPruningTimout",
@@ -72,10 +72,7 @@ CcnxPit::CcnxPit ()
 
 CcnxPit::~CcnxPit ()
 {
-  if (m_cleanupEvent.IsRunning ())
-    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
-
-  clear ();
+  DoDispose ();
 }
 
 void 
@@ -87,7 +84,10 @@ void
 CcnxPit::DoDispose ()
 {
   if (m_cleanupEvent.IsRunning ())
-    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
+    m_cleanupEvent.Cancel ();
+
+  if (m_PitBucketLeakEvent.IsRunning ())
+    m_PitBucketLeakEvent.Cancel ();
 
   clear ();
 }
@@ -116,11 +116,11 @@ void CcnxPit::CleanExpired ()
   Time now = Simulator::Now ();
 
   uint32_t count = 0;
-  while( !empty() )
+  while (!empty ())
     {
-      if( get<i_timestamp> ().front ().GetExpireTime () <= now ) // is the record stale?
+      if (get<i_timestamp> ().front ().GetExpireTime () <= now) // is the record stale?
         {
-          get<i_timestamp> ().pop_front( );
+          get<i_timestamp> ().pop_front ();
           count ++;
         }
       else
@@ -138,26 +138,6 @@ void
 CcnxPit::SetFib (Ptr<CcnxFib> fib)
 {
   m_fib = fib;
-}
-
-bool
-CcnxPit::TryAddOutgoing (const CcnxPitEntry &pitEntry, Ptr<CcnxFace> face)
-{
-  NS_LOG_FUNCTION ("Face has " << m_bucketsPerFace[face->GetId()] <<
-               " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
-    
-  if (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()])
-    {
-      NS_LOG_INFO("************ LIMIT **************");
-      return false;
-    }
-    
-  m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
-
-  modify (iterator_to (pitEntry),
-          bind(&CcnxPitEntry::AddOutgoing, lambda::_1, face));
-          
-  return true;
 }
 
 const CcnxPitEntry&
@@ -216,25 +196,5 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
 
   return make_tuple (cref(*entry), isNew, isDuplicate);
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////
-
-void 
-CcnxPit::LeakBuckets ()
-{
-  for (PitBucketIterator it = m_bucketsPerFace.begin(); 
-       it != m_bucketsPerFace.end();
-       it++)
-    {
-      it->second = std::max (0.0, it->second - leakSize[it->first]);
-    }
-}
-    
-void 
-CcnxPit::LeakBucket (Ptr<CcnxFace> face, int amount)
-{
-  m_bucketsPerFace[face->GetId()] = std::max (0.0, m_bucketsPerFace[face->GetId()] - amount);
-}
-
 
 } // namespace ns3

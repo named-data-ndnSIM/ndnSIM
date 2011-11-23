@@ -49,8 +49,7 @@ bool
 CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
                                          const Ptr<CcnxFace> &incomingFace,
                                          Ptr<CcnxInterestHeader> &header,
-                                         const Ptr<const Packet> &packet,
-                                         SendCallback sendCallback)
+                                         const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);
     
@@ -66,11 +65,13 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
         continue;
 
-      bool faceAvailable = m_pit->TryAddOutgoing (pitEntry, metricFace.m_face);
+      bool faceAvailable = metricFace.m_face->SendWithLimit (packet->Copy ());
       if (!faceAvailable) // huh...
-          continue;
+        continue;
+
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     bind(&CcnxPitEntry::AddOutgoing, lambda::_1, metricFace.m_face));
         
-      sendCallback (metricFace.m_face, header, packet->Copy());
       propagatedCount++;
     }
 

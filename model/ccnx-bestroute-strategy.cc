@@ -48,8 +48,7 @@ bool
 CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
                                           const Ptr<CcnxFace> &incomingFace,
                                           Ptr<CcnxInterestHeader> &header,
-                                          const Ptr<const Packet> &packet,
-                                          SendCallback sendCallback)
+                                          const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);
   bool forwardedCount = 0;
@@ -66,11 +65,13 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           if (pitEntry.m_outgoing.find (bestMetric.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
             continue;
 
-          bool faceAvailable = m_pit->TryAddOutgoing (pitEntry, bestMetric.m_face);
+          bool faceAvailable = bestMetric.m_face->SendWithLimit (packet->Copy ());
           if (!faceAvailable) // huh...
             continue;
 
-          sendCallback (bestMetric.m_face, header, packet->Copy());
+          m_pit->modify (m_pit->iterator_to (pitEntry),
+                         bind(&CcnxPitEntry::AddOutgoing, lambda::_1, bestMetric.m_face));
+
           forwardedCount++;
           break; // if we succeeded in sending one packet, stop
         }

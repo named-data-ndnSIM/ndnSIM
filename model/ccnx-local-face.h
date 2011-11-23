@@ -44,61 +44,32 @@ class Packet;
 class CcnxLocalFace  : public CcnxFace
 {
 public:
-  typedef Callback<void,const Ptr<const CcnxInterestHeader> &> InterestHandler;
-  typedef Callback<void,const Ptr<const CcnxContentObjectHeader> &,
-                        const Ptr<const Packet> &> ContentObjectHandler;
-
   /**
    * \brief Default constructor
    */
-  CcnxLocalFace ();
+  CcnxLocalFace (Ptr<CcnxApp> app);
   virtual ~CcnxLocalFace();
   
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
-
-  /**
-   * \brief This method should be called to establish link with lower layers
-   */
   virtual void
   RegisterProtocolHandler (ProtocolHandler handler);
 
-  /**
-   * \brief This method will be called by lower layers to send data to *application*
-   */
+protected:
   virtual void
-  Send (Ptr<Packet> p);
-    
+  SendImpl (Ptr<Packet> p);
+
+public:
   virtual std::ostream&
   Print (std::ostream &os) const;
   ////////////////////////////////////////////////////////////////////
-
-   /**
-   * \brief This method will be called by higher layers to send data to *ccnx stack*
-   */
-  void ReceiveFromApplication (Ptr<Packet> p);
-
-  /**
-   * \brief Set callback to application
-   *
-   * \param onInterest InterestHandler to be called when interest arrives on the face. Will be disabled if 0
-   */
-  void SetInterestHandler (InterestHandler onInterest);
-
-    /**
-   * \brief Set callback to application
-   *
-   * \param onContentObject ContentObjectHandler to be called when data arrives. Will be disabled if 0
-   */
-  void SetContentObjectHandler (ContentObjectHandler onContentObject);
  
 private:
   CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor
   CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
 
 private:
-  InterestHandler m_onInterest;
-  ContentObjectHandler m_onContentObject;
+  Ptr<CcnxApp> m_application;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);

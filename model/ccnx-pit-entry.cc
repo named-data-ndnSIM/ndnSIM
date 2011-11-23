@@ -66,27 +66,20 @@ CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
   return ret.first;
 }
 
+void
+CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
+{
+  CcnxPitEntryIncomingFaceContainer::type::iterator incoming =
+    m_incoming.find (face);
 
-// void
-// CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)
-// {
-//   NS_ASSERT_MSG (false, "Broken");
-//   m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
-//                  CcnxFibEntry::UpdateStatus (m_face, m_status));
-// }
+  if (incoming != m_incoming.end ())
+    m_incoming.erase (incoming);
 
-// void
-// CcnxPitEntry::EstimateRttAndRemoveFace::operator() (CcnxPitEntry &entry)
-// {
-//   // similar to Karn's Algorithm, we don't use RTT measurements for retx packets
-//   if (m_outFace->m_retxNum>0)
-//     return;
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+    m_outgoing.find (face);
 
-//   m_fib->modify (m_fib->iterator_to (entry.m_fibEntry),
-//                 CcnxFibEntry::UpdateFaceRtt (m_outFace->m_face,
-//                                              Simulator::Now() - m_outFace->m_sendTime));
-
-//   entry.m_outgoing.erase (m_outFace);
-// }
+  if (outgoing != m_outgoing.end ())
+    m_outgoing.erase (outgoing);
+}
 
 }  

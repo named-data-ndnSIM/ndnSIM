@@ -45,31 +45,26 @@ class Address;
 class CcnxNetDeviceFace  : public CcnxFace
 {
 public:
-  // /**
-  //  * \brief Interface ID
-  //  *
-  //  * \return interface ID
-  //  */
-  // static TypeId GetTypeId (void);
-
   /**
    * \brief Constructor
    *
    * \param netDevice a smart pointer to NetDevice object to which
    * this face will be associate
    */
-  CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice);
+  CcnxNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
   virtual ~CcnxNetDeviceFace();
 
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
-  
   virtual void
   RegisterProtocolHandler (ProtocolHandler handler);
 
+protected:
+  // also from CcnxFace
   virtual void
-  Send (Ptr<Packet> p);
-  
+  SendImpl (Ptr<Packet> p);
+
+public:
   virtual std::ostream&
   Print (std::ostream &os) const;
   ////////////////////////////////////////////////////////////////////

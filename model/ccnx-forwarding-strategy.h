@@ -42,10 +42,6 @@ class CcnxInterestHeader;
 class CcnxForwardingStrategy : public Object
 {
 public:
-  typedef
-  Callback<void, const Ptr<CcnxFace> &, const Ptr<const CcnxInterestHeader> &, const Ptr<Packet> &>
-  SendCallback;
-
   static TypeId GetTypeId (void);
 
   /**
@@ -69,8 +65,7 @@ public:
   PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packet,
-                     SendCallback sendCallback) = 0;
+                     const Ptr<const Packet> &packe) = 0;
     
   /**
    * @brief Set link to PIT for the forwarding strategy
