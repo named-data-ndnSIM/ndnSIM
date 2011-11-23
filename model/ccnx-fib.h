@@ -150,6 +150,8 @@ struct CcnxFibFaceMetricContainer
 class CcnxFibEntry : public SimpleRefCount<CcnxFibEntry>
 {
 public:
+  class NoFaces {};
+  
   /**
    * \brief Constructor
    * \param prefix Prefix for the FIB entry
@@ -163,15 +165,21 @@ public:
    * \brief Update status of FIB next hop
    * \param status Status to set on the FIB entry
    */
-  void UpdateStatus (const CcnxFace &face, CcnxFibFaceMetric::Status status);
+  void UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status);
 
-  // /**
-  //  * \brief Add or update routing metric of FIB next hop
-  //  *
-  //  * Initial status of the next hop is set to YELLOW
-  //  */
-  // void AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric);
+  /**
+   * \brief Add or update routing metric of FIB next hop
+   *
+   * Initial status of the next hop is set to YELLOW
+   */
+  void AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric);
 
+  /**
+   * @brief Update RTT averages for the face
+   */
+  void
+  UpdateFaceRtt (Ptr<CcnxFace> face, const Time &sample);
+  
   /**
    * \brief Get prefix for the FIB entry
    */
@@ -180,9 +188,11 @@ public:
 
   /**
    * \brief Find "best route" candidate, skipping `skip' first candidates (modulo # of faces)
+   *
+   * throws CcnxFibEntry::NoFaces if m_faces.size()==0
    */
-  Ptr<CcnxFace>
-    FindBestCandidate (int skip = 0) const;
+  const CcnxFibFaceMetric &
+  FindBestCandidate (uint32_t skip = 0) const;
 	
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);

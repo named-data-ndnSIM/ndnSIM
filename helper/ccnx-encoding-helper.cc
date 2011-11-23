@@ -156,16 +156,10 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxInterestHeader &interest)
     {
       written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Nonce, sizeof(uint32_t));
     }
-  if (interest.IsNack () )
+  if (interest.GetNack ()>0)
     {
-        written += EstimateBlockHeader (CcnbParser::NDN_DTAG_Nack);
-        written += EstimateNumber (1);
-        written += 1;
-    }
-  if (interest.IsCongested () )
-    {
-        written += EstimateBlockHeader (CcnbParser::NDN_DTAG_Congested);
-        written += EstimateNumber (1);
+        written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Nack);
+        written += EstimateNumber (interest.GetNack ());
         written += 1;
     }
 

@@ -20,8 +20,10 @@
 
 #include "ccnx-flooding-strategy.h"
 #include "ns3/assert.h"
+#include "ns3/log.h"
+#include "ccnx-interest-header.h"
 
-#include "ccnx-route.h"
+#include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxFloodingStrategy");
 
@@ -32,116 +34,47 @@ NS_OBJECT_ENSURE_REGISTERED (CcnxFloodingStrategy);
     
 TypeId CcnxFloodingStrategy::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::CcnxFloodingStrategy")
+  static TypeId tid = TypeId ("ns3::CcnxFloodingStrategy")
     .SetGroupName ("Ccnx")
-    .SetParent<Object> ()
+    .SetParent<CcnxForwardingStrategy> ()
     ;
-    return tid;
+  return tid;
 }
     
 CcnxFloodingStrategy::CcnxFloodingStrategy ()
 {
 }
-    
-    
+
 bool
-CcnxFloodingStrategy::PropagateInterest  (CcnxPitEntryContainer::type::iterator pitEntry, 
-                                          CcnxFibEntryContainer::type::iterator fibEntry,
-                                          const Ptr<CcnxFace> &incomingFace,
-                                          Ptr<CcnxInterestHeader> &header,
-                                          const Ptr<const Packet> &packet,
-                                          SendCallback ucb)
+CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
+                                         const Ptr<CcnxFace> &incomingFace,
+                                         Ptr<CcnxInterestHeader> &header,
+                                         const Ptr<const Packet> &packet,
+                                         SendCallback sendCallback)
 {
-    //CcnxFibEntryContainer::type::iterator fibEntryArray = GetFib()->LongestPrefixMatch(*header);
-    NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION (this);
     
-    //CcnxFibEntryContainer::type::iterator fibEntryArray = GetCcnx()->GetObject<CcnxFib>()->LongestPrefixMatch(*header);
-    NS_LOG_INFO(*fibEntry);
-    
-    int count = 0;
-    for(CcnxFibFaceMetricContainer::type::iterator face = fibEntry->m_faces.begin ();
-        face != fibEntry->m_faces.end ();
-        face++)
+  int propagatedCount = 0;
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces)
     {
-        if(face->m_face == incomingFace)
-            continue;
-        NS_LOG_INFO ("JUST before try add outgoing");
-        //Add new outgoing interest to pit entry
-		// If PIT entry cannot be created (limit reached or interest already sent), nothing will be forwarded
-		//if( _pit.add(VALUE(info.pe), PitOutgoingInterest( *iface, getSimTime(_node), pkt->nonce )) )
-		//{
-        //GetPit()->Add(*header,fibEntry,face->m_face);
-        //GetPit()->modify (GetPit()->end (), CcnxPitEntry::AddOutgoing(face->m_face));
-        bool tryResult = GetPit ()->TryAddOutgoing (pitEntry, face->m_face);
-        if ( tryResult == false )
-        {NS_LOG_INFO("false");
-            continue;
-        }
-        else
-            NS_LOG_INFO("true");
+      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
+        break;
+      
+      if (metricFace.m_face == incomingFace) // same face as incoming, don't forward
+        continue;
+
+      if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
+        continue;
+
+      bool faceAvailable = m_pit->TryAddOutgoing (pitEntry, metricFace.m_face);
+      if (!faceAvailable) // huh...
+          continue;
         
-        NS_LOG_INFO("count="<<count);
-        ucb (face->m_face, header, packet->Copy());
-        count++;
+      sendCallback (metricFace.m_face, header, packet->Copy());
+      propagatedCount++;
     }
-    
-    /*const CcnxFibEntryContainer& s,
-    
-    for (CcnxFibEntryContainer::type::iterator entry = fibEntryArray.begin ();
-         entry != fibEntryArray.end ();
-         entry++)
-    {
-    
-        const typename boost::multi_index::index<CcnxFibEntryContainer, Tag>::type& i = get<Tag>(s);
-        
-        typedef typename CcnxFibEntryContainer::value_type value_type;
-        
-        for(const CcnxFibEntryContainer& c = i.begin(); c != i.end (); c++)
-        {
-                c->
-        }
-        
-        for(nth_index<CcnxFibEntryContainer,1>::type::iterator it1=get<i_prefix>(entry).begin();
-            it1!=get<i_prefix>(entry).end();++it1)
-        {
-            //std::cout<<it1->name()<<std::endl;
-            
-           CcnxFibFaceMetricContainer faceContainer = it1->m_faces;
-            
-            const typename boost::multi_index::index<CcnxFibFaceMetricContainer, __ccnx_private::i_face>::type& i = get<__ccnx_private::i_face>(faceContainer);
-             
-             //typedef typename CcnxFibEntryContainer::value_type value_type;
-             
-             for(const CcnxFibFaceMetricContainer& c = i.begin(); c != i.end (); c++)
-             {
-                 Ptr<CcnxFace> face = c->m_face;
-                 
-                 typedef
-                 Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>
-                 SendCallback;
-                 
-                 ucb (face, header, packet);
-             }
-            
-        }
-        
-        
-        // obtain a reference to the index tagged by Tag
-        
-        const typename boost::multi_index::index<MultiIndexContainer,Tag>::type& i=
-        get<Tag>(s);
-        
-        typedef typename MultiIndexContainer::value_type value_type;
-        
-        // dump the elements of the index to cout 
-        
-        std::copy(i.begin(),i.end(),std::ostream_iterator<value_type>(std::cout));
-        */
-    
-    if(count == 0)
-        return false;
-    else
-        return true;
+
+  return propagatedCount > 0;
 }
     
 } //namespace ns3

@@ -37,33 +37,50 @@ class CcnxInterestHeader;
 
 /**
  * \ingroup ccnx
- * \brief Abstract base class for Ccnx forwarding protocols
+ * \brief Abstract base class for CCNx forwarding strategies
  */
 class CcnxForwardingStrategy : public Object
 {
 public:
-  static TypeId GetTypeId (void);
-
-  CcnxForwardingStrategy ();
-  virtual ~CcnxForwardingStrategy ();
-    
-  void
-  SetPit (Ptr<CcnxPit> pit);
-    
   typedef
-  Callback<void, const Ptr<CcnxFace> &, const Ptr<CcnxInterestHeader> &, const Ptr<Packet> &>
+  Callback<void, const Ptr<CcnxFace> &, const Ptr<const CcnxInterestHeader> &, const Ptr<Packet> &>
   SendCallback;
 
+  static TypeId GetTypeId (void);
+
+  /**
+   * @brief Default constructor
+   */
+  CcnxForwardingStrategy ();
+  virtual ~CcnxForwardingStrategy ();
+
+  /**
+   * @brief Interface method to propagate the insterest according to the forwarding strategy
+   *
+   * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
+   * @param incomingFace  Incoming face
+   * @param header        CcnxInterestHeader
+   * @param packet        Original Interest packet
+   * @param sendCallback  Send callback
+   *
+   * @return true if interest was successfully propagated, false if all options have failed
+   */
   virtual bool
-  PropagateInterest (CcnxPitEntryContainer::type::iterator pitEntry, 
-                     CcnxFibEntryContainer::type::iterator fibEntry,
+  PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet,
-                     SendCallback ucb) = 0;
-  Ptr<CcnxPit> GetPit();
+                     SendCallback sendCallback) = 0;
     
-private:  
+  /**
+   * @brief Set link to PIT for the forwarding strategy
+   *
+   * @param pit pointer to PIT
+   */
+  void
+  SetPit (Ptr<CcnxPit> pit);
+
+protected:  
   Ptr<CcnxPit> m_pit;
 };
 

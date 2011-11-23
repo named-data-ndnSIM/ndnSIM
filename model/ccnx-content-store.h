@@ -174,7 +174,7 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader> >
+  boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader> >
   Lookup (Ptr<const CcnxInterestHeader> interest);
             
   /**

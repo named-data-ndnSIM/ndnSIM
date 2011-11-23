@@ -72,8 +72,7 @@ main (int argc, char *argv[])
   uint32_t randomNonce = static_cast<uint32_t> (random.GetValue());
   interestHeader.SetNonce(randomNonce);
     
-  interestHeader.SetNack(true);
-  interestHeader.SetCongested(true);
+  interestHeader.SetNack(CcnxInterestHeader::NACK_CONGESTION);
   NS_LOG_INFO ("Source: \n" << interestHeader);
     
   packet.AddHeader (interestHeader);

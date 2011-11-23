@@ -183,9 +183,9 @@ CcnxInterestHeader::SetNack (uint32_t nackType)
 }
 
 uint32_t
-CcnxInterestHeader::IsNack () const
+CcnxInterestHeader::GetNack () const
 {
-  return m_nack;
+  return m_nackType;
 }
 
 uint32_t

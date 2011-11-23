@@ -129,8 +129,15 @@ public:
   AddSeenNonce (uint32_t nonce)
   { m_seenNonces.insert (nonce); }
 
+  CcnxPitEntryIncomingFaceContainer::type::iterator
+  AddIncoming (Ptr<CcnxFace> face);
+
   void
-  AddIncoming (const CcnxFace &face);
+  ClearIncoming ()
+  { m_incoming.clear (); }
+
+  CcnxPitEntryOutgoingFaceContainer::type::iterator
+  AddOutgoing (Ptr<CcnxFace> face);
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);

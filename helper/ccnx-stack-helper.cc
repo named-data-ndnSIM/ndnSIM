@@ -85,6 +85,10 @@
 #include <map>
 #include <boost/foreach.hpp>
 
+#define NDN_DEFAULT_DATA_SIZE      1024
+#define NDN_INTEREST_RESET_PERIOD  Seconds(0.01)
+
+
 NS_LOG_COMPONENT_DEFINE ("CcnxStackHelper");
 
 namespace ns3 {
@@ -222,19 +226,17 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
       pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
       NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
-      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD / SECOND * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD.ToDouble(Time::S) * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
       NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
         
-        
-      if(face->IsLocal()==true)
-        NS_LOG_INFO("Face #" << face_id << " is turned on");
+      NS_LOG_INFO("Face #" << face_id << " is turned on");
       face->SetUp ();
       faces->Add (face);
     }
     
   m_forwardingHelper.SetForwarding (ccnx, pit);
 
-  ccnx->ScheduleLeakage ();
+  // ccnx->ScheduleLeakage ();
     
   return faces;
 }

@@ -44,21 +44,28 @@ CcnxPitEntry::GetPrefix () const
   return *m_prefix;
 }
 
-// void
-// CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
-// {
-//   m_incoming.insert (CcnxPitEntryIncomingFace (face,     )
-// }
+CcnxPitEntryIncomingFaceContainer::type::iterator
+CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
+{
+  std::pair<CcnxPitEntryIncomingFaceContainer::type::iterator,bool> ret = 
+    m_incoming.insert (CcnxPitEntryIncomingFace (face));
 
+  NS_ASSERT_MSG (ret.second, "Something is wrong");
 
-// CcnxPitEntry::UpdateFibStatus::UpdateFibStatus (Ptr<CcnxFace> face,
-//                                                 CcnxFibFaceMetric::Status status,
-//                                                 Ptr<CcnxFib> fib)
-//   : m_face (face)
-//   , m_status (status)
-//   , m_fib (fib)
-// {
-// }
+  return ret.first;
+}
+
+CcnxPitEntryOutgoingFaceContainer::type::iterator
+CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
+{
+  std::pair<CcnxPitEntryOutgoingFaceContainer::type::iterator,bool> ret =
+    m_outgoing.insert (CcnxPitEntryOutgoingFace (face));
+
+  NS_ASSERT_MSG (ret.second, "Something is wrong");
+
+  return ret.first;
+}
+
 
 // void
 // CcnxPitEntry::UpdateFibStatus::operator() (CcnxPitEntry &entry)

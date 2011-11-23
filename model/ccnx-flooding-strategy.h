@@ -21,14 +21,7 @@
 #ifndef CCNX_FLOODING_STRATEGY_H
 #define CCNX_FLOODING_STRATEGY_H
 
-#include "ns3/packet.h"
-#include "ns3/callback.h"
-#include "ns3/object.h"
-#include "ns3/log.h"
-
 #include "ccnx-forwarding-strategy.h"
-#include "ccnx.h"
-#include "ccnx-fib.h"
 
 namespace ns3 
 {
@@ -39,22 +32,26 @@ class CcnxInterestHeader;
 /**
  * \ingroup ccnx
  * \brief Flooding strategy
+ *
+ * \todo Describe
  */
-
 class CcnxFloodingStrategy : public CcnxForwardingStrategy
 {
 public:
   static TypeId GetTypeId (void);
-        
+
+  /**
+   * @brief Default constructor
+   */
   CcnxFloodingStrategy ();
 
+  // inherited from  CcnxForwardingStrategy
   virtual bool
-  PropagateInterest (CcnxPitEntryContainer::type::iterator pitEntry,
-                     CcnxFibEntryContainer::type::iterator fibEntry,
+  PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet,
-                     SendCallback ucb);
+                     SendCallback sendCallback);
 };
     
 } //namespace ns3

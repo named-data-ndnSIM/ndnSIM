@@ -32,18 +32,6 @@ NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 
 namespace ns3 {
 
-// NS_OBJECT_ENSURE_REGISTERED (CcnxNetDeviceFace);
-
-// TypeId 
-// CcnxNetDeviceFace::GetTypeId ()
-// {
-//   static TypeId tid = TypeId ("ns3::CcnxNetDeviceFace")
-//     .SetGroupName ("Ccnx")
-//     .SetParent<CcnxFace> ()
-//   ;
-//   return tid;
-// }
-
 /** 
  * By default, Ccnx face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face
@@ -53,7 +41,6 @@ CcnxNetDeviceFace::CcnxNetDeviceFace (const Ptr<NetDevice> &netDevice)
   NS_LOG_FUNCTION (this);
 
   m_netDevice = netDevice;
-  m_isLocal = false;
 }
 
 CcnxNetDeviceFace::~CcnxNetDeviceFace ()
@@ -63,7 +50,6 @@ CcnxNetDeviceFace::~CcnxNetDeviceFace ()
 
 CcnxNetDeviceFace::CcnxNetDeviceFace (const CcnxNetDeviceFace &)
 {
-    m_isLocal = false;
 }
 
 CcnxNetDeviceFace& CcnxNetDeviceFace::operator= (const CcnxNetDeviceFace &)
@@ -94,8 +80,8 @@ CcnxNetDeviceFace::Send (Ptr<Packet> packet)
 {
   NS_ASSERT_MSG (packet->GetSize () <= m_netDevice->GetMtu (), 
                  "Packet size " << packet->GetSize () << " exceeds device MTU "
-                                << m_netDevice->GetMtu ()
-                                << " for Ccnx; fragmentation not supported");
+                 << m_netDevice->GetMtu ()
+                 << " for Ccnx; fragmentation not supported");
 
   NS_LOG_FUNCTION (*packet);
   if (!IsUp ())
@@ -104,7 +90,7 @@ CcnxNetDeviceFace::Send (Ptr<Packet> packet)
     }
 
   m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
-                  CcnxL3Protocol::ETHERNET_FRAME_TYPE);
+                     CcnxL3Protocol::ETHERNET_FRAME_TYPE);
 }
 
 // callback

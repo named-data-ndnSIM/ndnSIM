@@ -47,7 +47,7 @@ main (int argc, char *argv[])
 {
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
-  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1ms"));
+  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1s"));
     
   Packet::EnableChecking();
   Packet::EnablePrinting();

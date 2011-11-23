@@ -128,10 +128,10 @@ public:
   Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
 
   virtual void SendInterest (const Ptr<CcnxFace> &face,
-                             const Ptr<CcnxInterestHeader> &header,
+                             const Ptr<const CcnxInterestHeader> &header,
                              const Ptr<Packet> &packet);
   virtual void SendContentObject (const Ptr<CcnxFace> &face,
-                                  const Ptr<CcnxContentObjectHeader> &header,
+                                  const Ptr<const CcnxContentObjectHeader> &header,
                                   const Ptr<Packet> &packet);
   virtual void Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
 

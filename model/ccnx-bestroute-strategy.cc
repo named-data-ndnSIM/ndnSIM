@@ -19,21 +19,15 @@
  */
 
 #include "ccnx-bestroute-strategy.h"
+#include "ccnx-interest-header.h"
+
 #include "ns3/assert.h"
-
-#include "ccnx-route.h"
-
+#include "ns3/log.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxBestRouteStrategy");
-namespace __ccnx_private {
-    
-    struct CcnxFibFaceMetricByFace;
-}
 
 namespace ns3 
 {
-    
-using namespace __ccnx_private;
     
 NS_OBJECT_ENSURE_REGISTERED (CcnxBestRouteStrategy);
   
@@ -41,7 +35,7 @@ TypeId CcnxBestRouteStrategy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxBestRouteStrategy")
   .SetGroupName ("Ccnx")
-  .SetParent<Object> ()
+  .SetParent<CcnxForwardingStrategy> ()
   ;
   return tid;
 }
@@ -50,50 +44,42 @@ CcnxBestRouteStrategy::CcnxBestRouteStrategy ()
 {
 }
     
-    
 bool
-CcnxBestRouteStrategy::PropagateInterest (CcnxPitEntryContainer::type::iterator pitEntry, 
-                                          CcnxFibEntryContainer::type::iterator fibEntry,
+CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
                                           const Ptr<CcnxFace> &incomingFace,
                                           Ptr<CcnxInterestHeader> &header,
                                           const Ptr<const Packet> &packet,
-                                          SendCallback ucb)
+                                          SendCallback sendCallback)
 {
-  //NS_LOG_FUNCTION(this);
-  //NS_LOG_INFO(*fibEntry);
-    
-  Ptr<CcnxFace> bestFace = fibEntry->FindBestCandidate(0);
-   
-  if( bestFace == NULL )
+  NS_LOG_FUNCTION (this);
+  bool forwardedCount = 0;
+
+  try
     {
-      return false;
+      for (uint32_t skip = 0; skip < pitEntry.m_fibEntry.m_faces.size (); skip++)
+        {
+          const CcnxFibFaceMetric bestMetric = pitEntry.m_fibEntry.FindBestCandidate (skip);
+
+          if (bestMetric.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // no point to send there
+            continue;
+
+          if (pitEntry.m_outgoing.find (bestMetric.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
+            continue;
+
+          bool faceAvailable = m_pit->TryAddOutgoing (pitEntry, bestMetric.m_face);
+          if (!faceAvailable) // huh...
+            continue;
+
+          sendCallback (bestMetric.m_face, header, packet->Copy());
+          forwardedCount++;
+          break; // if we succeeded in sending one packet, stop
+        }
     }
-  else
+  catch (CcnxFibEntry::NoFaces)
     {
-      bool tryResult = GetPit ()->TryAddOutgoing (pitEntry, bestFace);
-      if (tryResult == false)
-      {
-          NS_LOG_INFO("!!!!!!!!!!!!!Trying different face!!!!!!!!!!!!!!!!");
-          for(uint32_t i = 1; i<fibEntry->m_faces.size(); i++ )
-          {
-            bestFace = fibEntry->FindBestCandidate(i);
-            tryResult = GetPit ()->TryAddOutgoing (pitEntry, bestFace);
-            if(tryResult == true)
-              break;
-              NS_LOG_INFO("Trying different face");
-          }
-          
-          if(tryResult == false)
-          {
-              NS_LOG_INFO("FAILURE");
-              return false;
-          }
-      }
-          
-      ucb (bestFace, header, packet->Copy());
     }
-     
-  return true;
+
+  return forwardedCount > 0;
 }
     
 } //namespace ns3

@@ -49,11 +49,10 @@ class i_ordered {}; ///< tag for Boost.MultiIndex container (ordered by prefix)
 class i_mru {};
 }
 
-#define MILLI_SECOND 1
-#define SECOND 1000
 // default data size
-#define NDN_DEFAULT_DATA_SIZE   1024
-#define NDN_INTEREST_RESET_PERIOD	(10*MILLI_SECOND)
+// #define NDN_DEFAULT_DATA_SIZE   1024
+// #define NDN_INTEREST_RESET_PERIOD	(10*MILLI_SECOND)
+
 /**
  * \defgroup ccnx NDN abstraction
  *
@@ -108,7 +107,7 @@ public:
    */
   virtual void
   SendInterest (const Ptr<CcnxFace> &face,
-                const Ptr<CcnxInterestHeader> &header,
+                const Ptr<const CcnxInterestHeader> &header,
                 const Ptr<Packet> &packet) = 0;
 
   /**
@@ -123,7 +122,7 @@ public:
    */
   virtual void
   SendContentObject (const Ptr<CcnxFace> &face,
-                     const Ptr<CcnxContentObjectHeader> &header,
+                     const Ptr<const CcnxContentObjectHeader> &header,
                      const Ptr<Packet> &packet) = 0;
 
   /**

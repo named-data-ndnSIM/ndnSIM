@@ -123,11 +123,16 @@ public:
    */
   virtual ~CcnxPit ();
 
-  /*CcnxPitEntryContainer::type::iterator
-  Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face);*/
-  
+  /**
+   * @brief Try to add outgoing entry to PIT entry.
+   * Will fail if there were too much (other) interests forwarded to this face
+   *
+   * @param pitEntry PIT entry
+   * @param face     face
+   * @returns false if rate limit is imposed and no outgoing entry was created. True otherwise
+   */
   bool
-  TryAddOutgoing(CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face);
+  TryAddOutgoing(const CcnxPitEntry &pitEntry, Ptr<CcnxFace> face);
   
   /**
    * \brief Find corresponding PIT entry for the given content name
@@ -211,6 +216,7 @@ private:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
   Time    m_PitEntryPruningTimout;
+  Time    m_PitEntryDefaultLifetime; 
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
   PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face

@@ -150,7 +150,7 @@ CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
 }
 
 
-boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader> >
+boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader> >
 CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
   NS_LOG_FUNCTION_NOARGS ();

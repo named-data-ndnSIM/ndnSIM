@@ -33,7 +33,7 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CcnxForwardingStrategy")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
-  ;
+    ;
   return tid;
 }
 
@@ -46,15 +46,15 @@ CcnxForwardingStrategy::~CcnxForwardingStrategy ()
 }
 
 void
-CcnxForwardingStrategy::SetPit(Ptr<CcnxPit> pit)
+CcnxForwardingStrategy::SetPit (Ptr<CcnxPit> pit)
 {
-    m_pit = pit;
+  m_pit = pit;
 }
     
-Ptr<CcnxPit>
-CcnxForwardingStrategy::GetPit()
-{
-    return m_pit;
-}
+// Ptr<CcnxPit>
+// CcnxForwardingStrategy::GetPit ()
+// {
+//   return m_pit;
+// }
     
 } //namespace ns3

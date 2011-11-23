@@ -54,7 +54,6 @@ CcnxLocalFace::CcnxLocalFace ()
   , m_onContentObject (0)
 {
   NS_LOG_FUNCTION (this);
-  m_isLocal = true;
 }
 
 CcnxLocalFace::~CcnxLocalFace ()
@@ -83,7 +82,7 @@ CcnxLocalFace::SetContentObjectHandler (ContentObjectHandler onContentObject)
 void
 CcnxLocalFace::Send (Ptr<Packet> p)
 {
-    NS_LOG_FUNCTION("Local face send");
+  NS_LOG_FUNCTION("Local face send");
   NS_LOG_FUNCTION (*p);
   if (!IsUp ())
     {

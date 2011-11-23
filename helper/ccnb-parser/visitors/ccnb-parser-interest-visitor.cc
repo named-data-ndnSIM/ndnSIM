@@ -177,6 +177,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
                boost::any_cast<uint32_t> (
                                           (*n.m_nestedTags.begin())->accept(nonNegativeIntegerVisitor)));
       break;
+    }
 }
 
 } // namespace CcnbParser

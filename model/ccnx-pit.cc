@@ -20,13 +20,18 @@
 
 #include "ccnx-pit.h"
 #include "ns3/log.h"
+#include "ns3/string.h"
 #include "ns3/simulator.h"
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
+#include <boost/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+
 NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
 using namespace boost::tuples;
+using namespace boost;
 
 namespace ns3 {
 
@@ -50,6 +55,11 @@ CcnxPit::GetTypeId ()
                    "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
                    StringValue ("100ms"),
                    MakeTimeAccessor (&CcnxPit::m_PitEntryPruningTimout),
+                   MakeTimeChecker ())
+    .AddAttribute ("PitEntryDefaultLifetime",
+                   "Default lifetime of PIT entry (aka default Interest lifetime)",
+                   StringValue("4s"),
+                   MakeTimeAccessor (&CcnxPit::m_PitEntryDefaultLifetime),
                    MakeTimeChecker ())
     ;
 
@@ -130,40 +140,23 @@ CcnxPit::SetFib (Ptr<CcnxFib> fib)
   m_fib = fib;
 }
 
-/*CcnxPitEntryContainer::type::iterator
-  CcnxPit::Add (const CcnxInterestHeader &header, CcnxFibEntryContainer::type::iterator fibEntry, Ptr<CcnxFace> face)
-  {
-  if( m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] )
-  {
-  //		printf( "DEBUG: bucket overflow. Should not forward anything to interface %d\n", interest.interfaceIndex );
-  return end();
-  }
-    
-  CcnxPitEntryContainer::type::iterator entry = insert (end (),
-  CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
-  *fibEntry));
-  return entry;
-  }*/
-
 bool
-CcnxPit::TryAddOutgoing (CcnxPitEntryContainer::type::iterator pitEntry, Ptr<CcnxFace> face)
+CcnxPit::TryAddOutgoing (const CcnxPitEntry &pitEntry, Ptr<CcnxFace> face)
 {
-  NS_LOG_INFO ("Face has " << m_bucketsPerFace[face->GetId()] << " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
+  NS_LOG_FUNCTION ("Face has " << m_bucketsPerFace[face->GetId()] <<
+               " packets with max allowance " << maxBucketsPerFace[face->GetId()]); 
     
-  if((face->IsLocal() == false) 
-     && (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()] ))
+  if (m_bucketsPerFace[face->GetId()]+1.0 >= maxBucketsPerFace[face->GetId()])
     {
-      NS_LOG_INFO("********LIMIT**************");
+      NS_LOG_INFO("************ LIMIT **************");
       return false;
     }
     
   m_bucketsPerFace[face->GetId()] = m_bucketsPerFace[face->GetId()] + 1.0;
-	
-  NS_LOG_INFO(this->size());
-  NS_LOG_INFO("before modify");
-  NS_LOG_INFO(pitEntry->GetPrefix());
-  modify (pitEntry, CcnxPitEntry::AddOutgoing(face));
-  NS_LOG_INFO("after modify");
+
+  modify (iterator_to (pitEntry),
+          bind(&CcnxPitEntry::AddOutgoing, lambda::_1, face));
+          
   return true;
 }
 
@@ -181,7 +174,7 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
   return *entry;
 }
 
-std::pair<CcnxPitEntryContainer::type::iterator,std::pair<bool, bool> >
+boost::tuple<const CcnxPitEntry&, bool, bool>
 CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -202,8 +195,8 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
       entry = insert (end (),
                       CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
                                     Simulator::Now () +
-                                    (header.GetInterestLifetime ().IsZero ()?DEFAULT_INTEREST_LIFETIME:
-                                                                             header.GetInterestLifetime ())
+                                    (header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
+                                     :                                       header.GetInterestLifetime ()),
                                     *fibEntry));
 
       // isDuplicate = false; // redundant
@@ -212,12 +205,13 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
   else
     {
       isNew = false;
-      isDuplicate = entry->IsNonceSeen (header->GetNonce ());
+      isDuplicate = entry->IsNonceSeen (header.GetNonce ());
     }
 
   if (!isDuplicate)
     {
-      modify (entry, boost::bind(&CcnxPitEntry::AddSeenNonce, boost::lambda::_1, header->GetNonce ()));
+      modify (entry,
+              boost::bind(&CcnxPitEntry::AddSeenNonce, boost::lambda::_1, header.GetNonce ()));
     }
 
   return make_tuple (cref(*entry), isNew, isDuplicate);

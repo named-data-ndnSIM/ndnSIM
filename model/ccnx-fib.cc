@@ -38,7 +38,7 @@
 
 #include <boost/lambda/lambda.hpp>
 
-using namespace boost::lambda;
+using namespace boost;
 
 //#define NDN_DUMP_FIB		0
 namespace ns3 {
@@ -100,42 +100,60 @@ CcnxFibFaceMetric::UpdateRtt (const Time &rttSample)
 /////////////////////////////////////////////////////////////////////
 
 void
-CcnxFibEntry::UpdateStatus (const CcnxFace &face, CcnxFibFaceMetric::Status status)
+CcnxFibEntry::UpdateFaceRtt (Ptr<CcnxFace> face, const Time &sample)
 {
   CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
-  m_faces.modify (record, _1->m_status = status);
+  m_faces.modify (record,
+                  bind (&CcnxFibFaceMetric::UpdateRtt, lambda::_1, sample));
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
 }
 
-// void
-// CcnxFibEntry::AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
-// {
-//   NS_LOG_FUNCTION(this);
-//   NS_ASSERT_MSG (m_face != NULL, "Trying to Add or Update NULL face");
-
-//   CcnxFibFaceMetricByFace::type::iterator record = entry.m_faces.get<i_face> ().find (m_face);
-//   if (record == entry.m_faces.get<i_face> ().end ())
-//     {
-//       entry.m_faces.insert (CcnxFibFaceMetric (m_face, m_metric));
-//     }
-//   else
-//   {
-//       entry.m_faces.modify (record, ChangeMetric (m_metric));
-//     }
-//   // reordering random access index same way as by metric index
-//   entry.m_faces.get<i_nth> ().rearrange (entry.m_faces.get<i_metric> ().begin ());
-// }
-
-Ptr<CcnxFace>
-CcnxFibEntry::FindBestCandidate (int skip/* = 0*/) const
+void
+CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
 {
+  CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
+                 "Update status can be performed only on existing faces of CcxnFibEntry");
+
+  m_faces.modify (record,
+                  (&lambda::_1)->*&CcnxFibFaceMetric::m_status = status);
+
+  // reordering random access index same way as by metric index
+  m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
+}
+
+void
+CcnxFibEntry::AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (face != NULL, "Trying to Add or Update NULL face");
+
+  CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  if (record == m_faces.get<i_face> ().end ())
+    {
+      m_faces.insert (CcnxFibFaceMetric (face, metric));
+    }
+  else
+  {
+    m_faces.modify (record,
+                    (&lambda::_1)->*&CcnxFibFaceMetric::m_routingCost = metric);
+  }
+  
+  // reordering random access index same way as by metric index
+  m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
+}
+
+const CcnxFibFaceMetric &
+CcnxFibEntry::FindBestCandidate (uint32_t skip/* = 0*/) const
+{
+  if (m_faces.size () == 0) throw CcnxFibEntry::NoFaces ();
   skip = skip % m_faces.size();
-  return m_faces.get<i_nth> () [skip].GetFace ();
+  return m_faces.get<i_nth> () [skip];
 }
 
 
@@ -192,7 +210,8 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
     }
 
   NS_ASSERT_MSG (face != NULL, "Trying to modify NULL face");
-  modify (entry, CcnxFibEntry::AddOrUpdateRoutingMetric (face, metric));
+  modify (entry,
+          bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, lambda::_1, face, metric));
     
   return entry;
 }
