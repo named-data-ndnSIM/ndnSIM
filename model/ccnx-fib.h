@@ -193,6 +193,15 @@ public:
    */
   const CcnxFibFaceMetric &
   FindBestCandidate (uint32_t skip = 0) const;
+
+  /**
+   * @brief Remove record associated with `face`
+   */
+  void
+  RemoveFace (const Ptr<CcnxFace> &face)
+  {
+    m_faces.erase (face);
+  }
 	
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);
@@ -278,18 +287,18 @@ public:
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
   /**
-   * @brief Remove reference to a face from the entry for `prefix`. If entry had only this face, the whole
+   * @brief Remove reference to a face from the entry. If entry had only this face, the whole
    * entry will be removed
    */
   void
-  Delete (const CcnxNameComponents &prefix, Ptr<CcnxFace> face);
+  Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face);
 
   /**
    * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
    * this FIB entry will be removed.
    */
   void
-  DeleteFromAll (Ptr<CcnxFace> face);
+  RemoveFromAll (Ptr<CcnxFace> face);
 
 protected:
   // inherited from Object class

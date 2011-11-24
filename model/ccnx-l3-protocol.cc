@@ -64,7 +64,8 @@ CcnxL3Protocol::GetTypeId (void)
     .AddAttribute ("BucketLeakInterval",
                    "Interval to leak buckets",
                    StringValue ("10ms"),
-                   MakeTimeAccessor (&CcnxPit::GetBucketLeakInterval, &CcnxPit::SetBucketLeakInterval),
+                   MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
+                                     &CcnxL3Protocol::SetBucketLeakInterval),
                    MakeTimeChecker ())
   ;
   return tid;
@@ -144,7 +145,7 @@ CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStr
 {
   NS_LOG_FUNCTION (this);
   m_forwardingStrategy = forwardingStrategy;
-  // m_forwardingStrategy->SetCcnx (this);
+  m_forwardingStrategy->SetPit (m_pit);
 }
 
 Ptr<CcnxForwardingStrategy>
@@ -158,7 +159,6 @@ CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 {
   NS_LOG_FUNCTION (this << &face);
 
-  face->SetNode (m_node);
   face->SetId (m_faceCounter); // sets a unique ID of the face. This ID serves only informational purposes
 
   // ask face to register in lower-layer stack
@@ -176,16 +176,16 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
   face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ());
 
   // just to be on a safe side. Do the process in two steps
-  list<CcnxPitEntryContainer::type::iterator> entriesToRemoves; 
+  std::list<CcnxPitEntryContainer::type::iterator> entriesToRemoves; 
   BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
     {
       m_pit->modify (m_pit->iterator_to (pitEntry),
-                     ll::bind (CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
+                     ll::bind (&CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
 
       // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
       // Thus, we have to remove the whole PIT entry
-      if (m_pit->m_fibEntry.size () == 1 &&
-          m_pit->m_fibEntry.m_faces.begin ()->m_face == face)
+      if (pitEntry.m_fibEntry.m_faces.size () == 1 &&
+          pitEntry.m_fibEntry.m_faces.begin ()->m_face == face)
         {
           entriesToRemoves.push_back (m_pit->iterator_to (pitEntry));
         }
@@ -330,7 +330,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &face,
   //               {
   //                 header->SetNonce(it->m_nonce);
   //                 header->SetNack(true);
-  //                 face.m_face->SendWithoutLimit (packet->Copy());
+  //                 face.m_face->Send (packet->Copy());
   //               }
   //           }
   //       }
@@ -373,7 +373,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       Ptr<Packet> packet = Create<Packet> ();
       packet->AddHeader (*header);
 
-      incomingFace->SendWithoutLimit (packet);
+      incomingFace->Send (packet);
       
       // //Trace duplicate interest  
       // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
@@ -391,7 +391,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
         
       // TransmittedDataTrace (contentObject, CACHED,
       //                       m_node->GetObject<Ccnx> (), incomingFace);
-      incomingFace->SendWithoutLimit (contentObject);
+      incomingFace->Send (contentObject);
 
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -462,7 +462,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
-          incoming.m_face->SendWithoutLimit (packet->Copy ());
+          incoming.m_face->Send (packet->Copy ());
 
           // m_droppedInterestsTrace (header, DROP_CONGESTION,
           //                          m_node->GetObject<Ccnx> (), incomingFace);
@@ -479,10 +479,11 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 // Processing ContentObjects
-void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
-                             Ptr<CcnxContentObjectHeader> &header,
-                             Ptr<Packet> &payload,
-                             const Ptr<const Packet> &packet)
+void
+CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
+                        Ptr<CcnxContentObjectHeader> &header,
+                        Ptr<Packet> &payload,
+                        const Ptr<const Packet> &packet)
 {
     
   NS_LOG_FUNCTION (incomingFace << header << payload << packet);
@@ -494,14 +495,6 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       const CcnxPitEntry &pitEntry = m_pit->Lookup (*header);
 
       // Note that with MultiIndex we need to modify entries indirectly
-  
-      // Update metric status for the incoming interface in the corresponding FIB entry
-      m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
-                     ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
-                           incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
-  
-      // Add or update entry in the content store
-      m_contentStore->Add (header, payload);
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator out = pitEntry.m_outgoing.find (incomingFace);
   
@@ -510,9 +503,9 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         {
           m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
                          ll::bind (&CcnxFibEntry::UpdateFaceRtt,
-                               ll::_1,
-                               incomingFace,
-                               Simulator::Now () - out->m_sendTime));
+                                   ll::_1,
+                                   incomingFace,
+                                   Simulator::Now () - out->m_sendTime));
         }
       else
         {
@@ -521,16 +514,25 @@ void CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           
           NS_LOG_ERROR ("Node "<< m_node->GetId() <<
                        ". PIT entry for "<< header->GetName ()<<" is valid, "
-                       "but outgoing entry for interface "<< incomingFace <<" doesn't exist\n");
+                        "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
 
-          NS_ASSERT (false); // temporary put false here
+          // ignore unsolicited data
+          return;
         }
+
+      // Update metric status for the incoming interface in the corresponding FIB entry
+      m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
+                     ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
+                               incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
+  
+      // Add or update entry in the content store
+      m_contentStore->Add (header, payload);
 
       //satisfy all pending incoming Interests
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
           if (incoming.m_face != incomingFace)
-            incoming.m_face->SendWithoutLimit (packet->Copy ());
+            incoming.m_face->Send (packet->Copy ());
 
           // successfull forwarded data trace
         }
@@ -573,7 +575,7 @@ CcnxL3Protocol::GetBucketLeakInterval () const
 }
 
 void 
-CcnxPit::LeakBuckets ()
+CcnxL3Protocol::LeakBuckets ()
 {
   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
     {

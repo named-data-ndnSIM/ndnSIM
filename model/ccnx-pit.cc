@@ -86,9 +86,6 @@ CcnxPit::DoDispose ()
   if (m_cleanupEvent.IsRunning ())
     m_cleanupEvent.Cancel ();
 
-  if (m_PitBucketLeakEvent.IsRunning ())
-    m_PitBucketLeakEvent.Cancel ();
-
   clear ();
 }
 

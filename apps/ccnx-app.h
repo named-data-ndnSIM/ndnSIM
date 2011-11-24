@@ -31,6 +31,7 @@ namespace ns3
 class Packet;
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
+class CcnxFace;
 
 /**
  * @ingroup ccnx
@@ -41,7 +42,7 @@ class CcnxContentObjectHeader;
 class CcnxApp: public Application
 {
 public:
-  typedef Callback<bool, const Ptr<CcnxFace>&> ProtocolHandler;
+  typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
   
   static TypeId GetTypeId ();
 
@@ -94,8 +95,6 @@ protected:
 protected:
   ProtocolHandler m_protocolHandler;
   bool m_active; 
-
-private:
   Ptr<CcnxFace> m_face; // local face that is created 
 };
 

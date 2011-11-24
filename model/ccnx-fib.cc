@@ -33,14 +33,10 @@
 #define NDN_RTO_BETA 0.25
 #define NDN_RTO_K 4
 
-//#define NDN_DEBUG_OSPF	0
-//#define NDN_DEBUG_OSPF_NODES 0
-
 #include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+namespace ll = boost::lambda;
 
-using namespace boost;
-
-//#define NDN_DUMP_FIB		0
 namespace ns3 {
 
 
@@ -107,7 +103,7 @@ CcnxFibEntry::UpdateFaceRtt (Ptr<CcnxFace> face, const Time &sample)
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
-                  bind (&CcnxFibFaceMetric::UpdateRtt, lambda::_1, sample));
+                  ll::bind (&CcnxFibFaceMetric::UpdateRtt, ll::_1, sample));
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
@@ -121,7 +117,7 @@ CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
-                  (&lambda::_1)->*&CcnxFibFaceMetric::m_status = status);
+                  (&ll::_1)->*&CcnxFibFaceMetric::m_status = status);
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
@@ -141,7 +137,7 @@ CcnxFibEntry::AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
   else
   {
     m_faces.modify (record,
-                    (&lambda::_1)->*&CcnxFibFaceMetric::m_routingCost = metric);
+                    (&ll::_1)->*&CcnxFibFaceMetric::m_routingCost = metric);
   }
   
   // reordering random access index same way as by metric index
@@ -211,32 +207,36 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
 
   NS_ASSERT_MSG (face != NULL, "Trying to modify NULL face");
   modify (entry,
-          bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, lambda::_1, face, metric));
+          ll::bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
     
   return entry;
 }
     
 void
-CcnxFib::Delete (const CcnxNameComponents &prefix, Ptr<CcnxFace> face)
+CcnxFib::Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face)
 {
-  NS_LOG_FUNCTION (this << prefix << face);
+  NS_LOG_FUNCTION (this);
 
-  CcnxFibEntryContainer::type::iterator entry = find (prefix);
-  if (entry == end ())
-    return;
-
-  modify (entry,
-          bind (&CcnxFibEntry::RemoveFace, _1, face));
-  if (entry->m_faces.size () == 0)
+  modify (iterator_to (entry),
+          ll::bind (&CcnxFibEntry::RemoveFace, ll::_1, face));
+  if (entry.m_faces.size () == 0)
     {
-      erase (entry);
+      erase (iterator_to (entry));
     }
 }
 
 void
-CcnxFib::DeleteFromAll (Ptr<CcnxFace> face)
+CcnxFib::RemoveFromAll (Ptr<CcnxFace> face)
 {
+  NS_LOG_FUNCTION (this);
+
+  for_each (begin (), end (), ll::bind (&CcnxFib::Remove, this, ll::_1, face));
+  // BOOST_FOREACH (const CcnxFibEntry &entry, *this)
+  //   {
+  //     Remove (entry, face);
+  //   }
 }
+
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {

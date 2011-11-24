@@ -38,12 +38,6 @@ CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
 {
 }
 
-const CcnxNameComponents &
-CcnxPitEntry::GetPrefix () const
-{
-  return *m_prefix;
-}
-
 CcnxPitEntryIncomingFaceContainer::type::iterator
 CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
 {

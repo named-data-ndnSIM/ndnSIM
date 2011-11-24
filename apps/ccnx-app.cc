@@ -20,9 +20,14 @@
 
 #include "ccnx-app.h"
 #include "ns3/log.h"
+#include "ns3/assert.h"
 #include "ns3/packet.h"
+
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+#include "ns3/ccnx.h"
+#include "ns3/ccnx-fib.h"
+#include "ns3/ccnx-local-face.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxApp");
 
@@ -32,7 +37,7 @@ namespace ns3
 NS_OBJECT_ENSURE_REGISTERED (CcnxApp);
     
 TypeId
-CcnxConsumer::GetTypeId (void)
+CcnxApp::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxApp")
     .SetParent<Application> ()
@@ -43,7 +48,7 @@ CcnxConsumer::GetTypeId (void)
     
 CcnxApp::CcnxApp ()
   : m_protocolHandler (0)
-  , m_active (true)
+  , m_active (false)
   , m_face (0)
 {
 }
@@ -54,12 +59,12 @@ CcnxApp::~CcnxApp ()
 }
 
 void
-CcnxProducer::DoDispose (void)
+CcnxApp::DoDispose (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   StopApplication ();
-  CcnxApp::DoDispose ();
+  Application::DoDispose ();
 }
 
 void
@@ -96,16 +101,14 @@ CcnxApp::StartApplication () // Called at time specified by Start
   NS_ASSERT (m_active != true);
   m_active = true;
 
-  NS_ASSERT_MSG (GetObject<Ccnx> () != 0,
+  NS_ASSERT_MSG (GetNode ()->GetObject<Ccnx> () != 0,
                  "Ccnx stack should be installed on the node " << GetNode ());
-  NS_ASSERT_MSG (GetObject<CcnxFib> () != 0);
 
   // step 1. Create a face
   m_face = Create<CcnxLocalFace> (/*Ptr<CcnxApp> (this)*/this);
     
   // step 2. Add face to the CCNx stack
-  GetObject<CcnxFib> ()->Add (m_prefix, m_face, 0);
-  GetObject<Ccnx> ()->AddFace (m_face);
+  GetNode ()->GetObject<Ccnx> ()->AddFace (m_face);
 
   // step 3. Enable face
   m_face->SetUp (true);
@@ -118,8 +121,7 @@ CcnxApp::StopApplication () // Called at time specified by Stop
 
   if (!m_active) return; //don't assert here, just return
  
-  NS_ASSERT (GetObject<Ccnx> () != 0);
-  NS_ASSERT (GetObject<CcnxFib> () != 0);
+  NS_ASSERT (GetNode ()->GetObject<Ccnx> () != 0);
 
   m_active = false;
 
@@ -127,14 +129,14 @@ CcnxApp::StopApplication () // Called at time specified by Stop
   m_face->SetUp (false);
 
   // step 2. Remove face from CCNx stack
-  GetObject<Ccnx> ()->RemoveFace (m_face);
-  GetObject<CcnxFib> ()->Add (m_prefix, m_face, 0);
+  GetNode ()->GetObject<Ccnx> ()->RemoveFace (m_face);
+  GetNode ()->GetObject<CcnxFib> ()->RemoveFromAll (m_face);
 
   // step 3. Destroy face
   NS_ASSERT_MSG (m_face->GetReferenceCount ()==1,
-                 "At this point, nobody else should have referenced this face");
+                 "At this point, nobody else should have referenced this face, but we have "
+                 << m_face->GetReferenceCount () << " references");
   m_face = 0;
 }
-
 
 }

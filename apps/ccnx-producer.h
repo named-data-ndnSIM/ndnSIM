@@ -41,6 +41,14 @@ public:
   // inherited from CcnxApp
   void OnInterest (const Ptr<const CcnxInterestHeader> &interest);
 
+protected:
+  // inherited from Application base class.
+  virtual void
+  StartApplication ();    // Called at time specified by Start
+
+  virtual void
+  StopApplication ();     // Called at time specified by Stop
+
 private:
   CcnxNameComponents m_prefix;
   uint32_t m_virtualPayloadSize;

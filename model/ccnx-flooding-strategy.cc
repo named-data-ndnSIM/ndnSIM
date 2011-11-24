@@ -23,7 +23,11 @@
 #include "ns3/log.h"
 #include "ccnx-interest-header.h"
 
+#include <boost/ref.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxFloodingStrategy");
 
@@ -65,16 +69,21 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
         continue;
 
-      bool faceAvailable = metricFace.m_face->SendWithLimit (packet->Copy ());
+      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...
         continue;
 
       m_pit->modify (m_pit->iterator_to (pitEntry),
-                     bind(&CcnxPitEntry::AddOutgoing, lambda::_1, metricFace.m_face));
-        
+                     ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
+
+      // NS_LOG_DEBUG ("new outgoing entry for " << boost::cref (*metricFace.m_face));
+
+      metricFace.m_face->Send (packet->Copy ());
+      
       propagatedCount++;
     }
 
+  NS_LOG_INFO ("Propagated to " << propagatedCount << " faces");
   return propagatedCount > 0;
 }
     

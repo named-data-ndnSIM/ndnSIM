@@ -119,6 +119,13 @@ CcnxNameComponents::operator () (const T &value)
   return *this;
 }
 
+// template<>
+// void
+// CcnxNameComponents::Add (const std::string &string)
+// {
+//   m_prefix.push_back (string);
+// }
+
 template<class T>
 void
 CcnxNameComponents::Add (const T &value)
@@ -126,13 +133,6 @@ CcnxNameComponents::Add (const T &value)
   std::ostringstream os;
   os << value;
   m_prefix.push_back (os.str ());
-}
-
-template<class T=std::string>
-void
-CcnxNameComponents::Add (const T &string)
-{
-  m_prefix.push_back (string);
 }
 
 bool

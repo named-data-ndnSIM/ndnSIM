@@ -24,6 +24,10 @@
 #include "ns3/assert.h"
 #include "ns3/log.h"
 
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+namespace ll = boost::lambda;
+
 NS_LOG_COMPONENT_DEFINE ("CcnxBestRouteStrategy");
 
 namespace ns3 
@@ -65,12 +69,16 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           if (pitEntry.m_outgoing.find (bestMetric.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
             continue;
 
-          bool faceAvailable = bestMetric.m_face->SendWithLimit (packet->Copy ());
+          bool faceAvailable = bestMetric.m_face->IsBelowLimit ();
           if (!faceAvailable) // huh...
             continue;
 
           m_pit->modify (m_pit->iterator_to (pitEntry),
-                         bind(&CcnxPitEntry::AddOutgoing, lambda::_1, bestMetric.m_face));
+                         ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, bestMetric.m_face));
+
+          // NS_LOG_DEBUG ("new outgoing entry for " << boost::cref (*metricFace.m_face));
+
+          bestMetric.m_face->Send (packet->Copy ());
 
           forwardedCount++;
           break; // if we succeeded in sending one packet, stop

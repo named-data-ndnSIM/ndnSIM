@@ -50,10 +50,6 @@ CcnxNetDeviceFace::~CcnxNetDeviceFace ()
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-CcnxNetDeviceFace::CcnxNetDeviceFace (const CcnxNetDeviceFace &)
-{
-}
-
 CcnxNetDeviceFace& CcnxNetDeviceFace::operator= (const CcnxNetDeviceFace &)
 {
   return *this;
@@ -68,7 +64,7 @@ CcnxNetDeviceFace::GetNetDevice () const
 void
 CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  NS_LOG_FUNCTION (this << handler);
+  NS_LOG_FUNCTION (this);
 
   CcnxFace::RegisterProtocolHandler (handler);
   
@@ -77,7 +73,7 @@ CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 }
 
 void
-CcnxNetDeviceFace::Send (Ptr<Packet> packet)
+CcnxNetDeviceFace::SendImpl (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
   

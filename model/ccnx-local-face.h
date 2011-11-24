@@ -30,6 +30,7 @@ namespace ns3
 class CcnxInterestHeader;
 class CcnxContentObjectHeader;
 class Packet;
+class CcnxApp;
 
 /**
  * \ingroup ccnx-face
@@ -69,7 +70,7 @@ private:
   CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
 
 private:
-  Ptr<CcnxApp> m_application;
+  Ptr<CcnxApp> m_app;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);

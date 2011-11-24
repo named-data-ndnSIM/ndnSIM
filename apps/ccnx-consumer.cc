@@ -20,11 +20,20 @@
 
 #include "ccnx-consumer.h"
 #include "ns3/ptr.h"
-#include "ns3/ccnx-local-face.h"
-#include "ns3/ccnx.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ns3/packet.h"
 #include "ns3/callback.h"
 #include "ns3/string.h"
+#include "ns3/boolean.h"
+#include "ns3/uinteger.h"
+
+#include "ns3/ccnx.h"
+#include "ns3/ccnx-local-face.h"
+#include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+
+#include <boost/ref.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumer");
 
@@ -67,14 +76,14 @@ CcnxConsumer::GetTypeId (void)
                    CcnxNameComponentsValue (),
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_exclude),
                    MakeCcnxNameComponentsChecker ())
-    .AddAttribute ("Initial Nonce", "If 0 then nonce is not used",
-                   UintegerValue(1),
-                   MakeUintegerAccessor(&CcnxConsumer::m_initialNonce),
-                   MakeUintegerChecker<uint32_t>())
-    .AddTraceSource ("InterestTrace", "Interests that were sent",
-                     MakeTraceSourceAccessor (&CcnxConsumer::m_interestsTrace))
-    .AddTraceSource ("ContentObjectTrace", "ContentObjects that were received",
-                     MakeTraceSourceAccessor (&CcnxConsumer::m_contentObjectsTrace))
+    // .AddAttribute ("Initial Nonce", "If 0 then nonce is not used",
+    //                UintegerValue(1),
+    //                MakeUintegerAccessor(&CcnxConsumer::m_initialNonce),
+    //                MakeUintegerChecker<uint32_t>())
+    // .AddTraceSource ("InterestTrace", "Interests that were sent",
+    //                  MakeTraceSourceAccessor (&CcnxConsumer::m_interestsTrace))
+    // .AddTraceSource ("ContentObjectTrace", "ContentObjects that were received",
+    //                  MakeTraceSourceAccessor (&CcnxConsumer::m_contentObjectsTrace))
     ;
 
   return tid;
@@ -85,19 +94,6 @@ CcnxConsumer::CcnxConsumer ()
   , m_seq (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
-}
-    
-CcnxConsumer::~CcnxConsumer()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-}
-    
-void
-CcnxConsumer::DoDispose (void)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-        
-  Application::DoDispose ();
 }
     
 // Application Methods
@@ -129,11 +125,10 @@ void
 CcnxConsumer::SendPacket ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_LOG_INFO ("Sending Interest at " << Simulator::Now ());
     
   //
   Ptr<CcnxNameComponents> nameWithSequence = Create<CcnxNameComponents> (m_interestName);
-  (*name) (m_seq++);
+  (*nameWithSequence) (m_seq++);
   //
 
   CcnxInterestHeader interestHeader;
@@ -145,7 +140,7 @@ CcnxConsumer::SendPacket ()
   interestHeader.SetMaxSuffixComponents (m_maxSuffixComponents);
   interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
         
-  NS_LOG_INFO ("Interest: \n" << interestHeader);
+  NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
 
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader (interestHeader);
@@ -161,7 +156,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 {
   NS_LOG_FUNCTION (this << contentObject << payload);
 
-  NS_LOG_INFO ("Received content object: " << cref(*contentObject));
+  NS_LOG_INFO ("Received content object: " << boost::cref(*contentObject));
 }
 
 } // namespace ns3

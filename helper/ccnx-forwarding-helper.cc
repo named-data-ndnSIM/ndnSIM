@@ -32,37 +32,28 @@ CcnxForwardingHelper::CcnxForwardingHelper()
     m_strategy = Ccnx::NDN_FLOODING;
 }
     
-CcnxForwardingHelper::CcnxForwardingHelper(Ccnx::ForwardingStrategy strategy)
+CcnxForwardingHelper::CcnxForwardingHelper (Ccnx::ForwardingStrategy strategy)
 {
     m_strategy = strategy;
 }
 
-CcnxForwardingHelper::~CcnxForwardingHelper ()
-{
-   
-}
-
 void 
-CcnxForwardingHelper::SetForwarding(Ptr<Ccnx> ccnx, Ptr<CcnxPit> pit) const
+CcnxForwardingHelper::SetForwarding (Ptr<Ccnx> ccnx) const
 {
     if(m_strategy == Ccnx::NDN_FLOODING)
     {
         Ptr<CcnxFloodingStrategy> ccnxForwarding = CreateObject<CcnxFloodingStrategy> ();
-        //ccnxForwarding->SetCcnx(ccnx);
-        ccnxForwarding->SetPit(pit);
         ccnx->SetForwardingStrategy (ccnxForwarding);
     }
     else if(m_strategy == Ccnx::NDN_BESTROUTE)
     {
         Ptr<CcnxBestRouteStrategy> ccnxForwarding = CreateObject<CcnxBestRouteStrategy> ();
-        //ccnxForwarding->SetCcnx(ccnx);
-        ccnxForwarding->SetPit(pit);
         ccnx->SetForwardingStrategy (ccnxForwarding);
     }
     else if (m_strategy == Ccnx::NDN_RANKING)
     {}
 }
-    
+
 // void
 // CcnxForwardingHelper::PrintForwardingTableAllAt (Time printTime, Ptr<OutputStreamWrapper> stream) const
 // {

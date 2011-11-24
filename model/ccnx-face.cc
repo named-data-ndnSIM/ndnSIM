@@ -21,6 +21,7 @@
 
 #include "ccnx-face.h"
 
+#include "ns3/packet.h"
 #include "ns3/log.h"
 #include "ns3/node.h"
 #include "ns3/assert.h"
@@ -35,7 +36,7 @@ namespace ns3 {
  * invoke SetUp on them once an Ccnx address and mask have been set.
  */
 CcnxFace::CcnxFace (Ptr<Node> node) 
-  : m_node (Ptr<Node> node)
+  : m_node (node)
   , m_bucket (0.0)
   , m_bucketMax (-1.0)
   , m_bucketLeak (0.0)
@@ -44,6 +45,8 @@ CcnxFace::CcnxFace (Ptr<Node> node)
   , m_id ((uint32_t)-1)
 {
   NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG (node != 0, "node cannot be NULL. Check the code");
 }
 
 CcnxFace::~CcnxFace ()
@@ -63,17 +66,20 @@ CcnxFace& CcnxFace::operator= (const CcnxFace &)
 void
 CcnxFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_protocolHandler = handler;
 }
 
 bool
-CcnxFace::SendWithLimit (Ptr<Packet> packet)
+CcnxFace::IsBelowLimit ()
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   /// \todo Implement tracing, if requested
-  
   if (!IsUp ())
     return false;
-
+  
   if (m_bucketMax > 0)
     {
       if (m_bucket+1.0 > m_bucketMax)
@@ -82,13 +88,14 @@ CcnxFace::SendWithLimit (Ptr<Packet> packet)
       m_bucket += 1.0;
     }
 
-  SendImpl (packet);
   return true;
 }
 
 bool
-CcnxFace::SendWithoutLimits (Ptr<Packet> packet)
+CcnxFace::Send (Ptr<Packet> packet)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   /// \todo Implement tracing, if requested
 
   if (!IsUp ())
@@ -99,14 +106,18 @@ CcnxFace::SendWithoutLimits (Ptr<Packet> packet)
 }
 
 bool
-CcnxFace::Receive (Ptr<const Packet> packet)
+CcnxFace::Receive (const Ptr<const Packet> &packet)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   /// \todo Implement tracing, if requested
 
   if (!IsUp ())
     return false;
 
   m_protocolHandler (this, packet);
+  
+  return true;
 }
 
 // void

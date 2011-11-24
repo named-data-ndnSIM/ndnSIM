@@ -22,6 +22,8 @@
 #define CCNX_CONSUMER_H
 
 #include "ccnx-app.h"
+#include "ns3/random-variable.h"
+#include "ns3/ccnx-name-components.h"
 
 namespace ns3 
 {

@@ -108,8 +108,11 @@ public:
   // // Get number of outgoing interests that we're expecting data from
   // inline size_t numberOfPromisingInterests( ) const; 
 
-  // const CcnxNameComponents &
-  // GetPrefix () const;
+  const CcnxNameComponents &
+  GetPrefix () const
+  {
+    return *m_prefix;
+  }
 
   /**
    * @brief Get current expiration time of the record

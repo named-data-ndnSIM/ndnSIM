@@ -22,9 +22,11 @@
 #define CCNX_FACE_H
 
 #include <ostream>
+#include <algorithm>
 
 #include "ns3/ptr.h"
 #include "ns3/ccnx.h"
+#include "ns3/nstime.h"
 
 namespace ns3 {
 
@@ -71,40 +73,36 @@ public:
    */
   virtual void
   RegisterProtocolHandler (ProtocolHandler handler);
-  
-  /**
-   * \brief Send packet on a face with regard Interest limits
-   *
-   * This method will be called by lower layers to send data to device or application
-   *
-   * \param p smart pointer to a packet to send
-   *
-   * @return false if either limit is reached or face is down
-   */ 
-  bool
-  SendWithLimit (Ptr<Packet> p);
 
   /**
-   * \brief Send content packet on a face without regard to limits
+   * @brief Check if Interest limit is reached
+   *
+   * Side effect: if limit is not yet reached, the number of outstanding packets will be increased
+   *
+   * @returns true if Interest limit is not yet reached
+   */
+  bool
+  IsBelowLimit ();
+  
+  /**
+   * \brief Send packet on a face
    *
    * This method will be called by lower layers to send data to device or application
    *
-   * !!! The only difference between this call and SendInterest is that the former check Interest limit !!!
-   *
    * \param p smart pointer to a packet to send
    *
-   * @return false if face is down
+   * @return false if either limit is reached
    */ 
   bool
-  SendWithoutLimits (Ptr<Packet> p);
+  Send (Ptr<Packet> p);
 
   /**
    * \brief Receive packet from application or another node and forward it to the CCNx stack
    *
    * \todo The only reason for this call is to handle tracing, if requested
    */
-  void
-  Receive (Ptr<const Packet> p);
+  bool
+  Receive (const Ptr<const Packet> &p);
   ////////////////////////////////////////////////////////////////////
 
   // /**
@@ -251,7 +249,7 @@ void
 CcnxFace::LeakBucket (const Time &interval)
 {
   const double leak = m_bucketLeak * 1.0 / interval.ToDouble (Time::S);
-  m_bucket -= std::max (0, m_bucket-leak); 
+  m_bucket -= std::max (0.0, m_bucket-leak); 
 }
 
 

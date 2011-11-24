@@ -204,8 +204,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
-  Ptr<CcnxPit> pit = ccnx->GetPit();
-  NS_LOG_INFO("NODE->GetNDevices()="<<node->GetNDevices());
+  NS_LOG_INFO("NODE->GetNDevices()=" << node->GetNDevices());
     
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
@@ -213,28 +212,28 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       if(device == 0)
         continue;
         
-      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node->GetDevice (index));
-      face->SetNode (node);
+      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node, node->GetDevice (index));
+
       uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
       // Setup bucket filtering
       // Assume that we know average data packet size, and this size is equal default size
       // Set maximum buckets (averaging over 1 second)
       
-      DataRateValue dataRate;
-      device->GetAttribute ("DataRate", dataRate);
-      NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
-      pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
-      NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
-      pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD.ToDouble(Time::S) * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
-      NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
+      // DataRateValue dataRate;
+      // device->GetAttribute ("DataRate", dataRate);
+      // NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
+      // pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      // NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
+      // pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD.ToDouble(Time::S) * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
+      // NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
         
       NS_LOG_INFO("Face #" << face_id << " is turned on");
       face->SetUp ();
       faces->Add (face);
     }
     
-  m_forwardingHelper.SetForwarding (ccnx, pit);
+  m_forwardingHelper.SetForwarding (ccnx);
 
   // ccnx->ScheduleLeakage ();
     

@@ -42,7 +42,6 @@ class Node;
 class CcnxForwardingHelper
 {
 public:
-    
   /*
    * \brief Default constructor, which sets NDN_FLOODING forwarding strategy
    */
@@ -52,16 +51,11 @@ public:
    * \brief This constructor sets a specified forwarding strategy 
    */
   CcnxForwardingHelper(Ccnx::ForwardingStrategy strategy);
-  
-  /*
-   * Destroy an instance of an CcnxForwardingHelper
-   */
-  ~CcnxForwardingHelper ();
 
   /*
-   * \brief creates a specified ForwardingStrategy object and binds it to Pit
+   * \brief creates a specified ForwardingStrategy object
    */
-  void SetForwarding(Ptr<Ccnx> ccnx, Ptr<CcnxPit> pit) const;
+  void SetForwarding(Ptr<Ccnx> ccnx) const;
     
   /**
    * \brief prints the forwarding tables of all nodes at a particular time.

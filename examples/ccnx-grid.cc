@@ -94,14 +94,14 @@ main (int argc, char *argv[])
   CcnxConsumerHelper consumerHelper (prefix.str ());
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
-  consumers.Start (Seconds (0.0));
-  consumers.Stop (finishTime);
+  // consumers.Start (Seconds (0.0));
+  // consumers.Stop (finishTime);
     
   CcnxProducerHelper producerHelper (prefix.str (),120);
   ApplicationContainer producers = producerHelper.Install (producer);
   
-  producers.Start(Seconds(0.0));
-  producers.Stop(finishTime);
+  // producers.Start(Seconds(0.0));
+  // producers.Stop(finishTime);
 
   NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);

@@ -20,11 +20,17 @@
  */
 
 #include "ccnx-producer.h"
+#include "ns3/log.h"
 #include "ns3/ccnx-interest-header.h"
+#include "ns3/ccnx-content-object-header.h"
 #include "ns3/string.h"
-#include "ns3/integer.h"
+#include "ns3/uinteger.h"
+#include "ns3/packet.h"
 
 #include "ns3/ccnx-local-face.h"
+#include "ns3/ccnx-fib.h"
+
+#include <boost/ref.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxProducer");
 
@@ -60,7 +66,29 @@ CcnxProducer::CcnxProducer ()
 {
   // NS_LOG_FUNCTION_NOARGS ();
 }
-       
+
+// inherited from Application base class.
+void
+CcnxProducer::StartApplication ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  NS_ASSERT (GetNode ()->GetObject<CcnxFib> () != 0);
+
+  CcnxApp::StartApplication ();
+
+  GetNode ()->GetObject<CcnxFib> ()->Add (m_prefix, m_face, 0);
+}
+
+void
+CcnxProducer::StopApplication ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  NS_ASSERT (GetNode ()->GetObject<CcnxFib> () != 0);
+
+  CcnxApp::StopApplication ();
+}
+
+
 void
 CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
 {
@@ -71,12 +99,14 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
   static CcnxContentObjectTail tail;
   Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
   header->SetName (Create<CcnxNameComponents> (interest->GetName ()));
+
+  NS_LOG_INFO ("Respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
-  outgoingPacket->AddHeader (*header);
-  outgoingPacket->AddTrailer (tail);
+  packet->AddHeader (*header);
+  packet->AddTrailer (tail);
 
-  m_protocolHandler (outgoingPacket);
+  m_protocolHandler (packet);
 }
 
 } // namespace ns3

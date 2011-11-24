@@ -28,6 +28,8 @@
 #include "ns3/assert.h"
 
 #include "ns3/ccnx-header-helper.h"
+#include "ns3/ccnx-app.h"
+
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
@@ -37,12 +39,12 @@ namespace ns3
 {
 
 CcnxLocalFace::CcnxLocalFace (Ptr<CcnxApp> app)
-  : CcnxFace (app->GetObject<Node> ())
+  : CcnxFace (app->GetNode ())
   , m_app (app)
 {
   NS_LOG_FUNCTION (this << app);
   
-  NS_ASSERT (app != 0);
+  NS_ASSERT (m_app != 0);
 }
 
 CcnxLocalFace::~CcnxLocalFace ()
@@ -53,11 +55,11 @@ CcnxLocalFace::~CcnxLocalFace ()
 void
 CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
-  NS_LOG_FUNCTION (this << handler);
+  NS_LOG_FUNCTION (this);
 
   CcnxFace::RegisterProtocolHandler (handler);
 
-  app->RegisterProtocolHandler (MakeCallback (&CcnxFace::Receive, this));
+  m_app->RegisterProtocolHandler (MakeCallback (&CcnxFace::Receive, this));
 }
     
 void
@@ -71,23 +73,27 @@ CcnxLocalFace::SendImpl (Ptr<Packet> p)
       switch (type)
         {
         case CcnxHeaderHelper::INTEREST:
-          if (!m_onInterest.IsNull ())
-            {
-              Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
-              p->RemoveHeader (*header);
-              app->OnInterest (header);
-            }
-          break;
+          {
+            Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
+            p->RemoveHeader (*header);
+
+            if (header->GetNack () > 0)
+              m_app->OnNack (header);
+            else
+              m_app->OnInterest (header);
+          
+            break;
+          }
         case CcnxHeaderHelper::CONTENT_OBJECT:
-          if (!m_onContentObject.IsNull ())
-            {
-              static CcnxContentObjectTail tail;
-              Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
-              p->RemoveHeader (*header);
-              p->RemoveTrailer (tail);
-              app->OnContentObject (header, p/*payload*/);
-            }
-          break;
+          {
+            static CcnxContentObjectTail tail;
+            Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+            p->RemoveHeader (*header);
+            p->RemoveTrailer (tail);
+            m_app->OnContentObject (header, p/*payload*/);
+          
+            break;
+          }
         }
     }
   catch (CcnxUnknownHeaderException)
