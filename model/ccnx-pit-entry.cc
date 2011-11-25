@@ -23,6 +23,12 @@
 #include "ccnx-fib.h"
 
 #include "ns3/simulator.h"
+#include "ns3/log.h"
+
+#include <boost/lambda/lambda.hpp>
+namespace ll = boost::lambda;
+
+NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");
 
 namespace ns3
 {
@@ -83,4 +89,23 @@ CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
     m_outgoing.erase (outgoing);
 }
 
-}  
+void
+CcnxPitEntry::SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterator face)
+{
+  m_outgoing.modify (face,
+                     (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain = true);
+}
+
+bool
+CcnxPitEntry::AreAllOutgoingInVain () const
+{
+  bool inVain = true;
+  std::for_each (m_outgoing.begin (), m_outgoing.end (),
+                 ll::var(inVain) &= (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain);
+
+  NS_LOG_DEBUG ("inVain " << inVain);
+  return inVain;
+}
+
+
+}

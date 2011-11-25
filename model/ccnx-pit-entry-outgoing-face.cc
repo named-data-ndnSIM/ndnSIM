@@ -30,7 +30,7 @@ CcnxPitEntryOutgoingFace::CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face)
   // , m_retxNum (0)
   // , m_nonce (nonce)
   // , m_outstanding (true)
-  // , m_waitingInVain (false)
+  , m_waitingInVain (false)
 {
 }
 

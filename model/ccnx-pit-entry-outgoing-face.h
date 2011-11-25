@@ -41,7 +41,7 @@ struct CcnxPitEntryOutgoingFace
   // uint32_t m_retxNum;       ///< \brief number of retransmission
   // int m_nonce;              ///< \brief nonce of the outgoing Interest
   // bool m_outstanding;		///< \brief flag to indicate that this interest is currently pending
-  // bool m_waitingInVain;     ///< \brief when flag is set, we do not expect data for this interest, only a small hope that it will happen
+  bool m_waitingInVain;     ///< \brief when flag is set, we do not expect data for this interest, only a small hope that it will happen
 	
 public:
   CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face);

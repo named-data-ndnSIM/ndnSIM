@@ -63,11 +63,14 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
       
-      if (metricFace.m_face == incomingFace) // same face as incoming, don't forward
-        continue;
+      if (metricFace.m_face == incomingFace) 
+        continue; // same face as incoming, don't forward
 
-      if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
-        continue;
+      if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
+        continue; // don't forward to face that we received interest from
+      
+      if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) 
+        continue; // already forwarded before
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...

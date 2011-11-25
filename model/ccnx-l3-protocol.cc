@@ -308,7 +308,8 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                  "Outgoing entry should exist");
 
   outFace->m_face->LeakBucketByOnePacket ();
-  // outFace->m_waitingInVain = true; // don't think that this is necessary
+  m_pit->modify (m_pit->iterator_to (pitEntry),
+                 ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
   
   // m_droppedInterestsTrace (header, DROP_CONGESTION, m_node->GetObject<Ccnx> (), incomingFace);
 
@@ -337,7 +338,8 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 
-  if (!propagated) GiveUpInterest (pitEntry, header);
+  if (!propagated && pitEntry.AreAllOutgoingInVain ())
+    GiveUpInterest (pitEntry, header);
 }
 
 // Processing Interests

@@ -66,6 +66,9 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           if (bestMetric.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // no point to send there
             continue;
 
+          if (pitEntry.m_incoming.find (bestMetric.m_face) != pitEntry.m_incoming.end ()) 
+            continue; // don't forward to face that we received interest from
+
           if (pitEntry.m_outgoing.find (bestMetric.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
             continue;
 

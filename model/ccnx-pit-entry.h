@@ -194,6 +194,18 @@ public:
   void
   RemoveAllReferencesToFace (Ptr<CcnxFace> face);
 
+  /**
+   * @brief Flag outgoing face as hopeless
+   */
+  void
+  SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterator face);
+  
+  /**
+   * @brief Check if all outgoing faces are NACKed
+   */
+  bool
+  AreAllOutgoingInVain () const;
+  
 protected:
   
 private:
