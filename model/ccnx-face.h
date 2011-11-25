@@ -175,6 +175,9 @@ public:
    */
   inline void
   LeakBucket (const Time &interval);
+
+  inline void
+  LeakBucketByOnePacket ();
   
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -252,6 +255,11 @@ CcnxFace::LeakBucket (const Time &interval)
   m_bucket -= std::max (0.0, m_bucket-leak); 
 }
 
+void
+CcnxFace::LeakBucketByOnePacket ()
+{
+  m_bucket -= std::max (0.0, m_bucket-1.0); 
+}
 
 } // namespace ns3
 

@@ -164,6 +164,12 @@ public:
   AddIncoming (Ptr<CcnxFace> face);
 
   /**
+   * @brief Remove incoming entry for face `face`
+   */
+  void
+  RemoveIncoming (Ptr<CcnxFace> face);
+
+  /**
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
    */
   void

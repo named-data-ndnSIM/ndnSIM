@@ -49,6 +49,13 @@ CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
   return ret.first;
 }
 
+void
+CcnxPitEntry::RemoveIncoming (Ptr<CcnxFace> face)
+{
+  m_incoming.erase (face);
+}
+
+
 CcnxPitEntryOutgoingFaceContainer::type::iterator
 CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
 {

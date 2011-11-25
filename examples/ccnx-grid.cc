@@ -24,6 +24,7 @@
 #include "ns3/NDNabstraction-module.h"
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/netanim-module.h"
 
 #include <iostream>
 #include <sstream>
@@ -42,6 +43,22 @@ void PrintTime ()
   Simulator::Schedule (Seconds (10.0), PrintTime);
 }
 
+void PrintFIBs ()
+{
+  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
+  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
+
+      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
+      NS_ASSERT_MSG (fib != 0, "Fire alarm");
+      *routingStream->GetStream () << *fib << "\n\n";
+    }
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -52,11 +69,13 @@ main (int argc, char *argv[])
   Packet::EnableChecking();
   Packet::EnablePrinting();
 
+  std::string animationFile = "";
   CommandLine cmd;
   cmd.AddValue ("nGrid", "Number of grid nodes", nGrid);
   cmd.AddValue ("finish", "Finish time", finishTime);
+  cmd.AddValue ("netanim", "NetAnim filename", animationFile);
   cmd.Parse (argc, argv);
-
+  
   PointToPointHelper p2p;
 
   InternetStackHelper stack;
@@ -103,30 +122,29 @@ main (int argc, char *argv[])
   // producers.Start(Seconds(0.0));
   // producers.Stop(finishTime);
 
-  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
-  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
-  for (NodeList::Iterator node = NodeList::Begin ();
-       node != NodeList::End ();
-       node++)
-    {
-      *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
-
-      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
-      NS_ASSERT_MSG (fib != 0, "Fire alarm");
-      *routingStream->GetStream () << *fib << "\n\n";
-    }
-
+  Simulator::Schedule (Seconds (1.0), PrintFIBs);
+  
   Simulator::Schedule (Seconds (10.0), PrintTime);
   
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
     
   Simulator::Stop (finishTime);
-    
+
+  AnimationInterface *anim = 0;
+  if (animationFile != "")
+    {
+      anim = new AnimationInterface (animationFile);
+      anim->SetMobilityPollInterval (Seconds (1));
+    }
+
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done!");
-    
+
+  if (anim != 0)
+    delete anim;
+  
   return 0;
 }

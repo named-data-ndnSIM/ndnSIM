@@ -207,6 +207,7 @@ public:
       NORMAL_INTEREST = 0,
       NACK_LOOP = 1,
       NACK_CONGESTION,
+      NACK_GIVEUP_PIT,
     };
 
   void

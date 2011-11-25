@@ -219,7 +219,12 @@ private:
   GetBucketLeakInterval () const;
   
   /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
-  void LeakBuckets( );
+  void
+  LeakBuckets ();
+
+  void
+  GiveUpInterest (const CcnxPitEntry &pitEntry,
+                  Ptr<CcnxInterestHeader> header);
 
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
