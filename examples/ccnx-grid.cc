@@ -87,7 +87,9 @@ main (int argc, char *argv[])
 
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
-  CcnxStackHelper ccnxHelper(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
+  CcnxStackHelper ccnxHelper;
+  ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
+  ccnxHelper.EnableLimits (true);
   ccnxHelper.InstallAll ();
 
   // Install IP stack (necessary to populate FIB)

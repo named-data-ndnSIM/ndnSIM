@@ -26,32 +26,9 @@
 #include "ccnx-forwarding-helper.h"
 
 namespace ns3 {
-
-CcnxForwardingHelper::CcnxForwardingHelper()
-{
-    m_strategy = Ccnx::NDN_FLOODING;
-}
     
-CcnxForwardingHelper::CcnxForwardingHelper (Ccnx::ForwardingStrategy strategy)
+CcnxForwardingHelper::CcnxForwardingHelper ()
 {
-    m_strategy = strategy;
-}
-
-void 
-CcnxForwardingHelper::SetForwarding (Ptr<Ccnx> ccnx) const
-{
-    if(m_strategy == Ccnx::NDN_FLOODING)
-    {
-        Ptr<CcnxFloodingStrategy> ccnxForwarding = CreateObject<CcnxFloodingStrategy> ();
-        ccnx->SetForwardingStrategy (ccnxForwarding);
-    }
-    else if(m_strategy == Ccnx::NDN_BESTROUTE)
-    {
-        Ptr<CcnxBestRouteStrategy> ccnxForwarding = CreateObject<CcnxBestRouteStrategy> ();
-        ccnx->SetForwardingStrategy (ccnxForwarding);
-    }
-    else if (m_strategy == Ccnx::NDN_RANKING)
-    {}
 }
 
 // void

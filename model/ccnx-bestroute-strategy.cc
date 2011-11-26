@@ -38,9 +38,10 @@ NS_OBJECT_ENSURE_REGISTERED (CcnxBestRouteStrategy);
 TypeId CcnxBestRouteStrategy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxBestRouteStrategy")
-  .SetGroupName ("Ccnx")
-  .SetParent<CcnxForwardingStrategy> ()
-  ;
+    .SetGroupName ("Ccnx")
+    .SetParent <CcnxForwardingStrategy> ()
+    .AddConstructor <CcnxBestRouteStrategy> ()
+    ;
   return tid;
 }
     

@@ -169,6 +169,12 @@ public:
   SetBucketMax (double bucket);
 
   /**
+   * @brief Set a normalized value (one second) for Interest allowance bucket leak
+   */
+  inline void
+  SetBucketLeak (double leak);
+  
+  /**
    * @brief Leak the Interest allowance bucket by (1/interval) * m_bucketMax amount
    *
    * @param interval Time interval with which the bucket is leaked
@@ -246,6 +252,12 @@ void
 CcnxFace::SetBucketMax (double bucket)
 {
   m_bucketMax = bucket;
+}
+
+void
+CcnxFace::SetBucketLeak (double leak)
+{
+  m_bucketLeak = leak;
 }
 
 void

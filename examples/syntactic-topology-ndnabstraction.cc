@@ -43,8 +43,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::OnOffApplication::PacketSize", UintegerValue (210));
   Config::SetDefault ("ns3::OnOffApplication::DataRate", StringValue ("448kb/s"));
   
-    Packet::EnableChecking();
-    Packet::EnablePrinting();
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
 
   // Allow the user to override any of the defaults and the above
   // DefaultValue::Bind ()s at run-time, via command-line arguments
@@ -55,13 +55,13 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Create nodes.");
   NodeContainer c;
   c.Create (7);
-    Names::Add ("1", c.Get (0));
-    Names::Add ("2", c.Get (1));
-    Names::Add ("3", c.Get (2));
-    Names::Add ("4", c.Get (3));
-    Names::Add ("5", c.Get (4));
-    Names::Add ("6", c.Get (5));
-    Names::Add ("7", c.Get (6));
+  Names::Add ("1", c.Get (0));
+  Names::Add ("2", c.Get (1));
+  Names::Add ("3", c.Get (2));
+  Names::Add ("4", c.Get (3));
+  Names::Add ("5", c.Get (4));
+  Names::Add ("6", c.Get (5));
+  Names::Add ("7", c.Get (6));
     
     
   NodeContainer n13 = NodeContainer (c.Get (0), c.Get (2));
@@ -104,14 +104,14 @@ main (int argc, char *argv[])
   p2p.SetChannelAttribute ("Delay", StringValue ("50ms"));
   NetDeviceContainer nd35 = p2p.Install (n35);
   
-    InternetStackHelper stack;
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper;
-    // Ptr<Ipv4RoutingHelper> ipv4RoutingHelper = stack.GetRoutingHelper ();
-    stack.SetRoutingHelper (ipv4RoutingHelper);
-    stack.Install(c);
-    // // Create router nodes, initialize routing database and set up the routing
-    // // tables in the nodes.
-    Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  InternetStackHelper stack;
+  Ipv4GlobalRoutingHelper ipv4RoutingHelper;
+  // Ptr<Ipv4RoutingHelper> ipv4RoutingHelper = stack.GetRoutingHelper ();
+  stack.SetRoutingHelper (ipv4RoutingHelper);
+  stack.Install(c);
+  // // Create router nodes, initialize routing database and set up the routing
+  // // tables in the nodes.
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
     
   // Later, we add IP addresses.
   NS_LOG_INFO ("Assign IP Addresses.");
@@ -128,38 +128,40 @@ main (int argc, char *argv[])
     
     
     
-    CcnxStackHelper ccnx(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
-    Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
+  CcnxStackHelper ccnx;
+  ccnx.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
+  ccnx.EnableLimits (false);
+  Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
     
-    NS_LOG_INFO ("Installing Applications");
-    CcnxConsumerHelper helper ("/3");
-    ApplicationContainer app = helper.Install (c.Get(1));
-    app.Start (Seconds (1.0));
-    app.Stop (Seconds (1000.05));
+  NS_LOG_INFO ("Installing Applications");
+  CcnxConsumerHelper helper ("/3");
+  ApplicationContainer app = helper.Install (c.Get(1));
+  app.Start (Seconds (1.0));
+  app.Stop (Seconds (1000.05));
     
-    /*CcnxConsumerHelper helper2 ("/4");
+  /*CcnxConsumerHelper helper2 ("/4");
     ApplicationContainer app2 = helper2.Install(c.Get(5));
     app2.Start (Seconds (1.0));
     app2.Stop (Seconds (1000.05));
-    */
-    CcnxProducerHelper helper3 ("/3",120);
-    ApplicationContainer app3 = helper3.Install(c.Get(6));
-    app3.Start(Seconds(0.0));
-    app3.Stop(Seconds(1500.0));
-    /*
+  */
+  CcnxProducerHelper helper3 ("/3",120);
+  ApplicationContainer app3 = helper3.Install(c.Get(6));
+  app3.Start(Seconds(0.0));
+  app3.Stop(Seconds(1500.0));
+  /*
     CcnxProducerHelper helper4 ("/4",150);
     ApplicationContainer app4 = helper4.Install(c.Get(0));
     app4.Start(Seconds(0.0));
     app4.Stop(Seconds(1500.0));
   */
     
-    ccnx.AddRoute("1","/3",0,1);
-    ccnx.AddRoute("3","/3",2,1);
-    ccnx.AddRoute("3","/3",3,1);
-    ccnx.AddRoute("4","/3",1,1);
-    ccnx.AddRoute("5","/3",2,1);
+  ccnx.AddRoute("1","/3",0,1);
+  ccnx.AddRoute("3","/3",2,1);
+  ccnx.AddRoute("3","/3",3,1);
+  ccnx.AddRoute("4","/3",1,1);
+  ccnx.AddRoute("5","/3",2,1);
     
-    /*ccnx.AddRoute ("1", "/3", 0, 1);
+  /*ccnx.AddRoute ("1", "/3", 0, 1);
     ccnx.AddRoute ("1", "/3", 1, 1);
     
     ccnx.AddRoute ("2", "/3", 1, 1);
@@ -178,40 +180,40 @@ main (int argc, char *argv[])
   // Create the OnOff application to send UDP datagrams of size
   // 210 bytes at a rate of 448 Kb/s from n0 to n4
   /*NS_LOG_INFO ("Create Applications.");
-  uint16_t port = 9;   // Discard port (RFC 863)
+    uint16_t port = 9;   // Discard port (RFC 863)
   
-  std::string sendsizeattr = "SendSize";
-  //flow2 7-->2
-  BulkSendHelper bulksend0 ("ns3::UdpSocketFactory", InetSocketAddress (i23.GetAddress (0), port));
-  //bulksend0.SetAttribute(sendsizeattr, AttributeValue(ConstantVariable(2560)));
-  bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
-  ApplicationContainer apps = bulksend0.Install(c.Get(6));
-  apps.Start(Seconds (1.0));
-  apps.Stop(Seconds (10.0));
+    std::string sendsizeattr = "SendSize";
+    //flow2 7-->2
+    BulkSendHelper bulksend0 ("ns3::UdpSocketFactory", InetSocketAddress (i23.GetAddress (0), port));
+    //bulksend0.SetAttribute(sendsizeattr, AttributeValue(ConstantVariable(2560)));
+    bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
+    ApplicationContainer apps = bulksend0.Install(c.Get(6));
+    apps.Start(Seconds (1.0));
+    apps.Stop(Seconds (10.0));
   
-  // Create a packet sink to receive these packets
-  PacketSinkHelper sink0 ("ns3::UdpSocketFactory", InetSocketAddress(Ipv4Address::GetAny (), port));
-  apps = sink0.Install(c.Get(1));
-  apps.Start(Seconds(0.0));
-  apps.Stop(Seconds(20.0));
+    // Create a packet sink to receive these packets
+    PacketSinkHelper sink0 ("ns3::UdpSocketFactory", InetSocketAddress(Ipv4Address::GetAny (), port));
+    apps = sink0.Install(c.Get(1));
+    apps.Start(Seconds(0.0));
+    apps.Stop(Seconds(20.0));
   
-  //flow1 1-->6
-  BulkSendHelper bulksend ("ns3::UdpSocketFactory", InetSocketAddress (i56.GetAddress (1), port));
-  //bulksend.SetAttribute(sendsizeattr, AttributeValue( ConstantVariable(2560)));
-  bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
-  apps = bulksend.Install (c.Get (0));
-  apps.Start (Seconds (6.0));
-  apps.Stop (Seconds (20.0));
+    //flow1 1-->6
+    BulkSendHelper bulksend ("ns3::UdpSocketFactory", InetSocketAddress (i56.GetAddress (1), port));
+    //bulksend.SetAttribute(sendsizeattr, AttributeValue( ConstantVariable(2560)));
+    bulksend0.SetAttribute("MaxBytes", UintegerValue(2560));
+    apps = bulksend.Install (c.Get (0));
+    apps.Start (Seconds (6.0));
+    apps.Stop (Seconds (20.0));
   
-  // Create a packet sink to receive these packets
-  PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
-  apps = sink.Install (c.Get (5));
-  apps.Start(Seconds(0.0));
-  apps.Stop(Seconds(20.0));
+    // Create a packet sink to receive these packets
+    PacketSinkHelper sink ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), port));
+    apps = sink.Install (c.Get (5));
+    apps.Start(Seconds(0.0));
+    apps.Stop(Seconds(20.0));
   
-  AsciiTraceHelper ascii;
-  p2p.EnableAsciiAll (ascii.CreateFileStream ("sync-topology-ndnabstraction.tr"));
-  p2p.EnablePcapAll ("sync-topology-ndnabstraction");*/
+    AsciiTraceHelper ascii;
+    p2p.EnableAsciiAll (ascii.CreateFileStream ("sync-topology-ndnabstraction.tr"));
+    p2p.EnablePcapAll ("sync-topology-ndnabstraction");*/
   
   Simulator::Stop (Seconds (2000));
   
@@ -220,5 +222,5 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
   
-	return 0;
+  return 0;
 }

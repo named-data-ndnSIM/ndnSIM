@@ -29,7 +29,6 @@
 #include "ccnx-trace-helper.h"
 #include "ns3/ccnx-forwarding-helper.h"
 #include "ns3/ccnx.h"
-#include "ns3/data-rate.h"
 #include "ns3/ccnx-interest-header.h"
 
 namespace ns3 {
@@ -58,7 +57,7 @@ class CcnxFaceContainer;
  * attribute or a set of functionality that may be of interest to many other
  * classes.
  */
-class CcnxStackHelper : public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
+class CcnxStackHelper //: public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
 {
 public:
   /**
@@ -67,19 +66,12 @@ public:
   CcnxStackHelper();
   
   /**
-   * \brief Create a new CcnxStackHelper with a specified forwarding strategy
-   */
-  CcnxStackHelper (Ccnx::ForwardingStrategy);
-
-  /**
    * \brief Destroy the CcnxStackHelper
    */
   virtual ~CcnxStackHelper ();
-  CcnxStackHelper (const CcnxStackHelper &);
-  CcnxStackHelper &operator = (const CcnxStackHelper &o);
 
   /**
-   * Set forwarding strategy helper
+   * @brief Set forwarding strategy helper
    *
    * \param forwarding a new forwarding helper
    *
@@ -89,8 +81,14 @@ public:
    * a single ns3::Ccnx object through its ns3::Ccnx::SetforwardingProtocol.
    */
   void
-  SetForwardingStrategy (Ccnx::ForwardingStrategy strategy);
+  SetForwardingStrategy (std::string forwardingStrategy);
 
+  /**
+   * @brief Enable Interest limits (disabled by default)
+   */
+  void
+  EnableLimits (bool enable = true);
+  
   /**
    * \brief Install CCNx stack on the node
    *
@@ -192,58 +190,63 @@ public:
    */
   void
   InstallRoutesToAll ();
+
+private:
+  CcnxStackHelper (const CcnxStackHelper &);
+  CcnxStackHelper &operator = (const CcnxStackHelper &o);
   
 private:
-   CcnxForwardingHelper m_forwardingHelper;
-    
-  /**
-   * @brief Enable pcap output the indicated Ccnx and interface pair.
-   * @internal
-   *
-   * @param prefix Filename prefix to use for pcap files.
-   * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
-   * @param interface Interface ID on the Ccnx on which you want to enable tracing.
-   */
-  virtual void EnablePcapCcnxInternal (std::string prefix, 
-                                       Ptr<Ccnx> ccnx, 
-                                       uint32_t interface,
-                                       bool explicitFilename);
+  ObjectFactory m_strategyFactory;
+  bool m_limitsEnabled;
+  
+  // /**
+  //  * @brief Enable pcap output the indicated Ccnx and interface pair.
+  //  * @internal
+  //  *
+  //  * @param prefix Filename prefix to use for pcap files.
+  //  * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
+  //  * @param interface Interface ID on the Ccnx on which you want to enable tracing.
+  //  */
+  // virtual void EnablePcapCcnxInternal (std::string prefix, 
+  //                                      Ptr<Ccnx> ccnx, 
+  //                                      uint32_t interface,
+  //                                      bool explicitFilename);
 
-  /**
-   * @brief Enable ascii trace output on the indicated Ccnx and interface pair.
-   * @internal
-   *
-   * @param stream An OutputStreamWrapper representing an existing file to use
-   *               when writing trace data.
-   * @param prefix Filename prefix to use for ascii trace files.
-   * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
-   * @param interface Interface ID on the Ccnx on which you want to enable tracing.
-   */
-  virtual void EnableAsciiCcnxInternal (Ptr<OutputStreamWrapper> stream, 
-                                        std::string prefix, 
-                                        Ptr<Ccnx> ccnx, 
-                                        uint32_t interface,
-                                        bool explicitFilename);
+  // /**
+  //  * @brief Enable ascii trace output on the indicated Ccnx and interface pair.
+  //  * @internal
+  //  *
+  //  * @param stream An OutputStreamWrapper representing an existing file to use
+  //  *               when writing trace data.
+  //  * @param prefix Filename prefix to use for ascii trace files.
+  //  * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
+  //  * @param interface Interface ID on the Ccnx on which you want to enable tracing.
+  //  */
+  // virtual void EnableAsciiCcnxInternal (Ptr<OutputStreamWrapper> stream, 
+  //                                       std::string prefix, 
+  //                                       Ptr<Ccnx> ccnx, 
+  //                                       uint32_t interface,
+  //                                       bool explicitFilename);
+
+  // // /**
+  // //  * \internal
+  // //  */
+  // // static void CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId);
 
   // /**
   //  * \internal
   //  */
-  // static void CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId);
+  // static void Cleanup (void);
 
-  /**
-   * \internal
-   */
-  static void Cleanup (void);
+  // /**
+  //  * \internal
+  //  */
+  // bool PcapHooked (Ptr<Ccnx> ccnx);
 
-  /**
-   * \internal
-   */
-  bool PcapHooked (Ptr<Ccnx> ccnx);
-
-  /**
-   * \internal
-   */
-  bool AsciiHooked (Ptr<Ccnx> ccnx);
+  // /**
+  //  * \internal
+  //  */
+  // bool AsciiHooked (Ptr<Ccnx> ccnx);
 };
 
 } // namespace ns3

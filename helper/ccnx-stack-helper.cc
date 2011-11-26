@@ -71,11 +71,14 @@
 #include "ns3/ccnx-l3-protocol.h"
 #include "ns3/ccnx-fib.h"
 #include "ns3/node-list.h"
-#include "ns3/ipv4.h"
-#include "ns3/ipv4-routing-helper.h"
-#include "ns3/ipv4-global-routing-ordered-nexthops.h"
+#include "ns3/loopback-net-device.h"
 #include "ns3/global-router-interface.h"
+#include "ns3/ipv4.h"
+#include "ns3/ipv4-global-routing.h"
+#include "ns3/ipv4-global-routing-ordered-nexthops.h"
+#include "ns3/ipv4-routing-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/data-rate.h"
 
 #include "ccnx-face-container.h"
 #include "ccnx-stack-helper.h"
@@ -86,8 +89,6 @@
 #include <boost/foreach.hpp>
 
 #define NDN_DEFAULT_DATA_SIZE      1024
-#define NDN_INTEREST_RESET_PERIOD  Seconds(0.01)
-
 
 NS_LOG_COMPONENT_DEFINE ("CcnxStackHelper");
 
@@ -116,47 +117,33 @@ namespace ns3 {
 // leaks.  Global maps of protocol/face pairs to file objects seems to
 // fit the bill.
 //
-typedef std::pair<Ptr<Ccnx>, uint32_t> FacePairCcnx; 
-typedef std::map<FacePairCcnx, Ptr<PcapFileWrapper> > FaceFileMapCcnx;
-typedef std::map<FacePairCcnx, Ptr<OutputStreamWrapper> > FaceStreamMapCcnx;
+// typedef std::pair<Ptr<Ccnx>, uint32_t> FacePairCcnx; 
+// typedef std::map<FacePairCcnx, Ptr<PcapFileWrapper> > FaceFileMapCcnx;
+// typedef std::map<FacePairCcnx, Ptr<OutputStreamWrapper> > FaceStreamMapCcnx;
 
-static FaceFileMapCcnx g_faceFileMapCcnx; /**< A mapping of Ccnx/face pairs to pcap files */
-static FaceStreamMapCcnx g_faceStreamMapCcnx; /**< A mapping of Ccnx/face pairs to ascii streams */
+// static FaceFileMapCcnx g_faceFileMapCcnx; /**< A mapping of Ccnx/face pairs to pcap files */
+// static FaceStreamMapCcnx g_faceStreamMapCcnx; /**< A mapping of Ccnx/face pairs to ascii streams */
 
     
 CcnxStackHelper::CcnxStackHelper ()
-    : m_forwardingHelper (Ccnx::NDN_FLOODING)
 {
-}
-    
-CcnxStackHelper::CcnxStackHelper (Ccnx::ForwardingStrategy strategy)
-    : m_forwardingHelper (strategy)
-{
+  m_strategyFactory.SetTypeId ("ns3::CcnxFloodingStrategy");
 }
     
 CcnxStackHelper::~CcnxStackHelper ()
 {
 }
 
-CcnxStackHelper::CcnxStackHelper (const CcnxStackHelper &o)
-{
-}
-
-CcnxStackHelper &
-CcnxStackHelper::operator = (const CcnxStackHelper &o)
-{
-  if (this == &o)
-    {
-      return *this;
-    }
-  return *this;
-}
-
 void 
-CcnxStackHelper::SetForwardingStrategy (Ccnx::ForwardingStrategy strategy)
+CcnxStackHelper::SetForwardingStrategy (std::string strategy)
 {
-  CcnxForwardingHelper newForwardingHelper (strategy);
-  m_forwardingHelper = newForwardingHelper;
+  m_strategyFactory.SetTypeId (strategy);
+}
+
+void
+CcnxStackHelper::EnableLimits (bool enable/* = true*/)
+{
+  m_limitsEnabled = enable;
 }
 
 Ptr<CcnxFaceContainer>
@@ -175,15 +162,6 @@ CcnxStackHelper::InstallAll (void) const
 {
   return Install (NodeContainer::GetGlobal ());
 }
-
-// void
-// CcnxStackHelper::CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId)
-// {
-//   ObjectFactory factory;
-//   factory.SetTypeId (typeId);
-//   Ptr<Object> protocol = factory.Create <Object> ();
-//   node->AggregateObject (protocol);
-// }
 
 Ptr<CcnxFaceContainer>
 CcnxStackHelper::Install (Ptr<Node> node) const
@@ -204,38 +182,43 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
-  NS_LOG_INFO("NODE->GetNDevices()=" << node->GetNDevices());
-    
+  ccnx->SetForwardingStrategy
+    (DynamicCast<CcnxForwardingStrategy> (m_strategyFactory.Create<Object> ()));
+  
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
-      Ptr<PointToPointNetDevice> device = DynamicCast<PointToPointNetDevice>(node->GetDevice(index));
-      if(device == 0)
-        continue;
-        
-      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node, node->GetDevice (index));
+      Ptr<NetDevice> device = node->GetDevice (index);
+      if (DynamicCast<LoopbackNetDevice> (device) != 0)
+        continue; // don't create face for a LoopbackNetDevice
+
+      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node, device);
 
       uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
-      // Setup bucket filtering
-      // Assume that we know average data packet size, and this size is equal default size
-      // Set maximum buckets (averaging over 1 second)
+
+      if (m_limitsEnabled)
+        {
+          Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
+          if (p2p == 0)
+            continue; // only PointToPointNetDevice supports limits
+
+          // Setup bucket filtering
+          // Assume that we know average data packet size, and this size is equal default size
+          // Set maximum buckets (averaging over 1 second)
       
-      // DataRateValue dataRate;
-      // device->GetAttribute ("DataRate", dataRate);
-      // NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
-      // pit->maxBucketsPerFace[face->GetId()] = 0.1 * dataRate.Get().GetBitRate () /(NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
-      // NS_LOG_INFO("maxBucketsPerFace["<<face->GetId()<<"] = " << pit->maxBucketsPerFace[face->GetId()]); 
-      // pit->leakSize[face->GetId()] = 0.97 * NDN_INTEREST_RESET_PERIOD.ToDouble(Time::S) * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof(CcnxInterestHeader));
-      // NS_LOG_INFO("pit->leakSize["<<face->GetId()<<"] = " << pit->leakSize[face->GetId()]);
+          DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
+          
+          NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
+          face->SetBucketMax
+            (0.1 * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof (CcnxInterestHeader)));
+             
+          face->SetBucketLeak
+            (0.97 * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof (CcnxInterestHeader)));
+        }
         
-      NS_LOG_INFO("Face #" << face_id << " is turned on");
       face->SetUp ();
       faces->Add (face);
     }
-    
-  m_forwardingHelper.SetForwarding (ccnx);
-
-  // ccnx->ScheduleLeakage ();
     
   return faces;
 }
@@ -275,10 +258,10 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
   AddRoute (node, prefix, face, metric);
 }
 /*
-void
-CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
-{
-    NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
+  void
+  CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
+  {
+  NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
     
   NS_ASSERT_MSG (node != 0, "Node does not exist");
         
@@ -290,259 +273,259 @@ CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, 
   CcnxNameComponentsValue prefixValue;
   prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
   fib->Add (prefixValue.Get (), face, metric);
-}
+  }
 */
 
-static void
-CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)
-{
-  NS_LOG_FUNCTION (p << ccnx << face);
+// static void
+// CcnxL3ProtocolRxTxSink (Ptr<const Packet> p, Ptr<Ccnx> ccnx, uint32_t face)
+// {
+//   NS_LOG_FUNCTION (p << ccnx << face);
 
-  //
-  // Since trace sources are independent of face, if we hook a source
-  // on a particular protocol we will get traces for all of its faces.
-  // We need to filter this to only report faces for which the user 
-  // has expressed interest.
-  //
-  FacePairCcnx pair = std::make_pair (ccnx, face);
-  if (g_faceFileMapCcnx.find (pair) == g_faceFileMapCcnx.end ())
-    {
-      NS_LOG_INFO ("Ignoring packet to/from face " << face);
-      return;
-    }
+//   //
+//   // Since trace sources are independent of face, if we hook a source
+//   // on a particular protocol we will get traces for all of its faces.
+//   // We need to filter this to only report faces for which the user 
+//   // has expressed interest.
+//   //
+//   FacePairCcnx pair = std::make_pair (ccnx, face);
+//   if (g_faceFileMapCcnx.find (pair) == g_faceFileMapCcnx.end ())
+//     {
+//       NS_LOG_INFO ("Ignoring packet to/from face " << face);
+//       return;
+//     }
 
-  Ptr<PcapFileWrapper> file = g_faceFileMapCcnx[pair];
-  file->Write (Simulator::Now (), p);
-}
+//   Ptr<PcapFileWrapper> file = g_faceFileMapCcnx[pair];
+//   file->Write (Simulator::Now (), p);
+// }
 
-bool
-CcnxStackHelper::PcapHooked (Ptr<Ccnx> ccnx)
-{
-  for (FaceFileMapCcnx::const_iterator i = g_faceFileMapCcnx.begin (); 
-       i != g_faceFileMapCcnx.end (); 
-       ++i)
-    {
-      if ((*i).first.first == ccnx)
-        {
-          return true;
-        }
-    }
-  return false;
-}
+// bool
+// CcnxStackHelper::PcapHooked (Ptr<Ccnx> ccnx)
+// {
+//   for (FaceFileMapCcnx::const_iterator i = g_faceFileMapCcnx.begin (); 
+//        i != g_faceFileMapCcnx.end (); 
+//        ++i)
+//     {
+//       if ((*i).first.first == ccnx)
+//         {
+//           return true;
+//         }
+//     }
+//   return false;
+// }
 
-void 
-CcnxStackHelper::EnablePcapCcnxInternal (std::string prefix, Ptr<Ccnx> ccnx, uint32_t face, bool explicitFilename)
-{
-  NS_LOG_FUNCTION (prefix << ccnx << face);
+// void 
+// CcnxStackHelper::EnablePcapCcnxInternal (std::string prefix, Ptr<Ccnx> ccnx, uint32_t face, bool explicitFilename)
+// {
+//   NS_LOG_FUNCTION (prefix << ccnx << face);
 
-  //
-  // We have to create a file and a mapping from protocol/face to file 
-  // irrespective of how many times we want to trace a particular protocol.
-  //
-  PcapHelper pcapHelper;
+//   //
+//   // We have to create a file and a mapping from protocol/face to file 
+//   // irrespective of how many times we want to trace a particular protocol.
+//   //
+//   PcapHelper pcapHelper;
 
-  std::string filename;
-  if (explicitFilename)
-    {
-      filename = prefix;
-    }
-  else
-    {
-      filename = pcapHelper.GetFilenameFromInterfacePair (prefix, ccnx, face);
-    }
+//   std::string filename;
+//   if (explicitFilename)
+//     {
+//       filename = prefix;
+//     }
+//   else
+//     {
+//       filename = pcapHelper.GetFilenameFromInterfacePair (prefix, ccnx, face);
+//     }
 
-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_RAW);
+//   Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_RAW);
 
-  //
-  // However, we only hook the trace source once to avoid multiple trace sink
-  // calls per event (connect is independent of face).
-  //
-  if (!PcapHooked (ccnx))
-    {
-      //
-      // Ptr<Ccnx> is aggregated to node and CcnxL3Protocol is aggregated to 
-      // node so we can get to CcnxL3Protocol through Ccnx.
-      //
-      Ptr<CcnxL3Protocol> ccnxL3Protocol = ccnx->GetObject<CcnxL3Protocol> ();
-      NS_ASSERT_MSG (ccnxL3Protocol, "CcnxStackHelper::EnablePcapCcnxInternal(): "
-                     "m_ccnxEnabled and ccnxL3Protocol inconsistent");
+//   //
+//   // However, we only hook the trace source once to avoid multiple trace sink
+//   // calls per event (connect is independent of face).
+//   //
+//   if (!PcapHooked (ccnx))
+//     {
+//       //
+//       // Ptr<Ccnx> is aggregated to node and CcnxL3Protocol is aggregated to 
+//       // node so we can get to CcnxL3Protocol through Ccnx.
+//       //
+//       Ptr<CcnxL3Protocol> ccnxL3Protocol = ccnx->GetObject<CcnxL3Protocol> ();
+//       NS_ASSERT_MSG (ccnxL3Protocol, "CcnxStackHelper::EnablePcapCcnxInternal(): "
+//                      "m_ccnxEnabled and ccnxL3Protocol inconsistent");
 
-      bool result = ccnxL3Protocol->TraceConnectWithoutContext ("Tx", MakeCallback (&CcnxL3ProtocolRxTxSink));
-      NS_ASSERT_MSG (result == true, "CcnxStackHelper::EnablePcapCcnxInternal():  "
-                     "Unable to connect ccnxL3Protocol \"Tx\"");
+//       bool result = ccnxL3Protocol->TraceConnectWithoutContext ("Tx", MakeCallback (&CcnxL3ProtocolRxTxSink));
+//       NS_ASSERT_MSG (result == true, "CcnxStackHelper::EnablePcapCcnxInternal():  "
+//                      "Unable to connect ccnxL3Protocol \"Tx\"");
 
-      result = ccnxL3Protocol->TraceConnectWithoutContext ("Rx", MakeCallback (&CcnxL3ProtocolRxTxSink));
-      NS_ASSERT_MSG (result == true, "CcnxStackHelper::EnablePcapCcnxInternal():  "
-                     "Unable to connect ccnxL3Protocol \"Rx\"");
-      // cast result to void, to suppress ‘result’ set but not used compiler-warning
-      // for optimized builds
-      (void) result;
-    }
+//       result = ccnxL3Protocol->TraceConnectWithoutContext ("Rx", MakeCallback (&CcnxL3ProtocolRxTxSink));
+//       NS_ASSERT_MSG (result == true, "CcnxStackHelper::EnablePcapCcnxInternal():  "
+//                      "Unable to connect ccnxL3Protocol \"Rx\"");
+//       // cast result to void, to suppress ‘result’ set but not used compiler-warning
+//       // for optimized builds
+//       (void) result;
+//     }
 
-  g_faceFileMapCcnx[std::make_pair (ccnx, face)] = file;
-}
+//   g_faceFileMapCcnx[std::make_pair (ccnx, face)] = file;
+// }
 
-static void
-CcnxL3ProtocolDropSinkWithoutContext (
-  Ptr<OutputStreamWrapper> stream,
-  Ptr<const Packet> packet,
-  CcnxL3Protocol::DropReason reason, 
-  Ptr<Ccnx> ccnx, 
-  uint32_t face)
-{
-  //
-  // Since trace sources are independent of face, if we hook a source
-  // on a particular protocol we will get traces for all of its faces.
-  // We need to filter this to only report faces for which the user 
-  // has expressed interest.
-  //
-  FacePairCcnx pair = std::make_pair (ccnx, face);
-  if (g_faceStreamMapCcnx.find (pair) == g_faceStreamMapCcnx.end ())
-    {
-      NS_LOG_INFO ("Ignoring packet to/from face " << face);
-      return;
-    }
+// static void
+// CcnxL3ProtocolDropSinkWithoutContext (
+//   Ptr<OutputStreamWrapper> stream,
+//   Ptr<const Packet> packet,
+//   CcnxL3Protocol::DropReason reason, 
+//   Ptr<Ccnx> ccnx, 
+//   uint32_t face)
+// {
+//   //
+//   // Since trace sources are independent of face, if we hook a source
+//   // on a particular protocol we will get traces for all of its faces.
+//   // We need to filter this to only report faces for which the user 
+//   // has expressed interest.
+//   //
+//   FacePairCcnx pair = std::make_pair (ccnx, face);
+//   if (g_faceStreamMapCcnx.find (pair) == g_faceStreamMapCcnx.end ())
+//     {
+//       NS_LOG_INFO ("Ignoring packet to/from face " << face);
+//       return;
+//     }
 
-  *stream->GetStream () << "d " << Simulator::Now ().GetSeconds () << " " << *packet << std::endl;
-}
+//   *stream->GetStream () << "d " << Simulator::Now ().GetSeconds () << " " << *packet << std::endl;
+// }
 
-static void
-CcnxL3ProtocolDropSinkWithContext (
-  Ptr<OutputStreamWrapper> stream,
-  std::string context,
-  Ptr<const Packet> packet,
-  CcnxL3Protocol::DropReason reason, 
-  Ptr<Ccnx> ccnx, 
-  uint32_t face)
-{
-  //
-  // Since trace sources are independent of face, if we hook a source
-  // on a particular protocol we will get traces for all of its faces.
-  // We need to filter this to only report faces for which the user 
-  // has expressed interest.
-  //
-  FacePairCcnx pair = std::make_pair (ccnx, face);
-  if (g_faceStreamMapCcnx.find (pair) == g_faceStreamMapCcnx.end ())
-    {
-      NS_LOG_INFO ("Ignoring packet to/from face " << face);
-      return;
-    }
+// static void
+// CcnxL3ProtocolDropSinkWithContext (
+//   Ptr<OutputStreamWrapper> stream,
+//   std::string context,
+//   Ptr<const Packet> packet,
+//   CcnxL3Protocol::DropReason reason, 
+//   Ptr<Ccnx> ccnx, 
+//   uint32_t face)
+// {
+//   //
+//   // Since trace sources are independent of face, if we hook a source
+//   // on a particular protocol we will get traces for all of its faces.
+//   // We need to filter this to only report faces for which the user 
+//   // has expressed interest.
+//   //
+//   FacePairCcnx pair = std::make_pair (ccnx, face);
+//   if (g_faceStreamMapCcnx.find (pair) == g_faceStreamMapCcnx.end ())
+//     {
+//       NS_LOG_INFO ("Ignoring packet to/from face " << face);
+//       return;
+//     }
 
-  *stream->GetStream () << "d " << Simulator::Now ().GetSeconds () << " " << context << "(" << face << ") " 
-                        << *packet << std::endl;
-}
+//   *stream->GetStream () << "d " << Simulator::Now ().GetSeconds () << " " << context << "(" << face << ") " 
+//                         << *packet << std::endl;
+// }
 
-bool
-CcnxStackHelper::AsciiHooked (Ptr<Ccnx> ccnx)
-{
-  for (  FaceStreamMapCcnx::const_iterator i = g_faceStreamMapCcnx.begin (); 
-         i != g_faceStreamMapCcnx.end (); 
-         ++i)
-    {
-      if ((*i).first.first == ccnx)
-        {
-          return true;
-        }
-    }
-  return false;
-}
+// bool
+// CcnxStackHelper::AsciiHooked (Ptr<Ccnx> ccnx)
+// {
+//   for (  FaceStreamMapCcnx::const_iterator i = g_faceStreamMapCcnx.begin (); 
+//          i != g_faceStreamMapCcnx.end (); 
+//          ++i)
+//     {
+//       if ((*i).first.first == ccnx)
+//         {
+//           return true;
+//         }
+//     }
+//   return false;
+// }
 
-void 
-CcnxStackHelper::EnableAsciiCcnxInternal (
-  Ptr<OutputStreamWrapper> stream, 
-  std::string prefix, 
-  Ptr<Ccnx> ccnx, 
-  uint32_t face,
-  bool explicitFilename)
-{
-  //
-  // Our trace sinks are going to use packet printing, so we have to 
-  // make sure that is turned on.
-  //
-  Packet::EnablePrinting ();
+// void 
+// CcnxStackHelper::EnableAsciiCcnxInternal (
+//   Ptr<OutputStreamWrapper> stream, 
+//   std::string prefix, 
+//   Ptr<Ccnx> ccnx, 
+//   uint32_t face,
+//   bool explicitFilename)
+// {
+//   //
+//   // Our trace sinks are going to use packet printing, so we have to 
+//   // make sure that is turned on.
+//   //
+//   Packet::EnablePrinting ();
 
-  //
-  // If we are not provided an OutputStreamWrapper, we are expected to create 
-  // one using the usual trace filename conventions and hook WithoutContext
-  // since there will be one file per context and therefore the context would
-  // be redundant.
-  //
-  if (stream == 0)
-    {
-      //
-      // Set up an output stream object to deal with private ofstream copy 
-      // constructor and lifetime issues.  Let the helper decide the actual
-      // name of the file given the prefix.
-      //
-      // We have to create a stream and a mapping from protocol/face to 
-      // stream irrespective of how many times we want to trace a particular 
-      // protocol.
-      //
-      AsciiTraceHelper asciiTraceHelper;
+//   //
+//   // If we are not provided an OutputStreamWrapper, we are expected to create 
+//   // one using the usual trace filename conventions and hook WithoutContext
+//   // since there will be one file per context and therefore the context would
+//   // be redundant.
+//   //
+//   if (stream == 0)
+//     {
+//       //
+//       // Set up an output stream object to deal with private ofstream copy 
+//       // constructor and lifetime issues.  Let the helper decide the actual
+//       // name of the file given the prefix.
+//       //
+//       // We have to create a stream and a mapping from protocol/face to 
+//       // stream irrespective of how many times we want to trace a particular 
+//       // protocol.
+//       //
+//       AsciiTraceHelper asciiTraceHelper;
 
-      std::string filename;
-      if (explicitFilename)
-        {
-          filename = prefix;
-        }
-      else
-        {
-          filename = asciiTraceHelper.GetFilenameFromInterfacePair (prefix, ccnx, face);
-        }
+//       std::string filename;
+//       if (explicitFilename)
+//         {
+//           filename = prefix;
+//         }
+//       else
+//         {
+//           filename = asciiTraceHelper.GetFilenameFromInterfacePair (prefix, ccnx, face);
+//         }
 
-      Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename);
+//       Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename);
 
-      //
-      // However, we only hook the trace sources once to avoid multiple trace sink
-      // calls per event (connect is independent of face).
-      //
-      if (!AsciiHooked (ccnx))
-        {
-          //
-          // The drop sink for the CcnxL3Protocol uses a different signature than
-          // the default sink, so we have to cook one up for ourselves.  We can get
-          // to the Ptr<CcnxL3Protocol> through our Ptr<Ccnx> since they must both 
-          // be aggregated to the same node.
-          //
-          Ptr<CcnxL3Protocol> ccnxL3Protocol = ccnx->GetObject<CcnxL3Protocol> ();
-          bool __attribute__ ((unused)) result = ccnxL3Protocol->TraceConnectWithoutContext ("Drop", 
-                                                                                             MakeBoundCallback (&CcnxL3ProtocolDropSinkWithoutContext, theStream));
-          NS_ASSERT_MSG (result == true, "CcnxStackHelper::EanableAsciiCcnxInternal():  "
-                         "Unable to connect ccnxL3Protocol \"Drop\"");
-        }
+//       //
+//       // However, we only hook the trace sources once to avoid multiple trace sink
+//       // calls per event (connect is independent of face).
+//       //
+//       if (!AsciiHooked (ccnx))
+//         {
+//           //
+//           // The drop sink for the CcnxL3Protocol uses a different signature than
+//           // the default sink, so we have to cook one up for ourselves.  We can get
+//           // to the Ptr<CcnxL3Protocol> through our Ptr<Ccnx> since they must both 
+//           // be aggregated to the same node.
+//           //
+//           Ptr<CcnxL3Protocol> ccnxL3Protocol = ccnx->GetObject<CcnxL3Protocol> ();
+//           bool __attribute__ ((unused)) result = ccnxL3Protocol->TraceConnectWithoutContext ("Drop", 
+//                                                                                              MakeBoundCallback (&CcnxL3ProtocolDropSinkWithoutContext, theStream));
+//           NS_ASSERT_MSG (result == true, "CcnxStackHelper::EanableAsciiCcnxInternal():  "
+//                          "Unable to connect ccnxL3Protocol \"Drop\"");
+//         }
 
-      g_faceStreamMapCcnx[std::make_pair (ccnx, face)] = theStream;
-      return;
-    }
+//       g_faceStreamMapCcnx[std::make_pair (ccnx, face)] = theStream;
+//       return;
+//     }
 
-  //
-  // If we are provided an OutputStreamWrapper, we are expected to use it, and
-  // to provide a context.  We are free to come up with our own context if we
-  // want, and use the AsciiTraceHelper Hook*WithContext functions, but for 
-  // compatibility and simplicity, we just use Config::Connect and let it deal
-  // with the context.
-  //
-  // We need to associate the ccnx/face with a stream to express interest
-  // in tracing events on that pair, however, we only hook the trace sources 
-  // once to avoid multiple trace sink calls per event (connect is independent
-  // of face).
-  //
-  if (!AsciiHooked (ccnx))
-    {
-      Ptr<Node> node = ccnx->GetObject<Node> ();
-      std::ostringstream oss;
+//   //
+//   // If we are provided an OutputStreamWrapper, we are expected to use it, and
+//   // to provide a context.  We are free to come up with our own context if we
+//   // want, and use the AsciiTraceHelper Hook*WithContext functions, but for 
+//   // compatibility and simplicity, we just use Config::Connect and let it deal
+//   // with the context.
+//   //
+//   // We need to associate the ccnx/face with a stream to express interest
+//   // in tracing events on that pair, however, we only hook the trace sources 
+//   // once to avoid multiple trace sink calls per event (connect is independent
+//   // of face).
+//   //
+//   if (!AsciiHooked (ccnx))
+//     {
+//       Ptr<Node> node = ccnx->GetObject<Node> ();
+//       std::ostringstream oss;
 
-      //
-      // This has all kinds of parameters coming with, so we have to cook up our
-      // own sink.
-      //
-      oss.str ("");
-      oss << "/NodeList/" << node->GetId () << "/$ns3::CcnxL3Protocol/Drop";
-      Config::Connect (oss.str (), MakeBoundCallback (&CcnxL3ProtocolDropSinkWithContext, stream));
-    }
+//       //
+//       // This has all kinds of parameters coming with, so we have to cook up our
+//       // own sink.
+//       //
+//       oss.str ("");
+//       oss << "/NodeList/" << node->GetId () << "/$ns3::CcnxL3Protocol/Drop";
+//       Config::Connect (oss.str (), MakeBoundCallback (&CcnxL3ProtocolDropSinkWithContext, stream));
+//     }
 
-  g_faceStreamMapCcnx[std::make_pair (ccnx, face)] = stream;
-}
+//   g_faceStreamMapCcnx[std::make_pair (ccnx, face)] = stream;
+// }
 
 void
 CcnxStackHelper::InstallFakeGlobalRoutes ()
@@ -557,7 +540,7 @@ CcnxStackHelper::InstallFakeGlobalRoutes ()
       NS_ASSERT_MSG (Ipv4RoutingHelper::GetRouting<Ipv4GlobalRoutingOrderedNexthops>
                      (
                       (*node)->GetObject<Ipv4> ()->GetRoutingProtocol ()
-                     ),
+                      ),
                      "InternetStack should have Ipv4GlobalRoutingOrderedNexthops as routing protocol");
       // Example:
       //

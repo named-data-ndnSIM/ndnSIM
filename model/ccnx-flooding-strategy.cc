@@ -40,7 +40,8 @@ TypeId CcnxFloodingStrategy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxFloodingStrategy")
     .SetGroupName ("Ccnx")
-    .SetParent<CcnxForwardingStrategy> ()
+    .SetParent <CcnxForwardingStrategy> ()
+    .AddConstructor <CcnxFloodingStrategy> ()
     ;
   return tid;
 }
