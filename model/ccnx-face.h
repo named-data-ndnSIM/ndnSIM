@@ -179,7 +179,7 @@ public:
    *
    * @param interval Time interval with which the bucket is leaked
    */
-  inline void
+  void
   LeakBucket (const Time &interval);
 
   inline void
@@ -258,13 +258,6 @@ void
 CcnxFace::SetBucketLeak (double leak)
 {
   m_bucketLeak = leak;
-}
-
-void
-CcnxFace::LeakBucket (const Time &interval)
-{
-  const double leak = m_bucketLeak * 1.0 / interval.ToDouble (Time::S);
-  m_bucket -= std::max (0.0, m_bucket-leak); 
 }
 
 void

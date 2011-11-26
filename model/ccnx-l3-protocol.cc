@@ -583,13 +583,15 @@ CcnxL3Protocol::GetBucketLeakInterval () const
 void 
 CcnxL3Protocol::LeakBuckets ()
 {
+  NS_LOG_FUNCTION (this);
   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
     {
       face->LeakBucket (m_bucketLeakInterval);
     }
 
   m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
-                                           &CcnxL3Protocol::LeakBuckets, this);
+                                           &CcnxL3Protocol::LeakBuckets,
+                                           this);
 }
 
 } //namespace ns3

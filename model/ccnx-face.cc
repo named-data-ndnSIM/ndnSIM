@@ -91,6 +91,15 @@ CcnxFace::IsBelowLimit ()
   return true;
 }
 
+void
+CcnxFace::LeakBucket (const Time &interval)
+{
+  const double leak = m_bucketLeak * interval.ToDouble (Time::S);
+  m_bucket -= std::max (0.0, m_bucket - leak);
+
+  NS_LOG_ERROR ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
+}
+
 bool
 CcnxFace::Send (Ptr<Packet> packet)
 {
