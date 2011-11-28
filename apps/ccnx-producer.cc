@@ -50,7 +50,7 @@ CcnxProducer::GetTypeId (void)
                    MakeCcnxNameComponentsAccessor (&CcnxProducer::m_prefix),
                    MakeCcnxNameComponentsChecker ())
     .AddAttribute ("PayloadSize", "Virtual payload size for Content packets",
-                   UintegerValue (100),
+                   UintegerValue (1024),
                    MakeUintegerAccessor(&CcnxProducer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
     // .AddTraceSource ("InterestTrace", "Interests that were received",

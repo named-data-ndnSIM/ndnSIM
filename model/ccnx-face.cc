@@ -82,8 +82,12 @@ CcnxFace::IsBelowLimit ()
   
   if (m_bucketMax > 0)
     {
+      //NS_LOG_ERROR ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
       if (m_bucket+1.0 > m_bucketMax)
-        return false;
+        {
+          //NS_LOG_ERROR ("Returning false");
+          return false;
+        }
       
       m_bucket += 1.0;
     }
@@ -95,9 +99,29 @@ void
 CcnxFace::LeakBucket (const Time &interval)
 {
   const double leak = m_bucketLeak * interval.ToDouble (Time::S);
-  m_bucket -= std::max (0.0, m_bucket - leak);
+  m_bucket = std::max (0.0, m_bucket - leak);
 
   NS_LOG_ERROR ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
+}
+
+void
+CcnxFace::SetBucketMax (double bucket)
+{
+  NS_LOG_FUNCTION (this << bucket);
+  m_bucketMax = bucket;
+}
+
+void
+CcnxFace::SetBucketLeak (double leak)
+{
+  NS_LOG_FUNCTION (this << leak);
+  m_bucketLeak = leak;
+}
+
+void
+CcnxFace::LeakBucketByOnePacket ()
+{
+  m_bucket = std::max (0.0, m_bucket-1.0); 
 }
 
 bool

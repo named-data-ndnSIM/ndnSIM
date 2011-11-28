@@ -30,6 +30,7 @@
 #include "ns3/ccnx-forwarding-helper.h"
 #include "ns3/ccnx.h"
 #include "ns3/ccnx-interest-header.h"
+#include "ns3/nstime.h"
 
 namespace ns3 {
 
@@ -85,9 +86,14 @@ public:
 
   /**
    * @brief Enable Interest limits (disabled by default)
+   *
+   * @param enable           Enable or disable limits
+   * @param avgRtt           Average RTT
+   * @param avgContentObject Average size of contentObject packets (including all headers)
+   * @param avgInterest      Average size of interest packets (including all headers)
    */
   void
-  EnableLimits (bool enable = true);
+  EnableLimits (bool enable = true, Time avgRtt=Seconds(0.1), uint32_t avgContentObject=1100, uint32_t avgInterest=40);
   
   /**
    * \brief Install CCNx stack on the node
@@ -198,6 +204,9 @@ private:
 private:
   ObjectFactory m_strategyFactory;
   bool m_limitsEnabled;
+  Time     m_avgRtt;
+  uint32_t m_avgContentObjectSize;
+  uint32_t m_avgInterestSize;
   
   // /**
   //  * @brief Enable pcap output the indicated Ccnx and interface pair.

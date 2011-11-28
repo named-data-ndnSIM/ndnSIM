@@ -584,6 +584,8 @@ void
 CcnxL3Protocol::LeakBuckets ()
 {
   NS_LOG_FUNCTION (this);
+  NS_LOG_ERROR ("Bucket Interval: " << m_bucketLeakInterval.ToDouble(Time::S));
+
   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
     {
       face->LeakBucket (m_bucketLeakInterval);

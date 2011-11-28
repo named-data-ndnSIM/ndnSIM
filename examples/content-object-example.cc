@@ -19,38 +19,38 @@ NS_LOG_COMPONENT_DEFINE ("ContentObjectHeaderExample");
 int
 main (int argc, char *argv[])
 {
-	LogComponentEnable ("ContentObjectHeaderExample", LOG_ALL);
-	LogComponentEnable ("Packet", LOG_ALL);
+  LogComponentEnable ("ContentObjectHeaderExample", LOG_ALL);
+  LogComponentEnable ("Packet", LOG_ALL);
 	
-    NS_LOG_INFO ("Test started");
+  NS_LOG_INFO ("Test started");
 
-	Packet::EnablePrinting ();
-	Packet::EnableChecking (); 
-	Packet packet (10);
+  Packet::EnablePrinting ();
+  Packet::EnableChecking (); 
+  Packet packet (10);
 	
-    CcnxContentObjectHeader header;
-	CcnxContentObjectTail   trailer;
+  CcnxContentObjectHeader header;
+  CcnxContentObjectTail   trailer;
 	
-    Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
-    (*testname) ("1");
-    header.SetName(testname);
+  Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
+  (*testname) ("1");
+  header.SetName(testname);
 
-	NS_LOG_INFO ("Source: \n" << header << trailer);
+  NS_LOG_INFO ("Source: \n" << header << trailer);
 
-	packet.AddHeader (header);
-	packet.AddTrailer (trailer);
+  packet.AddHeader (header);
+  packet.AddTrailer (trailer);
 
-	// NS_LOG_INFO ("Deserialized packet: \n" << packet);
+  // NS_LOG_INFO ("Deserialized packet: \n" << packet);
 
-	NS_LOG_INFO ("Removing and deserializing individual headers");
+  NS_LOG_INFO ("Removing and deserializing individual headers");
 	
-    CcnxContentObjectHeader dst_header;
-	CcnxContentObjectTail   dst_trailer;
+  CcnxContentObjectHeader dst_header;
+  CcnxContentObjectTail   dst_trailer;
 
-	packet.RemoveHeader (dst_header);
-	packet.RemoveTrailer (dst_trailer);
+  packet.RemoveHeader (dst_header);
+  packet.RemoveTrailer (dst_trailer);
 	
-	NS_LOG_INFO ("Target: \n" << dst_header << dst_trailer);
+  NS_LOG_INFO ("Target: \n" << dst_header << dst_trailer);
 
-	return 0;
+  return 0;
 }

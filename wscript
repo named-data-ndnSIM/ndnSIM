@@ -80,6 +80,10 @@ def build(bld):
         obj = bld.create_ns3_program('interest-header-example', ['NDNabstraction'])
         obj.source = 'examples/interest-header-example.cc'
 
+        obj = bld.create_ns3_program('packet-sizes', ['NDNabstraction'])
+        obj.source = 'examples/packet-sizes.cc'
+        
+
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
     #         if not anode or not anode.is_child_of(bld.srcnode):

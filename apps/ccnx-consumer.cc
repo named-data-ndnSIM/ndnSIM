@@ -136,7 +136,10 @@ CcnxConsumer::SendPacket ()
   interestHeader.SetName                (nameWithSequence);
   interestHeader.SetInterestLifetime    (m_interestLifeTime);
   interestHeader.SetChildSelector       (m_childSelector);
-  interestHeader.SetExclude             (Create<CcnxNameComponents> (m_exclude));
+  if (m_exclude.size ()>0)
+    {
+      interestHeader.SetExclude             (Create<CcnxNameComponents> (m_exclude));
+    }
   interestHeader.SetMaxSuffixComponents (m_maxSuffixComponents);
   interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
         

@@ -141,9 +141,13 @@ CcnxStackHelper::SetForwardingStrategy (std::string strategy)
 }
 
 void
-CcnxStackHelper::EnableLimits (bool enable/* = true*/)
+CcnxStackHelper::EnableLimits (bool enable/* = true*/, Time avgRtt/*=Seconds(0.1)*/, uint32_t avgContentObject/*=1100*/, uint32_t avgInterest/*=40*/)
 {
+  NS_LOG_INFO ("EnableLimits: " << enable);
   m_limitsEnabled = enable;
+  m_avgContentObjectSize = avgContentObject;
+  m_avgInterestSize = avgInterest;
+  m_avgRtt = avgRtt;
 }
 
 Ptr<CcnxFaceContainer>
@@ -198,9 +202,13 @@ CcnxStackHelper::Install (Ptr<Node> node) const
 
       if (m_limitsEnabled)
         {
+          NS_LOG_INFO ("Limits are enabled");
           Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
           if (p2p == 0)
-            continue; // only PointToPointNetDevice supports limits
+            {
+              NS_LOG_INFO ("Non p2p interface");
+              continue; // only PointToPointNetDevice supports limits
+            }
 
           // Setup bucket filtering
           // Assume that we know average data packet size, and this size is equal default size
@@ -209,11 +217,13 @@ CcnxStackHelper::Install (Ptr<Node> node) const
           DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
           
           NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
-          face->SetBucketMax
-            (0.1 * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof (CcnxInterestHeader)));
-             
-          face->SetBucketLeak
-            (0.97 * dataRate.Get().GetBitRate () / (NDN_DEFAULT_DATA_SIZE + sizeof (CcnxInterestHeader)));
+
+          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / m_avgContentObjectSize;
+          NS_LOG_INFO ("BucketMax: " << maxInterestPackets);
+
+          // Set bucket max to BDP
+          face->SetBucketMax (m_avgRtt.ToDouble (Time::S) * maxInterestPackets); // number of interests allowed
+          face->SetBucketLeak (maxInterestPackets);
         }
         
       face->SetUp ();

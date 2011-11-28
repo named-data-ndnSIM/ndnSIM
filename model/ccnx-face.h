@@ -165,13 +165,13 @@ public:
    *
    * @param bucket maximum value for Interest allowance. If < 0, then limit will be disabled
    */
-  inline void
+  void
   SetBucketMax (double bucket);
 
   /**
    * @brief Set a normalized value (one second) for Interest allowance bucket leak
    */
-  inline void
+   void
   SetBucketLeak (double leak);
   
   /**
@@ -182,7 +182,7 @@ public:
   void
   LeakBucket (const Time &interval);
 
-  inline void
+  void
   LeakBucketByOnePacket ();
   
   /**
@@ -246,24 +246,6 @@ uint32_t
 CcnxFace::GetId () const
 {
   return m_id;
-}
-
-void
-CcnxFace::SetBucketMax (double bucket)
-{
-  m_bucketMax = bucket;
-}
-
-void
-CcnxFace::SetBucketLeak (double leak)
-{
-  m_bucketLeak = leak;
-}
-
-void
-CcnxFace::LeakBucketByOnePacket ()
-{
-  m_bucket -= std::max (0.0, m_bucket-1.0); 
 }
 
 } // namespace ns3

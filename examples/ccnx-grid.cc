@@ -63,8 +63,9 @@ int
 main (int argc, char *argv[])
 {
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
-  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
+  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1s"));
+  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
     
   Packet::EnableChecking();
   Packet::EnablePrinting();
@@ -88,8 +89,9 @@ main (int argc, char *argv[])
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
+  // ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
   ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
-  ccnxHelper.EnableLimits (true);
+  ccnxHelper.EnableLimits (true, Seconds(0.1));
   ccnxHelper.InstallAll ();
 
   // Install IP stack (necessary to populate FIB)
@@ -118,7 +120,7 @@ main (int argc, char *argv[])
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);
     
-  CcnxProducerHelper producerHelper (prefix.str (),120);
+  CcnxProducerHelper producerHelper (prefix.str (),1024);
   ApplicationContainer producers = producerHelper.Install (producer);
   
   // producers.Start(Seconds(0.0));
