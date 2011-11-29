@@ -89,7 +89,7 @@ main (int argc, char *argv[])
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
-  // ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
+  //ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
   ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
   ccnxHelper.EnableLimits (true, Seconds(0.1));
   ccnxHelper.InstallAll ();

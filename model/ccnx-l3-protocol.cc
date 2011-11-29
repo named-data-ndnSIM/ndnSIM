@@ -296,11 +296,11 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
   bool isNew = ret.get<1> ();
-  //bool isDuplicated = ret.get<2> ();
+  bool isDuplicated = ret.get<2> ();
 
   // NS_ASSERT_MSG (isDuplicated,
   //                "NACK should be a duplicated interest");
-  if (isNew /*|| !isDuplicated*/) // potential flow
+  if (isNew || !isDuplicated) // potential flow
     {
       // somebody is doing something bad
       NS_ASSERT (false); // temporary assert
@@ -310,15 +310,18 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   // CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
 
-  if (outFace != pitEntry.m_outgoing.end ())
+  if (outFace == pitEntry.m_outgoing.end ())
     {
-      // NS_ASSERT_MSG (outFace != pitEntry.m_outgoing.end (),
-      //                "Outgoing entry should exist");
+      NS_ASSERT_MSG (false,
+                     "Node " << GetObject<Node> ()->GetId () << ", outgoing entry should exist for face " << boost::cref(*incomingFace) << "\n" <<
+                     "size: " << pitEntry.m_outgoing.size ());
       
       return;
     }
 
-  outFace->m_face->LeakBucketByOnePacket ();
+  NS_ASSERT_MSG (incomingFace == outFace->m_face, "Something is wrong");
+  incomingFace->LeakBucketByOnePacket ();
+
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
   
@@ -337,11 +340,10 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                 ll::bind (&CcnxFibEntry::UpdateStatus,
                           ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
 
-  if (!pitEntry.AreAllOutgoingInVain ())
+  if (!pitEntry.AreAllOutgoingInVain ()) // not all ougtoing are in vain
     {
       // suppress
       // Don't do anything, we are still expecting data from some other face
-
       return;
     }
   
@@ -357,7 +359,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 
-  if (!propagated && pitEntry.AreAllOutgoingInVain ())
+  if (!propagated)
     GiveUpInterest (pitEntry, header);
 }
 
@@ -473,7 +475,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 
-  if (!propagated && pitEntry.AreAllOutgoingInVain ())
+  if (!propagated)
     GiveUpInterest (pitEntry, header);
 }
 

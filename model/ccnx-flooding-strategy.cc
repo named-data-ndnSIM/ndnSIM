@@ -21,6 +21,7 @@
 #include "ccnx-flooding-strategy.h"
 #include "ns3/assert.h"
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 #include "ccnx-interest-header.h"
 
 #include <boost/ref.hpp>
@@ -75,12 +76,19 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...
-        continue;
+        {
+          // NS_LOG_ERROR (boost::cref (*metricFace.m_face) << " limit !!!");
+          continue;
+        }
 
       m_pit->modify (m_pit->iterator_to (pitEntry),
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
-      // NS_LOG_DEBUG ("new outgoing entry for " << boost::cref (*metricFace.m_face));
+      // if (Simulator::GetContext ()==2)
+      //   {
+      //     NS_LOG_ERROR ("new outgoing entry for " << boost::cref (*metricFace.m_face));
+      //     NS_LOG_ERROR ("size: " << pitEntry.m_outgoing.size ());
+      //   }
 
       metricFace.m_face->Send (packet->Copy ());
       
