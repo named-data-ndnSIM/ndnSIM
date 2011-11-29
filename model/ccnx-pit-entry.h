@@ -205,6 +205,13 @@ public:
    */
   bool
   AreAllOutgoingInVain () const;
+
+  /*
+   * @brief Similar to AreAllOutgoingInVain, but ignores `face`
+   * \see AreAllOutgoingInVain
+   **/
+  bool
+  AreTherePromisingOutgoingFacesExcept (Ptr<CcnxFace> face) const;
   
 protected:
   

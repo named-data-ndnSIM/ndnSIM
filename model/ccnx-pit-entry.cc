@@ -107,5 +107,16 @@ CcnxPitEntry::AreAllOutgoingInVain () const
   return inVain;
 }
 
+bool
+CcnxPitEntry::AreTherePromisingOutgoingFacesExcept (Ptr<CcnxFace> face) const
+{
+  bool inVain = true;
+  std::for_each (m_outgoing.begin (), m_outgoing.end (),
+                 ll::var(inVain) &=
+                 ((&ll::_1)->*&CcnxPitEntryOutgoingFace::m_face == face ||
+                  (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain));
+
+  return !inVain;
+}
 
 }

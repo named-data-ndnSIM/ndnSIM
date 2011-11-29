@@ -295,17 +295,28 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
-  // bool isNew = ret.get<1> ();
-  bool isDuplicated = ret.get<2> ();
+  bool isNew = ret.get<1> ();
+  //bool isDuplicated = ret.get<2> ();
 
-  NS_ASSERT_MSG (isDuplicated,
-                 "NACK should be a duplicated interest");
+  // NS_ASSERT_MSG (isDuplicated,
+  //                "NACK should be a duplicated interest");
+  if (isNew /*|| !isDuplicated*/) // potential flow
+    {
+      // somebody is doing something bad
+      NS_ASSERT (false); // temporary assert
+      return;
+    }
   
   // CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
 
-  NS_ASSERT_MSG (outFace != pitEntry.m_outgoing.end (),
-                 "Outgoing entry should exist");
+  if (outFace != pitEntry.m_outgoing.end ())
+    {
+      // NS_ASSERT_MSG (outFace != pitEntry.m_outgoing.end (),
+      //                "Outgoing entry should exist");
+      
+      return;
+    }
 
   outFace->m_face->LeakBucketByOnePacket ();
   m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -325,6 +336,14 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   m_fib->modify(m_fib->iterator_to (pitEntry.m_fibEntry),
                 ll::bind (&CcnxFibEntry::UpdateStatus,
                           ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+
+  if (!pitEntry.AreAllOutgoingInVain ())
+    {
+      // suppress
+      // Don't do anything, we are still expecting data from some other face
+
+      return;
+    }
   
   NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
 
@@ -432,17 +451,16 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       m_fib->modify(m_fib->iterator_to (pitEntry.m_fibEntry),
                     ll::bind (&CcnxFibEntry::UpdateStatus,
                               ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
-
-      // suppress?
     }
-  else if (pitEntry.m_outgoing.size() > 0) // Suppress this interest if we're still expecting data from some other face
 
-    {
+  if (pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
+    { // Suppress this interest if we're still expecting data from some other face
+      
       // We are already expecting data later in future. Suppress the interest
       // m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
-      return; 
+      return;
     }
-
+  
   /////////////////////////////////////////////////////////////////////
   // Propagate
   /////////////////////////////////////////////////////////////////////
@@ -455,7 +473,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 
-  if (!propagated) GiveUpInterest (pitEntry, header);
+  if (!propagated && pitEntry.AreAllOutgoingInVain ())
+    GiveUpInterest (pitEntry, header);
 }
 
 void
