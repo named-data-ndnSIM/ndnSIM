@@ -45,7 +45,7 @@ class CcnxNameComponents;
 
 namespace __ccnx_private
 {
-// class i_face {};
+class i_retx {};
 }
 
 /**
@@ -85,7 +85,11 @@ struct CcnxPitEntryOutgoingFaceContainer
       boost::multi_index::ordered_unique<
         boost::multi_index::tag<__ccnx_private::i_face>,
         boost::multi_index::member<CcnxPitEntryOutgoingFace, Ptr<CcnxFace>, &CcnxPitEntryOutgoingFace::m_face>
-      >
+      >,
+      boost::multi_index::ordered_non_unique<
+        boost::multi_index::tag<__ccnx_private::i_retx>,
+        boost::multi_index::member<CcnxPitEntryOutgoingFace, uint32_t, &CcnxPitEntryOutgoingFace::m_retxCount>
+      >    
     >
    > type;
 };
@@ -101,18 +105,25 @@ public:
   /**
    * \brief PIT entry constructor
    * \param prefix Prefix of the PIT entry
+   * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &expireTime, const CcnxFibEntry &fibEntry);
+  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &offsetTime, const CcnxFibEntry &fibEntry);
   
-  // // Get number of outgoing interests that we're expecting data from
-  // inline size_t numberOfPromisingInterests( ) const; 
-
+  /**
+   * @brief Update lifetime of PIT entry
+   *
+   * This function will update PIT entry lifetime to the maximum of the current lifetime and
+   * the lifetime Simulator::Now () + offsetTime
+   *
+   * @param offsetTime Relative time to the current moment, representing PIT entry lifetime
+   */
+  void
+  UpdateLifetime (const Time &offsetTime);
+  
   const CcnxNameComponents &
   GetPrefix () const
-  {
-    return *m_prefix;
-  }
+  { return *m_prefix; }
 
   /**
    * @brief Get current expiration time of the record
@@ -130,9 +141,7 @@ public:
    */
   void
   SetExpireTime (const Time &expireTime)
-  {
-    m_expireTime = expireTime;
-  }
+  { m_expireTime = expireTime; }
   
   /**
    * @brief Check if nonce `nonce` for the same prefix has already been seen
@@ -212,6 +221,12 @@ public:
    **/
   bool
   AreTherePromisingOutgoingFacesExcept (Ptr<CcnxFace> face) const;
+
+  /**
+   * @brief Increase maximum limit of allowed retransmission per outgoing face
+   */
+  void
+  IncreaseAllowedRetxCount ();
   
 protected:
   
@@ -227,8 +242,8 @@ public:
   CcnxPitEntryOutgoingFaceContainer::type m_outgoing; ///< \brief container for outgoing interests
 
   Time m_expireTime;         ///< \brief Time when PIT entry will be removed
-  bool m_timerExpired;       ///< \brief flag indicating that PIT timer has expired
-  int  m_counterExpirations; ///< \brief whether timer is expired (+ number of times timer expired)
+
+  uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
 };
 
 } // namespace ns3

@@ -51,7 +51,7 @@ public:
   virtual ~CcnxForwardingStrategy ();
 
   /**
-   * @brief Interface method to propagate the insterest according to the forwarding strategy
+   * @brief Base method to propagate the insterest according to the forwarding strategy
    *
    * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
    * @param incomingFace  Incoming face
@@ -65,7 +65,7 @@ public:
   PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packe) = 0;
+                     const Ptr<const Packet> &packet) = 0;
     
   /**
    * @brief Set link to PIT for the forwarding strategy
@@ -75,6 +75,25 @@ public:
   void
   SetPit (Ptr<CcnxPit> pit);
 
+protected:
+  /**
+   * @brief Propage interest vie a green interface. Fail, if no green interfaces available
+   *
+   * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
+   * @param incomingFace  Incoming face
+   * @param header        CcnxInterestHeader
+   * @param packet        Original Interest packet
+   * @param sendCallback  Send callback
+   * @return true if interest was successfully propagated, false if all options have failed
+   *
+   * \see PropagateInterest
+   */
+  bool
+  PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry, 
+                             const Ptr<CcnxFace> &incomingFace,
+                             Ptr<CcnxInterestHeader> &header,
+                             const Ptr<const Packet> &packet);
+  
 protected:  
   Ptr<CcnxPit> m_pit;
 };

@@ -319,8 +319,10 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
       return;
     }
 
-  NS_ASSERT_MSG (incomingFace == outFace->m_face, "Something is wrong");
-  incomingFace->LeakBucketByOnePacket ();
+  // This was done in error. Never, never do anything, except normal leakage. This way we ensure that we will not have losses,
+  // at least when there is only one client
+  //
+  // incomingFace->LeakBucketByOnePacket ();
 
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
@@ -336,9 +338,9 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                      ll::bind (&CcnxPitEntry::RemoveIncoming, ll::_1, incomingFace));
     }
 
-  m_fib->modify(m_fib->iterator_to (pitEntry.m_fibEntry),
-                ll::bind (&CcnxFibEntry::UpdateStatus,
-                          ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+  m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
+                 ll::bind (&CcnxFibEntry::UpdateStatus,
+                           ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
 
   if (!pitEntry.AreAllOutgoingInVain ()) // not all ougtoing are in vain
     {
@@ -428,10 +430,13 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
   CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
 
+  bool isRetransmitted = false;
+  
   if (inFace != pitEntry.m_incoming.end ())
     {
       // CcnxPitEntryIncomingFace.m_arrivalTime keeps track arrival time of the first packet... why?
-      
+
+      isRetransmitted = true;
       // this is almost definitely a retransmission. But should we trust the user on that?
     }
   else
@@ -440,6 +445,11 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                      ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
     }
 
+  // update PIT entry lifetime
+  m_pit->modify (m_pit->iterator_to (pitEntry),
+                 ll::bind (&CcnxPitEntry::UpdateLifetime, ll::_1,
+                           header->GetInterestLifetime ()));
+  
   if (outFace != pitEntry.m_outgoing.end ())
     {
       // got a non-duplicate interest from the face we have sent interest to
@@ -455,7 +465,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                               ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
     }
 
-  if (pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
+  if (!isRetransmitted &&
+      pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
     { // Suppress this interest if we're still expecting data from some other face
       
       // We are already expecting data later in future. Suppress the interest
@@ -472,6 +483,17 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   bool propagated = m_forwardingStrategy->
     PropagateInterest (pitEntry, incomingFace, header, packet);
 
+  if (isRetransmitted) //give another chance if retransmitted
+    {
+      // increase max number of allowed retransmissions
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind (&CcnxPitEntry::IncreaseAllowedRetxCount, ll::_1));
+
+      // try again
+      propagated = m_forwardingStrategy->
+        PropagateInterest (pitEntry, incomingFace, header, packet);
+    }
+  
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 

@@ -171,9 +171,8 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
 
       entry = insert (end (),
                       CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
-                                    Simulator::Now () +
-                                    (header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
-                                     :                                       header.GetInterestLifetime ()),
+                                    header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
+                                    :                                       header.GetInterestLifetime (),
                                     *fibEntry));
 
       // isDuplicate = false; // redundant

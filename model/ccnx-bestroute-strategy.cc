@@ -32,7 +32,9 @@ NS_LOG_COMPONENT_DEFINE ("CcnxBestRouteStrategy");
 
 namespace ns3 
 {
-    
+
+using namespace __ccnx_private;
+
 NS_OBJECT_ENSURE_REGISTERED (CcnxBestRouteStrategy);
   
 TypeId CcnxBestRouteStrategy::GetTypeId (void)
@@ -56,43 +58,51 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
                                           const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);
-  bool forwardedCount = 0;
 
-  try
+  // Try to work out with just green faces
+  bool greenOk = PropagateInterestViaGreen (pitEntry, incomingFace, header, packet);
+  if (greenOk)
+    return true;
+
+  int propagatedCount = 0;
+
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
     {
-      for (uint32_t skip = 0; skip < pitEntry.m_fibEntry.m_faces.size (); skip++)
+      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
+        break;
+      
+      if (metricFace.m_face == incomingFace) 
+        continue; // same face as incoming, don't forward
+
+      if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
+        continue; // don't forward to face that we received interest from
+
+      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+        pitEntry.m_outgoing.find (metricFace.m_face);
+      
+      if (outgoing != pitEntry.m_outgoing.end () &&
+          outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
         {
-          const CcnxFibFaceMetric bestMetric = pitEntry.m_fibEntry.FindBestCandidate (skip);
-
-          if (bestMetric.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // no point to send there
-            continue;
-
-          if (pitEntry.m_incoming.find (bestMetric.m_face) != pitEntry.m_incoming.end ()) 
-            continue; // don't forward to face that we received interest from
-
-          if (pitEntry.m_outgoing.find (bestMetric.m_face) != pitEntry.m_outgoing.end ()) // already forwarded before
-            continue;
-
-          bool faceAvailable = bestMetric.m_face->IsBelowLimit ();
-          if (!faceAvailable) // huh...
-            continue;
-
-          m_pit->modify (m_pit->iterator_to (pitEntry),
-                         ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, bestMetric.m_face));
-
-          // NS_LOG_DEBUG ("new outgoing entry for " << boost::cref (*metricFace.m_face));
-
-          bestMetric.m_face->Send (packet->Copy ());
-
-          forwardedCount++;
-          break; // if we succeeded in sending one packet, stop
+          continue; // already forwarded before during this retransmission cycle
         }
-    }
-  catch (CcnxFibEntry::NoFaces)
-    {
+
+      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
+      if (!faceAvailable) // huh...
+        {
+          continue;
+        }
+
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
+
+      metricFace.m_face->Send (packet->Copy ());
+      
+      propagatedCount++;
+      break; // do only once
     }
 
-  return forwardedCount > 0;
+  NS_LOG_INFO ("Propagated to " << propagatedCount << " faces");
+  return propagatedCount > 0;
 }
     
 } //namespace ns3

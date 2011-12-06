@@ -34,7 +34,9 @@ NS_LOG_COMPONENT_DEFINE ("CcnxFloodingStrategy");
 
 namespace ns3 
 {
-    
+
+using namespace __ccnx_private;
+
 NS_OBJECT_ENSURE_REGISTERED (CcnxFloodingStrategy);
     
 TypeId CcnxFloodingStrategy::GetTypeId (void)
@@ -58,9 +60,17 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
                                          const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);
-    
+
+  // Try to work out with just green faces
+  bool greenOk = PropagateInterestViaGreen (pitEntry, incomingFace, header, packet);
+  if (greenOk)
+    return true;
+
+  // boo... :(
+  
   int propagatedCount = 0;
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces)
+
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
     {
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
@@ -70,14 +80,19 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
 
       if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
         continue; // don't forward to face that we received interest from
+
+      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+        pitEntry.m_outgoing.find (metricFace.m_face);
       
-      if (pitEntry.m_outgoing.find (metricFace.m_face) != pitEntry.m_outgoing.end ()) 
-        continue; // already forwarded before
+      if (outgoing != pitEntry.m_outgoing.end () &&
+          outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
+        {
+          continue; // already forwarded before during this retransmission cycle
+        }
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...
         {
-          // NS_LOG_ERROR (boost::cref (*metricFace.m_face) << " limit !!!");
           continue;
         }
 

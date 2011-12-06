@@ -38,13 +38,17 @@ struct CcnxPitEntryOutgoingFace
   Time m_sendTime;          ///< \brief time when the first outgoing interest is sent (for RTT measurements)
                             ///< \todo handle problem of retransmitted interests... Probably, we should include something similar
                             ///<       to TimeStamp TCP option for retransmitted (i.e., only lost interests will suffer)
-  // uint32_t m_retxNum;       ///< \brief number of retransmission
-  // int m_nonce;              ///< \brief nonce of the outgoing Interest
-  // bool m_outstanding;		///< \brief flag to indicate that this interest is currently pending
+  uint32_t m_retxCount;     ///< \brief number of retransmission
   bool m_waitingInVain;     ///< \brief when flag is set, we do not expect data for this interest, only a small hope that it will happen
 	
 public:
   CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face);
+
+  /**
+   * @brief Update outgoing entry upon retransmission
+   */
+  void
+  UpdateOnRetransmit ();
 
   bool operator== (const CcnxPitEntryOutgoingFace &dst) { return *m_face==*dst.m_face; }
   bool operator== (Ptr<CcnxFace> face) { return *m_face==*face; }

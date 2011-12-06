@@ -21,8 +21,18 @@
 
 #include "ns3/assert.h"
 
-#include "ccnx-route.h"
 #include "ccnx-forwarding-strategy.h"
+#include "ns3/log.h"
+#include "ns3/simulator.h"
+#include "ccnx-interest-header.h"
+
+#include <boost/ref.hpp>
+#include <boost/foreach.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+namespace ll = boost::lambda;
+
+NS_LOG_COMPONENT_DEFINE ("CcnxForwardingStrategy");
 
 namespace ns3 {
 
@@ -50,11 +60,53 @@ CcnxForwardingStrategy::SetPit (Ptr<CcnxPit> pit)
 {
   m_pit = pit;
 }
-    
-// Ptr<CcnxPit>
-// CcnxForwardingStrategy::GetPit ()
-// {
-//   return m_pit;
-// }
-    
+
+bool
+CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry, 
+                                                   const Ptr<CcnxFace> &incomingFace,
+                                                   Ptr<CcnxInterestHeader> &header,
+                                                   const Ptr<const Packet> &packet)
+{
+  NS_LOG_FUNCTION (this);
+
+  int propagatedCount = 0;
+  
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces)
+    {
+      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
+          metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)
+        break; //propagate only to green faces
+
+      if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
+        continue; // don't forward to face that we received interest from
+
+      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+        pitEntry.m_outgoing.find (metricFace.m_face);
+      
+      if (outgoing != pitEntry.m_outgoing.end () &&
+          outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
+        {
+          continue;
+        }
+      
+      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
+      if (!faceAvailable) // huh...
+        {
+          // let's try different green face
+          continue;
+        }
+
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
+
+      metricFace.m_face->Send (packet->Copy ());
+      
+      propagatedCount++;
+      break; // propagate only one interest
+    }
+
+  return propagatedCount > 0;
+}
+
+
 } //namespace ns3

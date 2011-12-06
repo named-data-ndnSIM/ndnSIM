@@ -27,11 +27,17 @@ namespace ns3 {
 CcnxPitEntryOutgoingFace::CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face)
   : m_face (face)
   , m_sendTime (Simulator::Now ())
-  // , m_retxNum (0)
-  // , m_nonce (nonce)
-  // , m_outstanding (true)
+  , m_retxCount (0)
   , m_waitingInVain (false)
 {
+}
+
+void
+CcnxPitEntryOutgoingFace::UpdateOnRetransmit ()
+{
+  m_sendTime = Simulator::Now ();
+  m_retxCount++;
+  m_waitingInVain = false;
 }
 
 } // namespace ns3

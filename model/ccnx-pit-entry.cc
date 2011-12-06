@@ -26,6 +26,7 @@
 #include "ns3/log.h"
 
 #include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");
@@ -38,10 +39,19 @@ CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
                             const CcnxFibEntry &fibEntry)
   : m_prefix (prefix)
   , m_fibEntry (fibEntry)
-  , m_expireTime (expireTime)
-  , m_timerExpired (false)
-  , m_counterExpirations (0)
+  , m_expireTime (Simulator::Now () + expireTime)
+  // , m_timerExpired (false)
+  // , m_counterExpirations (0)
+  , m_maxRetxCount (0)
 {
+}
+
+void
+CcnxPitEntry::UpdateLifetime (const Time &offsetTime)
+{
+  Time newExpireTime = Simulator::Now () + offsetTime;
+  if (newExpireTime > m_expireTime)
+    m_expireTime = newExpireTime;
 }
 
 CcnxPitEntryIncomingFaceContainer::type::iterator
@@ -68,7 +78,11 @@ CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
   std::pair<CcnxPitEntryOutgoingFaceContainer::type::iterator,bool> ret =
     m_outgoing.insert (CcnxPitEntryOutgoingFace (face));
 
-  NS_ASSERT_MSG (ret.second, "Something is wrong");
+  if (!ret.second)
+    { // outgoing face already exists
+      m_outgoing.modify (ret.first,
+                         ll::bind (&CcnxPitEntryOutgoingFace::UpdateOnRetransmit, ll::_1));
+    }
 
   return ret.first;
 }
@@ -117,6 +131,12 @@ CcnxPitEntry::AreTherePromisingOutgoingFacesExcept (Ptr<CcnxFace> face) const
                   (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain));
 
   return !inVain;
+}
+
+void
+CcnxPitEntry::IncreaseAllowedRetxCount ()
+{
+  m_maxRetxCount++;
 }
 
 }
