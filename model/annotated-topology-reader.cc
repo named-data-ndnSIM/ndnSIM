@@ -122,6 +122,12 @@ AnnotatedTopologyReader::Read (void)
             {
                 link.SetAttribute ("DataRate", linkAttr);
             }
+            
+            lineBuffer >> linkAttr;
+            if ( !linkAttr.empty () )
+            {
+                link.SetAttribute ("OSPF", linkAttr);
+            }
                 
             lineBuffer >> linkAttr;
             if ( !linkAttr.empty () )
@@ -156,18 +162,57 @@ AnnotatedTopologyReader::Read (void)
 void
 AnnotatedTopologyReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* nc)
 {
+    InternetStackHelper stack;
+    Ipv4AddressHelper address;
+    address.SetBase ("10.1.0.0", "255.255.255.0");
+    
+    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+    stack.SetRoutingHelper (ipv4RoutingHelper);
+    
+    
+    
+    //This loop passes all links and checks if ipv4 is installed on the node
+    // if not, it installs. 
+    // We can't use stack.Install(nc) because in nc there are duplicates and assertion fails
+    TopologyReader::ConstLinksIterator iter;
+    int j = 0;
+    for ( iter = this->LinksBegin (); iter != this->LinksEnd (); iter++, j++ )
+    {
+        NodeContainer twoNodes = nc[j];
+        
+        Ptr<Node> nd = twoNodes.Get(0);
+        if(nd==NULL)
+            NS_LOG_INFO("nd = null");
+        
+        Ptr<Node> nd2 = twoNodes.Get(1);
+        if(nd2==NULL)
+            NS_LOG_INFO("nd2 = null");
+        
+        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
+        if(ipv4 == 0)
+        {
+            NS_LOG_INFO("ipv4 = null");
+            stack.Install(nd);
+        }
+        
+        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
+        if(ipv42 == 0)
+        {
+            NS_LOG_INFO("ipv42 = null");
+            stack.Install(nd2);
+        }
+        
+        //NS_LOG_INFO("#netdevices = " << nd->GetNDevices());
+        //NS_LOG_INFO("#netdevices = " << nd2->GetNDevices());
+    }
+    
+    NS_LOG_INFO("ITER2");
+    uint32_t base = 0;
     PointToPointHelper p2p;
     TopologyReader::ConstLinksIterator iter2;
     int i = 0;
     for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
     {
-        /*std::string dataRate = iter2->GetAttribute("DataRate");
-        NS_LOG_INFO("dataRate = "<<dataRate);
-        dataRate += "Kbps";
-        std::string delay = iter2->GetAttribute("Delay");
-        NS_LOG_INFO("delay = "<<delay);
-        delay += "ms";*/
-        
         p2p.SetDeviceAttribute("DataRate", StringValue(iter2->GetAttribute("DataRate")+"Kbps"));
         NS_LOG_INFO("DataRate = " + iter2->GetAttribute("DataRate")+"Kbps");
         p2p.SetChannelAttribute("Delay", StringValue(iter2->GetAttribute("Delay")+"ms"));
@@ -175,12 +220,16 @@ AnnotatedTopologyReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* n
         p2p.SetQueue("ns3::DropTailQueue","MaxPackets",StringValue("100"));
         ndc[i] = p2p.Install(nc[i]);
         
+        Ipv4Address address1(base+i*256 + 1);
+        Ipv4Address address2(base+i*256 + 2);
         
         NodeContainer twoNodes = nc[i];
             
         Ptr<Node> nd = twoNodes.Get(0);
         if(nd==NULL)
             NS_LOG_INFO("nd = null");
+        
+        
         
         Ptr<Node> nd2 = twoNodes.Get(1);
         if(nd2==NULL)
@@ -190,18 +239,82 @@ AnnotatedTopologyReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* n
         NS_LOG_INFO("#netdevices = " << nd->GetNDevices());
         NS_LOG_INFO("#netdevices = " << nd2->GetNDevices());
             
-        Ptr<PointToPointNetDevice> device = nd->GetDevice(nd->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-            
+        Ptr<NetDevice> device = nd->GetDevice(nd->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
+        
         if(device==NULL)
             NS_LOG_INFO("device = 0");
+        
+        std::string ospf = iter2->GetAttribute("OSPF");
+        uint16_t metric = atoi(ospf.c_str());
+        NS_LOG_INFO("OSPF metric = " << metric);
+        
+        {
+        NetDeviceContainer* temp = new NetDeviceContainer[1];
+        temp->Add(device);
+        address.Assign (*temp);
+        }
+        
+        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
+        if(ipv4 == 0)
+        {
+            NS_LOG_INFO("ipv4 = null");
+            //stack.Install(nd);
+            /*NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device);
+            address.Assign (*temp);
+            ipv4 = nd->GetObject<Ipv4>();*/
+        }
+        
+        NS_LOG_INFO("Before GetID");
+        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
+        NS_LOG_INFO("InterfaceID = " << interfaceId);
+        ipv4->SetMetric(interfaceId,metric);
+        
+        
+        
+
+        
+        /*Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
+        
+        if(ipv4 == 0)
+            NS_LOG_INFO("ipv4 = null");
+        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
+        ipv4->SetMetric(interfaceId,metric);*/
+        
+        //Ptr<Ipv4Interface> interface = nd->GetDevice(nd->GetNDevices()-1)->GetObject<Ipv4Interface> ();
+        //ipv4->SetMetric(metric);
             
         //NS_LOG_INFO("2");
             
-        Ptr<PointToPointNetDevice> device2 = nd2->GetDevice(nd2->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
+        Ptr<NetDevice> device2 = nd2->GetDevice(nd2->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
             
         if(device2==NULL)
             NS_LOG_INFO("device2 = 0");
             
+        {
+            NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device2);
+            address.Assign (*temp);
+        }
+        
+        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
+        if(ipv42 == 0)
+        {
+            NS_LOG_INFO("ipv42 = null");
+            /*stack.Install(nd2);
+            NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device2);
+            address.Assign (*temp);
+            ipv42 = nd2->GetObject<Ipv4>();*/
+        }
+        
+        NS_LOG_INFO("Before GetID");
+        interfaceId = ipv42->GetInterfaceForDevice(device2);
+        NS_LOG_INFO("InterfaceID = " << interfaceId);
+        ipv42->SetMetric(interfaceId,metric);
+
+        
+        
         PointerValue tmp1;
         device->GetAttribute ("TxQueue", tmp1);
         //NS_LOG_INFO("2.5");
@@ -230,6 +343,190 @@ AnnotatedTopologyReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* n
         txQueue2->GetAttribute ("MaxPackets", limit);
         NS_LOG_INFO ("NetDevice #"<< device2->GetIfIndex() << "has queue limit " << limit.Get () << " packets");
     }
+}
+
+    /*
+void
+AnnotatedTopologyReader::ApplyOspfMetric(NetDeviceContainer* ndc, NodeContainer* nc)
+{
+    InternetStackHelper stack;
+    Ipv4AddressHelper address;
+    address.SetBase ("10.0.0.0", "255.255.255.252");
+    
+    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+    stack.SetRoutingHelper (ipv4RoutingHelper);
+
+    
+    TopologyReader::ConstLinksIterator iter2;
+    int i = 0;
+    for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
+    {
+        NodeContainer twoNodes = nc[i];
+        Ptr<NetDevice> device = ndc[i].Get(0);
+        Ptr<NetDevice> device2 = ndc[i].Get(1);
+        
+        //Ptr<Node> nd = twoNodes.Get(0);
+        Ptr<Node> nd = device->GetNode();
+        if(nd==NULL)
+            NS_LOG_INFO("nd = null");
+        
+        //Ptr<Node> nd2 = twoNodes.Get(1);
+        Ptr<Node> nd2 = device->GetNode();
+        if(nd2==NULL)
+            NS_LOG_INFO("nd2 = null");
+
+        
+        
+        std::string ospf = iter2->GetAttribute("OSPF");
+        uint16_t metric = atoi(ospf.c_str());
+        NS_LOG_INFO("OSPF metric = " << metric);
+        
+        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
+        
+        if(ipv4 == 0)
+        {
+            NS_LOG_INFO("ipv4 = null");
+            stack.Install(nd);
+            NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device);
+            address.Assign (*temp);
+            ipv4 = nd->GetObject<Ipv4>();
+        }
+        
+        NS_LOG_INFO("Before GetID");
+        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
+        NS_LOG_INFO("InterfaceID = " << interfaceId);
+        ipv4->SetMetric(interfaceId,metric);
+        
+        
+        
+        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
+        if(ipv42 == 0)
+        {
+            NS_LOG_INFO("ipv42 = null");
+            stack.Install(nd2);
+            NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device2);
+            address.Assign (*temp);
+            ipv42 = nd2->GetObject<Ipv4>();
+        }
+
+        //if(ipv4 == 0)
+        //    NS_LOG_INFO("ipv4 = null");
+        
+        NS_LOG_INFO("Before GetID");
+        interfaceId = ipv42->GetInterfaceForDevice(device2);
+        if(interfaceId == -1)
+        {
+            NS_LOG_INFO("interfaceID = -1");
+            stack.Install(nd2);
+            NetDeviceContainer* temp = new NetDeviceContainer[1];
+            temp->Add(device2);
+            address.Assign (*temp);
+            ipv42 = nd2->GetObject<Ipv4>();
+            interfaceId = ipv42->GetInterfaceForDevice(device2);
+        }
+        NS_LOG_INFO("InterfaceID = " << interfaceId);
+        ipv42->SetMetric(interfaceId,metric);
+
+    }
+}*/
+
+void
+AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly, double lrx, double lry)
+{
+    
+    UniformVariable randX(ulx, lrx);
+    double x = 0.0;
+    UniformVariable randY(uly, lry);
+    double y = 0.0;
+
+
+    PointToPointHelper p2p;
+    TopologyReader::ConstLinksIterator iter2;
+    int i = 0;
+    for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
+    {
+        NodeContainer twoNodes = nc[i];
+        
+        Ptr<Node> nd = twoNodes.Get(0);
+        if(nd==NULL)
+            NS_LOG_INFO("nd = null");
+        
+        Ptr<Node> nd2 = twoNodes.Get(1);
+        if(nd2==NULL)
+            NS_LOG_INFO("nd2 = null");
+        
+        Ptr<ConstantPositionMobilityModel> loc = nd->GetObject<ConstantPositionMobilityModel> ();
+        if (loc ==0)
+        {
+            loc = CreateObject<ConstantPositionMobilityModel> ();
+            nd->AggregateObject (loc);
+        }
+        
+        x = randX.GetValue();
+        y = randY.GetValue();
+        NS_LOG_INFO("X = "<<x <<"Y = "<<y);
+        Vector locVec (x, y, 0);
+        loc->SetPosition (locVec);
+        
+        
+        Ptr<ConstantPositionMobilityModel> loc2 = nd2->GetObject<ConstantPositionMobilityModel> ();
+        if (loc2 ==0)
+        {
+            loc2 = CreateObject<ConstantPositionMobilityModel> ();
+            nd2->AggregateObject (loc2);
+        }
+        
+        x = randX.GetValue();
+        y = randY.GetValue();
+        NS_LOG_INFO("X = "<<x <<"Y = "<<y);
+        Vector locVec2 (x, y, 0);
+        loc2->SetPosition (locVec2);
+    }
+    /*
+        double xDist; 
+        double yDist; 
+        if (lrx > ulx)
+        {
+            xDist = lrx - ulx;
+        }
+        else
+        {
+            xDist = ulx - lrx;
+        }
+        if (lry > uly)
+        {
+            yDist = lry - uly;
+        }
+        else
+        {
+            yDist = uly - lry;
+        }
+        double xAdder = xDist / m_xSize;
+        double yAdder = yDist / m_ySize;
+        double yLoc = yDist / 2;
+        for (uint32_t i = 0; i < m_ySize; ++i)
+        {
+            double xLoc = xDist / 2;
+            for (uint32_t j = 0; j < m_xSize; ++j)
+            {
+                Ptr<Node> node = GetNode (i, j);
+                Ptr<ConstantPositionMobilityModel> loc = node->GetObject<ConstantPositionMobilityModel> ();
+                if (loc ==0)
+                {
+                    loc = CreateObject<ConstantPositionMobilityModel> ();
+                    node->AggregateObject (loc);
+                }
+                Vector locVec (xLoc, yLoc, 0);
+                loc->SetPosition (locVec);
+                
+                xLoc += xAdder;
+            }
+            yLoc += yAdder;
+        }
+    }
+*/
 }
 }
 

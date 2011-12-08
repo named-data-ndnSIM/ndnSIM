@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "ns3/visualizer-module.h"
 
 using namespace ns3;
 
@@ -44,6 +45,8 @@ void PrintTime ()
 int 
 main (int argc, char *argv[])
 {
+  //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::VisualSimulatorImpl"));
+    
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
     
@@ -65,7 +68,7 @@ main (int argc, char *argv[])
 
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
-  CcnxStackHelper ccnxHelper(Ccnx::NDN_FLOODING/*Ccnx::NDN_BESTROUTE*/);
+  CcnxStackHelper ccnxHelper(/*Ccnx::NDN_FLOODING*/Ccnx::NDN_BESTROUTE);
   ccnxHelper.InstallAll ();
 
   // Install IP stack (necessary to populate FIB)

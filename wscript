@@ -77,6 +77,15 @@ def build(bld):
         obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/annotated-topology-read-example.cc'
 
+        obj = bld.create_ns3_program('interest-header', ['NDNabstraction'])
+        obj.source = 'examples/interest-header-example.cc'
+
+        obj = bld.create_ns3_program('ccnx-sprint-topology', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/sprint-topology.cc'
+
+        obj = bld.create_ns3_program('ccnx-abilene-topology', ['NDNabstraction', 'point-to-point-layout'])
+        obj.source = 'examples/abilene-topology.cc'
+
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
     #         if not anode or not anode.is_child_of(bld.srcnode):
