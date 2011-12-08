@@ -71,10 +71,13 @@ main (int argc, char *argv[])
   Packet::EnablePrinting();
 
   std::string animationFile = "";
+  std::string strategy = "ns3::CcnxFloodingStrategy";
+
   CommandLine cmd;
   cmd.AddValue ("nGrid", "Number of grid nodes", nGrid);
   cmd.AddValue ("finish", "Finish time", finishTime);
   cmd.AddValue ("netanim", "NetAnim filename", animationFile);
+  cmd.AddValue ("strategy", "CCNx forwarding strategy", strategy);
   cmd.Parse (argc, argv);
   
   PointToPointHelper p2p;
@@ -89,8 +92,7 @@ main (int argc, char *argv[])
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
-  //ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
-  ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
+  ccnxHelper.SetForwardingStrategy (strategy);
   ccnxHelper.EnableLimits (true, Seconds(0.1));
   ccnxHelper.InstallAll ();
 

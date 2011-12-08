@@ -26,6 +26,8 @@
 #include "ns3/node.h"
 #include "ns3/assert.h"
 
+#include <boost/ref.hpp>
+
 NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
@@ -127,7 +129,7 @@ CcnxFace::LeakBucketByOnePacket ()
 bool
 CcnxFace::Send (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
 
   /// \todo Implement tracing, if requested
 
@@ -141,7 +143,7 @@ CcnxFace::Send (Ptr<Packet> packet)
 bool
 CcnxFace::Receive (const Ptr<const Packet> &packet)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
 
   /// \todo Implement tracing, if requested
 

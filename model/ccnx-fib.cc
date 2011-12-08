@@ -112,6 +112,8 @@ CcnxFibEntry::UpdateFaceRtt (Ptr<CcnxFace> face, const Time &sample)
 void
 CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status)
 {
+  NS_LOG_FUNCTION (this << boost::cref(*face) << status);
+
   CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
                  "Update status can be performed only on existing faces of CcxnFibEntry");

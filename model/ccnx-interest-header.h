@@ -205,9 +205,9 @@ public:
   enum
     {
       NORMAL_INTEREST = 0,
-      NACK_LOOP = 1,
-      NACK_CONGESTION,
-      NACK_GIVEUP_PIT,
+      NACK_LOOP = 10,
+      NACK_CONGESTION = 11,
+      NACK_GIVEUP_PIT = 12,
     };
 
   void

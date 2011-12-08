@@ -36,6 +36,8 @@ NS_LOG_COMPONENT_DEFINE ("CcnxForwardingStrategy");
 
 namespace ns3 {
 
+using namespace __ccnx_private;
+
 NS_OBJECT_ENSURE_REGISTERED (CcnxForwardingStrategy);
 
 TypeId CcnxForwardingStrategy::GetTypeId (void)
@@ -67,11 +69,11 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                                                    Ptr<CcnxInterestHeader> &header,
                                                    const Ptr<const Packet> &packet)
 {
-  NS_LOG_FUNCTION (this);
+  // NS_LOG_FUNCTION (this);
 
   int propagatedCount = 0;
   
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces)
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
     {
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
           metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)
@@ -105,6 +107,13 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
       break; // propagate only one interest
     }
 
+  // if (Simulator::GetContext ()==1)
+  //   {
+  //     if (propagatedCount > 0)
+  //       NS_LOG_DEBUG ("Propagate via a green face");
+  //     else 
+  //       NS_LOG_DEBUG ("Can't :(");
+  //   }
   return propagatedCount > 0;
 }
 

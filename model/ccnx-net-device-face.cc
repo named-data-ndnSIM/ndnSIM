@@ -95,6 +95,7 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
                                          const Address &to,
                                          NetDevice::PacketType packetType)
 {
+  NS_LOG_FUNCTION (device << p << protocol << from << to << packetType);
   Receive (p);
 }
 

@@ -303,7 +303,6 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   if (isNew || !isDuplicated) // potential flow
     {
       // somebody is doing something bad
-      NS_ASSERT (false); // temporary assert
       return;
     }
   
@@ -324,6 +323,8 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   //
   // incomingFace->LeakBucketByOnePacket ();
 
+  NS_LOG_ERROR ("Nack on " << boost::cref(*incomingFace));
+
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
   
@@ -342,8 +343,15 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                  ll::bind (&CcnxFibEntry::UpdateStatus,
                            ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
 
+  if (pitEntry.m_incoming.size () == 0) // interest was actually satisfied
+    {
+      // no need to do anything
+      return;
+    }
+
   if (!pitEntry.AreAllOutgoingInVain ()) // not all ougtoing are in vain
     {
+      NS_LOG_DEBUG ("Not all outgoing are in vain");
       // suppress
       // Don't do anything, we are still expecting data from some other face
       return;
@@ -358,11 +366,11 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   bool propagated = m_forwardingStrategy->
     PropagateInterest (pitEntry, incomingFace, header, nonNackInterest);
 
-  // ForwardingStrategy will try its best to forward packet to at least one interface.
-  // If no interests was propagated, then there is not other option for forwarding or
-  // ForwardingStrategy failed to find it. 
+  // // ForwardingStrategy will try its best to forward packet to at least one interface.
+  // // If no interests was propagated, then there is not other option for forwarding or
+  // // ForwardingStrategy failed to find it. 
   if (!propagated)
-    GiveUpInterest (pitEntry, header);
+     GiveUpInterest (pitEntry, header);
 }
 
 // Processing Interests
@@ -393,11 +401,12 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       // //Trace duplicate interest  
       // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
 
+      NS_LOG_DEBUG ("Sending NACK_LOOP");
       header->SetNack (CcnxInterestHeader::NACK_LOOP);
-      Ptr<Packet> packet = Create<Packet> ();
-      packet->AddHeader (*header);
+      Ptr<Packet> nack = Create<Packet> ();
+      nack->AddHeader (*header);
 
-      incomingFace->Send (packet);
+      incomingFace->Send (nack);
       
       // //Trace duplicate interest  
       // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
@@ -626,8 +635,7 @@ CcnxL3Protocol::GetBucketLeakInterval () const
 void 
 CcnxL3Protocol::LeakBuckets ()
 {
-  NS_LOG_FUNCTION (this);
-  NS_LOG_ERROR ("Bucket Interval: " << m_bucketLeakInterval.ToDouble(Time::S));
+  // NS_LOG_FUNCTION (this);
 
   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
     {

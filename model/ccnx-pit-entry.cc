@@ -106,6 +106,8 @@ CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
 void
 CcnxPitEntry::SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterator face)
 {
+  NS_LOG_DEBUG (boost::cref (*face->m_face));
+
   m_outgoing.modify (face,
                      (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain = true);
 }
@@ -113,6 +115,8 @@ CcnxPitEntry::SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterato
 bool
 CcnxPitEntry::AreAllOutgoingInVain () const
 {
+  NS_LOG_DEBUG (m_outgoing.size ());
+
   bool inVain = true;
   std::for_each (m_outgoing.begin (), m_outgoing.end (),
                  ll::var(inVain) &= (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain);
