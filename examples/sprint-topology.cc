@@ -28,7 +28,6 @@
 
 #include <iostream>
 #include <sstream>
-#include "ns3/visualizer-module.h"
 #include "ns3/rocketfuel-topology-reader.h"
 
 

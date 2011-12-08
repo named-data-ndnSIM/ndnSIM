@@ -28,7 +28,6 @@
 
 #include <iostream>
 #include <sstream>
-#include "ns3/visualizer-module.h"
 #include "ns3/annotated-topology-reader.h"
 
 using namespace ns3;
@@ -39,69 +38,68 @@ NS_LOG_COMPONENT_DEFINE ("CcnxAbileneTopology");
 int 
 main (int argc, char *argv[])
 {
-    //GlobalValue::Bind ("SimulatorImplementationType", StringValue ("ns3::VisualSimulatorImpl"));
-    Packet::EnableChecking();
-    Packet::EnablePrinting();
-    string input ("./src/NDNabstraction/examples/abilene-topology.txt");
+  // Packet::EnableChecking();
+  // Packet::EnablePrinting();
+  string input ("./src/NDNabstraction/examples/abilene-topology.txt");
     
-    CommandLine cmd;
-    cmd.Parse (argc, argv);
+  CommandLine cmd;
+  cmd.Parse (argc, argv);
     
-    // ------------------------------------------------------------
-    // -- Read topology data.
-    // --------------------------------------------
+  // ------------------------------------------------------------
+  // -- Read topology data.
+  // --------------------------------------------
     
-    Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
-    reader->SetFileName (input);
+  Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
+  reader->SetFileName (input);
     
-    NodeContainer nodes;
-    if (reader != 0)
+  NodeContainer nodes;
+  if (reader != 0)
     {
-        nodes = reader->Read ();
+      nodes = reader->Read ();
     }
     
-    if (reader->LinksSize () == 0)
+  if (reader->LinksSize () == 0)
     {
-        NS_LOG_ERROR ("Problems reading the topology file. Failing.");
-        return -1;
+      NS_LOG_ERROR ("Problems reading the topology file. Failing.");
+      return -1;
     }
 
-    NS_LOG_INFO("Nodes = " << nodes.GetN());
-    NS_LOG_INFO("Links = " << reader->LinksSize ());
+  NS_LOG_INFO("Nodes = " << nodes.GetN());
+  NS_LOG_INFO("Links = " << reader->LinksSize ());
     
-    int totlinks = reader->LinksSize ();
-    ///*** applying settings
-    NS_LOG_INFO ("creating node containers");
-    NodeContainer* nc = new NodeContainer[totlinks];
-    TopologyReader::ConstLinksIterator iter;
-    int i = 0;
-    for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
+  int totlinks = reader->LinksSize ();
+  ///*** applying settings
+  NS_LOG_INFO ("creating node containers");
+  NodeContainer* nc = new NodeContainer[totlinks];
+  TopologyReader::ConstLinksIterator iter;
+  int i = 0;
+  for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
     {
-        nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
+      nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
     }
     
-    NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-    reader->ApplySettings(ndc,nc);
-    reader->BoundingBox(nc, 100.0, 100.0, 400.0,400.0);
-            
+  NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
+  reader->ApplySettings(ndc,nc);
+  reader->BoundingBox(nc, 100.0, 100.0, 400.0,400.0);
     
-    // Install CCNx stack
-    NS_LOG_INFO ("Installing CCNx stack");
-    CcnxStackHelper ccnxHelper(Ccnx::NDN_FLOODING);
-    ccnxHelper.InstallAll ();
+  // Install CCNx stack
+  NS_LOG_INFO ("Installing CCNx stack");
+  CcnxStackHelper ccnxHelper;
+  // ccnxHelper.SetForwardingStrategy (strategy);
+  ccnxHelper.EnableLimits (true, Seconds(0.1));
+  ccnxHelper.InstallAll ();
     
-    NS_LOG_INFO ("Installing Applications");
-    CcnxConsumerHelper consumerHelper ("preved");
-    ApplicationContainer consumers = consumerHelper.Install (nc[0]);
+  NS_LOG_INFO ("Installing Applications");
+  CcnxConsumerHelper consumerHelper ("preved");
+  ApplicationContainer consumers = consumerHelper.Install (nc[0]);
     
-    consumers.Start (Seconds (0));
-    consumers.Stop (Seconds (20));
+  consumers.Start (Seconds (0));
+  consumers.Stop (Seconds (20));
 
-    
-    Simulator::Stop (Seconds (20));
-    NS_LOG_INFO ("Run Simulation.");
-    Simulator::Run ();
-    Simulator::Destroy ();
-    NS_LOG_INFO ("Done.");
-    return 0;
+  Simulator::Stop (Seconds (20));
+  NS_LOG_INFO ("Run Simulation.");
+  Simulator::Run ();
+  Simulator::Destroy ();
+  NS_LOG_INFO ("Done.");
+  return 0;
 }
