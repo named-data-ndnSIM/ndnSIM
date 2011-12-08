@@ -27,15 +27,25 @@
 #include "ns3/net-device-container.h"
 #include "ns3/point-to-point-helper.h"
 #include "ns3/point-to-point-net-device.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/drop-tail-queue.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4.h"
 #include "ns3/string.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
+#include "ns3/ipv4-address.h"
 #include <string>
 #include <fstream>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+
+#include "ns3/animation-interface.h"
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/random-variable.h"
 
 namespace ns3 
 {
@@ -44,7 +54,7 @@ namespace ns3
 * \brief This class reads annotated topology and apply settings to the corresponding nodes and links
 * Input File Format
 * 1st line is     NumberOfNodes    TAB     NumberofLinks
-* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS    TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
+* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
 *
 */
 class AnnotatedTopologyReader : public TopologyReader
@@ -72,6 +82,9 @@ public:
      * NodeContainer from Read method
      */
     void ApplySettings(NetDeviceContainer *ndc, NodeContainer* nc);
+    
+    //void ApplyOspfMetric(NetDeviceContainer* ndc, NodeContainer* nc);
+    void BoundingBox (NodeContainer* nc, double ulx, double uly, double lrx, double lry);
         
 private:
     AnnotatedTopologyReader (const AnnotatedTopologyReader&);

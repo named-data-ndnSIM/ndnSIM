@@ -82,7 +82,12 @@ def build(bld):
 
         obj = bld.create_ns3_program('packet-sizes', ['NDNabstraction'])
         obj.source = 'examples/packet-sizes.cc'
-        
+
+        obj = bld.create_ns3_program('ccnx-sprint-topology', ['NDNabstraction'])
+        obj.source = 'examples/sprint-topology.cc'
+
+        obj = bld.create_ns3_program('ccnx-abilene-topology', ['NDNabstraction'])
+        obj.source = 'examples/abilene-topology.cc'
 
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)

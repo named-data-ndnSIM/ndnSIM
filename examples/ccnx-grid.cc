@@ -79,7 +79,7 @@ main (int argc, char *argv[])
   cmd.AddValue ("netanim", "NetAnim filename", animationFile);
   cmd.AddValue ("strategy", "CCNx forwarding strategy", strategy);
   cmd.Parse (argc, argv);
-  
+
   PointToPointHelper p2p;
 
   InternetStackHelper stack;
@@ -129,14 +129,14 @@ main (int argc, char *argv[])
   // producers.Stop(finishTime);
 
   Simulator::Schedule (Seconds (1.0), PrintFIBs);
-  
+
   Simulator::Schedule (Seconds (10.0), PrintTime);
   
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
   // NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
     
   Simulator::Stop (finishTime);
-
+    
   AnimationInterface *anim = 0;
   if (animationFile != "")
     {
@@ -148,7 +148,7 @@ main (int argc, char *argv[])
   Simulator::Run ();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done!");
-
+    
   if (anim != 0)
     delete anim;
   
