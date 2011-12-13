@@ -3272,10 +3272,6 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
                    'ns3::NodeContainer', 
                    [], 
                    is_virtual=True)
-    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::SetBoundingBox(double ulx, double uly, double lrx, double lry) [member function]
-    cls.add_method('SetBoundingBox', 
-                   'void', 
-                   [param('double', 'ulx'), param('double', 'uly'), param('double', 'lrx'), param('double', 'lry')])
     ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::AssignIpv4Addresses(ns3::Ipv4Address base) [member function]
     cls.add_method('AssignIpv4Addresses', 
                    'void', 

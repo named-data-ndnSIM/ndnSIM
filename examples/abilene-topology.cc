@@ -81,7 +81,6 @@ main (int argc, char *argv[])
     
   AnnotatedTopologyReader reader ("/abilene");
   reader.SetFileName (input);
-  reader.SetBoundingBox (100.0, 100.0, 5000.0, 5000.0);
     
   NodeContainer nodes = reader.Read ();
     
@@ -90,6 +89,13 @@ main (int argc, char *argv[])
       NS_LOG_ERROR ("Problems reading the topology file. Failing.");
       return -1;
     }
+
+  // InternetStackHelper stack;
+  // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+  // stack.SetRoutingHelper (ipv4RoutingHelper);
+  // stack.Install (nodes);
+
+  // reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
 
   NS_LOG_INFO("Nodes = " << nodes.GetN());
   NS_LOG_INFO("Links = " << reader.LinksSize ());
@@ -103,14 +109,18 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("tralala");
+  CcnxConsumerHelper consumerHelper ("/5");
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
     
-  CcnxProducerHelper producerHelper ("tralala",1024);
+  CcnxProducerHelper producerHelper ("/5",1024);
   ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
 
+  // // Populate FIB based on IPv4 global routing controller
+  // ccnxHelper.InstallFakeGlobalRoutes ();
+  // ccnxHelper.InstallRouteTo (Names::Find<Node> ("/abilene", "IPLSng"));
+
   // Simulator::Schedule (Seconds (1.0), PrintFIBs);
-  PrintFIBs ();
+  // PrintFIBs ();
 
   Simulator::Schedule (Seconds (10.0), PrintTime);
 

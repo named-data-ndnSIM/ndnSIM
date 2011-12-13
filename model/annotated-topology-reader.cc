@@ -65,24 +65,24 @@ TypeId AnnotatedTopologyReader::GetTypeId (void)
     
 AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
   : m_path (path)
-  , m_ulx (0)
-  , m_uly (0)
-  , m_lrx (100.0)
-  , m_lry (100.0)
+  // , m_ulx (0)
+  // , m_uly (0)
+  // , m_lrx (100.0)
+  // , m_lry (100.0)
 {
   NS_LOG_FUNCTION (this);
 }
     
-void
-AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
-{
-  NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
+// void
+// AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
+// {
+//   NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
   
-  m_ulx = ulx;
-  m_uly = uly;
-  m_lrx = lrx;
-  m_lry = lry;
-}
+//   m_ulx = ulx;
+//   m_uly = uly;
+//   m_lrx = lrx;
+//   m_lry = lry;
+// }
 
 AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 {
@@ -280,7 +280,7 @@ AnnotatedTopologyReader::ApplySettings ()
           link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
           NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
         
-          txQueueTo.  Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
+          txQueueTo.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
         }
     }
 }

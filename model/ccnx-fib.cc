@@ -180,11 +180,11 @@ CcnxFibEntryContainer::type::iterator
 CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
   const CcnxNameComponents &name = interest.GetName ();
-  for (size_t componentsCount = name.GetComponents ().size ();
-       componentsCount >= 0;
+  for (size_t componentsCount = name.GetComponents ().size ()+1;
+       componentsCount > 0;
        componentsCount--)
     {
-      CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount));
+      CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount-1));
       CcnxFibEntryContainer::type::iterator match = m_fib.find (subPrefix);
       if (match != m_fib.end())
         return match;

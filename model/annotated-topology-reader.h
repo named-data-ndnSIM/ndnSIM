@@ -59,11 +59,11 @@ public:
   virtual
   NodeContainer Read (void);
     
-    /**
-   * \brief Set bounding box for the nodes
-   */
-  void
-  SetBoundingBox (double ulx, double uly, double lrx, double lry);
+  // /**
+  //  * \brief Set bounding box for the nodes
+  //  */
+  // void
+  // SetBoundingBox (double ulx, double uly, double lrx, double lry);
 
   /**
    * \brief Assign IPv4 addresses to all links
@@ -87,14 +87,14 @@ private:
   void ApplyOspfMetric ();
     
 private:
-    AnnotatedTopologyReader (const AnnotatedTopologyReader&);
-    AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
+  AnnotatedTopologyReader (const AnnotatedTopologyReader&);
+  AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
 
   std::string m_path;
-  double m_ulx;
-  double m_uly;
-  double m_lrx;
-  double m_lry;
+  // double m_ulx;
+  // double m_uly;
+  // double m_lrx;
+  // double m_lry;
 };
 }
 
