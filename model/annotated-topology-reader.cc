@@ -39,7 +39,6 @@
 #include "ns3/ipv4-address.h"
 
 #include "ns3/constant-position-mobility-model.h"
-#include "ns3/random-variable.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -53,40 +52,46 @@ namespace ns3
 
 NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyReader");
     
-NS_OBJECT_ENSURE_REGISTERED (AnnotatedTopologyReader);
-    
-TypeId AnnotatedTopologyReader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::AnnotatedTopologyReader")
-    .SetParent<Object> ()
-    ;
-  return tid;
-}
-    
 AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
   : m_path (path)
-  // , m_ulx (0)
-  // , m_uly (0)
-  // , m_lrx (100.0)
-  // , m_lry (100.0)
+  , m_randX (0, 100.0)
+  , m_randY (0, 100.0)
 {
   NS_LOG_FUNCTION (this);
 }
     
-// void
-// AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
-// {
-//   NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
+void
+AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
+{
+  NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
   
-//   m_ulx = ulx;
-//   m_uly = uly;
-//   m_lrx = lrx;
-//   m_lry = lry;
-// }
+  m_randX = UniformVariable (ulx, lrx);
+  m_randY = UniformVariable (uly, lry);
+}
 
 AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+Ptr<Node>
+AnnotatedTopologyReader::CreateNode (const std::string name)
+{
+  return CreateNode (name, m_randX.GetValue (), m_randX.GetValue ());
+}
+
+Ptr<Node>
+AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double posY)
+{
+  Ptr<Node> node = CreateObject<Node> ();
+  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
+  node->AggregateObject (loc);
+
+  loc->SetPosition (Vector (posX, posY, 0));
+
+  Names::Add (m_path, name, node);
+
+  return node;
 }
 
 NodeContainer
@@ -101,9 +106,6 @@ AnnotatedTopologyReader::Read (void)
       NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
       return nodes;
     }
-
-  uint32_t linksNumber = 0;
-  uint32_t nodesNumber = 0;
 
   while (!topgen.eof ())
     {
@@ -125,15 +127,8 @@ AnnotatedTopologyReader::Read (void)
       double latitude, longitude;
 
       lineBuffer >> name >> city >> latitude >> longitude;
-      Ptr<Node> node = CreateObject<Node> ();
-      Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
-      node->AggregateObject (loc);
-
-      loc->SetPosition (Vector (2*longitude, -2*latitude, 0));
-
-      Names::Add (m_path, name, node);
+      Ptr<Node> node = CreateNode (name, 2*longitude, -2*latitude);
       nodes.Add (node);
-      nodesNumber++;
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
@@ -175,11 +170,9 @@ AnnotatedTopologyReader::Read (void)
 
       AddLink (link);
       NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << "Kbps with " << metric << " metric");
-                
-      linksNumber++;
     }
         
-  NS_LOG_INFO ("Annotated topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
+  NS_LOG_INFO ("Annotated topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
   topgen.close ();
         
   ApplySettings ();

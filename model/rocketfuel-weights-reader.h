@@ -19,72 +19,60 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef ROCKETFUEL_TOPOLOGY_READER_H
-#define ROCKETFUEL_TOPOLOGY_READER_H
+#ifndef ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H
+#define ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H
 
-#include "ns3/topology-reader.h"
+#include "annotated-topology-reader.h"
 #include "ns3/net-device-container.h"
 
 namespace ns3 {
     
-    
-    // ------------------------------------------------------------
-    // --------------------------------------------
-    /**
-     * \brief Topology file reader (Rocketfuel-format type).
-     *
-     * http://www.cs.washington.edu/research/networking/rocketfuel/
-     *
-     * May 2nd, 2010: Currently only support "weights" file and "cch" file.
-     * http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
-     * http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
-     */
-    class RocketfuelWeightsReader : public TopologyReader
+// ------------------------------------------------------------
+// --------------------------------------------
+/**
+ * \brief Topology file reader (extension of Rocketfuel-format type).
+ *
+ * http://www.cs.washington.edu/research/networking/rocketfuel/
+ *
+ * Only weights and latencies file is supported
+ */
+class RocketfuelWeightsReader : public AnnotatedTopologyReader
+{
+public:
+  RocketfuelWeightsReader ();
+  virtual ~RocketfuelWeightsReader ();
+
+  void
+  SetFileType (uint8_t inputType);
+  
+  /**
+   * \brief Main topology reading function.
+   *
+   * This method opens an input stream and reads the Rocketfuel-format file.
+   * Every row represents a topology link (the ids of a couple of nodes),
+   * so the input file is read line by line to figure out how many links
+   * and nodes are in the topology.
+   *
+   * \return the container of the nodes created (or empty container if there was an error)
+   */
+  virtual NodeContainer Read (void);
+
+  enum
     {
-    public:
-        static TypeId GetTypeId (void);
-        
-        RocketfuelWeightsReader ();
-        virtual ~RocketfuelWeightsReader ();
-        
-        /**
-         * \brief Main topology reading function.
-         *
-         * This method opens an input stream and reads the Rocketfuel-format file.
-         * Every row represents a topology link (the ids of a couple of nodes),
-         * so the input file is read line by line to figure out how many links
-         * and nodes are in the topology.
-         *
-         * \return the container of the nodes created (or empty container if there was an error)
-         */
-        NodeContainer Read (std::string latenciesFile);
-        
-        virtual NodeContainer Read (void);
-        
-        void ApplySettings(NetDeviceContainer* ndc, NodeContainer* nc);
-        
-    private:
-        RocketfuelWeightsReader (const RocketfuelWeightsReader&);
-        RocketfuelWeightsReader& operator= (const RocketfuelWeightsReader&);
-        // Parser for the weights.* file available at:
-        // http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
-        NodeContainer GenerateFromWeightsFile (int argc, char *argv[], char *argl[]);
-        
-        enum RF_FileType
-        {
-            RF_MAPS,
-            RF_WEIGHTS,
-            RF_UNKNOWN
-        };
-        enum RF_FileType GetFileType (const char *);
-        
-        // end class RocketfuelWeightsReader
+      WEIGHTS,
+      LATENCIES
     };
-    
-    // end namespace ns3
-};
+
+private:
+  RocketfuelWeightsReader (const RocketfuelWeightsReader&);
+  RocketfuelWeightsReader& operator= (const RocketfuelWeightsReader&);
+  
+private:
+  uint8_t m_inputType;
+  
+}; // end class RocketfuelWeightsReader
+
+}; // end namespace ns3
 
 
-#endif /* ROCKETFUEL_TOPOLOGY_READER_H */
-
-
+#endif /* ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H */

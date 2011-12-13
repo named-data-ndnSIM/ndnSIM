@@ -30,7 +30,6 @@
 #include <sstream>
 #include "ns3/rocketfuel-topology-reader.h"
 
-
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxSprintTopology");
@@ -40,43 +39,31 @@ main (int argc, char *argv[])
 {
     Packet::EnableChecking();
     Packet::EnablePrinting();
-    std::string input ("./src/NDNabstraction/examples/sprint.weights");
+    std::string weights ("./src/NDNabstraction/examples/sprint.weights");
+    std::string latencies ("./src/NDNabstraction/examples/sprint.latencies");
     
     // ------------------------------------------------------------
     // -- Read topology data.
     // --------------------------------------------
     
-    Ptr<RocketfuelWeightsReader> reader = CreateObject<RocketfuelWeightsReader> ();
-    reader->SetFileName (input);
+    RocketfuelWeightsReader reader;
+
+    reader.SetFileName (weights);
+    reader.SetFileType (RocketfuelWeightsReader::WEIGHTS);    
+    NodeContainer nodes = reader.Read ();
+
+    reader.SetFileName (latencies);
+    reader.SetFileType (RocketfuelWeightsReader::LATENCIES);    
+    reader.Read ();
     
-    NodeContainer nodes;
-    if (reader != 0)
-    {
-        nodes = reader->Read ("./src/NDNabstraction/examples/sprint.latencies");
-    }
-    
-    if (reader->LinksSize () == 0)
+    if (reader.LinksSize () == 0)
     {
         NS_LOG_ERROR ("Problems reading the topology file. Failing.");
         return -1;
     }
     
     NS_LOG_INFO("Nodes = " << nodes.GetN());
-    NS_LOG_INFO("Links = " << reader->LinksSize ());
-    
-    int totlinks = reader->LinksSize ();
-    ///*** applying settings
-    NS_LOG_INFO ("creating node containers");
-    NodeContainer* nc = new NodeContainer[totlinks];
-    TopologyReader::ConstLinksIterator iter;
-    int i = 0;
-    for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
-    {
-        nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
-    }
-    
-    NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-    reader->ApplySettings(ndc,nc);
+    NS_LOG_INFO("Links = " << reader.LinksSize ());
     
     NS_LOG_INFO ("Run Simulation.");
     Simulator::Run ();

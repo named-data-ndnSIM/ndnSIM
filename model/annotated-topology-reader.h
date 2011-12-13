@@ -22,23 +22,18 @@
 #define __ANNOTATED_TOPOLOGY_READER_H__
 
 #include "ns3/topology-reader.h"
+#include "ns3/random-variable.h"
 
 namespace ns3 
 {
     
 /**
-* \brief This class reads annotated topology and apply settings to the corresponding nodes and links
-* Input File Format
-* 1st line is     NumberOfNodes    TAB     NumberofLinks
-* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2    TAB    X-coordinate-node1     TAB    Y-coordinate-node1  TAB    X-coordinate-node2     TAB    Y-coordinate-node2
-*
-*/
+ * \brief This class reads annotated topology and apply settings to the corresponding nodes and links
+ *
+ */
 class AnnotatedTopologyReader : public TopologyReader
 {
 public:
-    typedef std::list< Link >::iterator LinksIterator;
-    static TypeId GetTypeId (void);
-        
   /**
    * \brief Constructor
    *
@@ -47,24 +42,18 @@ public:
    * \see ns3::Names class
    */
   AnnotatedTopologyReader (const std::string &path="");
-    virtual ~AnnotatedTopologyReader ();
+  virtual ~AnnotatedTopologyReader ();
         
-    /**
-    * \brief Main annotated topology reading function.
-    *
-    * This method opens an input stream and reads topology file with annotations.
-    *
-    * \return the container of the nodes created (or empty container if there was an error)
-    */
+  /**
+   * \brief Main annotated topology reading function.
+   *
+   * This method opens an input stream and reads topology file with annotations.
+   *
+   * \return the container of the nodes created (or empty container if there was an error)
+   */
   virtual
   NodeContainer Read (void);
     
-  // /**
-  //  * \brief Set bounding box for the nodes
-  //  */
-  // void
-  // SetBoundingBox (double ulx, double uly, double lrx, double lry);
-
   /**
    * \brief Assign IPv4 addresses to all links
    *
@@ -76,28 +65,38 @@ public:
    */
   void
   AssignIpv4Addresses (Ipv4Address base);
+
+  void
+  SetBoundingBox (double ulx, double uly, double lrx, double lry);
+
+protected:
+  Ptr<Node>
+  CreateNode (const std::string name);
+
+  Ptr<Node>
+  CreateNode (const std::string name, double posX, double posY);
   
 private:
   /**
-     * \brief This method applies setting to corresponding nodes and links
-     * NetDeviceContainer must be allocated
-     * NodeContainer from Read method
-     */
+   * \brief This method applies setting to corresponding nodes and links
+   * NetDeviceContainer must be allocated
+   * NodeContainer from Read method
+   */
   void ApplySettings ();
   void ApplyOspfMetric ();
     
+protected:
+  std::string m_path;
+
 private:
   AnnotatedTopologyReader (const AnnotatedTopologyReader&);
   AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
 
-  std::string m_path;
-  // double m_ulx;
-  // double m_uly;
-  // double m_lrx;
-  // double m_lry;
+  UniformVariable m_randX;
+  UniformVariable m_randY;
 };
-}
 
+}
 
 #endif
 
