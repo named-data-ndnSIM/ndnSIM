@@ -65,7 +65,7 @@ main (int argc, char *argv[])
   // Packet::EnableChecking();
   // Packet::EnablePrinting();
   string input ("./src/NDNabstraction/examples/abilene-topology.txt");
-
+    
   Time finishTime = Seconds (20.0);
   string animationFile;
   string strategy = "ns3::CcnxFloodingStrategy";
@@ -81,8 +81,8 @@ main (int argc, char *argv[])
     
   AnnotatedTopologyReader reader ("/abilene");
   reader.SetFileName (input);
-  reader.SetBoundingBox (100.0, 100.0, 400.0, 400.0);
-  
+  reader.SetBoundingBox (100.0, 100.0, 5000.0, 5000.0;
+    
   NodeContainer nodes = reader.Read ();
     
   if (reader.LinksSize () == 0)
@@ -105,10 +105,10 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Installing Applications");
   CcnxConsumerHelper consumerHelper ("tralala");
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "1"));
-
+    
   CcnxProducerHelper producerHelper ("tralala",1024);
   ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "6"));
-  
+
   // Simulator::Schedule (Seconds (1.0), PrintFIBs);
   PrintFIBs ();
 

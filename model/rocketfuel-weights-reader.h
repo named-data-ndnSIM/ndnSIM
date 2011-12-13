@@ -77,6 +77,8 @@ namespace ns3 {
          *
          * \return the container of the nodes created (or empty container if there was an error)
          */
+        NodeContainer Read (std::string latenciesFile);
+        
         virtual NodeContainer Read (void);
         
         void ApplySettings(NetDeviceContainer* ndc, NodeContainer* nc);
@@ -84,12 +86,9 @@ namespace ns3 {
     private:
         RocketfuelWeightsReader (const RocketfuelWeightsReader&);
         RocketfuelWeightsReader& operator= (const RocketfuelWeightsReader&);
-        // Parser for the *.cch file available at:
-        // http://www.cs.washington.edu/research/networking/rocketfuel/maps/rocketfuel_maps_cch.tar.gz
-        NodeContainer GenerateFromMapsFile (int argc, char *argv[]);
         // Parser for the weights.* file available at:
         // http://www.cs.washington.edu/research/networking/rocketfuel/maps/weights-dist.tar.gz
-        NodeContainer GenerateFromWeightsFile (int argc, char *argv[]);
+        NodeContainer GenerateFromWeightsFile (int argc, char *argv[], char *argl[]);
         
         enum RF_FileType
         {

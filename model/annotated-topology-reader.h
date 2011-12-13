@@ -27,18 +27,18 @@ namespace ns3
 {
     
 /**
- * \brief This class reads annotated topology and apply settings to the corresponding nodes and links
- * Input File Format
- * 1st line is     NumberOfNodes    TAB     NumberofLinks
- * Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
- *
- */
+* \brief This class reads annotated topology and apply settings to the corresponding nodes and links
+* Input File Format
+* 1st line is     NumberOfNodes    TAB     NumberofLinks
+* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2    TAB    X-coordinate-node1     TAB    Y-coordinate-node1  TAB    X-coordinate-node2     TAB    Y-coordinate-node2
+*
+*/
 class AnnotatedTopologyReader : public TopologyReader
 {
 public:
-  typedef std::list< Link >::iterator LinksIterator;
-  static TypeId GetTypeId (void);
-
+    typedef std::list< Link >::iterator LinksIterator;
+    static TypeId GetTypeId (void);
+        
   /**
    * \brief Constructor
    *
@@ -47,19 +47,19 @@ public:
    * \see ns3::Names class
    */
   AnnotatedTopologyReader (const std::string &path="");
-  virtual ~AnnotatedTopologyReader ();
-
-  /**
-   * \brief Main annotated topology reading function.
-   *
-   * This method opens an input stream and reads topology file with annotations.
-   *
-   * \return the container of the nodes created (or empty container if there was an error)
-   */
+    virtual ~AnnotatedTopologyReader ();
+        
+    /**
+    * \brief Main annotated topology reading function.
+    *
+    * This method opens an input stream and reads topology file with annotations.
+    *
+    * \return the container of the nodes created (or empty container if there was an error)
+    */
   virtual
   NodeContainer Read (void);
-
-  /**
+    
+    /**
    * \brief Set bounding box for the nodes
    */
   void
@@ -79,17 +79,17 @@ public:
   
 private:
   /**
-   * \brief This method applies setting to corresponding nodes and links
-   * NetDeviceContainer must be allocated
-   * NodeContainer from Read method
-   */
+     * \brief This method applies setting to corresponding nodes and links
+     * NetDeviceContainer must be allocated
+     * NodeContainer from Read method
+     */
   void ApplySettings ();
   void AssignCoordinates ();
   void ApplyOspfMetric ();
-  
+    
 private:
-  AnnotatedTopologyReader (const AnnotatedTopologyReader&);
-  AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
+    AnnotatedTopologyReader (const AnnotatedTopologyReader&);
+    AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
 
   std::string m_path;
   double m_ulx;

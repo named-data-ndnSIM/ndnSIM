@@ -78,128 +78,7 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
     std::map<std::string, Ptr<Node> > nodeMap;
     
     NodeContainer
-    RocketfuelWeightsReader::GenerateFromMapsFile (int argc, char *argv[])
-    {
-        std::string uid;
-        std::string loc;
-        std::string ptr;
-        std::string name;
-        std::string nuid;
-        bool dns = false;
-        bool bb = false;
-        int num_neigh_s = 0;
-        unsigned int num_neigh = 0;
-        int radius = 0;
-        std::vector <std::string> neigh_list;
-        NodeContainer nodes;
-        
-        uid = argv[0];
-        loc = argv[1];
-        
-        if (argv[2])
-        {
-            dns = true;
-        }
-        
-        if (argv[3])
-        {
-            bb = true;
-        }
-        
-        num_neigh_s = ::atoi (argv[4]);
-        if (num_neigh_s < 0)
-        {
-            num_neigh = 0;
-            NS_LOG_WARN ("Negative number of neighbors given");
-        }
-        else
-        {
-            num_neigh = num_neigh_s;
-        }
-        
-        /* neighbors */
-        if (argv[6])
-        {
-            char *nbr;
-            char *stringp = argv[6];
-            while ((nbr = strsep (&stringp, " \t")) != NULL)
-            {
-                nbr[strlen (nbr) - 1] = '\0';
-                neigh_list.push_back (nbr + 1);
-            }
-        }
-        if (num_neigh != neigh_list.size ())
-        {
-            NS_LOG_WARN ("Given number of neighbors = " << num_neigh << " != size of neighbors list = " << neigh_list.size ());
-        }
-        
-        /* externs */
-        if (argv[7])
-        {
-            //      euid = argv[7];
-        }
-        
-        /* name */
-        if (argv[8])
-        {
-            name = argv[8];
-        }
-        
-        radius = ::atoi (&argv[9][1]);
-        if (radius > 0)
-        {
-            return nodes;
-        }
-        
-        /* uid @loc [+] [bb] (num_neigh) [&ext] -> <nuid-1> <nuid-2> ... {-euid} ... =name[!] rn */
-        NS_LOG_INFO ("Load Node[" << uid << "]: location: " << loc << " dns: " << dns
-                     << " bb: " << bb << " neighbors: " << neigh_list.size ()
-                     << "(" << "%d" << ") externals: \"%s\"(%d) "
-                     << "name: " << name << " radius: " << radius);
-        
-        //cast bb and dns to void, to suppress variable set but not used compiler warning
-        //in optimized builds
-        (void) bb;
-        (void) dns;
-        
-        // Create node and link
-        if (!uid.empty ())
-        {
-            if (nodeMap[uid] == 0)
-            {
-                Ptr<Node> tmpNode = CreateObject<Node> ();
-                nodeMap[uid] = tmpNode;
-                nodes.Add (tmpNode);
-                nodesNumber++;
-            }
-            
-            for (uint32_t i = 0; i < neigh_list.size (); ++i)
-            {
-                nuid = neigh_list[i];
-                
-                if (nuid.empty ())
-                {
-                    return nodes;
-                }
-                
-                if (nodeMap[nuid] == 0)
-                {
-                    Ptr<Node> tmpNode = CreateObject<Node> ();
-                    nodeMap[nuid] = tmpNode;
-                    nodes.Add (tmpNode);
-                    nodesNumber++;
-                }
-                NS_LOG_INFO (linksNumber << ":" << nodesNumber << " From: " << uid << " to: " << nuid);
-                Link link (nodeMap[uid], uid, nodeMap[nuid], nuid);
-                AddLink (link);
-                linksNumber++;
-            }
-        }
-        return nodes;
-    }
-    
-    NodeContainer
-    RocketfuelWeightsReader::GenerateFromWeightsFile (int argc, char *argv[])
+    RocketfuelWeightsReader::GenerateFromWeightsFile (int argc, char *argv[], char *argl[])
     {
         /* uid @loc [+] [bb] (num_neigh) [&ext] -> <nuid-1> <nuid-2> ... {-euid} ... =name[!] rn */
         std::string sname;
@@ -210,6 +89,7 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
         sname = argv[0];
         tname = argv[1];
         double v = strtod (argv[2], &endptr); // weight
+        double l = strtod (argl[2], &endptr); //latency
         // cast v to void , to suppress 'v' set but not used compiler warning
         //(void) v;
         
@@ -255,10 +135,19 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
             if (!found)
             {
                 Link link (nodeMap[sname], sname, nodeMap[tname], tname);
+                
                 std::ostringstream s;
                 s << std::setprecision(2) << v;
                 std::string ss = s.str();
                 link.SetAttribute ("OSPF", ss);
+                
+                std::ostringstream s2;
+                s2 << std::setprecision(2) << l;
+                std::string ss2 = s2.str();
+                link.SetAttribute("Latency", ss2);
+                NS_LOG_INFO("Written Latency = " << ss2);
+                
+                
                 AddLink (link);
                 linksNumber++;
             }
@@ -307,16 +196,29 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
         return RF_UNKNOWN;
     }
     
-    
     NodeContainer
     RocketfuelWeightsReader::Read (void)
+    {
+        NodeContainer nodes;
+        NS_LOG_INFO("Not implemented");
+        return nodes;
+    }
+    
+    NodeContainer
+    RocketfuelWeightsReader::Read (std::string latenciesFile)
     {
         std::ifstream topgen;
         topgen.open (GetFileName ().c_str ());
         NodeContainer nodes;
         
+        std::ifstream latencies;
+        latencies.open(latenciesFile.c_str());
+        
         std::istringstream lineBuffer;
+        std::istringstream lineBuffer2;
         std::string line;
+        std::string line2;
+        
         int lineNumber = 0;
         enum RF_FileType ftype = RF_UNKNOWN;
         char errbuf[512];
@@ -327,19 +229,31 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
             return nodes;
         }
         
+        if (!latencies.is_open ())
+        {
+            NS_LOG_WARN ("Couldn't open Latencies file " << latenciesFile);
+            return nodes;
+        }
+        
         while (!topgen.eof ())
         {
             int ret;
             int argc;
             char *argv[REGMATCH_MAX];
+            char *argl[REGMATCH_MAX];
             char *buf;
+            char *buf2;
             
             lineNumber++;
             line.clear ();
+            line2.clear ();
             lineBuffer.clear ();
+            lineBuffer2.clear ();
             
             getline (topgen, line);
+            getline (latencies, line2);
             buf = (char *)line.c_str ();
+            buf2 = (char *)line2.c_str ();
             
             if (lineNumber == 1)
             {
@@ -383,6 +297,7 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
                 }
                 
                 ret = regexec (&regex, buf, REGMATCH_MAX, regmatch, 0);
+                regexec (&regex, buf2, REGMATCH_MAX, regmatch, 0);
                 if (ret == REG_NOMATCH)
                 {
                     NS_LOG_WARN ("match failed (weights file): %s" << buf);
@@ -392,6 +307,7 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
             }
             
             line = buf;
+            line2 = buf2;
             argc = 0;
             
             /* regmatch[0] is the entire strings that matched */
@@ -400,22 +316,26 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
                 if (regmatch[i].rm_so == -1)
                 {
                     argv[i - 1] = NULL;
+                    argl[i - 1] = NULL;
                 }
                 else
                 {
                     line[regmatch[i].rm_eo] = '\0';
+                    line2[regmatch[i].rm_eo] = '\0';
                     argv[i - 1] = &line[regmatch[i].rm_so];
+                    argl[i - 1] = &line2[regmatch[i].rm_so];
                     argc = i;
                 }
             }
             
             if (ftype == RF_MAPS)
             {
-                nodes.Add (GenerateFromMapsFile (argc, argv));
+                NS_LOG_INFO("MAPS FILE is not supported");
+                //nodes.Add (GenerateFromMapsFile (argc, argv));
             }
             else if (ftype == RF_WEIGHTS)
             {
-                nodes.Add (GenerateFromWeightsFile (argc, argv));
+                nodes.Add (GenerateFromWeightsFile (argc, argv, argl));
             }
             else
             {
@@ -427,7 +347,7 @@ START "([^ \t]+)" SPACE "([^ \t]+)" SPACE "([0-9.]+)" MAYSPACE END
         
         
         topgen.close ();
-        
+        latencies.close ();
         NS_LOG_INFO ("Rocketfuel topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
         return nodes;
     }
@@ -486,7 +406,11 @@ RocketfuelWeightsReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* n
         for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
         {
             p2p.SetDeviceAttribute("DataRate", StringValue("9920000Kbps"));
-            p2p.SetChannelAttribute("Delay", StringValue("10ms"));
+            //p2p.SetChannelAttribute("Delay", StringValue("10ms"));
+            NS_LOG_INFO("Latency = " + iter2->GetAttribute("Latency")+"ms");
+            p2p.SetChannelAttribute("Delay", StringValue(iter2->GetAttribute("Latency")+"ms"));
+            
+
             p2p.SetQueue("ns3::DropTailQueue","MaxPackets",StringValue("100"));
             ndc[i] = p2p.Install(nc[i]);
             
