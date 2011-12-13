@@ -52,7 +52,7 @@ main (int argc, char *argv[])
     NodeContainer nodes;
     if (reader != 0)
     {
-        nodes = reader->Read ();
+        nodes = reader->Read ("./src/NDNabstraction/examples/sprint.latencies");
     }
     
     if (reader->LinksSize () == 0)
