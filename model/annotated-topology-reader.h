@@ -54,7 +54,7 @@ namespace ns3
 * \brief This class reads annotated topology and apply settings to the corresponding nodes and links
 * Input File Format
 * 1st line is     NumberOfNodes    TAB     NumberofLinks
-* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
+* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2    TAB    X-coordinate-node1     TAB    Y-coordinate-node1  TAB    X-coordinate-node2     TAB    Y-coordinate-node2
 *
 */
 class AnnotatedTopologyReader : public TopologyReader

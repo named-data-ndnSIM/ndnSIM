@@ -146,7 +146,31 @@ AnnotatedTopologyReader::Read (void)
             {
                 link.SetAttribute ("QueueSizeNode2", linkAttr);
             }
-                
+            
+            lineBuffer >> linkAttr;
+            if ( !linkAttr.empty () )
+            {
+                link.SetAttribute ("X1", linkAttr);
+            }
+            
+            lineBuffer >> linkAttr;
+            if ( !linkAttr.empty () )
+            {
+                link.SetAttribute ("Y1", linkAttr);
+            }
+            
+            lineBuffer >> linkAttr;
+            if ( !linkAttr.empty () )
+            {
+                link.SetAttribute ("X2", linkAttr);
+            }
+            
+            lineBuffer >> linkAttr;
+            if ( !linkAttr.empty () )
+            {
+                link.SetAttribute ("Y2", linkAttr);
+            }
+
             AddLink (link);
                 
             linksNumber++;
@@ -447,6 +471,19 @@ AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly,
     int i = 0;
     for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
     {
+        std::string x1str = iter2->GetAttribute("X1");
+        uint16_t x1 = atoi(x1str.c_str());
+        
+        std::string x2str = iter2->GetAttribute("X2");
+        uint16_t x2 = atoi(x2str.c_str());
+        
+        
+        std::string y1str = iter2->GetAttribute("Y1");
+        uint16_t y1 = atoi(y1str.c_str());
+        
+        std::string y2str = iter2->GetAttribute("Y2");
+        uint16_t y2 = atoi(y2str.c_str());
+        
         NodeContainer twoNodes = nc[i];
         
         Ptr<Node> nd = twoNodes.Get(0);
@@ -464,8 +501,8 @@ AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly,
             nd->AggregateObject (loc);
         }
         
-        x = randX.GetValue();
-        y = randY.GetValue();
+        x = x1; //randX.GetValue();
+        y = y1; //randY.GetValue();
         NS_LOG_INFO("X = "<<x <<"Y = "<<y);
         Vector locVec (x, y, 0);
         loc->SetPosition (locVec);
@@ -478,55 +515,12 @@ AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly,
             nd2->AggregateObject (loc2);
         }
         
-        x = randX.GetValue();
-        y = randY.GetValue();
+        x = x2; //randX.GetValue();
+        y = y2; //randY.GetValue();
         NS_LOG_INFO("X = "<<x <<"Y = "<<y);
         Vector locVec2 (x, y, 0);
         loc2->SetPosition (locVec2);
     }
-    /*
-        double xDist; 
-        double yDist; 
-        if (lrx > ulx)
-        {
-            xDist = lrx - ulx;
-        }
-        else
-        {
-            xDist = ulx - lrx;
-        }
-        if (lry > uly)
-        {
-            yDist = lry - uly;
-        }
-        else
-        {
-            yDist = uly - lry;
-        }
-        double xAdder = xDist / m_xSize;
-        double yAdder = yDist / m_ySize;
-        double yLoc = yDist / 2;
-        for (uint32_t i = 0; i < m_ySize; ++i)
-        {
-            double xLoc = xDist / 2;
-            for (uint32_t j = 0; j < m_xSize; ++j)
-            {
-                Ptr<Node> node = GetNode (i, j);
-                Ptr<ConstantPositionMobilityModel> loc = node->GetObject<ConstantPositionMobilityModel> ();
-                if (loc ==0)
-                {
-                    loc = CreateObject<ConstantPositionMobilityModel> ();
-                    node->AggregateObject (loc);
-                }
-                Vector locVec (xLoc, yLoc, 0);
-                loc->SetPosition (locVec);
-                
-                xLoc += xAdder;
-            }
-            yLoc += yAdder;
-        }
-    }
-*/
 }
 }
 
