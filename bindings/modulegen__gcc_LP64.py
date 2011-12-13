@@ -20,20 +20,12 @@ def module_init():
 def register_types(module):
     root_module = module.get_root()
     
-    ## log.h (module 'core'): ns3::LogLevel [enumeration]
-    module.add_enum('LogLevel', ['LOG_NONE', 'LOG_ERROR', 'LOG_LEVEL_ERROR', 'LOG_WARN', 'LOG_LEVEL_WARN', 'LOG_DEBUG', 'LOG_LEVEL_DEBUG', 'LOG_INFO', 'LOG_LEVEL_INFO', 'LOG_FUNCTION', 'LOG_LEVEL_FUNCTION', 'LOG_LOGIC', 'LOG_LEVEL_LOGIC', 'LOG_ALL', 'LOG_LEVEL_ALL', 'LOG_PREFIX_FUNC', 'LOG_PREFIX_TIME', 'LOG_PREFIX_NODE'], import_from_module='ns.core')
     ## address.h (module 'network'): ns3::Address [class]
     module.add_class('Address', import_from_module='ns.network')
     ## address.h (module 'network'): ns3::Address::MaxSize_e [enumeration]
     module.add_enum('MaxSize_e', ['MAX_SIZE'], outer_class=root_module['ns3::Address'], import_from_module='ns.network')
     ## application-container.h (module 'network'): ns3::ApplicationContainer [class]
     module.add_class('ApplicationContainer', import_from_module='ns.network')
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelper [class]
-    module.add_class('AsciiTraceHelper', import_from_module='ns.network')
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::AsciiTraceHelperForCcnx [class]
-    module.add_class('AsciiTraceHelperForCcnx', allow_subclassing=True)
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelperForDevice [class]
-    module.add_class('AsciiTraceHelperForDevice', allow_subclassing=True, import_from_module='ns.network')
     ## attribute-construction-list.h (module 'core'): ns3::AttributeConstructionList [class]
     module.add_class('AttributeConstructionList', import_from_module='ns.core')
     ## attribute-construction-list.h (module 'core'): ns3::AttributeConstructionList::Item [struct]
@@ -58,74 +50,20 @@ def register_types(module):
     module.add_class('CcnxConsumerHelper')
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeaderException [class]
     module.add_class('CcnxContentObjectHeaderException')
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreContainer [struct]
-    module.add_class('CcnxContentStoreContainer')
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreEntry [class]
-    module.add_class('CcnxContentStoreEntry')
-    ## ccnx-decoding-helper.h (module 'NDNabstraction'): ns3::CcnxDecodingHelper [class]
-    module.add_class('CcnxDecodingHelper')
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): ns3::CcnxEncodingHelper [class]
-    module.add_class('CcnxEncodingHelper')
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntryContainer [struct]
     module.add_class('CcnxFibEntryContainer')
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric [class]
     module.add_class('CcnxFibFaceMetric')
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::Status [enumeration]
     module.add_enum('Status', ['NDN_FIB_GREEN', 'NDN_FIB_YELLOW', 'NDN_FIB_RED'], outer_class=root_module['ns3::CcnxFibFaceMetric'])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::UpdateRtt [struct]
-    module.add_class('UpdateRtt', outer_class=root_module['ns3::CcnxFibFaceMetric'])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetricContainer [struct]
     module.add_class('CcnxFibFaceMetricContainer')
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): ns3::CcnxForwardingHelper [class]
-    module.add_class('CcnxForwardingHelper')
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper [class]
-    module.add_class('CcnxHeaderHelper')
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::Type [enumeration]
-    module.add_enum('Type', ['INTEREST', 'CONTENT_OBJECT'], outer_class=root_module['ns3::CcnxHeaderHelper'])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeaderException [class]
     module.add_class('CcnxInterestHeaderException')
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry [struct]
-    module.add_class('CcnxPitEntry')
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddIncoming [struct]
-    module.add_class('AddIncoming', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddOutgoing [struct]
-    module.add_class('AddOutgoing', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::ClearIncoming [struct]
-    module.add_class('ClearIncoming', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteIncoming [struct]
-    module.add_class('DeleteIncoming', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteOutgoing [struct]
-    module.add_class('DeleteOutgoing', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::EstimateRttAndRemoveFace [struct]
-    module.add_class('EstimateRttAndRemoveFace', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::UpdateFibStatus [struct]
-    module.add_class('UpdateFibStatus', outer_class=root_module['ns3::CcnxPitEntry'])
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryContainer [struct]
-    module.add_class('CcnxPitEntryContainer')
-    ## ccnx-pit-entry-incoming-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFace [struct]
-    module.add_class('CcnxPitEntryIncomingFace')
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFaceContainer [struct]
-    module.add_class('CcnxPitEntryIncomingFaceContainer')
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryNotFound [class]
-    module.add_class('CcnxPitEntryNotFound')
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace [struct]
-    module.add_class('CcnxPitEntryOutgoingFace')
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFaceContainer [struct]
-    module.add_class('CcnxPitEntryOutgoingFaceContainer')
     ## ccnx-producer-helper.h (module 'NDNabstraction'): ns3::CcnxProducerHelper [class]
     module.add_class('CcnxProducerHelper')
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitByNonce [struct]
-    module.add_class('CcnxRitByNonce')
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitContainer [struct]
-    module.add_class('CcnxRitContainer')
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry [struct]
-    module.add_class('CcnxRitEntry')
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException [class]
-    module.add_class('CcnxUnknownHeaderException')
-    ## data-rate.h (module 'network'): ns3::DataRate [class]
-    module.add_class('DataRate', import_from_module='ns.network')
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::DataStoreEntry [class]
-    module.add_class('DataStoreEntry')
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper [class]
+    module.add_class('CcnxStackHelper')
     ## event-id.h (module 'core'): ns3::EventId [class]
     module.add_class('EventId', import_from_module='ns.core')
     ## ipv4-address.h (module 'network'): ns3::Ipv4Address [class]
@@ -140,14 +78,6 @@ def register_types(module):
     root_module['ns3::Ipv6Address'].implicitly_converts_to(root_module['ns3::Address'])
     ## ipv6-address.h (module 'network'): ns3::Ipv6Prefix [class]
     module.add_class('Ipv6Prefix', import_from_module='ns.network')
-    ## log.h (module 'core'): ns3::LogComponent [class]
-    module.add_class('LogComponent', import_from_module='ns.core')
-    ## mac48-address.h (module 'network'): ns3::Mac48Address [class]
-    module.add_class('Mac48Address', import_from_module='ns.network')
-    ## mac48-address.h (module 'network'): ns3::Mac48Address [class]
-    root_module['ns3::Mac48Address'].implicitly_converts_to(root_module['ns3::Address'])
-    ## names.h (module 'core'): ns3::Names [class]
-    module.add_class('Names', import_from_module='ns.core')
     ## net-device-container.h (module 'network'): ns3::NetDeviceContainer [class]
     module.add_class('NetDeviceContainer', import_from_module='ns.network')
     ## node-container.h (module 'network'): ns3::NodeContainer [class]
@@ -174,18 +104,6 @@ def register_types(module):
     module.add_class('PacketTagList', import_from_module='ns.network')
     ## packet-tag-list.h (module 'network'): ns3::PacketTagList::TagData [struct]
     module.add_class('TagData', import_from_module='ns.network', outer_class=root_module['ns3::PacketTagList'])
-    ## pcap-file.h (module 'network'): ns3::PcapFile [class]
-    module.add_class('PcapFile', import_from_module='ns.network')
-    ## trace-helper.h (module 'network'): ns3::PcapHelper [class]
-    module.add_class('PcapHelper', import_from_module='ns.network')
-    ## trace-helper.h (module 'network'): ns3::PcapHelper [enumeration]
-    module.add_enum('', ['DLT_NULL', 'DLT_EN10MB', 'DLT_PPP', 'DLT_RAW', 'DLT_IEEE802_11', 'DLT_PRISM_HEADER', 'DLT_IEEE802_11_RADIO'], outer_class=root_module['ns3::PcapHelper'], import_from_module='ns.network')
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::PcapHelperForCcnx [class]
-    module.add_class('PcapHelperForCcnx', allow_subclassing=True)
-    ## trace-helper.h (module 'network'): ns3::PcapHelperForDevice [class]
-    module.add_class('PcapHelperForDevice', allow_subclassing=True, import_from_module='ns.network')
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::PointToPointHelper [class]
-    module.add_class('PointToPointHelper', import_from_module='ns.point_to_point', parent=[root_module['ns3::PcapHelperForDevice'], root_module['ns3::AsciiTraceHelperForDevice']])
     ## random-variable.h (module 'core'): ns3::RandomVariable [class]
     module.add_class('RandomVariable', import_from_module='ns.core')
     ## random-variable.h (module 'core'): ns3::SeedManager [class]
@@ -196,8 +114,6 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Chunk', 'ns3::ObjectBase', 'ns3::DefaultDeleter<ns3::Chunk>'], parent=root_module['ns3::ObjectBase'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Object', 'ns3::ObjectBase', 'ns3::ObjectDeleter'], parent=root_module['ns3::ObjectBase'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simulator.h (module 'core'): ns3::Simulator [class]
-    module.add_class('Simulator', destructor_visibility='private', import_from_module='ns.core')
     ## tag.h (module 'network'): ns3::Tag [class]
     module.add_class('Tag', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## tag-buffer.h (module 'network'): ns3::TagBuffer [class]
@@ -224,8 +140,6 @@ def register_types(module):
     module.add_class('empty', import_from_module='ns.core')
     ## int64x64-double.h (module 'core'): ns3::int64x64_t [class]
     module.add_class('int64x64_t', import_from_module='ns.core')
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper [class]
-    module.add_class('CcnxStackHelper', parent=[root_module['ns3::PcapHelperForCcnx'], root_module['ns3::AsciiTraceHelperForCcnx']])
     ## chunk.h (module 'network'): ns3::Chunk [class]
     module.add_class('Chunk', import_from_module='ns.network', parent=root_module['ns3::SimpleRefCount< ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >'])
     ## random-variable.h (module 'core'): ns3::ConstantVariable [class]
@@ -254,10 +168,6 @@ def register_types(module):
     module.add_class('AggregateIterator', import_from_module='ns.core', outer_class=root_module['ns3::Object'])
     ## random-variable.h (module 'core'): ns3::ParetoVariable [class]
     module.add_class('ParetoVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
-    ## pcap-file-wrapper.h (module 'network'): ns3::PcapFileWrapper [class]
-    module.add_class('PcapFileWrapper', import_from_module='ns.network', parent=root_module['ns3::Object'])
-    ## queue.h (module 'network'): ns3::Queue [class]
-    module.add_class('Queue', import_from_module='ns.network', parent=root_module['ns3::Object'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::AttributeAccessor', 'ns3::empty', 'ns3::DefaultDeleter<ns3::AttributeAccessor>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> > [class]
@@ -266,8 +176,6 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::AttributeValue', 'ns3::empty', 'ns3::DefaultDeleter<ns3::AttributeValue>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::CallbackImplBase', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CallbackImplBase>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnbParser::Block', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnbParser::Block>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxFace', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxFace>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> > [class]
@@ -276,32 +184,14 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxFibEntry', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxFibEntry>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxNameComponents', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxNameComponents>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxRoute', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxRoute>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::EventImpl', 'ns3::empty', 'ns3::DefaultDeleter<ns3::EventImpl>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::NixVector', 'ns3::empty', 'ns3::DefaultDeleter<ns3::NixVector>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::OutputStreamWrapper', 'ns3::empty', 'ns3::DefaultDeleter<ns3::OutputStreamWrapper>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Packet', 'ns3::empty', 'ns3::DefaultDeleter<ns3::Packet>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::TraceSourceAccessor', 'ns3::empty', 'ns3::DefaultDeleter<ns3::TraceSourceAccessor>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## socket.h (module 'network'): ns3::Socket [class]
-    module.add_class('Socket', import_from_module='ns.network', parent=root_module['ns3::Object'])
-    ## socket.h (module 'network'): ns3::Socket::SocketErrno [enumeration]
-    module.add_enum('SocketErrno', ['ERROR_NOTERROR', 'ERROR_ISCONN', 'ERROR_NOTCONN', 'ERROR_MSGSIZE', 'ERROR_AGAIN', 'ERROR_SHUTDOWN', 'ERROR_OPNOTSUPP', 'ERROR_AFNOSUPPORT', 'ERROR_INVAL', 'ERROR_BADF', 'ERROR_NOROUTETOHOST', 'ERROR_NODEV', 'ERROR_ADDRNOTAVAIL', 'ERROR_ADDRINUSE', 'SOCKET_ERRNO_LAST'], outer_class=root_module['ns3::Socket'], import_from_module='ns.network')
-    ## socket.h (module 'network'): ns3::Socket::SocketType [enumeration]
-    module.add_enum('SocketType', ['NS3_SOCK_STREAM', 'NS3_SOCK_SEQPACKET', 'NS3_SOCK_DGRAM', 'NS3_SOCK_RAW'], outer_class=root_module['ns3::Socket'], import_from_module='ns.network')
-    ## socket.h (module 'network'): ns3::SocketAddressTag [class]
-    module.add_class('SocketAddressTag', import_from_module='ns.network', parent=root_module['ns3::Tag'])
-    ## socket-factory.h (module 'network'): ns3::SocketFactory [class]
-    module.add_class('SocketFactory', import_from_module='ns.network', parent=root_module['ns3::Object'])
-    ## socket.h (module 'network'): ns3::SocketIpTtlTag [class]
-    module.add_class('SocketIpTtlTag', import_from_module='ns.network', parent=root_module['ns3::Tag'])
-    ## socket.h (module 'network'): ns3::SocketSetDontFragmentTag [class]
-    module.add_class('SocketSetDontFragmentTag', import_from_module='ns.network', parent=root_module['ns3::Tag'])
     ## nstime.h (module 'core'): ns3::Time [class]
     module.add_class('Time', import_from_module='ns.core')
     ## nstime.h (module 'core'): ns3::Time::Unit [enumeration]
@@ -316,8 +206,6 @@ def register_types(module):
     module.add_class('TraceSourceAccessor', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> >'])
     ## trailer.h (module 'network'): ns3::Trailer [class]
     module.add_class('Trailer', import_from_module='ns.network', parent=root_module['ns3::Chunk'])
-    ## udp-socket-factory.h (module 'internet'): ns3::UdpSocketFactory [class]
-    module.add_class('UdpSocketFactory', import_from_module='ns.internet', parent=root_module['ns3::SocketFactory'])
     ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::AnnotatedTopologyReader [class]
     module.add_class('AnnotatedTopologyReader', parent=root_module['ns3::TopologyReader'])
     ## application.h (module 'network'): ns3::Application [class]
@@ -328,10 +216,6 @@ def register_types(module):
     module.add_class('AttributeChecker', allow_subclassing=False, automatic_type_narrowing=True, import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> >'])
     ## attribute.h (module 'core'): ns3::AttributeValue [class]
     module.add_class('AttributeValue', allow_subclassing=False, automatic_type_narrowing=True, import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
-    ## boolean.h (module 'core'): ns3::BooleanChecker [class]
-    module.add_class('BooleanChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
-    ## boolean.h (module 'core'): ns3::BooleanValue [class]
-    module.add_class('BooleanValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## callback.h (module 'core'): ns3::CallbackChecker [class]
     module.add_class('CallbackChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## callback.h (module 'core'): ns3::CallbackImplBase [class]
@@ -342,60 +226,36 @@ def register_types(module):
     module.add_class('Ccnx', parent=root_module['ns3::Object'])
     ## ccnx.h (module 'NDNabstraction'): ns3::Ccnx::ForwardingStrategy [enumeration]
     module.add_enum('ForwardingStrategy', ['NDN_FLOODING', 'NDN_BESTROUTE', 'NDN_RANKING'], outer_class=root_module['ns3::Ccnx'])
+    ## ccnx-app.h (module 'NDNabstraction'): ns3::CcnxApp [class]
+    module.add_class('CcnxApp', parent=root_module['ns3::Application'])
     ## ccnx-consumer.h (module 'NDNabstraction'): ns3::CcnxConsumer [class]
-    module.add_class('CcnxConsumer', parent=root_module['ns3::Application'])
+    module.add_class('CcnxConsumer', parent=root_module['ns3::CcnxApp'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader [class]
     module.add_class('CcnxContentObjectHeader', parent=root_module['ns3::Header'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectTail [class]
     module.add_class('CcnxContentObjectTail', parent=root_module['ns3::Trailer'])
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStore [class]
-    module.add_class('CcnxContentStore', parent=root_module['ns3::Object'])
     ## ccnx-face.h (module 'NDNabstraction'): ns3::CcnxFace [class]
     module.add_class('CcnxFace', parent=root_module['ns3::SimpleRefCount< ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >'])
     ## ccnx-face-container.h (module 'NDNabstraction'): ns3::CcnxFaceContainer [class]
     module.add_class('CcnxFaceContainer', parent=root_module['ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >'])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFib [class]
+    module.add_class('CcnxFib', parent=root_module['ns3::Object'])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry [class]
     module.add_class('CcnxFibEntry', parent=root_module['ns3::SimpleRefCount< ns3::CcnxFibEntry, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFibEntry> >'])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::AddOrUpdateRoutingMetric [struct]
-    module.add_class('AddOrUpdateRoutingMetric', outer_class=root_module['ns3::CcnxFibEntry'])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateFaceRtt [struct]
-    module.add_class('UpdateFaceRtt', outer_class=root_module['ns3::CcnxFibEntry'])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateStatus [struct]
-    module.add_class('UpdateStatus', outer_class=root_module['ns3::CcnxFibEntry'])
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): ns3::CcnxForwardingStrategy [class]
-    module.add_class('CcnxForwardingStrategy', parent=root_module['ns3::Object'])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::NoFaces [class]
+    module.add_class('NoFaces', outer_class=root_module['ns3::CcnxFibEntry'])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeader [class]
     module.add_class('CcnxInterestHeader', parent=root_module['ns3::Header'])
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): ns3::CcnxInterestSender [class]
-    module.add_class('CcnxInterestSender', parent=root_module['ns3::Application'])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol [class]
-    module.add_class('CcnxL3Protocol', parent=root_module['ns3::Ccnx'])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::DropReason [enumeration]
-    module.add_enum('DropReason', ['NDN_DUPLICATE_INTEREST', 'NDN_SUPPRESSED_INTEREST', 'NDN_UNSOLICITED_DATA', 'NDN_PIT_TIMER_EXPIRED', 'INTERFACE_DOWN', 'DROP_CONGESTION', 'DROP_NO_ROUTE'], outer_class=root_module['ns3::CcnxL3Protocol'])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::ContentObjectSource [enumeration]
-    module.add_enum('ContentObjectSource', ['APPLICATION', 'FORWARDED', 'CACHED'], outer_class=root_module['ns3::CcnxL3Protocol'])
-    ## ccnx-local-face.h (module 'NDNabstraction'): ns3::CcnxLocalFace [class]
-    module.add_class('CcnxLocalFace', parent=root_module['ns3::CcnxFace'])
+    ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeader [enumeration]
+    module.add_enum('', ['NORMAL_INTEREST', 'NACK_LOOP', 'NACK_CONGESTION', 'NACK_GIVEUP_PIT'], outer_class=root_module['ns3::CcnxInterestHeader'])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponents [class]
     module.add_class('CcnxNameComponents', parent=root_module['ns3::SimpleRefCount< ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> >'])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponentsChecker [class]
     module.add_class('CcnxNameComponentsChecker', parent=root_module['ns3::AttributeChecker'])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponentsValue [class]
     module.add_class('CcnxNameComponentsValue', parent=root_module['ns3::AttributeValue'])
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::CcnxNetDeviceFace [class]
-    module.add_class('CcnxNetDeviceFace', parent=root_module['ns3::CcnxFace'])
     ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer [class]
-    module.add_class('CcnxProducer', parent=root_module['ns3::Application'])
-    ## ccnx-route.h (module 'NDNabstraction'): ns3::CcnxRoute [class]
-    module.add_class('CcnxRoute', parent=root_module['ns3::SimpleRefCount< ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> >'])
-    ## data-rate.h (module 'network'): ns3::DataRateChecker [class]
-    module.add_class('DataRateChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
-    ## data-rate.h (module 'network'): ns3::DataRateValue [class]
-    module.add_class('DataRateValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
-    ## drop-tail-queue.h (module 'network'): ns3::DropTailQueue [class]
-    module.add_class('DropTailQueue', import_from_module='ns.network', parent=root_module['ns3::Queue'])
-    ## drop-tail-queue.h (module 'network'): ns3::DropTailQueue::Mode [enumeration]
-    module.add_enum('Mode', ['ILLEGAL', 'PACKETS', 'BYTES'], outer_class=root_module['ns3::DropTailQueue'], import_from_module='ns.network')
+    module.add_class('CcnxProducer', parent=root_module['ns3::CcnxApp'])
     ## attribute.h (module 'core'): ns3::EmptyAttributeValue [class]
     module.add_class('EmptyAttributeValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## event-impl.h (module 'core'): ns3::EventImpl [class]
@@ -418,10 +278,6 @@ def register_types(module):
     module.add_class('Ipv6PrefixChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## ipv6-address.h (module 'network'): ns3::Ipv6PrefixValue [class]
     module.add_class('Ipv6PrefixValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressChecker [class]
-    module.add_class('Mac48AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressValue [class]
-    module.add_class('Mac48AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
     ## net-device.h (module 'network'): ns3::NetDevice [class]
     module.add_class('NetDevice', import_from_module='ns.network', parent=root_module['ns3::Object'])
     ## net-device.h (module 'network'): ns3::NetDevice::PacketType [enumeration]
@@ -434,28 +290,14 @@ def register_types(module):
     module.add_class('ObjectFactoryChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## object-factory.h (module 'core'): ns3::ObjectFactoryValue [class]
     module.add_class('ObjectFactoryValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## output-stream-wrapper.h (module 'network'): ns3::OutputStreamWrapper [class]
-    module.add_class('OutputStreamWrapper', import_from_module='ns.network', parent=root_module['ns3::SimpleRefCount< ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >'])
     ## packet.h (module 'network'): ns3::Packet [class]
     module.add_class('Packet', import_from_module='ns.network', parent=root_module['ns3::SimpleRefCount< ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> >'])
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::PointToPointNetDevice [class]
-    module.add_class('PointToPointNetDevice', import_from_module='ns.point_to_point', parent=root_module['ns3::NetDevice'])
-    ## pointer.h (module 'core'): ns3::PointerChecker [class]
-    module.add_class('PointerChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
-    ## pointer.h (module 'core'): ns3::PointerValue [class]
-    module.add_class('PointerValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## random-variable.h (module 'core'): ns3::RandomVariableChecker [class]
     module.add_class('RandomVariableChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## random-variable.h (module 'core'): ns3::RandomVariableValue [class]
     module.add_class('RandomVariableValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## string.h (module 'core'): ns3::StringChecker [class]
-    module.add_class('StringChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
-    ## string.h (module 'core'): ns3::StringValue [class]
-    module.add_class('StringValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## stupid-interest-generator.h (module 'NDNabstraction'): ns3::StupidInterestGenerator [class]
-    module.add_class('StupidInterestGenerator', parent=root_module['ns3::Application'])
-    ## stupid-interest-sink.h (module 'NDNabstraction'): ns3::StupidInterestSink [class]
-    module.add_class('StupidInterestSink', parent=root_module['ns3::Application'])
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::RocketfuelWeightsReader [class]
+    module.add_class('RocketfuelWeightsReader', parent=root_module['ns3::TopologyReader'])
     ## nstime.h (module 'core'): ns3::TimeChecker [class]
     module.add_class('TimeChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## nstime.h (module 'core'): ns3::TimeValue [class]
@@ -464,38 +306,13 @@ def register_types(module):
     module.add_class('TypeIdChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## type-id.h (module 'core'): ns3::TypeIdValue [class]
     module.add_class('TypeIdValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## uinteger.h (module 'core'): ns3::UintegerValue [class]
-    module.add_class('UintegerValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## address.h (module 'network'): ns3::AddressChecker [class]
     module.add_class('AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## address.h (module 'network'): ns3::AddressValue [class]
     module.add_class('AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
-    ## ccnx-bestroute-strategy.h (module 'NDNabstraction'): ns3::CcnxBestRouteStrategy [class]
-    module.add_class('CcnxBestRouteStrategy', parent=root_module['ns3::CcnxForwardingStrategy'])
-    ## ccnx-flooding-strategy.h (module 'NDNabstraction'): ns3::CcnxFloodingStrategy [class]
-    module.add_class('CcnxFloodingStrategy', parent=root_module['ns3::CcnxForwardingStrategy'])
     module.add_container('std::map< std::string, std::string >', ('std::string', 'std::string'), container_type='map')
     module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
-    module.add_container('std::list< ns3::Ptr< ns3::Socket > >', 'ns3::Ptr< ns3::Socket >', container_type='list')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) *', 'ns3::LogNodePrinter')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) **', 'ns3::LogNodePrinter*')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) *&', 'ns3::LogNodePrinter&')
-    typehandlers.add_type_alias('std::_Rb_tree_iterator< std::pair< int const, double > >', 'ns3::PitBucketIterator')
-    typehandlers.add_type_alias('std::_Rb_tree_iterator< std::pair< int const, double > >*', 'ns3::PitBucketIterator*')
-    typehandlers.add_type_alias('std::_Rb_tree_iterator< std::pair< int const, double > >&', 'ns3::PitBucketIterator&')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) *', 'ns3::LogTimePrinter')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) **', 'ns3::LogTimePrinter*')
-    typehandlers.add_type_alias('void ( * ) ( std::ostream & ) *&', 'ns3::LogTimePrinter&')
-    typehandlers.add_type_alias('std::map< int, double, std::less< int >, std::allocator< std::pair< int const, double > > >', 'ns3::PitBucket')
-    typehandlers.add_type_alias('std::map< int, double, std::less< int >, std::allocator< std::pair< int const, double > > >*', 'ns3::PitBucket*')
-    typehandlers.add_type_alias('std::map< int, double, std::less< int >, std::allocator< std::pair< int const, double > > >&', 'ns3::PitBucket&')
-    
-    ## Register a nested module for the namespace CcnbParser
-    
-    nested_module = module.add_cpp_namespace('CcnbParser')
-    register_types_ns3_CcnbParser(nested_module)
-    
     
     ## Register a nested module for the namespace FatalImpl
     
@@ -509,69 +326,6 @@ def register_types(module):
     register_types_ns3_internal(nested_module)
     
 
-def register_types_ns3_CcnbParser(module):
-    root_module = module.get_root()
-    
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser::ccn_dtag [enumeration]
-    module.add_enum('ccn_dtag', ['CCN_DTAG_Any', 'CCN_DTAG_Name', 'CCN_DTAG_Component', 'CCN_DTAG_Certificate', 'CCN_DTAG_Collection', 'CCN_DTAG_CompleteName', 'CCN_DTAG_Content', 'CCN_DTAG_SignedInfo', 'CCN_DTAG_ContentDigest', 'CCN_DTAG_ContentHash', 'CCN_DTAG_Count', 'CCN_DTAG_Header', 'CCN_DTAG_Interest', 'CCN_DTAG_Key', 'CCN_DTAG_KeyLocator', 'CCN_DTAG_KeyName', 'CCN_DTAG_Length', 'CCN_DTAG_Link', 'CCN_DTAG_LinkAuthenticator', 'CCN_DTAG_NameComponentCount', 'CCN_DTAG_RootDigest', 'CCN_DTAG_Signature', 'CCN_DTAG_Start', 'CCN_DTAG_Timestamp', 'CCN_DTAG_Type', 'CCN_DTAG_Nonce', 'CCN_DTAG_Scope', 'CCN_DTAG_Exclude', 'CCN_DTAG_Bloom', 'CCN_DTAG_BloomSeed', 'CCN_DTAG_AnswerOriginKind', 'CCN_DTAG_InterestLifetime', 'CCN_DTAG_Witness', 'CCN_DTAG_SignatureBits', 'CCN_DTAG_DigestAlgorithm', 'CCN_DTAG_BlockSize', 'CCN_DTAG_FreshnessSeconds', 'CCN_DTAG_FinalBlockID', 'CCN_DTAG_PublisherPublicKeyDigest', 'CCN_DTAG_PublisherCertificateDigest', 'CCN_DTAG_PublisherIssuerKeyDigest', 'CCN_DTAG_PublisherIssuerCertificateDigest', 'CCN_DTAG_ContentObject', 'CCN_DTAG_WrappedKey', 'CCN_DTAG_WrappingKeyIdentifier', 'CCN_DTAG_WrapAlgorithm', 'CCN_DTAG_KeyAlgorithm', 'CCN_DTAG_Label', 'CCN_DTAG_EncryptedKey', 'CCN_DTAG_EncryptedNonceKey', 'CCN_DTAG_WrappingKeyName', 'CCN_DTAG_Action', 'CCN_DTAG_FaceID', 'CCN_DTAG_IPProto', 'CCN_DTAG_Host', 'CCN_DTAG_Port', 'CCN_DTAG_MulticastInterface', 'CCN_DTAG_ForwardingFlags', 'CCN_DTAG_FaceInstance', 'CCN_DTAG_ForwardingEntry', 'CCN_DTAG_MulticastTTL', 'CCN_DTAG_MinSuffixComponents', 'CCN_DTAG_MaxSuffixComponents', 'CCN_DTAG_ChildSelector', 'CCN_DTAG_RepositoryInfo', 'CCN_DTAG_Version', 'CCN_DTAG_RepositoryVersion', 'CCN_DTAG_GlobalPrefix', 'CCN_DTAG_LocalName', 'CCN_DTAG_Policy', 'CCN_DTAG_Namespace', 'CCN_DTAG_GlobalPrefixName', 'CCN_DTAG_PolicyVersion', 'CCN_DTAG_KeyValueSet', 'CCN_DTAG_KeyValuePair', 'CCN_DTAG_IntegerValue', 'CCN_DTAG_DecimalValue', 'CCN_DTAG_StringValue', 'CCN_DTAG_BinaryValue', 'CCN_DTAG_NameValue', 'CCN_DTAG_Entry', 'CCN_DTAG_ACL', 'CCN_DTAG_ParameterizedName', 'CCN_DTAG_Prefix', 'CCN_DTAG_Suffix', 'CCN_DTAG_Root', 'CCN_DTAG_ProfileName', 'CCN_DTAG_Parameters', 'CCN_DTAG_InfoString', 'CCN_DTAG_StatusResponse', 'CCN_DTAG_StatusCode', 'CCN_DTAG_StatusText', 'NDN_DTAG_Nack', 'NDN_DTAG_Congested', 'CCN_DTAG_SequenceNumber', 'CCN_DTAG_CCNProtocolDataUnit'])
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser::ccn_tt [enumeration]
-    module.add_enum('ccn_tt', ['CCN_EXT', 'CCN_TAG', 'CCN_DTAG', 'CCN_ATTR', 'CCN_DATTR', 'CCN_BLOB', 'CCN_UDATA', 'CCN_NO_TOKEN'])
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser [enumeration]
-    module.add_enum('', ['CCN_CLOSE'])
-    ## ccnb-parser-block.h (module 'NDNabstraction'): ns3::CcnbParser::Block [class]
-    module.add_class('Block', parent=root_module['ns3::SimpleRefCount< ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> >'])
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser::CcnbDecodingException [class]
-    module.add_class('CcnbDecodingException')
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): ns3::CcnbParser::Ext [class]
-    module.add_class('Ext', parent=root_module['ns3::CcnbParser::Block'])
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguVisitor [class]
-    module.add_class('NoArguVisitor', allow_subclassing=True)
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): ns3::CcnbParser::Udata [class]
-    module.add_class('Udata', parent=root_module['ns3::CcnbParser::Block'])
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::Visitor [class]
-    module.add_class('Visitor', allow_subclassing=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguVisitor [class]
-    module.add_class('VoidNoArguVisitor', allow_subclassing=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidVisitor [class]
-    module.add_class('VoidVisitor', allow_subclassing=True)
-    ## ccnb-parser-base-attr.h (module 'NDNabstraction'): ns3::CcnbParser::BaseAttr [class]
-    module.add_class('BaseAttr', parent=root_module['ns3::CcnbParser::Block'])
-    ## ccnb-parser-base-tag.h (module 'NDNabstraction'): ns3::CcnbParser::BaseTag [class]
-    module.add_class('BaseTag', parent=root_module['ns3::CcnbParser::Block'])
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob [class]
-    module.add_class('Blob', parent=root_module['ns3::CcnbParser::Block'])
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): ns3::CcnbParser::Dattr [class]
-    module.add_class('Dattr', parent=root_module['ns3::CcnbParser::BaseAttr'])
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::DepthFirstVisitor [class]
-    module.add_class('DepthFirstVisitor', parent=root_module['ns3::CcnbParser::Visitor'])
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): ns3::CcnbParser::Dtag [class]
-    module.add_class('Dtag', parent=root_module['ns3::CcnbParser::BaseTag'])
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguDepthFirstVisitor [class]
-    module.add_class('NoArguDepthFirstVisitor', parent=root_module['ns3::CcnbParser::NoArguVisitor'])
-    ## ccnb-parser-non-negative-integer-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonNegativeIntegerVisitor [class]
-    module.add_class('NonNegativeIntegerVisitor', parent=root_module['ns3::CcnbParser::NoArguDepthFirstVisitor'])
-    ## ccnb-parser-nonce-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonceVisitor [class]
-    module.add_class('NonceVisitor', parent=root_module['ns3::CcnbParser::NoArguDepthFirstVisitor'])
-    ## ccnb-parser-string-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::StringVisitor [class]
-    module.add_class('StringVisitor', parent=root_module['ns3::CcnbParser::NoArguDepthFirstVisitor'])
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): ns3::CcnbParser::Tag [class]
-    module.add_class('Tag', parent=root_module['ns3::CcnbParser::BaseTag'])
-    ## ccnb-parser-timestamp-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::TimestampVisitor [class]
-    module.add_class('TimestampVisitor', parent=root_module['ns3::CcnbParser::NoArguDepthFirstVisitor'])
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidDepthFirstVisitor [class]
-    module.add_class('VoidDepthFirstVisitor', parent=root_module['ns3::CcnbParser::VoidVisitor'])
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguDepthFirstVisitor [class]
-    module.add_class('VoidNoArguDepthFirstVisitor', parent=root_module['ns3::CcnbParser::VoidNoArguVisitor'])
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): ns3::CcnbParser::Attr [class]
-    module.add_class('Attr', parent=root_module['ns3::CcnbParser::BaseAttr'])
-    ## ccnb-parser-content-object-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::ContentObjectVisitor [class]
-    module.add_class('ContentObjectVisitor', parent=root_module['ns3::CcnbParser::VoidDepthFirstVisitor'])
-    ## ccnb-parser-interest-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::InterestVisitor [class]
-    module.add_class('InterestVisitor', parent=root_module['ns3::CcnbParser::VoidDepthFirstVisitor'])
-    ## ccnb-parser-name-components-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NameComponentsVisitor [class]
-    module.add_class('NameComponentsVisitor', parent=root_module['ns3::CcnbParser::VoidDepthFirstVisitor'])
-    module.add_container('std::list< ns3::Ptr< ns3::CcnbParser::Block > >', 'ns3::Ptr< ns3::CcnbParser::Block >', container_type='list')
-
 def register_types_ns3_FatalImpl(module):
     root_module = module.get_root()
     
@@ -583,9 +337,6 @@ def register_types_ns3_internal(module):
 def register_methods(root_module):
     register_Ns3Address_methods(root_module, root_module['ns3::Address'])
     register_Ns3ApplicationContainer_methods(root_module, root_module['ns3::ApplicationContainer'])
-    register_Ns3AsciiTraceHelper_methods(root_module, root_module['ns3::AsciiTraceHelper'])
-    register_Ns3AsciiTraceHelperForCcnx_methods(root_module, root_module['ns3::AsciiTraceHelperForCcnx'])
-    register_Ns3AsciiTraceHelperForDevice_methods(root_module, root_module['ns3::AsciiTraceHelperForDevice'])
     register_Ns3AttributeConstructionList_methods(root_module, root_module['ns3::AttributeConstructionList'])
     register_Ns3AttributeConstructionListItem_methods(root_module, root_module['ns3::AttributeConstructionList::Item'])
     register_Ns3Buffer_methods(root_module, root_module['ns3::Buffer'])
@@ -598,46 +349,17 @@ def register_methods(root_module):
     register_Ns3CallbackBase_methods(root_module, root_module['ns3::CallbackBase'])
     register_Ns3CcnxConsumerHelper_methods(root_module, root_module['ns3::CcnxConsumerHelper'])
     register_Ns3CcnxContentObjectHeaderException_methods(root_module, root_module['ns3::CcnxContentObjectHeaderException'])
-    register_Ns3CcnxContentStoreContainer_methods(root_module, root_module['ns3::CcnxContentStoreContainer'])
-    register_Ns3CcnxContentStoreEntry_methods(root_module, root_module['ns3::CcnxContentStoreEntry'])
-    register_Ns3CcnxDecodingHelper_methods(root_module, root_module['ns3::CcnxDecodingHelper'])
-    register_Ns3CcnxEncodingHelper_methods(root_module, root_module['ns3::CcnxEncodingHelper'])
     register_Ns3CcnxFibEntryContainer_methods(root_module, root_module['ns3::CcnxFibEntryContainer'])
     register_Ns3CcnxFibFaceMetric_methods(root_module, root_module['ns3::CcnxFibFaceMetric'])
-    register_Ns3CcnxFibFaceMetricUpdateRtt_methods(root_module, root_module['ns3::CcnxFibFaceMetric::UpdateRtt'])
     register_Ns3CcnxFibFaceMetricContainer_methods(root_module, root_module['ns3::CcnxFibFaceMetricContainer'])
-    register_Ns3CcnxForwardingHelper_methods(root_module, root_module['ns3::CcnxForwardingHelper'])
-    register_Ns3CcnxHeaderHelper_methods(root_module, root_module['ns3::CcnxHeaderHelper'])
     register_Ns3CcnxInterestHeaderException_methods(root_module, root_module['ns3::CcnxInterestHeaderException'])
-    register_Ns3CcnxPitEntry_methods(root_module, root_module['ns3::CcnxPitEntry'])
-    register_Ns3CcnxPitEntryAddIncoming_methods(root_module, root_module['ns3::CcnxPitEntry::AddIncoming'])
-    register_Ns3CcnxPitEntryAddOutgoing_methods(root_module, root_module['ns3::CcnxPitEntry::AddOutgoing'])
-    register_Ns3CcnxPitEntryClearIncoming_methods(root_module, root_module['ns3::CcnxPitEntry::ClearIncoming'])
-    register_Ns3CcnxPitEntryDeleteIncoming_methods(root_module, root_module['ns3::CcnxPitEntry::DeleteIncoming'])
-    register_Ns3CcnxPitEntryDeleteOutgoing_methods(root_module, root_module['ns3::CcnxPitEntry::DeleteOutgoing'])
-    register_Ns3CcnxPitEntryEstimateRttAndRemoveFace_methods(root_module, root_module['ns3::CcnxPitEntry::EstimateRttAndRemoveFace'])
-    register_Ns3CcnxPitEntryUpdateFibStatus_methods(root_module, root_module['ns3::CcnxPitEntry::UpdateFibStatus'])
-    register_Ns3CcnxPitEntryContainer_methods(root_module, root_module['ns3::CcnxPitEntryContainer'])
-    register_Ns3CcnxPitEntryIncomingFace_methods(root_module, root_module['ns3::CcnxPitEntryIncomingFace'])
-    register_Ns3CcnxPitEntryIncomingFaceContainer_methods(root_module, root_module['ns3::CcnxPitEntryIncomingFaceContainer'])
-    register_Ns3CcnxPitEntryNotFound_methods(root_module, root_module['ns3::CcnxPitEntryNotFound'])
-    register_Ns3CcnxPitEntryOutgoingFace_methods(root_module, root_module['ns3::CcnxPitEntryOutgoingFace'])
-    register_Ns3CcnxPitEntryOutgoingFaceContainer_methods(root_module, root_module['ns3::CcnxPitEntryOutgoingFaceContainer'])
     register_Ns3CcnxProducerHelper_methods(root_module, root_module['ns3::CcnxProducerHelper'])
-    register_Ns3CcnxRitByNonce_methods(root_module, root_module['ns3::CcnxRitByNonce'])
-    register_Ns3CcnxRitContainer_methods(root_module, root_module['ns3::CcnxRitContainer'])
-    register_Ns3CcnxRitEntry_methods(root_module, root_module['ns3::CcnxRitEntry'])
-    register_Ns3CcnxUnknownHeaderException_methods(root_module, root_module['ns3::CcnxUnknownHeaderException'])
-    register_Ns3DataRate_methods(root_module, root_module['ns3::DataRate'])
-    register_Ns3DataStoreEntry_methods(root_module, root_module['ns3::DataStoreEntry'])
+    register_Ns3CcnxStackHelper_methods(root_module, root_module['ns3::CcnxStackHelper'])
     register_Ns3EventId_methods(root_module, root_module['ns3::EventId'])
     register_Ns3Ipv4Address_methods(root_module, root_module['ns3::Ipv4Address'])
     register_Ns3Ipv4Mask_methods(root_module, root_module['ns3::Ipv4Mask'])
     register_Ns3Ipv6Address_methods(root_module, root_module['ns3::Ipv6Address'])
     register_Ns3Ipv6Prefix_methods(root_module, root_module['ns3::Ipv6Prefix'])
-    register_Ns3LogComponent_methods(root_module, root_module['ns3::LogComponent'])
-    register_Ns3Mac48Address_methods(root_module, root_module['ns3::Mac48Address'])
-    register_Ns3Names_methods(root_module, root_module['ns3::Names'])
     register_Ns3NetDeviceContainer_methods(root_module, root_module['ns3::NetDeviceContainer'])
     register_Ns3NodeContainer_methods(root_module, root_module['ns3::NodeContainer'])
     register_Ns3ObjectBase_methods(root_module, root_module['ns3::ObjectBase'])
@@ -650,17 +372,11 @@ def register_methods(root_module):
     register_Ns3PacketTagIteratorItem_methods(root_module, root_module['ns3::PacketTagIterator::Item'])
     register_Ns3PacketTagList_methods(root_module, root_module['ns3::PacketTagList'])
     register_Ns3PacketTagListTagData_methods(root_module, root_module['ns3::PacketTagList::TagData'])
-    register_Ns3PcapFile_methods(root_module, root_module['ns3::PcapFile'])
-    register_Ns3PcapHelper_methods(root_module, root_module['ns3::PcapHelper'])
-    register_Ns3PcapHelperForCcnx_methods(root_module, root_module['ns3::PcapHelperForCcnx'])
-    register_Ns3PcapHelperForDevice_methods(root_module, root_module['ns3::PcapHelperForDevice'])
-    register_Ns3PointToPointHelper_methods(root_module, root_module['ns3::PointToPointHelper'])
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
     register_Ns3SeedManager_methods(root_module, root_module['ns3::SeedManager'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
     register_Ns3SimpleRefCount__Ns3Chunk_Ns3ObjectBase_Ns3DefaultDeleter__lt__ns3Chunk__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
-    register_Ns3Simulator_methods(root_module, root_module['ns3::Simulator'])
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
@@ -673,7 +389,6 @@ def register_methods(root_module):
     register_Ns3ZipfVariable_methods(root_module, root_module['ns3::ZipfVariable'])
     register_Ns3Empty_methods(root_module, root_module['ns3::empty'])
     register_Ns3Int64x64_t_methods(root_module, root_module['ns3::int64x64_t'])
-    register_Ns3CcnxStackHelper_methods(root_module, root_module['ns3::CcnxStackHelper'])
     register_Ns3Chunk_methods(root_module, root_module['ns3::Chunk'])
     register_Ns3ConstantVariable_methods(root_module, root_module['ns3::ConstantVariable'])
     register_Ns3DeterministicVariable_methods(root_module, root_module['ns3::DeterministicVariable'])
@@ -688,69 +403,46 @@ def register_methods(root_module):
     register_Ns3Object_methods(root_module, root_module['ns3::Object'])
     register_Ns3ObjectAggregateIterator_methods(root_module, root_module['ns3::Object::AggregateIterator'])
     register_Ns3ParetoVariable_methods(root_module, root_module['ns3::ParetoVariable'])
-    register_Ns3PcapFileWrapper_methods(root_module, root_module['ns3::PcapFileWrapper'])
-    register_Ns3Queue_methods(root_module, root_module['ns3::Queue'])
     register_Ns3SimpleRefCount__Ns3AttributeAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeAccessor__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> >'])
     register_Ns3SimpleRefCount__Ns3AttributeChecker_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeChecker__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> >'])
     register_Ns3SimpleRefCount__Ns3AttributeValue_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeValue__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
-    register_Ns3SimpleRefCount__Ns3CcnbParserBlock_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnbParserBlock__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFace_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFace__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFaceContainer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFibEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFibEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFibEntry, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFibEntry> >'])
     register_Ns3SimpleRefCount__Ns3CcnxNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxNameComponents__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> >'])
-    register_Ns3SimpleRefCount__Ns3CcnxRoute_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxRoute__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> >'])
     register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3EventImpl__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
     register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >'])
-    register_Ns3SimpleRefCount__Ns3OutputStreamWrapper_Ns3Empty_Ns3DefaultDeleter__lt__ns3OutputStreamWrapper__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >'])
     register_Ns3SimpleRefCount__Ns3Packet_Ns3Empty_Ns3DefaultDeleter__lt__ns3Packet__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> >'])
     register_Ns3SimpleRefCount__Ns3TraceSourceAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3TraceSourceAccessor__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> >'])
-    register_Ns3Socket_methods(root_module, root_module['ns3::Socket'])
-    register_Ns3SocketAddressTag_methods(root_module, root_module['ns3::SocketAddressTag'])
-    register_Ns3SocketFactory_methods(root_module, root_module['ns3::SocketFactory'])
-    register_Ns3SocketIpTtlTag_methods(root_module, root_module['ns3::SocketIpTtlTag'])
-    register_Ns3SocketSetDontFragmentTag_methods(root_module, root_module['ns3::SocketSetDontFragmentTag'])
     register_Ns3Time_methods(root_module, root_module['ns3::Time'])
     register_Ns3TopologyReader_methods(root_module, root_module['ns3::TopologyReader'])
     register_Ns3TopologyReaderLink_methods(root_module, root_module['ns3::TopologyReader::Link'])
     register_Ns3TraceSourceAccessor_methods(root_module, root_module['ns3::TraceSourceAccessor'])
     register_Ns3Trailer_methods(root_module, root_module['ns3::Trailer'])
-    register_Ns3UdpSocketFactory_methods(root_module, root_module['ns3::UdpSocketFactory'])
     register_Ns3AnnotatedTopologyReader_methods(root_module, root_module['ns3::AnnotatedTopologyReader'])
     register_Ns3Application_methods(root_module, root_module['ns3::Application'])
     register_Ns3AttributeAccessor_methods(root_module, root_module['ns3::AttributeAccessor'])
     register_Ns3AttributeChecker_methods(root_module, root_module['ns3::AttributeChecker'])
     register_Ns3AttributeValue_methods(root_module, root_module['ns3::AttributeValue'])
-    register_Ns3BooleanChecker_methods(root_module, root_module['ns3::BooleanChecker'])
-    register_Ns3BooleanValue_methods(root_module, root_module['ns3::BooleanValue'])
     register_Ns3CallbackChecker_methods(root_module, root_module['ns3::CallbackChecker'])
     register_Ns3CallbackImplBase_methods(root_module, root_module['ns3::CallbackImplBase'])
     register_Ns3CallbackValue_methods(root_module, root_module['ns3::CallbackValue'])
     register_Ns3Ccnx_methods(root_module, root_module['ns3::Ccnx'])
+    register_Ns3CcnxApp_methods(root_module, root_module['ns3::CcnxApp'])
     register_Ns3CcnxConsumer_methods(root_module, root_module['ns3::CcnxConsumer'])
     register_Ns3CcnxContentObjectHeader_methods(root_module, root_module['ns3::CcnxContentObjectHeader'])
     register_Ns3CcnxContentObjectTail_methods(root_module, root_module['ns3::CcnxContentObjectTail'])
-    register_Ns3CcnxContentStore_methods(root_module, root_module['ns3::CcnxContentStore'])
     register_Ns3CcnxFace_methods(root_module, root_module['ns3::CcnxFace'])
     register_Ns3CcnxFaceContainer_methods(root_module, root_module['ns3::CcnxFaceContainer'])
+    register_Ns3CcnxFib_methods(root_module, root_module['ns3::CcnxFib'])
     register_Ns3CcnxFibEntry_methods(root_module, root_module['ns3::CcnxFibEntry'])
-    register_Ns3CcnxFibEntryAddOrUpdateRoutingMetric_methods(root_module, root_module['ns3::CcnxFibEntry::AddOrUpdateRoutingMetric'])
-    register_Ns3CcnxFibEntryUpdateFaceRtt_methods(root_module, root_module['ns3::CcnxFibEntry::UpdateFaceRtt'])
-    register_Ns3CcnxFibEntryUpdateStatus_methods(root_module, root_module['ns3::CcnxFibEntry::UpdateStatus'])
-    register_Ns3CcnxForwardingStrategy_methods(root_module, root_module['ns3::CcnxForwardingStrategy'])
+    register_Ns3CcnxFibEntryNoFaces_methods(root_module, root_module['ns3::CcnxFibEntry::NoFaces'])
     register_Ns3CcnxInterestHeader_methods(root_module, root_module['ns3::CcnxInterestHeader'])
-    register_Ns3CcnxInterestSender_methods(root_module, root_module['ns3::CcnxInterestSender'])
-    register_Ns3CcnxL3Protocol_methods(root_module, root_module['ns3::CcnxL3Protocol'])
-    register_Ns3CcnxLocalFace_methods(root_module, root_module['ns3::CcnxLocalFace'])
     register_Ns3CcnxNameComponents_methods(root_module, root_module['ns3::CcnxNameComponents'])
     register_Ns3CcnxNameComponentsChecker_methods(root_module, root_module['ns3::CcnxNameComponentsChecker'])
     register_Ns3CcnxNameComponentsValue_methods(root_module, root_module['ns3::CcnxNameComponentsValue'])
-    register_Ns3CcnxNetDeviceFace_methods(root_module, root_module['ns3::CcnxNetDeviceFace'])
     register_Ns3CcnxProducer_methods(root_module, root_module['ns3::CcnxProducer'])
-    register_Ns3CcnxRoute_methods(root_module, root_module['ns3::CcnxRoute'])
-    register_Ns3DataRateChecker_methods(root_module, root_module['ns3::DataRateChecker'])
-    register_Ns3DataRateValue_methods(root_module, root_module['ns3::DataRateValue'])
-    register_Ns3DropTailQueue_methods(root_module, root_module['ns3::DropTailQueue'])
     register_Ns3EmptyAttributeValue_methods(root_module, root_module['ns3::EmptyAttributeValue'])
     register_Ns3EventImpl_methods(root_module, root_module['ns3::EventImpl'])
     register_Ns3IntegerValue_methods(root_module, root_module['ns3::IntegerValue'])
@@ -762,59 +454,21 @@ def register_methods(root_module):
     register_Ns3Ipv6AddressValue_methods(root_module, root_module['ns3::Ipv6AddressValue'])
     register_Ns3Ipv6PrefixChecker_methods(root_module, root_module['ns3::Ipv6PrefixChecker'])
     register_Ns3Ipv6PrefixValue_methods(root_module, root_module['ns3::Ipv6PrefixValue'])
-    register_Ns3Mac48AddressChecker_methods(root_module, root_module['ns3::Mac48AddressChecker'])
-    register_Ns3Mac48AddressValue_methods(root_module, root_module['ns3::Mac48AddressValue'])
     register_Ns3NetDevice_methods(root_module, root_module['ns3::NetDevice'])
     register_Ns3NixVector_methods(root_module, root_module['ns3::NixVector'])
     register_Ns3Node_methods(root_module, root_module['ns3::Node'])
     register_Ns3ObjectFactoryChecker_methods(root_module, root_module['ns3::ObjectFactoryChecker'])
     register_Ns3ObjectFactoryValue_methods(root_module, root_module['ns3::ObjectFactoryValue'])
-    register_Ns3OutputStreamWrapper_methods(root_module, root_module['ns3::OutputStreamWrapper'])
     register_Ns3Packet_methods(root_module, root_module['ns3::Packet'])
-    register_Ns3PointToPointNetDevice_methods(root_module, root_module['ns3::PointToPointNetDevice'])
-    register_Ns3PointerChecker_methods(root_module, root_module['ns3::PointerChecker'])
-    register_Ns3PointerValue_methods(root_module, root_module['ns3::PointerValue'])
     register_Ns3RandomVariableChecker_methods(root_module, root_module['ns3::RandomVariableChecker'])
     register_Ns3RandomVariableValue_methods(root_module, root_module['ns3::RandomVariableValue'])
-    register_Ns3StringChecker_methods(root_module, root_module['ns3::StringChecker'])
-    register_Ns3StringValue_methods(root_module, root_module['ns3::StringValue'])
-    register_Ns3StupidInterestGenerator_methods(root_module, root_module['ns3::StupidInterestGenerator'])
-    register_Ns3StupidInterestSink_methods(root_module, root_module['ns3::StupidInterestSink'])
+    register_Ns3RocketfuelWeightsReader_methods(root_module, root_module['ns3::RocketfuelWeightsReader'])
     register_Ns3TimeChecker_methods(root_module, root_module['ns3::TimeChecker'])
     register_Ns3TimeValue_methods(root_module, root_module['ns3::TimeValue'])
     register_Ns3TypeIdChecker_methods(root_module, root_module['ns3::TypeIdChecker'])
     register_Ns3TypeIdValue_methods(root_module, root_module['ns3::TypeIdValue'])
-    register_Ns3UintegerValue_methods(root_module, root_module['ns3::UintegerValue'])
     register_Ns3AddressChecker_methods(root_module, root_module['ns3::AddressChecker'])
     register_Ns3AddressValue_methods(root_module, root_module['ns3::AddressValue'])
-    register_Ns3CcnxBestRouteStrategy_methods(root_module, root_module['ns3::CcnxBestRouteStrategy'])
-    register_Ns3CcnxFloodingStrategy_methods(root_module, root_module['ns3::CcnxFloodingStrategy'])
-    register_Ns3CcnbParserBlock_methods(root_module, root_module['ns3::CcnbParser::Block'])
-    register_Ns3CcnbParserCcnbDecodingException_methods(root_module, root_module['ns3::CcnbParser::CcnbDecodingException'])
-    register_Ns3CcnbParserExt_methods(root_module, root_module['ns3::CcnbParser::Ext'])
-    register_Ns3CcnbParserNoArguVisitor_methods(root_module, root_module['ns3::CcnbParser::NoArguVisitor'])
-    register_Ns3CcnbParserUdata_methods(root_module, root_module['ns3::CcnbParser::Udata'])
-    register_Ns3CcnbParserVisitor_methods(root_module, root_module['ns3::CcnbParser::Visitor'])
-    register_Ns3CcnbParserVoidNoArguVisitor_methods(root_module, root_module['ns3::CcnbParser::VoidNoArguVisitor'])
-    register_Ns3CcnbParserVoidVisitor_methods(root_module, root_module['ns3::CcnbParser::VoidVisitor'])
-    register_Ns3CcnbParserBaseAttr_methods(root_module, root_module['ns3::CcnbParser::BaseAttr'])
-    register_Ns3CcnbParserBaseTag_methods(root_module, root_module['ns3::CcnbParser::BaseTag'])
-    register_Ns3CcnbParserBlob_methods(root_module, root_module['ns3::CcnbParser::Blob'])
-    register_Ns3CcnbParserDattr_methods(root_module, root_module['ns3::CcnbParser::Dattr'])
-    register_Ns3CcnbParserDepthFirstVisitor_methods(root_module, root_module['ns3::CcnbParser::DepthFirstVisitor'])
-    register_Ns3CcnbParserDtag_methods(root_module, root_module['ns3::CcnbParser::Dtag'])
-    register_Ns3CcnbParserNoArguDepthFirstVisitor_methods(root_module, root_module['ns3::CcnbParser::NoArguDepthFirstVisitor'])
-    register_Ns3CcnbParserNonNegativeIntegerVisitor_methods(root_module, root_module['ns3::CcnbParser::NonNegativeIntegerVisitor'])
-    register_Ns3CcnbParserNonceVisitor_methods(root_module, root_module['ns3::CcnbParser::NonceVisitor'])
-    register_Ns3CcnbParserStringVisitor_methods(root_module, root_module['ns3::CcnbParser::StringVisitor'])
-    register_Ns3CcnbParserTag_methods(root_module, root_module['ns3::CcnbParser::Tag'])
-    register_Ns3CcnbParserTimestampVisitor_methods(root_module, root_module['ns3::CcnbParser::TimestampVisitor'])
-    register_Ns3CcnbParserVoidDepthFirstVisitor_methods(root_module, root_module['ns3::CcnbParser::VoidDepthFirstVisitor'])
-    register_Ns3CcnbParserVoidNoArguDepthFirstVisitor_methods(root_module, root_module['ns3::CcnbParser::VoidNoArguDepthFirstVisitor'])
-    register_Ns3CcnbParserAttr_methods(root_module, root_module['ns3::CcnbParser::Attr'])
-    register_Ns3CcnbParserContentObjectVisitor_methods(root_module, root_module['ns3::CcnbParser::ContentObjectVisitor'])
-    register_Ns3CcnbParserInterestVisitor_methods(root_module, root_module['ns3::CcnbParser::InterestVisitor'])
-    register_Ns3CcnbParserNameComponentsVisitor_methods(root_module, root_module['ns3::CcnbParser::NameComponentsVisitor'])
     return
 
 def register_Ns3Address_methods(root_module, cls):
@@ -936,185 +590,6 @@ def register_Ns3ApplicationContainer_methods(root_module, cls):
     cls.add_method('Stop', 
                    'void', 
                    [param('ns3::Time', 'stop')])
-    return
-
-def register_Ns3AsciiTraceHelper_methods(root_module, cls):
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelper::AsciiTraceHelper(ns3::AsciiTraceHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::AsciiTraceHelper const &', 'arg0')])
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelper::AsciiTraceHelper() [constructor]
-    cls.add_constructor([])
-    ## trace-helper.h (module 'network'): ns3::Ptr<ns3::OutputStreamWrapper> ns3::AsciiTraceHelper::CreateFileStream(std::string filename, std::_Ios_Openmode filemode=std::ios_base::out) [member function]
-    cls.add_method('CreateFileStream', 
-                   'ns3::Ptr< ns3::OutputStreamWrapper >', 
-                   [param('std::string', 'filename'), param('std::_Ios_Openmode', 'filemode', default_value='std::ios_base::out')])
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultDequeueSinkWithContext(ns3::Ptr<ns3::OutputStreamWrapper> file, std::string context, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultDequeueSinkWithContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('std::string', 'context'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultDequeueSinkWithoutContext(ns3::Ptr<ns3::OutputStreamWrapper> file, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultDequeueSinkWithoutContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultDropSinkWithContext(ns3::Ptr<ns3::OutputStreamWrapper> file, std::string context, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultDropSinkWithContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('std::string', 'context'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultDropSinkWithoutContext(ns3::Ptr<ns3::OutputStreamWrapper> file, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultDropSinkWithoutContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultEnqueueSinkWithContext(ns3::Ptr<ns3::OutputStreamWrapper> file, std::string context, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultEnqueueSinkWithContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('std::string', 'context'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultEnqueueSinkWithoutContext(ns3::Ptr<ns3::OutputStreamWrapper> file, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultEnqueueSinkWithoutContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultReceiveSinkWithContext(ns3::Ptr<ns3::OutputStreamWrapper> file, std::string context, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultReceiveSinkWithContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('std::string', 'context'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): static void ns3::AsciiTraceHelper::DefaultReceiveSinkWithoutContext(ns3::Ptr<ns3::OutputStreamWrapper> file, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('DefaultReceiveSinkWithoutContext', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'file'), param('ns3::Ptr< ns3::Packet const >', 'p')], 
-                   is_static=True)
-    ## trace-helper.h (module 'network'): std::string ns3::AsciiTraceHelper::GetFilenameFromDevice(std::string prefix, ns3::Ptr<ns3::NetDevice> device, bool useObjectNames=true) [member function]
-    cls.add_method('GetFilenameFromDevice', 
-                   'std::string', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'device'), param('bool', 'useObjectNames', default_value='true')])
-    ## trace-helper.h (module 'network'): std::string ns3::AsciiTraceHelper::GetFilenameFromInterfacePair(std::string prefix, ns3::Ptr<ns3::Object> object, uint32_t interface, bool useObjectNames=true) [member function]
-    cls.add_method('GetFilenameFromInterfacePair', 
-                   'std::string', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Object >', 'object'), param('uint32_t', 'interface'), param('bool', 'useObjectNames', default_value='true')])
-    return
-
-def register_Ns3AsciiTraceHelperForCcnx_methods(root_module, cls):
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::AsciiTraceHelperForCcnx::AsciiTraceHelperForCcnx(ns3::AsciiTraceHelperForCcnx const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::AsciiTraceHelperForCcnx const &', 'arg0')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::AsciiTraceHelperForCcnx::AsciiTraceHelperForCcnx() [constructor]
-    cls.add_constructor([])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename=false) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename', default_value='false')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(std::string prefix, std::string ccnxName, uint32_t interface, bool explicitFilename=false) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('std::string', 'ccnxName'), param('uint32_t', 'interface'), param('bool', 'explicitFilename', default_value='false')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string ccnxName, uint32_t interface) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'ccnxName'), param('uint32_t', 'interface')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(std::string prefix, ns3::CcnxFaceContainer c) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::CcnxFaceContainer', 'c')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::CcnxFaceContainer c) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::CcnxFaceContainer', 'c')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(std::string prefix, ns3::NodeContainer n) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NodeContainer', 'n')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::NodeContainer n) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::NodeContainer', 'n')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(std::string prefix, uint32_t nodeid, uint32_t deviceid, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('uint32_t', 'nodeid'), param('uint32_t', 'deviceid'), param('bool', 'explicitFilename')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnx(ns3::Ptr<ns3::OutputStreamWrapper> stream, uint32_t nodeid, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiCcnx', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('uint32_t', 'nodeid'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnxAll(std::string prefix) [member function]
-    cls.add_method('EnableAsciiCcnxAll', 
-                   'void', 
-                   [param('std::string', 'prefix')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnxAll(ns3::Ptr<ns3::OutputStreamWrapper> stream) [member function]
-    cls.add_method('EnableAsciiCcnxAll', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::AsciiTraceHelperForCcnx::EnableAsciiCcnxInternal(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiCcnxInternal', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3AsciiTraceHelperForDevice_methods(root_module, cls):
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelperForDevice::AsciiTraceHelperForDevice(ns3::AsciiTraceHelperForDevice const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::AsciiTraceHelperForDevice const &', 'arg0')])
-    ## trace-helper.h (module 'network'): ns3::AsciiTraceHelperForDevice::AsciiTraceHelperForDevice() [constructor]
-    cls.add_constructor([])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool explicitFilename=false) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'explicitFilename', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::Ptr<ns3::NetDevice> nd) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::Ptr< ns3::NetDevice >', 'nd')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(std::string prefix, std::string ndName, bool explicitFilename=false) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('std::string', 'ndName'), param('bool', 'explicitFilename', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string ndName) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'ndName')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(std::string prefix, ns3::NetDeviceContainer d) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NetDeviceContainer', 'd')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::NetDeviceContainer d) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::NetDeviceContainer', 'd')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(std::string prefix, ns3::NodeContainer n) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NodeContainer', 'n')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(ns3::Ptr<ns3::OutputStreamWrapper> stream, ns3::NodeContainer n) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('ns3::NodeContainer', 'n')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(std::string prefix, uint32_t nodeid, uint32_t deviceid, bool explicitFilename) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('uint32_t', 'nodeid'), param('uint32_t', 'deviceid'), param('bool', 'explicitFilename')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAscii(ns3::Ptr<ns3::OutputStreamWrapper> stream, uint32_t nodeid, uint32_t deviceid) [member function]
-    cls.add_method('EnableAscii', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('uint32_t', 'nodeid'), param('uint32_t', 'deviceid')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAsciiAll(std::string prefix) [member function]
-    cls.add_method('EnableAsciiAll', 
-                   'void', 
-                   [param('std::string', 'prefix')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAsciiAll(ns3::Ptr<ns3::OutputStreamWrapper> stream) [member function]
-    cls.add_method('EnableAsciiAll', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')])
-    ## trace-helper.h (module 'network'): void ns3::AsciiTraceHelperForDevice::EnableAsciiInternal(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiInternal', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'explicitFilename')], 
-                   is_pure_virtual=True, is_virtual=True)
     return
 
 def register_Ns3AttributeConstructionList_methods(root_module, cls):
@@ -1563,84 +1038,6 @@ def register_Ns3CcnxContentObjectHeaderException_methods(root_module, cls):
     cls.add_constructor([param('ns3::CcnxContentObjectHeaderException const &', 'arg0')])
     return
 
-def register_Ns3CcnxContentStoreContainer_methods(root_module, cls):
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreContainer::CcnxContentStoreContainer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreContainer::CcnxContentStoreContainer(ns3::CcnxContentStoreContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxContentStoreContainer const &', 'arg0')])
-    return
-
-def register_Ns3CcnxContentStoreEntry_methods(root_module, cls):
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreEntry::CcnxContentStoreEntry(ns3::CcnxContentStoreEntry const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxContentStoreEntry const &', 'arg0')])
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStoreEntry::CcnxContentStoreEntry(ns3::Ptr<ns3::CcnxContentObjectHeader> header, ns3::Ptr<ns3::Packet const> packet) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxContentObjectHeader >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'packet')])
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::Ptr<ns3::Packet> ns3::CcnxContentStoreEntry::GetFullyFormedCcnxPacket() const [member function]
-    cls.add_method('GetFullyFormedCcnxPacket', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [], 
-                   is_const=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxContentObjectHeader const> ns3::CcnxContentStoreEntry::GetHeader() const [member function]
-    cls.add_method('GetHeader', 
-                   'ns3::Ptr< ns3::CcnxContentObjectHeader const >', 
-                   [], 
-                   is_const=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxContentStoreEntry::GetName() const [member function]
-    cls.add_method('GetName', 
-                   'ns3::CcnxNameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::Ptr<ns3::Packet const> ns3::CcnxContentStoreEntry::GetPacket() const [member function]
-    cls.add_method('GetPacket', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True)
-    return
-
-def register_Ns3CcnxDecodingHelper_methods(root_module, cls):
-    ## ccnx-decoding-helper.h (module 'NDNabstraction'): ns3::CcnxDecodingHelper::CcnxDecodingHelper() [constructor]
-    cls.add_constructor([])
-    ## ccnx-decoding-helper.h (module 'NDNabstraction'): ns3::CcnxDecodingHelper::CcnxDecodingHelper(ns3::CcnxDecodingHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxDecodingHelper const &', 'arg0')])
-    ## ccnx-decoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxDecodingHelper::Deserialize(ns3::Buffer::Iterator start, ns3::CcnxInterestHeader & interest) [member function]
-    cls.add_method('Deserialize', 
-                   'size_t', 
-                   [param('ns3::Buffer::Iterator', 'start'), param('ns3::CcnxInterestHeader &', 'interest')], 
-                   is_static=True)
-    ## ccnx-decoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxDecodingHelper::Deserialize(ns3::Buffer::Iterator start, ns3::CcnxContentObjectHeader & contentObject) [member function]
-    cls.add_method('Deserialize', 
-                   'size_t', 
-                   [param('ns3::Buffer::Iterator', 'start'), param('ns3::CcnxContentObjectHeader &', 'contentObject')], 
-                   is_static=True)
-    return
-
-def register_Ns3CcnxEncodingHelper_methods(root_module, cls):
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): ns3::CcnxEncodingHelper::CcnxEncodingHelper() [constructor]
-    cls.add_constructor([])
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): ns3::CcnxEncodingHelper::CcnxEncodingHelper(ns3::CcnxEncodingHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxEncodingHelper const &', 'arg0')])
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::GetSerializedSize(ns3::CcnxInterestHeader const & interest) [member function]
-    cls.add_method('GetSerializedSize', 
-                   'size_t', 
-                   [param('ns3::CcnxInterestHeader const &', 'interest')], 
-                   is_static=True)
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::GetSerializedSize(ns3::CcnxContentObjectHeader const & contentObject) [member function]
-    cls.add_method('GetSerializedSize', 
-                   'size_t', 
-                   [param('ns3::CcnxContentObjectHeader const &', 'contentObject')], 
-                   is_static=True)
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::Serialize(ns3::Buffer::Iterator start, ns3::CcnxInterestHeader const & interest) [member function]
-    cls.add_method('Serialize', 
-                   'size_t', 
-                   [param('ns3::Buffer::Iterator', 'start'), param('ns3::CcnxInterestHeader const &', 'interest')], 
-                   is_static=True)
-    ## ccnx-encoding-helper.h (module 'NDNabstraction'): static size_t ns3::CcnxEncodingHelper::Serialize(ns3::Buffer::Iterator start, ns3::CcnxContentObjectHeader const & contentObject) [member function]
-    cls.add_method('Serialize', 
-                   'size_t', 
-                   [param('ns3::Buffer::Iterator', 'start'), param('ns3::CcnxContentObjectHeader const &', 'contentObject')], 
-                   is_static=True)
-    return
-
 def register_Ns3CcnxFibEntryContainer_methods(root_module, cls):
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntryContainer::CcnxFibEntryContainer() [constructor]
     cls.add_constructor([])
@@ -1660,6 +1057,10 @@ def register_Ns3CcnxFibFaceMetric_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxFace >', 
                    [], 
                    is_const=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibFaceMetric::UpdateRtt(ns3::Time const & rttSample) [member function]
+    cls.add_method('UpdateRtt', 
+                   'void', 
+                   [param('ns3::Time const &', 'rttSample')])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::m_face [variable]
     cls.add_instance_attribute('m_face', 'ns3::Ptr< ns3::CcnxFace >', is_const=False)
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::m_routingCost [variable]
@@ -1672,18 +1073,6 @@ def register_Ns3CcnxFibFaceMetric_methods(root_module, cls):
     cls.add_instance_attribute('m_status', 'ns3::CcnxFibFaceMetric::Status', is_const=False)
     return
 
-def register_Ns3CcnxFibFaceMetricUpdateRtt_methods(root_module, cls):
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::UpdateRtt::UpdateRtt(ns3::CcnxFibFaceMetric::UpdateRtt const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxFibFaceMetric::UpdateRtt const &', 'arg0')])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric::UpdateRtt::UpdateRtt(ns3::Time const & rttSample) [constructor]
-    cls.add_constructor([param('ns3::Time const &', 'rttSample')])
-    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibFaceMetric::UpdateRtt::operator()(ns3::CcnxFibFaceMetric & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxFibFaceMetric &', 'entry')], 
-                   custom_name='__call__')
-    return
-
 def register_Ns3CcnxFibFaceMetricContainer_methods(root_module, cls):
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetricContainer::CcnxFibFaceMetricContainer() [constructor]
     cls.add_constructor([])
@@ -1691,229 +1080,11 @@ def register_Ns3CcnxFibFaceMetricContainer_methods(root_module, cls):
     cls.add_constructor([param('ns3::CcnxFibFaceMetricContainer const &', 'arg0')])
     return
 
-def register_Ns3CcnxForwardingHelper_methods(root_module, cls):
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): ns3::CcnxForwardingHelper::CcnxForwardingHelper(ns3::CcnxForwardingHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxForwardingHelper const &', 'arg0')])
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): ns3::CcnxForwardingHelper::CcnxForwardingHelper() [constructor]
-    cls.add_constructor([])
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): ns3::CcnxForwardingHelper::CcnxForwardingHelper(ns3::Ccnx::ForwardingStrategy strategy) [constructor]
-    cls.add_constructor([param('ns3::Ccnx::ForwardingStrategy', 'strategy')])
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): void ns3::CcnxForwardingHelper::PrintForwardingTableAllAt(ns3::Time printTime, ns3::Ptr<ns3::OutputStreamWrapper> stream) const [member function]
-    cls.add_method('PrintForwardingTableAllAt', 
-                   'void', 
-                   [param('ns3::Time', 'printTime'), param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')], 
-                   is_const=True)
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): void ns3::CcnxForwardingHelper::PrintForwardingTableAllEvery(ns3::Time printInterval, ns3::Ptr<ns3::OutputStreamWrapper> stream) const [member function]
-    cls.add_method('PrintForwardingTableAllEvery', 
-                   'void', 
-                   [param('ns3::Time', 'printInterval'), param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')], 
-                   is_const=True)
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): void ns3::CcnxForwardingHelper::PrintForwardingTableAt(ns3::Time printTime, ns3::Ptr<ns3::Node> node, ns3::Ptr<ns3::OutputStreamWrapper> stream) const [member function]
-    cls.add_method('PrintForwardingTableAt', 
-                   'void', 
-                   [param('ns3::Time', 'printTime'), param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')], 
-                   is_const=True)
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): void ns3::CcnxForwardingHelper::PrintForwardingTableEvery(ns3::Time printInterval, ns3::Ptr<ns3::Node> node, ns3::Ptr<ns3::OutputStreamWrapper> stream) const [member function]
-    cls.add_method('PrintForwardingTableEvery', 
-                   'void', 
-                   [param('ns3::Time', 'printInterval'), param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream')], 
-                   is_const=True)
-    ## ccnx-forwarding-helper.h (module 'NDNabstraction'): void ns3::CcnxForwardingHelper::SetForwarding(ns3::Ptr<ns3::Ccnx> ccnx, ns3::Ptr<ns3::CcnxPit> pit) const [member function]
-    cls.add_method('SetForwarding', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('ns3::Ptr< ns3::CcnxPit >', 'pit')], 
-                   is_const=True)
-    return
-
-def register_Ns3CcnxHeaderHelper_methods(root_module, cls):
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::CcnxHeaderHelper() [constructor]
-    cls.add_constructor([])
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::CcnxHeaderHelper(ns3::CcnxHeaderHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxHeaderHelper const &', 'arg0')])
-    ## ccnx-header-helper.h (module 'NDNabstraction'): static ns3::CcnxHeaderHelper::Type ns3::CcnxHeaderHelper::GetCcnxHeaderType(ns3::Ptr<ns3::Packet const> packet) [member function]
-    cls.add_method('GetCcnxHeaderType', 
-                   'ns3::CcnxHeaderHelper::Type', 
-                   [param('ns3::Ptr< ns3::Packet const >', 'packet')], 
-                   is_static=True)
-    return
-
 def register_Ns3CcnxInterestHeaderException_methods(root_module, cls):
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeaderException::CcnxInterestHeaderException() [constructor]
     cls.add_constructor([])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeaderException::CcnxInterestHeaderException(ns3::CcnxInterestHeaderException const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxInterestHeaderException const &', 'arg0')])
-    return
-
-def register_Ns3CcnxPitEntry_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::CcnxPitEntry(ns3::CcnxPitEntry const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::CcnxPitEntry(ns3::Ptr<ns3::CcnxNameComponents> prefix, ns3::CcnxFibEntry const & fibEntry) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxNameComponents >', 'prefix'), param('ns3::CcnxFibEntry const &', 'fibEntry')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::Time const & ns3::CcnxPitEntry::GetExpireTime() const [member function]
-    cls.add_method('GetExpireTime', 
-                   'ns3::Time const &', 
-                   [], 
-                   is_const=True)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxPitEntry::GetPrefix() const [member function]
-    cls.add_method('GetPrefix', 
-                   'ns3::CcnxNameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_counterExpirations [variable]
-    cls.add_instance_attribute('m_counterExpirations', 'int', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_expireTime [variable]
-    cls.add_instance_attribute('m_expireTime', 'ns3::Time', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_fibEntry [variable]
-    cls.add_instance_attribute('m_fibEntry', 'ns3::CcnxFibEntry const &', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_incoming [variable]
-    cls.add_instance_attribute('m_incoming', 'boost::multi_index::multi_index_container< ns3::CcnxPitEntryIncomingFace, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryIncomingFace, ns3::Ptr< ns3::CcnxFace >, & ( ns3::CcnxPitEntryIncomingFace::m_face ) >, mpl_::na >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxPitEntryIncomingFace > >', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_outgoing [variable]
-    cls.add_instance_attribute('m_outgoing', 'boost::multi_index::multi_index_container< ns3::CcnxPitEntryOutgoingFace, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryOutgoingFace, ns3::Ptr< ns3::CcnxFace >, & ( ns3::CcnxPitEntryOutgoingFace::m_face ) >, mpl_::na >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxPitEntryOutgoingFace > >', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_prefix [variable]
-    cls.add_instance_attribute('m_prefix', 'ns3::Ptr< ns3::CcnxNameComponents >', is_const=False)
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::m_timerExpired [variable]
-    cls.add_instance_attribute('m_timerExpired', 'bool', is_const=False)
-    return
-
-def register_Ns3CcnxPitEntryAddIncoming_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddIncoming::AddIncoming(ns3::CcnxPitEntry::AddIncoming const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::AddIncoming const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddIncoming::AddIncoming(ns3::Ptr<ns3::CcnxFace> incomingFace) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'incomingFace')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::AddIncoming::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryAddOutgoing_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddOutgoing::AddOutgoing(ns3::CcnxPitEntry::AddOutgoing const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::AddOutgoing const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::AddOutgoing::AddOutgoing(ns3::Ptr<ns3::CcnxFace> outgoingFace) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'outgoingFace')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::AddOutgoing::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryClearIncoming_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::ClearIncoming::ClearIncoming(ns3::CcnxPitEntry::ClearIncoming const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::ClearIncoming const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::ClearIncoming::ClearIncoming() [constructor]
-    cls.add_constructor([])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::ClearIncoming::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryDeleteIncoming_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteIncoming::DeleteIncoming(ns3::CcnxPitEntry::DeleteIncoming const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::DeleteIncoming const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteIncoming::DeleteIncoming(ns3::Ptr<ns3::CcnxFace> face) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::DeleteIncoming::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryDeleteOutgoing_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteOutgoing::DeleteOutgoing(ns3::CcnxPitEntry::DeleteOutgoing const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::DeleteOutgoing const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::DeleteOutgoing::DeleteOutgoing(ns3::Ptr<ns3::CcnxFace> face) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::DeleteOutgoing::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryEstimateRttAndRemoveFace_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::EstimateRttAndRemoveFace::EstimateRttAndRemoveFace(ns3::CcnxPitEntry::EstimateRttAndRemoveFace const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::EstimateRttAndRemoveFace const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::EstimateRttAndRemoveFace::EstimateRttAndRemoveFace(boost::multi_index::detail::bidir_node_iterator<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntryOutgoingFace, std::allocator<ns3::CcnxPitEntryOutgoingFace> > > > outFace, ns3::Ptr<ns3::CcnxFib> fib) [constructor]
-    cls.add_constructor([param('boost::multi_index::detail::bidir_node_iterator< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntryOutgoingFace, std::allocator< ns3::CcnxPitEntryOutgoingFace > > > >', 'outFace'), param('ns3::Ptr< ns3::CcnxFib >', 'fib')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::EstimateRttAndRemoveFace::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryUpdateFibStatus_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::UpdateFibStatus::UpdateFibStatus(ns3::CcnxPitEntry::UpdateFibStatus const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntry::UpdateFibStatus const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntry::UpdateFibStatus::UpdateFibStatus(ns3::Ptr<ns3::CcnxFace> face, ns3::CcnxFibFaceMetric::Status status, ns3::Ptr<ns3::CcnxFib> fib) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('ns3::CcnxFibFaceMetric::Status', 'status'), param('ns3::Ptr< ns3::CcnxFib >', 'fib')])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): void ns3::CcnxPitEntry::UpdateFibStatus::operator()(ns3::CcnxPitEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxPitEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxPitEntryContainer_methods(root_module, cls):
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryContainer::CcnxPitEntryContainer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryContainer::CcnxPitEntryContainer(ns3::CcnxPitEntryContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryContainer const &', 'arg0')])
-    return
-
-def register_Ns3CcnxPitEntryIncomingFace_methods(root_module, cls):
-    cls.add_binary_comparison_operator('==')
-    cls.add_binary_comparison_operator('<')
-    ## ccnx-pit-entry-incoming-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace(ns3::CcnxPitEntryIncomingFace const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryIncomingFace const &', 'arg0')])
-    ## ccnx-pit-entry-incoming-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace(ns3::Ptr<ns3::CcnxFace> face) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face')])
-    ## ccnx-pit-entry-incoming-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFace::m_arrivalTime [variable]
-    cls.add_instance_attribute('m_arrivalTime', 'ns3::Time', is_const=False)
-    ## ccnx-pit-entry-incoming-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFace::m_face [variable]
-    cls.add_instance_attribute('m_face', 'ns3::Ptr< ns3::CcnxFace >', is_const=False)
-    return
-
-def register_Ns3CcnxPitEntryIncomingFaceContainer_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFaceContainer::CcnxPitEntryIncomingFaceContainer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryIncomingFaceContainer::CcnxPitEntryIncomingFaceContainer(ns3::CcnxPitEntryIncomingFaceContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryIncomingFaceContainer const &', 'arg0')])
-    return
-
-def register_Ns3CcnxPitEntryNotFound_methods(root_module, cls):
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryNotFound::CcnxPitEntryNotFound() [constructor]
-    cls.add_constructor([])
-    ## ccnx-pit.h (module 'NDNabstraction'): ns3::CcnxPitEntryNotFound::CcnxPitEntryNotFound(ns3::CcnxPitEntryNotFound const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryNotFound const &', 'arg0')])
-    return
-
-def register_Ns3CcnxPitEntryOutgoingFace_methods(root_module, cls):
-    cls.add_binary_comparison_operator('==')
-    cls.add_binary_comparison_operator('<')
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace::CcnxPitEntryOutgoingFace(ns3::CcnxPitEntryOutgoingFace const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryOutgoingFace const &', 'arg0')])
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace::CcnxPitEntryOutgoingFace(ns3::Ptr<ns3::CcnxFace> face) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face')])
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace::m_face [variable]
-    cls.add_instance_attribute('m_face', 'ns3::Ptr< ns3::CcnxFace >', is_const=False)
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace::m_retxNum [variable]
-    cls.add_instance_attribute('m_retxNum', 'uint32_t', is_const=False)
-    ## ccnx-pit-entry-outgoing-face.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFace::m_sendTime [variable]
-    cls.add_instance_attribute('m_sendTime', 'ns3::Time', is_const=False)
-    return
-
-def register_Ns3CcnxPitEntryOutgoingFaceContainer_methods(root_module, cls):
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFaceContainer::CcnxPitEntryOutgoingFaceContainer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-pit-entry.h (module 'NDNabstraction'): ns3::CcnxPitEntryOutgoingFaceContainer::CcnxPitEntryOutgoingFaceContainer(ns3::CcnxPitEntryOutgoingFaceContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxPitEntryOutgoingFaceContainer const &', 'arg0')])
     return
 
 def register_Ns3CcnxProducerHelper_methods(root_module, cls):
@@ -1939,93 +1110,63 @@ def register_Ns3CcnxProducerHelper_methods(root_module, cls):
                    [param('std::string', 'name'), param('ns3::AttributeValue const &', 'value')])
     return
 
-def register_Ns3CcnxRitByNonce_methods(root_module, cls):
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitByNonce::CcnxRitByNonce() [constructor]
+def register_Ns3CcnxStackHelper_methods(root_module, cls):
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper::CcnxStackHelper() [constructor]
     cls.add_constructor([])
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitByNonce::CcnxRitByNonce(ns3::CcnxRitByNonce const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxRitByNonce const &', 'arg0')])
-    return
-
-def register_Ns3CcnxRitContainer_methods(root_module, cls):
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitContainer::CcnxRitContainer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitContainer::CcnxRitContainer(ns3::CcnxRitContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxRitContainer const &', 'arg0')])
-    return
-
-def register_Ns3CcnxRitEntry_methods(root_module, cls):
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry::CcnxRitEntry(ns3::CcnxRitEntry const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxRitEntry const &', 'arg0')])
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry::CcnxRitEntry(ns3::CcnxNameComponents const & prefix, uint32_t nonce, ns3::Time const & timeout) [constructor]
-    cls.add_constructor([param('ns3::CcnxNameComponents const &', 'prefix'), param('uint32_t', 'nonce'), param('ns3::Time const &', 'timeout')])
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry::m_expireTime [variable]
-    cls.add_instance_attribute('m_expireTime', 'ns3::Time', is_const=False)
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry::m_nonce [variable]
-    cls.add_instance_attribute('m_nonce', 'uint32_t', is_const=False)
-    ## ccnx-rit.h (module 'NDNabstraction'): ns3::CcnxRitEntry::m_prefix [variable]
-    cls.add_instance_attribute('m_prefix', 'ns3::CcnxNameComponents', is_const=False)
-    return
-
-def register_Ns3CcnxUnknownHeaderException_methods(root_module, cls):
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException::CcnxUnknownHeaderException() [constructor]
-    cls.add_constructor([])
-    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException::CcnxUnknownHeaderException(ns3::CcnxUnknownHeaderException const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxUnknownHeaderException const &', 'arg0')])
-    return
-
-def register_Ns3DataRate_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('<')
-    cls.add_binary_comparison_operator('<=')
-    cls.add_binary_comparison_operator('==')
-    cls.add_binary_comparison_operator('>')
-    cls.add_binary_comparison_operator('>=')
-    ## data-rate.h (module 'network'): ns3::DataRate::DataRate(ns3::DataRate const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::DataRate const &', 'arg0')])
-    ## data-rate.h (module 'network'): ns3::DataRate::DataRate() [constructor]
-    cls.add_constructor([])
-    ## data-rate.h (module 'network'): ns3::DataRate::DataRate(uint64_t bps) [constructor]
-    cls.add_constructor([param('uint64_t', 'bps')])
-    ## data-rate.h (module 'network'): ns3::DataRate::DataRate(std::string rate) [constructor]
-    cls.add_constructor([param('std::string', 'rate')])
-    ## data-rate.h (module 'network'): double ns3::DataRate::CalculateTxTime(uint32_t bytes) const [member function]
-    cls.add_method('CalculateTxTime', 
-                   'double', 
-                   [param('uint32_t', 'bytes')], 
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::SetForwardingStrategy(std::string forwardingStrategy) [member function]
+    cls.add_method('SetForwardingStrategy', 
+                   'void', 
+                   [param('std::string', 'forwardingStrategy')])
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::EnableLimits(bool enable=true, ns3::Time avgRtt=ns3::Seconds( ), uint32_t avgContentObject=1100, uint32_t avgInterest=40) [member function]
+    cls.add_method('EnableLimits', 
+                   'void', 
+                   [param('bool', 'enable', default_value='true'), param('ns3::Time', 'avgRtt', default_value='ns3::Seconds(0)'), param('uint32_t', 'avgContentObject', default_value='1100'), param('uint32_t', 'avgInterest', default_value='40')])
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(std::string nodeName) const [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
+                   [param('std::string', 'nodeName')], 
                    is_const=True)
-    ## data-rate.h (module 'network'): uint64_t ns3::DataRate::GetBitRate() const [member function]
-    cls.add_method('GetBitRate', 
-                   'uint64_t', 
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(ns3::Ptr<ns3::Node> node) const [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
+                   [param('ns3::Ptr< ns3::Node >', 'node')], 
+                   is_const=True)
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(ns3::NodeContainer c) const [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
+                   [param('ns3::NodeContainer', 'c')], 
+                   is_const=True)
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::InstallAll() const [member function]
+    cls.add_method('InstallAll', 
+                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
                    [], 
                    is_const=True)
-    return
-
-def register_Ns3DataStoreEntry_methods(root_module, cls):
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::DataStoreEntry::DataStoreEntry(ns3::DataStoreEntry const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::DataStoreEntry const &', 'arg0')])
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::DataStoreEntry::DataStoreEntry(ns3::Ptr<ns3::CcnxContentObjectHeader> header, ns3::Ptr<ns3::Packet const> packet) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxContentObjectHeader >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'packet')])
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::Ptr<ns3::Packet> ns3::DataStoreEntry::GetFullyFormedCcnxPacket() const [member function]
-    cls.add_method('GetFullyFormedCcnxPacket', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [], 
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::AddRoute(std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) const [member function]
+    cls.add_method('AddRoute', 
+                   'void', 
+                   [param('std::string', 'nodeName'), param('std::string', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')], 
                    is_const=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxContentObjectHeader const> ns3::DataStoreEntry::GetHeader() const [member function]
-    cls.add_method('GetHeader', 
-                   'ns3::Ptr< ns3::CcnxContentObjectHeader const >', 
-                   [], 
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string prefix, ns3::Ptr<ns3::CcnxFace> face, int32_t metric) const [member function]
+    cls.add_method('AddRoute', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('int32_t', 'metric')], 
                    is_const=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::DataStoreEntry::GetName() const [member function]
-    cls.add_method('GetName', 
-                   'ns3::CcnxNameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::Ptr<ns3::Packet const> ns3::DataStoreEntry::GetPacket() const [member function]
-    cls.add_method('GetPacket', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True)
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::SetDefaultRoutes(bool needSet) [member function]
+    cls.add_method('SetDefaultRoutes', 
+                   'void', 
+                   [param('bool', 'needSet')])
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::InstallFakeGlobalRoutes() [member function]
+    cls.add_method('InstallFakeGlobalRoutes', 
+                   'void', 
+                   [])
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::InstallRouteTo(ns3::Ptr<ns3::Node> node) [member function]
+    cls.add_method('InstallRouteTo', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::InstallRoutesToAll() [member function]
+    cls.add_method('InstallRoutesToAll', 
+                   'void', 
+                   [])
     return
 
 def register_Ns3EventId_methods(root_module, cls):
@@ -2456,164 +1597,6 @@ def register_Ns3Ipv6Prefix_methods(root_module, cls):
                    is_const=True)
     return
 
-def register_Ns3LogComponent_methods(root_module, cls):
-    ## log.h (module 'core'): ns3::LogComponent::LogComponent(ns3::LogComponent const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::LogComponent const &', 'arg0')])
-    ## log.h (module 'core'): ns3::LogComponent::LogComponent(char const * name) [constructor]
-    cls.add_constructor([param('char const *', 'name')])
-    ## log.h (module 'core'): void ns3::LogComponent::Disable(ns3::LogLevel level) [member function]
-    cls.add_method('Disable', 
-                   'void', 
-                   [param('ns3::LogLevel', 'level')])
-    ## log.h (module 'core'): void ns3::LogComponent::Enable(ns3::LogLevel level) [member function]
-    cls.add_method('Enable', 
-                   'void', 
-                   [param('ns3::LogLevel', 'level')])
-    ## log.h (module 'core'): void ns3::LogComponent::EnvVarCheck(char const * name) [member function]
-    cls.add_method('EnvVarCheck', 
-                   'void', 
-                   [param('char const *', 'name')])
-    ## log.h (module 'core'): bool ns3::LogComponent::IsEnabled(ns3::LogLevel level) const [member function]
-    cls.add_method('IsEnabled', 
-                   'bool', 
-                   [param('ns3::LogLevel', 'level')], 
-                   is_const=True)
-    ## log.h (module 'core'): bool ns3::LogComponent::IsNoneEnabled() const [member function]
-    cls.add_method('IsNoneEnabled', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## log.h (module 'core'): char const * ns3::LogComponent::Name() const [member function]
-    cls.add_method('Name', 
-                   'char const *', 
-                   [], 
-                   is_const=True)
-    return
-
-def register_Ns3Mac48Address_methods(root_module, cls):
-    cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
-    cls.add_binary_comparison_operator('==')
-    cls.add_binary_comparison_operator('<')
-    ## mac48-address.h (module 'network'): ns3::Mac48Address::Mac48Address(ns3::Mac48Address const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Mac48Address const &', 'arg0')])
-    ## mac48-address.h (module 'network'): ns3::Mac48Address::Mac48Address() [constructor]
-    cls.add_constructor([])
-    ## mac48-address.h (module 'network'): ns3::Mac48Address::Mac48Address(char const * str) [constructor]
-    cls.add_constructor([param('char const *', 'str')])
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::Allocate() [member function]
-    cls.add_method('Allocate', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::ConvertFrom(ns3::Address const & address) [member function]
-    cls.add_method('ConvertFrom', 
-                   'ns3::Mac48Address', 
-                   [param('ns3::Address const &', 'address')], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): void ns3::Mac48Address::CopyFrom(uint8_t const * buffer) [member function]
-    cls.add_method('CopyFrom', 
-                   'void', 
-                   [param('uint8_t const *', 'buffer')])
-    ## mac48-address.h (module 'network'): void ns3::Mac48Address::CopyTo(uint8_t * buffer) const [member function]
-    cls.add_method('CopyTo', 
-                   'void', 
-                   [param('uint8_t *', 'buffer')], 
-                   is_const=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::GetBroadcast() [member function]
-    cls.add_method('GetBroadcast', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::GetMulticast(ns3::Ipv4Address address) [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Mac48Address', 
-                   [param('ns3::Ipv4Address', 'address')], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::GetMulticast(ns3::Ipv6Address address) [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Mac48Address', 
-                   [param('ns3::Ipv6Address', 'address')], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::GetMulticast6Prefix() [member function]
-    cls.add_method('GetMulticast6Prefix', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): static ns3::Mac48Address ns3::Mac48Address::GetMulticastPrefix() [member function]
-    cls.add_method('GetMulticastPrefix', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_static=True)
-    ## mac48-address.h (module 'network'): bool ns3::Mac48Address::IsBroadcast() const [member function]
-    cls.add_method('IsBroadcast', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## mac48-address.h (module 'network'): bool ns3::Mac48Address::IsGroup() const [member function]
-    cls.add_method('IsGroup', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## mac48-address.h (module 'network'): static bool ns3::Mac48Address::IsMatchingType(ns3::Address const & address) [member function]
-    cls.add_method('IsMatchingType', 
-                   'bool', 
-                   [param('ns3::Address const &', 'address')], 
-                   is_static=True)
-    return
-
-def register_Ns3Names_methods(root_module, cls):
-    ## names.h (module 'core'): ns3::Names::Names() [constructor]
-    cls.add_constructor([])
-    ## names.h (module 'core'): ns3::Names::Names(ns3::Names const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Names const &', 'arg0')])
-    ## names.h (module 'core'): static void ns3::Names::Add(std::string name, ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('Add', 
-                   'void', 
-                   [param('std::string', 'name'), param('ns3::Ptr< ns3::Object >', 'object')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Add(std::string path, std::string name, ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('Add', 
-                   'void', 
-                   [param('std::string', 'path'), param('std::string', 'name'), param('ns3::Ptr< ns3::Object >', 'object')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Add(ns3::Ptr<ns3::Object> context, std::string name, ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('Add', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Object >', 'context'), param('std::string', 'name'), param('ns3::Ptr< ns3::Object >', 'object')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Clear() [member function]
-    cls.add_method('Clear', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    ## names.h (module 'core'): static std::string ns3::Names::FindName(ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('FindName', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::Object >', 'object')], 
-                   is_static=True)
-    ## names.h (module 'core'): static std::string ns3::Names::FindPath(ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('FindPath', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::Object >', 'object')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Rename(std::string oldpath, std::string newname) [member function]
-    cls.add_method('Rename', 
-                   'void', 
-                   [param('std::string', 'oldpath'), param('std::string', 'newname')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Rename(std::string path, std::string oldname, std::string newname) [member function]
-    cls.add_method('Rename', 
-                   'void', 
-                   [param('std::string', 'path'), param('std::string', 'oldname'), param('std::string', 'newname')], 
-                   is_static=True)
-    ## names.h (module 'core'): static void ns3::Names::Rename(ns3::Ptr<ns3::Object> context, std::string oldname, std::string newname) [member function]
-    cls.add_method('Rename', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Object >', 'context'), param('std::string', 'oldname'), param('std::string', 'newname')], 
-                   is_static=True)
-    return
-
 def register_Ns3NetDeviceContainer_methods(root_module, cls):
     ## net-device-container.h (module 'network'): ns3::NetDeviceContainer::NetDeviceContainer(ns3::NetDeviceContainer const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::NetDeviceContainer const &', 'arg0')])
@@ -3034,234 +2017,6 @@ def register_Ns3PacketTagListTagData_methods(root_module, cls):
     cls.add_instance_attribute('tid', 'ns3::TypeId', is_const=False)
     return
 
-def register_Ns3PcapFile_methods(root_module, cls):
-    ## pcap-file.h (module 'network'): ns3::PcapFile::PcapFile() [constructor]
-    cls.add_constructor([])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Clear() [member function]
-    cls.add_method('Clear', 
-                   'void', 
-                   [])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Close() [member function]
-    cls.add_method('Close', 
-                   'void', 
-                   [])
-    ## pcap-file.h (module 'network'): static bool ns3::PcapFile::Diff(std::string const & f1, std::string const & f2, uint32_t & sec, uint32_t & usec, uint32_t snapLen=ns3::PcapFile::SNAPLEN_DEFAULT) [member function]
-    cls.add_method('Diff', 
-                   'bool', 
-                   [param('std::string const &', 'f1'), param('std::string const &', 'f2'), param('uint32_t &', 'sec'), param('uint32_t &', 'usec'), param('uint32_t', 'snapLen', default_value='ns3::PcapFile::SNAPLEN_DEFAULT')], 
-                   is_static=True)
-    ## pcap-file.h (module 'network'): bool ns3::PcapFile::Eof() const [member function]
-    cls.add_method('Eof', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## pcap-file.h (module 'network'): bool ns3::PcapFile::Fail() const [member function]
-    cls.add_method('Fail', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## pcap-file.h (module 'network'): uint32_t ns3::PcapFile::GetDataLinkType() [member function]
-    cls.add_method('GetDataLinkType', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file.h (module 'network'): uint32_t ns3::PcapFile::GetMagic() [member function]
-    cls.add_method('GetMagic', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file.h (module 'network'): uint32_t ns3::PcapFile::GetSigFigs() [member function]
-    cls.add_method('GetSigFigs', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file.h (module 'network'): uint32_t ns3::PcapFile::GetSnapLen() [member function]
-    cls.add_method('GetSnapLen', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file.h (module 'network'): bool ns3::PcapFile::GetSwapMode() [member function]
-    cls.add_method('GetSwapMode', 
-                   'bool', 
-                   [])
-    ## pcap-file.h (module 'network'): int32_t ns3::PcapFile::GetTimeZoneOffset() [member function]
-    cls.add_method('GetTimeZoneOffset', 
-                   'int32_t', 
-                   [])
-    ## pcap-file.h (module 'network'): uint16_t ns3::PcapFile::GetVersionMajor() [member function]
-    cls.add_method('GetVersionMajor', 
-                   'uint16_t', 
-                   [])
-    ## pcap-file.h (module 'network'): uint16_t ns3::PcapFile::GetVersionMinor() [member function]
-    cls.add_method('GetVersionMinor', 
-                   'uint16_t', 
-                   [])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Init(uint32_t dataLinkType, uint32_t snapLen=ns3::PcapFile::SNAPLEN_DEFAULT, int32_t timeZoneCorrection=ns3::PcapFile::ZONE_DEFAULT, bool swapMode=false) [member function]
-    cls.add_method('Init', 
-                   'void', 
-                   [param('uint32_t', 'dataLinkType'), param('uint32_t', 'snapLen', default_value='ns3::PcapFile::SNAPLEN_DEFAULT'), param('int32_t', 'timeZoneCorrection', default_value='ns3::PcapFile::ZONE_DEFAULT'), param('bool', 'swapMode', default_value='false')])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Open(std::string const & filename, std::_Ios_Openmode mode) [member function]
-    cls.add_method('Open', 
-                   'void', 
-                   [param('std::string const &', 'filename'), param('std::_Ios_Openmode', 'mode')])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Read(uint8_t * const data, uint32_t maxBytes, uint32_t & tsSec, uint32_t & tsUsec, uint32_t & inclLen, uint32_t & origLen, uint32_t & readLen) [member function]
-    cls.add_method('Read', 
-                   'void', 
-                   [param('uint8_t * const', 'data'), param('uint32_t', 'maxBytes'), param('uint32_t &', 'tsSec'), param('uint32_t &', 'tsUsec'), param('uint32_t &', 'inclLen'), param('uint32_t &', 'origLen'), param('uint32_t &', 'readLen')])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Write(uint32_t tsSec, uint32_t tsUsec, uint8_t const * const data, uint32_t totalLen) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('uint32_t', 'tsSec'), param('uint32_t', 'tsUsec'), param('uint8_t const * const', 'data'), param('uint32_t', 'totalLen')])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Write(uint32_t tsSec, uint32_t tsUsec, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('uint32_t', 'tsSec'), param('uint32_t', 'tsUsec'), param('ns3::Ptr< ns3::Packet const >', 'p')])
-    ## pcap-file.h (module 'network'): void ns3::PcapFile::Write(uint32_t tsSec, uint32_t tsUsec, ns3::Header & header, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('uint32_t', 'tsSec'), param('uint32_t', 'tsUsec'), param('ns3::Header &', 'header'), param('ns3::Ptr< ns3::Packet const >', 'p')])
-    ## pcap-file.h (module 'network'): ns3::PcapFile::SNAPLEN_DEFAULT [variable]
-    cls.add_static_attribute('SNAPLEN_DEFAULT', 'uint32_t const', is_const=True)
-    ## pcap-file.h (module 'network'): ns3::PcapFile::ZONE_DEFAULT [variable]
-    cls.add_static_attribute('ZONE_DEFAULT', 'int32_t const', is_const=True)
-    return
-
-def register_Ns3PcapHelper_methods(root_module, cls):
-    ## trace-helper.h (module 'network'): ns3::PcapHelper::PcapHelper(ns3::PcapHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PcapHelper const &', 'arg0')])
-    ## trace-helper.h (module 'network'): ns3::PcapHelper::PcapHelper() [constructor]
-    cls.add_constructor([])
-    ## trace-helper.h (module 'network'): ns3::Ptr<ns3::PcapFileWrapper> ns3::PcapHelper::CreateFile(std::string filename, std::_Ios_Openmode filemode, uint32_t dataLinkType, uint32_t snapLen=65535, int32_t tzCorrection=0) [member function]
-    cls.add_method('CreateFile', 
-                   'ns3::Ptr< ns3::PcapFileWrapper >', 
-                   [param('std::string', 'filename'), param('std::_Ios_Openmode', 'filemode'), param('uint32_t', 'dataLinkType'), param('uint32_t', 'snapLen', default_value='65535'), param('int32_t', 'tzCorrection', default_value='0')])
-    ## trace-helper.h (module 'network'): std::string ns3::PcapHelper::GetFilenameFromDevice(std::string prefix, ns3::Ptr<ns3::NetDevice> device, bool useObjectNames=true) [member function]
-    cls.add_method('GetFilenameFromDevice', 
-                   'std::string', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'device'), param('bool', 'useObjectNames', default_value='true')])
-    ## trace-helper.h (module 'network'): std::string ns3::PcapHelper::GetFilenameFromInterfacePair(std::string prefix, ns3::Ptr<ns3::Object> object, uint32_t interface, bool useObjectNames=true) [member function]
-    cls.add_method('GetFilenameFromInterfacePair', 
-                   'std::string', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Object >', 'object'), param('uint32_t', 'interface'), param('bool', 'useObjectNames', default_value='true')])
-    return
-
-def register_Ns3PcapHelperForCcnx_methods(root_module, cls):
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::PcapHelperForCcnx::PcapHelperForCcnx(ns3::PcapHelperForCcnx const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PcapHelperForCcnx const &', 'arg0')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): ns3::PcapHelperForCcnx::PcapHelperForCcnx() [constructor]
-    cls.add_constructor([])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnx(std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename=false) [member function]
-    cls.add_method('EnablePcapCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename', default_value='false')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnx(std::string prefix, std::string ccnxName, uint32_t interface, bool explicitFilename=false) [member function]
-    cls.add_method('EnablePcapCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('std::string', 'ccnxName'), param('uint32_t', 'interface'), param('bool', 'explicitFilename', default_value='false')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnx(std::string prefix, ns3::CcnxFaceContainer c) [member function]
-    cls.add_method('EnablePcapCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::CcnxFaceContainer', 'c')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnx(std::string prefix, ns3::NodeContainer n) [member function]
-    cls.add_method('EnablePcapCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NodeContainer', 'n')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnx(std::string prefix, uint32_t nodeid, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnablePcapCcnx', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('uint32_t', 'nodeid'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnxAll(std::string prefix) [member function]
-    cls.add_method('EnablePcapCcnxAll', 
-                   'void', 
-                   [param('std::string', 'prefix')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::PcapHelperForCcnx::EnablePcapCcnxInternal(std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnablePcapCcnxInternal', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3PcapHelperForDevice_methods(root_module, cls):
-    ## trace-helper.h (module 'network'): ns3::PcapHelperForDevice::PcapHelperForDevice(ns3::PcapHelperForDevice const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PcapHelperForDevice const &', 'arg0')])
-    ## trace-helper.h (module 'network'): ns3::PcapHelperForDevice::PcapHelperForDevice() [constructor]
-    cls.add_constructor([])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcap(std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool promiscuous=false, bool explicitFilename=false) [member function]
-    cls.add_method('EnablePcap', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'promiscuous', default_value='false'), param('bool', 'explicitFilename', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcap(std::string prefix, std::string ndName, bool promiscuous=false, bool explicitFilename=false) [member function]
-    cls.add_method('EnablePcap', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('std::string', 'ndName'), param('bool', 'promiscuous', default_value='false'), param('bool', 'explicitFilename', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcap(std::string prefix, ns3::NetDeviceContainer d, bool promiscuous=false) [member function]
-    cls.add_method('EnablePcap', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NetDeviceContainer', 'd'), param('bool', 'promiscuous', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcap(std::string prefix, ns3::NodeContainer n, bool promiscuous=false) [member function]
-    cls.add_method('EnablePcap', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::NodeContainer', 'n'), param('bool', 'promiscuous', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcap(std::string prefix, uint32_t nodeid, uint32_t deviceid, bool promiscuous=false) [member function]
-    cls.add_method('EnablePcap', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('uint32_t', 'nodeid'), param('uint32_t', 'deviceid'), param('bool', 'promiscuous', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcapAll(std::string prefix, bool promiscuous=false) [member function]
-    cls.add_method('EnablePcapAll', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('bool', 'promiscuous', default_value='false')])
-    ## trace-helper.h (module 'network'): void ns3::PcapHelperForDevice::EnablePcapInternal(std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool promiscuous, bool explicitFilename) [member function]
-    cls.add_method('EnablePcapInternal', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'promiscuous'), param('bool', 'explicitFilename')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3PointToPointHelper_methods(root_module, cls):
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::PointToPointHelper::PointToPointHelper(ns3::PointToPointHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PointToPointHelper const &', 'arg0')])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::PointToPointHelper::PointToPointHelper() [constructor]
-    cls.add_constructor([])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::NetDeviceContainer ns3::PointToPointHelper::Install(ns3::NodeContainer c) [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('ns3::NodeContainer', 'c')])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::NetDeviceContainer ns3::PointToPointHelper::Install(ns3::Ptr<ns3::Node> a, ns3::Ptr<ns3::Node> b) [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('ns3::Ptr< ns3::Node >', 'a'), param('ns3::Ptr< ns3::Node >', 'b')])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::NetDeviceContainer ns3::PointToPointHelper::Install(ns3::Ptr<ns3::Node> a, std::string bName) [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('ns3::Ptr< ns3::Node >', 'a'), param('std::string', 'bName')])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::NetDeviceContainer ns3::PointToPointHelper::Install(std::string aName, ns3::Ptr<ns3::Node> b) [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('std::string', 'aName'), param('ns3::Ptr< ns3::Node >', 'b')])
-    ## point-to-point-helper.h (module 'point-to-point'): ns3::NetDeviceContainer ns3::PointToPointHelper::Install(std::string aNode, std::string bNode) [member function]
-    cls.add_method('Install', 
-                   'ns3::NetDeviceContainer', 
-                   [param('std::string', 'aNode'), param('std::string', 'bNode')])
-    ## point-to-point-helper.h (module 'point-to-point'): void ns3::PointToPointHelper::SetChannelAttribute(std::string name, ns3::AttributeValue const & value) [member function]
-    cls.add_method('SetChannelAttribute', 
-                   'void', 
-                   [param('std::string', 'name'), param('ns3::AttributeValue const &', 'value')])
-    ## point-to-point-helper.h (module 'point-to-point'): void ns3::PointToPointHelper::SetDeviceAttribute(std::string name, ns3::AttributeValue const & value) [member function]
-    cls.add_method('SetDeviceAttribute', 
-                   'void', 
-                   [param('std::string', 'name'), param('ns3::AttributeValue const &', 'value')])
-    ## point-to-point-helper.h (module 'point-to-point'): void ns3::PointToPointHelper::SetQueue(std::string type, std::string n1="", ns3::AttributeValue const & v1=ns3::EmptyAttributeValue(), std::string n2="", ns3::AttributeValue const & v2=ns3::EmptyAttributeValue(), std::string n3="", ns3::AttributeValue const & v3=ns3::EmptyAttributeValue(), std::string n4="", ns3::AttributeValue const & v4=ns3::EmptyAttributeValue()) [member function]
-    cls.add_method('SetQueue', 
-                   'void', 
-                   [param('std::string', 'type'), param('std::string', 'n1', default_value='""'), param('ns3::AttributeValue const &', 'v1', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n2', default_value='""'), param('ns3::AttributeValue const &', 'v2', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n3', default_value='""'), param('ns3::AttributeValue const &', 'v3', default_value='ns3::EmptyAttributeValue()'), param('std::string', 'n4', default_value='""'), param('ns3::AttributeValue const &', 'v4', default_value='ns3::EmptyAttributeValue()')])
-    ## point-to-point-helper.h (module 'point-to-point'): void ns3::PointToPointHelper::EnableAsciiInternal(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiInternal', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'explicitFilename')], 
-                   visibility='private', is_virtual=True)
-    ## point-to-point-helper.h (module 'point-to-point'): void ns3::PointToPointHelper::EnablePcapInternal(std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool promiscuous, bool explicitFilename) [member function]
-    cls.add_method('EnablePcapInternal', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::NetDevice >', 'nd'), param('bool', 'promiscuous'), param('bool', 'explicitFilename')], 
-                   visibility='private', is_virtual=True)
-    return
-
 def register_Ns3RandomVariable_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## random-variable.h (module 'core'): ns3::RandomVariable::RandomVariable() [constructor]
@@ -3342,96 +2097,6 @@ def register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods
     cls.add_method('Cleanup', 
                    'void', 
                    [], 
-                   is_static=True)
-    return
-
-def register_Ns3Simulator_methods(root_module, cls):
-    ## simulator.h (module 'core'): ns3::Simulator::Simulator(ns3::Simulator const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Simulator const &', 'arg0')])
-    ## simulator.h (module 'core'): static void ns3::Simulator::Cancel(ns3::EventId const & id) [member function]
-    cls.add_method('Cancel', 
-                   'void', 
-                   [param('ns3::EventId const &', 'id')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::Destroy() [member function]
-    cls.add_method('Destroy', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static uint32_t ns3::Simulator::GetContext() [member function]
-    cls.add_method('GetContext', 
-                   'uint32_t', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::GetDelayLeft(ns3::EventId const & id) [member function]
-    cls.add_method('GetDelayLeft', 
-                   'ns3::Time', 
-                   [param('ns3::EventId const &', 'id')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static ns3::Ptr<ns3::SimulatorImpl> ns3::Simulator::GetImplementation() [member function]
-    cls.add_method('GetImplementation', 
-                   'ns3::Ptr< ns3::SimulatorImpl >', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::GetMaximumSimulationTime() [member function]
-    cls.add_method('GetMaximumSimulationTime', 
-                   'ns3::Time', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static uint32_t ns3::Simulator::GetSystemId() [member function]
-    cls.add_method('GetSystemId', 
-                   'uint32_t', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static bool ns3::Simulator::IsExpired(ns3::EventId const & id) [member function]
-    cls.add_method('IsExpired', 
-                   'bool', 
-                   [param('ns3::EventId const &', 'id')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static bool ns3::Simulator::IsFinished() [member function]
-    cls.add_method('IsFinished', 
-                   'bool', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::Next() [member function]
-    cls.add_method('Next', 
-                   'ns3::Time', 
-                   [], 
-                   is_static=True, deprecated=True)
-    ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::Now() [member function]
-    cls.add_method('Now', 
-                   'ns3::Time', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::Remove(ns3::EventId const & id) [member function]
-    cls.add_method('Remove', 
-                   'void', 
-                   [param('ns3::EventId const &', 'id')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::RunOneEvent() [member function]
-    cls.add_method('RunOneEvent', 
-                   'void', 
-                   [], 
-                   is_static=True, deprecated=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::SetImplementation(ns3::Ptr<ns3::SimulatorImpl> impl) [member function]
-    cls.add_method('SetImplementation', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::SimulatorImpl >', 'impl')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::SetScheduler(ns3::ObjectFactory schedulerFactory) [member function]
-    cls.add_method('SetScheduler', 
-                   'void', 
-                   [param('ns3::ObjectFactory', 'schedulerFactory')], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::Stop() [member function]
-    cls.add_method('Stop', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::Stop(ns3::Time const & time) [member function]
-    cls.add_method('Stop', 
-                   'void', 
-                   [param('ns3::Time const &', 'time')], 
                    is_static=True)
     return
 
@@ -3774,13 +2439,13 @@ def register_Ns3Empty_methods(root_module, cls):
     return
 
 def register_Ns3Int64x64_t_methods(root_module, cls):
+    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('!=')
     cls.add_inplace_numeric_operator('*=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('/=', param('ns3::int64x64_t const &', 'right'))
     cls.add_output_stream_operator()
-    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long long unsigned int const', 'right'))
@@ -3878,53 +2543,6 @@ def register_Ns3Int64x64_t_methods(root_module, cls):
     cls.add_method('MulByInvert', 
                    'void', 
                    [param('ns3::int64x64_t const &', 'o')])
-    return
-
-def register_Ns3CcnxStackHelper_methods(root_module, cls):
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper::CcnxStackHelper() [constructor]
-    cls.add_constructor([])
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper::CcnxStackHelper(ns3::Ccnx::ForwardingStrategy arg0) [constructor]
-    cls.add_constructor([param('ns3::Ccnx::ForwardingStrategy', 'arg0')])
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper::CcnxStackHelper(ns3::CcnxStackHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxStackHelper const &', 'arg0')])
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::AddRoute(std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) [member function]
-    cls.add_method('AddRoute', 
-                   'void', 
-                   [param('std::string', 'nodeName'), param('std::string', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')])
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(std::string nodeName) const [member function]
-    cls.add_method('Install', 
-                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
-                   [param('std::string', 'nodeName')], 
-                   is_const=True)
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(ns3::Ptr<ns3::Node> node) const [member function]
-    cls.add_method('Install', 
-                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')], 
-                   is_const=True)
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::Install(ns3::NodeContainer c) const [member function]
-    cls.add_method('Install', 
-                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
-                   [param('ns3::NodeContainer', 'c')], 
-                   is_const=True)
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFaceContainer> ns3::CcnxStackHelper::InstallAll() const [member function]
-    cls.add_method('InstallAll', 
-                   'ns3::Ptr< ns3::CcnxFaceContainer >', 
-                   [], 
-                   is_const=True)
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::SetForwardingStrategy(ns3::Ccnx::ForwardingStrategy strategy) [member function]
-    cls.add_method('SetForwardingStrategy', 
-                   'void', 
-                   [param('ns3::Ccnx::ForwardingStrategy', 'strategy')])
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::EnableAsciiCcnxInternal(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnableAsciiCcnxInternal', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::OutputStreamWrapper >', 'stream'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')], 
-                   visibility='private', is_virtual=True)
-    ## ccnx-stack-helper.h (module 'NDNabstraction'): void ns3::CcnxStackHelper::EnablePcapCcnxInternal(std::string prefix, ns3::Ptr<ns3::Ccnx> ccnx, uint32_t interface, bool explicitFilename) [member function]
-    cls.add_method('EnablePcapCcnxInternal', 
-                   'void', 
-                   [param('std::string', 'prefix'), param('ns3::Ptr< ns3::Ccnx >', 'ccnx'), param('uint32_t', 'interface'), param('bool', 'explicitFilename')], 
-                   visibility='private', is_virtual=True)
     return
 
 def register_Ns3Chunk_methods(root_module, cls):
@@ -4170,170 +2788,6 @@ def register_Ns3ParetoVariable_methods(root_module, cls):
     cls.add_constructor([param('std::pair< double, double >', 'params'), param('double', 'b')])
     return
 
-def register_Ns3PcapFileWrapper_methods(root_module, cls):
-    ## pcap-file-wrapper.h (module 'network'): static ns3::TypeId ns3::PcapFileWrapper::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## pcap-file-wrapper.h (module 'network'): ns3::PcapFileWrapper::PcapFileWrapper() [constructor]
-    cls.add_constructor([])
-    ## pcap-file-wrapper.h (module 'network'): bool ns3::PcapFileWrapper::Fail() const [member function]
-    cls.add_method('Fail', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## pcap-file-wrapper.h (module 'network'): bool ns3::PcapFileWrapper::Eof() const [member function]
-    cls.add_method('Eof', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Clear() [member function]
-    cls.add_method('Clear', 
-                   'void', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Open(std::string const & filename, std::_Ios_Openmode mode) [member function]
-    cls.add_method('Open', 
-                   'void', 
-                   [param('std::string const &', 'filename'), param('std::_Ios_Openmode', 'mode')])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Close() [member function]
-    cls.add_method('Close', 
-                   'void', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Init(uint32_t dataLinkType, uint32_t snapLen=std::numeric_limits<unsigned int>::max(), int32_t tzCorrection=ns3::PcapFile::ZONE_DEFAULT) [member function]
-    cls.add_method('Init', 
-                   'void', 
-                   [param('uint32_t', 'dataLinkType'), param('uint32_t', 'snapLen', default_value='std::numeric_limits<unsigned int>::max()'), param('int32_t', 'tzCorrection', default_value='ns3::PcapFile::ZONE_DEFAULT')])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Write(ns3::Time t, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('ns3::Time', 't'), param('ns3::Ptr< ns3::Packet const >', 'p')])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Write(ns3::Time t, ns3::Header & header, ns3::Ptr<ns3::Packet const> p) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('ns3::Time', 't'), param('ns3::Header &', 'header'), param('ns3::Ptr< ns3::Packet const >', 'p')])
-    ## pcap-file-wrapper.h (module 'network'): void ns3::PcapFileWrapper::Write(ns3::Time t, uint8_t const * buffer, uint32_t length) [member function]
-    cls.add_method('Write', 
-                   'void', 
-                   [param('ns3::Time', 't'), param('uint8_t const *', 'buffer'), param('uint32_t', 'length')])
-    ## pcap-file-wrapper.h (module 'network'): uint32_t ns3::PcapFileWrapper::GetMagic() [member function]
-    cls.add_method('GetMagic', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): uint16_t ns3::PcapFileWrapper::GetVersionMajor() [member function]
-    cls.add_method('GetVersionMajor', 
-                   'uint16_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): uint16_t ns3::PcapFileWrapper::GetVersionMinor() [member function]
-    cls.add_method('GetVersionMinor', 
-                   'uint16_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): int32_t ns3::PcapFileWrapper::GetTimeZoneOffset() [member function]
-    cls.add_method('GetTimeZoneOffset', 
-                   'int32_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): uint32_t ns3::PcapFileWrapper::GetSigFigs() [member function]
-    cls.add_method('GetSigFigs', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): uint32_t ns3::PcapFileWrapper::GetSnapLen() [member function]
-    cls.add_method('GetSnapLen', 
-                   'uint32_t', 
-                   [])
-    ## pcap-file-wrapper.h (module 'network'): uint32_t ns3::PcapFileWrapper::GetDataLinkType() [member function]
-    cls.add_method('GetDataLinkType', 
-                   'uint32_t', 
-                   [])
-    return
-
-def register_Ns3Queue_methods(root_module, cls):
-    ## queue.h (module 'network'): ns3::Queue::Queue(ns3::Queue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Queue const &', 'arg0')])
-    ## queue.h (module 'network'): ns3::Queue::Queue() [constructor]
-    cls.add_constructor([])
-    ## queue.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Queue::Dequeue() [member function]
-    cls.add_method('Dequeue', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [])
-    ## queue.h (module 'network'): void ns3::Queue::DequeueAll() [member function]
-    cls.add_method('DequeueAll', 
-                   'void', 
-                   [])
-    ## queue.h (module 'network'): bool ns3::Queue::Enqueue(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Enqueue', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')])
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetNBytes() const [member function]
-    cls.add_method('GetNBytes', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetNPackets() const [member function]
-    cls.add_method('GetNPackets', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetTotalDroppedBytes() const [member function]
-    cls.add_method('GetTotalDroppedBytes', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetTotalDroppedPackets() const [member function]
-    cls.add_method('GetTotalDroppedPackets', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetTotalReceivedBytes() const [member function]
-    cls.add_method('GetTotalReceivedBytes', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): uint32_t ns3::Queue::GetTotalReceivedPackets() const [member function]
-    cls.add_method('GetTotalReceivedPackets', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): static ns3::TypeId ns3::Queue::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## queue.h (module 'network'): bool ns3::Queue::IsEmpty() const [member function]
-    cls.add_method('IsEmpty', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): ns3::Ptr<ns3::Packet const> ns3::Queue::Peek() const [member function]
-    cls.add_method('Peek', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True)
-    ## queue.h (module 'network'): void ns3::Queue::ResetStatistics() [member function]
-    cls.add_method('ResetStatistics', 
-                   'void', 
-                   [])
-    ## queue.h (module 'network'): void ns3::Queue::Drop(ns3::Ptr<ns3::Packet> packet) [member function]
-    cls.add_method('Drop', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
-                   visibility='protected')
-    ## queue.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Queue::DoDequeue() [member function]
-    cls.add_method('DoDequeue', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [], 
-                   is_pure_virtual=True, visibility='private', is_virtual=True)
-    ## queue.h (module 'network'): bool ns3::Queue::DoEnqueue(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('DoEnqueue', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   is_pure_virtual=True, visibility='private', is_virtual=True)
-    ## queue.h (module 'network'): ns3::Ptr<ns3::Packet const> ns3::Queue::DoPeek() const [member function]
-    cls.add_method('DoPeek', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, visibility='private', is_virtual=True)
-    return
-
 def register_Ns3SimpleRefCount__Ns3AttributeAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeAccessor__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::AttributeAccessor, ns3::empty, ns3::DefaultDeleter<ns3::AttributeAccessor> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -4376,18 +2830,6 @@ def register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> > const & o) [copy constructor]
     cls.add_constructor([param('ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter< ns3::CallbackImplBase > > const &', 'o')])
     ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
-def register_Ns3SimpleRefCount__Ns3CcnbParserBlock_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnbParserBlock__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter< ns3::CcnbParser::Block > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnbParser::Block, ns3::empty, ns3::DefaultDeleter<ns3::CcnbParser::Block> >::Cleanup() [member function]
     cls.add_method('Cleanup', 
                    'void', 
                    [], 
@@ -4442,18 +2884,6 @@ def register_Ns3SimpleRefCount__Ns3CcnxNameComponents_Ns3Empty_Ns3DefaultDeleter
                    is_static=True)
     return
 
-def register_Ns3SimpleRefCount__Ns3CcnxRoute_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxRoute__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter< ns3::CcnxRoute > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnxRoute, ns3::empty, ns3::DefaultDeleter<ns3::CcnxRoute> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
 def register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3EventImpl__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -4472,18 +2902,6 @@ def register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >::SimpleRefCount(ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> > const & o) [copy constructor]
     cls.add_constructor([param('ns3::SimpleRefCount< ns3::NixVector, ns3::empty, ns3::DefaultDeleter< ns3::NixVector > > const &', 'o')])
     ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
-def register_Ns3SimpleRefCount__Ns3OutputStreamWrapper_Ns3Empty_Ns3DefaultDeleter__lt__ns3OutputStreamWrapper__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >::SimpleRefCount(ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter< ns3::OutputStreamWrapper > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::OutputStreamWrapper, ns3::empty, ns3::DefaultDeleter<ns3::OutputStreamWrapper> >::Cleanup() [member function]
     cls.add_method('Cleanup', 
                    'void', 
                    [], 
@@ -4514,398 +2932,12 @@ def register_Ns3SimpleRefCount__Ns3TraceSourceAccessor_Ns3Empty_Ns3DefaultDelete
                    is_static=True)
     return
 
-def register_Ns3Socket_methods(root_module, cls):
-    ## socket.h (module 'network'): ns3::Socket::Socket(ns3::Socket const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Socket const &', 'arg0')])
-    ## socket.h (module 'network'): ns3::Socket::Socket() [constructor]
-    cls.add_constructor([])
-    ## socket.h (module 'network'): int ns3::Socket::Bind(ns3::Address const & address) [member function]
-    cls.add_method('Bind', 
-                   'int', 
-                   [param('ns3::Address const &', 'address')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::Bind() [member function]
-    cls.add_method('Bind', 
-                   'int', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::Socket::BindToNetDevice(ns3::Ptr<ns3::NetDevice> netdevice) [member function]
-    cls.add_method('BindToNetDevice', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::NetDevice >', 'netdevice')], 
-                   is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::Close() [member function]
-    cls.add_method('Close', 
-                   'int', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::Connect(ns3::Address const & address) [member function]
-    cls.add_method('Connect', 
-                   'int', 
-                   [param('ns3::Address const &', 'address')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): static ns3::Ptr<ns3::Socket> ns3::Socket::CreateSocket(ns3::Ptr<ns3::Node> node, ns3::TypeId tid) [member function]
-    cls.add_method('CreateSocket', 
-                   'ns3::Ptr< ns3::Socket >', 
-                   [param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::TypeId', 'tid')], 
-                   is_static=True)
-    ## socket.h (module 'network'): bool ns3::Socket::GetAllowBroadcast() const [member function]
-    cls.add_method('GetAllowBroadcast', 
-                   'bool', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Ptr<ns3::NetDevice> ns3::Socket::GetBoundNetDevice() [member function]
-    cls.add_method('GetBoundNetDevice', 
-                   'ns3::Ptr< ns3::NetDevice >', 
-                   [])
-    ## socket.h (module 'network'): ns3::Socket::SocketErrno ns3::Socket::GetErrno() const [member function]
-    cls.add_method('GetErrno', 
-                   'ns3::Socket::SocketErrno', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Ptr<ns3::Node> ns3::Socket::GetNode() const [member function]
-    cls.add_method('GetNode', 
-                   'ns3::Ptr< ns3::Node >', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint32_t ns3::Socket::GetRxAvailable() const [member function]
-    cls.add_method('GetRxAvailable', 
-                   'uint32_t', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::GetSockName(ns3::Address & address) const [member function]
-    cls.add_method('GetSockName', 
-                   'int', 
-                   [param('ns3::Address &', 'address')], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Socket::SocketType ns3::Socket::GetSocketType() const [member function]
-    cls.add_method('GetSocketType', 
-                   'ns3::Socket::SocketType', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint32_t ns3::Socket::GetTxAvailable() const [member function]
-    cls.add_method('GetTxAvailable', 
-                   'uint32_t', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): bool ns3::Socket::IsRecvPktInfo() const [member function]
-    cls.add_method('IsRecvPktInfo', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## socket.h (module 'network'): int ns3::Socket::Listen() [member function]
-    cls.add_method('Listen', 
-                   'int', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Socket::Recv(uint32_t maxSize, uint32_t flags) [member function]
-    cls.add_method('Recv', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [param('uint32_t', 'maxSize'), param('uint32_t', 'flags')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Socket::Recv() [member function]
-    cls.add_method('Recv', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [])
-    ## socket.h (module 'network'): int ns3::Socket::Recv(uint8_t * buf, uint32_t size, uint32_t flags) [member function]
-    cls.add_method('Recv', 
-                   'int', 
-                   [param('uint8_t *', 'buf'), param('uint32_t', 'size'), param('uint32_t', 'flags')])
-    ## socket.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Socket::RecvFrom(uint32_t maxSize, uint32_t flags, ns3::Address & fromAddress) [member function]
-    cls.add_method('RecvFrom', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [param('uint32_t', 'maxSize'), param('uint32_t', 'flags'), param('ns3::Address &', 'fromAddress')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::Socket::RecvFrom(ns3::Address & fromAddress) [member function]
-    cls.add_method('RecvFrom', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [param('ns3::Address &', 'fromAddress')])
-    ## socket.h (module 'network'): int ns3::Socket::RecvFrom(uint8_t * buf, uint32_t size, uint32_t flags, ns3::Address & fromAddress) [member function]
-    cls.add_method('RecvFrom', 
-                   'int', 
-                   [param('uint8_t *', 'buf'), param('uint32_t', 'size'), param('uint32_t', 'flags'), param('ns3::Address &', 'fromAddress')])
-    ## socket.h (module 'network'): int ns3::Socket::Send(ns3::Ptr<ns3::Packet> p, uint32_t flags) [member function]
-    cls.add_method('Send', 
-                   'int', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p'), param('uint32_t', 'flags')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::Send(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Send', 
-                   'int', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')])
-    ## socket.h (module 'network'): int ns3::Socket::Send(uint8_t const * buf, uint32_t size, uint32_t flags) [member function]
-    cls.add_method('Send', 
-                   'int', 
-                   [param('uint8_t const *', 'buf'), param('uint32_t', 'size'), param('uint32_t', 'flags')])
-    ## socket.h (module 'network'): int ns3::Socket::SendTo(ns3::Ptr<ns3::Packet> p, uint32_t flags, ns3::Address const & toAddress) [member function]
-    cls.add_method('SendTo', 
-                   'int', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p'), param('uint32_t', 'flags'), param('ns3::Address const &', 'toAddress')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::SendTo(uint8_t const * buf, uint32_t size, uint32_t flags, ns3::Address const & address) [member function]
-    cls.add_method('SendTo', 
-                   'int', 
-                   [param('uint8_t const *', 'buf'), param('uint32_t', 'size'), param('uint32_t', 'flags'), param('ns3::Address const &', 'address')])
-    ## socket.h (module 'network'): void ns3::Socket::SetAcceptCallback(ns3::Callback<bool, ns3::Ptr<ns3::Socket>, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> connectionRequest, ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> newConnectionCreated) [member function]
-    cls.add_method('SetAcceptCallback', 
-                   'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::Socket >, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'connectionRequest'), param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'newConnectionCreated')])
-    ## socket.h (module 'network'): bool ns3::Socket::SetAllowBroadcast(bool allowBroadcast) [member function]
-    cls.add_method('SetAllowBroadcast', 
-                   'bool', 
-                   [param('bool', 'allowBroadcast')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::Socket::SetCloseCallbacks(ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> normalClose, ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> errorClose) [member function]
-    cls.add_method('SetCloseCallbacks', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'normalClose'), param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'errorClose')])
-    ## socket.h (module 'network'): void ns3::Socket::SetConnectCallback(ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> connectionSucceeded, ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> connectionFailed) [member function]
-    cls.add_method('SetConnectCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'connectionSucceeded'), param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'connectionFailed')])
-    ## socket.h (module 'network'): void ns3::Socket::SetDataSentCallback(ns3::Callback<void, ns3::Ptr<ns3::Socket>, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> dataSent) [member function]
-    cls.add_method('SetDataSentCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'dataSent')])
-    ## socket.h (module 'network'): void ns3::Socket::SetRecvCallback(ns3::Callback<void, ns3::Ptr<ns3::Socket>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> arg0) [member function]
-    cls.add_method('SetRecvCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'arg0')])
-    ## socket.h (module 'network'): void ns3::Socket::SetRecvPktInfo(bool flag) [member function]
-    cls.add_method('SetRecvPktInfo', 
-                   'void', 
-                   [param('bool', 'flag')])
-    ## socket.h (module 'network'): void ns3::Socket::SetSendCallback(ns3::Callback<void, ns3::Ptr<ns3::Socket>, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> sendCb) [member function]
-    cls.add_method('SetSendCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::Socket >, unsigned int, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'sendCb')])
-    ## socket.h (module 'network'): int ns3::Socket::ShutdownRecv() [member function]
-    cls.add_method('ShutdownRecv', 
-                   'int', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): int ns3::Socket::ShutdownSend() [member function]
-    cls.add_method('ShutdownSend', 
-                   'int', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::Socket::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## socket.h (module 'network'): void ns3::Socket::NotifyConnectionFailed() [member function]
-    cls.add_method('NotifyConnectionFailed', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## socket.h (module 'network'): bool ns3::Socket::NotifyConnectionRequest(ns3::Address const & from) [member function]
-    cls.add_method('NotifyConnectionRequest', 
-                   'bool', 
-                   [param('ns3::Address const &', 'from')], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyConnectionSucceeded() [member function]
-    cls.add_method('NotifyConnectionSucceeded', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyDataRecv() [member function]
-    cls.add_method('NotifyDataRecv', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyDataSent(uint32_t size) [member function]
-    cls.add_method('NotifyDataSent', 
-                   'void', 
-                   [param('uint32_t', 'size')], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyErrorClose() [member function]
-    cls.add_method('NotifyErrorClose', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyNewConnectionCreated(ns3::Ptr<ns3::Socket> socket, ns3::Address const & from) [member function]
-    cls.add_method('NotifyNewConnectionCreated', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Socket >', 'socket'), param('ns3::Address const &', 'from')], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifyNormalClose() [member function]
-    cls.add_method('NotifyNormalClose', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## socket.h (module 'network'): void ns3::Socket::NotifySend(uint32_t spaceAvailable) [member function]
-    cls.add_method('NotifySend', 
-                   'void', 
-                   [param('uint32_t', 'spaceAvailable')], 
-                   visibility='protected')
-    return
-
-def register_Ns3SocketAddressTag_methods(root_module, cls):
-    ## socket.h (module 'network'): ns3::SocketAddressTag::SocketAddressTag(ns3::SocketAddressTag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SocketAddressTag const &', 'arg0')])
-    ## socket.h (module 'network'): ns3::SocketAddressTag::SocketAddressTag() [constructor]
-    cls.add_constructor([])
-    ## socket.h (module 'network'): void ns3::SocketAddressTag::Deserialize(ns3::TagBuffer i) [member function]
-    cls.add_method('Deserialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_virtual=True)
-    ## socket.h (module 'network'): ns3::Address ns3::SocketAddressTag::GetAddress() const [member function]
-    cls.add_method('GetAddress', 
-                   'ns3::Address', 
-                   [], 
-                   is_const=True)
-    ## socket.h (module 'network'): ns3::TypeId ns3::SocketAddressTag::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint32_t ns3::SocketAddressTag::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): static ns3::TypeId ns3::SocketAddressTag::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## socket.h (module 'network'): void ns3::SocketAddressTag::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketAddressTag::Serialize(ns3::TagBuffer i) const [member function]
-    cls.add_method('Serialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketAddressTag::SetAddress(ns3::Address addr) [member function]
-    cls.add_method('SetAddress', 
-                   'void', 
-                   [param('ns3::Address', 'addr')])
-    return
-
-def register_Ns3SocketFactory_methods(root_module, cls):
-    ## socket-factory.h (module 'network'): ns3::SocketFactory::SocketFactory(ns3::SocketFactory const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SocketFactory const &', 'arg0')])
-    ## socket-factory.h (module 'network'): ns3::SocketFactory::SocketFactory() [constructor]
-    cls.add_constructor([])
-    ## socket-factory.h (module 'network'): ns3::Ptr<ns3::Socket> ns3::SocketFactory::CreateSocket() [member function]
-    cls.add_method('CreateSocket', 
-                   'ns3::Ptr< ns3::Socket >', 
-                   [], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## socket-factory.h (module 'network'): static ns3::TypeId ns3::SocketFactory::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    return
-
-def register_Ns3SocketIpTtlTag_methods(root_module, cls):
-    ## socket.h (module 'network'): ns3::SocketIpTtlTag::SocketIpTtlTag(ns3::SocketIpTtlTag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SocketIpTtlTag const &', 'arg0')])
-    ## socket.h (module 'network'): ns3::SocketIpTtlTag::SocketIpTtlTag() [constructor]
-    cls.add_constructor([])
-    ## socket.h (module 'network'): void ns3::SocketIpTtlTag::Deserialize(ns3::TagBuffer i) [member function]
-    cls.add_method('Deserialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_virtual=True)
-    ## socket.h (module 'network'): ns3::TypeId ns3::SocketIpTtlTag::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint32_t ns3::SocketIpTtlTag::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint8_t ns3::SocketIpTtlTag::GetTtl() const [member function]
-    cls.add_method('GetTtl', 
-                   'uint8_t', 
-                   [], 
-                   is_const=True)
-    ## socket.h (module 'network'): static ns3::TypeId ns3::SocketIpTtlTag::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## socket.h (module 'network'): void ns3::SocketIpTtlTag::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketIpTtlTag::Serialize(ns3::TagBuffer i) const [member function]
-    cls.add_method('Serialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketIpTtlTag::SetTtl(uint8_t ttl) [member function]
-    cls.add_method('SetTtl', 
-                   'void', 
-                   [param('uint8_t', 'ttl')])
-    return
-
-def register_Ns3SocketSetDontFragmentTag_methods(root_module, cls):
-    ## socket.h (module 'network'): ns3::SocketSetDontFragmentTag::SocketSetDontFragmentTag(ns3::SocketSetDontFragmentTag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SocketSetDontFragmentTag const &', 'arg0')])
-    ## socket.h (module 'network'): ns3::SocketSetDontFragmentTag::SocketSetDontFragmentTag() [constructor]
-    cls.add_constructor([])
-    ## socket.h (module 'network'): void ns3::SocketSetDontFragmentTag::Deserialize(ns3::TagBuffer i) [member function]
-    cls.add_method('Deserialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketSetDontFragmentTag::Disable() [member function]
-    cls.add_method('Disable', 
-                   'void', 
-                   [])
-    ## socket.h (module 'network'): void ns3::SocketSetDontFragmentTag::Enable() [member function]
-    cls.add_method('Enable', 
-                   'void', 
-                   [])
-    ## socket.h (module 'network'): ns3::TypeId ns3::SocketSetDontFragmentTag::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): uint32_t ns3::SocketSetDontFragmentTag::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): static ns3::TypeId ns3::SocketSetDontFragmentTag::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## socket.h (module 'network'): bool ns3::SocketSetDontFragmentTag::IsEnabled() const [member function]
-    cls.add_method('IsEnabled', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## socket.h (module 'network'): void ns3::SocketSetDontFragmentTag::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## socket.h (module 'network'): void ns3::SocketSetDontFragmentTag::Serialize(ns3::TagBuffer i) const [member function]
-    cls.add_method('Serialize', 
-                   'void', 
-                   [param('ns3::TagBuffer', 'i')], 
-                   is_const=True, is_virtual=True)
-    return
-
 def register_Ns3Time_methods(root_module, cls):
+    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('!=')
     cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::Time const &', 'right'))
     cls.add_output_stream_operator()
-    cls.add_binary_comparison_operator('<=')
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
     cls.add_binary_numeric_operator('+', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
@@ -5098,17 +3130,17 @@ def register_Ns3TopologyReader_methods(root_module, cls):
                    'ns3::NodeContainer', 
                    [], 
                    is_pure_virtual=True, is_virtual=True)
-    ## topology-reader.h (module 'topology-read'): void ns3::TopologyReader::SetFileName(std::string const fileName) [member function]
+    ## topology-reader.h (module 'topology-read'): void ns3::TopologyReader::SetFileName(std::string const & fileName) [member function]
     cls.add_method('SetFileName', 
                    'void', 
-                   [param('std::string const', 'fileName')])
+                   [param('std::string const &', 'fileName')])
     return
 
 def register_Ns3TopologyReaderLink_methods(root_module, cls):
     ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link(ns3::TopologyReader::Link const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::TopologyReader::Link const &', 'arg0')])
-    ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link(ns3::Ptr<ns3::Node> fromPtr, std::string fromName, ns3::Ptr<ns3::Node> toPtr, std::string toName) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'fromPtr'), param('std::string', 'fromName'), param('ns3::Ptr< ns3::Node >', 'toPtr'), param('std::string', 'toName')])
+    ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link(ns3::Ptr<ns3::Node> fromPtr, std::string const & fromName, ns3::Ptr<ns3::Node> toPtr, std::string const & toName) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'fromPtr'), param('std::string const &', 'fromName'), param('ns3::Ptr< ns3::Node >', 'toPtr'), param('std::string const &', 'toName')])
     ## topology-reader.h (module 'topology-read'): std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ns3::TopologyReader::Link::AttributesBegin() [member function]
     cls.add_method('AttributesBegin', 
                    'std::_Rb_tree_const_iterator< std::pair< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const, std::basic_string< char, std::char_traits< char >, std::allocator< char > > > >', 
@@ -5117,15 +3149,20 @@ def register_Ns3TopologyReaderLink_methods(root_module, cls):
     cls.add_method('AttributesEnd', 
                    'std::_Rb_tree_const_iterator< std::pair< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const, std::basic_string< char, std::char_traits< char >, std::allocator< char > > > >', 
                    [])
-    ## topology-reader.h (module 'topology-read'): std::string ns3::TopologyReader::Link::GetAttribute(std::string name) const [member function]
+    ## topology-reader.h (module 'topology-read'): std::string ns3::TopologyReader::Link::GetAttribute(std::string const & name) const [member function]
     cls.add_method('GetAttribute', 
                    'std::string', 
-                   [param('std::string', 'name')], 
+                   [param('std::string const &', 'name')], 
                    is_const=True)
-    ## topology-reader.h (module 'topology-read'): bool ns3::TopologyReader::Link::GetAttributeFailSafe(std::string name, std::string & value) const [member function]
+    ## topology-reader.h (module 'topology-read'): bool ns3::TopologyReader::Link::GetAttributeFailSafe(std::string const & name, std::string & value) const [member function]
     cls.add_method('GetAttributeFailSafe', 
                    'bool', 
-                   [param('std::string', 'name'), param('std::string &', 'value')], 
+                   [param('std::string const &', 'name'), param('std::string &', 'value')], 
+                   is_const=True)
+    ## topology-reader.h (module 'topology-read'): ns3::Ptr<ns3::NetDevice> ns3::TopologyReader::Link::GetFromNetDevice() const [member function]
+    cls.add_method('GetFromNetDevice', 
+                   'ns3::Ptr< ns3::NetDevice >', 
+                   [], 
                    is_const=True)
     ## topology-reader.h (module 'topology-read'): ns3::Ptr<ns3::Node> ns3::TopologyReader::Link::GetFromNode() const [member function]
     cls.add_method('GetFromNode', 
@@ -5135,6 +3172,11 @@ def register_Ns3TopologyReaderLink_methods(root_module, cls):
     ## topology-reader.h (module 'topology-read'): std::string ns3::TopologyReader::Link::GetFromNodeName() const [member function]
     cls.add_method('GetFromNodeName', 
                    'std::string', 
+                   [], 
+                   is_const=True)
+    ## topology-reader.h (module 'topology-read'): ns3::Ptr<ns3::NetDevice> ns3::TopologyReader::Link::GetToNetDevice() const [member function]
+    cls.add_method('GetToNetDevice', 
+                   'ns3::Ptr< ns3::NetDevice >', 
                    [], 
                    is_const=True)
     ## topology-reader.h (module 'topology-read'): ns3::Ptr<ns3::Node> ns3::TopologyReader::Link::GetToNode() const [member function]
@@ -5147,10 +3189,14 @@ def register_Ns3TopologyReaderLink_methods(root_module, cls):
                    'std::string', 
                    [], 
                    is_const=True)
-    ## topology-reader.h (module 'topology-read'): void ns3::TopologyReader::Link::SetAttribute(std::string name, std::string & value) [member function]
+    ## topology-reader.h (module 'topology-read'): void ns3::TopologyReader::Link::SetAttribute(std::string const & name, std::string const & value) [member function]
     cls.add_method('SetAttribute', 
                    'void', 
-                   [param('std::string', 'name'), param('std::string &', 'value')])
+                   [param('std::string const &', 'name'), param('std::string const &', 'value')])
+    ## topology-reader.h (module 'topology-read'): void ns3::TopologyReader::Link::SetNetDevices(ns3::Ptr<ns3::NetDevice> from, ns3::Ptr<ns3::NetDevice> to) [member function]
+    cls.add_method('SetNetDevices', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice >', 'from'), param('ns3::Ptr< ns3::NetDevice >', 'to')])
     return
 
 def register_Ns3TraceSourceAccessor_methods(root_module, cls):
@@ -5213,35 +3259,27 @@ def register_Ns3Trailer_methods(root_module, cls):
                    is_pure_virtual=True, is_const=True, is_virtual=True)
     return
 
-def register_Ns3UdpSocketFactory_methods(root_module, cls):
-    ## udp-socket-factory.h (module 'internet'): ns3::UdpSocketFactory::UdpSocketFactory() [constructor]
-    cls.add_constructor([])
-    ## udp-socket-factory.h (module 'internet'): ns3::UdpSocketFactory::UdpSocketFactory(ns3::UdpSocketFactory const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::UdpSocketFactory const &', 'arg0')])
-    ## udp-socket-factory.h (module 'internet'): static ns3::TypeId ns3::UdpSocketFactory::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    return
-
 def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
     ## annotated-topology-reader.h (module 'NDNabstraction'): static ns3::TypeId ns3::AnnotatedTopologyReader::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::AnnotatedTopologyReader::AnnotatedTopologyReader() [constructor]
-    cls.add_constructor([])
+    ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::AnnotatedTopologyReader::AnnotatedTopologyReader(std::string const & path="") [constructor]
+    cls.add_constructor([param('std::string const &', 'path', default_value='""')])
     ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::NodeContainer ns3::AnnotatedTopologyReader::Read() [member function]
     cls.add_method('Read', 
                    'ns3::NodeContainer', 
                    [], 
                    is_virtual=True)
-    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplySettings(ns3::NetDeviceContainer * ndc, ns3::NodeContainer * nc) [member function]
-    cls.add_method('ApplySettings', 
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::SetBoundingBox(double ulx, double uly, double lrx, double lry) [member function]
+    cls.add_method('SetBoundingBox', 
                    'void', 
-                   [param('ns3::NetDeviceContainer *', 'ndc'), param('ns3::NodeContainer *', 'nc')])
+                   [param('double', 'ulx'), param('double', 'uly'), param('double', 'lrx'), param('double', 'lry')])
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::AssignIpv4Addresses(ns3::Ipv4Address base) [member function]
+    cls.add_method('AssignIpv4Addresses', 
+                   'void', 
+                   [param('ns3::Ipv4Address', 'base')])
     return
 
 def register_Ns3Application_methods(root_module, cls):
@@ -5285,12 +3323,12 @@ def register_Ns3Application_methods(root_module, cls):
     cls.add_method('StartApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     ## application.h (module 'network'): void ns3::Application::StopApplication() [member function]
     cls.add_method('StopApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     return
 
 def register_Ns3AttributeAccessor_methods(root_module, cls):
@@ -5384,47 +3422,6 @@ def register_Ns3AttributeValue_methods(root_module, cls):
                    is_pure_virtual=True, is_const=True, is_virtual=True)
     return
 
-def register_Ns3BooleanChecker_methods(root_module, cls):
-    ## boolean.h (module 'core'): ns3::BooleanChecker::BooleanChecker() [constructor]
-    cls.add_constructor([])
-    ## boolean.h (module 'core'): ns3::BooleanChecker::BooleanChecker(ns3::BooleanChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::BooleanChecker const &', 'arg0')])
-    return
-
-def register_Ns3BooleanValue_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue(ns3::BooleanValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::BooleanValue const &', 'arg0')])
-    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue() [constructor]
-    cls.add_constructor([])
-    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue(bool value) [constructor]
-    cls.add_constructor([param('bool', 'value')])
-    ## boolean.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::BooleanValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## boolean.h (module 'core'): bool ns3::BooleanValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## boolean.h (module 'core'): bool ns3::BooleanValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## boolean.h (module 'core'): std::string ns3::BooleanValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## boolean.h (module 'core'): void ns3::BooleanValue::Set(bool value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('bool', 'value')])
-    return
-
 def register_Ns3CallbackChecker_methods(root_module, cls):
     ## callback.h (module 'core'): ns3::CallbackChecker::CallbackChecker() [constructor]
     cls.add_constructor([])
@@ -5487,6 +3484,11 @@ def register_Ns3Ccnx_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxFace >', 
                    [param('uint32_t', 'face')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ccnx.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFace> ns3::Ccnx::GetFaceByNetDevice(ns3::Ptr<ns3::NetDevice> netDevice) const [member function]
+    cls.add_method('GetFaceByNetDevice', 
+                   'ns3::Ptr< ns3::CcnxFace >', 
+                   [param('ns3::Ptr< ns3::NetDevice >', 'netDevice')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
     ## ccnx.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxForwardingStrategy> ns3::Ccnx::GetForwardingStrategy() const [member function]
     cls.add_method('GetForwardingStrategy', 
                    'ns3::Ptr< ns3::CcnxForwardingStrategy >', 
@@ -5502,31 +3504,62 @@ def register_Ns3Ccnx_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ccnx.h (module 'NDNabstraction'): void ns3::Ccnx::Receive(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::Packet const> const & p) [member function]
-    cls.add_method('Receive', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::Packet const > const &', 'p')], 
-                   is_pure_virtual=True, is_virtual=True)
     ## ccnx.h (module 'NDNabstraction'): void ns3::Ccnx::RemoveFace(ns3::Ptr<ns3::CcnxFace> face) [member function]
     cls.add_method('RemoveFace', 
                    'void', 
                    [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnx.h (module 'NDNabstraction'): void ns3::Ccnx::SendContentObject(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxContentObjectHeader> const & header, ns3::Ptr<ns3::Packet> const & packet) [member function]
-    cls.add_method('SendContentObject', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxContentObjectHeader > const &', 'header'), param('ns3::Ptr< ns3::Packet > const &', 'packet')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnx.h (module 'NDNabstraction'): void ns3::Ccnx::SendInterest(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxInterestHeader> const & header, ns3::Ptr<ns3::Packet> const & packet) [member function]
-    cls.add_method('SendInterest', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxInterestHeader > const &', 'header'), param('ns3::Ptr< ns3::Packet > const &', 'packet')], 
                    is_pure_virtual=True, is_virtual=True)
     ## ccnx.h (module 'NDNabstraction'): void ns3::Ccnx::SetForwardingStrategy(ns3::Ptr<ns3::CcnxForwardingStrategy> forwardingStrategy) [member function]
     cls.add_method('SetForwardingStrategy', 
                    'void', 
                    [param('ns3::Ptr< ns3::CcnxForwardingStrategy >', 'forwardingStrategy')], 
                    is_pure_virtual=True, is_virtual=True)
+    return
+
+def register_Ns3CcnxApp_methods(root_module, cls):
+    ## ccnx-app.h (module 'NDNabstraction'): ns3::CcnxApp::CcnxApp(ns3::CcnxApp const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CcnxApp const &', 'arg0')])
+    ## ccnx-app.h (module 'NDNabstraction'): ns3::CcnxApp::CcnxApp() [constructor]
+    cls.add_constructor([])
+    ## ccnx-app.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxApp::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::OnContentObject(ns3::Ptr<const ns3::CcnxContentObjectHeader> const & contentObject, ns3::Ptr<const ns3::Packet> const & payload) [member function]
+    cls.add_method('OnContentObject', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxContentObjectHeader const > const &', 'contentObject'), param('ns3::Ptr< ns3::Packet const > const &', 'payload')], 
+                   is_virtual=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::OnInterest(ns3::Ptr<const ns3::CcnxInterestHeader> const & interest) [member function]
+    cls.add_method('OnInterest', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxInterestHeader const > const &', 'interest')], 
+                   is_virtual=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::OnNack(ns3::Ptr<const ns3::CcnxInterestHeader> const & interest) [member function]
+    cls.add_method('OnNack', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxInterestHeader const > const &', 'interest')], 
+                   is_virtual=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::RegisterProtocolHandler(ns3::Callback<bool, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
+    cls.add_method('RegisterProtocolHandler', 
+                   'void', 
+                   [param('ns3::Callback< bool, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')])
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::DoDispose() [member function]
+    cls.add_method('DoDispose', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::StartApplication() [member function]
+    cls.add_method('StartApplication', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    ## ccnx-app.h (module 'NDNabstraction'): void ns3::CcnxApp::StopApplication() [member function]
+    cls.add_method('StopApplication', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
     return
 
 def register_Ns3CcnxConsumer_methods(root_module, cls):
@@ -5539,25 +3572,21 @@ def register_Ns3CcnxConsumer_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::OnContentObject(ns3::Ptr<ns3::CcnxContentObjectHeader const> const & contentObject, ns3::Ptr<ns3::Packet const> const & payload) [member function]
+    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::OnContentObject(ns3::Ptr<const ns3::CcnxContentObjectHeader> const & contentObject, ns3::Ptr<const ns3::Packet> const & payload) [member function]
     cls.add_method('OnContentObject', 
                    'void', 
-                   [param('ns3::Ptr< ns3::CcnxContentObjectHeader const > const &', 'contentObject'), param('ns3::Ptr< ns3::Packet const > const &', 'payload')])
-    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
+                   [param('ns3::Ptr< ns3::CcnxContentObjectHeader const > const &', 'contentObject'), param('ns3::Ptr< ns3::Packet const > const &', 'payload')], 
+                   is_virtual=True)
     ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::StartApplication() [member function]
     cls.add_method('StartApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::StopApplication() [member function]
     cls.add_method('StopApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     return
 
 def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
@@ -5643,99 +3672,74 @@ def register_Ns3CcnxContentObjectTail_methods(root_module, cls):
                    is_const=True, is_virtual=True)
     return
 
-def register_Ns3CcnxContentStore_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::CcnxContentStore::CcnxContentStore() [constructor]
-    cls.add_constructor([])
-    ## ccnx-content-store.h (module 'NDNabstraction'): void ns3::CcnxContentStore::Add(ns3::Ptr<ns3::CcnxContentObjectHeader> header, ns3::Ptr<ns3::Packet const> packet) [member function]
-    cls.add_method('Add', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxContentObjectHeader >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'packet')])
-    ## ccnx-content-store.h (module 'NDNabstraction'): uint32_t ns3::CcnxContentStore::GetMaxSize() const [member function]
-    cls.add_method('GetMaxSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxContentStore::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): ns3::Ptr<ns3::Packet> ns3::CcnxContentStore::Lookup(ns3::Ptr<const ns3::CcnxInterestHeader> interest) [member function]
-    cls.add_method('Lookup', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [param('ns3::Ptr< ns3::CcnxInterestHeader const >', 'interest')])
-    ## ccnx-content-store.h (module 'NDNabstraction'): void ns3::CcnxContentStore::Print() const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [], 
-                   is_const=True)
-    ## ccnx-content-store.h (module 'NDNabstraction'): void ns3::CcnxContentStore::SetMaxSize(uint32_t maxSize) [member function]
-    cls.add_method('SetMaxSize', 
-                   'void', 
-                   [param('uint32_t', 'maxSize')])
-    return
-
 def register_Ns3CcnxFace_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     cls.add_binary_comparison_operator('==')
-    ## ccnx-face.h (module 'NDNabstraction'): ns3::CcnxFace::CcnxFace() [constructor]
-    cls.add_constructor([])
+    ## ccnx-face.h (module 'NDNabstraction'): ns3::CcnxFace::CcnxFace(ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'node')])
     ## ccnx-face.h (module 'NDNabstraction'): uint32_t ns3::CcnxFace::GetId() const [member function]
     cls.add_method('GetId', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::IsDown() const [member function]
-    cls.add_method('IsDown', 
+    ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::IsBelowLimit() [member function]
+    cls.add_method('IsBelowLimit', 
                    'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::IsLocal() const [member function]
-    cls.add_method('IsLocal', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
+                   [])
     ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::IsUp() const [member function]
     cls.add_method('IsUp', 
                    'bool', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::LeakBucket(ns3::Time const & interval) [member function]
+    cls.add_method('LeakBucket', 
+                   'void', 
+                   [param('ns3::Time const &', 'interval')])
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::LeakBucketByOnePacket() [member function]
+    cls.add_method('LeakBucketByOnePacket', 
+                   'void', 
+                   [])
     ## ccnx-face.h (module 'NDNabstraction'): std::ostream & ns3::CcnxFace::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'std::ostream &', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
+    ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::Receive(ns3::Ptr<const ns3::Packet> const & p) [member function]
+    cls.add_method('Receive', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet const > const &', 'p')])
     ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::RegisterProtocolHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxFace> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
     cls.add_method('RegisterProtocolHandler', 
                    'void', 
                    [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::Send(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Send', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetDown() [member function]
-    cls.add_method('SetDown', 
-                   'void', 
-                   [], 
                    is_virtual=True)
+    ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::Send(ns3::Ptr<ns3::Packet> p) [member function]
+    cls.add_method('Send', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::Packet >', 'p')])
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetBucketLeak(double leak) [member function]
+    cls.add_method('SetBucketLeak', 
+                   'void', 
+                   [param('double', 'leak')])
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetBucketMax(double bucket) [member function]
+    cls.add_method('SetBucketMax', 
+                   'void', 
+                   [param('double', 'bucket')])
     ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetId(uint32_t id) [member function]
     cls.add_method('SetId', 
                    'void', 
                    [param('uint32_t', 'id')])
-    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetNode(ns3::Ptr<ns3::Node> node) [member function]
-    cls.add_method('SetNode', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')], 
-                   is_virtual=True)
-    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetUp() [member function]
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetUp(bool up=true) [member function]
     cls.add_method('SetUp', 
                    'void', 
-                   [], 
+                   [param('bool', 'up', default_value='true')], 
                    is_virtual=True)
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SendImpl(ns3::Ptr<ns3::Packet> p) [member function]
+    cls.add_method('SendImpl', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
     return
 
 def register_Ns3CcnxFaceContainer_methods(root_module, cls):
@@ -5777,22 +3781,87 @@ def register_Ns3CcnxFaceContainer_methods(root_module, cls):
                    is_const=True)
     return
 
+def register_Ns3CcnxFib_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFib::CcnxFib() [constructor]
+    cls.add_constructor([])
+    ## ccnx-fib.h (module 'NDNabstraction'): boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::random_access_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxFibEntry, std::allocator<ns3::CcnxFibEntry> > > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxFibEntry> > > ns3::CcnxFib::Add(ns3::CcnxNameComponents const & prefix, ns3::Ptr<ns3::CcnxFace> face, int32_t metric) [member function]
+    cls.add_method('Add', 
+                   'boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::random_access_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxFibEntry, std::allocator< ns3::CcnxFibEntry > > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxFibEntry > > >', 
+                   [param('ns3::CcnxNameComponents const &', 'prefix'), param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('int32_t', 'metric')])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry const & ns3::CcnxFib::GetCcnxFibEntry(uint32_t index) [member function]
+    cls.add_method('GetCcnxFibEntry', 
+                   'ns3::CcnxFibEntry const &', 
+                   [param('uint32_t', 'index')])
+    ## ccnx-fib.h (module 'NDNabstraction'): uint32_t ns3::CcnxFib::GetCcnxFibEntryCount() const [member function]
+    cls.add_method('GetCcnxFibEntryCount', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxFib::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::random_access_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxFibEntry, std::allocator<ns3::CcnxFibEntry> > > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxFibEntry> > > ns3::CcnxFib::LongestPrefixMatch(ns3::CcnxInterestHeader const & interest) const [member function]
+    cls.add_method('LongestPrefixMatch', 
+                   'boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::random_access_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxFibEntry, std::allocator< ns3::CcnxFibEntry > > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxFibEntry > > >', 
+                   [param('ns3::CcnxInterestHeader const &', 'interest')], 
+                   is_const=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFib::Remove(ns3::CcnxFibEntry const & entry, ns3::Ptr<ns3::CcnxFace> face) [member function]
+    cls.add_method('Remove', 
+                   'void', 
+                   [param('ns3::CcnxFibEntry const &', 'entry'), param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFib::RemoveFromAll(ns3::Ptr<ns3::CcnxFace> face) [member function]
+    cls.add_method('RemoveFromAll', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFib::m_fib [variable]
+    cls.add_instance_attribute('m_fib', 'boost::multi_index::multi_index_container< ns3::CcnxFibEntry, boost::multi_index::indexed_by< boost::multi_index::hashed_unique< boost::multi_index::tag< ns3::__ccnx_private::i_prefix, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::const_mem_fun< ns3::CcnxFibEntry, ns3::CcnxNameComponents const &, & ( ns3::CcnxFibEntry::GetPrefix (  ) const ) >, ns3::CcnxPrefixHash, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::__ccnx_private::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxFibEntry > >', is_const=False)
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFib::DoDispose() [member function]
+    cls.add_method('DoDispose', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFib::NotifyNewAggregate() [member function]
+    cls.add_method('NotifyNewAggregate', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    return
+
 def register_Ns3CcnxFibEntry_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::CcnxFibEntry(ns3::CcnxFibEntry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxFibEntry const &', 'arg0')])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::CcnxFibEntry(ns3::CcnxNameComponents const & prefix) [constructor]
     cls.add_constructor([param('ns3::CcnxNameComponents const &', 'prefix')])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFace> ns3::CcnxFibEntry::FindBestCandidate(int skip=0) const [member function]
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::AddOrUpdateRoutingMetric(ns3::Ptr<ns3::CcnxFace> face, int32_t metric) [member function]
+    cls.add_method('AddOrUpdateRoutingMetric', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('int32_t', 'metric')])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetric const & ns3::CcnxFibEntry::FindBestCandidate(uint32_t skip=0) const [member function]
     cls.add_method('FindBestCandidate', 
-                   'ns3::Ptr< ns3::CcnxFace >', 
-                   [param('int', 'skip', default_value='0')], 
+                   'ns3::CcnxFibFaceMetric const &', 
+                   [param('uint32_t', 'skip', default_value='0')], 
                    is_const=True)
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxFibEntry::GetPrefix() const [member function]
     cls.add_method('GetPrefix', 
                    'ns3::CcnxNameComponents const &', 
                    [], 
                    is_const=True)
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::RemoveFace(ns3::Ptr<ns3::CcnxFace> const & face) [member function]
+    cls.add_method('RemoveFace', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face')])
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::UpdateFaceRtt(ns3::Ptr<ns3::CcnxFace> face, ns3::Time const & sample) [member function]
+    cls.add_method('UpdateFaceRtt', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('ns3::Time const &', 'sample')])
+    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::UpdateStatus(ns3::Ptr<ns3::CcnxFace> face, ns3::CcnxFibFaceMetric::Status status) [member function]
+    cls.add_method('UpdateStatus', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('ns3::CcnxFibFaceMetric::Status', 'status')])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::m_faces [variable]
     cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::CcnxFibFaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxFibFaceMetric, ns3::Ptr< ns3::CcnxFace >, & ( ns3::CcnxFibFaceMetric::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::__ccnx_private::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::CcnxFibFaceMetric, boost::multi_index::member< ns3::CcnxFibFaceMetric, ns3::CcnxFibFaceMetric::Status, & ( ns3::CcnxFibFaceMetric::m_status ) >, boost::multi_index::member< ns3::CcnxFibFaceMetric, int, & ( ns3::CcnxFibFaceMetric::m_routingCost ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::__ccnx_private::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxFibFaceMetric > >', is_const=False)
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::m_needsProbing [variable]
@@ -5801,65 +3870,11 @@ def register_Ns3CcnxFibEntry_methods(root_module, cls):
     cls.add_instance_attribute('m_prefix', 'ns3::Ptr< ns3::CcnxNameComponents >', is_const=False)
     return
 
-def register_Ns3CcnxFibEntryAddOrUpdateRoutingMetric_methods(root_module, cls):
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::AddOrUpdateRoutingMetric::AddOrUpdateRoutingMetric(ns3::CcnxFibEntry::AddOrUpdateRoutingMetric const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxFibEntry::AddOrUpdateRoutingMetric const &', 'arg0')])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::AddOrUpdateRoutingMetric::AddOrUpdateRoutingMetric(ns3::Ptr<ns3::CcnxFace> face, int32_t metric) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('int32_t', 'metric')])
-    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::AddOrUpdateRoutingMetric::operator()(ns3::CcnxFibEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxFibEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxFibEntryUpdateFaceRtt_methods(root_module, cls):
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateFaceRtt::UpdateFaceRtt(ns3::CcnxFibEntry::UpdateFaceRtt const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxFibEntry::UpdateFaceRtt const &', 'arg0')])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateFaceRtt::UpdateFaceRtt(ns3::Ptr<ns3::CcnxFace> face, ns3::Time const & rttSample) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('ns3::Time const &', 'rttSample')])
-    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::UpdateFaceRtt::operator()(ns3::CcnxFibEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxFibEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxFibEntryUpdateStatus_methods(root_module, cls):
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateStatus::UpdateStatus(ns3::CcnxFibEntry::UpdateStatus const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxFibEntry::UpdateStatus const &', 'arg0')])
-    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::UpdateStatus::UpdateStatus(ns3::Ptr<ns3::CcnxFace> face, ns3::CcnxFibFaceMetric::Status status) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('ns3::CcnxFibFaceMetric::Status', 'status')])
-    ## ccnx-fib.h (module 'NDNabstraction'): void ns3::CcnxFibEntry::UpdateStatus::operator()(ns3::CcnxFibEntry & entry) [member operator]
-    cls.add_method('operator()', 
-                   'void', 
-                   [param('ns3::CcnxFibEntry &', 'entry')], 
-                   custom_name='__call__')
-    return
-
-def register_Ns3CcnxForwardingStrategy_methods(root_module, cls):
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): ns3::CcnxForwardingStrategy::CcnxForwardingStrategy(ns3::CcnxForwardingStrategy const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxForwardingStrategy const &', 'arg0')])
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): ns3::CcnxForwardingStrategy::CcnxForwardingStrategy() [constructor]
+def register_Ns3CcnxFibEntryNoFaces_methods(root_module, cls):
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::NoFaces::NoFaces() [constructor]
     cls.add_constructor([])
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxPit> ns3::CcnxForwardingStrategy::GetPit() [member function]
-    cls.add_method('GetPit', 
-                   'ns3::Ptr< ns3::CcnxPit >', 
-                   [])
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxForwardingStrategy::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): bool ns3::CcnxForwardingStrategy::PropagateInterest(boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::sequenced_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntry, std::allocator<ns3::CcnxPitEntry> > > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxPitEntry> > > pitEntry, boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxFibEntry, std::allocator<ns3::CcnxFibEntry> > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxFibEntry> > > fibEntry, ns3::Ptr<ns3::CcnxFace> const & incomingFace, ns3::Ptr<ns3::CcnxInterestHeader> & header, ns3::Ptr<ns3::Packet const> const & packet, ns3::Callback<void,const ns3::Ptr<ns3::CcnxFace>&,const ns3::Ptr<ns3::CcnxInterestHeader>&,const ns3::Ptr<ns3::Packet>&,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> ucb) [member function]
-    cls.add_method('PropagateInterest', 
-                   'bool', 
-                   [param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::sequenced_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntry, std::allocator< ns3::CcnxPitEntry > > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxPitEntry > > >', 'pitEntry'), param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxFibEntry, std::allocator< ns3::CcnxFibEntry > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxFibEntry > > >', 'fibEntry'), param('ns3::Ptr< ns3::CcnxFace > const &', 'incomingFace'), param('ns3::Ptr< ns3::CcnxInterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace > const, ns3::Ptr< ns3::CcnxInterestHeader > const, ns3::Ptr< ns3::Packet > const, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'ucb')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnx-forwarding-strategy.h (module 'NDNabstraction'): void ns3::CcnxForwardingStrategy::SetPit(ns3::Ptr<ns3::CcnxPit> pit) [member function]
-    cls.add_method('SetPit', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxPit >', 'pit')])
+    ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibEntry::NoFaces::NoFaces(ns3::CcnxFibEntry::NoFaces const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CcnxFibEntry::NoFaces const &', 'arg0')])
     return
 
 def register_Ns3CcnxInterestHeader_methods(root_module, cls):
@@ -5897,6 +3912,11 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
                    'int32_t', 
                    [], 
                    is_const=True)
+    ## ccnx-interest-header.h (module 'NDNabstraction'): uint32_t ns3::CcnxInterestHeader::GetNack() const [member function]
+    cls.add_method('GetNack', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxInterestHeader::GetName() const [member function]
     cls.add_method('GetName', 
                    'ns3::CcnxNameComponents const &', 
@@ -5922,11 +3942,6 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ccnx-interest-header.h (module 'NDNabstraction'): bool ns3::CcnxInterestHeader::IsCongested() const [member function]
-    cls.add_method('IsCongested', 
-                   'bool', 
-                   [], 
-                   is_const=True)
     ## ccnx-interest-header.h (module 'NDNabstraction'): bool ns3::CcnxInterestHeader::IsEnabledAnswerOriginKind() const [member function]
     cls.add_method('IsEnabledAnswerOriginKind', 
                    'bool', 
@@ -5939,11 +3954,6 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
                    is_const=True)
     ## ccnx-interest-header.h (module 'NDNabstraction'): bool ns3::CcnxInterestHeader::IsEnabledExclude() const [member function]
     cls.add_method('IsEnabledExclude', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## ccnx-interest-header.h (module 'NDNabstraction'): bool ns3::CcnxInterestHeader::IsNack() const [member function]
-    cls.add_method('IsNack', 
                    'bool', 
                    [], 
                    is_const=True)
@@ -5965,10 +3975,6 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
     cls.add_method('SetChildSelector', 
                    'void', 
                    [param('bool', 'value')])
-    ## ccnx-interest-header.h (module 'NDNabstraction'): void ns3::CcnxInterestHeader::SetCongested(bool IsCongested) [member function]
-    cls.add_method('SetCongested', 
-                   'void', 
-                   [param('bool', 'IsCongested')])
     ## ccnx-interest-header.h (module 'NDNabstraction'): void ns3::CcnxInterestHeader::SetExclude(ns3::Ptr<ns3::CcnxNameComponents> const & exclude) [member function]
     cls.add_method('SetExclude', 
                    'void', 
@@ -5985,10 +3991,10 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
     cls.add_method('SetMinSuffixComponents', 
                    'void', 
                    [param('int32_t', 'value')])
-    ## ccnx-interest-header.h (module 'NDNabstraction'): void ns3::CcnxInterestHeader::SetNack(bool isNack) [member function]
+    ## ccnx-interest-header.h (module 'NDNabstraction'): void ns3::CcnxInterestHeader::SetNack(uint32_t nackType) [member function]
     cls.add_method('SetNack', 
                    'void', 
-                   [param('bool', 'isNack')])
+                   [param('uint32_t', 'nackType')])
     ## ccnx-interest-header.h (module 'NDNabstraction'): void ns3::CcnxInterestHeader::SetName(ns3::Ptr<ns3::CcnxNameComponents> const & name) [member function]
     cls.add_method('SetName', 
                    'void', 
@@ -6003,155 +4009,6 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
                    [param('int8_t', 'scope')])
     return
 
-def register_Ns3CcnxInterestSender_methods(root_module, cls):
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): ns3::CcnxInterestSender::CcnxInterestSender(ns3::CcnxInterestSender const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxInterestSender const &', 'arg0')])
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): ns3::CcnxInterestSender::CcnxInterestSender() [constructor]
-    cls.add_constructor([])
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxInterestSender::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): void ns3::CcnxInterestSender::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): void ns3::CcnxInterestSender::StartApplication() [member function]
-    cls.add_method('StartApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## ccnx-interest-sender.h (module 'NDNabstraction'): void ns3::CcnxInterestSender::StopApplication() [member function]
-    cls.add_method('StopApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    return
-
-def register_Ns3CcnxL3Protocol_methods(root_module, cls):
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::ETHERNET_FRAME_TYPE [variable]
-    cls.add_static_attribute('ETHERNET_FRAME_TYPE', 'uint16_t const', is_const=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::IP_PROTOCOL_TYPE [variable]
-    cls.add_static_attribute('IP_PROTOCOL_TYPE', 'uint16_t const', is_const=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::UDP_PORT [variable]
-    cls.add_static_attribute('UDP_PORT', 'uint16_t const', is_const=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxL3Protocol::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::CcnxL3Protocol::CcnxL3Protocol() [constructor]
-    cls.add_constructor([])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::SetNode(ns3::Ptr<ns3::Node> node) [member function]
-    cls.add_method('SetNode', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::SetForwardingStrategy(ns3::Ptr<ns3::CcnxForwardingStrategy> forwardingStrategy) [member function]
-    cls.add_method('SetForwardingStrategy', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxForwardingStrategy >', 'forwardingStrategy')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxForwardingStrategy> ns3::CcnxL3Protocol::GetForwardingStrategy() const [member function]
-    cls.add_method('GetForwardingStrategy', 
-                   'ns3::Ptr< ns3::CcnxForwardingStrategy >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::SendInterest(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxInterestHeader> const & header, ns3::Ptr<ns3::Packet> const & packet) [member function]
-    cls.add_method('SendInterest', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxInterestHeader > const &', 'header'), param('ns3::Ptr< ns3::Packet > const &', 'packet')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::SendContentObject(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxContentObjectHeader> const & header, ns3::Ptr<ns3::Packet> const & packet) [member function]
-    cls.add_method('SendContentObject', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxContentObjectHeader > const &', 'header'), param('ns3::Ptr< ns3::Packet > const &', 'packet')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::Receive(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::Packet const> const & p) [member function]
-    cls.add_method('Receive', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::Packet const > const &', 'p')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): uint32_t ns3::CcnxL3Protocol::AddFace(ns3::Ptr<ns3::CcnxFace> const & face) [member function]
-    cls.add_method('AddFace', 
-                   'uint32_t', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): uint32_t ns3::CcnxL3Protocol::GetNFaces() const [member function]
-    cls.add_method('GetNFaces', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFace> ns3::CcnxL3Protocol::GetFace(uint32_t face) const [member function]
-    cls.add_method('GetFace', 
-                   'ns3::Ptr< ns3::CcnxFace >', 
-                   [param('uint32_t', 'face')], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::RemoveFace(ns3::Ptr<ns3::CcnxFace> face) [member function]
-    cls.add_method('RemoveFace', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
-                   is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxPit> ns3::CcnxL3Protocol::GetPit() [member function]
-    cls.add_method('GetPit', 
-                   'ns3::Ptr< ns3::CcnxPit >', 
-                   [])
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::OnInterest(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxInterestHeader> & header, ns3::Ptr<ns3::Packet const> const & p) [member function]
-    cls.add_method('OnInterest', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxInterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'p')], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::OnData(ns3::Ptr<ns3::CcnxFace> const & face, ns3::Ptr<ns3::CcnxContentObjectHeader> & header, ns3::Ptr<ns3::Packet> & payload, ns3::Ptr<ns3::Packet const> const & packet) [member function]
-    cls.add_method('OnData', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace > const &', 'face'), param('ns3::Ptr< ns3::CcnxContentObjectHeader > &', 'header'), param('ns3::Ptr< ns3::Packet > &', 'payload'), param('ns3::Ptr< ns3::Packet const > const &', 'packet')], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-l3-protocol.h (module 'NDNabstraction'): void ns3::CcnxL3Protocol::NotifyNewAggregate() [member function]
-    cls.add_method('NotifyNewAggregate', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    return
-
-def register_Ns3CcnxLocalFace_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ccnx-local-face.h (module 'NDNabstraction'): ns3::CcnxLocalFace::CcnxLocalFace() [constructor]
-    cls.add_constructor([])
-    ## ccnx-local-face.h (module 'NDNabstraction'): std::ostream & ns3::CcnxLocalFace::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'std::ostream &', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-local-face.h (module 'NDNabstraction'): void ns3::CcnxLocalFace::ReceiveFromApplication(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('ReceiveFromApplication', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')])
-    ## ccnx-local-face.h (module 'NDNabstraction'): void ns3::CcnxLocalFace::RegisterProtocolHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxFace> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
-    cls.add_method('RegisterProtocolHandler', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')], 
-                   is_virtual=True)
-    ## ccnx-local-face.h (module 'NDNabstraction'): void ns3::CcnxLocalFace::Send(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Send', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   is_virtual=True)
-    ## ccnx-local-face.h (module 'NDNabstraction'): void ns3::CcnxLocalFace::SetContentObjectHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxContentObjectHeader const> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onContentObject) [member function]
-    cls.add_method('SetContentObjectHandler', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxContentObjectHeader const >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onContentObject')])
-    ## ccnx-local-face.h (module 'NDNabstraction'): void ns3::CcnxLocalFace::SetInterestHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxInterestHeader const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onInterest) [member function]
-    cls.add_method('SetInterestHandler', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxInterestHeader const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onInterest')])
-    return
-
 def register_Ns3CcnxNameComponents_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
@@ -6162,10 +4019,6 @@ def register_Ns3CcnxNameComponents_methods(root_module, cls):
     cls.add_constructor([])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponents::CcnxNameComponents(std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > const & components) [constructor]
     cls.add_constructor([param('std::list< boost::reference_wrapper< std::string const > > const &', 'components')])
-    ## ccnx-name-components.h (module 'NDNabstraction'): void ns3::CcnxNameComponents::Add(std::string const & s) [member function]
-    cls.add_method('Add', 
-                   'void', 
-                   [param('std::string const &', 's')])
     ## ccnx-name-components.h (module 'NDNabstraction'): std::list<std::string, std::allocator<std::string> > const & ns3::CcnxNameComponents::GetComponents() const [member function]
     cls.add_method('GetComponents', 
                    'std::list< std::string > const &', 
@@ -6186,11 +4039,6 @@ def register_Ns3CcnxNameComponents_methods(root_module, cls):
                    'size_t', 
                    [], 
                    is_const=True)
-    ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponents & ns3::CcnxNameComponents::operator()(std::string const & s) [member operator]
-    cls.add_method('operator()', 
-                   'ns3::CcnxNameComponents &', 
-                   [param('std::string const &', 's')], 
-                   custom_name='__call__')
     return
 
 def register_Ns3CcnxNameComponentsChecker_methods(root_module, cls):
@@ -6233,41 +4081,11 @@ def register_Ns3CcnxNameComponentsValue_methods(root_module, cls):
                    [param('ns3::CcnxNameComponents const &', 'value')])
     return
 
-def register_Ns3CcnxNetDeviceFace_methods(root_module, cls):
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::CcnxNetDeviceFace::CcnxNetDeviceFace(ns3::Ptr<ns3::NetDevice> const & netDevice) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::NetDevice > const &', 'netDevice')])
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): void ns3::CcnxNetDeviceFace::RegisterProtocolHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxFace> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
-    cls.add_method('RegisterProtocolHandler', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')], 
-                   is_virtual=True)
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): void ns3::CcnxNetDeviceFace::Send(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Send', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   is_virtual=True)
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): std::ostream & ns3::CcnxNetDeviceFace::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'std::ostream &', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::Ptr<ns3::NetDevice> ns3::CcnxNetDeviceFace::GetNetDevice() const [member function]
-    cls.add_method('GetNetDevice', 
-                   'ns3::Ptr< ns3::NetDevice >', 
-                   [], 
-                   is_const=True)
-    return
-
 def register_Ns3CcnxProducer_methods(root_module, cls):
     ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer::CcnxProducer(ns3::CcnxProducer const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxProducer const &', 'arg0')])
     ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer::CcnxProducer() [constructor]
     cls.add_constructor([])
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxNameComponents ns3::CcnxProducer::GetPrefix() const [member function]
-    cls.add_method('GetPrefix', 
-                   'ns3::CcnxNameComponents', 
-                   [], 
-                   is_const=True)
     ## ccnx-producer.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxProducer::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -6276,123 +4094,18 @@ def register_Ns3CcnxProducer_methods(root_module, cls):
     ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::OnInterest(ns3::Ptr<const ns3::CcnxInterestHeader> const & interest) [member function]
     cls.add_method('OnInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::CcnxInterestHeader const > const &', 'interest')])
-    ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
+                   [param('ns3::Ptr< ns3::CcnxInterestHeader const > const &', 'interest')], 
+                   is_virtual=True)
     ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::StartApplication() [member function]
     cls.add_method('StartApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::StopApplication() [member function]
     cls.add_method('StopApplication', 
                    'void', 
                    [], 
-                   visibility='private', is_virtual=True)
-    return
-
-def register_Ns3CcnxRoute_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ccnx-route.h (module 'NDNabstraction'): ns3::CcnxRoute::CcnxRoute(ns3::CcnxRoute const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxRoute const &', 'arg0')])
-    ## ccnx-route.h (module 'NDNabstraction'): ns3::CcnxRoute::CcnxRoute() [constructor]
-    cls.add_constructor([])
-    ## ccnx-route.h (module 'NDNabstraction'): ns3::Ptr<ns3::CcnxFace> ns3::CcnxRoute::GetOutputFace() const [member function]
-    cls.add_method('GetOutputFace', 
-                   'ns3::Ptr< ns3::CcnxFace >', 
-                   [], 
-                   is_const=True)
-    ## ccnx-route.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxRoute::GetPrefix() const [member function]
-    cls.add_method('GetPrefix', 
-                   'ns3::CcnxNameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ccnx-route.h (module 'NDNabstraction'): void ns3::CcnxRoute::SetOutputFace(ns3::Ptr<ns3::CcnxFace> outputDevice) [member function]
-    cls.add_method('SetOutputFace', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'outputDevice')])
-    ## ccnx-route.h (module 'NDNabstraction'): void ns3::CcnxRoute::SetPrefix(ns3::Ptr<ns3::CcnxNameComponents> const & dest) [member function]
-    cls.add_method('SetPrefix', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxNameComponents > const &', 'dest')])
-    return
-
-def register_Ns3DataRateChecker_methods(root_module, cls):
-    ## data-rate.h (module 'network'): ns3::DataRateChecker::DataRateChecker() [constructor]
-    cls.add_constructor([])
-    ## data-rate.h (module 'network'): ns3::DataRateChecker::DataRateChecker(ns3::DataRateChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::DataRateChecker const &', 'arg0')])
-    return
-
-def register_Ns3DataRateValue_methods(root_module, cls):
-    ## data-rate.h (module 'network'): ns3::DataRateValue::DataRateValue() [constructor]
-    cls.add_constructor([])
-    ## data-rate.h (module 'network'): ns3::DataRateValue::DataRateValue(ns3::DataRateValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::DataRateValue const &', 'arg0')])
-    ## data-rate.h (module 'network'): ns3::DataRateValue::DataRateValue(ns3::DataRate const & value) [constructor]
-    cls.add_constructor([param('ns3::DataRate const &', 'value')])
-    ## data-rate.h (module 'network'): ns3::Ptr<ns3::AttributeValue> ns3::DataRateValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## data-rate.h (module 'network'): bool ns3::DataRateValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## data-rate.h (module 'network'): ns3::DataRate ns3::DataRateValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::DataRate', 
-                   [], 
-                   is_const=True)
-    ## data-rate.h (module 'network'): std::string ns3::DataRateValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## data-rate.h (module 'network'): void ns3::DataRateValue::Set(ns3::DataRate const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::DataRate const &', 'value')])
-    return
-
-def register_Ns3DropTailQueue_methods(root_module, cls):
-    ## drop-tail-queue.h (module 'network'): ns3::DropTailQueue::DropTailQueue(ns3::DropTailQueue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::DropTailQueue const &', 'arg0')])
-    ## drop-tail-queue.h (module 'network'): ns3::DropTailQueue::DropTailQueue() [constructor]
-    cls.add_constructor([])
-    ## drop-tail-queue.h (module 'network'): ns3::DropTailQueue::Mode ns3::DropTailQueue::GetMode() [member function]
-    cls.add_method('GetMode', 
-                   'ns3::DropTailQueue::Mode', 
-                   [])
-    ## drop-tail-queue.h (module 'network'): static ns3::TypeId ns3::DropTailQueue::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## drop-tail-queue.h (module 'network'): void ns3::DropTailQueue::SetMode(ns3::DropTailQueue::Mode mode) [member function]
-    cls.add_method('SetMode', 
-                   'void', 
-                   [param('ns3::DropTailQueue::Mode', 'mode')])
-    ## drop-tail-queue.h (module 'network'): ns3::Ptr<ns3::Packet> ns3::DropTailQueue::DoDequeue() [member function]
-    cls.add_method('DoDequeue', 
-                   'ns3::Ptr< ns3::Packet >', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## drop-tail-queue.h (module 'network'): bool ns3::DropTailQueue::DoEnqueue(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('DoEnqueue', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   visibility='private', is_virtual=True)
-    ## drop-tail-queue.h (module 'network'): ns3::Ptr<ns3::Packet const> ns3::DropTailQueue::DoPeek() const [member function]
-    cls.add_method('DoPeek', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True, visibility='private', is_virtual=True)
+                   visibility='protected', is_virtual=True)
     return
 
 def register_Ns3EmptyAttributeValue_methods(root_module, cls):
@@ -6634,46 +4347,6 @@ def register_Ns3Ipv6PrefixValue_methods(root_module, cls):
                    [param('ns3::Ipv6Prefix const &', 'value')])
     return
 
-def register_Ns3Mac48AddressChecker_methods(root_module, cls):
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressChecker::Mac48AddressChecker() [constructor]
-    cls.add_constructor([])
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressChecker::Mac48AddressChecker(ns3::Mac48AddressChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Mac48AddressChecker const &', 'arg0')])
-    return
-
-def register_Ns3Mac48AddressValue_methods(root_module, cls):
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressValue::Mac48AddressValue() [constructor]
-    cls.add_constructor([])
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressValue::Mac48AddressValue(ns3::Mac48AddressValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Mac48AddressValue const &', 'arg0')])
-    ## mac48-address.h (module 'network'): ns3::Mac48AddressValue::Mac48AddressValue(ns3::Mac48Address const & value) [constructor]
-    cls.add_constructor([param('ns3::Mac48Address const &', 'value')])
-    ## mac48-address.h (module 'network'): ns3::Ptr<ns3::AttributeValue> ns3::Mac48AddressValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## mac48-address.h (module 'network'): bool ns3::Mac48AddressValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## mac48-address.h (module 'network'): ns3::Mac48Address ns3::Mac48AddressValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::Mac48Address', 
-                   [], 
-                   is_const=True)
-    ## mac48-address.h (module 'network'): std::string ns3::Mac48AddressValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## mac48-address.h (module 'network'): void ns3::Mac48AddressValue::Set(ns3::Mac48Address const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::Mac48Address const &', 'value')])
-    return
-
 def register_Ns3NetDevice_methods(root_module, cls):
     ## net-device.h (module 'network'): ns3::NetDevice::NetDevice() [constructor]
     cls.add_constructor([])
@@ -6789,15 +4462,15 @@ def register_Ns3NetDevice_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::Node >', 'node')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## net-device.h (module 'network'): void ns3::NetDevice::SetPromiscReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::Address const&, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    ## net-device.h (module 'network'): void ns3::NetDevice::SetPromiscReceiveCallback(ns3::Callback<bool,ns3::Ptr<ns3::NetDevice>,ns3::Ptr<const ns3::Packet>,short unsigned int,const ns3::Address&,const ns3::Address&,ns3::NetDevice::PacketType,ns3::empty,ns3::empty,ns3::empty> cb) [member function]
     cls.add_method('SetPromiscReceiveCallback', 
                    'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::Address const &, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
+                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, short unsigned int, ns3::Address const &, ns3::Address const &, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## net-device.h (module 'network'): void ns3::NetDevice::SetReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
+    ## net-device.h (module 'network'): void ns3::NetDevice::SetReceiveCallback(ns3::Callback<bool,ns3::Ptr<ns3::NetDevice>,ns3::Ptr<const ns3::Packet>,short unsigned int,const ns3::Address&,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> cb) [member function]
     cls.add_method('SetReceiveCallback', 
                    'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
+                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, short unsigned int, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
                    is_pure_virtual=True, is_virtual=True)
     ## net-device.h (module 'network'): bool ns3::NetDevice::SupportsSendFrom() const [member function]
     cls.add_method('SupportsSendFrom', 
@@ -6973,19 +4646,6 @@ def register_Ns3ObjectFactoryValue_methods(root_module, cls):
                    [param('ns3::ObjectFactory const &', 'value')])
     return
 
-def register_Ns3OutputStreamWrapper_methods(root_module, cls):
-    ## output-stream-wrapper.h (module 'network'): ns3::OutputStreamWrapper::OutputStreamWrapper(ns3::OutputStreamWrapper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::OutputStreamWrapper const &', 'arg0')])
-    ## output-stream-wrapper.h (module 'network'): ns3::OutputStreamWrapper::OutputStreamWrapper(std::string filename, std::_Ios_Openmode filemode) [constructor]
-    cls.add_constructor([param('std::string', 'filename'), param('std::_Ios_Openmode', 'filemode')])
-    ## output-stream-wrapper.h (module 'network'): ns3::OutputStreamWrapper::OutputStreamWrapper(std::ostream * os) [constructor]
-    cls.add_constructor([param('std::ostream *', 'os')])
-    ## output-stream-wrapper.h (module 'network'): std::ostream * ns3::OutputStreamWrapper::GetStream() [member function]
-    cls.add_method('GetStream', 
-                   'std::ostream *', 
-                   [])
-    return
-
 def register_Ns3Packet_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## packet.h (module 'network'): ns3::Packet::Packet() [constructor]
@@ -6998,7 +4658,7 @@ def register_Ns3Packet_methods(root_module, cls):
     cls.add_constructor([param('uint8_t const *', 'buffer'), param('uint32_t', 'size'), param('bool', 'magic')])
     ## packet.h (module 'network'): ns3::Packet::Packet(uint8_t const * buffer, uint32_t size) [constructor]
     cls.add_constructor([param('uint8_t const *', 'buffer'), param('uint32_t', 'size')])
-    ## packet.h (module 'network'): void ns3::Packet::AddAtEnd(ns3::Ptr<ns3::Packet const> packet) [member function]
+    ## packet.h (module 'network'): void ns3::Packet::AddAtEnd(ns3::Ptr<const ns3::Packet> packet) [member function]
     cls.add_method('AddAtEnd', 
                    'void', 
                    [param('ns3::Ptr< ns3::Packet const >', 'packet')])
@@ -7167,220 +4827,6 @@ def register_Ns3Packet_methods(root_module, cls):
                    [param('ns3::Ptr< ns3::NixVector >', 'arg0')])
     return
 
-def register_Ns3PointToPointNetDevice_methods(root_module, cls):
-    ## point-to-point-net-device.h (module 'point-to-point'): static ns3::TypeId ns3::PointToPointNetDevice::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::PointToPointNetDevice::PointToPointNetDevice() [constructor]
-    cls.add_constructor([])
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetDataRate(ns3::DataRate bps) [member function]
-    cls.add_method('SetDataRate', 
-                   'void', 
-                   [param('ns3::DataRate', 'bps')])
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetInterframeGap(ns3::Time t) [member function]
-    cls.add_method('SetInterframeGap', 
-                   'void', 
-                   [param('ns3::Time', 't')])
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::Attach(ns3::Ptr<ns3::PointToPointChannel> ch) [member function]
-    cls.add_method('Attach', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::PointToPointChannel >', 'ch')])
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetQueue(ns3::Ptr<ns3::Queue> queue) [member function]
-    cls.add_method('SetQueue', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Queue >', 'queue')])
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Ptr<ns3::Queue> ns3::PointToPointNetDevice::GetQueue() const [member function]
-    cls.add_method('GetQueue', 
-                   'ns3::Ptr< ns3::Queue >', 
-                   [], 
-                   is_const=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetReceiveErrorModel(ns3::Ptr<ns3::ErrorModel> em) [member function]
-    cls.add_method('SetReceiveErrorModel', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::ErrorModel >', 'em')])
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::Receive(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('Receive', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')])
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetIfIndex(uint32_t const index) [member function]
-    cls.add_method('SetIfIndex', 
-                   'void', 
-                   [param('uint32_t const', 'index')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): uint32_t ns3::PointToPointNetDevice::GetIfIndex() const [member function]
-    cls.add_method('GetIfIndex', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Ptr<ns3::Channel> ns3::PointToPointNetDevice::GetChannel() const [member function]
-    cls.add_method('GetChannel', 
-                   'ns3::Ptr< ns3::Channel >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetAddress(ns3::Address address) [member function]
-    cls.add_method('SetAddress', 
-                   'void', 
-                   [param('ns3::Address', 'address')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Address ns3::PointToPointNetDevice::GetAddress() const [member function]
-    cls.add_method('GetAddress', 
-                   'ns3::Address', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::SetMtu(uint16_t const mtu) [member function]
-    cls.add_method('SetMtu', 
-                   'bool', 
-                   [param('uint16_t const', 'mtu')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): uint16_t ns3::PointToPointNetDevice::GetMtu() const [member function]
-    cls.add_method('GetMtu', 
-                   'uint16_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::IsLinkUp() const [member function]
-    cls.add_method('IsLinkUp', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::AddLinkChangeCallback(ns3::Callback<void,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> callback) [member function]
-    cls.add_method('AddLinkChangeCallback', 
-                   'void', 
-                   [param('ns3::Callback< void, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::IsBroadcast() const [member function]
-    cls.add_method('IsBroadcast', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Address ns3::PointToPointNetDevice::GetBroadcast() const [member function]
-    cls.add_method('GetBroadcast', 
-                   'ns3::Address', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::IsMulticast() const [member function]
-    cls.add_method('IsMulticast', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Address ns3::PointToPointNetDevice::GetMulticast(ns3::Ipv4Address multicastGroup) const [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Address', 
-                   [param('ns3::Ipv4Address', 'multicastGroup')], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::IsPointToPoint() const [member function]
-    cls.add_method('IsPointToPoint', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::IsBridge() const [member function]
-    cls.add_method('IsBridge', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::Send(ns3::Ptr<ns3::Packet> packet, ns3::Address const & dest, uint16_t protocolNumber) [member function]
-    cls.add_method('Send', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::SendFrom(ns3::Ptr<ns3::Packet> packet, ns3::Address const & source, ns3::Address const & dest, uint16_t protocolNumber) [member function]
-    cls.add_method('SendFrom', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::Packet >', 'packet'), param('ns3::Address const &', 'source'), param('ns3::Address const &', 'dest'), param('uint16_t', 'protocolNumber')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Ptr<ns3::Node> ns3::PointToPointNetDevice::GetNode() const [member function]
-    cls.add_method('GetNode', 
-                   'ns3::Ptr< ns3::Node >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetNode(ns3::Ptr<ns3::Node> node) [member function]
-    cls.add_method('SetNode', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::NeedsArp() const [member function]
-    cls.add_method('NeedsArp', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetReceiveCallback', 
-                   'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): ns3::Address ns3::PointToPointNetDevice::GetMulticast(ns3::Ipv6Address addr) const [member function]
-    cls.add_method('GetMulticast', 
-                   'ns3::Address', 
-                   [param('ns3::Ipv6Address', 'addr')], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::SetPromiscReceiveCallback(ns3::Callback<bool, ns3::Ptr<ns3::NetDevice>, ns3::Ptr<ns3::Packet const>, unsigned short, ns3::Address const&, ns3::Address const&, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty> cb) [member function]
-    cls.add_method('SetPromiscReceiveCallback', 
-                   'void', 
-                   [param('ns3::Callback< bool, ns3::Ptr< ns3::NetDevice >, ns3::Ptr< ns3::Packet const >, unsigned short, ns3::Address const &, ns3::Address const &, ns3::NetDevice::PacketType, ns3::empty, ns3::empty, ns3::empty >', 'cb')], 
-                   is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): bool ns3::PointToPointNetDevice::SupportsSendFrom() const [member function]
-    cls.add_method('SupportsSendFrom', 
-                   'bool', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::DoMpiReceive(ns3::Ptr<ns3::Packet> p) [member function]
-    cls.add_method('DoMpiReceive', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
-                   visibility='protected')
-    ## point-to-point-net-device.h (module 'point-to-point'): void ns3::PointToPointNetDevice::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    return
-
-def register_Ns3PointerChecker_methods(root_module, cls):
-    ## pointer.h (module 'core'): ns3::PointerChecker::PointerChecker() [constructor]
-    cls.add_constructor([])
-    ## pointer.h (module 'core'): ns3::PointerChecker::PointerChecker(ns3::PointerChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PointerChecker const &', 'arg0')])
-    ## pointer.h (module 'core'): ns3::TypeId ns3::PointerChecker::GetPointeeTypeId() const [member function]
-    cls.add_method('GetPointeeTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, is_virtual=True)
-    return
-
-def register_Ns3PointerValue_methods(root_module, cls):
-    ## pointer.h (module 'core'): ns3::PointerValue::PointerValue(ns3::PointerValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::PointerValue const &', 'arg0')])
-    ## pointer.h (module 'core'): ns3::PointerValue::PointerValue() [constructor]
-    cls.add_constructor([])
-    ## pointer.h (module 'core'): ns3::PointerValue::PointerValue(ns3::Ptr<ns3::Object> object) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::Object >', 'object')])
-    ## pointer.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::PointerValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## pointer.h (module 'core'): bool ns3::PointerValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## pointer.h (module 'core'): ns3::Ptr<ns3::Object> ns3::PointerValue::GetObject() const [member function]
-    cls.add_method('GetObject', 
-                   'ns3::Ptr< ns3::Object >', 
-                   [], 
-                   is_const=True)
-    ## pointer.h (module 'core'): std::string ns3::PointerValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## pointer.h (module 'core'): void ns3::PointerValue::SetObject(ns3::Ptr<ns3::Object> object) [member function]
-    cls.add_method('SetObject', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Object >', 'object')])
-    return
-
 def register_Ns3RandomVariableChecker_methods(root_module, cls):
     ## random-variable.h (module 'core'): ns3::RandomVariableChecker::RandomVariableChecker() [constructor]
     cls.add_constructor([])
@@ -7421,113 +4867,27 @@ def register_Ns3RandomVariableValue_methods(root_module, cls):
                    [param('ns3::RandomVariable const &', 'value')])
     return
 
-def register_Ns3StringChecker_methods(root_module, cls):
-    ## string.h (module 'core'): ns3::StringChecker::StringChecker() [constructor]
-    cls.add_constructor([])
-    ## string.h (module 'core'): ns3::StringChecker::StringChecker(ns3::StringChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::StringChecker const &', 'arg0')])
-    return
-
-def register_Ns3StringValue_methods(root_module, cls):
-    ## string.h (module 'core'): ns3::StringValue::StringValue() [constructor]
-    cls.add_constructor([])
-    ## string.h (module 'core'): ns3::StringValue::StringValue(ns3::StringValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::StringValue const &', 'arg0')])
-    ## string.h (module 'core'): ns3::StringValue::StringValue(std::string const & value) [constructor]
-    cls.add_constructor([param('std::string const &', 'value')])
-    ## string.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::StringValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
+def register_Ns3RocketfuelWeightsReader_methods(root_module, cls):
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): static ns3::TypeId ns3::RocketfuelWeightsReader::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
                    [], 
-                   is_const=True, is_virtual=True)
-    ## string.h (module 'core'): bool ns3::StringValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_static=True)
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::RocketfuelWeightsReader::RocketfuelWeightsReader() [constructor]
+    cls.add_constructor([])
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::NodeContainer ns3::RocketfuelWeightsReader::Read(std::string latenciesFile) [member function]
+    cls.add_method('Read', 
+                   'ns3::NodeContainer', 
+                   [param('std::string', 'latenciesFile')])
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::NodeContainer ns3::RocketfuelWeightsReader::Read() [member function]
+    cls.add_method('Read', 
+                   'ns3::NodeContainer', 
+                   [], 
                    is_virtual=True)
-    ## string.h (module 'core'): std::string ns3::StringValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'std::string', 
-                   [], 
-                   is_const=True)
-    ## string.h (module 'core'): std::string ns3::StringValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## string.h (module 'core'): void ns3::StringValue::Set(std::string const & value) [member function]
-    cls.add_method('Set', 
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): void ns3::RocketfuelWeightsReader::ApplySettings(ns3::NetDeviceContainer * ndc, ns3::NodeContainer * nc) [member function]
+    cls.add_method('ApplySettings', 
                    'void', 
-                   [param('std::string const &', 'value')])
-    return
-
-def register_Ns3StupidInterestGenerator_methods(root_module, cls):
-    ## stupid-interest-generator.h (module 'NDNabstraction'): ns3::StupidInterestGenerator::StupidInterestGenerator(ns3::StupidInterestGenerator const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::StupidInterestGenerator const &', 'arg0')])
-    ## stupid-interest-generator.h (module 'NDNabstraction'): ns3::StupidInterestGenerator::StupidInterestGenerator() [constructor]
-    cls.add_constructor([])
-    ## stupid-interest-generator.h (module 'NDNabstraction'): static ns3::TypeId ns3::StupidInterestGenerator::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## stupid-interest-generator.h (module 'NDNabstraction'): void ns3::StupidInterestGenerator::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## stupid-interest-generator.h (module 'NDNabstraction'): void ns3::StupidInterestGenerator::StartApplication() [member function]
-    cls.add_method('StartApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## stupid-interest-generator.h (module 'NDNabstraction'): void ns3::StupidInterestGenerator::StopApplication() [member function]
-    cls.add_method('StopApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    return
-
-def register_Ns3StupidInterestSink_methods(root_module, cls):
-    ## stupid-interest-sink.h (module 'NDNabstraction'): ns3::StupidInterestSink::StupidInterestSink(ns3::StupidInterestSink const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::StupidInterestSink const &', 'arg0')])
-    ## stupid-interest-sink.h (module 'NDNabstraction'): ns3::StupidInterestSink::StupidInterestSink() [constructor]
-    cls.add_constructor([])
-    ## stupid-interest-sink.h (module 'NDNabstraction'): std::list<ns3::Ptr<ns3::Socket>, std::allocator<ns3::Ptr<ns3::Socket> > > ns3::StupidInterestSink::GetAcceptedSockets() const [member function]
-    cls.add_method('GetAcceptedSockets', 
-                   'std::list< ns3::Ptr< ns3::Socket > >', 
-                   [], 
-                   is_const=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): ns3::Ptr<ns3::Socket> ns3::StupidInterestSink::GetListeningSocket() const [member function]
-    cls.add_method('GetListeningSocket', 
-                   'ns3::Ptr< ns3::Socket >', 
-                   [], 
-                   is_const=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): uint32_t ns3::StupidInterestSink::GetTotalRx() const [member function]
-    cls.add_method('GetTotalRx', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): static ns3::TypeId ns3::StupidInterestSink::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): void ns3::StupidInterestSink::DoDispose() [member function]
-    cls.add_method('DoDispose', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): void ns3::StupidInterestSink::StartApplication() [member function]
-    cls.add_method('StartApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    ## stupid-interest-sink.h (module 'NDNabstraction'): void ns3::StupidInterestSink::StopApplication() [member function]
-    cls.add_method('StopApplication', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
+                   [param('ns3::NetDeviceContainer *', 'ndc'), param('ns3::NodeContainer *', 'nc')])
     return
 
 def register_Ns3TimeChecker_methods(root_module, cls):
@@ -7610,39 +4970,6 @@ def register_Ns3TypeIdValue_methods(root_module, cls):
                    [param('ns3::TypeId const &', 'value')])
     return
 
-def register_Ns3UintegerValue_methods(root_module, cls):
-    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue() [constructor]
-    cls.add_constructor([])
-    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue(ns3::UintegerValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::UintegerValue const &', 'arg0')])
-    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue(uint64_t const & value) [constructor]
-    cls.add_constructor([param('uint64_t const &', 'value')])
-    ## uinteger.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::UintegerValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## uinteger.h (module 'core'): bool ns3::UintegerValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## uinteger.h (module 'core'): uint64_t ns3::UintegerValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'uint64_t', 
-                   [], 
-                   is_const=True)
-    ## uinteger.h (module 'core'): std::string ns3::UintegerValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## uinteger.h (module 'core'): void ns3::UintegerValue::Set(uint64_t const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('uint64_t const &', 'value')])
-    return
-
 def register_Ns3AddressChecker_methods(root_module, cls):
     ## address.h (module 'network'): ns3::AddressChecker::AddressChecker() [constructor]
     cls.add_constructor([])
@@ -7683,757 +5010,14 @@ def register_Ns3AddressValue_methods(root_module, cls):
                    [param('ns3::Address const &', 'value')])
     return
 
-def register_Ns3CcnxBestRouteStrategy_methods(root_module, cls):
-    ## ccnx-bestroute-strategy.h (module 'NDNabstraction'): ns3::CcnxBestRouteStrategy::CcnxBestRouteStrategy(ns3::CcnxBestRouteStrategy const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxBestRouteStrategy const &', 'arg0')])
-    ## ccnx-bestroute-strategy.h (module 'NDNabstraction'): ns3::CcnxBestRouteStrategy::CcnxBestRouteStrategy() [constructor]
-    cls.add_constructor([])
-    ## ccnx-bestroute-strategy.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxBestRouteStrategy::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-bestroute-strategy.h (module 'NDNabstraction'): bool ns3::CcnxBestRouteStrategy::PropagateInterest(boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::sequenced_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntry, std::allocator<ns3::CcnxPitEntry> > > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxPitEntry> > > pitEntry, boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxFibEntry, std::allocator<ns3::CcnxFibEntry> > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxFibEntry> > > fibEntry, ns3::Ptr<ns3::CcnxFace> const & incomingFace, ns3::Ptr<ns3::CcnxInterestHeader> & header, ns3::Ptr<ns3::Packet const> const & packet, ns3::Callback<void,const ns3::Ptr<ns3::CcnxFace>&,const ns3::Ptr<ns3::CcnxInterestHeader>&,const ns3::Ptr<ns3::Packet>&,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> ucb) [member function]
-    cls.add_method('PropagateInterest', 
-                   'bool', 
-                   [param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::sequenced_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntry, std::allocator< ns3::CcnxPitEntry > > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxPitEntry > > >', 'pitEntry'), param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxFibEntry, std::allocator< ns3::CcnxFibEntry > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxFibEntry > > >', 'fibEntry'), param('ns3::Ptr< ns3::CcnxFace > const &', 'incomingFace'), param('ns3::Ptr< ns3::CcnxInterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace > const, ns3::Ptr< ns3::CcnxInterestHeader > const, ns3::Ptr< ns3::Packet > const, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'ucb')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnxFloodingStrategy_methods(root_module, cls):
-    ## ccnx-flooding-strategy.h (module 'NDNabstraction'): ns3::CcnxFloodingStrategy::CcnxFloodingStrategy(ns3::CcnxFloodingStrategy const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxFloodingStrategy const &', 'arg0')])
-    ## ccnx-flooding-strategy.h (module 'NDNabstraction'): ns3::CcnxFloodingStrategy::CcnxFloodingStrategy() [constructor]
-    cls.add_constructor([])
-    ## ccnx-flooding-strategy.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxFloodingStrategy::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-flooding-strategy.h (module 'NDNabstraction'): bool ns3::CcnxFloodingStrategy::PropagateInterest(boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::sequenced_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntry, std::allocator<ns3::CcnxPitEntry> > > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxPitEntry> > > pitEntry, boost::multi_index::detail::hashed_index_iterator<boost::multi_index::detail::hashed_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxFibEntry, std::allocator<ns3::CcnxFibEntry> > >,boost::multi_index::detail::bucket_array<std::allocator<ns3::CcnxFibEntry> > > fibEntry, ns3::Ptr<ns3::CcnxFace> const & incomingFace, ns3::Ptr<ns3::CcnxInterestHeader> & header, ns3::Ptr<ns3::Packet const> const & packet, ns3::Callback<void,const ns3::Ptr<ns3::CcnxFace>&,const ns3::Ptr<ns3::CcnxInterestHeader>&,const ns3::Ptr<ns3::Packet>&,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> ucb) [member function]
-    cls.add_method('PropagateInterest', 
-                   'bool', 
-                   [param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::sequenced_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntry, std::allocator< ns3::CcnxPitEntry > > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxPitEntry > > >', 'pitEntry'), param('boost::multi_index::detail::hashed_index_iterator< boost::multi_index::detail::hashed_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxFibEntry, std::allocator< ns3::CcnxFibEntry > > >, boost::multi_index::detail::bucket_array< std::allocator< ns3::CcnxFibEntry > > >', 'fibEntry'), param('ns3::Ptr< ns3::CcnxFace > const &', 'incomingFace'), param('ns3::Ptr< ns3::CcnxInterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace > const, ns3::Ptr< ns3::CcnxInterestHeader > const, ns3::Ptr< ns3::Packet > const, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'ucb')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserBlock_methods(root_module, cls):
-    ## ccnb-parser-block.h (module 'NDNabstraction'): ns3::CcnbParser::Block::Block() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-block.h (module 'NDNabstraction'): ns3::CcnbParser::Block::Block(ns3::CcnbParser::Block const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Block const &', 'arg0')])
-    ## ccnb-parser-block.h (module 'NDNabstraction'): static ns3::Ptr<ns3::CcnbParser::Block> ns3::CcnbParser::Block::ParseBlock(ns3::Buffer::Iterator & start) [member function]
-    cls.add_method('ParseBlock', 
-                   'ns3::Ptr< ns3::CcnbParser::Block >', 
-                   [param('ns3::Buffer::Iterator &', 'start')], 
-                   is_static=True)
-    ## ccnb-parser-block.h (module 'NDNabstraction'): void ns3::CcnbParser::Block::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-block.h (module 'NDNabstraction'): void ns3::CcnbParser::Block::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-block.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Block::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-block.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Block::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3CcnbParserCcnbDecodingException_methods(root_module, cls):
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser::CcnbDecodingException::CcnbDecodingException() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-common.h (module 'NDNabstraction'): ns3::CcnbParser::CcnbDecodingException::CcnbDecodingException(ns3::CcnbParser::CcnbDecodingException const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::CcnbDecodingException const &', 'arg0')])
-    return
-
-def register_Ns3CcnbParserExt_methods(root_module, cls):
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): ns3::CcnbParser::Ext::Ext(ns3::CcnbParser::Ext const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Ext const &', 'arg0')])
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): ns3::CcnbParser::Ext::Ext(ns3::Buffer::Iterator & start, uint32_t extSubtype) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'extSubtype')])
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): void ns3::CcnbParser::Ext::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): void ns3::CcnbParser::Ext::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Ext::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Ext::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-ext.h (module 'NDNabstraction'): ns3::CcnbParser::Ext::m_extSubtype [variable]
-    cls.add_instance_attribute('m_extSubtype', 'uint64_t', is_const=False)
-    return
-
-def register_Ns3CcnbParserNoArguVisitor_methods(root_module, cls):
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguVisitor::NoArguVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguVisitor::NoArguVisitor(ns3::CcnbParser::NoArguVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::NoArguVisitor const &', 'arg0')])
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Blob & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Udata & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Tag & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Attr & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Dtag & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Dattr & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-no-argu-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguVisitor::visit(ns3::CcnbParser::Ext & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3CcnbParserUdata_methods(root_module, cls):
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): ns3::CcnbParser::Udata::Udata(ns3::CcnbParser::Udata const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Udata const &', 'arg0')])
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): ns3::CcnbParser::Udata::Udata(ns3::Buffer::Iterator & start, uint32_t length) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'length')])
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): void ns3::CcnbParser::Udata::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): void ns3::CcnbParser::Udata::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Udata::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Udata::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-udata.h (module 'NDNabstraction'): ns3::CcnbParser::Udata::m_udata [variable]
-    cls.add_instance_attribute('m_udata', 'std::string', is_const=False)
-    return
-
-def register_Ns3CcnbParserVisitor_methods(root_module, cls):
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::Visitor::Visitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::Visitor::Visitor(ns3::CcnbParser::Visitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Visitor const &', 'arg0')])
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Blob & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Udata & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Tag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Attr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Dtag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Dattr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Visitor::visit(ns3::CcnbParser::Ext & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3CcnbParserVoidNoArguVisitor_methods(root_module, cls):
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguVisitor::VoidNoArguVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguVisitor::VoidNoArguVisitor(ns3::CcnbParser::VoidNoArguVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::VoidNoArguVisitor const &', 'arg0')])
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Blob & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Udata & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Tag & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Attr & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Dtag & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Dattr & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-no-argu-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguVisitor::visit(ns3::CcnbParser::Ext & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3CcnbParserVoidVisitor_methods(root_module, cls):
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidVisitor::VoidVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidVisitor::VoidVisitor(ns3::CcnbParser::VoidVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::VoidVisitor const &', 'arg0')])
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Blob & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Udata & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Tag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Attr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Dtag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Dattr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    ## ccnb-parser-void-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidVisitor::visit(ns3::CcnbParser::Ext & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_pure_virtual=True, is_virtual=True)
-    return
-
-def register_Ns3CcnbParserBaseAttr_methods(root_module, cls):
-    ## ccnb-parser-base-attr.h (module 'NDNabstraction'): ns3::CcnbParser::BaseAttr::BaseAttr() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-base-attr.h (module 'NDNabstraction'): ns3::CcnbParser::BaseAttr::BaseAttr(ns3::CcnbParser::BaseAttr const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::BaseAttr const &', 'arg0')])
-    ## ccnb-parser-base-attr.h (module 'NDNabstraction'): ns3::CcnbParser::BaseAttr::m_value [variable]
-    cls.add_instance_attribute('m_value', 'ns3::Ptr< ns3::CcnbParser::Udata >', is_const=False)
-    return
-
-def register_Ns3CcnbParserBaseTag_methods(root_module, cls):
-    ## ccnb-parser-base-tag.h (module 'NDNabstraction'): ns3::CcnbParser::BaseTag::BaseTag(ns3::CcnbParser::BaseTag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::BaseTag const &', 'arg0')])
-    ## ccnb-parser-base-tag.h (module 'NDNabstraction'): ns3::CcnbParser::BaseTag::m_attrs [variable]
-    cls.add_instance_attribute('m_attrs', 'std::list< ns3::Ptr< ns3::CcnbParser::Block > >', is_const=False)
-    ## ccnb-parser-base-tag.h (module 'NDNabstraction'): ns3::CcnbParser::BaseTag::m_nestedTags [variable]
-    cls.add_instance_attribute('m_nestedTags', 'std::list< ns3::Ptr< ns3::CcnbParser::Block > >', is_const=False)
-    ## ccnb-parser-base-tag.h (module 'NDNabstraction'): ns3::CcnbParser::BaseTag::BaseTag() [constructor]
-    cls.add_constructor([], 
-                        visibility='protected')
-    return
-
-def register_Ns3CcnbParserBlob_methods(root_module, cls):
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::Blob(ns3::CcnbParser::Blob const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Blob const &', 'arg0')])
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::Blob(ns3::Buffer::Iterator & start, uint32_t length) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'length')])
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): void ns3::CcnbParser::Blob::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): void ns3::CcnbParser::Blob::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Blob::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Blob::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::m_blob [variable]
-    cls.add_instance_attribute('m_blob', 'char *', is_const=False)
-    ## ccnb-parser-blob.h (module 'NDNabstraction'): ns3::CcnbParser::Blob::m_blobSize [variable]
-    cls.add_instance_attribute('m_blobSize', 'uint32_t', is_const=False)
-    return
-
-def register_Ns3CcnbParserDattr_methods(root_module, cls):
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): ns3::CcnbParser::Dattr::Dattr(ns3::CcnbParser::Dattr const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Dattr const &', 'arg0')])
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): ns3::CcnbParser::Dattr::Dattr(ns3::Buffer::Iterator & start, uint32_t dattr) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'dattr')])
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): void ns3::CcnbParser::Dattr::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): void ns3::CcnbParser::Dattr::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Dattr::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Dattr::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-dattr.h (module 'NDNabstraction'): ns3::CcnbParser::Dattr::m_dattr [variable]
-    cls.add_instance_attribute('m_dattr', 'uint32_t', is_const=False)
-    return
-
-def register_Ns3CcnbParserDepthFirstVisitor_methods(root_module, cls):
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::DepthFirstVisitor::DepthFirstVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::DepthFirstVisitor::DepthFirstVisitor(ns3::CcnbParser::DepthFirstVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::DepthFirstVisitor const &', 'arg0')])
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Blob & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Udata & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Tag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Attr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Dtag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Dattr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::DepthFirstVisitor::visit(ns3::CcnbParser::Ext & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserDtag_methods(root_module, cls):
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): ns3::CcnbParser::Dtag::Dtag(ns3::CcnbParser::Dtag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Dtag const &', 'arg0')])
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): ns3::CcnbParser::Dtag::Dtag(ns3::Buffer::Iterator & start, uint32_t dtag) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'dtag')])
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): void ns3::CcnbParser::Dtag::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): void ns3::CcnbParser::Dtag::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Dtag::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Dtag::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-dtag.h (module 'NDNabstraction'): ns3::CcnbParser::Dtag::m_dtag [variable]
-    cls.add_instance_attribute('m_dtag', 'uint32_t', is_const=False)
-    return
-
-def register_Ns3CcnbParserNoArguDepthFirstVisitor_methods(root_module, cls):
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguDepthFirstVisitor::NoArguDepthFirstVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NoArguDepthFirstVisitor::NoArguDepthFirstVisitor(ns3::CcnbParser::NoArguDepthFirstVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::NoArguDepthFirstVisitor const &', 'arg0')])
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Blob & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Udata & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Tag & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Attr & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Dtag & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Dattr & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-no-argu-depth-first-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NoArguDepthFirstVisitor::visit(ns3::CcnbParser::Ext & arg0) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserNonNegativeIntegerVisitor_methods(root_module, cls):
-    ## ccnb-parser-non-negative-integer-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonNegativeIntegerVisitor::NonNegativeIntegerVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-non-negative-integer-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonNegativeIntegerVisitor::NonNegativeIntegerVisitor(ns3::CcnbParser::NonNegativeIntegerVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::NonNegativeIntegerVisitor const &', 'arg0')])
-    ## ccnb-parser-non-negative-integer-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NonNegativeIntegerVisitor::visit(ns3::CcnbParser::Blob & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'n')], 
-                   is_virtual=True)
-    ## ccnb-parser-non-negative-integer-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NonNegativeIntegerVisitor::visit(ns3::CcnbParser::Udata & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'n')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserNonceVisitor_methods(root_module, cls):
-    ## ccnb-parser-nonce-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonceVisitor::NonceVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-nonce-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NonceVisitor::NonceVisitor(ns3::CcnbParser::NonceVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::NonceVisitor const &', 'arg0')])
-    ## ccnb-parser-nonce-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NonceVisitor::visit(ns3::CcnbParser::Blob & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'n')], 
-                   is_virtual=True)
-    ## ccnb-parser-nonce-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::NonceVisitor::visit(ns3::CcnbParser::Udata & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'n')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserStringVisitor_methods(root_module, cls):
-    ## ccnb-parser-string-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::StringVisitor::StringVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-string-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::StringVisitor::StringVisitor(ns3::CcnbParser::StringVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::StringVisitor const &', 'arg0')])
-    ## ccnb-parser-string-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::StringVisitor::visit(ns3::CcnbParser::Blob & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'n')], 
-                   is_virtual=True)
-    ## ccnb-parser-string-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::StringVisitor::visit(ns3::CcnbParser::Udata & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'n')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserTag_methods(root_module, cls):
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): ns3::CcnbParser::Tag::Tag(ns3::CcnbParser::Tag const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Tag const &', 'arg0')])
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): ns3::CcnbParser::Tag::Tag(ns3::Buffer::Iterator & start, uint32_t length) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'length')])
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): void ns3::CcnbParser::Tag::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): void ns3::CcnbParser::Tag::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Tag::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Tag::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-tag.h (module 'NDNabstraction'): ns3::CcnbParser::Tag::m_tag [variable]
-    cls.add_instance_attribute('m_tag', 'std::string', is_const=False)
-    return
-
-def register_Ns3CcnbParserTimestampVisitor_methods(root_module, cls):
-    ## ccnb-parser-timestamp-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::TimestampVisitor::TimestampVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-timestamp-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::TimestampVisitor::TimestampVisitor(ns3::CcnbParser::TimestampVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::TimestampVisitor const &', 'arg0')])
-    ## ccnb-parser-timestamp-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::TimestampVisitor::visit(ns3::CcnbParser::Blob & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Blob &', 'n')], 
-                   is_virtual=True)
-    ## ccnb-parser-timestamp-visitor.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::TimestampVisitor::visit(ns3::CcnbParser::Udata & n) [member function]
-    cls.add_method('visit', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Udata &', 'n')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserVoidDepthFirstVisitor_methods(root_module, cls):
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidDepthFirstVisitor::VoidDepthFirstVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidDepthFirstVisitor::VoidDepthFirstVisitor(ns3::CcnbParser::VoidDepthFirstVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::VoidDepthFirstVisitor const &', 'arg0')])
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Blob & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Udata & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Tag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Attr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Dtag & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Dattr & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidDepthFirstVisitor::visit(ns3::CcnbParser::Ext & arg0, boost::any arg1) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0'), param('boost::any', 'arg1')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserVoidNoArguDepthFirstVisitor_methods(root_module, cls):
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguDepthFirstVisitor::VoidNoArguDepthFirstVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::VoidNoArguDepthFirstVisitor::VoidNoArguDepthFirstVisitor(ns3::CcnbParser::VoidNoArguDepthFirstVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::VoidNoArguDepthFirstVisitor const &', 'arg0')])
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Blob & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Blob &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Udata & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Udata &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Tag & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Tag &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Attr & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Attr &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Dtag & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Dattr & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dattr &', 'arg0')], 
-                   is_virtual=True)
-    ## ccnb-parser-void-no-argu-depth-first-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::VoidNoArguDepthFirstVisitor::visit(ns3::CcnbParser::Ext & arg0) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Ext &', 'arg0')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserAttr_methods(root_module, cls):
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): ns3::CcnbParser::Attr::Attr(ns3::CcnbParser::Attr const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::Attr const &', 'arg0')])
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): ns3::CcnbParser::Attr::Attr(ns3::Buffer::Iterator & start, uint32_t length) [constructor]
-    cls.add_constructor([param('ns3::Buffer::Iterator &', 'start'), param('uint32_t', 'length')])
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): void ns3::CcnbParser::Attr::accept(ns3::CcnbParser::VoidNoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidNoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): void ns3::CcnbParser::Attr::accept(ns3::CcnbParser::VoidVisitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'void', 
-                   [param('ns3::CcnbParser::VoidVisitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Attr::accept(ns3::CcnbParser::NoArguVisitor & v) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::NoArguVisitor &', 'v')], 
-                   is_virtual=True)
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): boost::any ns3::CcnbParser::Attr::accept(ns3::CcnbParser::Visitor & v, boost::any param) [member function]
-    cls.add_method('accept', 
-                   'boost::any', 
-                   [param('ns3::CcnbParser::Visitor &', 'v'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    ## ccnb-parser-attr.h (module 'NDNabstraction'): ns3::CcnbParser::Attr::m_attr [variable]
-    cls.add_instance_attribute('m_attr', 'std::string', is_const=False)
-    return
-
-def register_Ns3CcnbParserContentObjectVisitor_methods(root_module, cls):
-    ## ccnb-parser-content-object-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::ContentObjectVisitor::ContentObjectVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-content-object-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::ContentObjectVisitor::ContentObjectVisitor(ns3::CcnbParser::ContentObjectVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::ContentObjectVisitor const &', 'arg0')])
-    ## ccnb-parser-content-object-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::ContentObjectVisitor::visit(ns3::CcnbParser::Dtag & n, boost::any param) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'n'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserInterestVisitor_methods(root_module, cls):
-    ## ccnb-parser-interest-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::InterestVisitor::InterestVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-interest-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::InterestVisitor::InterestVisitor(ns3::CcnbParser::InterestVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::InterestVisitor const &', 'arg0')])
-    ## ccnb-parser-interest-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::InterestVisitor::visit(ns3::CcnbParser::Dtag & n, boost::any param) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'n'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    return
-
-def register_Ns3CcnbParserNameComponentsVisitor_methods(root_module, cls):
-    ## ccnb-parser-name-components-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NameComponentsVisitor::NameComponentsVisitor() [constructor]
-    cls.add_constructor([])
-    ## ccnb-parser-name-components-visitor.h (module 'NDNabstraction'): ns3::CcnbParser::NameComponentsVisitor::NameComponentsVisitor(ns3::CcnbParser::NameComponentsVisitor const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnbParser::NameComponentsVisitor const &', 'arg0')])
-    ## ccnb-parser-name-components-visitor.h (module 'NDNabstraction'): void ns3::CcnbParser::NameComponentsVisitor::visit(ns3::CcnbParser::Dtag & n, boost::any param) [member function]
-    cls.add_method('visit', 
-                   'void', 
-                   [param('ns3::CcnbParser::Dtag &', 'n'), param('boost::any', 'param')], 
-                   is_virtual=True)
-    return
-
 def register_functions(root_module):
     module = root_module
     ## ccnx-name-components.h (module 'NDNabstraction'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::MakeCcnxNameComponentsChecker() [free function]
     module.add_function('MakeCcnxNameComponentsChecker', 
                         'ns3::Ptr< ns3::AttributeChecker const >', 
                         [])
-    register_functions_ns3_CcnbParser(module.get_submodule('CcnbParser'), root_module)
     register_functions_ns3_FatalImpl(module.get_submodule('FatalImpl'), root_module)
     register_functions_ns3_internal(module.get_submodule('internal'), root_module)
-    return
-
-def register_functions_ns3_CcnbParser(module, root_module):
     return
 
 def register_functions_ns3_FatalImpl(module, root_module):

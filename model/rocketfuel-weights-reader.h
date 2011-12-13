@@ -22,28 +22,8 @@
 #ifndef ROCKETFUEL_TOPOLOGY_READER_H
 #define ROCKETFUEL_TOPOLOGY_READER_H
 
-#include "ns3/nstime.h"
-#include "ns3/net-device-container.h"
 #include "ns3/topology-reader.h"
-
-
-#include "ns3/point-to-point-helper.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/ipv4-address-helper.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/drop-tail-queue.h"
-#include "ns3/ipv4-interface.h"
-#include "ns3/ipv4.h"
-#include "ns3/string.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include <string>
-#include <fstream>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
+#include "ns3/net-device-container.h"
 
 namespace ns3 {
     

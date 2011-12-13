@@ -89,12 +89,6 @@ struct CcnxPitEntryContainer
     > type;
 };
 
-// typedef std::map<int,int> PitCounter;
-// typedef std::map<int,int>::iterator PitCounterIterator;
-
-typedef std::map<int,double> PitBucket;
-typedef std::map<int,double>::iterator PitBucketIterator;
-
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 

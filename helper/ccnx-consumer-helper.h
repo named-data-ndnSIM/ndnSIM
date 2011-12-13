@@ -21,22 +21,11 @@
 #ifndef CCNX_CONSUMER_HELPER_H
 #define CCNX_CONSUMER_HELPER_H
 
-#include <stdint.h>
-#include <string>
 #include "ns3/object-factory.h"
-#include "ns3/address.h"
 #include "ns3/attribute.h"
-#include "ns3/net-device.h"
 #include "ns3/node-container.h"
 #include "ns3/application-container.h"
-#include "ns3/ccnx-name-components.h"
-#include "ns3/pointer.h"
-#include "ns3/ccnx-local-face.h"
-#include "ns3/callback.h"
-#include "ns3/ccnx-consumer.h"
-#include "ns3/log.h"
-#include "ns3/string.h"
-#include "ns3/names.h"
+#include "ns3/ptr.h"
 
 namespace ns3 
 {    

@@ -25,17 +25,13 @@
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
 #include "ns3/object-factory.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ccnx-trace-helper.h"
-#include "ns3/ccnx-forwarding-helper.h"
-#include "ns3/ccnx.h"
-#include "ns3/ccnx-interest-header.h"
 #include "ns3/nstime.h"
 
 namespace ns3 {
 
 class Node;
 class CcnxFaceContainer;
+class CcnxFace;
 
 /**
  * \ingroup ccnx
@@ -58,7 +54,7 @@ class CcnxFaceContainer;
  * attribute or a set of functionality that may be of interest to many other
  * classes.
  */
-class CcnxStackHelper //: public PcapHelperForCcnx, public AsciiTraceHelperForCcnx
+class CcnxStackHelper 
 {
 public:
   /**

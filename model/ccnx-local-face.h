@@ -66,6 +66,7 @@ public:
   ////////////////////////////////////////////////////////////////////
  
 private:
+  CcnxLocalFace ();
   CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor
   CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
 

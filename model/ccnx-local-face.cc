@@ -52,6 +52,22 @@ CcnxLocalFace::~CcnxLocalFace ()
   NS_LOG_FUNCTION_NOARGS ();
 }
 
+CcnxLocalFace::CcnxLocalFace ()
+  : CcnxFace (0)
+{
+}
+
+CcnxLocalFace::CcnxLocalFace (const CcnxLocalFace &)
+  : CcnxFace (0)
+{
+}
+
+CcnxLocalFace& CcnxLocalFace::operator= (const CcnxLocalFace &)
+{
+  return *((CcnxLocalFace*)0);
+}
+
+
 void
 CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {

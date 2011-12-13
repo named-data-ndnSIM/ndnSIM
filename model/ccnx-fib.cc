@@ -170,9 +170,8 @@ CcnxFib::NotifyNewAggregate ()
 void 
 CcnxFib::DoDispose (void)
 {
-  clear ();
+  m_fib.clear ();
   m_node = 0;
-  clear ();
   Object::DoDispose ();
 }
 
@@ -186,12 +185,12 @@ CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
        componentsCount--)
     {
       CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount));
-      CcnxFibEntryContainer::type::iterator match = find (subPrefix);
-      if (match != end())
+      CcnxFibEntryContainer::type::iterator match = m_fib.find (subPrefix);
+      if (match != m_fib.end())
         return match;
     }
   
-  return end ();
+  return m_fib.end ();
 }
 
 
@@ -200,16 +199,16 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
 {
 // CcnxFibFaceMetric
   NS_LOG_FUNCTION(this << prefix << face << metric);
-  CcnxFibEntryContainer::type::iterator entry = find (prefix);
-  if (entry == end ())
+  CcnxFibEntryContainer::type::iterator entry = m_fib.find (prefix);
+  if (entry == m_fib.end ())
     {
-      entry = insert (end (), CcnxFibEntry (prefix));
+      entry = m_fib.insert (m_fib.end (), CcnxFibEntry (prefix));
       // insert new
     }
 
   NS_ASSERT_MSG (face != NULL, "Trying to modify NULL face");
-  modify (entry,
-          ll::bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
+  m_fib.modify (entry,
+                ll::bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
     
   return entry;
 }
@@ -219,11 +218,11 @@ CcnxFib::Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face)
 {
   NS_LOG_FUNCTION (this);
 
-  modify (iterator_to (entry),
-          ll::bind (&CcnxFibEntry::RemoveFace, ll::_1, face));
+  m_fib.modify (m_fib.iterator_to (entry),
+                ll::bind (&CcnxFibEntry::RemoveFace, ll::_1, face));
   if (entry.m_faces.size () == 0)
     {
-      erase (iterator_to (entry));
+      m_fib.erase (m_fib.iterator_to (entry));
     }
 }
 
@@ -232,11 +231,27 @@ CcnxFib::RemoveFromAll (Ptr<CcnxFace> face)
 {
   NS_LOG_FUNCTION (this);
 
-  for_each (begin (), end (), ll::bind (&CcnxFib::Remove, this, ll::_1, face));
-  // BOOST_FOREACH (const CcnxFibEntry &entry, *this)
-  //   {
-  //     Remove (entry, face);
-  //   }
+  for_each (m_fib.begin (), m_fib.end (), 
+            ll::bind (&CcnxFib::Remove, this, ll::_1, face));
+}
+
+/**
+ * \brief Get number of FIB entry (for python bindings)
+ */
+uint32_t 
+CcnxFib::GetCcnxFibEntryCount () const
+{
+  return m_fib.size ();
+}
+
+/**
+ * \brief Get FIB entry by index (for python bindings)
+ */
+const CcnxFibEntry &
+CcnxFib::GetCcnxFibEntry (uint32_t index)
+{
+  NS_ASSERT (0 <= index && index < m_fib.size ());
+  return m_fib.get <i_nth> () [index];
 }
 
 
@@ -246,19 +261,17 @@ std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
   os << "  Dest prefix      Interfaces(Costs)                  \n";
   os << "+-------------+--------------------------------------+\n";
   
-  for (CcnxFibEntryContainer::type::iterator entry = fib.begin ();
-       entry != fib.end ();
+  for (CcnxFibEntryContainer::type::iterator entry = fib.m_fib.begin ();
+       entry != fib.m_fib.end ();
        entry++)
     {
-      os << *entry << "\n";
+      os << entry->GetPrefix () << "\t" << *entry << "\n";
     }
   return os;
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry)
 {
-  os << *entry.m_prefix << "\t";
-  
   for (CcnxFibFaceMetricContainer::type::index<i_nth>::type::iterator metric =
          entry.m_faces.get<i_nth> ().begin ();
        metric != entry.m_faces.get<i_nth> ().end ();

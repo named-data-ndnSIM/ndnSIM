@@ -19,14 +19,37 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include <fstream>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
+#include "rocketfuel-weights-reader.h"
+
+#include "ns3/nstime.h"
+#include "ns3/log.h"
+#include "ns3/assert.h"
+#include "ns3/names.h"
+#include "ns3/net-device-container.h"
+#include "ns3/point-to-point-helper.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/drop-tail-queue.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4.h"
+#include "ns3/string.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
+#include "ns3/ipv4-address.h"
+
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/random-variable.h"
+
 #include <regex.h>
 
-#include "ns3/log.h"
-#include "rocketfuel-weights-reader.h"
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <iomanip>
+#include <set>
+
 
 namespace ns3 {
     

@@ -77,6 +77,7 @@ CcnxNameComponents::Print (std::ostream &os) const
     {
       os << "/" << *i;
     }
+  if (m_prefix.size ()==0) os << "/";
 }
   
 std::ostream &

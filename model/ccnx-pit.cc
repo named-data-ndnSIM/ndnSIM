@@ -166,7 +166,7 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
   if (entry == end ())
     {
       CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
-      NS_ASSERT_MSG (fibEntry != m_fib->end (),
+      NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
                      "There should be at least default route set");
 
       entry = insert (end (),

@@ -232,6 +232,10 @@ protected:
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
+  /**
+   * \brief Default constructor
+   */
+  CcnxPitEntry () : m_fibEntry(*((CcnxFibEntry*)0)) {};
   
 public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry

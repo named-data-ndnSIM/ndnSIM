@@ -32,7 +32,6 @@
 
 #include "ns3/ccnx-producer-helper.h"
 #include "ccnx-content-store.h"
-#include "ccnx-rit.h"
 #include "ccnx-pit.h"
 #include "ccnx-fib.h"
 
@@ -78,8 +77,8 @@ public:
   static TypeId GetTypeId ();
 
   static const uint16_t ETHERNET_FRAME_TYPE; ///< \brief Ethernet Frame Type of CCNx
-  static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of CCNx
-  static const uint16_t UDP_PORT;            ///< \brief UDP port of CCNx
+  // static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of CCNx
+  // static const uint16_t UDP_PORT;            ///< \brief UDP port of CCNx
 
   /**
    * \brief Default constructor. Creates an empty stack without forwarding strategy set

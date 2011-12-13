@@ -46,18 +46,41 @@ def build(bld):
         return
    
     module.source = bld.path.ant_glob(['model/*.cc', 'apps/*.cc', 
-                          'helper/*.cc',
-                          'helper/ccnb-parser/*.cc',
-                          'helper/ccnb-parser/visitors/*.cc',
-                          'helper/ccnb-parser/syntax-tree/*.cc'])
+                                       'utils/*.cc',
+                                       'helper/*.cc',
+                                       'helper/ccnb-parser/*.cc',
+                                       'helper/ccnb-parser/visitors/*.cc',
+                                       'helper/ccnb-parser/syntax-tree/*.cc'])
 
-    headers.source = bld.path.ant_glob(['model/*.h', 'apps/*.h', 
-                          'helper/*.h',
-                          'helper/ccnb-parser/*.h',
-                          'helper/ccnb-parser/visitors/*.h',
-                          'helper/ccnb-parser/syntax-tree/*.h'])
+    headers.source = [
+        "helper/ccnx-stack-helper.h",
+        "helper/ccnx-producer-helper.h",
+        "helper/ccnx-consumer-helper.h",
 
-    headers.source = [x.path_from(bld.path) for x in headers.source]
+        "apps/ccnx-app.h",
+        "apps/ccnx-consumer.h",
+        "apps/ccnx-producer.h",
+
+        "model/hash-helper.h",
+        "model/ccnx.h",
+        "model/ccnx-face.h",
+
+        "model/ccnx-interest-header.h",
+        "model/ccnx-content-object-header.h",
+        "model/ccnx-name-components.h",
+        "model/ccnx-fib.h",
+        
+        "helper/ccnx-face-container.h",
+        "model/rocketfuel-weights-reader.h",
+        "model/annotated-topology-reader.h",
+        ]
+    # headers.source = bld.path.ant_glob(['model/*.h', 'apps/*.h', 
+    #                       'helper/*.h',
+    #                       'helper/ccnb-parser/*.h',
+    #                       'helper/ccnb-parser/visitors/*.h',
+    #                       'helper/ccnb-parser/syntax-tree/*.h'])
+
+    # headers.source = [x.path_from(bld.path) for x in headers.source]
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
@@ -107,4 +130,4 @@ def build(bld):
     #             obj.name = obj.target
     #             obj.uselib = 'BOOST BOOST_IOSTREAMS'
 
-    # bld.ns3_python_bindings()
+    bld.ns3_python_bindings()

@@ -66,7 +66,11 @@
 #include "ns3/callback.h"
 #include "ns3/node.h"
 #include "ns3/core-config.h"
-#include "ns3/ccnx-forwarding-strategy.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/point-to-point-helper.h"
+
+#include "../model/ccnx-forwarding-strategy.h"
+
 #include "ns3/ccnx-net-device-face.h"
 #include "ns3/ccnx-l3-protocol.h"
 #include "ns3/ccnx-fib.h"
@@ -82,7 +86,6 @@
 
 #include "ccnx-face-container.h"
 #include "ccnx-stack-helper.h"
-#include "ccnx-forwarding-helper.h"
 
 #include <limits>
 #include <map>

@@ -129,7 +129,7 @@ AnnotatedTopologyReader::Read (void)
       Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
       node->AggregateObject (loc);
 
-      loc->SetPosition (Vector (latitude, longitude, 0));
+      loc->SetPosition (Vector (2*longitude, -2*latitude, 0));
 
       Names::Add (m_path, name, node);
       nodes.Add (node);

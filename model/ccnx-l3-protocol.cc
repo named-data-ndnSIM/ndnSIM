@@ -29,6 +29,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/object-vector.h"
 #include "ns3/boolean.h"
+#include "ns3/string.h"
 
 #include "ns3/ccnx-header-helper.h"
 
@@ -51,6 +52,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxL3Protocol");
 namespace ns3 {
 
 const uint16_t CcnxL3Protocol::ETHERNET_FRAME_TYPE = 0x7777;
+
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxL3Protocol);
 
@@ -339,9 +341,9 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                      ll::bind (&CcnxPitEntry::RemoveIncoming, ll::_1, incomingFace));
     }
 
-  m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
-                 ll::bind (&CcnxFibEntry::UpdateStatus,
-                           ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+  m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                       ll::bind (&CcnxFibEntry::UpdateStatus,
+                                 ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
 
   if (pitEntry.m_incoming.size () == 0) // interest was actually satisfied
     {
@@ -469,9 +471,9 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 
       // ?? not sure if we need to do that ?? ...
       
-      m_fib->modify(m_fib->iterator_to (pitEntry.m_fibEntry),
-                    ll::bind (&CcnxFibEntry::UpdateStatus,
-                              ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
+      m_fib->m_fib.modify(m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                          ll::bind (&CcnxFibEntry::UpdateStatus,
+                                    ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
     }
 
   if (!isRetransmitted &&
@@ -559,11 +561,11 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       // If we have sent interest for this data via this face, then update stats.
       if (out != pitEntry.m_outgoing.end ())
         {
-          m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
-                         ll::bind (&CcnxFibEntry::UpdateFaceRtt,
-                                   ll::_1,
-                                   incomingFace,
-                                   Simulator::Now () - out->m_sendTime));
+          m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                               ll::bind (&CcnxFibEntry::UpdateFaceRtt,
+                                         ll::_1,
+                                         incomingFace,
+                                         Simulator::Now () - out->m_sendTime));
         }
       else
         {
@@ -579,9 +581,9 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         }
 
       // Update metric status for the incoming interface in the corresponding FIB entry
-      m_fib->modify (m_fib->iterator_to (pitEntry.m_fibEntry),
-                     ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
-                               incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
+      m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                           ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
+                                     incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
       // Add or update entry in the content store
       m_contentStore->Add (header, payload);

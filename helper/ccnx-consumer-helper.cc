@@ -19,6 +19,10 @@
  */
 
 #include "ccnx-consumer-helper.h"
+#include "ns3/log.h"
+#include "ns3/ccnx-name-components.h"
+#include "ns3/names.h"
+#include "../apps/ccnx-consumer.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumerHelper");
 

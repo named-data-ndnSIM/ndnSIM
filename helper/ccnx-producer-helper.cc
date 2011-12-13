@@ -19,6 +19,11 @@
  */
 
 #include "ccnx-producer-helper.h"
+#include "ns3/log.h"
+#include "ns3/ccnx-name-components.h"
+#include "ns3/uinteger.h"
+#include "ns3/names.h"
+#include "../apps/ccnx-producer.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxProducerHelper");
 

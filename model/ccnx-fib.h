@@ -234,18 +234,20 @@ struct CcnxFibEntryContainer
         boost::multi_index::const_mem_fun<CcnxFibEntry,
                                           const CcnxNameComponents&,
                                           &CcnxFibEntry::GetPrefix>,
-        CcnxPrefixHash>
+        CcnxPrefixHash>,
 
-      // other indexes?
-    >
-  > type;
+      boost::multi_index::random_access<
+        boost::multi_index::tag<__ccnx_private::i_nth>
+        >
+      >
+    > type;
 };
 
 /**
  * \ingroup ccnx
  * \brief Class implementing FIB functionality
  */
-class CcnxFib : public Object, public CcnxFibEntryContainer::type
+class CcnxFib : public Object
 {
 public:
   /**
@@ -299,6 +301,21 @@ public:
    */
   void
   RemoveFromAll (Ptr<CcnxFace> face);
+
+  /**
+   * \brief Get number of FIB entry (for python bindings)
+   */
+  uint32_t 
+  GetCcnxFibEntryCount () const;
+
+  /**
+   * \brief Get FIB entry by index (for python bindings)
+   */
+  const CcnxFibEntry &
+  GetCcnxFibEntry (uint32_t index);
+
+public:
+  CcnxFibEntryContainer::type m_fib;
 
 protected:
   // inherited from Object class
