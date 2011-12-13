@@ -22,73 +22,80 @@
 #define __ANNOTATED_TOPOLOGY_READER_H__
 
 #include "ns3/topology-reader.h"
-#include "ns3/nstime.h"
-#include "ns3/log.h"
-#include "ns3/net-device-container.h"
-#include "ns3/point-to-point-helper.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/internet-stack-helper.h"
-#include "ns3/ipv4-address-helper.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/drop-tail-queue.h"
-#include "ns3/ipv4-interface.h"
-#include "ns3/ipv4.h"
-#include "ns3/string.h"
-#include "ns3/pointer.h"
-#include "ns3/uinteger.h"
-#include "ns3/ipv4-address.h"
-#include <string>
-#include <fstream>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-
-#include "ns3/animation-interface.h"
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/random-variable.h"
 
 namespace ns3 
 {
     
 /**
-* \brief This class reads annotated topology and apply settings to the corresponding nodes and links
-* Input File Format
-* 1st line is     NumberOfNodes    TAB     NumberofLinks
-* Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
-*
-*/
+ * \brief This class reads annotated topology and apply settings to the corresponding nodes and links
+ * Input File Format
+ * 1st line is     NumberOfNodes    TAB     NumberofLinks
+ * Nth line is     NodeID1  TAB    NodeID2   TAB  DataRateKBPS TAB OSPF   TAB    DelayMiliseconds   TAB   QueueSizeInPacketsNode1     TAB    QueueSizeInPacketsNode2 
+ *
+ */
 class AnnotatedTopologyReader : public TopologyReader
 {
 public:
-    typedef std::list< Link >::iterator LinksIterator;
-    static TypeId GetTypeId (void);
-        
-    AnnotatedTopologyReader ();
-    virtual ~AnnotatedTopologyReader ();
-        
-        
-    /**
-    * \brief Main annotated topology reading function.
-    *
-    * This method opens an input stream and reads topology file with annotations.
-    *
-    * \return the container of the nodes created (or empty container if there was an error)
-    */
-    virtual NodeContainer Read (void);
-    
-    /**
-     * \brief This method applies setting to corresponding nodes and links
-     * NetDeviceContainer must be allocated
-     * NodeContainer from Read method
-     */
-    void ApplySettings(NetDeviceContainer *ndc, NodeContainer* nc);
-    
-    //void ApplyOspfMetric(NetDeviceContainer* ndc, NodeContainer* nc);
-    void BoundingBox (NodeContainer* nc, double ulx, double uly, double lrx, double lry);
-        
+  typedef std::list< Link >::iterator LinksIterator;
+  static TypeId GetTypeId (void);
+
+  /**
+   * \brief Constructor
+   *
+   * \param path ns3::Names path
+   *
+   * \see ns3::Names class
+   */
+  AnnotatedTopologyReader (const std::string &path="");
+  virtual ~AnnotatedTopologyReader ();
+
+  /**
+   * \brief Main annotated topology reading function.
+   *
+   * This method opens an input stream and reads topology file with annotations.
+   *
+   * \return the container of the nodes created (or empty container if there was an error)
+   */
+  virtual
+  NodeContainer Read (void);
+
+  /**
+   * \brief Set bounding box for the nodes
+   */
+  void
+  SetBoundingBox (double ulx, double uly, double lrx, double lry);
+
+  /**
+   * \brief Assign IPv4 addresses to all links
+   *
+   * Note, IPv4 stack should be installed on all nodes prior this call
+   *
+   * Every link will receive /24 netmask
+   *
+   * \param base Starting IPv4 address (second link will have base+256)
+   */
+  void
+  AssignIpv4Addresses (Ipv4Address base);
+  
 private:
-    AnnotatedTopologyReader (const AnnotatedTopologyReader&);
-    AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
+  /**
+   * \brief This method applies setting to corresponding nodes and links
+   * NetDeviceContainer must be allocated
+   * NodeContainer from Read method
+   */
+  void ApplySettings ();
+  void AssignCoordinates ();
+  void ApplyOspfMetric ();
+  
+private:
+  AnnotatedTopologyReader (const AnnotatedTopologyReader&);
+  AnnotatedTopologyReader& operator= (const AnnotatedTopologyReader&);
+
+  std::string m_path;
+  double m_ulx;
+  double m_uly;
+  double m_lrx;
+  double m_lry;
 };
 }
 

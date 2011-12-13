@@ -41,46 +41,34 @@ main (int argc, char *argv[])
   // Packet::EnableChecking();
   // Packet::EnablePrinting();
   string input ("./src/NDNabstraction/examples/abilene-topology.txt");
-    
+
+  Time finishTime = Seconds (20.0);
+  string animationFile;
+  string strategy = "ns3::CcnxFloodingStrategy";
   CommandLine cmd;
+  cmd.AddValue ("finish", "Finish time", finishTime);
+  cmd.AddValue ("netanim", "NetAnim filename", animationFile);
+  cmd.AddValue ("strategy", "CCNx forwarding strategy", strategy);
   cmd.Parse (argc, argv);
     
   // ------------------------------------------------------------
   // -- Read topology data.
   // --------------------------------------------
     
-  Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
-  reader->SetFileName (input);
+  AnnotatedTopologyReader reader;
+  reader.SetFileName (input);
+  reader.SetBoundingBox (100.0, 100.0, 400.0, 400.0);
+  
+  NodeContainer nodes = reader.Read ();
     
-  NodeContainer nodes;
-  if (reader != 0)
-    {
-      nodes = reader->Read ();
-    }
-    
-  if (reader->LinksSize () == 0)
+  if (reader.LinksSize () == 0)
     {
       NS_LOG_ERROR ("Problems reading the topology file. Failing.");
       return -1;
     }
 
   NS_LOG_INFO("Nodes = " << nodes.GetN());
-  NS_LOG_INFO("Links = " << reader->LinksSize ());
-    
-  int totlinks = reader->LinksSize ();
-  ///*** applying settings
-  NS_LOG_INFO ("creating node containers");
-  NodeContainer* nc = new NodeContainer[totlinks];
-  TopologyReader::ConstLinksIterator iter;
-  int i = 0;
-  for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
-    {
-      nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
-    }
-    
-  NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-  reader->ApplySettings(ndc,nc);
-  reader->BoundingBox(nc, 100.0, 100.0, 400.0,400.0);
+  NS_LOG_INFO("Links = " << reader.LinksSize ());
     
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
@@ -89,14 +77,11 @@ main (int argc, char *argv[])
   ccnxHelper.EnableLimits (true, Seconds(0.1));
   ccnxHelper.InstallAll ();
     
-  NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("preved");
-  ApplicationContainer consumers = consumerHelper.Install (nc[0]);
+  // NS_LOG_INFO ("Installing Applications");
+  // CcnxConsumerHelper consumerHelper ("preved");
+  // ApplicationContainer consumers = consumerHelper.Install (nc[0]);
     
-  consumers.Start (Seconds (0));
-  consumers.Stop (Seconds (20));
-
-  Simulator::Stop (Seconds (20));
+  Simulator::Stop (finishTime);
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
   Simulator::Destroy ();

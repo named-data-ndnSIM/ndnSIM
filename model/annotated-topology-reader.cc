@@ -20,6 +20,30 @@
 
 #include "annotated-topology-reader.h"
 
+#include "ns3/nstime.h"
+#include "ns3/log.h"
+#include "ns3/assert.h"
+#include "ns3/names.h"
+#include "ns3/net-device-container.h"
+#include "ns3/point-to-point-helper.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/internet-stack-helper.h"
+#include "ns3/ipv4-address-helper.h"
+#include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/drop-tail-queue.h"
+#include "ns3/ipv4-interface.h"
+#include "ns3/ipv4.h"
+#include "ns3/string.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
+#include "ns3/ipv4-address.h"
+
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/random-variable.h"
+
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 
 namespace ns3 
@@ -31,502 +55,252 @@ NS_OBJECT_ENSURE_REGISTERED (AnnotatedTopologyReader);
     
 TypeId AnnotatedTopologyReader::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::AnnotatedTopologyReader")
+  static TypeId tid = TypeId ("ns3::AnnotatedTopologyReader")
     .SetParent<Object> ()
     ;
-    return tid;
+  return tid;
 }
     
-AnnotatedTopologyReader::AnnotatedTopologyReader ()
+AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
+  : m_path (path)
+  , m_ulx (0)
+  , m_uly (0)
+  , m_lrx (100.0)
+  , m_lry (100.0)
 {
-    NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
-    
+
+void
+AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
+{
+  NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
+  
+  m_ulx = ulx;
+  m_uly = uly;
+  m_lrx = lrx;
+  m_lry = lry;
+}
+
 AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 {
-    NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
     
 NodeContainer
 AnnotatedTopologyReader::Read (void)
 {
-    ifstream topgen;
-    topgen.open (GetFileName ().c_str ());
-    map<string, Ptr<Node> > nodeMap;
-    NodeContainer nodes;
+  ifstream topgen;
+  topgen.open (GetFileName ().c_str ());
+  NodeContainer nodes;
         
-    if ( !topgen.is_open () )
+  if (!topgen.is_open ())
     {
-        return nodes;
+      NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
+      return nodes;
     }
-        
-    string from;
-    string to;
-    string linkAttr;
-        
-    int linksNumber = 0;
-    int nodesNumber = 0;
-        
-    int totnode = 0;
-    int totlink = 0;
-        
-    istringstream lineBuffer;
-    string line;
-        
-    getline (topgen,line);
-    lineBuffer.str (line);
-        
-    lineBuffer >> totnode;
-    lineBuffer >> totlink;
-    NS_LOG_INFO ("Annotated topology should have " << totnode << " nodes and " << totlink << " links");
-        
-    if(!topgen.eof ())
-        NS_LOG_INFO("!EOF");
 
+  int linksNumber = 0;
+  int nodesNumber = 0;
         
-    for (int i = 0; i < totlink && !topgen.eof (); i++)
+  string line;
+  getline (topgen,line);
+  istringstream headerLineBuffer (line);
+        
+  int totnode;
+  int totlink;
+  headerLineBuffer >> totnode;
+  headerLineBuffer >> totlink;
+  
+  NS_LOG_INFO ("Annotated topology should have " << totnode << " nodes and " << totlink << " links");
+
+  for (int i = 0; i < totlink && !topgen.eof (); i++)
     {
-        //NS_LOG_INFO("Line #" <<i);
-        getline (topgen,line);
-        lineBuffer.clear ();
-        lineBuffer.str (line);
+      getline (topgen, line);
+      istringstream lineBuffer (line);
             
-        lineBuffer >> from;
-        lineBuffer >> to;
-            
-            
-        if ( (!from.empty ()) && (!to.empty ()) )
+      string from;
+      string to;
+      lineBuffer >> from;
+      lineBuffer >> to;
+
+      if ( (!from.empty ()) && (!to.empty ()) )
         {
-            NS_LOG_INFO ( linksNumber << " From: " << from << " to: " << to );
-                
-            if ( nodeMap[from] == 0 )
+          NS_LOG_INFO ( linksNumber << " From: " << from << " to: " << to );
+
+          Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
+          Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
+          
+          if (fromNode == 0)
             {
-                Ptr<Node> tmpNode = CreateObject<Node> ();
-                nodeMap[from] = tmpNode;
-                nodes.Add (tmpNode);
-                nodesNumber++;
+              fromNode = CreateObject<Node> ();
+              Names::Add (m_path, from, fromNode);
+              nodes.Add (fromNode);
+              nodesNumber++;
             }
                 
-            if (nodeMap[to] == 0)
+          if (toNode == 0)
             {
-                Ptr<Node> tmpNode = CreateObject<Node> ();
-                nodeMap[to] = tmpNode;
-                nodes.Add (tmpNode);
-                nodesNumber++;
+              toNode = CreateObject<Node> ();
+              Names::Add (m_path, to, toNode);
+              nodes.Add (toNode);
+              nodesNumber++;
             }
                 
-            Link link ( nodeMap[from], from, nodeMap[to], to );
+          Link link (fromNode, from, toNode, to);
                 
-            lineBuffer >> linkAttr;
-            if ( !linkAttr.empty () )
+          string dataRate;
+          lineBuffer >> dataRate;
+
+          string ospf;
+          lineBuffer >> ospf;
+
+          string delay;
+          lineBuffer >> delay;
+
+          string queueSizeNode1;
+          lineBuffer >> queueSizeNode1;
+          
+          string queueSizeNode2;
+          lineBuffer >> queueSizeNode2;
+
+          if (dataRate.empty () ||
+              ospf.empty () ||
+              delay.empty () ||
+              queueSizeNode1.empty () ||
+              queueSizeNode2.empty ())
             {
-                link.SetAttribute ("DataRate", linkAttr);
+              NS_LOG_ERROR ("File [" << GetFileName () << ":" << i+2 << " wrong format, skipping");
+              continue;
             }
-            
-            lineBuffer >> linkAttr;
-            if ( !linkAttr.empty () )
-            {
-                link.SetAttribute ("OSPF", linkAttr);
-            }
+          
+          link.SetAttribute ("DataRate", dataRate);
+          link.SetAttribute ("OSPF", ospf);
+          link.SetAttribute ("Delay", delay);
+          link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
+          link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
                 
-            lineBuffer >> linkAttr;
-            if ( !linkAttr.empty () )
-            {
-                link.SetAttribute ("Delay", linkAttr);
-            }
+          AddLink (link);
                 
-            lineBuffer >> linkAttr;
-            if ( !linkAttr.empty () )
-            {
-                link.SetAttribute ("QueueSizeNode1", linkAttr);
-            }
-                
-            lineBuffer >> linkAttr;
-            if ( !linkAttr.empty () )
-            {
-                link.SetAttribute ("QueueSizeNode2", linkAttr);
-            }
-                
-            AddLink (link);
-                
-            linksNumber++;
+          linksNumber++;
         }
     }
+
+  NS_ASSERT (nodesNumber == totnode && linksNumber == totlink);
         
-    NS_LOG_INFO ("Annotated topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
-    topgen.close ();
-        
-    return nodes;
+  NS_LOG_INFO ("Annotated topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
+  topgen.close ();
+
+  ApplySettings ();
+  AssignCoordinates ();
+  
+  return nodes;
 }
-    
-void
-AnnotatedTopologyReader::ApplySettings(NetDeviceContainer* ndc, NodeContainer* nc)
-{
-    InternetStackHelper stack;
-    Ipv4AddressHelper address;
-    address.SetBase ("10.1.0.0", "255.255.255.0");
-    
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-    stack.SetRoutingHelper (ipv4RoutingHelper);
-    
-    
-    
-    //This loop passes all links and checks if ipv4 is installed on the node
-    // if not, it installs. 
-    // We can't use stack.Install(nc) because in nc there are duplicates and assertion fails
-    TopologyReader::ConstLinksIterator iter;
-    int j = 0;
-    for ( iter = this->LinksBegin (); iter != this->LinksEnd (); iter++, j++ )
-    {
-        NodeContainer twoNodes = nc[j];
-        
-        Ptr<Node> nd = twoNodes.Get(0);
-        if(nd==NULL)
-            NS_LOG_INFO("nd = null");
-        
-        Ptr<Node> nd2 = twoNodes.Get(1);
-        if(nd2==NULL)
-            NS_LOG_INFO("nd2 = null");
-        
-        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
-        if(ipv4 == 0)
-        {
-            NS_LOG_INFO("ipv4 = null");
-            stack.Install(nd);
-        }
-        
-        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
-        if(ipv42 == 0)
-        {
-            NS_LOG_INFO("ipv42 = null");
-            stack.Install(nd2);
-        }
-        
-        //NS_LOG_INFO("#netdevices = " << nd->GetNDevices());
-        //NS_LOG_INFO("#netdevices = " << nd2->GetNDevices());
-    }
-    
-    NS_LOG_INFO("ITER2");
-    uint32_t base = 0;
-    PointToPointHelper p2p;
-    TopologyReader::ConstLinksIterator iter2;
-    int i = 0;
-    for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
-    {
-        p2p.SetDeviceAttribute("DataRate", StringValue(iter2->GetAttribute("DataRate")+"Kbps"));
-        NS_LOG_INFO("DataRate = " + iter2->GetAttribute("DataRate")+"Kbps");
-        p2p.SetChannelAttribute("Delay", StringValue(iter2->GetAttribute("Delay")+"ms"));
-        NS_LOG_INFO("Delay = " + iter2->GetAttribute("Delay")+"ms");
-        p2p.SetQueue("ns3::DropTailQueue","MaxPackets",StringValue("100"));
-        ndc[i] = p2p.Install(nc[i]);
-        
-        Ipv4Address address1(base+i*256 + 1);
-        Ipv4Address address2(base+i*256 + 2);
-        
-        NodeContainer twoNodes = nc[i];
-            
-        Ptr<Node> nd = twoNodes.Get(0);
-        if(nd==NULL)
-            NS_LOG_INFO("nd = null");
-        
-        
-        
-        Ptr<Node> nd2 = twoNodes.Get(1);
-        if(nd2==NULL)
-            NS_LOG_INFO("nd2 = null");
-        
-        //NS_LOG_INFO("1");
-        NS_LOG_INFO("#netdevices = " << nd->GetNDevices());
-        NS_LOG_INFO("#netdevices = " << nd2->GetNDevices());
-            
-        Ptr<NetDevice> device = nd->GetDevice(nd->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-        
-        if(device==NULL)
-            NS_LOG_INFO("device = 0");
-        
-        std::string ospf = iter2->GetAttribute("OSPF");
-        uint16_t metric = atoi(ospf.c_str());
-        NS_LOG_INFO("OSPF metric = " << metric);
-        
-        {
-        NetDeviceContainer* temp = new NetDeviceContainer[1];
-        temp->Add(device);
-        address.Assign (*temp);
-        }
-        
-        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
-        if(ipv4 == 0)
-        {
-            NS_LOG_INFO("ipv4 = null");
-            //stack.Install(nd);
-            /*NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device);
-            address.Assign (*temp);
-            ipv4 = nd->GetObject<Ipv4>();*/
-        }
-        
-        NS_LOG_INFO("Before GetID");
-        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
-        NS_LOG_INFO("InterfaceID = " << interfaceId);
-        ipv4->SetMetric(interfaceId,metric);
-        
-        
-        
-
-        
-        /*Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
-        
-        if(ipv4 == 0)
-            NS_LOG_INFO("ipv4 = null");
-        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
-        ipv4->SetMetric(interfaceId,metric);*/
-        
-        //Ptr<Ipv4Interface> interface = nd->GetDevice(nd->GetNDevices()-1)->GetObject<Ipv4Interface> ();
-        //ipv4->SetMetric(metric);
-            
-        //NS_LOG_INFO("2");
-            
-        Ptr<NetDevice> device2 = nd2->GetDevice(nd2->GetNDevices()-1)->GetObject<PointToPointNetDevice> ();
-            
-        if(device2==NULL)
-            NS_LOG_INFO("device2 = 0");
-            
-        {
-            NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device2);
-            address.Assign (*temp);
-        }
-        
-        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
-        if(ipv42 == 0)
-        {
-            NS_LOG_INFO("ipv42 = null");
-            /*stack.Install(nd2);
-            NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device2);
-            address.Assign (*temp);
-            ipv42 = nd2->GetObject<Ipv4>();*/
-        }
-        
-        NS_LOG_INFO("Before GetID");
-        interfaceId = ipv42->GetInterfaceForDevice(device2);
-        NS_LOG_INFO("InterfaceID = " << interfaceId);
-        ipv42->SetMetric(interfaceId,metric);
-
-        
-        
-        PointerValue tmp1;
-        device->GetAttribute ("TxQueue", tmp1);
-        //NS_LOG_INFO("2.5");
-        Ptr<Object> txQueue1 = tmp1.GetObject ();
-            
-        PointerValue tmp2;
-        device2->GetAttribute ("TxQueue", tmp2);
-        Ptr<Object> txQueue2 = tmp2.GetObject ();
-        //NS_LOG_INFO("3");
-        Ptr<DropTailQueue> dtq1 = txQueue1->GetObject <DropTailQueue> ();
-        NS_ASSERT (dtq1 != 0);
-            
-        Ptr<DropTailQueue> dtq2 = txQueue2->GetObject <DropTailQueue> ();
-        NS_ASSERT (dtq2 != 0);
-            
-        std::string queuesize1 = iter2->GetAttribute("QueueSizeNode1");
-        std::string queuesize2 = iter2->GetAttribute("QueueSizeNode2");
-        //NS_LOG_INFO("4");
-        txQueue1->SetAttribute("MaxPackets", UintegerValue (atoi(queuesize1.c_str())));
-        txQueue2->SetAttribute("MaxPackets", UintegerValue (atoi(queuesize2.c_str())));
-            
-        UintegerValue limit;
-        txQueue1->GetAttribute ("MaxPackets", limit);
-        NS_LOG_INFO ("NetDevice #"<< device->GetIfIndex() << "has queue limit " << limit.Get () << " packets");
-            
-        txQueue2->GetAttribute ("MaxPackets", limit);
-        NS_LOG_INFO ("NetDevice #"<< device2->GetIfIndex() << "has queue limit " << limit.Get () << " packets");
-    }
-}
-
-    /*
-void
-AnnotatedTopologyReader::ApplyOspfMetric(NetDeviceContainer* ndc, NodeContainer* nc)
-{
-    InternetStackHelper stack;
-    Ipv4AddressHelper address;
-    address.SetBase ("10.0.0.0", "255.255.255.252");
-    
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-    stack.SetRoutingHelper (ipv4RoutingHelper);
-
-    
-    TopologyReader::ConstLinksIterator iter2;
-    int i = 0;
-    for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
-    {
-        NodeContainer twoNodes = nc[i];
-        Ptr<NetDevice> device = ndc[i].Get(0);
-        Ptr<NetDevice> device2 = ndc[i].Get(1);
-        
-        //Ptr<Node> nd = twoNodes.Get(0);
-        Ptr<Node> nd = device->GetNode();
-        if(nd==NULL)
-            NS_LOG_INFO("nd = null");
-        
-        //Ptr<Node> nd2 = twoNodes.Get(1);
-        Ptr<Node> nd2 = device->GetNode();
-        if(nd2==NULL)
-            NS_LOG_INFO("nd2 = null");
-
-        
-        
-        std::string ospf = iter2->GetAttribute("OSPF");
-        uint16_t metric = atoi(ospf.c_str());
-        NS_LOG_INFO("OSPF metric = " << metric);
-        
-        Ptr<Ipv4> ipv4 = nd->GetObject<Ipv4>();
-        
-        if(ipv4 == 0)
-        {
-            NS_LOG_INFO("ipv4 = null");
-            stack.Install(nd);
-            NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device);
-            address.Assign (*temp);
-            ipv4 = nd->GetObject<Ipv4>();
-        }
-        
-        NS_LOG_INFO("Before GetID");
-        int32_t interfaceId = ipv4->GetInterfaceForDevice(device);
-        NS_LOG_INFO("InterfaceID = " << interfaceId);
-        ipv4->SetMetric(interfaceId,metric);
-        
-        
-        
-        Ptr<Ipv4> ipv42 = nd2->GetObject<Ipv4>();
-        if(ipv42 == 0)
-        {
-            NS_LOG_INFO("ipv42 = null");
-            stack.Install(nd2);
-            NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device2);
-            address.Assign (*temp);
-            ipv42 = nd2->GetObject<Ipv4>();
-        }
-
-        //if(ipv4 == 0)
-        //    NS_LOG_INFO("ipv4 = null");
-        
-        NS_LOG_INFO("Before GetID");
-        interfaceId = ipv42->GetInterfaceForDevice(device2);
-        if(interfaceId == -1)
-        {
-            NS_LOG_INFO("interfaceID = -1");
-            stack.Install(nd2);
-            NetDeviceContainer* temp = new NetDeviceContainer[1];
-            temp->Add(device2);
-            address.Assign (*temp);
-            ipv42 = nd2->GetObject<Ipv4>();
-            interfaceId = ipv42->GetInterfaceForDevice(device2);
-        }
-        NS_LOG_INFO("InterfaceID = " << interfaceId);
-        ipv42->SetMetric(interfaceId,metric);
-
-    }
-}*/
 
 void
-AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly, double lrx, double lry)
+AnnotatedTopologyReader::AssignIpv4Addresses (Ipv4Address base)
 {
-    
-    UniformVariable randX(ulx, lrx);
-    double x = 0.0;
-    UniformVariable randY(uly, lry);
-    double y = 0.0;
+  Ipv4AddressHelper address (base, Ipv4Mask ("/24"));
 
-
-    PointToPointHelper p2p;
-    TopologyReader::ConstLinksIterator iter2;
-    int i = 0;
-    for ( iter2 = this->LinksBegin (); iter2 != this->LinksEnd (); iter2++, i++ )
+  BOOST_FOREACH (const Link &link, m_linksList)
     {
-        NodeContainer twoNodes = nc[i];
-        
-        Ptr<Node> nd = twoNodes.Get(0);
-        if(nd==NULL)
-            NS_LOG_INFO("nd = null");
-        
-        Ptr<Node> nd2 = twoNodes.Get(1);
-        if(nd2==NULL)
-            NS_LOG_INFO("nd2 = null");
-        
-        Ptr<ConstantPositionMobilityModel> loc = nd->GetObject<ConstantPositionMobilityModel> ();
-        if (loc ==0)
-        {
-            loc = CreateObject<ConstantPositionMobilityModel> ();
-            nd->AggregateObject (loc);
-        }
-        
-        x = randX.GetValue();
-        y = randY.GetValue();
-        NS_LOG_INFO("X = "<<x <<"Y = "<<y);
-        Vector locVec (x, y, 0);
-        loc->SetPosition (locVec);
-        
-        
-        Ptr<ConstantPositionMobilityModel> loc2 = nd2->GetObject<ConstantPositionMobilityModel> ();
-        if (loc2 ==0)
-        {
-            loc2 = CreateObject<ConstantPositionMobilityModel> ();
-            nd2->AggregateObject (loc2);
-        }
-        
-        x = randX.GetValue();
-        y = randY.GetValue();
-        NS_LOG_INFO("X = "<<x <<"Y = "<<y);
-        Vector locVec2 (x, y, 0);
-        loc2->SetPosition (locVec2);
+      address.Assign (NetDeviceContainer (link.GetFromNetDevice (),
+                                          link.GetToNetDevice ()));
+      
+      base = Ipv4Address (base.Get () + 256);
+      address.SetBase (base, Ipv4Mask ("/24"));
     }
-    /*
-        double xDist; 
-        double yDist; 
-        if (lrx > ulx)
-        {
-            xDist = lrx - ulx;
-        }
-        else
-        {
-            xDist = ulx - lrx;
-        }
-        if (lry > uly)
-        {
-            yDist = lry - uly;
-        }
-        else
-        {
-            yDist = uly - lry;
-        }
-        double xAdder = xDist / m_xSize;
-        double yAdder = yDist / m_ySize;
-        double yLoc = yDist / 2;
-        for (uint32_t i = 0; i < m_ySize; ++i)
-        {
-            double xLoc = xDist / 2;
-            for (uint32_t j = 0; j < m_xSize; ++j)
-            {
-                Ptr<Node> node = GetNode (i, j);
-                Ptr<ConstantPositionMobilityModel> loc = node->GetObject<ConstantPositionMobilityModel> ();
-                if (loc ==0)
-                {
-                    loc = CreateObject<ConstantPositionMobilityModel> ();
-                    node->AggregateObject (loc);
-                }
-                Vector locVec (xLoc, yLoc, 0);
-                loc->SetPosition (locVec);
-                
-                xLoc += xAdder;
-            }
-            yLoc += yAdder;
-        }
-    }
-*/
-}
+
+  ApplyOspfMetric ();
 }
 
+void
+AnnotatedTopologyReader::ApplyOspfMetric ()
+{
+  BOOST_FOREACH (const Link &link, m_linksList)
+    {
+      uint16_t metric = boost::lexical_cast<uint16_t> (link.GetAttribute ("OSPF"));
+      
+      {
+        Ptr<Ipv4> ipv4 = link.GetFromNode ()->GetObject<Ipv4> ();
+        NS_ASSERT (ipv4 != 0);
+
+        int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetFromNetDevice ());
+        NS_ASSERT (interfaceId >= 0);
+
+        ipv4->SetMetric (interfaceId,metric);
+      }
+
+      {
+        Ptr<Ipv4> ipv4 = link.GetToNode ()->GetObject<Ipv4> ();
+        NS_ASSERT (ipv4 != 0);
+        
+        int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetToNetDevice ());
+        NS_ASSERT (interfaceId >= 0);
+
+        ipv4->SetMetric (interfaceId,metric);
+      }
+    }
+}
+
+void
+AnnotatedTopologyReader::ApplySettings ()
+{
+  PointToPointHelper p2p;
+
+  // temporary queue, will be changed later
+  p2p.SetQueue ("ns3::DropTailQueue",
+                "MaxPackets", StringValue("100"));
+  
+  BOOST_FOREACH (Link &link, m_linksList)
+    {
+      NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate")+"Kbps");
+      p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")+"Kbps"));
+
+      NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay")+"ms");
+      p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")+"ms"));
+      
+      NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
+      link.SetNetDevices (nd.Get (0), nd.Get (1));
+
+      NS_LOG_INFO ("Queue: " << link.GetAttribute("QueueSizeNode1") << " <==> " << link.GetAttribute("QueueSizeNode2"));
+      
+      PointerValue txQueueFrom;
+      link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueueFrom);
+      NS_ASSERT (txQueueFrom.Get<DropTailQueue> () != 0);
+
+      PointerValue txQueueTo;
+      link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
+      NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
+      
+      txQueueFrom.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode1")));
+      txQueueTo.  Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
+    }
+}
+
+void
+AnnotatedTopologyReader::AssignCoordinates ()
+{
+  UniformVariable randX (m_ulx, m_lrx);
+  double x = 0.0;
+  UniformVariable randY (m_uly, m_lry);
+  double y = 0.0;
+
+  BOOST_FOREACH (Link &link, m_linksList)
+    {
+      Ptr<ConstantPositionMobilityModel> loc = link.GetFromNode ()->GetObject<ConstantPositionMobilityModel> ();
+      if (loc != 0)
+        continue; // no need to assign twice
+
+      loc = CreateObject<ConstantPositionMobilityModel> ();
+      link.GetFromNode ()->AggregateObject (loc);
+        
+      x = randX.GetValue();
+      y = randY.GetValue();
+      NS_LOG_INFO("X = "<<x <<"Y = "<<y);
+
+      loc->SetPosition (Vector (x, y, 0));
+    }
+}
+
+}
