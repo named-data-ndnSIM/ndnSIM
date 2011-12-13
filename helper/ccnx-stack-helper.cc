@@ -126,6 +126,8 @@ namespace ns3 {
 
     
 CcnxStackHelper::CcnxStackHelper ()
+  : m_limitsEnabled (false)
+  , m_needSetDefaultRoutes (false)
 {
   m_strategyFactory.SetTypeId ("ns3::CcnxFloodingStrategy");
 }
@@ -138,6 +140,14 @@ void
 CcnxStackHelper::SetForwardingStrategy (std::string strategy)
 {
   m_strategyFactory.SetTypeId (strategy);
+}
+
+
+void
+CcnxStackHelper::SetDefaultRoutes (bool needSet)
+{
+  NS_LOG_FUNCTION (this << needSet);
+  m_needSetDefaultRoutes = needSet;
 }
 
 void
@@ -197,9 +207,15 @@ CcnxStackHelper::Install (Ptr<Node> node) const
 
       Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node, device);
 
-      uint32_t __attribute__ ((unused)) face_id = ccnx->AddFace (face);
-      NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << face_id);
+      ccnx->AddFace (face);
+      NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << *face);
 
+      if (m_needSetDefaultRoutes)
+        {
+          // default route with lowest priority possible
+          AddRoute (node, "/", face, std::numeric_limits<int32_t>::max ()); 
+        }
+      
       if (m_limitsEnabled)
         {
           NS_LOG_INFO ("Limits are enabled");
@@ -242,8 +258,10 @@ CcnxStackHelper::Install (std::string nodeName) const
 
 
 void
-CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric)
+CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric) const
 {
+  NS_LOG_LOGIC ("[" << node->GetId () << "]$ route add " << prefix << " via " << *face << " metric " << metric);
+
   Ptr<CcnxFib>  fib  = node->GetObject<CcnxFib> ();
 
   CcnxNameComponentsValue prefixValue;
@@ -252,10 +270,8 @@ CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> fac
 }
 
 void
-CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
+CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) const
 {
-  NS_LOG_LOGIC ("[" << nodeName << "]$ route add " << prefix << " via " << faceId << " metric " << metric);
-  
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
   
@@ -267,6 +283,7 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
 
   AddRoute (node, prefix, face, metric);
 }
+
 /*
   void
   CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)

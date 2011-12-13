@@ -182,7 +182,7 @@ CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
   const CcnxNameComponents &name = interest.GetName ();
   for (size_t componentsCount = name.GetComponents ().size ();
-       componentsCount > 0;
+       componentsCount >= 0;
        componentsCount--)
     {
       CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount));

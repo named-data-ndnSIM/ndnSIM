@@ -25,6 +25,7 @@
 #include "ns3/NDNabstraction-module.h"
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/animation-interface.h"
 
 #include <iostream>
 #include <sstream>
@@ -34,6 +35,29 @@ using namespace ns3;
 using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxAbileneTopology");
+
+void PrintTime ()
+{
+  NS_LOG_INFO (Simulator::Now ());
+
+  Simulator::Schedule (Seconds (10.0), PrintTime);
+}
+
+void PrintFIBs ()
+{
+  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
+  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      // *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
+
+      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
+      NS_ASSERT_MSG (fib != 0, "Fire alarm");
+      *routingStream->GetStream () << *fib << "\n\n";
+    }
+}
 
 int 
 main (int argc, char *argv[])
@@ -55,7 +79,7 @@ main (int argc, char *argv[])
   // -- Read topology data.
   // --------------------------------------------
     
-  AnnotatedTopologyReader reader;
+  AnnotatedTopologyReader reader ("/abilene");
   reader.SetFileName (input);
   reader.SetBoundingBox (100.0, 100.0, 400.0, 400.0);
   
@@ -73,15 +97,32 @@ main (int argc, char *argv[])
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
-  // ccnxHelper.SetForwardingStrategy (strategy);
-  ccnxHelper.EnableLimits (true, Seconds(0.1));
+  ccnxHelper.SetForwardingStrategy (strategy);
+  ccnxHelper.EnableLimits (false, Seconds(0.1));
+  ccnxHelper.SetDefaultRoutes (true);
   ccnxHelper.InstallAll ();
     
-  // NS_LOG_INFO ("Installing Applications");
-  // CcnxConsumerHelper consumerHelper ("preved");
-  // ApplicationContainer consumers = consumerHelper.Install (nc[0]);
-    
+  NS_LOG_INFO ("Installing Applications");
+  CcnxConsumerHelper consumerHelper ("tralala");
+  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "1"));
+
+  CcnxProducerHelper producerHelper ("tralala",1024);
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "6"));
+  
+  // Simulator::Schedule (Seconds (1.0), PrintFIBs);
+  PrintFIBs ();
+
+  Simulator::Schedule (Seconds (10.0), PrintTime);
+
   Simulator::Stop (finishTime);
+
+  AnimationInterface *anim = 0;
+  if (animationFile != "")
+    {
+      anim = new AnimationInterface (animationFile);
+      anim->SetMobilityPollInterval (Seconds (1));
+    }
+
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
   Simulator::Destroy ();

@@ -176,7 +176,7 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
   face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ());
 
   // just to be on a safe side. Do the process in two steps
-  std::list<CcnxPitEntryContainer::type::iterator> entriesToRemoves; 
+  std::list<boost::reference_wrapper<const CcnxPitEntry> > entriesToRemoves;
   BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
     {
       m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -187,12 +187,12 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
       if (pitEntry.m_fibEntry.m_faces.size () == 1 &&
           pitEntry.m_fibEntry.m_faces.begin ()->m_face == face)
         {
-          entriesToRemoves.push_back (m_pit->iterator_to (pitEntry));
+          entriesToRemoves.push_back (boost::cref (pitEntry));
         }
     }
-  BOOST_FOREACH (CcnxPitEntryContainer::type::iterator entry, entriesToRemoves)
+  BOOST_FOREACH (const CcnxPitEntry &removedEntry, entriesToRemoves)
     {
-      m_pit->erase (entry);
+      m_pit->erase (m_pit->iterator_to (removedEntry));
     }
 
   CcnxFaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);

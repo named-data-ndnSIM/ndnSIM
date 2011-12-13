@@ -156,7 +156,7 @@ public:
    * \param metric Routing metric
    */
   void
-  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
+  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) const;
 
   /**
    * \brief Add forwarding entry in FIB
@@ -167,8 +167,13 @@ public:
    * \param metric Routing metric
    */
   void
-  AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric);
-  
+  AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric) const;
+
+  /**
+   * \brief Set flag indicating necessity to install default routes in FIB
+   */
+  void
+  SetDefaultRoutes (bool needSet);
 
   /**
    * \brief Install fake IPv4 routes that could be used to find nexthops for CCNx routes
@@ -207,6 +212,7 @@ private:
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;
   uint32_t m_avgInterestSize;
+  bool m_needSetDefaultRoutes;
   
   // /**
   //  * @brief Enable pcap output the indicated Ccnx and interface pair.

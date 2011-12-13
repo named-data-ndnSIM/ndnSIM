@@ -55,7 +55,6 @@ CcnxApp::CcnxApp ()
     
 CcnxApp::~CcnxApp ()
 {
-  StopApplication ();
 }
 
 void
@@ -63,7 +62,9 @@ CcnxApp::DoDispose (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  StopApplication ();
+  // Unfortunately, this causes SEGFAULT
+  // The best reason I see is that apps are freed after ccnx stack is removed
+  // StopApplication ();  
   Application::DoDispose ();
 }
 

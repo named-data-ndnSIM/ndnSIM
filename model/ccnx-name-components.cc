@@ -58,7 +58,7 @@ CcnxNameComponents::GetComponents () const
 std::list<boost::reference_wrapper<const std::string> >
 CcnxNameComponents::GetSubComponents (size_t num) const
 {
-  NS_ASSERT_MSG (1<=num && num<=m_prefix.size (), "Invalid number of subcomponents requested");
+  NS_ASSERT_MSG (0<=num && num<=m_prefix.size (), "Invalid number of subcomponents requested");
   
   std::list<boost::reference_wrapper<const std::string> > subComponents;
   std::list<std::string>::const_iterator component = m_prefix.begin();
