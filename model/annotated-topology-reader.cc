@@ -501,8 +501,8 @@ AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly,
             nd->AggregateObject (loc);
         }
         
-        x = x1; //randX.GetValue();
-        y = y1; //randY.GetValue();
+        x = -x1; //randX.GetValue();
+        y = -y1; //randY.GetValue();
         NS_LOG_INFO("X = "<<x <<"Y = "<<y);
         Vector locVec (x, y, 0);
         loc->SetPosition (locVec);
@@ -515,8 +515,8 @@ AnnotatedTopologyReader::BoundingBox (NodeContainer* nc, double ulx, double uly,
             nd2->AggregateObject (loc2);
         }
         
-        x = x2; //randX.GetValue();
-        y = y2; //randY.GetValue();
+        x = -x2; //randX.GetValue();
+        y = -y2; //randY.GetValue();
         NS_LOG_INFO("X = "<<x <<"Y = "<<y);
         Vector locVec2 (x, y, 0);
         loc2->SetPosition (locVec2);

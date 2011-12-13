@@ -80,7 +80,7 @@ main (int argc, char *argv[])
     
   NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
   reader->ApplySettings(ndc,nc);
-  reader->BoundingBox(nc, 100.0, 100.0, 400.0,400.0);
+  reader->BoundingBox(nc, 100.0, 100.0, 5000.0,5000.0);
     
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
