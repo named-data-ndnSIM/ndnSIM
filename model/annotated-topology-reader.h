@@ -84,7 +84,6 @@ private:
      * NodeContainer from Read method
      */
   void ApplySettings ();
-  void AssignCoordinates ();
   void ApplyOspfMetric ();
     
 private:

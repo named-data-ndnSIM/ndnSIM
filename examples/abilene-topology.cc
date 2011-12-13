@@ -81,7 +81,7 @@ main (int argc, char *argv[])
     
   AnnotatedTopologyReader reader ("/abilene");
   reader.SetFileName (input);
-  reader.SetBoundingBox (100.0, 100.0, 5000.0, 5000.0;
+  reader.SetBoundingBox (100.0, 100.0, 5000.0, 5000.0);
     
   NodeContainer nodes = reader.Read ();
     
@@ -104,10 +104,10 @@ main (int argc, char *argv[])
     
   NS_LOG_INFO ("Installing Applications");
   CcnxConsumerHelper consumerHelper ("tralala");
-  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "1"));
+  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
     
   CcnxProducerHelper producerHelper ("tralala",1024);
-  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "6"));
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
 
   // Simulator::Schedule (Seconds (1.0), PrintFIBs);
   PrintFIBs ();

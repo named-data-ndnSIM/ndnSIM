@@ -44,6 +44,8 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <set>
+
 using namespace std;
 
 namespace ns3 
@@ -55,10 +57,10 @@ NS_OBJECT_ENSURE_REGISTERED (AnnotatedTopologyReader);
     
 TypeId AnnotatedTopologyReader::GetTypeId (void)
 {
-    static TypeId tid = TypeId ("ns3::AnnotatedTopologyReader")
+  static TypeId tid = TypeId ("ns3::AnnotatedTopologyReader")
     .SetParent<Object> ()
     ;
-    return tid;
+  return tid;
 }
     
 AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
@@ -68,7 +70,7 @@ AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
   , m_lrx (100.0)
   , m_lry (100.0)
 {
-    NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
     
 void
@@ -84,117 +86,105 @@ AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, dou
 
 AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 {
-    NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 }
-    
+
 NodeContainer
 AnnotatedTopologyReader::Read (void)
 {
-    ifstream topgen;
-    topgen.open (GetFileName ().c_str ());
-    NodeContainer nodes;
+  ifstream topgen;
+  topgen.open (GetFileName ().c_str ());
+  NodeContainer nodes;
         
-    if ( !topgen.is_open () )
+  if ( !topgen.is_open () )
     {
       NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
-        return nodes;
+      return nodes;
     }
-        
-    int linksNumber = 0;
-    int nodesNumber = 0;
-        
-    string line;
-    getline (topgen,line);
-  istringstream headerLineBuffer (line);
-        
-  int totnode;
-  int totlink;
-  headerLineBuffer >> totnode;
-  headerLineBuffer >> totlink;
-  
-    NS_LOG_INFO ("Annotated topology should have " << totnode << " nodes and " << totlink << " links");
-        
-    for (int i = 0; i < totlink && !topgen.eof (); i++)
-    {
-        getline (topgen,line);
-      istringstream lineBuffer (line);
-            
-      string from;
-      string to;
-        lineBuffer >> from;
-        lineBuffer >> to;
-            
-        if ( (!from.empty ()) && (!to.empty ()) )
-        {
-            NS_LOG_INFO ( linksNumber << " From: " << from << " to: " << to );
-                
-          Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
-          Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
-          
-          if (fromNode == 0)
-            {
-              fromNode = CreateObject<Node> ();
-              Names::Add (m_path, from, fromNode);
-              nodes.Add (fromNode);
-                nodesNumber++;
-            }
-                
-          if (toNode == 0)
-            {
-              toNode = CreateObject<Node> ();
-              Names::Add (m_path, to, toNode);
-              nodes.Add (toNode);
-                nodesNumber++;
-            }
-                
-          Link link (fromNode, from, toNode, to);
-                
-          string dataRate;
-          lineBuffer >> dataRate;
-            
-          string ospf;
-          lineBuffer >> ospf;
-                
-          string delay;
-          lineBuffer >> delay;
-                
-          string queueSizeNode1;
-          lineBuffer >> queueSizeNode1;
-                
-          string queueSizeNode2;
-          lineBuffer >> queueSizeNode2;
 
-          if (dataRate.empty () ||
-              ospf.empty () ||
-              delay.empty () ||
-              queueSizeNode1.empty () ||
-              queueSizeNode2.empty ())
-            {
-              NS_LOG_ERROR ("File [" << GetFileName () << ":" << i+2 << " wrong format, skipping");
-              continue;
-            }
-            
-          link.SetAttribute ("DataRate", dataRate);
-          link.SetAttribute ("OSPF", ospf);
-          link.SetAttribute ("Delay", delay);
-          link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
-          link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
-                
-            AddLink (link);
-                
-            linksNumber++;
+  uint32_t linksNumber = 0;
+  uint32_t nodesNumber = 0;
+
+  while (!topgen.eof ())
+    {
+      string line;
+      getline (topgen, line);
+
+      if (line == "router") break;
+    }
+
+  while (!topgen.eof ())
+    {
+      string line;
+      getline (topgen,line);
+      if (line[0] == '#') continue; // comments
+      if (line=="link") break; // stop reading nodes
+      
+      istringstream lineBuffer (line);
+      string name, city;
+      double latitude, longitude;
+
+      lineBuffer >> name >> city >> latitude >> longitude;
+      Ptr<Node> node = CreateObject<Node> ();
+      Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
+      node->AggregateObject (loc);
+
+      loc->SetPosition (Vector (latitude, longitude, 0));
+
+      Names::Add (m_path, name, node);
+      nodes.Add (node);
+      nodesNumber++;
+    }
+
+  map<string, set<string> > processedLinks; // to eliminate duplications
+  
+  // SeekToSection ("link"); 
+  while (!topgen.eof ())
+    {
+      string line;
+      getline (topgen,line);
+      if (line == "") continue;
+      if (line[0] == '#') continue; // comments
+
+      // NS_LOG_DEBUG ("Input: [" << line << "]");
+      
+      istringstream lineBuffer (line);
+      string from, to, capacity, metric;
+
+      lineBuffer >> from >> to >> capacity >> metric;
+
+      if (processedLinks[to].size () != 0 &&
+          processedLinks[to].find (from) != processedLinks[to].end ())
+        {
+          continue; // duplicated link
         }
+      processedLinks[from].insert (to);
+      
+      Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
+      NS_ASSERT (fromNode != 0);
+      Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
+      NS_ASSERT (fromNode != 0);
+
+      Link link (fromNode, from, toNode, to);
+      
+      link.SetAttribute ("DataRate", capacity);
+      link.SetAttribute ("OSPF", metric);
+      // link.SetAttribute ("Delay", delay);
+      // link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
+      // link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
+
+      AddLink (link);
+      NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << "Kbps with " << metric << " metric");
+                
+      linksNumber++;
     }
         
-  NS_ASSERT (nodesNumber == totnode && linksNumber == totlink);
-        
-    NS_LOG_INFO ("Annotated topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
-    topgen.close ();
+  NS_LOG_INFO ("Annotated topology created with " << nodesNumber << " nodes and " << linksNumber << " links");
+  topgen.close ();
         
   ApplySettings ();
-  AssignCoordinates ();
   
-    return nodes;
+  return nodes;
 }
     
 void
@@ -209,19 +199,19 @@ AnnotatedTopologyReader::AssignIpv4Addresses (Ipv4Address base)
         
       base = Ipv4Address (base.Get () + 256);
       address.SetBase (base, Ipv4Mask ("/24"));
-        }
+    }
         
   ApplyOspfMetric ();
-        }
+}
         
 void
 AnnotatedTopologyReader::ApplyOspfMetric ()
-    {
+{
   BOOST_FOREACH (const Link &link, m_linksList)
-        {
+    {
       uint16_t metric = boost::lexical_cast<uint16_t> (link.GetAttribute ("OSPF"));
         
-        {
+      {
         Ptr<Ipv4> ipv4 = link.GetFromNode ()->GetObject<Ipv4> ();
         NS_ASSERT (ipv4 != 0);
         
@@ -229,9 +219,9 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
         NS_ASSERT (interfaceId >= 0);
         
         ipv4->SetMetric (interfaceId,metric);
-        }
+      }
         
-        {
+      {
         Ptr<Ipv4> ipv4 = link.GetToNode ()->GetObject<Ipv4> ();
         NS_ASSERT (ipv4 != 0);
         
@@ -239,8 +229,8 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
         NS_ASSERT (interfaceId >= 0);
 
         ipv4->SetMetric (interfaceId,metric);
+      }
     }
-}
 }
 
 void
@@ -254,53 +244,45 @@ AnnotatedTopologyReader::ApplySettings ()
 
   BOOST_FOREACH (Link &link, m_linksList)
     {
+      string tmp;
+
       NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate")+"Kbps");
       p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")+"Kbps"));
-        
-      NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay")+"ms");
-      p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")+"ms"));
+
+      if (link.GetAttributeFailSafe("Delay", tmp))
+        {
+          NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay")+"ms");
+          p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")+"ms"));
+        }
+      else
+        {
+          NS_LOG_INFO ("Default delay 1ms");
+          p2p.SetChannelAttribute ("Delay", StringValue("1ms"));
+        }
         
       NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
       link.SetNetDevices (nd.Get (0), nd.Get (1));
 
-      NS_LOG_INFO ("Queue: " << link.GetAttribute("QueueSizeNode1") << " <==> " << link.GetAttribute("QueueSizeNode2"));
-        
-      PointerValue txQueueFrom;
-      link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueueFrom);
-      NS_ASSERT (txQueueFrom.Get<DropTailQueue> () != 0);
-        
-      PointerValue txQueueTo;
-      link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
-      NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
-        
-      txQueueFrom.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode1")));
-      txQueueTo.  Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
-        }
-        }
+      // NS_LOG_INFO ("Queue: " << link.GetAttribute("QueueSizeNode1") << " <==> " << link.GetAttribute("QueueSizeNode2"));
 
-void
-AnnotatedTopologyReader::AssignCoordinates ()
-{
-  UniformVariable randX (m_ulx, m_lrx);
-    double x = 0.0;
-  UniformVariable randY (m_uly, m_lry);
-    double y = 0.0;
+      if (link.GetAttributeFailSafe("QueueSizeNode1", tmp))
+        {
+          PointerValue txQueueFrom;
+          link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueueFrom);
+          NS_ASSERT (txQueueFrom.Get<DropTailQueue> () != 0);
 
-  BOOST_FOREACH (Link &link, m_linksList)
-    {
-      Ptr<ConstantPositionMobilityModel> loc = link.GetFromNode ()->GetObject<ConstantPositionMobilityModel> ();
-      if (loc != 0)
-        continue; // no need to assign twice
+          txQueueFrom.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode1")));
+        }
+      
+      if (link.GetAttributeFailSafe("QueueSizeNode2", tmp))
+        {
+          PointerValue txQueueTo;
+          link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
+          NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
         
-            loc = CreateObject<ConstantPositionMobilityModel> ();
-      link.GetFromNode ()->AggregateObject (loc);
-        
-      x = randX.GetValue();
-      y = randY.GetValue();
-        NS_LOG_INFO("X = "<<x <<"Y = "<<y);
-        
-      loc->SetPosition (Vector (x, y, 0));
+          txQueueTo.  Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
         }
     }
+}
 
 }
