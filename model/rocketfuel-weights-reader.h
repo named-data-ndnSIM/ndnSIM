@@ -39,7 +39,7 @@ namespace ns3 {
 class RocketfuelWeightsReader : public AnnotatedTopologyReader
 {
 public:
-  RocketfuelWeightsReader ();
+  RocketfuelWeightsReader (const std::string &path="");
   virtual ~RocketfuelWeightsReader ();
 
   void
@@ -55,13 +55,20 @@ public:
    *
    * \return the container of the nodes created (or empty container if there was an error)
    */
-  virtual NodeContainer Read (void);
+  virtual NodeContainer 
+  Read (void);
+
+  void
+  Commit ();
 
   enum
     {
       WEIGHTS,
       LATENCIES
     };
+
+  // void
+  // Cheat (NodeContainer &nodes);
 
 private:
   RocketfuelWeightsReader (const RocketfuelWeightsReader&);

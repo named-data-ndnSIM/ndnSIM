@@ -23,6 +23,7 @@
 
 #include "ns3/topology-reader.h"
 #include "ns3/random-variable.h"
+#include "ns3/object-factory.h"
 
 namespace ns3 
 {
@@ -69,6 +70,9 @@ public:
   void
   SetBoundingBox (double ulx, double uly, double lrx, double lry);
 
+  void
+  SetMobilityModel (const std::string &model);
+
 protected:
   Ptr<Node>
   CreateNode (const std::string name);
@@ -76,7 +80,7 @@ protected:
   Ptr<Node>
   CreateNode (const std::string name, double posX, double posY);
   
-private:
+protected:
   /**
    * \brief This method applies setting to corresponding nodes and links
    * NetDeviceContainer must be allocated
@@ -94,6 +98,8 @@ private:
 
   UniformVariable m_randX;
   UniformVariable m_randY;
+
+  ObjectFactory m_mobilityFactory;
 };
 
 }

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <sstream>
 #include "ns3/annotated-topology-reader.h"
+#include "../utils/spring-mobility-helper.h"
 
 using namespace ns3;
 using namespace std;
@@ -80,6 +81,7 @@ main (int argc, char *argv[])
   // --------------------------------------------
     
   AnnotatedTopologyReader reader ("/abilene");
+  reader.SetMobilityModel ("ns3::SpringMobilityModel");
   reader.SetFileName (input);
     
   NodeContainer nodes = reader.Read ();
@@ -89,6 +91,8 @@ main (int argc, char *argv[])
       NS_LOG_ERROR ("Problems reading the topology file. Failing.");
       return -1;
     }
+
+  SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
 
   // InternetStackHelper stack;
   // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");

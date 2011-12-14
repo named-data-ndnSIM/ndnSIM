@@ -58,6 +58,8 @@ AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
   , m_randY (0, 100.0)
 {
   NS_LOG_FUNCTION (this);
+
+  // SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 }
     
 void
@@ -69,6 +71,13 @@ AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, dou
   m_randY = UniformVariable (uly, lry);
 }
 
+void
+AnnotatedTopologyReader::SetMobilityModel (const std::string &model)
+{
+  NS_LOG_FUNCTION (this << model);
+  m_mobilityFactory.SetTypeId (model);
+}
+
 AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 {
   NS_LOG_FUNCTION (this);
@@ -77,14 +86,15 @@ AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 Ptr<Node>
 AnnotatedTopologyReader::CreateNode (const std::string name)
 {
-  return CreateNode (name, m_randX.GetValue (), m_randX.GetValue ());
+  return CreateNode (name, m_randX.GetValue (), m_randY.GetValue ());
 }
 
 Ptr<Node>
 AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double posY)
 {
+  NS_LOG_FUNCTION (this << name << posX << posY);
   Ptr<Node> node = CreateObject<Node> ();
-  Ptr<ConstantPositionMobilityModel> loc = CreateObject<ConstantPositionMobilityModel> ();
+  Ptr<MobilityModel> loc = DynamicCast<MobilityModel> (m_mobilityFactory.Create ());
   node->AggregateObject (loc);
 
   loc->SetPosition (Vector (posX, posY, 0));
@@ -144,9 +154,9 @@ AnnotatedTopologyReader::Read (void)
       // NS_LOG_DEBUG ("Input: [" << line << "]");
       
       istringstream lineBuffer (line);
-      string from, to, capacity, metric;
+      string from, to, capacity, metric, delay, queueSizeNode1, queueSizeNode2;
 
-      lineBuffer >> from >> to >> capacity >> metric;
+      lineBuffer >> from >> to >> capacity >> metric >> delay >> queueSizeNode1 >> queueSizeNode2;
 
       if (processedLinks[to].size () != 0 &&
           processedLinks[to].find (from) != processedLinks[to].end ())
@@ -164,9 +174,13 @@ AnnotatedTopologyReader::Read (void)
       
       link.SetAttribute ("DataRate", capacity);
       link.SetAttribute ("OSPF", metric);
-      // link.SetAttribute ("Delay", delay);
-      // link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
-      // link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
+
+      if (!delay.empty ())
+          link.SetAttribute ("Delay", delay);
+      if (!queueSizeNode1.empty ())
+        link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
+      if (!queueSizeNode2.empty ())
+        link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
 
       AddLink (link);
       NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << "Kbps with " << metric << " metric");
@@ -202,6 +216,7 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
 {
   BOOST_FOREACH (const Link &link, m_linksList)
     {
+      NS_LOG_DEBUG ("OSPF: " << link.GetAttribute ("OSPF"));
       uint16_t metric = boost::lexical_cast<uint16_t> (link.GetAttribute ("OSPF"));
         
       {
@@ -230,33 +245,25 @@ void
 AnnotatedTopologyReader::ApplySettings ()
 {
   PointToPointHelper p2p;
-    
-  // temporary queue, will be changed later
-  p2p.SetQueue ("ns3::DropTailQueue",
-                "MaxPackets", StringValue("100"));
 
   BOOST_FOREACH (Link &link, m_linksList)
     {
       string tmp;
 
-      NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate")+"Kbps");
-      p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")+"Kbps"));
+      if (link.GetAttributeFailSafe ("DataRate", tmp))
+        {
+          NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate")+"Kbps");
+          p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")+"Kbps"));
+        }
 
       if (link.GetAttributeFailSafe("Delay", tmp))
         {
           NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay")+"ms");
           p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")+"ms"));
         }
-      else
-        {
-          NS_LOG_INFO ("Default delay 1ms");
-          p2p.SetChannelAttribute ("Delay", StringValue("1ms"));
-        }
         
       NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
       link.SetNetDevices (nd.Get (0), nd.Get (1));
-
-      // NS_LOG_INFO ("Queue: " << link.GetAttribute("QueueSizeNode1") << " <==> " << link.GetAttribute("QueueSizeNode2"));
 
       if (link.GetAttributeFailSafe("QueueSizeNode1", tmp))
         {
@@ -264,6 +271,7 @@ AnnotatedTopologyReader::ApplySettings ()
           link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueueFrom);
           NS_ASSERT (txQueueFrom.Get<DropTailQueue> () != 0);
 
+          NS_LOG_INFO ("QueueFrom: " << link.GetAttribute("QueueSizeNode1"));
           txQueueFrom.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode1")));
         }
       
@@ -273,6 +281,7 @@ AnnotatedTopologyReader::ApplySettings ()
           link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
           NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
         
+          NS_LOG_INFO ("QueueTo: " << link.GetAttribute("QueueSizeNode2"));
           txQueueTo.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
         }
     }

@@ -31,43 +31,81 @@
 #include "ns3/rocketfuel-topology-reader.h"
 
 using namespace ns3;
+using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxSprintTopology");
 
 int 
 main (int argc, char *argv[])
 {
-    Packet::EnableChecking();
-    Packet::EnablePrinting();
-    std::string weights ("./src/NDNabstraction/examples/sprint.weights");
-    std::string latencies ("./src/NDNabstraction/examples/sprint.latencies");
+  // Packet::EnableChecking();
+  // Packet::EnablePrinting();
+  string weights ("./src/NDNabstraction/examples/sprint.weights");
+  string latencies ("./src/NDNabstraction/examples/sprint.latencies");
     
-    // ------------------------------------------------------------
-    // -- Read topology data.
-    // --------------------------------------------
-    
-    RocketfuelWeightsReader reader;
+  Time finishTime = Seconds (2.0);
+  string animationFile;
+  string strategy = "ns3::CcnxFloodingStrategy";
+  CommandLine cmd;
+  cmd.AddValue ("finish", "Finish time", finishTime);
+  cmd.AddValue ("netanim", "NetAnim filename", animationFile);
+  cmd.AddValue ("strategy", "CCNx forwarding strategy", strategy);
+  cmd.AddValue ("weights", "Weights file", weights);
+  cmd.AddValue ("latencies", "Latencies file", latencies);
+  cmd.Parse (argc, argv);
 
-    reader.SetFileName (weights);
-    reader.SetFileType (RocketfuelWeightsReader::WEIGHTS);    
-    NodeContainer nodes = reader.Read ();
-
-    reader.SetFileName (latencies);
-    reader.SetFileType (RocketfuelWeightsReader::LATENCIES);    
-    reader.Read ();
+  // ------------------------------------------------------------
+  // -- Read topology data.
+  // --------------------------------------------
     
-    if (reader.LinksSize () == 0)
+  RocketfuelWeightsReader reader ("/sprint");
+  reader.SetBoundingBox (0, 0, 400, 250);
+
+  reader.SetFileName (weights);
+  reader.SetFileType (RocketfuelWeightsReader::WEIGHTS);    
+  NodeContainer nodes = reader.Read ();
+
+  reader.SetFileName (latencies);
+  reader.SetFileType (RocketfuelWeightsReader::LATENCIES);    
+  reader.Read ();
+    
+  reader.Commit ();
+  if (reader.LinksSize () == 0)
     {
-        NS_LOG_ERROR ("Problems reading the topology file. Failing.");
-        return -1;
+      NS_LOG_ERROR ("Problems reading the topology file. Failing.");
+      return -1;
     }
     
-    NS_LOG_INFO("Nodes = " << nodes.GetN());
-    NS_LOG_INFO("Links = " << reader.LinksSize ());
+  NS_LOG_INFO("Nodes = " << nodes.GetN());
+  NS_LOG_INFO("Links = " << reader.LinksSize ());
     
-    NS_LOG_INFO ("Run Simulation.");
-    Simulator::Run ();
-    Simulator::Destroy ();
-    NS_LOG_INFO ("Done.");
-    return 0;
+  InternetStackHelper stack;
+  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
+  stack.SetRoutingHelper (ipv4RoutingHelper);
+  stack.Install (nodes);
+
+  reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
+
+  // Install CCNx stack
+  NS_LOG_INFO ("Installing CCNx stack");
+  CcnxStackHelper ccnxHelper;
+  ccnxHelper.SetForwardingStrategy (strategy);
+  ccnxHelper.EnableLimits (false, Seconds(0.1));
+  ccnxHelper.SetDefaultRoutes (true);
+  ccnxHelper.InstallAll ();
+
+  // // Populate FIB based on IPv4 global routing controller
+  // ccnxHelper.InstallFakeGlobalRoutes ();
+  // ccnxHelper.InstallRouteTo (Names::Find<Node> ("/sprint", "San+Jose,+CA4062"));
+
+  // Simulator::Schedule (Seconds (1.0), PrintFIBs);
+  // PrintFIBs ();
+
+  Simulator::Stop (finishTime);
+
+  NS_LOG_INFO ("Run Simulation.");
+  Simulator::Run ();
+  Simulator::Destroy ();
+  NS_LOG_INFO ("Done.");
+  return 0;
 }

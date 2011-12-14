@@ -46,6 +46,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include "../utils/spring-mobility-helper.h"
 
 #include <iomanip>
 #include <set>
@@ -56,9 +57,11 @@ NS_LOG_COMPONENT_DEFINE ("RocketfuelWeightsReader");
 
 namespace ns3 {
     
-RocketfuelWeightsReader::RocketfuelWeightsReader ()
+RocketfuelWeightsReader::RocketfuelWeightsReader (const std::string &path/*=""*/)
+  : AnnotatedTopologyReader (path)
 {
   NS_LOG_FUNCTION (this);
+  SetMobilityModel ("ns3::SpringMobilityModel");
 }
     
 RocketfuelWeightsReader::~RocketfuelWeightsReader ()
@@ -138,8 +141,11 @@ RocketfuelWeightsReader::Read ()
       switch (m_inputType)
         {
         case WEIGHTS:
-          link->SetAttribute ("OSPF", attribute);
-          break;
+          {
+            double metric = boost::lexical_cast<double> (attribute);
+            link->SetAttribute ("OSPF", boost::lexical_cast<string> (metric*2));
+            break;
+          }
         case LATENCIES:
           link->SetAttribute ("Delay", attribute);
           break;
@@ -156,8 +162,34 @@ RocketfuelWeightsReader::Read ()
     }
         
   topgen.close ();
-  NS_LOG_INFO ("Rocketfuel topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
+
+  if (!repeatedRun)
+    {
+      NS_LOG_INFO ("Rocketfuel topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
+    }
   return nodes;
 }
-    
+
+void
+RocketfuelWeightsReader::Commit ()
+{
+  ApplySettings ();
+
+  SpringMobilityHelper::InstallSprings (LinksBegin (), LinksEnd ());
+}
+
+
+// void
+// RocketfuelWeightsReader::Cheat (NodeContainer &nodes)
+// {
+//   double epsilon = 1;
+
+//   for (NodeContainer::Iterator i = nodes.Begin ();
+//        i != nodes.End ();
+//        i++)
+//     {
+      
+//     }  
+// }
+
 } /* namespace ns3 */

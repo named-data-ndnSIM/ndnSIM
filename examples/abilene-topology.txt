@@ -1,7 +1,7 @@
 router
 #name	city	latitude	longitude
 ATLA-M5	Atlanta_GA	33.750000	-84.383300
-ATLAng	Atlanta_GA	33.750000	-84.383300
+ATLAng	Atlanta_GA	33.850000	-84.483300
 CHINng	Chicago_IL	41.833300	-87.616700
 DNVRng	Denver_CO	40.750000	-105.000000
 HSTNng	Houston_TX	29.770031	-95.517364
