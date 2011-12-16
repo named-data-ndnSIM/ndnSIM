@@ -69,6 +69,25 @@ CcnxL3Protocol::GetTypeId (void)
                    MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
                                      &CcnxL3Protocol::SetBucketLeakInterval),
                    MakeTimeChecker ())
+    
+    .AddTraceSource ("TransmittedInterestTrace", "Interests that were transmitted",
+                    MakeTraceSourceAccessor (&CcnxL3Protocol::m_transmittedInterestsTrace))
+    
+    .AddTraceSource ("ReceivedInterestTrace", "Interests that were received",
+                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_receivedInterestsTrace))
+    
+    .AddTraceSource ("DroppedInterestTrace", "Interests that were dropped",
+                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_droppedInterestsTrace))
+
+    .AddTraceSource ("ReceivedDataTrace", "Data that were received",
+                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_receivedDataTrace))
+    
+    .AddTraceSource ("TransmittedDataTrace", "Data that were transmitted",
+                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_transmittedDataTrace))
+    
+    .AddTraceSource ("DroppedDataTrace", "Data that were dropped",
+                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_droppedDataTrace))
+
   ;
   return tid;
 }
@@ -240,7 +259,43 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
   if (!face->IsUp ())
     {
       NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-      // m_dropTrace (p, INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
+        
+      //m_droppedDTrace (p, INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
+        
+        Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
+        try
+        {
+            CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
+            switch (type)
+            {
+                case CcnxHeaderHelper::INTEREST:
+                {
+                    Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
+                    m_droppedInterestsTrace (header, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
+                    break;
+                }
+                case CcnxHeaderHelper::CONTENT_OBJECT:
+                {
+                    Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
+                    
+                    static CcnxContentObjectTail contentObjectTrailer; //there is no data in this object
+                    
+                    // Deserialization. Exception may be thrown
+                    packet->RemoveHeader (*header);
+                    packet->RemoveTrailer (contentObjectTrailer);
+                    
+                    m_droppedDataTrace (header, packet, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
+                    break;
+                }
+            }
+            
+            // exception will be thrown if packet is not recognized
+        }
+        catch (CcnxUnknownHeaderException)
+        {
+            NS_ASSERT_MSG (false, "Unknown CCNx header. Should not happen");
+        }
+        
       return;
     }
   NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
@@ -305,6 +360,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   if (isNew || !isDuplicated) // potential flow
     {
       // somebody is doing something bad
+      m_droppedInterestsTrace (header, NACK_NONDUPLICATE, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
   
@@ -329,8 +385,6 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
 
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
-  
-  // m_droppedInterestsTrace (header, DROP_CONGESTION, m_node->GetObject<Ccnx> (), incomingFace);
 
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
@@ -348,6 +402,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   if (pitEntry.m_incoming.size () == 0) // interest was actually satisfied
     {
       // no need to do anything
+      m_droppedInterestsTrace (header, NACK_AFTER_SATISFIED, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
 
@@ -356,6 +411,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
       NS_LOG_DEBUG ("Not all outgoing are in vain");
       // suppress
       // Don't do anything, we are still expecting data from some other face
+      m_droppedInterestsTrace (header, NACK_SUPPRESSED, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
   
@@ -384,7 +440,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
-  // m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> (), incomingFace);
+  //m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> (), incomingFace);
 
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
@@ -411,7 +467,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       incomingFace->Send (nack);
       
       // //Trace duplicate interest  
-      // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
+      m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
 
@@ -424,14 +480,14 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       
       NS_LOG_LOGIC("Found in cache");
         
-      // TransmittedDataTrace (contentObject, CACHED,
-      //                       m_node->GetObject<Ccnx> (), incomingFace);
+      m_transmittedDataTrace (contentObjectHeader, contentObject, CACHED, m_node->GetObject<Ccnx> (), incomingFace);
       incomingFace->Send (contentObject);
 
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->modify (m_pit->iterator_to (pitEntry),
                      bind (&CcnxPitEntry::SetExpireTime, ll::_1,
                            Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+        
       return;
     }
 
@@ -481,7 +537,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     { // Suppress this interest if we're still expecting data from some other face
       
       // We are already expecting data later in future. Suppress the interest
-      // m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
+      m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
   
@@ -524,8 +580,8 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
     {
       incoming.m_face->Send (packet->Copy ());
 
-      // m_droppedInterestsTrace (header, DROP_CONGESTION,
-      //                          m_node->GetObject<Ccnx> (), incomingFace);
+      //m_droppedInterestsTrace (header, DROP_CONGESTION,
+      //                         m_node->GetObject<Ccnx> (), incomingFace);
     }
   // All incoming interests cannot be satisfied. Remove them
   m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -547,7 +603,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 {
     
   NS_LOG_FUNCTION (incomingFace << header << payload << packet);
-  // m_receivedDataTrace (header, payload, m_node->GetObject<Ccnx> ()/*this*/, incomingFace);
+  m_receivedDataTrace (header, payload, m_node->GetObject<Ccnx> (), incomingFace);
 
   // 1. Lookup PIT entry
   try
@@ -611,7 +667,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       //    (unsolicited data packets should not "poison" content store)
       
       //drop dulicated or not requested data packet
-      // m_droppedDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
+      m_droppedDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
       return; // do not process unsoliced data packets
     }
 }

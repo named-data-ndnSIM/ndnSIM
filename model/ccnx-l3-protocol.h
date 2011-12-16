@@ -94,13 +94,18 @@ public:
   {
     NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest
     NDN_SUPPRESSED_INTEREST, ///< \brief Suppressed Interest
-    NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject (duplicate?)
+    NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject(duplicate?)
     NDN_PIT_TIMER_EXPIRED,
     INTERFACE_DOWN,          ///< \brief Interface is down
 
-    DROP_CONGESTION, /**< Congestion detected */
+    NACK_SUPPRESSED,
+    NACK_AFTER_SATISFIED,
+    NACK_NONDUPLICATE,
+
     DROP_NO_ROUTE,   /**< No route to host */
   };
+    
+    
 
   /**
    * \enum DropReason
@@ -241,25 +246,25 @@ private:
   Time    m_bucketLeakInterval;
   EventId m_bucketLeakEvent;
   
-  // TracedCallback<Ptr<const CcnxInterestHeader>,
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
-  // TracedCallback<Ptr<const CcnxInterestHeader>,
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
-  // TracedCallback<Ptr<const CcnxInterestHeader>,
-  //                DropReason,
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                  DropReason,
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
 
-  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
-  //                Ptr<const Packet>,/*payload*/
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
-  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
-  //                Ptr<const Packet>,/*payload*/
-  //                ContentObjectSource,
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
-  // TracedCallback<Ptr<const CcnxContentObjectHeader>,
-  //                Ptr<const Packet>,/*payload*/
-  //                DropReason,
-  //                Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                  Ptr<const Packet>,/*payload*/
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                  Ptr<const Packet>,/*payload*/
+                  ContentObjectSource,
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
+  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+                  Ptr<const Packet>,/*payload*/
+                  DropReason,
+                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
 };
   
 } // Namespace ns3
