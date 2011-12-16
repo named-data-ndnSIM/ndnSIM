@@ -256,48 +256,6 @@ CcnxL3Protocol::GetNFaces (void) const
 void 
 CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
-  if (!face->IsUp ())
-    {
-      NS_LOG_LOGIC ("Dropping received packet -- interface is down");
-        
-      //m_droppedDTrace (p, INTERFACE_DOWN, m_node->GetObject<Ccnx> ()/*this*/, face);
-        
-        Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
-        try
-        {
-            CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
-            switch (type)
-            {
-                case CcnxHeaderHelper::INTEREST:
-                {
-                    Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
-                    m_droppedInterestsTrace (header, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
-                    break;
-                }
-                case CcnxHeaderHelper::CONTENT_OBJECT:
-                {
-                    Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
-                    
-                    static CcnxContentObjectTail contentObjectTrailer; //there is no data in this object
-                    
-                    // Deserialization. Exception may be thrown
-                    packet->RemoveHeader (*header);
-                    packet->RemoveTrailer (contentObjectTrailer);
-                    
-                    m_droppedDataTrace (header, packet, INTERFACE_DOWN, m_node->GetObject<Ccnx> (), face);
-                    break;
-                }
-            }
-            
-            // exception will be thrown if packet is not recognized
-        }
-        catch (CcnxUnknownHeaderException)
-        {
-            NS_ASSERT_MSG (false, "Unknown CCNx header. Should not happen");
-        }
-        
-      return;
-    }
   NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet

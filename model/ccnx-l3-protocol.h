@@ -103,9 +103,7 @@ public:
     NACK_NONDUPLICATE,
 
     DROP_NO_ROUTE,   /**< No route to host */
-  };
-    
-    
+  };    
 
   /**
    * \enum DropReason
@@ -247,16 +245,19 @@ private:
   EventId m_bucketLeakEvent;
   
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
+  
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                  DropReason,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
+                 DropReason,
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                  Ptr<const Packet>,/*payload*/
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+                 Ptr<const Packet>,/*payload*/
+                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
+
   TracedCallback<Ptr<const CcnxContentObjectHeader>,
                   Ptr<const Packet>,/*payload*/
                   ContentObjectSource,

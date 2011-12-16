@@ -53,10 +53,9 @@ CcnxProducer::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor(&CcnxProducer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
-    // .AddTraceSource ("InterestTrace", "Interests that were received",
-    //                 MakeTraceSourceAccessor (&CcnxProducer::m_interestsTrace))
-    // .AddTraceSource ("ContentObjectTrace", "ContentObjects that were sent",
-    //                 MakeTraceSourceAccessor (&CcnxProducer::m_contentObjectsTrace))
+    
+    .AddTraceSource ("TransmittedContentObjects", "TransmittedContentObjects",
+                    MakeTraceSourceAccessor (&CcnxProducer::m_transmittedContentObjects))
     ;
         
   return tid;
@@ -92,6 +91,8 @@ CcnxProducer::StopApplication ()
 void
 CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
 {
+  CcnxApp::OnInterest (interest); // tracing inside
+
   NS_LOG_FUNCTION (this << interest);
 
   if (!m_active) return;
@@ -103,6 +104,9 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
   NS_LOG_INFO ("Respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
+
+  m_transmittedContentObjects (header, packet, this, m_face);
+  
   packet->AddHeader (*header);
   packet->AddTrailer (tail);
 

@@ -24,6 +24,7 @@
 #include "ns3/application.h"
 #include "ns3/ptr.h"
 #include "ns3/callback.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 
 {
@@ -96,6 +97,15 @@ protected:
   ProtocolHandler m_protocolHandler;
   bool m_active; 
   Ptr<CcnxFace> m_face; // local face that is created 
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedInterests;
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedNacks;
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedContentObjects;
 };
 
 } // namespace ns3

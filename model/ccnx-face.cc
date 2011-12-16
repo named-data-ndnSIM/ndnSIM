@@ -32,6 +32,16 @@ NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
 
+TypeId
+CcnxFace::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::CcnxFace")
+    .SetParent<Object> ()
+    .SetGroupName ("Ccnx")
+    ;
+  return tid;
+}
+
 /** 
  * By default, Ccnx face are created in the "down" state
  *  with no IP addresses.  Before becoming useable, the user must 
@@ -79,6 +89,7 @@ CcnxFace::IsBelowLimit ()
   NS_LOG_FUNCTION_NOARGS ();
 
   /// \todo Implement tracing, if requested
+  
   if (!IsUp ())
     return false;
   

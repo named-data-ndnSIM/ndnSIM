@@ -52,6 +52,9 @@ protected:
 private:
   CcnxNameComponents m_prefix;
   uint32_t m_virtualPayloadSize;
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedContentObjects;
 };
 
 }

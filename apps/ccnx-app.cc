@@ -42,6 +42,15 @@ CcnxApp::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CcnxApp")
     .SetParent<Application> ()
     .AddConstructor<CcnxApp> ()
+
+    .AddTraceSource ("ReceivedInterests", "ReceivedInterests",
+                    MakeTraceSourceAccessor (&CcnxApp::m_receivedInterests))
+    
+    .AddTraceSource ("ReceivedNacks", "ReceivedNacks",
+                    MakeTraceSourceAccessor (&CcnxApp::m_receivedNacks))
+    
+    .AddTraceSource ("ReceivedContentObjects", "ReceivedContentObjects",
+                    MakeTraceSourceAccessor (&CcnxApp::m_receivedContentObjects))
     ;
   return tid;
 }
@@ -78,12 +87,14 @@ void
 CcnxApp::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
 {
   NS_LOG_FUNCTION (this << interest);
+  m_receivedInterests (interest, this, m_face);
 }
 
 void
 CcnxApp::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 {
   NS_LOG_FUNCTION (this << interest);
+  m_receivedNacks (interest, this, m_face);
 }
 
 void
@@ -91,6 +102,7 @@ CcnxApp::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObjec
                           const Ptr<const Packet> &payload)
 {
   NS_LOG_FUNCTION (this << contentObject << payload);
+  m_receivedContentObjects (contentObject, payload, this, m_face);
 }
 
 // Application Methods

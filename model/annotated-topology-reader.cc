@@ -59,7 +59,7 @@ AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
 {
   NS_LOG_FUNCTION (this);
 
-  // SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 }
     
 void

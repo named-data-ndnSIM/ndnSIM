@@ -51,7 +51,7 @@ TypeId
 CcnxConsumer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumer")
-    .SetParent<Application> ()
+    .SetParent<CcnxApp> ()
     .AddConstructor<CcnxConsumer> ()
     .AddAttribute ("StartSeq", "Initial sequence number",
                    IntegerValue(0),
@@ -98,12 +98,8 @@ CcnxConsumer::GetTypeId (void)
                    MakeTimeAccessor (&CcnxConsumer::GetRetxTimer, &CcnxConsumer::SetRetxTimer),
                    MakeTimeChecker ())
 
-    // .AddTraceSource ("InterestTrace", "Interests that were sent",
-    //                  MakeTraceSourceAccessor (&CcnxConsumer::m_interestsTrace))
-    // .AddTraceSource ("NackTrace", "NACKs received",
-    //                  MakeTraceSourceAccessor (&CcnxConsumer::m_nackTrace))
-    // .AddTraceSource ("ContentObjectTrace", "ContentObjects received",
-    //                  MakeTraceSourceAccessor (&CcnxConsumer::m_contentObjectsTrace))
+    .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
+                    MakeTraceSourceAccessor (&CcnxConsumer::m_transmittedInterests))
     ;
 
   return tid;
@@ -138,6 +134,8 @@ void
 CcnxConsumer::CheckRetxTimeout ()
 {
   Time now = Simulator::Now ();
+
+  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
 
   while (!m_seqTimeouts.empty ())
     {
@@ -187,6 +185,8 @@ CcnxConsumer::SendPacket ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 
+  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
+
   uint32_t seq;
   
   if (m_retxSeqs.size () != 0)
@@ -209,7 +209,7 @@ CcnxConsumer::SendPacket ()
   interestHeader.SetChildSelector       (m_childSelector);
   if (m_exclude.size ()>0)
     {
-      interestHeader.SetExclude             (Create<CcnxNameComponents> (m_exclude));
+      interestHeader.SetExclude (Create<CcnxNameComponents> (m_exclude));
     }
   interestHeader.SetMaxSuffixComponents (m_maxSuffixComponents);
   interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
@@ -222,21 +222,26 @@ CcnxConsumer::SendPacket ()
 
   m_protocolHandler (packet);
 
+  NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
+  
   std::pair<SeqTimeoutsContainer::iterator, bool>
     res = m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
-  if (!res.second)
-    m_seqTimeouts.modify (res.first,
-                          ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
+  
+  // if (!res.second)
+  //   m_seqTimeouts.modify (res.first,
+  //                         ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
   
   m_sendEvent = Simulator::Schedule (m_offTime, &CcnxConsumer::SendPacket, this);
 
-  // \todo Trace
+  m_transmittedInterests (&interestHeader, this, m_face);
 }
 
 void
 CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                                const Ptr<const Packet> &payload)
 {
+  CcnxApp::OnContentObject (contentObject, payload); // tracing inside
+  
   NS_LOG_FUNCTION (this << contentObject << payload);
 
   // NS_LOG_INFO ("Received content object: " << boost::cref(*contentObject));
@@ -244,6 +249,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
+  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
+  
   SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
 
   NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
@@ -251,13 +258,13 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 
   if (entry != m_seqTimeouts.end ())
     m_seqTimeouts.erase (entry);
-
-  // \todo Trace
 }
 
 void
 CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 {
+  CcnxApp::OnNack (interest); // tracing inside
+  
   NS_LOG_FUNCTION (this << interest);
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
@@ -266,8 +273,6 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 
   // put in the queue of interests to be retransmitted
   m_retxSeqs.insert (seq);
-
-  // \todo Trace?
 }
 
 } // namespace ns3

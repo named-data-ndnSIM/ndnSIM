@@ -47,11 +47,14 @@ class Node;
  *
  * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
-class CcnxFace  : public SimpleRefCount<CcnxFace>
+class CcnxFace  : public Object
 {
 public:
+  static TypeId
+  GetTypeId ();
+  
   /**
-   * \brief Ccnx protocol hanler
+   * \brief Ccnx protocol handler
    *
    * \param face Face from which packet has been received
    * \param packet Original packet

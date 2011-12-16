@@ -33,6 +33,8 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
+#include <boost/thread/mutex.hpp>
+
 namespace ns3 
 {
 
@@ -106,8 +108,6 @@ protected:
     
     uint32_t seq;
     Time time;
-
-    bool operator < (const SeqTimeout &st) { return time < st.time || (time == st.time && seq < st.seq); }
   };
 
   class i_seq { };
@@ -129,6 +129,10 @@ protected:
     > { } ;
 
   SeqTimeoutsContainer m_seqTimeouts;
+  boost::mutex m_seqTimeoutsGuard;
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
 };
 
 } // namespace ns3
