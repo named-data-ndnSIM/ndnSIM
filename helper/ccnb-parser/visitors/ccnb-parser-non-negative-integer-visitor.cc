@@ -20,8 +20,8 @@
 
 #include "ccnb-parser-non-negative-integer-visitor.h"
 
-#include "ns3/ccnb-parser-blob.h"
-#include "ns3/ccnb-parser-udata.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
+#include "../syntax-tree/ccnb-parser-udata.h"
 #include <sstream>
 
 namespace ns3 {

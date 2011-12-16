@@ -23,11 +23,11 @@
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
 
-#include "ns3/ccnb-parser-interest-visitor.h"
-#include "ns3/ccnb-parser-content-object-visitor.h"
-#include "ns3/ccnb-parser-block.h"
+#include "ccnb-parser/visitors/ccnb-parser-interest-visitor.h"
+#include "ccnb-parser/visitors/ccnb-parser-content-object-visitor.h"
 
-#include "ns3/ccnb-parser-dtag.h"
+#include "ccnb-parser/syntax-tree/ccnb-parser-block.h"
+#include "ccnb-parser/syntax-tree/ccnb-parser-dtag.h"
 
 #include "ns3/log.h"
 

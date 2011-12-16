@@ -27,7 +27,7 @@
 #include "ns3/ccnx-content-object-header.h"
 #include "ns3/ccnx.h"
 #include "ns3/ccnx-fib.h"
-#include "ns3/ccnx-local-face.h"
+#include "../model/ccnx-local-face.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxApp");
 

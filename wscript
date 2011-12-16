@@ -56,6 +56,7 @@ def build(bld):
         "helper/ccnx-stack-helper.h",
         "helper/ccnx-producer-helper.h",
         "helper/ccnx-consumer-helper.h",
+        "helper/ccnx-header-helper.h",
 
         "apps/ccnx-app.h",
         "apps/ccnx-consumer.h",

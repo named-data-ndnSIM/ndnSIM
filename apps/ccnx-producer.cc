@@ -27,7 +27,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"
 
-#include "ns3/ccnx-local-face.h"
+#include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-fib.h"
 
 #include <boost/ref.hpp>

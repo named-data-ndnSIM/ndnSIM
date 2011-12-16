@@ -22,8 +22,8 @@
 #include "ccnx-content-object-header.h"
 
 #include "ns3/log.h"
-#include "ns3/ccnx-encoding-helper.h"
-#include "ns3/ccnx-decoding-helper.h"
+#include "../helper/ccnx-encoding-helper.h"
+#include "../helper/ccnx-decoding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxContentObjectHeader");
 

@@ -21,8 +21,9 @@
 #include "ccnb-parser-content-object-visitor.h"
 #include "ccnb-parser-name-components-visitor.h"
 
-#include "ns3/ccnb-parser-block.h"
-#include "ns3/ccnb-parser-dtag.h"
+#include "../syntax-tree/ccnb-parser-block.h"
+#include "../syntax-tree/ccnb-parser-dtag.h"
+
 #include "ns3/ccnx-name-components.h"
 #include "ns3/assert.h"
 

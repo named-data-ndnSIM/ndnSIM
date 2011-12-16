@@ -19,7 +19,7 @@
  */
 
 #include "ccnb-parser-timestamp-visitor.h"
-#include "ns3/ccnb-parser-blob.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
 
 #include "ns3/nstime.h"
 

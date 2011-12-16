@@ -19,7 +19,7 @@
  */
 
 #include "ccnb-parser-nonce-visitor.h"
-#include "ns3/ccnb-parser-blob.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {

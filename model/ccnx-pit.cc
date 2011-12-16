@@ -51,11 +51,13 @@ CcnxPit::GetTypeId ()
                    StringValue ("1s"),
                    MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
                    MakeTimeChecker ())
+    
     .AddAttribute ("PitEntryPruningTimout",
                    "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
                    StringValue ("100ms"),
                    MakeTimeAccessor (&CcnxPit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
+    
     .AddAttribute ("PitEntryDefaultLifetime",
                    "Default lifetime of PIT entry (aka default Interest lifetime)",
                    StringValue("4s"),

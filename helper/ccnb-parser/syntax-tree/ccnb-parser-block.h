@@ -26,10 +26,10 @@
 #include "ns3/ptr.h"
 
 // visitors
-#include "ns3/ccnb-parser-void-no-argu-visitor.h"
-#include "ns3/ccnb-parser-void-visitor.h"
-#include "ns3/ccnb-parser-no-argu-visitor.h"
-#include "ns3/ccnb-parser-visitor.h"
+#include "../visitors/ccnb-parser-void-no-argu-visitor.h"
+#include "../visitors/ccnb-parser-void-visitor.h"
+#include "../visitors/ccnb-parser-no-argu-visitor.h"
+#include "../visitors/ccnb-parser-visitor.h"
 
 namespace ns3 {
 namespace CcnbParser {

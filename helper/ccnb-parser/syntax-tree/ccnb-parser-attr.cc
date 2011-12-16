@@ -19,7 +19,7 @@
  */
 
 #include "ccnb-parser-attr.h"
-#include "ns3/ccnb-parser-common.h"
+#include "../ccnb-parser-common.h"
 
 namespace ns3 {
 namespace CcnbParser {

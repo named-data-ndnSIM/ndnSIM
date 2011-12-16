@@ -23,7 +23,7 @@
 
 #include <sys/types.h>
 
-#include "ns3/ccnb-parser-common.h"
+#include "ccnb-parser/ccnb-parser-common.h"
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/buffer.h"

@@ -20,13 +20,13 @@
 
 #include "ccnb-parser-void-depth-first-visitor.h"
 
-#include "ns3/ccnb-parser-blob.h"
-#include "ns3/ccnb-parser-udata.h"
-#include "ns3/ccnb-parser-tag.h"
-#include "ns3/ccnb-parser-dtag.h"
-#include "ns3/ccnb-parser-attr.h"
-#include "ns3/ccnb-parser-dattr.h"
-#include "ns3/ccnb-parser-ext.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
+#include "../syntax-tree/ccnb-parser-udata.h"
+#include "../syntax-tree/ccnb-parser-tag.h"
+#include "../syntax-tree/ccnb-parser-dtag.h"
+#include "../syntax-tree/ccnb-parser-attr.h"
+#include "../syntax-tree/ccnb-parser-dattr.h"
+#include "../syntax-tree/ccnb-parser-ext.h"
 
 #include <boost/foreach.hpp>
 

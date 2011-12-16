@@ -19,8 +19,8 @@
  */
 
 #include "ccnb-parser-string-visitor.h"
-#include "ns3/ccnb-parser-udata.h"
-#include "ns3/ccnb-parser-blob.h"
+#include "../syntax-tree/ccnb-parser-udata.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {

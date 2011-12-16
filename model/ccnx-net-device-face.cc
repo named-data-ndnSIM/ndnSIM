@@ -20,8 +20,8 @@
  */
 
 #include "ccnx-net-device-face.h"
+#include "ccnx-l3-protocol.h"
 
-#include "ns3/ccnx-l3-protocol.h"
 #include "ns3/net-device.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"

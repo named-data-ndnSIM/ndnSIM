@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ns3/ccnb-parser-blob.h"
+#include "ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {
