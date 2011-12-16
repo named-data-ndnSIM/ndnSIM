@@ -209,7 +209,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       if (DynamicCast<LoopbackNetDevice> (device) != 0)
         continue; // don't create face for a LoopbackNetDevice
 
-      Ptr<CcnxNetDeviceFace> face = Create<CcnxNetDeviceFace> (node, device);
+      Ptr<CcnxNetDeviceFace> face = CreateObject<CcnxNetDeviceFace> (node, device);
 
       ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << *face);

@@ -45,6 +45,9 @@ class CcnxApp;
 class CcnxLocalFace  : public CcnxFace
 {
 public:
+  static TypeId
+  GetTypeId ();
+
   /**
    * \brief Default constructor
    */

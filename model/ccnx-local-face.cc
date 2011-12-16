@@ -38,6 +38,16 @@ NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 namespace ns3 
 {
 
+TypeId
+CcnxLocalFace::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::CcnxLocalFace")
+    .SetParent<CcnxFace> ()
+    .SetGroupName ("Ccnx")
+    ;
+  return tid;
+}
+
 CcnxLocalFace::CcnxLocalFace (Ptr<CcnxApp> app)
   : CcnxFace (app->GetNode ())
   , m_app (app)

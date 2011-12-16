@@ -96,6 +96,7 @@ protected:
   
 protected:  
   Ptr<CcnxPit> m_pit;
+  Ptr<Ccnx> m_ccnx; // just for tracing purposes. Should not be used in any other way
 };
 
 } //namespace ns3

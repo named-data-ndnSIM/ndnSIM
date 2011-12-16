@@ -118,7 +118,7 @@ CcnxApp::StartApplication () // Called at time specified by Start
                  "Ccnx stack should be installed on the node " << GetNode ());
 
   // step 1. Create a face
-  m_face = Create<CcnxLocalFace> (/*Ptr<CcnxApp> (this)*/this);
+  m_face = CreateObject<CcnxLocalFace> (/*Ptr<CcnxApp> (this)*/this);
     
   // step 2. Add face to the CCNx stack
   GetNode ()->GetObject<Ccnx> ()->AddFace (m_face);

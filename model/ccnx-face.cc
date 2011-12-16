@@ -25,6 +25,8 @@
 #include "ns3/log.h"
 #include "ns3/node.h"
 #include "ns3/assert.h"
+#include "ns3/uinteger.h"
+#include "ns3/double.h"
 
 #include <boost/ref.hpp>
 
@@ -38,6 +40,21 @@ CcnxFace::GetTypeId ()
   static TypeId tid = TypeId ("ns3::CcnxFace")
     .SetParent<Object> ()
     .SetGroupName ("Ccnx")
+    .AddAttribute ("Id", "Face id (unique integer for the CCNx stack on this node)",
+                   TypeId::ATTR_GET, // allow only getting it.
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&CcnxFace::m_id),
+                   MakeUintegerChecker<uint32_t> ())
+
+    .AddAttribute ("BucketMax", "Maximum size of leaky bucket",
+                   DoubleValue (-1.0),
+                   MakeDoubleAccessor (&CcnxFace::m_bucketMax),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("BucketLeak", "Normalized bucket leak size",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&CcnxFace::m_bucketLeak),
+                   MakeDoubleChecker<double> ())
+                   
     ;
   return tid;
 }
@@ -108,35 +125,6 @@ CcnxFace::IsBelowLimit ()
   return true;
 }
 
-void
-CcnxFace::LeakBucket (const Time &interval)
-{
-  const double leak = m_bucketLeak * interval.ToDouble (Time::S);
-  m_bucket = std::max (0.0, m_bucket - leak);
-
-  // NS_LOG_DEBUG ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
-}
-
-void
-CcnxFace::SetBucketMax (double bucket)
-{
-  NS_LOG_FUNCTION (this << bucket);
-  m_bucketMax = bucket;
-}
-
-void
-CcnxFace::SetBucketLeak (double leak)
-{
-  NS_LOG_FUNCTION (this << leak);
-  m_bucketLeak = leak;
-}
-
-void
-CcnxFace::LeakBucketByOnePacket ()
-{
-  m_bucket = std::max (0.0, m_bucket-1.0); 
-}
-
 bool
 CcnxFace::Send (Ptr<Packet> packet)
 {
@@ -164,6 +152,35 @@ CcnxFace::Receive (const Ptr<const Packet> &packet)
   m_protocolHandler (this, packet);
   
   return true;
+}
+
+void
+CcnxFace::LeakBucket (const Time &interval)
+{
+  const double leak = m_bucketLeak * interval.ToDouble (Time::S);
+  m_bucket = std::max (0.0, m_bucket - leak);
+
+  // NS_LOG_DEBUG ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
+}
+
+void
+CcnxFace::SetBucketMax (double bucket)
+{
+  NS_LOG_FUNCTION (this << bucket);
+  m_bucketMax = bucket;
+}
+
+void
+CcnxFace::SetBucketLeak (double leak)
+{
+  NS_LOG_FUNCTION (this << leak);
+  m_bucketLeak = leak;
+}
+
+void
+CcnxFace::LeakBucketByOnePacket ()
+{
+  m_bucket = std::max (0.0, m_bucket-1.0); 
 }
 
 // void

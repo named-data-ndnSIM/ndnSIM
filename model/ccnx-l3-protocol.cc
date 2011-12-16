@@ -28,6 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/object-vector.h"
+#include "ns3/pointer.h"
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 
@@ -63,13 +64,23 @@ CcnxL3Protocol::GetTypeId (void)
     .SetParent<Ccnx> ()
     .SetGroupName ("Ccnx")
     .AddConstructor<CcnxL3Protocol> ()
+    .AddAttribute ("FaceList", "List of faces associated with CCNx stack",
+                   ObjectVectorValue (),
+                   MakeObjectVectorAccessor (&CcnxL3Protocol::m_faces),
+                   MakeObjectVectorChecker<CcnxFace> ())
+
+    .AddAttribute ("ForwardingStrategy", "Forwarding strategy used by CCNx stack",
+                   PointerValue (),
+                   MakePointerAccessor (&CcnxL3Protocol::SetForwardingStrategy, &CcnxL3Protocol::GetForwardingStrategy),
+                   MakePointerChecker<CcnxForwardingStrategy> ())
+    
     .AddAttribute ("BucketLeakInterval",
                    "Interval to leak buckets",
                    StringValue ("10ms"),
                    MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
                                      &CcnxL3Protocol::SetBucketLeakInterval),
                    MakeTimeChecker ())
-    
+
     .AddTraceSource ("TransmittedInterestTrace", "Interests that were transmitted",
                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_transmittedInterestsTrace))
     

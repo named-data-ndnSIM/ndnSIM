@@ -32,6 +32,16 @@ NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 
 namespace ns3 {
 
+TypeId
+CcnxNetDeviceFace::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::CcnxNetDeviceFace")
+    .SetParent<CcnxFace> ()
+    .SetGroupName ("Ccnx")
+    ;
+  return tid;
+}
+
 /** 
  * By default, Ccnx face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face

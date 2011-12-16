@@ -45,6 +45,9 @@ class Address;
 class CcnxNetDeviceFace  : public CcnxFace
 {
 public:
+  static TypeId
+  GetTypeId ();
+
   /**
    * \brief Constructor
    *

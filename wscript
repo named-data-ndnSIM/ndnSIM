@@ -59,8 +59,8 @@ def build(bld):
         "helper/ccnx-header-helper.h",
 
         "apps/ccnx-app.h",
-        "apps/ccnx-consumer.h",
-        "apps/ccnx-producer.h",
+        # "apps/ccnx-consumer.h",
+        # "apps/ccnx-producer.h",
 
         "model/hash-helper.h",
         "model/ccnx.h",
