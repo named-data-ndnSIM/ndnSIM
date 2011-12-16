@@ -58,12 +58,18 @@ def register_types(module):
     module.add_enum('Status', ['NDN_FIB_GREEN', 'NDN_FIB_YELLOW', 'NDN_FIB_RED'], outer_class=root_module['ns3::CcnxFibFaceMetric'])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFibFaceMetricContainer [struct]
     module.add_class('CcnxFibFaceMetricContainer')
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper [class]
+    module.add_class('CcnxHeaderHelper')
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::Type [enumeration]
+    module.add_enum('Type', ['INTEREST', 'CONTENT_OBJECT'], outer_class=root_module['ns3::CcnxHeaderHelper'])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeaderException [class]
     module.add_class('CcnxInterestHeaderException')
     ## ccnx-producer-helper.h (module 'NDNabstraction'): ns3::CcnxProducerHelper [class]
     module.add_class('CcnxProducerHelper')
     ## ccnx-stack-helper.h (module 'NDNabstraction'): ns3::CcnxStackHelper [class]
     module.add_class('CcnxStackHelper')
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException [class]
+    module.add_class('CcnxUnknownHeaderException')
     ## event-id.h (module 'core'): ns3::EventId [class]
     module.add_class('EventId', import_from_module='ns.core')
     ## ipv4-address.h (module 'network'): ns3::Ipv4Address [class]
@@ -176,8 +182,6 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::AttributeValue', 'ns3::empty', 'ns3::DefaultDeleter<ns3::AttributeValue>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::CallbackImplBase', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CallbackImplBase>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxFace', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxFace>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxFaceContainer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxFaceContainer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFibEntry, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFibEntry> > [class]
@@ -230,14 +234,12 @@ def register_types(module):
     module.add_enum('ForwardingStrategy', ['NDN_FLOODING', 'NDN_BESTROUTE', 'NDN_RANKING'], outer_class=root_module['ns3::Ccnx'])
     ## ccnx-app.h (module 'NDNabstraction'): ns3::CcnxApp [class]
     module.add_class('CcnxApp', parent=root_module['ns3::Application'])
-    ## ccnx-consumer.h (module 'NDNabstraction'): ns3::CcnxConsumer [class]
-    module.add_class('CcnxConsumer', parent=root_module['ns3::CcnxApp'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader [class]
     module.add_class('CcnxContentObjectHeader', parent=root_module['ns3::Header'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectTail [class]
     module.add_class('CcnxContentObjectTail', parent=root_module['ns3::Trailer'])
     ## ccnx-face.h (module 'NDNabstraction'): ns3::CcnxFace [class]
-    module.add_class('CcnxFace', parent=root_module['ns3::SimpleRefCount< ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >'])
+    module.add_class('CcnxFace', parent=root_module['ns3::Object'])
     ## ccnx-face-container.h (module 'NDNabstraction'): ns3::CcnxFaceContainer [class]
     module.add_class('CcnxFaceContainer', parent=root_module['ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >'])
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFib [class]
@@ -256,8 +258,6 @@ def register_types(module):
     module.add_class('CcnxNameComponentsChecker', parent=root_module['ns3::AttributeChecker'])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponentsValue [class]
     module.add_class('CcnxNameComponentsValue', parent=root_module['ns3::AttributeValue'])
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer [class]
-    module.add_class('CcnxProducer', parent=root_module['ns3::CcnxApp'])
     ## attribute.h (module 'core'): ns3::EmptyAttributeValue [class]
     module.add_class('EmptyAttributeValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## event-impl.h (module 'core'): ns3::EventImpl [class]
@@ -356,9 +356,11 @@ def register_methods(root_module):
     register_Ns3CcnxFibEntryContainer_methods(root_module, root_module['ns3::CcnxFibEntryContainer'])
     register_Ns3CcnxFibFaceMetric_methods(root_module, root_module['ns3::CcnxFibFaceMetric'])
     register_Ns3CcnxFibFaceMetricContainer_methods(root_module, root_module['ns3::CcnxFibFaceMetricContainer'])
+    register_Ns3CcnxHeaderHelper_methods(root_module, root_module['ns3::CcnxHeaderHelper'])
     register_Ns3CcnxInterestHeaderException_methods(root_module, root_module['ns3::CcnxInterestHeaderException'])
     register_Ns3CcnxProducerHelper_methods(root_module, root_module['ns3::CcnxProducerHelper'])
     register_Ns3CcnxStackHelper_methods(root_module, root_module['ns3::CcnxStackHelper'])
+    register_Ns3CcnxUnknownHeaderException_methods(root_module, root_module['ns3::CcnxUnknownHeaderException'])
     register_Ns3EventId_methods(root_module, root_module['ns3::EventId'])
     register_Ns3Ipv4Address_methods(root_module, root_module['ns3::Ipv4Address'])
     register_Ns3Ipv4Mask_methods(root_module, root_module['ns3::Ipv4Mask'])
@@ -411,7 +413,6 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3AttributeChecker_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeChecker__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> >'])
     register_Ns3SimpleRefCount__Ns3AttributeValue_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeValue__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
-    register_Ns3SimpleRefCount__Ns3CcnxFace_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFace__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFaceContainer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFibEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFibEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFibEntry, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFibEntry> >'])
     register_Ns3SimpleRefCount__Ns3CcnxNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxNameComponents__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> >'])
@@ -435,7 +436,6 @@ def register_methods(root_module):
     register_Ns3CallbackValue_methods(root_module, root_module['ns3::CallbackValue'])
     register_Ns3Ccnx_methods(root_module, root_module['ns3::Ccnx'])
     register_Ns3CcnxApp_methods(root_module, root_module['ns3::CcnxApp'])
-    register_Ns3CcnxConsumer_methods(root_module, root_module['ns3::CcnxConsumer'])
     register_Ns3CcnxContentObjectHeader_methods(root_module, root_module['ns3::CcnxContentObjectHeader'])
     register_Ns3CcnxContentObjectTail_methods(root_module, root_module['ns3::CcnxContentObjectTail'])
     register_Ns3CcnxFace_methods(root_module, root_module['ns3::CcnxFace'])
@@ -447,7 +447,6 @@ def register_methods(root_module):
     register_Ns3CcnxNameComponents_methods(root_module, root_module['ns3::CcnxNameComponents'])
     register_Ns3CcnxNameComponentsChecker_methods(root_module, root_module['ns3::CcnxNameComponentsChecker'])
     register_Ns3CcnxNameComponentsValue_methods(root_module, root_module['ns3::CcnxNameComponentsValue'])
-    register_Ns3CcnxProducer_methods(root_module, root_module['ns3::CcnxProducer'])
     register_Ns3EmptyAttributeValue_methods(root_module, root_module['ns3::EmptyAttributeValue'])
     register_Ns3EventImpl_methods(root_module, root_module['ns3::EventImpl'])
     register_Ns3IntegerValue_methods(root_module, root_module['ns3::IntegerValue'])
@@ -1085,6 +1084,18 @@ def register_Ns3CcnxFibFaceMetricContainer_methods(root_module, cls):
     cls.add_constructor([param('ns3::CcnxFibFaceMetricContainer const &', 'arg0')])
     return
 
+def register_Ns3CcnxHeaderHelper_methods(root_module, cls):
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::CcnxHeaderHelper() [constructor]
+    cls.add_constructor([])
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxHeaderHelper::CcnxHeaderHelper(ns3::CcnxHeaderHelper const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CcnxHeaderHelper const &', 'arg0')])
+    ## ccnx-header-helper.h (module 'NDNabstraction'): static ns3::CcnxHeaderHelper::Type ns3::CcnxHeaderHelper::GetCcnxHeaderType(ns3::Ptr<const ns3::Packet> packet) [member function]
+    cls.add_method('GetCcnxHeaderType', 
+                   'ns3::CcnxHeaderHelper::Type', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'packet')], 
+                   is_static=True)
+    return
+
 def register_Ns3CcnxInterestHeaderException_methods(root_module, cls):
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeaderException::CcnxInterestHeaderException() [constructor]
     cls.add_constructor([])
@@ -1172,6 +1183,13 @@ def register_Ns3CcnxStackHelper_methods(root_module, cls):
     cls.add_method('InstallRoutesToAll', 
                    'void', 
                    [])
+    return
+
+def register_Ns3CcnxUnknownHeaderException_methods(root_module, cls):
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException::CcnxUnknownHeaderException() [constructor]
+    cls.add_constructor([])
+    ## ccnx-header-helper.h (module 'NDNabstraction'): ns3::CcnxUnknownHeaderException::CcnxUnknownHeaderException(ns3::CcnxUnknownHeaderException const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CcnxUnknownHeaderException const &', 'arg0')])
     return
 
 def register_Ns3EventId_methods(root_module, cls):
@@ -2841,18 +2859,6 @@ def register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__
                    is_static=True)
     return
 
-def register_Ns3SimpleRefCount__Ns3CcnxFace_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFace__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter< ns3::CcnxFace > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnxFace, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFace> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
 def register_Ns3SimpleRefCount__Ns3CcnxFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFaceContainer__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -3287,6 +3293,10 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
     cls.add_method('SetBoundingBox', 
                    'void', 
                    [param('double', 'ulx'), param('double', 'uly'), param('double', 'lrx'), param('double', 'lry')])
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::SetMobilityModel(std::string const & model) [member function]
+    cls.add_method('SetMobilityModel', 
+                   'void', 
+                   [param('std::string const &', 'model')])
     ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::AnnotatedTopologyReader::CreateNode(std::string const name) [member function]
     cls.add_method('CreateNode', 
                    'ns3::Ptr< ns3::Node >', 
@@ -3296,6 +3306,16 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
     cls.add_method('CreateNode', 
                    'ns3::Ptr< ns3::Node >', 
                    [param('std::string const', 'name'), param('double', 'posX'), param('double', 'posY')], 
+                   visibility='protected')
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplySettings() [member function]
+    cls.add_method('ApplySettings', 
+                   'void', 
+                   [], 
+                   visibility='protected')
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplyOspfMetric() [member function]
+    cls.add_method('ApplyOspfMetric', 
+                   'void', 
+                   [], 
                    visibility='protected')
     return
 
@@ -3579,33 +3599,6 @@ def register_Ns3CcnxApp_methods(root_module, cls):
                    visibility='protected', is_virtual=True)
     return
 
-def register_Ns3CcnxConsumer_methods(root_module, cls):
-    ## ccnx-consumer.h (module 'NDNabstraction'): ns3::CcnxConsumer::CcnxConsumer(ns3::CcnxConsumer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxConsumer const &', 'arg0')])
-    ## ccnx-consumer.h (module 'NDNabstraction'): ns3::CcnxConsumer::CcnxConsumer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-consumer.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxConsumer::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::OnContentObject(ns3::Ptr<const ns3::CcnxContentObjectHeader> const & contentObject, ns3::Ptr<const ns3::Packet> const & payload) [member function]
-    cls.add_method('OnContentObject', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxContentObjectHeader const > const &', 'contentObject'), param('ns3::Ptr< ns3::Packet const > const &', 'payload')], 
-                   is_virtual=True)
-    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::StartApplication() [member function]
-    cls.add_method('StartApplication', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-consumer.h (module 'NDNabstraction'): void ns3::CcnxConsumer::StopApplication() [member function]
-    cls.add_method('StopApplication', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    return
-
 def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::CcnxContentObjectHeader(ns3::CcnxContentObjectHeader const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxContentObjectHeader const &', 'arg0')])
@@ -3700,6 +3693,11 @@ def register_Ns3CcnxFace_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
+    ## ccnx-face.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxFace::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
     ## ccnx-face.h (module 'NDNabstraction'): bool ns3::CcnxFace::IsBelowLimit() [member function]
     cls.add_method('IsBelowLimit', 
                    'bool', 
@@ -4096,33 +4094,6 @@ def register_Ns3CcnxNameComponentsValue_methods(root_module, cls):
     cls.add_method('Set', 
                    'void', 
                    [param('ns3::CcnxNameComponents const &', 'value')])
-    return
-
-def register_Ns3CcnxProducer_methods(root_module, cls):
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer::CcnxProducer(ns3::CcnxProducer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::CcnxProducer const &', 'arg0')])
-    ## ccnx-producer.h (module 'NDNabstraction'): ns3::CcnxProducer::CcnxProducer() [constructor]
-    cls.add_constructor([])
-    ## ccnx-producer.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxProducer::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::OnInterest(ns3::Ptr<const ns3::CcnxInterestHeader> const & interest) [member function]
-    cls.add_method('OnInterest', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::CcnxInterestHeader const > const &', 'interest')], 
-                   is_virtual=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::StartApplication() [member function]
-    cls.add_method('StartApplication', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
-    ## ccnx-producer.h (module 'NDNabstraction'): void ns3::CcnxProducer::StopApplication() [member function]
-    cls.add_method('StopApplication', 
-                   'void', 
-                   [], 
-                   visibility='protected', is_virtual=True)
     return
 
 def register_Ns3EmptyAttributeValue_methods(root_module, cls):
@@ -4885,8 +4856,8 @@ def register_Ns3RandomVariableValue_methods(root_module, cls):
     return
 
 def register_Ns3RocketfuelWeightsReader_methods(root_module, cls):
-    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::RocketfuelWeightsReader::RocketfuelWeightsReader() [constructor]
-    cls.add_constructor([])
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): ns3::RocketfuelWeightsReader::RocketfuelWeightsReader(std::string const & path="") [constructor]
+    cls.add_constructor([param('std::string const &', 'path', default_value='""')])
     ## rocketfuel-weights-reader.h (module 'NDNabstraction'): void ns3::RocketfuelWeightsReader::SetFileType(uint8_t inputType) [member function]
     cls.add_method('SetFileType', 
                    'void', 
@@ -4896,6 +4867,10 @@ def register_Ns3RocketfuelWeightsReader_methods(root_module, cls):
                    'ns3::NodeContainer', 
                    [], 
                    is_virtual=True)
+    ## rocketfuel-weights-reader.h (module 'NDNabstraction'): void ns3::RocketfuelWeightsReader::Commit() [member function]
+    cls.add_method('Commit', 
+                   'void', 
+                   [])
     return
 
 def register_Ns3TimeChecker_methods(root_module, cls):
