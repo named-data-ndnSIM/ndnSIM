@@ -227,9 +227,9 @@ CcnxConsumer::SendPacket ()
   std::pair<SeqTimeoutsContainer::iterator, bool>
     res = m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
   
-  // if (!res.second)
-  //   m_seqTimeouts.modify (res.first,
-  //                         ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
+  if (!res.second)
+    m_seqTimeouts.modify (res.first,
+                          ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
   
   m_sendEvent = Simulator::Schedule (m_offTime, &CcnxConsumer::SendPacket, this);
 
