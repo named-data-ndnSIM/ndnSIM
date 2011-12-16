@@ -112,13 +112,14 @@ void CcnxPit::CleanExpired ()
   NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
   Time now = Simulator::Now ();
 
-  uint32_t count = 0;
+  // uint32_t count = 0;
   while (!empty ())
     {
-      if (get<i_timestamp> ().front ().GetExpireTime () <= now) // is the record stale?
+      CcnxPit::index<i_timestamp>::type::iterator entry = get<i_timestamp> ().begin ();
+      if (entry->GetExpireTime () <= now) // is the record stale?
         {
-          get<i_timestamp> ().pop_front ();
-          count ++;
+          get<i_timestamp> ().erase (entry);
+          // count ++;
         }
       else
         break; // nothing else to do. All later records will not be stale

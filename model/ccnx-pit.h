@@ -35,7 +35,6 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
-#include <boost/multi_index/sequenced_index.hpp>
 #include <map>
 #include <iostream>
 #include <algorithm>
@@ -83,8 +82,10 @@ struct CcnxPitEntryContainer
         CcnxPrefixHash
         >,
       // sequenced to implement MRU
-      boost::multi_index::sequenced<
-        boost::multi_index::tag<__ccnx_private::i_timestamp> >
+      boost::multi_index::ordered_non_unique<
+        boost::multi_index::tag<__ccnx_private::i_timestamp>,
+        boost::multi_index::member<CcnxPitEntry, Time, &CcnxPitEntry::m_expireTime>
+        >
       >
     > type;
 };
