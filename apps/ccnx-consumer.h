@@ -24,6 +24,14 @@
 #include "ccnx-app.h"
 #include "ns3/random-variable.h"
 #include "ns3/ccnx-name-components.h"
+#include "ns3/nstime.h"
+
+#include <set>
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/tag.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 
 namespace ns3 
 {
@@ -35,8 +43,16 @@ public:
         
   CcnxConsumer ();
 
-  void OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                        const Ptr<const Packet> &payload);
+  // From CcnxApp
+  // virtual void
+  // OnInterest (const Ptr<const CcnxInterestHeader> &interest);
+
+  virtual void
+  OnNack (const Ptr<const CcnxInterestHeader> &interest);
+
+  virtual void
+  OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
+                   const Ptr<const Packet> &payload);
 
 protected:
   // from CcnxApp
@@ -48,13 +64,29 @@ protected:
   
 private:
   //helpers
-  void SendPacket ();
-     
-private:
+  void
+  SendPacket ();
+
+  void
+  CheckRetxTimeout ();
+  
+  void
+  SetRetxTimer (Time retxTimer);
+
+  Time
+  GetRetxTimer () const;
+  
+protected:
   UniformVariable m_rand;
   uint32_t        m_seq;
   EventId         m_sendEvent; // Eventid of pending "send packet" event
+  Time            m_retxTimer;
+  EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
 
+  Time            m_rto; // Retransmission timeout
+  Time            m_rttVar; // RTT variance
+  Time            m_sRtt; // smoothed RTT
+  
   Time               m_offTime;
   CcnxNameComponents m_interestName;
   Time               m_interestLifeTime;
@@ -62,6 +94,41 @@ private:
   int32_t            m_maxSuffixComponents;
   bool               m_childSelector;
   CcnxNameComponents m_exclude;
+
+  struct RetxSeqsContainer :
+    public std::set<uint32_t> { };
+  
+  RetxSeqsContainer m_retxSeqs; // ordered set of sequence numbers to be retransmitted
+
+  struct SeqTimeout
+  {
+    SeqTimeout (uint32_t _seq, Time _time) : seq (_seq), time (_time) { }
+    
+    uint32_t seq;
+    Time time;
+
+    bool operator < (const SeqTimeout &st) { return time < st.time || (time == st.time && seq < st.seq); }
+  };
+
+  class i_seq { };
+  class i_timestamp { }; 
+  
+  struct SeqTimeoutsContainer :
+    public boost::multi_index::multi_index_container<
+    SeqTimeout,
+    boost::multi_index::indexed_by<
+      boost::multi_index::ordered_unique<
+        boost::multi_index::tag<i_seq>,
+        boost::multi_index::member<SeqTimeout, uint32_t, &SeqTimeout::seq>
+        >,
+      boost::multi_index::ordered_non_unique<
+        boost::multi_index::tag<i_timestamp>,
+        boost::multi_index::member<SeqTimeout, Time, &SeqTimeout::time>
+        >
+      >
+    > { } ;
+
+  SeqTimeoutsContainer m_seqTimeouts;
 };
 
 } // namespace ns3
