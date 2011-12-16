@@ -23,6 +23,10 @@
 #include "ns3/boolean.h"
 
 #include "ccnx.h"
+#include "ccnx-face.h"
+#include "ccnx-forwarding-strategy.h"
+#include "ccnx-interest-header.h"
+#include "ccnx-content-object-header.h"
 
 namespace ns3 {
 
@@ -34,6 +38,29 @@ Ccnx::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::Ccnx")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+
+    // "OutInterests" trace is inside CcnxForwardingStrategy
+    .AddTraceSource ("InInterests",   "InInterests",   MakeTraceSourceAccessor (&Ccnx::m_inInterests))
+    .AddTraceSource ("DropInterests", "DropInterests", MakeTraceSourceAccessor (&Ccnx::m_dropInterests))
+    
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+
+    .AddTraceSource ("OutNacks",  "OutNacks",  MakeTraceSourceAccessor (&Ccnx::m_outNacks))
+    .AddTraceSource ("InNacks",   "InNacks",   MakeTraceSourceAccessor (&Ccnx::m_inNacks))
+    .AddTraceSource ("DropNacks", "DropNacks", MakeTraceSourceAccessor (&Ccnx::m_dropNacks))
+    
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+
+    .AddTraceSource ("OutData",  "OutData",  MakeTraceSourceAccessor (&Ccnx::m_outData))
+    .AddTraceSource ("InData",   "InData",   MakeTraceSourceAccessor (&Ccnx::m_inData))
+    .AddTraceSource ("DropData", "DropData", MakeTraceSourceAccessor (&Ccnx::m_dropData))
+    
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
   ;
   return tid;
 }

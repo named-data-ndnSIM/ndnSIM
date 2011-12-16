@@ -200,8 +200,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
-  ccnx->SetForwardingStrategy
-    (DynamicCast<CcnxForwardingStrategy> (m_strategyFactory.Create<Object> ()));
+  ccnx->SetForwardingStrategy (m_strategyFactory.Create<CcnxForwardingStrategy> ());
   
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {

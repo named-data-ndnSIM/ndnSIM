@@ -80,25 +80,6 @@ CcnxL3Protocol::GetTypeId (void)
                    MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
                                      &CcnxL3Protocol::SetBucketLeakInterval),
                    MakeTimeChecker ())
-
-    .AddTraceSource ("TransmittedInterestTrace", "Interests that were transmitted",
-                    MakeTraceSourceAccessor (&CcnxL3Protocol::m_transmittedInterestsTrace))
-    
-    .AddTraceSource ("ReceivedInterestTrace", "Interests that were received",
-                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_receivedInterestsTrace))
-    
-    .AddTraceSource ("DroppedInterestTrace", "Interests that were dropped",
-                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_droppedInterestsTrace))
-
-    .AddTraceSource ("ReceivedDataTrace", "Data that were received",
-                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_receivedDataTrace))
-    
-    .AddTraceSource ("TransmittedDataTrace", "Data that were transmitted",
-                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_transmittedDataTrace))
-    
-    .AddTraceSource ("DroppedDataTrace", "Data that were dropped",
-                     MakeTraceSourceAccessor (&CcnxL3Protocol::m_droppedDataTrace))
-
   ;
   return tid;
 }
@@ -318,18 +299,17 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                         const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
+  m_inNacks (header, incomingFace);
 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
   bool isNew = ret.get<1> ();
   bool isDuplicated = ret.get<2> ();
 
-  // NS_ASSERT_MSG (isDuplicated,
-  //                "NACK should be a duplicated interest");
   if (isNew || !isDuplicated) // potential flow
     {
       // somebody is doing something bad
-      m_droppedInterestsTrace (header, NACK_NONDUPLICATE, m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropNacks (header, NON_DUPLICATED, incomingFace);
       return;
     }
   
@@ -342,6 +322,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
                      "Node " << GetObject<Node> ()->GetId () << ", outgoing entry should exist for face " << boost::cref(*incomingFace) << "\n" <<
                      "size: " << pitEntry.m_outgoing.size ());
       
+      // m_dropNacks (header, NON_DUPLICATE, incomingFace);
       return;
     }
 
@@ -371,7 +352,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   if (pitEntry.m_incoming.size () == 0) // interest was actually satisfied
     {
       // no need to do anything
-      m_droppedInterestsTrace (header, NACK_AFTER_SATISFIED, m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropNacks (header, AFTER_SATISFIED, incomingFace);
       return;
     }
 
@@ -380,7 +361,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
       NS_LOG_DEBUG ("Not all outgoing are in vain");
       // suppress
       // Don't do anything, we are still expecting data from some other face
-      m_droppedInterestsTrace (header, NACK_SUPPRESSED, m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropNacks (header, SUPPRESSED, incomingFace);
       return;
     }
   
@@ -397,7 +378,10 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   // // If no interests was propagated, then there is not other option for forwarding or
   // // ForwardingStrategy failed to find it. 
   if (!propagated)
-     GiveUpInterest (pitEntry, header);
+    {
+      m_dropNacks (header, NO_FACES, incomingFace); // this headers doesn't have NACK flag set
+      GiveUpInterest (pitEntry, header);
+    }
 }
 
 // Processing Interests
@@ -409,7 +393,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
-  //m_receivedInterestsTrace (header, m_node->GetObject<Ccnx> (), incomingFace);
+  m_inInterests (header, incomingFace);
 
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
@@ -419,24 +403,22 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 
   if (isDuplicated) 
     {
+      m_dropInterests (header, DUPLICATED, incomingFace);
+
       /**
        * This condition will handle "routing" loops and also recently satisfied interests.
        * Every time interest is satisfied, PIT entry (with empty incoming and outgoing faces)
        * is kept for another small chunk of time.
        */
       
-      // //Trace duplicate interest  
-      // m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
-
       NS_LOG_DEBUG ("Sending NACK_LOOP");
       header->SetNack (CcnxInterestHeader::NACK_LOOP);
       Ptr<Packet> nack = Create<Packet> ();
       nack->AddHeader (*header);
 
       incomingFace->Send (nack);
+      m_outNacks (header, incomingFace);
       
-      // //Trace duplicate interest  
-      m_droppedInterestsTrace (header, NDN_DUPLICATE_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
       return;
     }
 
@@ -449,8 +431,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       
       NS_LOG_LOGIC("Found in cache");
         
-      m_transmittedDataTrace (contentObjectHeader, contentObject, CACHED, m_node->GetObject<Ccnx> (), incomingFace);
       incomingFace->Send (contentObject);
+      m_outData (contentObjectHeader, true, incomingFace);
 
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -504,9 +486,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   if (!isRetransmitted &&
       pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
     { // Suppress this interest if we're still expecting data from some other face
-      
-      // We are already expecting data later in future. Suppress the interest
-      m_droppedInterestsTrace (header, NDN_SUPPRESSED_INTEREST, m_node->GetObject<Ccnx> (), incomingFace);
+
+      m_dropInterests (header, SUPPRESSED, incomingFace);
       return;
     }
   
@@ -534,34 +515,11 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // If no interests was propagated, then there is not other option for forwarding or
   // ForwardingStrategy failed to find it. 
   if (!propagated)
-    GiveUpInterest (pitEntry, header);
-}
-
-void
-CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
-                                Ptr<CcnxInterestHeader> header)
-{
-  Ptr<Packet> packet = Create<Packet> ();
-  header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
-  packet->AddHeader (*header);
-
-  BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
     {
-      incoming.m_face->Send (packet->Copy ());
-
-      //m_droppedInterestsTrace (header, DROP_CONGESTION,
-      //                         m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropInterests (header, NO_FACES, incomingFace);
+      GiveUpInterest (pitEntry, header);
     }
-  // All incoming interests cannot be satisfied. Remove them
-  m_pit->modify (m_pit->iterator_to (pitEntry),
-                 ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
-
-  // Set pruning timout on PIT entry (instead of deleting the record)
-  m_pit->modify (m_pit->iterator_to (pitEntry),
-                 ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
 }
-
 
 // Processing ContentObjects
 void
@@ -572,7 +530,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 {
     
   NS_LOG_FUNCTION (incomingFace << header << payload << packet);
-  m_receivedDataTrace (header, payload, m_node->GetObject<Ccnx> (), incomingFace);
+  m_inData (header, incomingFace);
 
   // 1. Lookup PIT entry
   try
@@ -617,7 +575,10 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
           if (incoming.m_face != incomingFace)
-            incoming.m_face->Send (packet->Copy ());
+            {
+              incoming.m_face->Send (packet->Copy ());
+              m_outData (header, false, incoming.m_face);
+            }
 
           // successfull forwarded data trace
         }
@@ -636,9 +597,33 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       //    (unsolicited data packets should not "poison" content store)
       
       //drop dulicated or not requested data packet
-      m_droppedDataTrace (header, payload, NDN_UNSOLICITED_DATA, m_node->GetObject<Ccnx> (), incomingFace);
+      m_dropData (header, UNSOLICITED, incomingFace);
       return; // do not process unsoliced data packets
     }
+}
+
+void
+CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
+                                Ptr<CcnxInterestHeader> header)
+{
+  Ptr<Packet> packet = Create<Packet> ();
+  header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
+  packet->AddHeader (*header);
+
+  BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
+    {
+      incoming.m_face->Send (packet->Copy ());
+
+      m_outNacks (header, incoming.m_face);
+    }
+  // All incoming interests cannot be satisfied. Remove them
+  m_pit->modify (m_pit->iterator_to (pitEntry),
+                 ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
+
+  // Set pruning timout on PIT entry (instead of deleting the record)
+  m_pit->modify (m_pit->iterator_to (pitEntry),
+                 ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
 }
 
 void

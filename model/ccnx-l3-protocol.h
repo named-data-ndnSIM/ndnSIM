@@ -26,7 +26,6 @@
 #include <stdint.h>
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
-#include "ns3/traced-callback.h"
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
 
@@ -85,36 +84,6 @@ public:
    */
   CcnxL3Protocol();
   virtual ~CcnxL3Protocol ();
-
-  /**
-   * \enum DropReason
-   * \brief Reason why a packet has been dropped.
-   */
-  enum DropReason 
-  {
-    NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest
-    NDN_SUPPRESSED_INTEREST, ///< \brief Suppressed Interest
-    NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject(duplicate?)
-    NDN_PIT_TIMER_EXPIRED,
-    INTERFACE_DOWN,          ///< \brief Interface is down
-
-    NACK_SUPPRESSED,
-    NACK_AFTER_SATISFIED,
-    NACK_NONDUPLICATE,
-
-    DROP_NO_ROUTE,   /**< No route to host */
-  };    
-
-  /**
-   * \enum DropReason
-   * \brief Description of where content object was originated
-   */
-  enum ContentObjectSource
-  {
-    APPLICATION,
-    FORWARDED,
-    CACHED
-  };
 
   /**
    * \brief Assigns node to the CCNx stack
@@ -243,29 +212,6 @@ private:
 
   Time    m_bucketLeakInterval;
   EventId m_bucketLeakEvent;
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 DropReason,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                 Ptr<const Packet>,/*payload*/
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                  Ptr<const Packet>,/*payload*/
-                  ContentObjectSource,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                  Ptr<const Packet>,/*payload*/
-                  DropReason,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
 };
   
 } // Namespace ns3

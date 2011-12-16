@@ -19,10 +19,13 @@
  */
 
 #include "ccnx-flooding-strategy.h"
+#include "ccnx-interest-header.h"
+#include "ccnx-pit.h"
+#include "ccnx-pit-entry.h"
+
 #include "ns3/assert.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ccnx-interest-header.h"
 
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
@@ -114,6 +117,7 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       //   }
 
       metricFace.m_face->Send (packet->Copy ());
+      m_transmittedInterestsTrace (header, metricFace.m_face);
       
       propagatedCount++;
     }
