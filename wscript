@@ -113,6 +113,9 @@ def build(bld):
         obj = bld.create_ns3_program('ccnx-abilene-topology', ['NDNabstraction'])
         obj.source = 'examples/abilene-topology.cc'
 
+        obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
+        obj.source = 'examples/synthetic-topology.cc'
+
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
     #         if not anode or not anode.is_child_of(bld.srcnode):

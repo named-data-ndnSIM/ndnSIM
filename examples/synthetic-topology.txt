@@ -1,0 +1,20 @@
+router
+#name	city	latitude	longitude
+NODE1	NODE1	60  20
+NODE2	NODE2	20	20
+NODE3	NODE3	40	40
+NODE4	NODE4	20	60
+NODE5	NODE5	40	80
+NODE6	NODE6	60  100
+NODE7	NODE7	20	100
+link
+#capacity on 4/10/2003 (see page 20 of http://www.internet2.edu/presentations/spring03/20030410-Abilene-Corbato.pdf)
+#OSPF weight on 04/10/2003 (see http://www.abilene.iu.edu/images/Ab-IGP-topo.jpg)
+#x	y	capacity(kbps)	OSPF    Delay   QueueSize1  QueueSize2
+NODE1	NODE3	10000 1 1   80  120
+NODE2	NODE3	10000 1 1   110 150
+NODE3	NODE4	1000 1176   1   40  30
+NODE3	NODE5	1000 587 1  50  55  50
+NODE4	NODE5	1000 846    1   10  20
+NODE5	NODE6	10000 260   1   15  35
+NODE5	NODE7	10000 700   50  25  45
