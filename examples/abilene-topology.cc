@@ -72,15 +72,29 @@ void PrintFIBs ()
 }
 
 
-struct AggregateTrace
+struct AggregateAppTrace
 {
-  AggregateTrace ()
+  AggregateAppTrace ()
     : m_transmittedInterests (0)
     , m_transmittedData (0)
     , m_receivedInterests (0)
     , m_receivedNacks (0)
     , m_receivedData (0)
   {
+    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/TransmittedInterests",
+                     MakeCallback (&AggregateAppTrace::TransmittedInterests, this));
+
+    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedNacks",
+                     MakeCallback (&AggregateAppTrace::ReceivedNacks, this));
+
+    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/ReceivedInterests",
+                     MakeCallback (&AggregateAppTrace::ReceivedInterests, this));
+  
+    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/TransmittedContentObjects",
+                     MakeCallback (&AggregateAppTrace::TransmittedData, this));
+
+    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedContentObjects",
+                     MakeCallback (&AggregateAppTrace::ReceivedData, this));
   }
   
   void
@@ -130,7 +144,7 @@ struct AggregateTrace
 };
 
 ostream&
-operator << (ostream &os, const AggregateTrace &trace)
+operator << (ostream &os, const AggregateAppTrace &trace)
 {
   os << ">> (i): " << trace.m_transmittedInterests << "\n";
   os << ">> (d): " << trace.m_transmittedData << "\n";
@@ -140,41 +154,99 @@ operator << (ostream &os, const AggregateTrace &trace)
   return os;
 }
 
-// static void OnTransmittedInterest (std::string context, Ptr<const CcnxInterestHeader> header, 
-//                                    Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//   transmittedInterests++;
-// }
+struct AggregateCcnxTrace
+{
+  AggregateCcnxTrace (const std::string &node = "*")
+    : m_inInterests (0)
+    , m_outInterests (0)
+    , m_dropInterests (0)
+    , m_inNacks (0)
+    , m_outNacks (0)
+    , m_dropNacks (0)
+    , m_inData (0)
+    , m_outData (0)
+    , m_dropData (0)
+  {
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/ForwardingStrategy/OutInterests",
+                     MakeCallback (&AggregateCcnxTrace::OutInterests, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InInterests",
+                     MakeCallback (&AggregateCcnxTrace::InInterests, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropInterests",
+                     MakeCallback (&AggregateCcnxTrace::DropInterests, this));
 
-// static void OnReceivedInterest (std::string context, Ptr<const CcnxInterestHeader> header, 
-//                                 Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//   receivedInterests++;
-// }
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/OutNacks",
+                     MakeCallback (&AggregateCcnxTrace::OutNacks, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InNacks",
+                     MakeCallback (&AggregateCcnxTrace::InNacks, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropNacks",
+                     MakeCallback (&AggregateCcnxTrace::DropNacks, this));
 
-// static void OnDroppedInterest (std::string context, Ptr<const CcnxInterestHeader> header, CcnxL3Protocol::DropReason reason,
-//                                Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//   droppedInterests++;
-// }
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/OutData",
+                     MakeCallback (&AggregateCcnxTrace::OutData, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InData",
+                     MakeCallback (&AggregateCcnxTrace::InData, this));
+    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropData",
+                     MakeCallback (&AggregateCcnxTrace::DropData, this));
+  }
 
-// static void OnTransmittedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                                CcnxL3Protocol::ContentObjectSource source, Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//     transmittedData++;    
-// }
+  void OutInterests  (std::string context,
+                      Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
+  { m_outInterests++; }
+  void InInterests   (std::string context,
+                      Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
+  { m_inInterests++; }
+  void DropInterests (std::string context,
+                      Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
+  { m_dropInterests++; }
 
-// static void OnReceivedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                             Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//     receivedData++;
-// }
+  void OutNacks  (std::string context,
+                  Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
+  { m_outNacks++; }
+  void InNacks   (std::string context,
+                  Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
+  { m_inNacks++; }
+  void DropNacks (std::string context,
+                  Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
+  { m_dropNacks++; }
 
-// static void OnDroppedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                            CcnxL3Protocol::DropReason reason, Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face )
-// {
-//     droppedData++;
-// }
+  void OutData  (std::string context,
+                 Ptr<const CcnxContentObjectHeader>, bool fromCache, Ptr<const CcnxFace>)
+  { m_inData++; }
+  void InData   (std::string context,
+                 Ptr<const CcnxContentObjectHeader>, Ptr<const CcnxFace>)
+  { m_outData++; }
+  void DropData (std::string context,
+                 Ptr<const CcnxContentObjectHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
+  { m_dropData++; }
+
+  uint64_t m_inInterests;
+  uint64_t m_outInterests;
+  uint64_t m_dropInterests;
+  uint64_t m_inNacks;
+  uint64_t m_outNacks;
+  uint64_t m_dropNacks;
+  uint64_t m_inData;
+  uint64_t m_outData;
+  uint64_t m_dropData;
+};
+
+ostream&
+operator << (ostream &os, const AggregateCcnxTrace &trace)
+{
+  os << "(Interests)\n";
+  os << ">> (in):   " << trace.m_inInterests   << "\n";
+  os << ">> (out):  " << trace.m_outInterests  << "\n";
+  os << "<< (drop): " << trace.m_dropInterests << "\n";
+  os << "(Nacks)\n";
+  os << "<< (in):   " << trace.m_inNacks   << "\n";
+  os << "<< (out):  " << trace.m_outNacks  << "\n";
+  os << "<< (drop): " << trace.m_dropNacks << "\n";
+  os << "(Data)\n";
+  os << ">> (in):   " << trace.m_inData   << "\n";
+  os << ">> (out):  " << trace.m_outData  << "\n";
+  os << "<< (drop): " << trace.m_dropData << "\n";
+  return os;
+}
 
 int 
 main (int argc, char *argv[])
@@ -235,8 +307,8 @@ main (int argc, char *argv[])
   CcnxConsumerHelper consumerHelper ("/5");
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
     
-  // CcnxProducerHelper producerHelper ("/5",1024);
-  // ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
+  CcnxProducerHelper producerHelper ("/5",1024);
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
 
   // // Populate FIB based on IPv4 global routing controller
   // ccnxHelper.InstallFakeGlobalRoutes ();
@@ -257,36 +329,9 @@ main (int argc, char *argv[])
     }
 
   // NS_LOG_INFO ("Configure Tracing.");
-  AggregateTrace trace;
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/TransmittedInterests",
-                   MakeCallback (&AggregateTrace::TransmittedInterests, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedNacks",
-                   MakeCallback (&AggregateTrace::ReceivedNacks, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/ReceivedInterests",
-                   MakeCallback (&AggregateTrace::ReceivedInterests, &trace));
-  
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/TransmittedContentObjects",
-                   MakeCallback (&AggregateTrace::TransmittedData, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedContentObjects",
-                   MakeCallback (&AggregateTrace::ReceivedData, &trace));
-
-  // Config::Connect("/NodeList/*/ns3::CcnxL3Protocol/TransmittedInterestTrace",
-  //                                MakeCallback (&OnTransmittedInterest));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/ReceivedInterestTrace",
-  //                    MakeCallback (&OnReceivedInterest));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/DroppedInterestTrace",
-  //                    MakeCallback (&OnDroppedInterest));
+  AggregateAppTrace appTrace;
+  AggregateCcnxTrace ccnxTrace ("1");
     
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/ReceivedDataTrace",
-  //                    MakeCallback (&OnReceivedData));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/TransmittedDataTrace",
-  //                    MakeCallback (&OnTransmittedData));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/DroppedDataTrace",
-  //                    MakeCallback (&OnDroppedData));
-  
   config.ConfigureAttributes ();  
   
   NS_LOG_INFO ("Run Simulation.");
@@ -294,12 +339,7 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 
-  // NS_LOG_INFO("Total received interests = " << receivedInterests);
-  // NS_LOG_INFO("Total transmitted interests = " << transmittedInterests);
-  // NS_LOG_INFO("Total dropped interests = " << droppedInterests);
-  // NS_LOG_INFO("Total received data = " << receivedData);
-  // NS_LOG_INFO("Total transmitted data = " << transmittedData);
-  // NS_LOG_INFO("Total dropped data = " << droppedData);
-  NS_LOG_INFO (trace);
+  NS_LOG_INFO ("AppTrace: \n" << appTrace);
+  NS_LOG_INFO ("CcnxTrace: \n" << ccnxTrace);
   return 0;
 }
