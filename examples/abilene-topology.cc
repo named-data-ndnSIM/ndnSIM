@@ -26,10 +26,8 @@
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/animation-interface.h"
-// #include "ns3/ccnx-l3-protocol.h"
 
-#include <iostream>
-#include <sstream>
+#include "../helper/ccnx-trace-helper.h"
 #include "ns3/annotated-topology-reader.h"
 #include "../utils/spring-mobility-helper.h"
 
@@ -40,13 +38,6 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxAbileneTopology");
 
-// int transmittedInterests = 0;
-// int receivedInterests = 0;
-// int droppedInterests = 0;
-
-// int transmittedData = 0;
-// int receivedData = 0;
-// int droppedData = 0;
 
 void PrintTime ()
 {
@@ -72,187 +63,13 @@ void PrintFIBs ()
 }
 
 
-struct AggregateAppTrace
-{
-  AggregateAppTrace ()
-    : m_transmittedInterests (0)
-    , m_transmittedData (0)
-    , m_receivedInterests (0)
-    , m_receivedNacks (0)
-    , m_receivedData (0)
-  {
-    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/TransmittedInterests",
-                     MakeCallback (&AggregateAppTrace::TransmittedInterests, this));
 
-    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedNacks",
-                     MakeCallback (&AggregateAppTrace::ReceivedNacks, this));
 
-    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/ReceivedInterests",
-                     MakeCallback (&AggregateAppTrace::ReceivedInterests, this));
-  
-    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/TransmittedContentObjects",
-                     MakeCallback (&AggregateAppTrace::TransmittedData, this));
 
-    Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedContentObjects",
-                     MakeCallback (&AggregateAppTrace::ReceivedData, this));
-  }
-  
-  void
-  TransmittedInterests (std::string context,
-                        Ptr<const CcnxInterestHeader>, Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_transmittedInterests++;
-  }
-
-  void
-  TransmittedData (std::string context,
-                   Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                   Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_transmittedData++;
-  }
-
-  void
-  ReceivedInterests (std::string context,
-                     Ptr<const CcnxInterestHeader>,
-                     Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedInterests++;
-  }
-
-  void
-  ReceivedNacks (std::string context,
-                 Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedNacks++;
-  }
-  
-  void
-  ReceivedData (std::string context,
-                Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedData++;
-  }
-
-  uint64_t m_transmittedInterests;
-  uint64_t m_transmittedData;
-  uint64_t m_receivedInterests;
-  uint64_t m_receivedNacks;
-  uint64_t m_receivedData;
-};
-
-ostream&
-operator << (ostream &os, const AggregateAppTrace &trace)
-{
-  os << ">> (i): " << trace.m_transmittedInterests << "\n";
-  os << ">> (d): " << trace.m_transmittedData << "\n";
-  os << "<< (i): " << trace.m_receivedInterests << "\n";
-  os << "<< (d): " << trace.m_receivedData << "\n";
-  os << "<< (n): " << trace.m_receivedNacks << "\n";
-  return os;
-}
-
-struct AggregateCcnxTrace
-{
-  AggregateCcnxTrace (const std::string &node = "*")
-    : m_inInterests (0)
-    , m_outInterests (0)
-    , m_dropInterests (0)
-    , m_inNacks (0)
-    , m_outNacks (0)
-    , m_dropNacks (0)
-    , m_inData (0)
-    , m_outData (0)
-    , m_dropData (0)
-  {
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/ForwardingStrategy/OutInterests",
-                     MakeCallback (&AggregateCcnxTrace::OutInterests, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InInterests",
-                     MakeCallback (&AggregateCcnxTrace::InInterests, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropInterests",
-                     MakeCallback (&AggregateCcnxTrace::DropInterests, this));
-
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/OutNacks",
-                     MakeCallback (&AggregateCcnxTrace::OutNacks, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InNacks",
-                     MakeCallback (&AggregateCcnxTrace::InNacks, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropNacks",
-                     MakeCallback (&AggregateCcnxTrace::DropNacks, this));
-
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/OutData",
-                     MakeCallback (&AggregateCcnxTrace::OutData, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/InData",
-                     MakeCallback (&AggregateCcnxTrace::InData, this));
-    Config::Connect ("/NodeList/"+node+"/$ns3::CcnxL3Protocol/DropData",
-                     MakeCallback (&AggregateCcnxTrace::DropData, this));
-  }
-
-  void OutInterests  (std::string context,
-                      Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
-  { m_outInterests++; }
-  void InInterests   (std::string context,
-                      Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
-  { m_inInterests++; }
-  void DropInterests (std::string context,
-                      Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
-  { m_dropInterests++; }
-
-  void OutNacks  (std::string context,
-                  Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
-  { m_outNacks++; }
-  void InNacks   (std::string context,
-                  Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>)
-  { m_inNacks++; }
-  void DropNacks (std::string context,
-                  Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
-  { m_dropNacks++; }
-
-  void OutData  (std::string context,
-                 Ptr<const CcnxContentObjectHeader>, bool fromCache, Ptr<const CcnxFace>)
-  { m_inData++; }
-  void InData   (std::string context,
-                 Ptr<const CcnxContentObjectHeader>, Ptr<const CcnxFace>)
-  { m_outData++; }
-  void DropData (std::string context,
-                 Ptr<const CcnxContentObjectHeader>, Ccnx::DropReason, Ptr<const CcnxFace>)
-  { m_dropData++; }
-
-  uint64_t m_inInterests;
-  uint64_t m_outInterests;
-  uint64_t m_dropInterests;
-  uint64_t m_inNacks;
-  uint64_t m_outNacks;
-  uint64_t m_dropNacks;
-  uint64_t m_inData;
-  uint64_t m_outData;
-  uint64_t m_dropData;
-};
-
-ostream&
-operator << (ostream &os, const AggregateCcnxTrace &trace)
-{
-  os << "(Interests)\n";
-  os << ">> (in):   " << trace.m_inInterests   << "\n";
-  os << ">> (out):  " << trace.m_outInterests  << "\n";
-  os << "<< (drop): " << trace.m_dropInterests << "\n";
-  os << "(Nacks)\n";
-  os << "<< (in):   " << trace.m_inNacks   << "\n";
-  os << "<< (out):  " << trace.m_outNacks  << "\n";
-  os << "<< (drop): " << trace.m_dropNacks << "\n";
-  os << "(Data)\n";
-  os << ">> (in):   " << trace.m_inData   << "\n";
-  os << ">> (out):  " << trace.m_outData  << "\n";
-  os << "<< (drop): " << trace.m_dropData << "\n";
-  return os;
-}
 
 int 
 main (int argc, char *argv[])
 {
-  // Packet::EnableChecking();
-  // Packet::EnablePrinting();
   string input ("./src/NDNabstraction/examples/abilene-topology.txt");
 
   Time finishTime = Seconds (20.0);
@@ -329,9 +146,16 @@ main (int argc, char *argv[])
     }
 
   // NS_LOG_INFO ("Configure Tracing.");
-  AggregateAppTrace appTrace;
-  AggregateCcnxTrace ccnxTrace ("1");
-    
+  // CcnxAggregateAppTracer consumerTrace ("ns3::CcnxConsumer", "*");
+  // CcnxAggregateAppTracer producerTrace ("ns3::CcnxProducer", "*");
+  // CcnxAggregateL3Tracer ccnxTrace ("1");
+  CcnxTraceHelper traceHelper;
+  traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
+  traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
+  traceHelper.EnableAggregateL3All ();
+  traceHelper.SetL3TraceFile ("trace-l3.log");
+  traceHelper.SetAppTraceFile ("trace-app.log");
+  
   config.ConfigureAttributes ();  
   
   NS_LOG_INFO ("Run Simulation.");
@@ -339,7 +163,8 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 
-  NS_LOG_INFO ("AppTrace: \n" << appTrace);
-  NS_LOG_INFO ("CcnxTrace: \n" << ccnxTrace);
+  // NS_LOG_INFO ("ConsumerTrace: \n" << consumerTrace);
+  // NS_LOG_INFO ("ProducerTrace: \n" << producerTrace);
+  // NS_LOG_INFO ("CcnxTrace: \n" << ccnxTrace);
   return 0;
 }
