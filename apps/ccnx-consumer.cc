@@ -192,7 +192,9 @@ CcnxConsumer::SendPacket ()
   if (m_retxSeqs.size () != 0)
     {
       seq = *m_retxSeqs.begin ();
+      NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
       m_retxSeqs.erase (m_retxSeqs.begin ());
+      NS_LOG_INFO ("After: " << m_retxSeqs.size ());
     }
   else
     seq = m_seq++;
@@ -265,6 +267,9 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 {
   CcnxApp::OnNack (interest); // tracing inside
   
+  NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
+  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
+
   NS_LOG_FUNCTION (this << interest);
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
@@ -272,7 +277,9 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
   NS_LOG_INFO ("< NACK for " << seq);
 
   // put in the queue of interests to be retransmitted
+  NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
   m_retxSeqs.insert (seq);
+  NS_LOG_INFO ("After: " << m_retxSeqs.size ());
 }
 
 } // namespace ns3

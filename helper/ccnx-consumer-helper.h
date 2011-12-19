@@ -44,7 +44,13 @@ public:
    * \param prefix Prefix which will be requested by the consumer applications
    */
   CcnxConsumerHelper (const std::string &prefix);
-        
+
+  /**
+   * @brief Set the prefix consumer will be requesting
+   */
+  void
+  SetPrefix (const std::string &prefix);
+  
   /**
    * \brief Helper function used to set the underlying application attributes.
    *

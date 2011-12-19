@@ -86,6 +86,7 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       if (outgoing != pitEntry.m_outgoing.end () &&
           outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
         {
+          NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry.m_maxRetxCount);
           continue; // already forwarded before during this retransmission cycle
         }
 

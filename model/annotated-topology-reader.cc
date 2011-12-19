@@ -137,7 +137,7 @@ AnnotatedTopologyReader::Read (void)
       double latitude, longitude;
 
       lineBuffer >> name >> city >> latitude >> longitude;
-      Ptr<Node> node = CreateNode (name, 2*longitude, -2*latitude);
+      Ptr<Node> node = CreateNode (name, longitude, -latitude);
       nodes.Add (node);
     }
 
@@ -154,9 +154,9 @@ AnnotatedTopologyReader::Read (void)
       // NS_LOG_DEBUG ("Input: [" << line << "]");
       
       istringstream lineBuffer (line);
-      string from, to, capacity, metric, delay, queueSizeNode1, queueSizeNode2;
+      string from, to, capacity, metric, delay, maxPackets;
 
-      lineBuffer >> from >> to >> capacity >> metric >> delay >> queueSizeNode1 >> queueSizeNode2;
+      lineBuffer >> from >> to >> capacity >> metric >> delay >> maxPackets;
 
       if (processedLinks[to].size () != 0 &&
           processedLinks[to].find (from) != processedLinks[to].end ())
@@ -177,13 +177,11 @@ AnnotatedTopologyReader::Read (void)
 
       if (!delay.empty ())
           link.SetAttribute ("Delay", delay);
-      if (!queueSizeNode1.empty ())
-        link.SetAttribute ("QueueSizeNode1", queueSizeNode1);
-      if (!queueSizeNode2.empty ())
-        link.SetAttribute ("QueueSizeNode2", queueSizeNode2);
+      if (!maxPackets.empty ())
+        link.SetAttribute ("MaxPackets", maxPackets);
 
       AddLink (link);
-      NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << "Kbps with " << metric << " metric");
+      NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << " with " << metric << " metric (" << delay << ", " << maxPackets << ")");
     }
         
   NS_LOG_INFO ("Annotated topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
@@ -253,37 +251,33 @@ AnnotatedTopologyReader::ApplySettings ()
       if (link.GetAttributeFailSafe ("DataRate", tmp))
         {
           NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate"));
-          p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")));
+          p2p.SetDeviceAttribute ("DataRate", StringValue (link.GetAttribute ("DataRate")));
         }
 
-      if (link.GetAttributeFailSafe("Delay", tmp))
+      if (link.GetAttributeFailSafe ("Delay", tmp))
         {
           NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay"));
-          p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")));
+          p2p.SetChannelAttribute ("Delay", StringValue (link.GetAttribute ("Delay")));
         }
-        
+
       NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
       link.SetNetDevices (nd.Get (0), nd.Get (1));
 
-      if (link.GetAttributeFailSafe("QueueSizeNode1", tmp))
+      if (link.GetAttributeFailSafe ("MaxPackets", tmp))
         {
-          PointerValue txQueueFrom;
-          link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueueFrom);
-          NS_ASSERT (txQueueFrom.Get<DropTailQueue> () != 0);
+          NS_LOG_INFO ("MaxPackets = " + link.GetAttribute ("MaxPackets"));
 
-          NS_LOG_INFO ("QueueFrom: " << link.GetAttribute("QueueSizeNode1"));
-          txQueueFrom.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode1")));
+          PointerValue txQueue;
+
+          link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueue);
+          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);       
+          txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
+
+          link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueue);
+          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);
+          txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
         }
-      
-      if (link.GetAttributeFailSafe("QueueSizeNode2", tmp))
-        {
-          PointerValue txQueueTo;
-          link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueueTo);
-          NS_ASSERT (txQueueTo.Get<DropTailQueue> () != 0);
         
-          NS_LOG_INFO ("QueueTo: " << link.GetAttribute("QueueSizeNode2"));
-          txQueueTo.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute("QueueSizeNode2")));
-        }
     }
 }
 

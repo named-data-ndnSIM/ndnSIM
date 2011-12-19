@@ -195,6 +195,13 @@ public:
   AddOutgoing (Ptr<CcnxFace> face);
 
   /**
+   * @brief Clear all incoming faces either after all of them were satisfied or NACKed
+   */
+  void
+  ClearOutgoing ()
+  { m_outgoing.clear (); }  
+  
+  /**
    * @brief Remove all references to face.
    * 
    * This method should be called before face is completely removed from the stack.

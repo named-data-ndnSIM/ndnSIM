@@ -112,7 +112,7 @@ CcnxFace::IsBelowLimit ()
   
   if (m_bucketMax > 0)
     {
-      //NS_LOG_DEBUG ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
+      NS_LOG_DEBUG ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
       if (m_bucket+1.0 > m_bucketMax)
         {
           //NS_LOG_DEBUG ("Returning false");

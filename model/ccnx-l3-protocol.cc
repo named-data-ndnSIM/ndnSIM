@@ -76,7 +76,7 @@ CcnxL3Protocol::GetTypeId (void)
     
     .AddAttribute ("BucketLeakInterval",
                    "Interval to leak buckets",
-                   StringValue ("10ms"),
+                   StringValue ("100ms"),
                    MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
                                      &CcnxL3Protocol::SetBucketLeakInterval),
                    MakeTimeChecker ())
@@ -398,9 +398,11 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
-  // bool isNew = ret.get<1> ();
+  bool isNew = ret.get<1> ();
   bool isDuplicated = ret.get<2> ();
 
+  NS_LOG_DEBUG ("isNew: " << isNew << ", isDup: " << isDuplicated);
+  
   if (isDuplicated) 
     {
       m_dropInterests (header, DUPLICATED, incomingFace);
@@ -463,6 +465,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                      ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
     }
 
+  NS_LOG_DEBUG ("IsRetx: " << isRetransmitted);
+
   // update PIT entry lifetime
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::UpdateLifetime, ll::_1,
@@ -516,6 +520,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // ForwardingStrategy failed to find it. 
   if (!propagated)
     {
+      NS_LOG_DEBUG ("Not propagated");
       m_dropInterests (header, NO_FACES, incomingFace);
       GiveUpInterest (pitEntry, header);
     }
@@ -620,6 +625,10 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
 
+  // Remove also outgoing
+  m_pit->modify (m_pit->iterator_to (pitEntry),
+                 ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
+  
   // Set pruning timout on PIT entry (instead of deleting the record)
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,

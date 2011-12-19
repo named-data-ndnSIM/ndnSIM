@@ -32,12 +32,18 @@ namespace ns3
 CcnxConsumerHelper::CcnxConsumerHelper (const std::string &prefix)
 {
     m_factory.SetTypeId ("ns3::CcnxConsumer");
-    
+
+    SetPrefix (prefix);
+}
+
+void
+CcnxConsumerHelper::SetPrefix (const std::string &prefix)
+{
     CcnxNameComponentsValue prefixValue;
     prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
     m_factory.Set ("InterestName", prefixValue);
 }
-    
+
 void 
 CcnxConsumerHelper::SetAttribute (std::string name, const AttributeValue &value)
 {

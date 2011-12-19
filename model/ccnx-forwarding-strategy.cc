@@ -78,7 +78,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                                                    Ptr<CcnxInterestHeader> &header,
                                                    const Ptr<const Packet> &packet)
 {
-  // NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
   int propagatedCount = 0;
   
@@ -97,6 +97,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
       if (outgoing != pitEntry.m_outgoing.end () &&
           outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
         {
+          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry.m_maxRetxCount);
           continue;
         }
       

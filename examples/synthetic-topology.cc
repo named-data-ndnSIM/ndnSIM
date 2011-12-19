@@ -44,7 +44,7 @@ void PrintTime ()
   Simulator::Schedule (Seconds (10.0), PrintTime);
 }
 
-int 
+int
 main (int argc, char *argv[])
 {
   string input ("./src/NDNabstraction/examples/synthetic-topology.txt");
@@ -64,18 +64,18 @@ main (int argc, char *argv[])
   // --------------------------------------------
     
   AnnotatedTopologyReader reader ("/synthetic");
-  reader.SetMobilityModel ("ns3::SpringMobilityModel");
+  // reader.SetMobilityModel ("ns3::SpringMobilityModel");
   reader.SetFileName (input);
   NodeContainer nodes = reader.Read ();
-  SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
+  // SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
     
   InternetStackHelper stack;
   Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
   stack.SetRoutingHelper (ipv4RoutingHelper);
   stack.Install (nodes);
-  /*
-    reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
-  */
+
+  reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
+
   NS_LOG_INFO("Nodes = " << nodes.GetN());
   NS_LOG_INFO("Links = " << reader.LinksSize ());
     
@@ -84,31 +84,50 @@ main (int argc, char *argv[])
   CcnxStackHelper ccnxHelper;
   ccnxHelper.SetForwardingStrategy (strategy);
   ccnxHelper.EnableLimits (true, Seconds(0.1));
-  ccnxHelper.SetDefaultRoutes (true);
+  ccnxHelper.SetDefaultRoutes (false);
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("/1");
-  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/synthetic", "NODE1"));
-    
-  CcnxConsumerHelper consumerHelper2("/2");
-  ApplicationContainer consumers2 = consumerHelper2.Install(Names::Find<Node> ("/synthetic", "NODE2"));
-    
-  CcnxProducerHelper producerHelper ("/1",1024);
-  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/synthetic", "NODE6"));
-        
-  CcnxProducerHelper producerHelper2 ("/2",1024);
-  ApplicationContainer producers2 = producerHelper2.Install (Names::Find<Node> ("/synthetic", "NODE7"));
+  CcnxConsumerHelper consumerHelper ("/6");
+  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/synthetic", "c1"));
 
+  consumerHelper.SetPrefix ("/7");
+  ApplicationContainer consumers2 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c2"));
+
+  consumerHelper.SetPrefix ("/8");
+  ApplicationContainer consumers3 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c3"));
+  
+  consumerHelper.SetPrefix ("/10");
+  ApplicationContainer consumers4 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c4"));
+
+  consumers.Start (Seconds (2.121212123));
+  consumers2.Start (Seconds (0.166666));
+  consumers3.Start (Seconds (4.1235432));
+  consumers4.Start (Seconds (3.00005421));
+  
+  CcnxProducerHelper producerHelper ("/6",1024);
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/synthetic", "p1"));
+        
+  CcnxProducerHelper producerHelper2 ("/7",1024);
+  ApplicationContainer producers2 = producerHelper2.Install (Names::Find<Node> ("/synthetic", "p2"));
+
+  CcnxProducerHelper producerHelper3 ("/8",1024);
+  ApplicationContainer producers3 = producerHelper3.Install (Names::Find<Node> ("/synthetic", "p3"));
+  
+  CcnxProducerHelper producerHelper4 ("/10",1024);
+  ApplicationContainer producers4 = producerHelper4.Install (Names::Find<Node> ("/synthetic", "p4"));
+  
   Simulator::Schedule (Seconds (10.0), PrintTime);
 
   // Populate FIB based on IPv4 global routing controller
-  //ccnxHelper.InstallFakeGlobalRoutes ();
-  //ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "NODE1"));
-  //ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "NODE7"));
-    
+  ccnxHelper.InstallFakeGlobalRoutes ();
+  ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p1"));
+  ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p2"));
+  ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p3"));
+  ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p4"));
+
   Simulator::Stop (finishTime);
-    
+
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
   Simulator::Destroy ();
