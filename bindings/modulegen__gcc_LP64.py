@@ -230,8 +230,8 @@ def register_types(module):
     module.add_class('CallbackValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## ccnx.h (module 'NDNabstraction'): ns3::Ccnx [class]
     module.add_class('Ccnx', parent=root_module['ns3::Object'])
-    ## ccnx.h (module 'NDNabstraction'): ns3::Ccnx::ForwardingStrategy [enumeration]
-    module.add_enum('ForwardingStrategy', ['NDN_FLOODING', 'NDN_BESTROUTE', 'NDN_RANKING'], outer_class=root_module['ns3::Ccnx'])
+    ## ccnx.h (module 'NDNabstraction'): ns3::Ccnx::DropReason [enumeration]
+    module.add_enum('DropReason', ['DUPLICATED', 'SUPPRESSED', 'NO_FACES', 'NON_DUPLICATED', 'AFTER_SATISFIED', 'UNSOLICITED'], outer_class=root_module['ns3::Ccnx'])
     ## ccnx-app.h (module 'NDNabstraction'): ns3::CcnxApp [class]
     module.add_class('CcnxApp', parent=root_module['ns3::Application'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader [class]

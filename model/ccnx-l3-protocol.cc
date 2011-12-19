@@ -318,9 +318,9 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
 
   if (outFace == pitEntry.m_outgoing.end ())
     {
-      NS_ASSERT_MSG (false,
-                     "Node " << GetObject<Node> ()->GetId () << ", outgoing entry should exist for face " << boost::cref(*incomingFace) << "\n" <<
-                     "size: " << pitEntry.m_outgoing.size ());
+//      NS_ASSERT_MSG (false,
+//                     "Node " << GetObject<Node> ()->GetId () << ", outgoing entry should exist for face " << boost::cref(*incomingFace) << "\n" <<
+//                     "size: " << pitEntry.m_outgoing.size ());
       
       // m_dropNacks (header, NON_DUPLICATE, incomingFace);
       return;

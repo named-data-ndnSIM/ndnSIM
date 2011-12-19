@@ -253,8 +253,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   
   SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
 
-  NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
-                 "Comment out this assert, if it causes problems");
+  //  NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
+  //             "Comment out this assert, if it causes problems");
 
   if (entry != m_seqTimeouts.end ())
     m_seqTimeouts.erase (entry);

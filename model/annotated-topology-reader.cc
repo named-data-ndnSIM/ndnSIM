@@ -252,14 +252,14 @@ AnnotatedTopologyReader::ApplySettings ()
 
       if (link.GetAttributeFailSafe ("DataRate", tmp))
         {
-          NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate")+"Kbps");
-          p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")+"Kbps"));
+          NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate"));
+          p2p.SetDeviceAttribute ("DataRate", StringValue(link.GetAttribute("DataRate")));
         }
 
       if (link.GetAttributeFailSafe("Delay", tmp))
         {
-          NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay")+"ms");
-          p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")+"ms"));
+          NS_LOG_INFO ("Delay = " + link.GetAttribute("Delay"));
+          p2p.SetChannelAttribute ("Delay", StringValue(link.GetAttribute("Delay")));
         }
         
       NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
