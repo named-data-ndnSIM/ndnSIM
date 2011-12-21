@@ -46,25 +46,21 @@ void PrintTime ()
   Simulator::Schedule (Seconds (10.0), PrintTime);
 }
 
-void PrintFIBs ()
-{
-  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
-  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
-  for (NodeList::Iterator node = NodeList::Begin ();
-       node != NodeList::End ();
-       node++)
-    {
-      // *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
+// void PrintFIBs ()
+// {
+//   NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
+//   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
+//   for (NodeList::Iterator node = NodeList::Begin ();
+//        node != NodeList::End ();
+//        node++)
+//     {
+//       // *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
 
-      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
-      NS_ASSERT_MSG (fib != 0, "Fire alarm");
-      *routingStream->GetStream () << *fib << "\n\n";
-    }
-}
-
-
-
-
+//       Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
+//       NS_ASSERT_MSG (fib != 0, "Fire alarm");
+//       *routingStream->GetStream () << *fib << "\n\n";
+//     }
+// }
 
 
 int 
@@ -88,8 +84,8 @@ main (int argc, char *argv[])
   // -- Read topology data.
   // --------------------------------------------
     
-  AnnotatedTopologyReader reader ("/abilene");
-  reader.SetMobilityModel ("ns3::SpringMobilityModel");
+  AnnotatedTopologyReader reader ("/abilene", 2.0);
+  // reader.SetMobilityModel ("ns3::SpringMobilityModel");
   reader.SetFileName (input);
     
   NodeContainer nodes = reader.Read ();
@@ -100,7 +96,7 @@ main (int argc, char *argv[])
       return -1;
     }
 
-  SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
+  // SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
 
   // InternetStackHelper stack;
   // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
@@ -122,14 +118,14 @@ main (int argc, char *argv[])
     
   NS_LOG_INFO ("Installing Applications");
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
-  consumerHelper.SetPrefix ("/5");
-  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
+  consumerHelper.SetPrefix ("/Data");
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
+  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "SNVAng"));
   
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
-  producerHelper.SetPrefix ("/5");
-  producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+  producerHelper.SetPrefix ("/Data");
 
-  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "NYCMng"));
 
   // // Populate FIB based on IPv4 global routing controller
   // ccnxHelper.InstallFakeGlobalRoutes ();
@@ -138,7 +134,7 @@ main (int argc, char *argv[])
   // Simulator::Schedule (Seconds (1.0), PrintFIBs);
   // PrintFIBs ();
 
-  // Simulator::Schedule (Seconds (10.0), PrintTime);
+  Simulator::Schedule (Seconds (10.0), PrintTime);
 
   Simulator::Stop (finishTime);
 
@@ -149,10 +145,6 @@ main (int argc, char *argv[])
       anim->SetMobilityPollInterval (Seconds (1));
     }
 
-  // NS_LOG_INFO ("Configure Tracing.");
-  // CcnxAggregateAppTracer consumerTrace ("ns3::CcnxConsumer", "*");
-  // CcnxAggregateAppTracer producerTrace ("ns3::CcnxProducer", "*");
-  // CcnxAggregateL3Tracer ccnxTrace ("1");
   CcnxTraceHelper traceHelper;
   traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
   traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
@@ -167,8 +159,5 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 
-  // NS_LOG_INFO ("ConsumerTrace: \n" << consumerTrace);
-  // NS_LOG_INFO ("ProducerTrace: \n" << producerTrace);
-  // NS_LOG_INFO ("CcnxTrace: \n" << ccnxTrace);
   return 0;
 }

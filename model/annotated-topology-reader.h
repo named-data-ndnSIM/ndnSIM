@@ -39,10 +39,11 @@ public:
    * \brief Constructor
    *
    * \param path ns3::Names path
+   * \param scale Scaling factor for coordinates in input file
    *
    * \see ns3::Names class
    */
-  AnnotatedTopologyReader (const std::string &path="");
+  AnnotatedTopologyReader (const std::string &path="", double scale=1.0);
   virtual ~AnnotatedTopologyReader ();
         
   /**
@@ -100,6 +101,7 @@ private:
   UniformVariable m_randY;
 
   ObjectFactory m_mobilityFactory;
+  double m_scale;
 };
 
 }

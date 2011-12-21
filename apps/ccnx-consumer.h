@@ -25,6 +25,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/ccnx-name-components.h"
 #include "ns3/nstime.h"
+#include "ns3/data-rate.h"
 
 #include <set>
 
@@ -67,6 +68,24 @@ protected:
 private:
   //helpers
   void
+  ScheduleNextPacket ();
+
+  void
+  UpdateMean ();
+
+  void
+  SetPayloadSize (uint32_t payload);
+
+  uint32_t
+  GetPayloadSize () const;
+
+  void
+  SetDesiredRate (DataRate rate);
+
+  DataRate
+  GetDesiredRate () const;
+  
+  void
   SendPacket ();
 
   void
@@ -79,7 +98,12 @@ private:
   GetRetxTimer () const;
   
 protected:
-  UniformVariable m_rand;
+  UniformVariable m_rand; // nonce generator
+
+  ExponentialVariable m_randExp; // packet inter-arrival time generation (Poisson process)
+  DataRate            m_desiredRate;    // Desired data packet rate
+  uint32_t            m_payloadSize; // expected payload size
+  
   uint32_t        m_seq;
   EventId         m_sendEvent; // Eventid of pending "send packet" event
   Time            m_retxTimer;

@@ -64,7 +64,6 @@ main (int argc, char *argv[])
 {
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
-  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1s"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
     
   Packet::EnableChecking();
@@ -118,6 +117,7 @@ main (int argc, char *argv[])
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
   consumerHelper.SetPrefix (prefix.str ());
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   // consumers.Start (Seconds (0.0));

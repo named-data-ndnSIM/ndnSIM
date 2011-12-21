@@ -52,10 +52,11 @@ namespace ns3
 
 NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyReader");
     
-AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path)
+AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path, double scale/*=1.0*/)
   : m_path (path)
   , m_randX (0, 100.0)
   , m_randY (0, 100.0)
+  , m_scale (scale)
 {
   NS_LOG_FUNCTION (this);
 
@@ -137,7 +138,7 @@ AnnotatedTopologyReader::Read (void)
       double latitude, longitude;
 
       lineBuffer >> name >> city >> latitude >> longitude;
-      Ptr<Node> node = CreateNode (name, longitude, -latitude);
+      Ptr<Node> node = CreateNode (name, m_scale*longitude, -m_scale*latitude);
       nodes.Add (node);
     }
 

@@ -57,11 +57,18 @@ CcnxConsumer::GetTypeId (void)
                    IntegerValue(0),
                    MakeIntegerAccessor(&CcnxConsumer::m_seq),
                    MakeIntegerChecker<int32_t>())
-    
-    .AddAttribute ("OffTime", "Time interval between packets",
-                   StringValue ("100ms"),
-                   MakeTimeAccessor (&CcnxConsumer::m_offTime),
-                   MakeTimeChecker ())
+
+    ///////
+    .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
+                   UintegerValue (1040),
+                   MakeUintegerAccessor (&CcnxConsumer::GetPayloadSize, &CcnxConsumer::SetPayloadSize),
+                   MakeUintegerChecker<uint32_t>())
+    .AddAttribute ("MeanRate", "Mean data packet rate (relies on the PayloadSize parameter)",
+                   StringValue ("100Kbps"),
+                   MakeDataRateAccessor (&CcnxConsumer::GetDesiredRate, &CcnxConsumer::SetDesiredRate),
+                   MakeDataRateChecker ())
+    ///////
+
     .AddAttribute ("Prefix","CcnxName of the Interest",
                    StringValue ("/"),
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
@@ -107,9 +114,13 @@ CcnxConsumer::GetTypeId (void)
     
 CcnxConsumer::CcnxConsumer ()
   : m_rand (0, std::numeric_limits<uint32_t>::max ())
+  , m_desiredRate ("10Kbps")
+  , m_payloadSize (1024)
   , m_seq (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
+
+  UpdateMean (); // not necessary (will be called by ns3 object system anyways), but doesn't hurt
 }
 
 void
@@ -155,6 +166,49 @@ CcnxConsumer::CheckRetxTimeout ()
                                      &CcnxConsumer::CheckRetxTimeout, this); 
 }
 
+void
+CcnxConsumer::UpdateMean ()
+{
+  double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
+  m_randExp = ExponentialVariable (mean, 10000 * mean); // set upper limit to inter-arrival time
+}
+
+void
+CcnxConsumer::SetPayloadSize (uint32_t payload)
+{
+  m_payloadSize = payload;
+  UpdateMean ();
+}
+
+uint32_t
+CcnxConsumer::GetPayloadSize () const
+{
+  return m_payloadSize;
+}
+
+void
+CcnxConsumer::SetDesiredRate (DataRate rate)
+{
+  m_desiredRate = rate;
+  UpdateMean ();
+}
+
+DataRate
+CcnxConsumer::GetDesiredRate () const
+{
+  return m_desiredRate;
+}
+
+void
+CcnxConsumer::ScheduleNextPacket ()
+{
+  // schedule periodic packet generation
+  
+  m_sendEvent = Simulator::Schedule (
+                                     Seconds(m_randExp.GetValue ()),
+                                     &CcnxConsumer::SendPacket, this);
+}
+
 // Application Methods
 void 
 CcnxConsumer::StartApplication () // Called at time specified by Start
@@ -163,9 +217,8 @@ CcnxConsumer::StartApplication () // Called at time specified by Start
 
   // do base stuff
   CcnxApp::StartApplication ();
-  
-  // schedule periodic packet generation
-  m_sendEvent = Simulator::Schedule (Seconds(0.0), &CcnxConsumer::SendPacket, this);
+
+  ScheduleNextPacket ();
 }
     
 void 
@@ -233,10 +286,15 @@ CcnxConsumer::SendPacket ()
     m_seqTimeouts.modify (res.first,
                           ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
   
-  m_sendEvent = Simulator::Schedule (m_offTime, &CcnxConsumer::SendPacket, this);
-
   m_transmittedInterests (&interestHeader, this, m_face);
+
+  ScheduleNextPacket ();
 }
+
+///////////////////////////////////////////////////
+//          Process incoming packets             //
+///////////////////////////////////////////////////
+
 
 void
 CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,

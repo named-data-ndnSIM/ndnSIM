@@ -15,7 +15,7 @@ link
 #capacity on 4/10/2003 (see page 20 of http://www.internet2.edu/presentations/spring03/20030410-Abilene-Corbato.pdf)
 #OSPF weight on 04/10/2003 (see http://www.abilene.iu.edu/images/Ab-IGP-topo.jpg)
 #x	y	capacity(kbps)	OSPF    Delay		MaxPackets
-c1	n1	10Mbps 		1 	1ms  		200
+c1	n1	10Mbps 		1 	50ms  		200
 c2	n1	10Mbps 		1 	1ms   		200
 c3	n1	10Mbps		1	1ms		200
 n1	n2	1Mbps 		1176   	1ms   		20 
