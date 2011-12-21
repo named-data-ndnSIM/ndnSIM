@@ -54,13 +54,10 @@ def build(bld):
 
     headers.source = [
         "helper/ccnx-stack-helper.h",
-        "helper/ccnx-producer-helper.h",
-        "helper/ccnx-consumer-helper.h",
+        "helper/ccnx-app-helper.h",
         "helper/ccnx-header-helper.h",
 
         "apps/ccnx-app.h",
-        # "apps/ccnx-consumer.h",
-        # "apps/ccnx-producer.h",
 
         "model/hash-helper.h",
         "model/ccnx.h",
@@ -70,6 +67,9 @@ def build(bld):
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
         "model/ccnx-fib.h",
+
+        "utils/spring-mobility-model.h",
+        "utils/spring-mobility-helper.h",
         
         "helper/ccnx-face-container.h",
         "model/rocketfuel-weights-reader.h",
@@ -94,9 +94,6 @@ def build(bld):
         
         obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/ccnx-grid.cc'
-
-        obj = bld.create_ns3_program('syntactic-topology', ['NDNabstraction', 'point-to-point-layout'])
-        obj.source = 'examples/syntactic-topology-ndnabstraction.cc'
 
         obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/annotated-topology-read-example.cc'

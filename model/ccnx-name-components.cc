@@ -93,7 +93,8 @@ operator >> (std::istream &is, CcnxNameComponents &components)
   istream_iterator<char> eos; // end of stream
   
   std::string component = "";
-  for (istream_iterator<char> it (is); it != eos; it++)
+  istream_iterator<char> it (is);
+  for (; it != eos; it++)
     {
       if (*it == '/')
         {
@@ -107,6 +108,9 @@ operator >> (std::istream &is, CcnxNameComponents &components)
   if (component != "")
       components.Add (component);
 
+  is.clear (); 
+  // NS_LOG_ERROR (components << ", bad: " << is.bad () <<", fail: " << is.fail ());
+  
   return is;
 }
 

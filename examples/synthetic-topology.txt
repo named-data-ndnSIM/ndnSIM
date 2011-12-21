@@ -21,7 +21,7 @@ c3	n1	10Mbps		1	1ms		200
 n1	n2	1Mbps 		1176   	1ms   		20 
 n1	n12	1Mbps 		587    	1ms   		20
 n12	n2	1Mbps 		846    	1ms   		20
-n2	p1	10Mbps 		260   	50ms   		200
+n2	p1	10Mbps 		260   	1ms   		200
 n2	p2	10Mbps 		700   	1ms  		200
 n2	p3	10Mbps		1	1ms		200
 c4	n1	10Mbps		1	1ms		200

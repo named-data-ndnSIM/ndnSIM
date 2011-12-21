@@ -46,13 +46,17 @@ main (int argc, char *argv[])
   CcnxStackHelper ccnx;
   Ptr<CcnxFaceContainer> cf = ccnx.Install (c);
 
-  CcnxConsumerHelper helper ("/3");
+  CcnxAppHelper helper ("ns3::CcnxConsumer");
+  helper.SetPrefix ("/3");
   ApplicationContainer app = helper.Install ("1");
   app.Start (Seconds (1.0));
   app.Stop (Seconds (10.05));
-    
-  CcnxProducerHelper helper2 ("/3",120);
+
+  CcnxAppHelper helper2 ("ns3::CcnxProducer");
+  helper2.SetPrefix ("/3");
+  helper2.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer app2 = helper2.Install("3");
+  
   app2.Start(Seconds(0.0));
   app2.Stop(Seconds(15.0));
   

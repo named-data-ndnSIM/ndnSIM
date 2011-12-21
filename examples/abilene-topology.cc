@@ -121,10 +121,14 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("/5");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  consumerHelper.SetPrefix ("/5");
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
-    
-  CcnxProducerHelper producerHelper ("/5",1024);
+  
+  CcnxAppHelper producerHelper ("ns3::CcnxProducer");
+  producerHelper.SetPrefix ("/5");
+  producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+
   ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
 
   // // Populate FIB based on IPv4 global routing controller

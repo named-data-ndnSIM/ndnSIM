@@ -23,13 +23,11 @@
 
 #include <list>
 #include <vector>
-#include <stdint.h>
+
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
 #include "ns3/nstime.h"
-#include "ns3/simulator.h"
 
-#include "ns3/ccnx-producer-helper.h"
 #include "ccnx-content-store.h"
 #include "ccnx-pit.h"
 #include "ccnx-fib.h"
@@ -181,17 +179,17 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  /// \brief Set buckets leak interval
-  void
-  SetBucketLeakInterval (Time interval);
+  // /// \brief Set buckets leak interval
+  // void
+  // SetBucketLeakInterval (Time interval);
 
-  /// \brief Get buckets leak interval
-  Time
-  GetBucketLeakInterval () const;
+  // /// \brief Get buckets leak interval
+  // Time
+  // GetBucketLeakInterval () const;
   
-  /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
-  void
-  LeakBuckets ();
+  // /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
+  // void
+  // LeakBuckets ();
 
   void
   GiveUpInterest (const CcnxPitEntry &pitEntry,
@@ -209,9 +207,9 @@ private:
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
-
-  Time    m_bucketLeakInterval;
-  EventId m_bucketLeakEvent;
+  
+  // Time    m_bucketLeakInterval;
+  // EventId m_bucketLeakEvent;
 };
   
 } // Namespace ns3

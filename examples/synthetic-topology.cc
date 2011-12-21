@@ -88,7 +88,9 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("/6");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+
+  consumerHelper.SetPrefix ("/6");
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/synthetic", "c1"));
 
   consumerHelper.SetPrefix ("/7");
@@ -100,24 +102,27 @@ main (int argc, char *argv[])
   consumerHelper.SetPrefix ("/10");
   ApplicationContainer consumers4 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c4"));
 
-  consumers.Start (Seconds (2.121212123));
-  consumers2.Start (Seconds (0.166666));
-  consumers3.Start (Seconds (4.1235432));
-  consumers4.Start (Seconds (3.00005421));
-  
-  CcnxProducerHelper producerHelper ("/6",1024);
-  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/synthetic", "p1"));
-        
-  CcnxProducerHelper producerHelper2 ("/7",1024);
-  ApplicationContainer producers2 = producerHelper2.Install (Names::Find<Node> ("/synthetic", "p2"));
+  consumers.Start (Seconds (0));
+  consumers2.Start (Seconds (10));
+  consumers3.Start (Seconds (20));
+  consumers4.Start (Seconds (30));
 
-  CcnxProducerHelper producerHelper3 ("/8",1024);
-  ApplicationContainer producers3 = producerHelper3.Install (Names::Find<Node> ("/synthetic", "p3"));
+  /////////////////////////////////////////////
   
-  CcnxProducerHelper producerHelper4 ("/10",1024);
-  ApplicationContainer producers4 = producerHelper4.Install (Names::Find<Node> ("/synthetic", "p4"));
+  CcnxAppHelper producerHelper ("ns3::CcnxProducer");
+  producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+ 
+  producerHelper.SetPrefix ("/6");  
+  producerHelper.Install (Names::Find<Node> ("/synthetic", "p1"));
+        
+  producerHelper.SetPrefix ("/7");
+  producerHelper.Install (Names::Find<Node> ("/synthetic", "p2"));
+
+  producerHelper.SetPrefix ("/8");
+  producerHelper.Install (Names::Find<Node> ("/synthetic", "p3"));
   
-  Simulator::Schedule (Seconds (10.0), PrintTime);
+  producerHelper.SetPrefix ("/10");
+  producerHelper.Install (Names::Find<Node> ("/synthetic", "p4"));
 
   // Populate FIB based on IPv4 global routing controller
   ccnxHelper.InstallFakeGlobalRoutes ();
@@ -125,6 +130,8 @@ main (int argc, char *argv[])
   ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p2"));
   ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p3"));
   ccnxHelper.InstallRouteTo (Names::Find<Node> ("/synthetic", "p4"));
+
+  Simulator::Schedule (Seconds (10.0), PrintTime);
 
   Simulator::Stop (finishTime);
 

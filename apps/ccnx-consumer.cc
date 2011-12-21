@@ -62,7 +62,7 @@ CcnxConsumer::GetTypeId (void)
                    StringValue ("100ms"),
                    MakeTimeAccessor (&CcnxConsumer::m_offTime),
                    MakeTimeChecker ())
-    .AddAttribute ("InterestName","CcnxName of the Interest (use CcnxNameComponents)",
+    .AddAttribute ("Prefix","CcnxName of the Interest",
                    StringValue ("/"),
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
                    MakeCcnxNameComponentsChecker ())

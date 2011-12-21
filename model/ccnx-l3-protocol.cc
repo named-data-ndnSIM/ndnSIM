@@ -31,6 +31,7 @@
 #include "ns3/pointer.h"
 #include "ns3/boolean.h"
 #include "ns3/string.h"
+#include "ns3/simulator.h"
 
 #include "ns3/ccnx-header-helper.h"
 
@@ -74,12 +75,12 @@ CcnxL3Protocol::GetTypeId (void)
                    MakePointerAccessor (&CcnxL3Protocol::SetForwardingStrategy, &CcnxL3Protocol::GetForwardingStrategy),
                    MakePointerChecker<CcnxForwardingStrategy> ())
     
-    .AddAttribute ("BucketLeakInterval",
-                   "Interval to leak buckets",
-                   StringValue ("100ms"),
-                   MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
-                                     &CcnxL3Protocol::SetBucketLeakInterval),
-                   MakeTimeChecker ())
+    // .AddAttribute ("BucketLeakInterval",
+    //                "Interval to leak buckets",
+    //                StringValue ("100ms"),
+    //                MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
+    //                                  &CcnxL3Protocol::SetBucketLeakInterval),
+    //                MakeTimeChecker ())
   ;
   return tid;
 }
@@ -133,9 +134,6 @@ CcnxL3Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_bucketLeakEvent.IsRunning ())
-    m_bucketLeakEvent.Cancel ();
-  
   for (CcnxFaceList::iterator i = m_faces.begin (); i != m_faces.end (); ++i)
     {
       *i = 0;
@@ -635,37 +633,37 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
                            Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
 }
 
-void
-CcnxL3Protocol::SetBucketLeakInterval (Time interval)
-{
-  m_bucketLeakInterval = interval;
+// void
+// CcnxL3Protocol::SetBucketLeakInterval (Time interval)
+// {
+//   m_bucketLeakInterval = interval;
   
-  if (m_bucketLeakEvent.IsRunning ())
-    m_bucketLeakEvent.Cancel ();
+//   if (m_bucketLeakEvent.IsRunning ())
+//     m_bucketLeakEvent.Cancel ();
 
-  m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
-                                           &CcnxL3Protocol::LeakBuckets, this);
-}
+//   m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
+//                                            &CcnxL3Protocol::LeakBuckets, this);
+// }
 
-Time
-CcnxL3Protocol::GetBucketLeakInterval () const
-{
-  return m_bucketLeakInterval;
-}
+// Time
+// CcnxL3Protocol::GetBucketLeakInterval () const
+// {
+//   return m_bucketLeakInterval;
+// }
 
-void 
-CcnxL3Protocol::LeakBuckets ()
-{
-  // NS_LOG_FUNCTION (this);
+// void 
+// CcnxL3Protocol::LeakBuckets ()
+// {
+//   // NS_LOG_FUNCTION (this);
 
-  BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
-    {
-      face->LeakBucket (m_bucketLeakInterval);
-    }
+//   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
+//     {
+//       face->LeakBucket (m_bucketLeakInterval);
+//     }
 
-  m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
-                                           &CcnxL3Protocol::LeakBuckets,
-                                           this);
-}
+//   m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
+//                                            &CcnxL3Protocol::LeakBuckets,
+//                                            this);
+// }
 
 } //namespace ns3
