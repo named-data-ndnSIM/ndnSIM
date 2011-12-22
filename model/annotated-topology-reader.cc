@@ -101,21 +101,28 @@ AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double
   loc->SetPosition (Vector (posX, posY, 0));
 
   Names::Add (m_path, name, node);
+  m_nodes.Add (node);
 
   return node;
 }
+
+NodeContainer
+AnnotatedTopologyReader::GetNodes () const
+{
+  return m_nodes;
+}
+
 
 NodeContainer
 AnnotatedTopologyReader::Read (void)
 {
   ifstream topgen;
   topgen.open (GetFileName ().c_str ());
-  NodeContainer nodes;
         
   if ( !topgen.is_open () )
     {
       NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
-      return nodes;
+      return m_nodes;
     }
 
   while (!topgen.eof ())
@@ -138,8 +145,9 @@ AnnotatedTopologyReader::Read (void)
       double latitude, longitude;
 
       lineBuffer >> name >> city >> latitude >> longitude;
+      if (name.empty ()) continue;
+
       Ptr<Node> node = CreateNode (name, m_scale*longitude, -m_scale*latitude);
-      nodes.Add (node);
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
@@ -185,12 +193,12 @@ AnnotatedTopologyReader::Read (void)
       NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << " with " << metric << " metric (" << delay << ", " << maxPackets << ")");
     }
         
-  NS_LOG_INFO ("Annotated topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
+  NS_LOG_INFO ("Annotated topology created with " << m_nodes.GetN () << " nodes and " << LinksSize () << " links");
   topgen.close ();
         
   ApplySettings ();
   
-  return nodes;
+  return m_nodes;
 }
     
 void

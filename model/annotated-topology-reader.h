@@ -53,8 +53,14 @@ public:
    *
    * \return the container of the nodes created (or empty container if there was an error)
    */
-  virtual
-  NodeContainer Read (void);
+  virtual NodeContainer
+  Read ();
+
+  /**
+   * \brief Get nodes read by the reader
+   */
+  NodeContainer
+  GetNodes () const;
     
   /**
    * \brief Assign IPv4 addresses to all links
@@ -92,6 +98,7 @@ protected:
     
 protected:
   std::string m_path;
+  NodeContainer m_nodes;
 
 private:
   AnnotatedTopologyReader (const AnnotatedTopologyReader&);

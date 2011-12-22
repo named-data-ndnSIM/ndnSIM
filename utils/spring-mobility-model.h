@@ -68,8 +68,11 @@ private:
   void 
   Update (void) const;
 
+  static void
+  UpdateAll ();
+
 private:
-  double m_epsilon;
+  static double m_epsilon;
 
   double m_nodeMass;
   double m_nodeCharge;
@@ -78,13 +81,12 @@ private:
   double m_dampingFactor;
 
   static double m_totalKineticEnergy;  
+  static bool m_stable;
+  static EventId m_updateEvent;
   
   mutable Vector m_position;
   mutable Vector m_velocity;
-  mutable bool m_stable;
   mutable Time m_lastTime;
-
-  EventId m_updateEvent;
 
   std::list<Ptr<MobilityModel> > m_springs;
 };

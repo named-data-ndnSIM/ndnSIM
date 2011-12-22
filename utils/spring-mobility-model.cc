@@ -33,6 +33,9 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (SpringMobilityModel);
 
 double SpringMobilityModel::m_totalKineticEnergy = 0.0;
+bool SpringMobilityModel::m_stable = false;
+EventId SpringMobilityModel::m_updateEvent;
+double SpringMobilityModel::m_epsilon = 100.0;
 
 const double COLOUMB_K = 200; 
 
@@ -41,10 +44,10 @@ TypeId SpringMobilityModel::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::SpringMobilityModel")
     .SetParent<MobilityModel> ()
     .AddConstructor<SpringMobilityModel> ()
-    .AddAttribute ("Epsilon", "Bound for kinetic energy when system is considered stable",
-                   DoubleValue (1000.0),
-                   MakeDoubleAccessor (&SpringMobilityModel::m_epsilon),
-                   MakeDoubleChecker<double> ())
+    // .AddAttribute ("Epsilon", "Bound for kinetic energy when system is considered stable",
+    //                DoubleValue (100.0),
+    //                MakeDoubleAccessor (&SpringMobilityModel::m_epsilon),
+    //                MakeDoubleChecker<double> ())
     .AddAttribute ("NodeMass", "Node mass",
                    DoubleValue (10),
                    MakeDoubleAccessor (&SpringMobilityModel::m_nodeMass),
@@ -62,7 +65,7 @@ TypeId SpringMobilityModel::GetTypeId (void)
                    MakeDoubleAccessor (&SpringMobilityModel::m_springConstant),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("DampingFactor", "Dumping factor",
-                   DoubleValue (0.6),
+                   DoubleValue (0.8),
                    MakeDoubleAccessor (&SpringMobilityModel::m_dampingFactor),
                    MakeDoubleChecker<double> ())
     ;
@@ -73,7 +76,6 @@ TypeId SpringMobilityModel::GetTypeId (void)
 SpringMobilityModel::SpringMobilityModel ()
   : m_position (0,0,0)
   , m_velocity (0,0,0)
-  , m_stable (false)
 {
 }
 
@@ -90,15 +92,35 @@ SpringMobilityModel::AddSpring (Ptr<MobilityModel> node)
 void
 SpringMobilityModel::DoStart ()
 {
-  // m_updateEvent = Simulator::Schedule (Seconds(0.05), &SpringMobilityModel::Update, this);
+  if (!m_updateEvent.IsRunning ())
+    m_updateEvent = Simulator::Schedule (Seconds(0.05), SpringMobilityModel::UpdateAll);
+}
 
-  // Simulator::Schedule (Seconds(2.0), &SpringMobilityModel::Test, this);
+void
+SpringMobilityModel::UpdateAll ()
+{
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      Ptr<SpringMobilityModel> model = (*node)->GetObject<SpringMobilityModel> ();
+      if (model != 0)
+        model->Update ();
+    }
+
+  if (m_totalKineticEnergy < m_epsilon)
+    {
+      m_stable = true;
+      NS_LOG_INFO ("Stabilized with " << m_totalKineticEnergy);
+    }
+  else
+    m_updateEvent = Simulator::Schedule (Seconds(0.05), SpringMobilityModel::UpdateAll);  
 }
 
 void
 SpringMobilityModel::Update () const
 {
-  // NS_LOG_FUNCTION (this << m_stable << m_position << m_velocity);
+  NS_LOG_FUNCTION (this << m_stable << m_position << m_velocity);
   if (m_stable) return;
   Time now = Simulator::Now ();
 
@@ -152,22 +174,13 @@ SpringMobilityModel::Update () const
   velocityValue = CalculateDistance (m_velocity, Vector(0,0,0)); 
   m_totalKineticEnergy += m_nodeMass * velocityValue * velocityValue;
 
-  if (m_totalKineticEnergy < m_epsilon)
-    {
-      m_stable = true;
-      NS_LOG_INFO ("Stabilized with " << m_totalKineticEnergy);
-    }
-
   NotifyCourseChange ();
-  // m_updateEvent = Simulator::Schedule (Seconds(0.05), &SpringMobilityModel::Update, this);
 }
 
 Vector
 SpringMobilityModel::DoGetPosition (void) const
 {
   // NS_LOG_FUNCTION (this << m_position);
-  Update ();
-  
   return m_position;
 }
 void 
@@ -178,6 +191,19 @@ SpringMobilityModel::DoSetPosition (const Vector &position)
 
   NotifyCourseChange ();
   m_stable = false;
+
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      Ptr<SpringMobilityModel> model = (*node)->GetObject<SpringMobilityModel> ();
+      if (model != 0)
+        model->m_lastTime = Simulator::Now ();
+    }
+  
+  if (!m_updateEvent.IsRunning ())
+    m_updateEvent = Simulator::Schedule (Seconds(0.05), SpringMobilityModel::UpdateAll);
 }
 Vector
 SpringMobilityModel::DoGetVelocity (void) const

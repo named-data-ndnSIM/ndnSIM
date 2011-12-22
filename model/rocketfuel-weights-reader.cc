@@ -39,8 +39,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
 
-#include "ns3/constant-position-mobility-model.h"
-#include "ns3/random-variable.h"
+#include "ns3/mobility-model.h"
 
 #include <regex.h>
 
@@ -78,14 +77,16 @@ RocketfuelWeightsReader::SetFileType (uint8_t inputType)
 NodeContainer
 RocketfuelWeightsReader::Read ()
 {
+  if (m_inputType == POSITIONS)
+    return AnnotatedTopologyReader::Read ();
+  
   ifstream topgen;
   topgen.open (GetFileName ().c_str ());
-  NodeContainer nodes;
         
   if ( !topgen.is_open () )
     {
       NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
-      return nodes;
+      return m_nodes;
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
@@ -117,14 +118,12 @@ RocketfuelWeightsReader::Read ()
       if (fromNode == 0)
         {
           fromNode = CreateNode (from);
-          nodes.Add (fromNode);
         }
 
       Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
       if (toNode == 0)
         {
           toNode = CreateNode (to);
-          nodes.Add (toNode);
         }
 
       Link *link;
@@ -142,8 +141,8 @@ RocketfuelWeightsReader::Read ()
         {
         case WEIGHTS:
           {
-            double metric = boost::lexical_cast<double> (attribute);
-            link->SetAttribute ("OSPF", boost::lexical_cast<string> (metric*2));
+            uint16_t metric = boost::lexical_cast<uint16_t> (attribute);
+            link->SetAttribute ("OSPF", boost::lexical_cast<string> (metric));
             break;
           }
         case LATENCIES:
@@ -165,9 +164,9 @@ RocketfuelWeightsReader::Read ()
 
   if (!repeatedRun)
     {
-      NS_LOG_INFO ("Rocketfuel topology created with " << nodes.GetN () << " nodes and " << LinksSize () << " links");
+      NS_LOG_INFO ("Rocketfuel topology created with " << m_nodes.GetN () << " nodes and " << LinksSize () << " links");
     }
-  return nodes;
+  return m_nodes;
 }
 
 void
@@ -178,6 +177,23 @@ RocketfuelWeightsReader::Commit ()
   SpringMobilityHelper::InstallSprings (LinksBegin (), LinksEnd ());
 }
 
+void
+RocketfuelWeightsReader::SavePositions (const std::string &file) const
+{
+  ofstream os (file.c_str (), ios::trunc);
+  os << "router\n";
+  
+  for (NodeContainer::Iterator node = m_nodes.Begin ();
+       node != m_nodes.End ();
+       node++)
+    {
+      std::string name = Names::FindName (*node);
+      Ptr<MobilityModel> mobility = (*node)->GetObject<MobilityModel> ();
+      Vector position = mobility->GetPosition ();
+
+      os << name << "\t" << "unknown" << "\t" << -position.y << "\t" << position.x << "\n";
+    }
+}
 
 // void
 // RocketfuelWeightsReader::Cheat (NodeContainer &nodes)
