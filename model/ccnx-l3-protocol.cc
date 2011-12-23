@@ -423,8 +423,9 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
 
   Ptr<Packet> contentObject;
-  Ptr<const CcnxContentObjectHeader> contentObjectHeader; // unused for now
-  tie (contentObject, contentObjectHeader) = m_contentStore->Lookup (header);
+  Ptr<const CcnxContentObjectHeader> contentObjectHeader; // used for tracing
+  Ptr<const Packet> payload; // used for tracing
+  tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
   if (contentObject != 0)
     {
       NS_ASSERT (contentObjectHeader != 0);
@@ -432,7 +433,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       NS_LOG_LOGIC("Found in cache");
         
       incomingFace->Send (contentObject);
-      m_outData (contentObjectHeader, true, incomingFace);
+      m_outData (contentObjectHeader, payload, true, incomingFace);
 
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -533,7 +534,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 {
     
   NS_LOG_FUNCTION (incomingFace << header << payload << packet);
-  m_inData (header, incomingFace);
+  m_inData (header, payload, incomingFace);
 
   // 1. Lookup PIT entry
   try
@@ -580,7 +581,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           if (incoming.m_face != incomingFace)
             {
               incoming.m_face->Send (packet->Copy ());
-              m_outData (header, false, incoming.m_face);
+              m_outData (header, payload, false, incoming.m_face);
             }
 
           // successfull forwarded data trace
@@ -600,7 +601,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       //    (unsolicited data packets should not "poison" content store)
       
       //drop dulicated or not requested data packet
-      m_dropData (header, UNSOLICITED, incomingFace);
+      m_dropData (header, payload, UNSOLICITED, incomingFace);
       return; // do not process unsoliced data packets
     }
 }

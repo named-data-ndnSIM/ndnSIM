@@ -26,6 +26,7 @@
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "../utils/spring-mobility-helper.h"
+#include "../helper/ccnx-trace-helper.h"
 
 #include <sstream>
 #include "ns3/annotated-topology-reader.h"
@@ -99,11 +100,11 @@ main (int argc, char *argv[])
   ApplicationContainer consumers2 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c2"));
 
   consumerHelper.SetPrefix ("/8");
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("3Mbps"));
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("4Mbps"));
   ApplicationContainer consumers3 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c3"));
   
   consumerHelper.SetPrefix ("/10");
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("10Mbps"));
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("8Mbps"));
   ApplicationContainer consumers4 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c4"));
 
   consumers.Start (Seconds (0));
@@ -138,6 +139,14 @@ main (int argc, char *argv[])
   Simulator::Schedule (Seconds (10.0), PrintTime);
 
   Simulator::Stop (finishTime);
+
+  CcnxTraceHelper traceHelper;
+  // traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
+  // traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
+  // traceHelper.EnableAggregateL3All ();
+  // traceHelper.SetL3TraceFile ("trace-l3.log");
+  // traceHelper.SetAppTraceFile ("trace-app.log");
+  traceHelper.EnableRateL3All ("rate-trace.log");
 
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();

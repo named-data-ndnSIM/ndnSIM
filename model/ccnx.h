@@ -197,14 +197,14 @@ protected:
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                  bool /*from cache*/,
                  Ptr<const CcnxFace> > m_outData;
 
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                  Ptr<const CcnxFace> > m_inData;
 
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                   DropReason,
                   Ptr<const CcnxFace> > m_dropData;  
 };

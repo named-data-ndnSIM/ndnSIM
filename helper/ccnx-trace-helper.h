@@ -24,6 +24,11 @@
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/ccnx.h"
+#include "ns3/nstime.h"
+#include "ns3/event-id.h"
+
+#include <boost/tuple/tuple.hpp>
+#include <map>
 
 namespace ns3 {
 
@@ -32,8 +37,12 @@ class CcnxApp;
 class CcnxAppTracer : public SimpleRefCount<CcnxAppTracer>
 {
 public:
-  CcnxAppTracer (const std::string &app, const std::string &node = "*", const std::string &appId = "*");
+  CcnxAppTracer (const std::string &app, Ptr<Node> node, const std::string &appId = "*");
+  CcnxAppTracer (const std::string &app, const std::string &node, const std::string &appId = "*");
   virtual ~CcnxAppTracer ()  { };
+
+  void
+  Connect ();
 
   virtual void
   PrintHeader (std::ostream &os) const = 0;
@@ -65,6 +74,7 @@ protected:
   std::string m_app;
   std::string m_appId;
   std::string m_node;
+  Ptr<Node> m_nodePtr;
 };
 
 std::ostream&
@@ -80,9 +90,13 @@ operator << (std::ostream &os, const CcnxAppTracer &tracer)
 class CcnxL3Tracer : public SimpleRefCount<CcnxL3Tracer>
 {
 public:
-  CcnxL3Tracer (const std::string &node = "*");
+  CcnxL3Tracer (Ptr<Node> node);
+  CcnxL3Tracer (const std::string &node);
   virtual ~CcnxL3Tracer () { };
 
+  void
+  Connect ();
+  
   virtual void
   PrintHeader (std::ostream &os) const = 0;
 
@@ -116,18 +130,34 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, bool fromCache, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
 
 protected:
   std::string m_node;
+  Ptr<Node> m_nodePtr;
+
+  struct Stats
+  {
+    void Reset ();
+    
+    uint64_t m_inInterests;
+    uint64_t m_outInterests;
+    uint64_t m_dropInterests;
+    uint64_t m_inNacks;
+    uint64_t m_outNacks;
+    uint64_t m_dropNacks;
+    uint64_t m_inData;
+    uint64_t m_outData;
+    uint64_t m_dropData;
+  };
 };
 
 std::ostream&
@@ -147,7 +177,8 @@ operator << (std::ostream &os, const CcnxL3Tracer &tracer)
 class CcnxAggregateAppTracer : public CcnxAppTracer
 {
 public:
-  CcnxAggregateAppTracer (const std::string &app, const std::string &node = "*", const std::string &appId = "*");
+  CcnxAggregateAppTracer (const std::string &app, Ptr<Node> node, const std::string &appId = "*");
+  CcnxAggregateAppTracer (const std::string &app, const std::string &node, const std::string &appId = "*");
   virtual ~CcnxAggregateAppTracer () { };
 
   virtual void
@@ -176,18 +207,29 @@ public:
   InData  (std::string context,
            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>);
 
-private:
+protected:
+  void
+  Reset ();
+
+protected:
   uint64_t m_inInterests;
   uint64_t m_outInterests;
   uint64_t m_inNacks;
   uint64_t m_inData; 
   uint64_t m_outData;
+
+  uint64_t m_inInterestsBytes;
+  uint64_t m_outInterestsBytes;
+  uint64_t m_inNacksBytes;
+  uint64_t m_inDataBytes;
+  uint64_t m_outDataBytes;
 };
 
 class CcnxAggregateL3Tracer : public CcnxL3Tracer
 {
 public:
-  CcnxAggregateL3Tracer (const std::string &node = "*");
+  CcnxAggregateL3Tracer (Ptr<Node> node);
+  CcnxAggregateL3Tracer (const std::string &node);
   virtual ~CcnxAggregateL3Tracer () { };
   
   virtual void
@@ -222,31 +264,105 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, bool fromCache, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>);
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ccnx::DropReason, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
+
+protected:
+  void
+  Reset ();
+  
+protected:
+  Stats m_packets;
+  Stats m_bytes;
+};
+
+/**
+ * @ingroup ccnx
+ * @brief CCNx network-layer rate tracer
+ */
+class CcnxRateL3Tracer : public CcnxL3Tracer
+{
+public:
+  /**
+   * @brief Network layer tracer constructor
+   */
+  CcnxRateL3Tracer (std::ostream &os, Ptr<Node> node);
+  CcnxRateL3Tracer (std::ostream &os, const std::string &node);
+  virtual ~CcnxRateL3Tracer ();
+
+  void
+  SetAveragingPeriod (const Time &period);
+  
+  virtual void
+  PrintHeader (std::ostream &os) const;
+
+  virtual void
+  Print (std::ostream &os) const;
+
+  virtual void
+  OutInterests  (std::string context,
+                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+
+  virtual void
+  InInterests   (std::string context,
+                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+
+  virtual void
+  DropInterests (std::string context,
+                 Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>);
+  
+  virtual void
+  OutNacks  (std::string context,
+             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+
+  virtual void
+  InNacks   (std::string context,
+             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+
+  virtual void
+  DropNacks (std::string context,
+             Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>);
+  
+  virtual void
+  OutData  (std::string context,
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
+
+  virtual void
+  InData   (std::string context,
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>);
+
+  virtual void
+  DropData (std::string context,
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
 
 private:
-  uint64_t m_inInterests;
-  uint64_t m_outInterests;
-  uint64_t m_dropInterests;
-  uint64_t m_inNacks;
-  uint64_t m_outNacks;
-  uint64_t m_dropNacks;
-  uint64_t m_inData;
-  uint64_t m_outData;
-  uint64_t m_dropData;
+  void
+  PeriodicPrinter ();
+  
+  void
+  Reset ();
+
+private:
+  std::ostream& m_os;
+  Time m_period;
+  EventId m_printEvent;
+
+  mutable std::map<Ptr<const CcnxFace>, boost::tuple<Stats, Stats, Stats, Stats> > m_stats;
 };
+
 
 class CcnxTraceHelper
 {
 public:
+  CcnxTraceHelper ();
+  
   /**
    * @brief Destructor that invokes trace output procedures
    */
@@ -271,9 +387,9 @@ public:
    */
   void
   SetL3TraceFile (const std::string &l3Trace = "l3.log");
-  
+
   /**
-   * @brief Enable aggregate app-level CCNx tracing on all CCNx applications (individual file per application)
+   * @brief Enable aggregate app-level CCNx tracing on all CCNx applications
    *
    * @param app  Class name of the application of interest
    */
@@ -281,17 +397,26 @@ public:
   EnableAggregateAppAll (const std::string &app);
 
   /**
-   * @brief Enable aggregate network-level CCNx tracing on all CCNx nodes (individual file per node)
+   * @brief Enable aggregate network-level CCNx tracing on all CCNx node
    */
   void
   EnableAggregateL3All ();
 
+  /**
+   * @brief Enable network-level CCNx rate tracing on all CCNx nodes (individual file per node)
+   */
+  void
+  EnableRateL3All (const std::string &l3RateTrace = "l3-rate.log");
+  
 private:
   std::string m_appTrace;
   std::list<Ptr<CcnxAggregateAppTracer> > m_apps;
 
   std::string m_l3Trace;
   std::list<Ptr<CcnxAggregateL3Tracer> > m_l3s;
+
+  std::list<Ptr<CcnxRateL3Tracer> > m_l3Rates;
+  std::ostream *m_l3RateTrace;
 };
 
 
