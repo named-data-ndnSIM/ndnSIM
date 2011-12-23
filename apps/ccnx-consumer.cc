@@ -27,6 +27,7 @@
 #include "ns3/string.h"
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
+#include "ns3/double.h"
 
 #include "ns3/ccnx.h"
 #include "../model/ccnx-local-face.h"
@@ -54,9 +55,14 @@ CcnxConsumer::GetTypeId (void)
     .SetParent<CcnxApp> ()
     .AddConstructor<CcnxConsumer> ()
     .AddAttribute ("StartSeq", "Initial sequence number",
-                   IntegerValue(0),
+                   IntegerValue (0),
                    MakeIntegerAccessor(&CcnxConsumer::m_seq),
                    MakeIntegerChecker<int32_t>())
+
+    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
+                   DoubleValue (-1), // don't impose limit by default
+                   MakeDoubleAccessor (&CcnxConsumer::GetMaxSize, &CcnxConsumer::SetMaxSize),
+                   MakeDoubleChecker<double> ())
 
     ///////
     .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
@@ -199,6 +205,28 @@ CcnxConsumer::GetDesiredRate () const
   return m_desiredRate;
 }
 
+double
+CcnxConsumer::GetMaxSize () const
+{
+  if (m_seqMax == 0)
+    return -1.0;
+
+  return m_seqMax * m_payloadSize / 1024.0 / 1024.0;
+}
+
+void
+CcnxConsumer::SetMaxSize (double size)
+{
+  if (size < 0)
+    {
+      m_seqMax = 0;
+      return;
+    }
+
+  m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
+}
+
+
 void
 CcnxConsumer::ScheduleNextPacket ()
 {
@@ -250,7 +278,20 @@ CcnxConsumer::SendPacket ()
       NS_LOG_INFO ("After: " << m_retxSeqs.size ());
     }
   else
-    seq = m_seq++;
+    {
+      if (m_seqMax > 0)
+        {
+          if (m_seq >= m_seqMax)
+            {
+              if (m_seqTimeouts.size () == 0)
+                return; // we are totally done
+              else
+                ScheduleNextPacket (); // we will probably need to retransmit something in the future
+            }
+        }
+      
+      seq = m_seq++;
+    }
   
   //
   Ptr<CcnxNameComponents> nameWithSequence = Create<CcnxNameComponents> (m_interestName);

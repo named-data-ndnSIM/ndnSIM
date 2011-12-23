@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #ifndef CCNX_CONSUMER_H
@@ -96,6 +97,12 @@ private:
 
   Time
   GetRetxTimer () const;
+
+  double
+  GetMaxSize () const;
+
+  void
+  SetMaxSize (double size);
   
 protected:
   UniformVariable m_rand; // nonce generator
@@ -105,10 +112,11 @@ protected:
   uint32_t            m_payloadSize; // expected payload size
   
   uint32_t        m_seq;
+  uint32_t        m_seqMax;    // maximum number of sequence number
   EventId         m_sendEvent; // Eventid of pending "send packet" event
   Time            m_retxTimer;
   EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
-
+  
   Time            m_rto; // Retransmission timeout
   Time            m_rttVar; // RTT variance
   Time            m_sRtt; // smoothed RTT

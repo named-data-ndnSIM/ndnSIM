@@ -48,6 +48,7 @@ def build(bld):
     module.source = bld.path.ant_glob(['model/*.cc', 'apps/*.cc', 
                                        'utils/*.cc',
                                        'helper/*.cc',
+                                       'helper/tracers/*.cc',
                                        'helper/ccnb-parser/*.cc',
                                        'helper/ccnb-parser/visitors/*.cc',
                                        'helper/ccnb-parser/syntax-tree/*.cc'])
@@ -56,6 +57,10 @@ def build(bld):
         "helper/ccnx-stack-helper.h",
         "helper/ccnx-app-helper.h",
         "helper/ccnx-header-helper.h",
+        "helper/ccnx-trace-helper.h",
+        "helper/tracers/ccnx-app-tracer.h",
+        "helper/tracers/ccnx-l3-tracer.h",
+        "helper/ccnx-face-container.h",
 
         "apps/ccnx-app.h",
 
@@ -70,18 +75,10 @@ def build(bld):
 
         "utils/spring-mobility-model.h",
         "utils/spring-mobility-helper.h",
-        
-        "helper/ccnx-face-container.h",
+
         "model/rocketfuel-weights-reader.h",
         "model/annotated-topology-reader.h",
         ]
-    # headers.source = bld.path.ant_glob(['model/*.h', 'apps/*.h', 
-    #                       'helper/*.h',
-    #                       'helper/ccnb-parser/*.h',
-    #                       'helper/ccnb-parser/visitors/*.h',
-    #                       'helper/ccnb-parser/syntax-tree/*.h'])
-
-    # headers.source = [x.path_from(bld.path) for x in headers.source]
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
@@ -112,23 +109,5 @@ def build(bld):
 
         obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
         obj.source = 'examples/synthetic-topology.cc'
-
-    #     for path in ["examples"]:
-    #         anode = bld.path.find_dir (path)
-    #         if not anode or not anode.is_child_of(bld.srcnode):
-    #             raise Utils.WscriptError("Unable to use '%s' - either because \
-    #             it's not a relative path"", or it's not child of \
-    #            '%s'."%(name,bld.srcnode))
-    #         bld.rescan(anode)
-    #         for filename in bld.cache_dir_contents[anode.id]:
-    #             if filename.startswith('.') or not filename.endswith(".cc"):
-    #                 continue
-    #             name = filename[:-len(".cc")]
-    #             obj = bld.create_ns3_program(name, ['NDNabstraction'])
-    #             obj.path = obj.path.find_dir (path)
-    #             obj.source = filename
-    #             obj.target = name
-    #             obj.name = obj.target
-    #             obj.uselib = 'BOOST BOOST_IOSTREAMS'
 
     bld.ns3_python_bindings()

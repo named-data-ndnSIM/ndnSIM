@@ -92,7 +92,7 @@ main (int argc, char *argv[])
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
 
   consumerHelper.SetPrefix ("/6");
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/synthetic", "c1"));
 
   consumerHelper.SetPrefix ("/7");
@@ -100,11 +100,11 @@ main (int argc, char *argv[])
   ApplicationContainer consumers2 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c2"));
 
   consumerHelper.SetPrefix ("/8");
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("4Mbps"));
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
   ApplicationContainer consumers3 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c3"));
   
   consumerHelper.SetPrefix ("/10");
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("8Mbps"));
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
   ApplicationContainer consumers4 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c4"));
 
   consumers.Start (Seconds (0));
