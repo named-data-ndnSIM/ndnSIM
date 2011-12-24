@@ -167,6 +167,11 @@ CcnxConsumer::CheckRetxTimeout ()
       else
         break; // nothing else to do. All later packets need not be retransmitted
     }
+
+  if (m_retxSeqs.size () > 0)
+    {
+      ScheduleNextPacket ();
+    }
   
   m_retxEvent = Simulator::Schedule (m_retxTimer,
                                      &CcnxConsumer::CheckRetxTimeout, this); 
@@ -224,17 +229,17 @@ CcnxConsumer::SetMaxSize (double size)
     }
 
   m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
+  NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
 }
 
 
 void
 CcnxConsumer::ScheduleNextPacket ()
 {
-  // schedule periodic packet generation
-  
-  m_sendEvent = Simulator::Schedule (
-                                     Seconds(m_randExp.GetValue ()),
-                                     &CcnxConsumer::SendPacket, this);
+  if (!m_sendEvent.IsRunning ())
+    m_sendEvent = Simulator::Schedule (
+                                       Seconds(m_randExp.GetValue ()),
+                                       &CcnxConsumer::SendPacket, this);
 }
 
 // Application Methods
@@ -264,6 +269,8 @@ CcnxConsumer::StopApplication () // Called at time specified by Stop
 void
 CcnxConsumer::SendPacket ()
 {
+  if (!m_active) return;
+
   NS_LOG_FUNCTION_NOARGS ();
 
   boost::mutex::scoped_lock (m_seqTimeoutsGuard);
@@ -283,10 +290,7 @@ CcnxConsumer::SendPacket ()
         {
           if (m_seq >= m_seqMax)
             {
-              if (m_seqTimeouts.size () == 0)
-                return; // we are totally done
-              else
-                ScheduleNextPacket (); // we will probably need to retransmit something in the future
+              return; // we are totally done
             }
         }
       
@@ -341,6 +345,8 @@ void
 CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                                const Ptr<const Packet> &payload)
 {
+  if (!m_active) return;
+
   CcnxApp::OnContentObject (contentObject, payload); // tracing inside
   
   NS_LOG_FUNCTION (this << contentObject << payload);
@@ -364,6 +370,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 void
 CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 {
+  if (!m_active) return;
+  
   CcnxApp::OnNack (interest); // tracing inside
   
   NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
@@ -379,6 +387,8 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
   NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
   m_retxSeqs.insert (seq);
   NS_LOG_INFO ("After: " << m_retxSeqs.size ());
+
+  ScheduleNextPacket ();
 }
 
 } // namespace ns3

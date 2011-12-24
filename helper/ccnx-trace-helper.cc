@@ -38,6 +38,7 @@
 #include "tracers/ccnx-aggregate-app-tracer.h"
 #include "tracers/ccnx-aggregate-l3-tracer.h"
 #include "tracers/ccnx-rate-l3-tracer.h"
+#include "tracers/ccnx-seqs-app-tracer.h"
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
@@ -53,6 +54,7 @@ namespace ns3 {
 
 CcnxTraceHelper::CcnxTraceHelper ()
   : m_l3RateTrace (0)
+  , m_appSeqsTrace (0)
 {
 }
 
@@ -60,6 +62,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
 {
   NS_LOG_FUNCTION (this);
   if (m_l3RateTrace != 0) delete m_l3RateTrace;
+  if (m_appSeqsTrace != 0) delete m_appSeqsTrace;
   
   if (m_apps.size () > 0)
     {
@@ -198,5 +201,47 @@ CcnxTraceHelper::EnableRateL3All (const std::string &l3RateTrace)
       *m_l3RateTrace << "\n";
     }
 }
+
+void
+CcnxTraceHelper::EnableSeqsAppAll (const std::string &appName, const std::string &trace)
+{
+  NS_LOG_FUNCTION (this);
+  m_appSeqsTrace = new ofstream (trace.c_str (), ios::trunc);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      ObjectVectorValue apps;
+      (*node)->GetAttribute ("ApplicationList", apps);
+
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+      
+      uint32_t appId = 0;
+      for (ObjectVectorValue::Iterator app = apps.Begin ();
+           app != apps.End ();
+           app++, appId++)
+        {
+          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app)->GetInstanceTypeId ().GetName ());
+          if ((*app)->GetInstanceTypeId ().GetName () == appName)
+            {
+              Ptr<CcnxSeqsAppTracer> trace = Create<CcnxSeqsAppTracer> (boost::ref(*m_appSeqsTrace),
+                                                                        appName,
+                                                                        *node,
+                                                                        lexical_cast<string> (appId));
+              m_appSeqs.push_back (trace);
+            }
+        }
+      
+    }
+
+  if (m_appSeqs.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      m_appSeqs.front ()->PrintHeader (*m_appSeqsTrace);
+      *m_appSeqsTrace << "\n";
+    }
+}
+
 
 } // namespace ns3

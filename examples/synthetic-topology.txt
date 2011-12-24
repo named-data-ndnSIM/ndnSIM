@@ -16,9 +16,9 @@ link
 #OSPF weight on 04/10/2003 (see http://www.abilene.iu.edu/images/Ab-IGP-topo.jpg)
 #x	y	capacity(kbps)	OSPF    Delay		MaxPackets
 c1	n1	10Mbps 		1 	50ms  		200
-c2	n1	10Mbps 		1 	1ms   		200
-c3	n1	10Mbps		1	1ms		200
-n1	n2	1Mbps 		1176   	1ms   		20 
+c2	n1	10Mbps 		1 	10ms   		200
+c3	n1	10Mbps		1	100ms		200
+n1	n2	1Mbps 		1176   	20ms   		20 
 n1	n12	1Mbps 		587    	1ms   		20
 n12	n2	1Mbps 		846    	1ms   		20
 n2	p1	10Mbps 		260   	1ms   		200

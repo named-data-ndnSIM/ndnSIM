@@ -76,11 +76,17 @@ public:
   EnableAggregateL3All ();
 
   /**
-   * @brief Enable network-level CCNx rate tracing on all CCNx nodes (individual file per node)
+   * @brief Enable network-level CCNx rate tracing on all CCNx nodes
    */
   void
   EnableRateL3All (const std::string &l3RateTrace = "l3-rate.log");
   
+  /**
+   * @brief Enable app-level CCNx sequence tracing on all CCNx applications
+   */
+  void
+  EnableSeqsAppAll (const std::string &app, const std::string &appSeqsTrace = "app-seqs.log");
+
 private:
   std::string m_appTrace;
   std::list<Ptr<CcnxAppTracer> > m_apps;
@@ -90,6 +96,9 @@ private:
 
   std::list<Ptr<CcnxL3Tracer> > m_l3Rates;
   std::ostream *m_l3RateTrace;
+
+  std::list<Ptr<CcnxAppTracer> > m_appSeqs;
+  std::ostream *m_appSeqsTrace;
 };
 
 

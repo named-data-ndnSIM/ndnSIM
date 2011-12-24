@@ -55,6 +55,17 @@ CcnxNameComponents::GetComponents () const
   return m_prefix;
 }
 
+std::string
+CcnxNameComponents::GetLastComponent () const
+{
+  if (m_prefix.size () == 0)
+    {
+      return "";
+    }
+
+  return m_prefix.back ();
+}
+
 std::list<boost::reference_wrapper<const std::string> >
 CcnxNameComponents::GetSubComponents (size_t num) const
 {

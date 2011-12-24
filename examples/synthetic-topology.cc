@@ -93,6 +93,7 @@ main (int argc, char *argv[])
 
   consumerHelper.SetPrefix ("/6");
   consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
+  consumerHelper.SetAttribute ("Size", StringValue ("1.0"));
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/synthetic", "c1"));
 
   consumerHelper.SetPrefix ("/7");
@@ -108,9 +109,9 @@ main (int argc, char *argv[])
   ApplicationContainer consumers4 = consumerHelper.Install(Names::Find<Node> ("/synthetic", "c4"));
 
   consumers.Start (Seconds (0));
-  consumers2.Start (Seconds (10));
-  consumers3.Start (Seconds (20));
-  consumers4.Start (Seconds (30));
+  consumers2.Start (Seconds (2.5));
+  consumers3.Start (Seconds (5));
+  consumers4.Start (Seconds (7.5));
 
   /////////////////////////////////////////////
   
@@ -146,7 +147,8 @@ main (int argc, char *argv[])
   // traceHelper.EnableAggregateL3All ();
   // traceHelper.SetL3TraceFile ("trace-l3.log");
   // traceHelper.SetAppTraceFile ("trace-app.log");
-  traceHelper.EnableRateL3All ("rate-trace.log");
+  // traceHelper.EnableRateL3All ("rate-trace.log");
+  traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", "consumers-seqs.log");
 
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
