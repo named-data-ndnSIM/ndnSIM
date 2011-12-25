@@ -35,15 +35,24 @@ class CcnxContentObjectHeader;
 class CcnxDecodingHelper
 {
 public:
+  /**
+   * \brief Deserialize Buffer::Iterator to CcnxInterestHeader
+   * @param start Buffer containing serialized CCNx message
+   * @param interest Pointer to the CcnxInterestHeader to hold deserialized value
+   * @return Number of bytes used for deserialization
+   */
   static size_t
   Deserialize (Buffer::Iterator start, CcnxInterestHeader &interest);
 
+  /**
+   * \brief Deserialize Buffer::Iterator to CcnxContentObjectHeader
+   * @param start Buffer containing serialized CCNx message
+   * @param contentObject Pointer to the CcnxContentObjectHeader to hold deserialized value
+   * @return Number of bytes used for deserialization
+   */
   static size_t
   Deserialize (Buffer::Iterator start, CcnxContentObjectHeader &contentObject);
-  
-private:
 };
-
 } // namespace ns3
 
 #endif // _CCNX_DECODING_HELPER_H_

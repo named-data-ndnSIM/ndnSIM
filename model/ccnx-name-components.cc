@@ -36,11 +36,6 @@ CcnxNameComponents::CcnxNameComponents (/* root */)
 {
 }
 
-// CcnxNameComponents::CcnxNameComponents (const string &s)
-// {
-//   m_prefix.push_back (s);
-// }
-
 CcnxNameComponents::CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
 {
   BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)

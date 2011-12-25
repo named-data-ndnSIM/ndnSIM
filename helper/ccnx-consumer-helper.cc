@@ -31,51 +31,50 @@ namespace ns3
     
 CcnxConsumerHelper::CcnxConsumerHelper (const std::string &prefix)
 {
-    m_factory.SetTypeId ("ns3::CcnxConsumer");
+  m_factory.SetTypeId ("ns3::CcnxConsumer");
     
-    CcnxNameComponentsValue prefixValue;
-    prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
-    m_factory.Set ("InterestName", prefixValue);
+  CcnxNameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+  m_factory.Set ("InterestName", prefixValue);
 }
     
 void 
 CcnxConsumerHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
-    m_factory.Set (name, value);
+  m_factory.Set (name, value);
 }
     
 ApplicationContainer
 CcnxConsumerHelper::Install (Ptr<Node> node)
 {
-    return ApplicationContainer (InstallPriv (node));
+  return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
 CcnxConsumerHelper::Install (std::string nodeName)
 {
-    Ptr<Node> node = Names::Find<Node> (nodeName);
-    return ApplicationContainer (InstallPriv (node));
+  Ptr<Node> node = Names::Find<Node> (nodeName);
+  return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
 CcnxConsumerHelper::Install (NodeContainer c)
 {
-    ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+  ApplicationContainer apps;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-        apps.Add (InstallPriv (*i));
+      apps.Add (InstallPriv (*i));
     }
     
-    return apps;
+  return apps;
 }
     
 Ptr<Application>
 CcnxConsumerHelper::InstallPriv (Ptr<Node> node)
 {
-    Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();        
-    node->AddApplication (app);
+  Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();        
+  node->AddApplication (app);
         
-    return app;
+  return app;
 }
-
 }

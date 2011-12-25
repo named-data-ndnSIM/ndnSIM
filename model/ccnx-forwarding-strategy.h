@@ -51,7 +51,7 @@ public:
   virtual ~CcnxForwardingStrategy ();
 
   /**
-   * @brief Base method to propagate the insterest according to the forwarding strategy
+   * @brief Base method to propagate the interest according to the forwarding strategy
    *
    * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
    * @param incomingFace  Incoming face
@@ -77,7 +77,7 @@ public:
 
 protected:
   /**
-   * @brief Propage interest vie a green interface. Fail, if no green interfaces available
+   * @brief Propagate interest via a green interface. Fail, if no green interfaces available
    *
    * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
    * @param incomingFace  Incoming face

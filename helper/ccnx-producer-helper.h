@@ -39,60 +39,59 @@ class Node;
 class CcnxProducerHelper
 {
 public:
-/**
-* Create an CcnxProducerHelper to make it easier to work with CcnxProducer applications
-*
-*/
-CcnxProducerHelper (const std::string &prefix, uint32_t virtualPayloadSize);
+  /**
+   * Create an CcnxProducerHelper to make it easier to work with CcnxProducer applications
+   *
+   */
+  CcnxProducerHelper (const std::string &prefix, uint32_t virtualPayloadSize);
         
-/**
-* Helper function used to set the underlying application attributes.
-*
-* \param name the name of the application attribute to set
-* \param value the value of the application attribute to set
-*/
-void SetAttribute (std::string name, const AttributeValue &value);
+  /**
+   * Helper function used to set the underlying application attributes.
+   *
+   * \param name the name of the application attribute to set
+   * \param value the value of the application attribute to set
+   */
+  void SetAttribute (std::string name, const AttributeValue &value);
         
-/**
-* Install an ns3::CcnxProducer on each node of the input container
-* configured with all the attributes set with SetAttribute.
-*
-* \param c NodeContainer of the set of nodes on which an CcnxProducer 
-* will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (NodeContainer c);
+  /**
+   * Install an ns3::CcnxProducer on each node of the input container
+   * configured with all the attributes set with SetAttribute.
+   *
+   * \param c NodeContainer of the set of nodes on which an CcnxProducer 
+   * will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (NodeContainer c);
         
-/**
-* Install an ns3::CcnxProducer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param node The node on which an CcnxProducer will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (Ptr<Node> node);
+  /**
+   * Install an ns3::CcnxProducer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param node The node on which an CcnxProducer will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (Ptr<Node> node);
         
-/**
-* Install an ns3::CcnxProducer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param nodeName The node on which an CcnxProducer will be installed.
-* \returns Container of Ptr to the applications installed.
-*/
-ApplicationContainer Install (std::string nodeName);
+  /**
+   * Install an ns3::CcnxProducer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param nodeName The node on which an CcnxProducer will be installed.
+   * \returns Container of Ptr to the applications installed.
+   */
+  ApplicationContainer Install (std::string nodeName);
         
 private:
-/**
-* \internal
-* Install an ns3::CcnxProducer on the node configured with all the 
-* attributes set with SetAttribute.
-*
-* \param node The node on which an CcnxProducer will be installed.
-* \returns Ptr to the application installed.
-*/
-Ptr<Application> InstallPriv (Ptr<Node> node);
-ObjectFactory m_factory;
-
+  /**
+   * \internal
+   * Install an ns3::CcnxProducer on the node configured with all the 
+   * attributes set with SetAttribute.
+   *
+   * \param node The node on which an CcnxProducer will be installed.
+   * \returns Ptr to the application installed.
+   */
+  Ptr<Application> InstallPriv (Ptr<Node> node);
+  ObjectFactory m_factory;
 };
 }
 

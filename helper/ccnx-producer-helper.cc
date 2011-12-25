@@ -32,89 +32,54 @@ namespace ns3
     
 CcnxProducerHelper::CcnxProducerHelper (const std::string &prefix, uint32_t virtualPayloadSize)
 {
-    m_factory.SetTypeId ("ns3::CcnxProducer");
+  m_factory.SetTypeId ("ns3::CcnxProducer");
     
-    CcnxNameComponentsValue prefixValue;
-    prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
-    m_factory.Set ("Prefix", prefixValue);
+  CcnxNameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
+  m_factory.Set ("Prefix", prefixValue);
     
-    m_factory.Set ("PayloadSize", UintegerValue (virtualPayloadSize));
+  m_factory.Set ("PayloadSize", UintegerValue (virtualPayloadSize));
 }
     
 void 
 CcnxProducerHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
-    m_factory.Set (name, value);
+  m_factory.Set (name, value);
 }
     
 ApplicationContainer
 CcnxProducerHelper::Install (Ptr<Node> node)
 {
-    NS_LOG_FUNCTION(this);
-    return ApplicationContainer (InstallPriv (node));
+  NS_LOG_FUNCTION(this);
+  return ApplicationContainer (InstallPriv (node));
 }
 
 ApplicationContainer
 CcnxProducerHelper::Install (std::string nodeName)
 {
-    Ptr<Node> node = Names::Find<Node> (nodeName);
-    return ApplicationContainer (InstallPriv (node));
+  Ptr<Node> node = Names::Find<Node> (nodeName);
+  return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
 CcnxProducerHelper::Install (NodeContainer c)
 {
-    ApplicationContainer apps;
-    for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
+  ApplicationContainer apps;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-        apps.Add (InstallPriv (*i));
+      apps.Add (InstallPriv (*i));
     }
         
-    return apps;
+  return apps;
 }
-    
-    /*CcnxStackHelper::CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId)
-    {
-        ObjectFactory factory;
-        factory.SetTypeId (typeId);
-        Ptr<Object> protocol = factory.Create <Object> ();
-        node->AggregateObject (protocol);
-    }*/
+
 Ptr<Application>
 CcnxProducerHelper::InstallPriv (Ptr<Node> node)
 {
-    NS_LOG_INFO ("InstallPriv started");
-    Ptr<CcnxProducer> app = m_factory.Create<CcnxProducer> ();        
-    node->AddApplication (app);
-
-    /*Ptr<CcnxLocalFace> localFace = Create<CcnxLocalFace> ();
-    localFace->SetNode(node);
+  NS_LOG_INFO ("InstallPriv started");
+  Ptr<CcnxProducer> app = m_factory.Create<CcnxProducer> ();        
+  node->AddApplication (app);
         
-    //CreateAndAggregateObjectFromTypeId (node, "ns3::CcnxL3Protocol");
-    ObjectFactory factory;
-    factory.SetTypeId("ns3::CcnxL3Protocol");
-    Ptr<Object> protocol = factory.Create<Object> ();
-    node->AggregateObject(protocol);
-    
-    Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-    
-    if (ccnx == NULL)
-    {
-        NS_FATAL_ERROR ("CcnxProducerHelper::InstallPriv (): Getting Ccnx " 
-                        "a CcnxStack must be installed on the node");
-        return 0;
-    }
-
-    // m_factory.Set ("Face", PointerValue (localFace));
-    m_factory.Set ("Ccnx", PointerValue (ccnx));
-    Ptr<CcnxProducer> app = m_factory.Create<CcnxProducer> ();
-
-    //app->m_ccnx->m_contentStore->SetMaxSize(app->GetStoreCapacity());
-    localFace->RegisterProtocolHandler (MakeCallback (&CcnxProducer::HandlePacket, app));
-    localFace->SetUp();
-        
-    node->AddApplication (app);*/
-        
-    return app;
+  return app;
 }
 }
