@@ -396,10 +396,10 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
-  bool isNew = ret.get<1> ();
+  // bool isNew = ret.get<1> ();
   bool isDuplicated = ret.get<2> ();
 
-  NS_LOG_DEBUG ("isNew: " << isNew << ", isDup: " << isDuplicated);
+  // NS_LOG_DEBUG ("isNew: " << isNew << ", isDup: " << isDuplicated);
   
   if (isDuplicated) 
     {
