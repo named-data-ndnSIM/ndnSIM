@@ -43,6 +43,9 @@ class CcnxFace;
 class CcnxApp: public Application
 {
 public:
+  /**
+   * \typedef A callback to pass packets to underlying CCNx protocol
+   */
   typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
   
   static TypeId GetTypeId ();
@@ -94,9 +97,9 @@ protected:
   StopApplication ();     // Called at time specified by Stop
 
 protected:
-  ProtocolHandler m_protocolHandler;
+  ProtocolHandler m_protocolHandler;      ///< \brief A callback to pass packets to underlying CCNx protocol
   bool m_active; 
-  Ptr<CcnxFace> m_face; // local face that is created 
+  Ptr<CcnxFace> m_face;   // local face that is created 
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedInterests;

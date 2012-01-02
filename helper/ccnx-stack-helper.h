@@ -74,7 +74,7 @@ public:
    *
    * Set the forwarding helper to use during Install. The forwarding helper is
    * really an object factory which is used to create an object of type
-   * ns3::CcnxFrProtocol per node. This forwarding object is then associated to
+   * ns3::CcnxL3Protocol per node. This forwarding object is then associated to
    * a single ns3::Ccnx object through its ns3::Ccnx::SetforwardingProtocol.
    */
   void
