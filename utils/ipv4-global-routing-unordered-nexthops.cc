@@ -141,9 +141,18 @@ Ipv4GlobalRoutingUnorderedNexthops::LookupGlobal (uint32_t entryNum, Ipv4Address
   NS_ASSERT_MSG (entryNum < m_numLogicalEntries,
                "Number of requested logical entry should be smaller than total number of logical entries");
   
-  Ipv4AddressTrieMap::const_iterator longest_prefix_map = m_routes.longest_prefix_match (dest);
+  // Cheating with lookups. Need to redesign Trie
+  Ipv4AddressTrieMap::const_iterator longest_prefix_map;
+  Ipv4Mask mask ("255.255.255.255");
+  do {
+    NS_LOG_DEBUG ("Try mask " << mask);
+    longest_prefix_map = m_routes.longest_prefix_match (dest.CombineMask (mask));
+    mask = Ipv4Mask (mask.Get () << 8);
+  } while (longest_prefix_map == m_routes.end () && !mask.IsEqual (Ipv4Mask::GetZero ()));
+
   if (longest_prefix_map == m_routes.end ())
     {
+      NS_LOG_LOGIC ("Route not found...");
       return 0;
     }
 

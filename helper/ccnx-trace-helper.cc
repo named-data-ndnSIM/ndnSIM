@@ -39,6 +39,7 @@
 #include "tracers/ccnx-aggregate-l3-tracer.h"
 #include "tracers/ccnx-rate-l3-tracer.h"
 #include "tracers/ccnx-seqs-app-tracer.h"
+#include "tracers/ipv4-seqs-app-tracer.h"
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
@@ -55,6 +56,7 @@ namespace ns3 {
 CcnxTraceHelper::CcnxTraceHelper ()
   : m_l3RateTrace (0)
   , m_appSeqsTrace (0)
+  , m_ipv4AppSeqsTrace (0)
 {
 }
 
@@ -63,6 +65,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
   NS_LOG_FUNCTION (this);
   if (m_l3RateTrace != 0) delete m_l3RateTrace;
   if (m_appSeqsTrace != 0) delete m_appSeqsTrace;
+  if (m_ipv4AppSeqsTrace != 0) delete m_ipv4AppSeqsTrace;
   
   if (m_apps.size () > 0)
     {
@@ -240,6 +243,46 @@ CcnxTraceHelper::EnableSeqsAppAll (const std::string &appName, const std::string
       // *m_l3RateTrace << "# "; // not necessary for R's read.table
       m_appSeqs.front ()->PrintHeader (*m_appSeqsTrace);
       *m_appSeqsTrace << "\n";
+    }
+}
+
+void
+CcnxTraceHelper::EnableIpv4SeqsAppAll (const std::string &trace)
+{
+  NS_LOG_FUNCTION (this);
+  m_ipv4AppSeqsTrace = new ofstream (trace.c_str (), ios::trunc);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      ObjectVectorValue apps;
+      (*node)->GetAttribute ("ApplicationList", apps);
+
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+      
+      uint32_t appId = 0;
+      for (ObjectVectorValue::Iterator app = apps.Begin ();
+           app != apps.End ();
+           app++, appId++)
+        {
+          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app)->GetInstanceTypeId ().GetName ());
+          if ((*app)->GetInstanceTypeId ().GetName () == "ns3::PacketSink" ||
+              (*app)->GetInstanceTypeId ().GetName () == "ns3::BulkSendApplication")
+            {
+              Ptr<Ipv4SeqsAppTracer> trace = Create<Ipv4SeqsAppTracer> (boost::ref(*m_ipv4AppSeqsTrace),
+                                                                        *node,
+                                                                        lexical_cast<string> (appId));
+              m_ipv4AppSeqs.push_back (trace);
+            }
+        }
+      
+    }
+
+  if (m_ipv4AppSeqs.size () > 0)
+    {
+      m_ipv4AppSeqs.front ()->PrintHeader (*m_ipv4AppSeqsTrace);
+      *m_ipv4AppSeqsTrace << "\n";
     }
 }
 

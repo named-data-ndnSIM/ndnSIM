@@ -230,8 +230,6 @@ CcnxConsumer::SetMaxSize (double size)
 
   m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
   NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
-
-  std::cout << "MaxSeqNo = " << m_seqMax << "\n";
 }
 
 

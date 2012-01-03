@@ -28,6 +28,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/config-store.h"
 
 #include <iostream>
 #include <sstream>
@@ -35,6 +36,8 @@
 #include <list>
 #include <set>
 #include "ns3/rocketfuel-topology-reader.h"
+
+#include "../helper/tracers/ipv4-seqs-app-tracer.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -55,62 +58,10 @@ void PrintTime ()
 class Experiment
 {
 public:
-  void
-  ConfigureCcnxTopology ()
-  {
-    Names::Clear ();
-    
-    string weights   ("./src/NDNabstraction/examples/sprint-pops.weights");
-    string latencies ("./src/NDNabstraction/examples/sprint-pops.latencies");
-    string positions ("./src/NDNabstraction/examples/sprint-pops.positions");
-    string strategy  ("ns3::CcnxBestRouteStrategy");
-    // string strategy ("ns3::CcnxFloodingStrategy");
-  
-    RocketfuelWeightsReader reader ("/sprint");
-
-    reader.SetFileName (positions);
-    reader.SetFileType (RocketfuelWeightsReader::POSITIONS);
-    reader.Read ();
-  
-    reader.SetFileName (weights);
-    reader.SetFileType (RocketfuelWeightsReader::WEIGHTS);    
-    reader.Read ();
-
-    reader.SetFileName (latencies);
-    reader.SetFileType (RocketfuelWeightsReader::LATENCIES);    
-    reader.Read ();
-    
-    reader.Commit ();
-    NS_ASSERT_MSG (reader.LinksSize () != 0, "Problems reading the topology file. Failing.");
-    
-    NS_LOG_INFO("Nodes = " << reader.GetNodes ().GetN());
-    NS_LOG_INFO("Links = " << reader.LinksSize ());
-  
-    // ------------------------------------------------------------
-    // -- Read topology data.
-    // --------------------------------------------
-        
-    InternetStackHelper stack;
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-    stack.SetRoutingHelper (ipv4RoutingHelper);
-    stack.Install (reader.GetNodes ());
-
-    reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
-
-    // Install CCNx stack
-    NS_LOG_INFO ("Installing CCNx stack");
-    CcnxStackHelper ccnxHelper;
-    ccnxHelper.SetForwardingStrategy (strategy);
-    ccnxHelper.EnableLimits (true, Seconds(0.1));
-    ccnxHelper.SetDefaultRoutes (false);
-    ccnxHelper.InstallAll ();
-
-    // // Populate FIB based on IPv4 global routing controller
-    ccnxHelper.InstallFakeGlobalRoutes ();
-    ccnxHelper.InstallRoutesToAll ();
-
-    m_rand = UniformVariable (0, reader.GetNodes ().GetN());
-  }
+  Experiment ()
+    : m_rand (0,52)
+    , reader ("/sprint")
+  { }
 
   void
   ConfigureIpv4Topology ()
@@ -120,11 +71,7 @@ public:
     string weights   ("./src/NDNabstraction/examples/sprint-pops.weights");
     string latencies ("./src/NDNabstraction/examples/sprint-pops.latencies");
     string positions ("./src/NDNabstraction/examples/sprint-pops.positions");
-    string strategy  ("ns3::CcnxBestRouteStrategy");
-    // string strategy ("ns3::CcnxFloodingStrategy");
   
-    RocketfuelWeightsReader reader ("/sprint");
-
     reader.SetFileName (positions);
     reader.SetFileType (RocketfuelWeightsReader::POSITIONS);
     reader.Read ();
@@ -142,81 +89,27 @@ public:
     
     NS_LOG_INFO("Nodes = " << reader.GetNodes ().GetN());
     NS_LOG_INFO("Links = " << reader.LinksSize ());
-  
-    // ------------------------------------------------------------
-    // -- Read topology data.
-    // --------------------------------------------
-        
+
     InternetStackHelper stack;
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper;
-    stack.SetRoutingHelper (ipv4RoutingHelper);
     stack.Install (reader.GetNodes ());
-
     reader.AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
+  }
 
-    // Install CCNx stack
-    NS_LOG_INFO ("Installing CCNx stack");
-    CcnxStackHelper ccnxHelper;
-    ccnxHelper.InstallFakeGlobalRoutesImpl ();
+  void
+  ConfigureRouting ()
+  {
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-    m_rand = UniformVariable (0, reader.GetNodes ().GetN());
+    // m_rand = UniformVariable (0, reader.GetNodes ().GetN());
   }
   
-  
-  ApplicationContainer
-  AddCcnxRandomApplications (uint16_t numStreams)
-  {
-    map<uint32_t, set<uint32_t> > streams;
-    ApplicationContainer apps;
-    
-    uint16_t createdStreams = 0;
-    uint16_t guard = 0;
-    while (createdStreams < numStreams && guard < (numeric_limits<uint16_t>::max ()-1))
-      {
-        guard ++;
-        
-        uint32_t node1_num = m_rand.GetValue ();
-        uint32_t node2_num = m_rand.GetValue ();
-
-        if (node1_num == node2_num)
-          continue;
-
-        if (streams[node1_num].count (node2_num) > 0) // don't create duplicate streams
-          continue;
-        
-        streams[node1_num].insert (node2_num);
-
-        Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (node1_num));
-        Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (node2_num));
-
-        CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
-        consumerHelper.SetPrefix ("/" + lexical_cast<string> (node2->GetId ()));
-        consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
-        consumerHelper.SetAttribute ("Size", StringValue ("1.983642578125")); //to make sure max seq # is 2000
-
-        CcnxAppHelper producerHelper ("ns3::CcnxProducer");
-        producerHelper.SetPrefix ("/" + lexical_cast<string> (node2->GetId ()));
-        
-        apps.Add
-          (consumerHelper.Install (node1));
-
-        apps.Add
-          (producerHelper.Install (node2));
-
-        createdStreams ++;
-      }
-
-    return apps;
-  }
-
   ApplicationContainer
   AddTcpRandomApplications (uint16_t numStreams)
   {
     map<uint32_t, set<uint32_t> > streams;
     ApplicationContainer apps;
 
-    const static uint32_t base_port = 1000;
+    const static uint32_t base_port = 10;
     uint16_t createdStreams = 0;
     uint16_t guard = 0;
     while (createdStreams < numStreams && guard < (numeric_limits<uint16_t>::max ()-1))
@@ -237,13 +130,17 @@ public:
         Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (node1_num));
         Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (node2_num));
 
+        Ptr<Ipv4> ipv4 = node1->GetObject<Ipv4> ();
+        // ipv4->GetAddress (0, 0);
+
         // to make sure we don't reuse the same port numbers for different flows, just make all port numbers unique
         PacketSinkHelper consumerHelper ("ns3::TcpSocketFactory",
                                          InetSocketAddress (Ipv4Address::GetAny (), base_port + createdStreams));
 
         BulkSendHelper producerHelper ("ns3::TcpSocketFactory",
-                                       InetSocketAddress (Ipv4Address(node1->GetId ()), base_port + createdStreams));
-        producerHelper.SetAttribute ("MaxBytes", UintegerValue (2080000)); // equal to 2000 ccnx packets
+                                       InetSocketAddress (ipv4->GetAddress (1, 0).GetLocal (), base_port + createdStreams));
+        // cout << "SendTo: " <<  ipv4->GetAddress (1, 0).GetLocal () << endl;
+        producerHelper.SetAttribute ("MaxBytes", UintegerValue (2081040)); // equal to 2001 ccnx packets
         
         apps.Add
           (consumerHelper.Install (node1));
@@ -269,17 +166,26 @@ public:
   }
 
   UniformVariable m_rand;
+  RocketfuelWeightsReader reader;
 };
-
 
 int 
 main (int argc, char *argv[])
 {
   cout << "Begin congestion-pop scenario\n";
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
   
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
+  Config::SetDefault ("ns3::TcpSocket::SegmentSize", StringValue ("1040"));
+  
+  Config::SetDefault ("ns3::BulkSendApplication::SendSize", StringValue ("1040"));
 
+  // Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("attributes.xml"));
+  // Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  // Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  
   uint32_t maxRuns = 1;
   uint32_t startRun = 0;
   CommandLine cmd;
@@ -287,35 +193,35 @@ main (int argc, char *argv[])
   cmd.AddValue ("runs", "Number of runs", maxRuns);
   cmd.Parse (argc, argv);
 
+  // ConfigStore config;
+  // config.ConfigureDefaults ();
+
   for (uint32_t run = startRun; run < startRun + maxRuns; run++)
     {
       Config::SetGlobal ("RngRun", IntegerValue (run));
+      cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
       
       Experiment experiment;
       cout << "Run " << run << endl;
       
-      experiment.ConfigureTopology ();
-      // ApplicationContainer apps = experiment.AddCcnxRandomApplications (20);
+      experiment.ConfigureIpv4Topology ();
       ApplicationContainer apps = experiment.AddTcpRandomApplications (20);
+      experiment.ConfigureRouting ();
 
+      string prefix = "run-tcp-" + lexical_cast<string> (run) + "-";      
+
+      ofstream of_nodes ((prefix + "apps.log").c_str ());
       for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
         {
-          cout << "From " << apps.Get (i*2)->GetNode ()->GetId ()
-               << " to "  << apps.Get (i*2 + 1)->GetNode ()->GetId ();
-          cout << "\n";
+          of_nodes << "From " << apps.Get (i*2)->GetNode ()->GetId ()
+                   << " to "  << apps.Get (i*2 + 1)->GetNode ()->GetId ();
+          of_nodes << "\n";
         }
-  
-      // CcnxTraceHelper traceHelper;
-      // traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
-      // traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
-      // traceHelper.SetAppTraceFile (prefix + "trace-app.log");
 
-      // string prefix = "run-" + lexical_cast<string> (run) + "-";
-      
-      // traceHelper.EnableAggregateL3All ();
-      // traceHelper.SetL3TraceFile ("trace-l3.log");
-      // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-      // traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", prefix + "consumers-seqs.log");
+      CcnxTraceHelper traceHelper;
+      traceHelper.EnableIpv4SeqsAppAll (prefix + "consumers-seqs.log");
+
+      // config.ConfigureAttributes ();  
 
       experiment.Run (Seconds (200.0));
     }

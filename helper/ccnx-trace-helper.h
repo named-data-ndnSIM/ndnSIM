@@ -30,6 +30,7 @@ namespace ns3 {
 
 class CcnxAppTracer;
 class CcnxL3Tracer;
+class Ipv4AppTracer;
 
 class CcnxTraceHelper
 {
@@ -87,6 +88,12 @@ public:
   void
   EnableSeqsAppAll (const std::string &app, const std::string &appSeqsTrace = "app-seqs.log");
 
+  /**
+   * @brief Enable app-level IPv4 sequence tracing on all nodes (BulkSender + PacketSink)
+   */
+  void
+  EnableIpv4SeqsAppAll (const std::string &appSeqsTrace = "app-seqs.log");
+  
 private:
   std::string m_appTrace;
   std::list<Ptr<CcnxAppTracer> > m_apps;
@@ -99,6 +106,9 @@ private:
 
   std::list<Ptr<CcnxAppTracer> > m_appSeqs;
   std::ostream *m_appSeqsTrace;
+
+  std::list<Ptr<Ipv4AppTracer> > m_ipv4AppSeqs;
+  std::ostream *m_ipv4AppSeqsTrace;
 };
 
 
