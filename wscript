@@ -110,4 +110,7 @@ def build(bld):
         obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
         obj.source = 'examples/synthetic-topology.cc'
 
+        obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
+        obj.source = 'examples/congestion-pop.cc'
+
     bld.ns3_python_bindings()

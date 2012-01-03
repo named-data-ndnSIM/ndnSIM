@@ -146,7 +146,7 @@ RocketfuelWeightsReader::Read ()
             break;
           }
         case LATENCIES:
-          link->SetAttribute ("Delay", attribute);
+          link->SetAttribute ("Delay", attribute+"ms");
           break;
         default:
           ; //
@@ -194,18 +194,5 @@ RocketfuelWeightsReader::SavePositions (const std::string &file) const
       os << name << "\t" << "unknown" << "\t" << -position.y << "\t" << position.x << "\n";
     }
 }
-
-// void
-// RocketfuelWeightsReader::Cheat (NodeContainer &nodes)
-// {
-//   double epsilon = 1;
-
-//   for (NodeContainer::Iterator i = nodes.Begin ();
-//        i != nodes.End ();
-//        i++)
-//     {
-      
-//     }  
-// }
 
 } /* namespace ns3 */
