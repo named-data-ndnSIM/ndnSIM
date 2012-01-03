@@ -559,7 +559,7 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
 // }
 
 void
-CcnxStackHelper::InstallFakeGlobalRoutes ()
+CcnxStackHelper::InstallFakeGlobalRoutesImpl ()
 {
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
@@ -584,7 +584,12 @@ CcnxStackHelper::InstallFakeGlobalRoutes ()
 
       globalRouter->InjectRoute (Ipv4Address((*node)->GetId ()), Ipv4Mask("255.255.255.255"));
     }
+}
 
+void
+CcnxStackHelper::InstallFakeGlobalRoutes ()
+{
+  InstallFakeGlobalRoutesImpl ();
   Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
 }
 

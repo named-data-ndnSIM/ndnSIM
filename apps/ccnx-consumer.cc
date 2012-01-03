@@ -121,7 +121,7 @@ CcnxConsumer::GetTypeId (void)
 CcnxConsumer::CcnxConsumer ()
   : m_rand (0, std::numeric_limits<uint32_t>::max ())
   , m_desiredRate ("10Kbps")
-  , m_payloadSize (1024)
+  , m_payloadSize (1040)
   , m_seq (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -230,6 +230,8 @@ CcnxConsumer::SetMaxSize (double size)
 
   m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
   NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
+
+  std::cout << "MaxSeqNo = " << m_seqMax << "\n";
 }
 
 
@@ -363,8 +365,11 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   //  NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
   //             "Comment out this assert, if it causes problems");
 
-  if (entry != m_seqTimeouts.end ())
-    m_seqTimeouts.erase (entry);
+  // if (entry != m_seqTimeouts.end ())
+  //   m_seqTimeouts.erase (entry);
+
+  m_seqTimeouts.erase (seq);
+  m_retxSeqs.erase (seq);
 }
 
 void

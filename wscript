@@ -113,4 +113,7 @@ def build(bld):
         obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
         obj.source = 'examples/congestion-pop.cc'
 
+        obj = bld.create_ns3_program('congestion-tcp-pop', ['NDNabstraction'])
+        obj.source = 'examples/congestion-tcp-pop.cc'
+
     bld.ns3_python_bindings()
