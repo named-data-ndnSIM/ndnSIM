@@ -55,13 +55,6 @@ struct CcnxPrefixHash : public std::unary_function<CcnxNameComponents, std::size
     return hash;
   }
 };
-  
-// // A collision-chaining hash table mapping strings to ints.
-// template<typename Value>
-// class string_key_hash_t : public boost::unordered_map<std::string,Value, string_hash, std::equal_to<std::string>,std::allocator<std::string> >
-// {
-// };
-
 } // namespace ns3
 
 #endif // CCNX_HASH_HELPER_H

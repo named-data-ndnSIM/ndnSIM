@@ -40,11 +40,19 @@
 namespace ns3 
 {
 
+/**
+ * @ingroup ccnx
+ * \brief CCNx application for sending out Interest packets
+ */
 class CcnxConsumer: public CcnxApp
 {
 public: 
   static TypeId GetTypeId ();
         
+  /**
+   * \brief Default constructor 
+   * Sets up randomizer function and packet sequence number
+   */
   CcnxConsumer ();
 
   // From CcnxApp
@@ -67,7 +75,9 @@ protected:
   StopApplication ();
   
 private:
-  //helpers
+  /**
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying CCNx protocol
+   */
   void
   ScheduleNextPacket ();
 
@@ -89,15 +99,26 @@ private:
   void
   SendPacket ();
 
+  /**
+   * \brief Checks if the packet need to be retransmitted becuase of retransmission timer expiration
+   */
   void
   CheckRetxTimeout ();
   
+  /**
+   * \brief Modifies the frequency of checking the retransmission timeouts
+   * \param retxTimer Timeout defining how frequent retransmission timeouts should be checked
+   */
   void
   SetRetxTimer (Time retxTimer);
 
+  /**
+   * \brief Returns the frequency of checking the retransmission timeouts
+   * \return Timeout defining how frequent retransmission timeouts should be checked
+   */
   Time
   GetRetxTimer () const;
-
+  
   double
   GetMaxSize () const;
 
@@ -116,24 +137,30 @@ protected:
   EventId         m_sendEvent; // Eventid of pending "send packet" event
   Time            m_retxTimer;
   EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
-  
-  Time            m_rto; // Retransmission timeout
-  Time            m_rttVar; // RTT variance
-  Time            m_sRtt; // smoothed RTT
-  
-  Time               m_offTime;
-  CcnxNameComponents m_interestName;
-  Time               m_interestLifeTime;
-  int32_t            m_minSuffixComponents;
-  int32_t            m_maxSuffixComponents;
-  bool               m_childSelector;
-  CcnxNameComponents m_exclude;
 
+  Time            m_rto;        ///< \brief Retransmission timeout
+  Time            m_rttVar;     ///< \brief RTT variance
+  Time            m_sRtt;       ///< \brief smoothed RTT
+  
+  Time               m_offTime;             ///< \brief Time interval between packets
+  CcnxNameComponents m_interestName;        ///< \brief CcnxName of the Interest (use CcnxNameComponents)
+  Time               m_interestLifeTime;    ///< \brief LifeTime for interest packet
+  int32_t            m_minSuffixComponents; ///< \brief MinSuffixComponents. See CcnxInterestHeader for more information
+  int32_t            m_maxSuffixComponents; ///< \brief MaxSuffixComponents. See CcnxInterestHeader for more information
+  bool               m_childSelector;       ///< \brief ChildSelector. See CcnxInterestHeader for more information
+  CcnxNameComponents m_exclude;             ///< \brief Exclude. See CcnxInterestHeader for more information
+
+  /**
+   * \struct This struct contains sequence numbers of packets to be retransmitted
+   */
   struct RetxSeqsContainer :
     public std::set<uint32_t> { };
   
-  RetxSeqsContainer m_retxSeqs; // ordered set of sequence numbers to be retransmitted
+  RetxSeqsContainer m_retxSeqs;             ///< \brief ordered set of sequence numbers to be retransmitted
 
+  /**
+   * \struct This struct contains a pair of packet sequence number and its timeout
+   */ 
   struct SeqTimeout
   {
     SeqTimeout (uint32_t _seq, Time _time) : seq (_seq), time (_time) { }
@@ -145,6 +172,9 @@ protected:
   class i_seq { };
   class i_timestamp { }; 
   
+  /**
+   * \struct This struct contains a multi-index for the set of SeqTimeout structs
+   */
   struct SeqTimeoutsContainer :
     public boost::multi_index::multi_index_container<
     SeqTimeout,
@@ -160,9 +190,12 @@ protected:
       >
     > { } ;
 
-  SeqTimeoutsContainer m_seqTimeouts;
-  boost::mutex m_seqTimeoutsGuard;
+  SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
+  boost::mutex m_seqTimeoutsGuard;          ///< \brief mutex for safe work with the m_seqTimeouts
 
+  /**
+   * \brief A trace that is called after each transmitted Interest packet
+   */
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
 };

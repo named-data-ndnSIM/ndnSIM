@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: 
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #ifndef _CCNX_ENCODING_HELPER_H_
@@ -36,15 +36,26 @@ class CcnxInterestHeader;
 class CcnxContentObjectHeader;
   
 /**
- * Helper to encode/decode ccnb formatted CCNx message
+ * \brief Helper to encode/decode ccnb formatted CCNx message
  *
  */
 class CcnxEncodingHelper
 {
 public:
+  /**
+   * \brief Serialize CcnxInterestHeader to Buffer::Iterator
+   * @param start Buffer to store serialized CcnxInterestHeader
+   * @param interest Pointer to CcnxInterestHeader to be serialized 
+   * @return length of serialized CcnxInterestHeader
+   */
   static size_t
   Serialize (Buffer::Iterator start, const CcnxInterestHeader &interest);
 
+  /**
+   * \brief Compute the size of serialized CcnxInterestHeader
+   * @param interest Pointer to CcnxInterestHeader
+   * @return length 
+   */
   static size_t
   GetSerializedSize (const CcnxInterestHeader &interest);
 

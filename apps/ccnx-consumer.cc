@@ -79,7 +79,7 @@ CcnxConsumer::GetTypeId (void)
                    StringValue ("/"),
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
                    MakeCcnxNameComponentsChecker ())
-    .AddAttribute ("LifeTime", "LifeTime fo interest packet",
+    .AddAttribute ("LifeTime", "LifeTime for interest packet",
                    StringValue ("2s"),
                    MakeTimeAccessor (&CcnxConsumer::m_interestLifeTime),
                    MakeTimeChecker ())
