@@ -358,7 +358,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 
   boost::mutex::scoped_lock (m_seqTimeoutsGuard);
   
-  SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
+  // SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
 
   //  NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
   //             "Comment out this assert, if it causes problems");
