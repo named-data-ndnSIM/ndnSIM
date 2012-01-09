@@ -64,7 +64,6 @@ main (int argc, char *argv[])
 {
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
-  Config::SetDefault ("ns3::CcnxConsumer::OffTime", StringValue ("1s"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
     
   Packet::EnableChecking();
@@ -116,13 +115,17 @@ main (int argc, char *argv[])
   std::ostringstream prefix;
   prefix << "/" << producer->GetId ();
   
-  CcnxConsumerHelper consumerHelper (prefix.str ());
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  consumerHelper.SetPrefix (prefix.str ());
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);
     
-  CcnxProducerHelper producerHelper (prefix.str (),1024);
+  CcnxAppHelper producerHelper ("ns3::CcnxProducer");
+  producerHelper.SetPrefix (prefix.str ());
+  producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producer);
   
   // producers.Start(Seconds(0.0));

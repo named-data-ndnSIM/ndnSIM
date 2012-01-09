@@ -64,12 +64,13 @@ public:
   enum
     {
       WEIGHTS,
-      LATENCIES
+      LATENCIES,
+      POSITIONS
     };
 
-  // void
-  // Cheat (NodeContainer &nodes);
-
+  void
+  SavePositions (const std::string &file) const;
+  
 private:
   RocketfuelWeightsReader (const RocketfuelWeightsReader&);
   RocketfuelWeightsReader& operator= (const RocketfuelWeightsReader&);

@@ -24,16 +24,14 @@
 #include "ns3/packet.h"
 #include "ns3/callback.h"
 #include "ns3/object.h"
-
-#include "ccnx.h"
-#include "ccnx-fib.h"
-#include "ccnx-pit.h"
-#include "ccnx-pit-entry.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
 class CcnxFace;
 class CcnxInterestHeader;
+class CcnxPit;
+class CcnxPitEntry;
 
 /**
  * \ingroup ccnx
@@ -74,7 +72,7 @@ public:
    */
   void
   SetPit (Ptr<CcnxPit> pit);
-
+  
 protected:
   /**
    * @brief Propagate interest via a green interface. Fail, if no green interfaces available
@@ -93,10 +91,11 @@ protected:
                              const Ptr<CcnxFace> &incomingFace,
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
+
+  TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
   
 protected:  
   Ptr<CcnxPit> m_pit;
-  Ptr<Ccnx> m_ccnx; // just for tracing purposes. Should not be used in any other way
 };
 
 } //namespace ns3

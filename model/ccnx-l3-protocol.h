@@ -23,14 +23,11 @@
 
 #include <list>
 #include <vector>
-#include <stdint.h>
+
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
-#include "ns3/traced-callback.h"
 #include "ns3/nstime.h"
-#include "ns3/simulator.h"
 
-#include "ns3/ccnx-producer-helper.h"
 #include "ccnx-content-store.h"
 #include "ccnx-pit.h"
 #include "ccnx-fib.h"
@@ -85,36 +82,6 @@ public:
    */
   CcnxL3Protocol();
   virtual ~CcnxL3Protocol ();
-
-  /**
-   * \enum DropReason
-   * \brief Reason why a packet has been dropped.
-   */
-  enum DropReason 
-  {
-    NDN_DUPLICATE_INTEREST,  ///< \brief Duplicate Interest
-    NDN_SUPPRESSED_INTEREST, ///< \brief Suppressed Interest
-    NDN_UNSOLICITED_DATA,    ///< \brief Unsolicited ContentObject(duplicate?)
-    NDN_PIT_TIMER_EXPIRED,
-    INTERFACE_DOWN,          ///< \brief Interface is down
-
-    NACK_SUPPRESSED,
-    NACK_AFTER_SATISFIED,
-    NACK_NONDUPLICATE,
-
-    DROP_NO_ROUTE,   /**< No route to host */
-  };    
-
-  /**
-   * \enum DropReason
-   * \brief Description of where content object was originated
-   */
-  enum ContentObjectSource
-  {
-    APPLICATION,
-    FORWARDED,
-    CACHED
-  };
 
   /**
    * \brief Assigns node to the CCNx stack
@@ -212,17 +179,17 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  /// \brief Set buckets leak interval
-  void
-  SetBucketLeakInterval (Time interval);
+  // /// \brief Set buckets leak interval
+  // void
+  // SetBucketLeakInterval (Time interval);
 
-  /// \brief Get buckets leak interval
-  Time
-  GetBucketLeakInterval () const;
+  // /// \brief Get buckets leak interval
+  // Time
+  // GetBucketLeakInterval () const;
   
-  /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
-  void
-  LeakBuckets ();
+  // /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
+  // void
+  // LeakBuckets ();
 
   void
   GiveUpInterest (const CcnxPitEntry &pitEntry,
@@ -240,32 +207,9 @@ private:
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
-
-  Time    m_bucketLeakInterval;
-  EventId m_bucketLeakEvent;
   
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedInterestsTrace;
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 DropReason,
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedInterestsTrace;
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                 Ptr<const Packet>,/*payload*/
-                 Ptr<Ccnx>, Ptr<const CcnxFace> > m_receivedDataTrace;
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                  Ptr<const Packet>,/*payload*/
-                  ContentObjectSource,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_transmittedDataTrace;
-  TracedCallback<Ptr<const CcnxContentObjectHeader>,
-                  Ptr<const Packet>,/*payload*/
-                  DropReason,
-                  Ptr<Ccnx>, Ptr<const CcnxFace> > m_droppedDataTrace;
+  // Time    m_bucketLeakInterval;
+  // EventId m_bucketLeakEvent;
 };
   
 } // Namespace ns3

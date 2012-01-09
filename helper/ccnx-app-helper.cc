@@ -18,47 +18,49 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ccnx-consumer-helper.h"
+#include "ccnx-app-helper.h"
 #include "ns3/log.h"
-#include "ns3/ccnx-name-components.h"
+#include "ns3/string.h"
 #include "ns3/names.h"
-#include "../apps/ccnx-consumer.h"
+#include "ns3/ccnx-app.h"
 
-NS_LOG_COMPONENT_DEFINE ("CcnxConsumerHelper");
+NS_LOG_COMPONENT_DEFINE ("CcnxAppHelper");
 
 namespace ns3 
 {
-    
-CcnxConsumerHelper::CcnxConsumerHelper (const std::string &prefix)
+
+CcnxAppHelper::CcnxAppHelper (const std::string &app)
 {
-  m_factory.SetTypeId ("ns3::CcnxConsumer");
-    
-  CcnxNameComponentsValue prefixValue;
-  prefixValue.DeserializeFromString (prefix, MakeCcnxNameComponentsChecker ());
-  m_factory.Set ("InterestName", prefixValue);
+  m_factory.SetTypeId (app);
 }
-    
+
+void
+CcnxAppHelper::SetPrefix (const std::string &prefix)
+{
+  m_factory.Set ("Prefix", StringValue(prefix));
+}
+
 void 
-CcnxConsumerHelper::SetAttribute (std::string name, const AttributeValue &value)
+CcnxAppHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
   m_factory.Set (name, value);
 }
     
 ApplicationContainer
-CcnxConsumerHelper::Install (Ptr<Node> node)
+CcnxAppHelper::Install (Ptr<Node> node)
 {
   return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxConsumerHelper::Install (std::string nodeName)
+CcnxAppHelper::Install (std::string nodeName)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   return ApplicationContainer (InstallPriv (node));
 }
     
 ApplicationContainer
-CcnxConsumerHelper::Install (NodeContainer c)
+CcnxAppHelper::Install (NodeContainer c)
 {
   ApplicationContainer apps;
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -70,11 +72,12 @@ CcnxConsumerHelper::Install (NodeContainer c)
 }
     
 Ptr<Application>
-CcnxConsumerHelper::InstallPriv (Ptr<Node> node)
+CcnxAppHelper::InstallPriv (Ptr<Node> node)
 {
-  Ptr<CcnxConsumer> app = m_factory.Create<CcnxConsumer> ();        
+  Ptr<CcnxApp> app = m_factory.Create<CcnxApp> ();        
   node->AddApplication (app);
         
   return app;
 }
+
 }

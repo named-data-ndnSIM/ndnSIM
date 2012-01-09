@@ -180,6 +180,9 @@ public:
   void
   InstallFakeGlobalRoutes ();
 
+  void
+  InstallFakeGlobalRoutesImpl ();
+  
   /**
    * \brief Installs CCNx route to `node` based on fake IPv4 routes
    *

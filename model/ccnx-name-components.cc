@@ -50,6 +50,17 @@ CcnxNameComponents::GetComponents () const
   return m_prefix;
 }
 
+std::string
+CcnxNameComponents::GetLastComponent () const
+{
+  if (m_prefix.size () == 0)
+    {
+      return "";
+    }
+
+  return m_prefix.back ();
+}
+
 std::list<boost::reference_wrapper<const std::string> >
 CcnxNameComponents::GetSubComponents (size_t num) const
 {
@@ -88,7 +99,8 @@ operator >> (std::istream &is, CcnxNameComponents &components)
   istream_iterator<char> eos; // end of stream
   
   std::string component = "";
-  for (istream_iterator<char> it (is); it != eos; it++)
+  istream_iterator<char> it (is);
+  for (; it != eos; it++)
     {
       if (*it == '/')
         {
@@ -102,6 +114,9 @@ operator >> (std::istream &is, CcnxNameComponents &components)
   if (component != "")
       components.Add (component);
 
+  is.clear (); 
+  // NS_LOG_ERROR (components << ", bad: " << is.bad () <<", fail: " << is.fail ());
+  
   return is;
 }
 

@@ -24,6 +24,11 @@
 #include "ccnx-forwarding-strategy.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/double.h"
+
+#include "ccnx-pit.h"
+#include "ccnx-pit-entry.h"
+
 #include "ccnx-interest-header.h"
 
 #include <boost/ref.hpp>
@@ -45,6 +50,10 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CcnxForwardingStrategy")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
+
+    .AddTraceSource ("OutInterests", "Interests that were transmitted",
+                    MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_transmittedInterestsTrace))
+
     ;
   return tid;
 }
@@ -69,7 +78,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                                                    Ptr<CcnxInterestHeader> &header,
                                                    const Ptr<const Packet> &packet)
 {
-  // NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
   int propagatedCount = 0;
   
@@ -88,6 +97,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
       if (outgoing != pitEntry.m_outgoing.end () &&
           outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
         {
+          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry.m_maxRetxCount);
           continue;
         }
       
@@ -102,6 +112,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
       metricFace.m_face->Send (packet->Copy ());
+      m_transmittedInterestsTrace (header, metricFace.m_face);
       
       propagatedCount++;
       break; // propagate only one interest
@@ -116,6 +127,5 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
   //   }
   return propagatedCount > 0;
 }
-
 
 } //namespace ns3

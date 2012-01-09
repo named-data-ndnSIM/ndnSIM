@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #ifndef CCNX_CONSUMER_H
@@ -25,6 +26,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/ccnx-name-components.h"
 #include "ns3/nstime.h"
+#include "ns3/data-rate.h"
 
 #include <set>
 
@@ -77,6 +79,24 @@ private:
    * \brief Constructs the Interest packet and sends it using a callback to the underlying CCNx protocol
    */
   void
+  ScheduleNextPacket ();
+
+  void
+  UpdateMean ();
+
+  void
+  SetPayloadSize (uint32_t payload);
+
+  uint32_t
+  GetPayloadSize () const;
+
+  void
+  SetDesiredRate (DataRate rate);
+
+  DataRate
+  GetDesiredRate () const;
+  
+  void
   SendPacket ();
 
   /**
@@ -99,12 +119,24 @@ private:
   Time
   GetRetxTimer () const;
   
+  double
+  GetMaxSize () const;
+
+  void
+  SetMaxSize (double size);
+  
 protected:
-  UniformVariable m_rand;       ///< \brief this random variable is used for Nonce generation
-  uint32_t        m_seq;        ///< \brief packet sequence number specific for every application
-  EventId         m_sendEvent;  ///< \brief Eventid of pending "send packet" event
-  Time            m_retxTimer;  ///< \brief Timeout defining how frequent retransmission timeouts should be checked
-  EventId         m_retxEvent;  ///< \brief Event to check whether or not retransmission should be performed
+  UniformVariable m_rand; // nonce generator
+
+  ExponentialVariable m_randExp; // packet inter-arrival time generation (Poisson process)
+  DataRate            m_desiredRate;    // Desired data packet rate
+  uint32_t            m_payloadSize; // expected payload size
+  
+  uint32_t        m_seq;
+  uint32_t        m_seqMax;    // maximum number of sequence number
+  EventId         m_sendEvent; // Eventid of pending "send packet" event
+  Time            m_retxTimer;
+  EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
 
   Time            m_rto;        ///< \brief Retransmission timeout
   Time            m_rttVar;     ///< \brief RTT variance

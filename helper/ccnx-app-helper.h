@@ -18,8 +18,8 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef CCNX_CONSUMER_HELPER_H
-#define CCNX_CONSUMER_HELPER_H
+#ifndef CCNX_APP_HELPER_H
+#define CCNX_APP_HELPER_H
 
 #include "ns3/object-factory.h"
 #include "ns3/attribute.h"
@@ -28,23 +28,29 @@
 #include "ns3/ptr.h"
 
 namespace ns3 
-{    
+{
+
 /**
  * \brief A helper to make it easier to instantiate an ns3::CcnxConsumer Application
  * on a set of nodes.
  */
-    
-class CcnxConsumerHelper
+class CcnxAppHelper
 {        
 public:
 
   /**
-   * \brief Create an CcnxConsumerHelper to make it easier to work with CcnxConsumer Apps
+   * \brief Create an CcnxAppHelper to make it easier to work with CCNx apps
    *
-   * \param prefix Prefix which will be requested by the consumer applications
+   * \param app Class of the application
    */
-  CcnxConsumerHelper (const std::string &prefix);
-        
+  CcnxAppHelper (const std::string &prefix);
+
+  /**
+   * @brief Set the prefix consumer will be requesting
+   */
+  void
+  SetPrefix (const std::string &prefix);
+  
   /**
    * \brief Helper function used to set the underlying application attributes.
    *
@@ -94,7 +100,7 @@ private:
   ObjectFactory m_factory;
 };
 
-}
+} // namespace ns3
 
-#endif
+#endif // CCNX_APP_HELPER_H
 

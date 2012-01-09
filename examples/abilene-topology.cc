@@ -26,10 +26,8 @@
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/animation-interface.h"
-// #include "ns3/ccnx-l3-protocol.h"
 
-#include <iostream>
-#include <sstream>
+#include "../helper/ccnx-trace-helper.h"
 #include "ns3/annotated-topology-reader.h"
 #include "../utils/spring-mobility-helper.h"
 
@@ -40,13 +38,6 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxAbileneTopology");
 
-// int transmittedInterests = 0;
-// int receivedInterests = 0;
-// int droppedInterests = 0;
-
-// int transmittedData = 0;
-// int receivedData = 0;
-// int droppedData = 0;
 
 void PrintTime ()
 {
@@ -55,132 +46,26 @@ void PrintTime ()
   Simulator::Schedule (Seconds (10.0), PrintTime);
 }
 
-void PrintFIBs ()
-{
-  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
-  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
-  for (NodeList::Iterator node = NodeList::Begin ();
-       node != NodeList::End ();
-       node++)
-    {
-      // *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
-
-      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
-      NS_ASSERT_MSG (fib != 0, "Fire alarm");
-      *routingStream->GetStream () << *fib << "\n\n";
-    }
-}
-
-
-struct AggregateTrace
-{
-  AggregateTrace ()
-    : m_transmittedInterests (0)
-    , m_transmittedData (0)
-    , m_receivedInterests (0)
-    , m_receivedNacks (0)
-    , m_receivedData (0)
-  {
-  }
-  
-  void
-  TransmittedInterests (std::string context,
-                        Ptr<const CcnxInterestHeader>, Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_transmittedInterests++;
-  }
-
-  void
-  TransmittedData (std::string context,
-                   Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                   Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_transmittedData++;
-  }
-
-  void
-  ReceivedInterests (std::string context,
-                     Ptr<const CcnxInterestHeader>,
-                     Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedInterests++;
-  }
-
-  void
-  ReceivedNacks (std::string context,
-                 Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedNacks++;
-  }
-  
-  void
-  ReceivedData (std::string context,
-                Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                Ptr<CcnxApp>, Ptr<CcnxFace>)
-  {
-    m_receivedData++;
-  }
-
-  uint64_t m_transmittedInterests;
-  uint64_t m_transmittedData;
-  uint64_t m_receivedInterests;
-  uint64_t m_receivedNacks;
-  uint64_t m_receivedData;
-};
-
-ostream&
-operator << (ostream &os, const AggregateTrace &trace)
-{
-  os << ">> (i): " << trace.m_transmittedInterests << "\n";
-  os << ">> (d): " << trace.m_transmittedData << "\n";
-  os << "<< (i): " << trace.m_receivedInterests << "\n";
-  os << "<< (d): " << trace.m_receivedData << "\n";
-  os << "<< (n): " << trace.m_receivedNacks << "\n";
-  return os;
-}
-
-// static void OnTransmittedInterest (std::string context, Ptr<const CcnxInterestHeader> header, 
-//                                    Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
+// void PrintFIBs ()
 // {
-//   transmittedInterests++;
+//   NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
+//   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
+//   for (NodeList::Iterator node = NodeList::Begin ();
+//        node != NodeList::End ();
+//        node++)
+//     {
+//       // *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
+
+//       Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
+//       NS_ASSERT_MSG (fib != 0, "Fire alarm");
+//       *routingStream->GetStream () << *fib << "\n\n";
+//     }
 // }
 
-// static void OnReceivedInterest (std::string context, Ptr<const CcnxInterestHeader> header, 
-//                                 Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//   receivedInterests++;
-// }
-
-// static void OnDroppedInterest (std::string context, Ptr<const CcnxInterestHeader> header, CcnxL3Protocol::DropReason reason,
-//                                Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//   droppedInterests++;
-// }
-
-// static void OnTransmittedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                                CcnxL3Protocol::ContentObjectSource source, Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//     transmittedData++;    
-// }
-
-// static void OnReceivedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                             Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face)
-// {
-//     receivedData++;
-// }
-
-// static void OnDroppedData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
-//                            CcnxL3Protocol::DropReason reason, Ptr<Ccnx> ccnx, Ptr<const CcnxFace> face )
-// {
-//     droppedData++;
-// }
 
 int 
 main (int argc, char *argv[])
 {
-  // Packet::EnableChecking();
-  // Packet::EnablePrinting();
   string input ("./src/NDNabstraction/examples/abilene-topology.txt");
 
   Time finishTime = Seconds (20.0);
@@ -199,8 +84,8 @@ main (int argc, char *argv[])
   // -- Read topology data.
   // --------------------------------------------
     
-  AnnotatedTopologyReader reader ("/abilene");
-  reader.SetMobilityModel ("ns3::SpringMobilityModel");
+  AnnotatedTopologyReader reader ("/abilene", 2.0);
+  // reader.SetMobilityModel ("ns3::SpringMobilityModel");
   reader.SetFileName (input);
     
   NodeContainer nodes = reader.Read ();
@@ -211,7 +96,7 @@ main (int argc, char *argv[])
       return -1;
     }
 
-  SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
+  // SpringMobilityHelper::InstallSprings (reader.LinksBegin (), reader.LinksEnd ());
 
   // InternetStackHelper stack;
   // Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
@@ -232,11 +117,15 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper consumerHelper ("/5");
-  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "ATLAng"));
-    
-  // CcnxProducerHelper producerHelper ("/5",1024);
-  // ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "IPLSng"));
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  consumerHelper.SetPrefix ("/Data");
+  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
+  ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "SNVAng"));
+  
+  CcnxAppHelper producerHelper ("ns3::CcnxProducer");
+  producerHelper.SetPrefix ("/Data");
+
+  ApplicationContainer producers = producerHelper.Install (Names::Find<Node> ("/abilene", "NYCMng"));
 
   // // Populate FIB based on IPv4 global routing controller
   // ccnxHelper.InstallFakeGlobalRoutes ();
@@ -245,7 +134,7 @@ main (int argc, char *argv[])
   // Simulator::Schedule (Seconds (1.0), PrintFIBs);
   // PrintFIBs ();
 
-  // Simulator::Schedule (Seconds (10.0), PrintTime);
+  Simulator::Schedule (Seconds (10.0), PrintTime);
 
   Simulator::Stop (finishTime);
 
@@ -256,36 +145,12 @@ main (int argc, char *argv[])
       anim->SetMobilityPollInterval (Seconds (1));
     }
 
-  // NS_LOG_INFO ("Configure Tracing.");
-  AggregateTrace trace;
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/TransmittedInterests",
-                   MakeCallback (&AggregateTrace::TransmittedInterests, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedNacks",
-                   MakeCallback (&AggregateTrace::ReceivedNacks, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/ReceivedInterests",
-                   MakeCallback (&AggregateTrace::ReceivedInterests, &trace));
-  
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxProducer/TransmittedContentObjects",
-                   MakeCallback (&AggregateTrace::TransmittedData, &trace));
-
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::CcnxConsumer/ReceivedContentObjects",
-                   MakeCallback (&AggregateTrace::ReceivedData, &trace));
-
-  // Config::Connect("/NodeList/*/ns3::CcnxL3Protocol/TransmittedInterestTrace",
-  //                                MakeCallback (&OnTransmittedInterest));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/ReceivedInterestTrace",
-  //                    MakeCallback (&OnReceivedInterest));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/DroppedInterestTrace",
-  //                    MakeCallback (&OnDroppedInterest));
-    
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/ReceivedDataTrace",
-  //                    MakeCallback (&OnReceivedData));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/TransmittedDataTrace",
-  //                    MakeCallback (&OnTransmittedData));
-  // Config::Connect ("/NodeList/*/ns3::CcnxL3Protocol/DroppedDataTrace",
-  //                    MakeCallback (&OnDroppedData));
+  CcnxTraceHelper traceHelper;
+  traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
+  traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
+  traceHelper.EnableAggregateL3All ();
+  traceHelper.SetL3TraceFile ("trace-l3.log");
+  traceHelper.SetAppTraceFile ("trace-app.log");
   
   config.ConfigureAttributes ();  
   
@@ -294,12 +159,5 @@ main (int argc, char *argv[])
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 
-  // NS_LOG_INFO("Total received interests = " << receivedInterests);
-  // NS_LOG_INFO("Total transmitted interests = " << transmittedInterests);
-  // NS_LOG_INFO("Total dropped interests = " << droppedInterests);
-  // NS_LOG_INFO("Total received data = " << receivedData);
-  // NS_LOG_INFO("Total transmitted data = " << transmittedData);
-  // NS_LOG_INFO("Total dropped data = " << droppedData);
-  NS_LOG_INFO (trace);
   return 0;
 }

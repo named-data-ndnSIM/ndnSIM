@@ -140,6 +140,7 @@ CcnxPitEntry::AreTherePromisingOutgoingFacesExcept (Ptr<CcnxFace> face) const
 void
 CcnxPitEntry::IncreaseAllowedRetxCount ()
 {
+  NS_LOG_ERROR (this);
   m_maxRetxCount++;
 }
 

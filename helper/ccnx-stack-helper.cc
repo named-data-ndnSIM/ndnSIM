@@ -159,9 +159,9 @@ CcnxStackHelper::EnableLimits (bool enable/* = true*/, Time avgRtt/*=Seconds(0.1
 {
   NS_LOG_INFO ("EnableLimits: " << enable);
   m_limitsEnabled = enable;
+  m_avgRtt = avgRtt;
   m_avgContentObjectSize = avgContentObject;
   m_avgInterestSize = avgInterest;
-  m_avgRtt = avgRtt;
 }
 
 Ptr<CcnxFaceContainer>
@@ -200,8 +200,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
-  ccnx->SetForwardingStrategy
-    (DynamicCast<CcnxForwardingStrategy> (m_strategyFactory.Create<Object> ()));
+  ccnx->SetForwardingStrategy (m_strategyFactory.Create<CcnxForwardingStrategy> ());
   
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
@@ -239,7 +238,8 @@ CcnxStackHelper::Install (Ptr<Node> node) const
           NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
           double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / m_avgContentObjectSize;
-          NS_LOG_INFO ("BucketMax: " << maxInterestPackets);
+          NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
+          NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
 
           // Set bucket max to BDP
           face->SetBucketMax (m_avgRtt.ToDouble (Time::S) * maxInterestPackets); // number of interests allowed
@@ -559,7 +559,7 @@ CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t fa
 // }
 
 void
-CcnxStackHelper::InstallFakeGlobalRoutes ()
+CcnxStackHelper::InstallFakeGlobalRoutesImpl ()
 {
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
@@ -584,7 +584,12 @@ CcnxStackHelper::InstallFakeGlobalRoutes ()
 
       globalRouter->InjectRoute (Ipv4Address((*node)->GetId ()), Ipv4Mask("255.255.255.255"));
     }
+}
 
+void
+CcnxStackHelper::InstallFakeGlobalRoutes ()
+{
+  InstallFakeGlobalRoutesImpl ();
   Ipv4GlobalRoutingHelper::PopulateAllPossibleRoutingTables ();
 }
 

@@ -178,16 +178,12 @@ public:
   SetBucketLeak (double leak);
   
   /**
-   * @brief Leak the Interest allowance bucket by (1/interval) * m_bucketMax amount
-   *
-   * @param interval Time interval with which the bucket is leaked
+   * @brief Leak the Interest allowance bucket by (1/interval) * m_bucketMax amount,
+   * where interval is time between two consecutive calls of LeakBucket
    */
   void
-  LeakBucket (const Time &interval);
+  LeakBucket ();
 
-  void
-  LeakBucketByOnePacket ();
-  
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
    *
@@ -228,7 +224,8 @@ protected:
 private:
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
-  uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)  
+  uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
+  Time m_lastLeakTime; 
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);

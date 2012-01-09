@@ -48,19 +48,22 @@ def build(bld):
     module.source = bld.path.ant_glob(['model/*.cc', 'apps/*.cc', 
                                        'utils/*.cc',
                                        'helper/*.cc',
+                                       'helper/tracers/*.cc',
                                        'helper/ccnb-parser/*.cc',
                                        'helper/ccnb-parser/visitors/*.cc',
                                        'helper/ccnb-parser/syntax-tree/*.cc'])
 
     headers.source = [
         "helper/ccnx-stack-helper.h",
-        "helper/ccnx-producer-helper.h",
-        "helper/ccnx-consumer-helper.h",
+        "helper/ccnx-app-helper.h",
         "helper/ccnx-header-helper.h",
+        "helper/ccnx-trace-helper.h",
+        "helper/tracers/ipv4-app-tracer.h",
+        "helper/tracers/ccnx-app-tracer.h",
+        "helper/tracers/ccnx-l3-tracer.h",
+        "helper/ccnx-face-container.h",
 
         "apps/ccnx-app.h",
-        # "apps/ccnx-consumer.h",
-        # "apps/ccnx-producer.h",
 
         "model/hash-helper.h",
         "model/ccnx.h",
@@ -70,18 +73,13 @@ def build(bld):
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
         "model/ccnx-fib.h",
-        
-        "helper/ccnx-face-container.h",
+
+        "utils/spring-mobility-model.h",
+        "utils/spring-mobility-helper.h",
+
         "model/rocketfuel-weights-reader.h",
         "model/annotated-topology-reader.h",
         ]
-    # headers.source = bld.path.ant_glob(['model/*.h', 'apps/*.h', 
-    #                       'helper/*.h',
-    #                       'helper/ccnb-parser/*.h',
-    #                       'helper/ccnb-parser/visitors/*.h',
-    #                       'helper/ccnb-parser/syntax-tree/*.h'])
-
-    # headers.source = [x.path_from(bld.path) for x in headers.source]
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
@@ -94,9 +92,6 @@ def build(bld):
         
         obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/ccnx-grid.cc'
-
-        obj = bld.create_ns3_program('syntactic-topology', ['NDNabstraction', 'point-to-point-layout'])
-        obj.source = 'examples/syntactic-topology-ndnabstraction.cc'
 
         obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction', 'point-to-point-layout'])
         obj.source = 'examples/annotated-topology-read-example.cc'
@@ -116,6 +111,12 @@ def build(bld):
         obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
         obj.source = 'examples/synthetic-topology.cc'
 
+        obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
+        obj.source = 'examples/congestion-pop.cc'
+
+        obj = bld.create_ns3_program('congestion-tcp-pop', ['NDNabstraction'])
+        obj.source = 'examples/congestion-tcp-pop.cc'
+
         #obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
         #obj.source = 'examples/congestion-pop.cc'
         
@@ -130,23 +131,5 @@ def build(bld):
 
         #obj = bld.create_ns3_program('blackhole-abilene', ['NDNabstraction'])
         #obj.source = 'examples/blackhole-abilene.cc'
-
-    #     for path in ["examples"]:
-    #         anode = bld.path.find_dir (path)
-    #         if not anode or not anode.is_child_of(bld.srcnode):
-    #             raise Utils.WscriptError("Unable to use '%s' - either because \
-    #             it's not a relative path"", or it's not child of \
-    #            '%s'."%(name,bld.srcnode))
-    #         bld.rescan(anode)
-    #         for filename in bld.cache_dir_contents[anode.id]:
-    #             if filename.startswith('.') or not filename.endswith(".cc"):
-    #                 continue
-    #             name = filename[:-len(".cc")]
-    #             obj = bld.create_ns3_program(name, ['NDNabstraction'])
-    #             obj.path = obj.path.find_dir (path)
-    #             obj.source = filename
-    #             obj.target = name
-    #             obj.name = obj.target
-    #             obj.uselib = 'BOOST BOOST_IOSTREAMS'
 
     bld.ns3_python_bindings()

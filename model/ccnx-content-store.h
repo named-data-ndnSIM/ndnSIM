@@ -174,7 +174,7 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader> >
+  boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> >
   Lookup (Ptr<const CcnxInterestHeader> interest);
             
   /**
@@ -215,22 +215,6 @@ public:
    * Release build dumps everything in MRU order
    */
   void Print () const;
-            
-protected:
-  // /**
-  //  * \brief Move the given CS entry to the head of the list
-  //  *
-  //  * \param entry Content Store entry
-  //  */
-  // void Promote( CsEntry &entry );
-
-  /**
-   * \todo Alex: DoDispose and NotifyNewAggregate are seem to be very
-   * important, but I'm not yet sure what exactly they are supposed to
-   * do
-   */
-  // virtual void DoDispose ();
-  // virtual void NotifyNewAggregate ();
 
 private:
   CcnxContentStore (const CcnxContentStore &o); ///< Disabled copy constructor
@@ -244,7 +228,7 @@ private:
    * \brief Content store implemented as a Boost.MultiIndex container
    * \internal
    */
-    CcnxContentStoreContainer::type m_contentStore;
+  CcnxContentStoreContainer::type m_contentStore;
 };
 
 inline std::ostream&

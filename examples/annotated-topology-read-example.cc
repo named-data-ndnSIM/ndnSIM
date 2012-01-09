@@ -93,15 +93,19 @@ int main (int argc, char *argv[])
   Ptr<CcnxFaceContainer> cf = ccnx.Install (nodes);
      
   NS_LOG_INFO ("Installing Applications");
-  CcnxConsumerHelper helper ("/3");
-  ApplicationContainer app = helper.Install (nodes.Get(1));
+  CcnxAppHelper helper ("ns3::CcnxConsumer");
+  helper.SetPrefix ("/3");
+  ApplicationContainer app = helper.Install ("1");
   app.Start (Seconds (1.0));
   app.Stop (Seconds (1000.05));
-    
-  CcnxProducerHelper helper3 ("/3",120);
-  ApplicationContainer app3 = helper3.Install(nodes.Get(6));
-  app3.Start(Seconds(0.0));
-  app3.Stop(Seconds(1500.0));
+
+  CcnxAppHelper helper2 ("ns3::CcnxProducer");
+  helper2.SetPrefix ("/3");
+  helper2.SetAttribute ("PayloadSize", StringValue("1024"));
+  ApplicationContainer app2 = helper2.Install("3");
+
+  app2.Start(Seconds(0.0));
+  app2.Stop(Seconds(1500.0));
     
   // ------------------------------------------------------------
   // -- Run the simulation

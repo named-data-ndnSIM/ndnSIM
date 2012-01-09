@@ -27,6 +27,7 @@
 #include "ns3/assert.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
+#include "ns3/simulator.h"
 
 #include <boost/ref.hpp>
 
@@ -72,6 +73,7 @@ CcnxFace::CcnxFace (Ptr<Node> node)
   , m_protocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
+  , m_lastLeakTime (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -109,10 +111,12 @@ CcnxFace::IsBelowLimit ()
   
   if (!IsUp ())
     return false;
+
+  LeakBucket ();
   
   if (m_bucketMax > 0)
     {
-      //NS_LOG_DEBUG ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
+      NS_LOG_DEBUG ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
       if (m_bucket+1.0 > m_bucketMax)
         {
           //NS_LOG_DEBUG ("Returning false");
@@ -155,10 +159,21 @@ CcnxFace::Receive (const Ptr<const Packet> &packet)
 }
 
 void
-CcnxFace::LeakBucket (const Time &interval)
+CcnxFace::LeakBucket ()
 {
+  if (m_lastLeakTime.IsZero ())
+    {
+      m_lastLeakTime = Simulator::Now ();
+      return;
+    }
+
+  Time interval = Simulator::Now () - m_lastLeakTime;
   const double leak = m_bucketLeak * interval.ToDouble (Time::S);
-  m_bucket = std::max (0.0, m_bucket - leak);
+  if (leak >= 1.0)
+    {
+      m_bucket = std::max (0.0, m_bucket - leak);
+      m_lastLeakTime = Simulator::Now ();
+    }
 
   // NS_LOG_DEBUG ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
 }
@@ -175,12 +190,6 @@ CcnxFace::SetBucketLeak (double leak)
 {
   NS_LOG_FUNCTION (this << leak);
   m_bucketLeak = leak;
-}
-
-void
-CcnxFace::LeakBucketByOnePacket ()
-{
-  m_bucket = std::max (0.0, m_bucket-1.0); 
 }
 
 // void
@@ -202,6 +211,7 @@ CcnxFace::LeakBucketByOnePacket ()
  * NetDevice states, such as found in real implementations
  * (where the device may be down but face state is still up).
  */
+
 bool 
 CcnxFace::IsUp (void) const
 {

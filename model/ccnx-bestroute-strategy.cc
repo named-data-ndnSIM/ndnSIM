@@ -19,7 +19,10 @@
  */
 
 #include "ccnx-bestroute-strategy.h"
+
 #include "ccnx-interest-header.h"
+#include "ccnx-pit.h"
+#include "ccnx-pit-entry.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -83,6 +86,7 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       if (outgoing != pitEntry.m_outgoing.end () &&
           outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
         {
+          NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry.m_maxRetxCount);
           continue; // already forwarded before during this retransmission cycle
         }
 
@@ -96,6 +100,7 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
       metricFace.m_face->Send (packet->Copy ());
+      m_transmittedInterestsTrace (header, metricFace.m_face);
       
       propagatedCount++;
       break; // do only once
