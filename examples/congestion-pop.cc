@@ -144,7 +144,7 @@ public:
         Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (node1_num));
         Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (node2_num));
 
-        CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+        CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
         consumerHelper.SetPrefix ("/" + lexical_cast<string> (node2->GetId ()));
         consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
         consumerHelper.SetAttribute ("Size", StringValue ("1.983642578125")); //to make sure max seq # is 2000

@@ -66,6 +66,11 @@ public:
   OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                    const Ptr<const Packet> &payload);
 
+
+  // Simulator::Schedule doesn't work with protected members???
+  void
+  SendPacket ();
+  
 protected:
   // from CcnxApp
   virtual void
@@ -74,31 +79,12 @@ protected:
   virtual void
   StopApplication ();
   
-private:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying CCNx protocol
    */
-  void
-  ScheduleNextPacket ();
-
-  void
-  UpdateMean ();
-
-  void
-  SetPayloadSize (uint32_t payload);
-
-  uint32_t
-  GetPayloadSize () const;
-
-  void
-  SetDesiredRate (DataRate rate);
-
-  DataRate
-  GetDesiredRate () const;
+  virtual void
+  ScheduleNextPacket () = 0;
   
-  void
-  SendPacket ();
-
   /**
    * \brief Checks if the packet need to be retransmitted becuase of retransmission timer expiration
    */
@@ -119,6 +105,12 @@ private:
   Time
   GetRetxTimer () const;
   
+  virtual void
+  SetPayloadSize (uint32_t payload);
+
+  uint32_t
+  GetPayloadSize () const;
+
   double
   GetMaxSize () const;
 
@@ -127,11 +119,8 @@ private:
   
 protected:
   UniformVariable m_rand; // nonce generator
-
-  ExponentialVariable m_randExp; // packet inter-arrival time generation (Poisson process)
-  DataRate            m_desiredRate;    // Desired data packet rate
   uint32_t            m_payloadSize; // expected payload size
-  
+
   uint32_t        m_seq;
   uint32_t        m_seqMax;    // maximum number of sequence number
   EventId         m_sendEvent; // Eventid of pending "send packet" event

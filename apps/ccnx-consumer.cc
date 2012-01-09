@@ -53,27 +53,19 @@ CcnxConsumer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumer")
     .SetParent<CcnxApp> ()
-    .AddConstructor<CcnxConsumer> ()
     .AddAttribute ("StartSeq", "Initial sequence number",
                    IntegerValue (0),
                    MakeIntegerAccessor(&CcnxConsumer::m_seq),
                    MakeIntegerChecker<int32_t>())
 
-    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
-                   DoubleValue (-1), // don't impose limit by default
-                   MakeDoubleAccessor (&CcnxConsumer::GetMaxSize, &CcnxConsumer::SetMaxSize),
-                   MakeDoubleChecker<double> ())
-
-    ///////
     .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
                    UintegerValue (1040),
                    MakeUintegerAccessor (&CcnxConsumer::GetPayloadSize, &CcnxConsumer::SetPayloadSize),
                    MakeUintegerChecker<uint32_t>())
-    .AddAttribute ("MeanRate", "Mean data packet rate (relies on the PayloadSize parameter)",
-                   StringValue ("100Kbps"),
-                   MakeDataRateAccessor (&CcnxConsumer::GetDesiredRate, &CcnxConsumer::SetDesiredRate),
-                   MakeDataRateChecker ())
-    ///////
+    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
+                   DoubleValue (-1), // don't impose limit by default
+                   MakeDoubleAccessor (&CcnxConsumer::GetMaxSize, &CcnxConsumer::SetMaxSize),
+                   MakeDoubleChecker<double> ())
 
     .AddAttribute ("Prefix","CcnxName of the Interest",
                    StringValue ("/"),
@@ -120,13 +112,10 @@ CcnxConsumer::GetTypeId (void)
     
 CcnxConsumer::CcnxConsumer ()
   : m_rand (0, std::numeric_limits<uint32_t>::max ())
-  , m_desiredRate ("10Kbps")
   , m_payloadSize (1040)
   , m_seq (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
-
-  UpdateMean (); // not necessary (will be called by ns3 object system anyways), but doesn't hurt
 }
 
 void
@@ -177,20 +166,6 @@ CcnxConsumer::CheckRetxTimeout ()
                                      &CcnxConsumer::CheckRetxTimeout, this); 
 }
 
-void
-CcnxConsumer::UpdateMean ()
-{
-  double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
-  m_randExp = ExponentialVariable (mean, 10000 * mean); // set upper limit to inter-arrival time
-}
-
-void
-CcnxConsumer::SetPayloadSize (uint32_t payload)
-{
-  m_payloadSize = payload;
-  UpdateMean ();
-}
-
 uint32_t
 CcnxConsumer::GetPayloadSize () const
 {
@@ -198,16 +173,9 @@ CcnxConsumer::GetPayloadSize () const
 }
 
 void
-CcnxConsumer::SetDesiredRate (DataRate rate)
+CcnxConsumer::SetPayloadSize (uint32_t payload)
 {
-  m_desiredRate = rate;
-  UpdateMean ();
-}
-
-DataRate
-CcnxConsumer::GetDesiredRate () const
-{
-  return m_desiredRate;
+  m_payloadSize = payload;
 }
 
 double
@@ -230,16 +198,6 @@ CcnxConsumer::SetMaxSize (double size)
 
   m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
   NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
-}
-
-
-void
-CcnxConsumer::ScheduleNextPacket ()
-{
-  if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (
-                                       Seconds(m_randExp.GetValue ()),
-                                       &CcnxConsumer::SendPacket, this);
 }
 
 // Application Methods
