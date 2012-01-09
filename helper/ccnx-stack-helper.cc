@@ -155,7 +155,10 @@ CcnxStackHelper::SetDefaultRoutes (bool needSet)
 }
 
 void
-CcnxStackHelper::EnableLimits (bool enable/* = true*/, Time avgRtt/*=Seconds(0.1)*/, uint32_t avgContentObject/*=1100*/, uint32_t avgInterest/*=40*/)
+CcnxStackHelper::EnableLimits (bool enable/* = true*/,
+                               Time avgRtt/*=Seconds(0.1)*/,
+                               uint32_t avgContentObject/*=1100*/,
+                               uint32_t avgInterest/*=40*/)
 {
   NS_LOG_INFO ("EnableLimits: " << enable);
   m_limitsEnabled = enable;
@@ -237,7 +240,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
           
           NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
-          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / m_avgContentObjectSize;
+          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
           NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
           NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
 
