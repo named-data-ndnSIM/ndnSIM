@@ -116,6 +116,21 @@ def build(bld):
         obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
         obj.source = 'examples/synthetic-topology.cc'
 
+        #obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
+        #obj.source = 'examples/congestion-pop.cc'
+        
+        obj = bld.create_ns3_program('link-failure-sprint', ['NDNabstraction'])
+        obj.source = 'examples/link-failure-sprint.cc'
+        
+        #obj = bld.create_ns3_program('link-failure-abilene', ['NDNabstraction'])
+        #obj.source = 'examples/link-failure-abilene.cc'
+
+        #obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
+        #obj.source = 'examples/blackhole-sprint.cc'
+
+        #obj = bld.create_ns3_program('blackhole-abilene', ['NDNabstraction'])
+        #obj.source = 'examples/blackhole-abilene.cc'
+
     #     for path in ["examples"]:
     #         anode = bld.path.find_dir (path)
     #         if not anode or not anode.is_child_of(bld.srcnode):
