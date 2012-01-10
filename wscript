@@ -120,8 +120,8 @@ def build(bld):
         #obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
         #obj.source = 'examples/congestion-pop.cc'
         
-        obj = bld.create_ns3_program('link-failure-sprint', ['NDNabstraction'])
-        obj.source = 'examples/link-failure-sprint.cc'
+        #obj = bld.create_ns3_program('link-failure-sprint', ['NDNabstraction'])
+        #obj.source = 'examples/link-failure-sprint.cc'
         
         #obj = bld.create_ns3_program('link-failure-abilene', ['NDNabstraction'])
         #obj.source = 'examples/link-failure-abilene.cc'
