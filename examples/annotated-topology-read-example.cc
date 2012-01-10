@@ -93,7 +93,7 @@ int main (int argc, char *argv[])
   Ptr<CcnxFaceContainer> cf = ccnx.Install (nodes);
      
   NS_LOG_INFO ("Installing Applications");
-  CcnxAppHelper helper ("ns3::CcnxConsumer");
+  CcnxAppHelper helper ("ns3::CcnxConsumerCbr");
   helper.SetPrefix ("/3");
   ApplicationContainer app = helper.Install ("1");
   app.Start (Seconds (1.0));

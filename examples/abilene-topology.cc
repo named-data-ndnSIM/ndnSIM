@@ -117,7 +117,7 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix ("/Data");
   consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
   ApplicationContainer consumers = consumerHelper.Install (Names::Find<Node> ("/abilene", "SNVAng"));
@@ -146,7 +146,7 @@ main (int argc, char *argv[])
     }
 
   CcnxTraceHelper traceHelper;
-  traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
+  traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumerCbr");
   traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
   traceHelper.EnableAggregateL3All ();
   traceHelper.SetL3TraceFile ("trace-l3.log");

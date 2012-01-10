@@ -84,23 +84,14 @@ def build(bld):
     tests.source = bld.path.ant_glob('test/*.cc');
 
     if True or bld.env['ENABLE_EXAMPLES']:
-        obj = bld.create_ns3_program('ccnx-test', ['NDNabstraction', 'internet'])
-        obj.source = 'examples/ccnx-test.cc'
-        
-        obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction', 'point-to-point-layout'])
+        obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction'])
         obj.source = 'examples/ccnx-routing-simple.cc'
         
-        obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'point-to-point-layout'])
+        obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction'])
         obj.source = 'examples/ccnx-grid.cc'
 
-        obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction', 'point-to-point-layout'])
+        obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction'])
         obj.source = 'examples/annotated-topology-read-example.cc'
-
-        obj = bld.create_ns3_program('interest-header-example', ['NDNabstraction'])
-        obj.source = 'examples/interest-header-example.cc'
-
-        obj = bld.create_ns3_program('packet-sizes', ['NDNabstraction'])
-        obj.source = 'examples/packet-sizes.cc'
 
         obj = bld.create_ns3_program('ccnx-sprint-topology', ['NDNabstraction'])
         obj.source = 'examples/sprint-topology.cc'
@@ -116,14 +107,8 @@ def build(bld):
 
         #obj = bld.create_ns3_program('link-failure-sprint', ['NDNabstraction'])
         #obj.source = 'examples/link-failure-sprint.cc'
-        
-        #obj = bld.create_ns3_program('link-failure-abilene', ['NDNabstraction'])
-        #obj.source = 'examples/link-failure-abilene.cc'
 
         #obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
         #obj.source = 'examples/blackhole-sprint.cc'
-
-        #obj = bld.create_ns3_program('blackhole-abilene', ['NDNabstraction'])
-        #obj.source = 'examples/blackhole-abilene.cc'
 
     bld.ns3_python_bindings()

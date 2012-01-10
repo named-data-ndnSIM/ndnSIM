@@ -89,7 +89,7 @@ main (int argc, char *argv[])
   ccnxHelper.InstallAll ();
     
   NS_LOG_INFO ("Installing Applications");
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
 
   consumerHelper.SetPrefix ("/6");
   consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
@@ -142,13 +142,13 @@ main (int argc, char *argv[])
   Simulator::Stop (finishTime);
 
   CcnxTraceHelper traceHelper;
-  // traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
+  // traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumerCbr");
   // traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
   // traceHelper.EnableAggregateL3All ();
   // traceHelper.SetL3TraceFile ("trace-l3.log");
   // traceHelper.SetAppTraceFile ("trace-app.log");
   // traceHelper.EnableRateL3All ("rate-trace.log");
-  traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", "consumers-seqs.log");
+  traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", "consumers-seqs.log");
 
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();

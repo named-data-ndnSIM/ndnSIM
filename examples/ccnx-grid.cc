@@ -115,7 +115,7 @@ main (int argc, char *argv[])
   std::ostringstream prefix;
   prefix << "/" << producer->GetId ();
   
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix (prefix.str ());
   consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
