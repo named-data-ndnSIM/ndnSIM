@@ -144,9 +144,9 @@ public:
         Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (node1_num));
         Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (node2_num));
 
-        CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+        CcnxAppHelper consumerHelper ("ns3::CcnxConsumerWindow");
         consumerHelper.SetPrefix ("/" + lexical_cast<string> (node2->GetId ()));
-        consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
+        // consumerHelper.SetAttribute ("MeanRate", StringValue ("2Mbps"));
         consumerHelper.SetAttribute ("Size", StringValue ("1.983642578125")); //to make sure max seq # is 2000
 
         CcnxAppHelper producerHelper ("ns3::CcnxProducer");
@@ -169,7 +169,7 @@ public:
   {
     cout << "Run Simulation.\n";
     Simulator::Stop (finishTime);
-    // Simulator::Schedule (Seconds (1.0), PrintTime);
+    Simulator::Schedule (Seconds (1.0), PrintTime);
     Simulator::Run ();
     Simulator::Destroy ();
     cout << "Done.\n";
@@ -186,7 +186,7 @@ main (int argc, char *argv[])
   cout << "Begin congestion-pop scenario\n";
   
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
-  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
+  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("60"));
 
   uint32_t maxRuns = 1;
   uint32_t startRun = 0;
@@ -212,6 +212,9 @@ main (int argc, char *argv[])
       ofstream of_nodes ((prefix + "apps.log").c_str ());
       for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
         {
+          apps.Get (i*2)->SetStartTime (Seconds (i));
+          apps.Get (i*2 + 1)->SetStartTime (Seconds (i));
+          
           of_nodes << "From " << apps.Get (i*2)->GetNode ()->GetId ()
                    << " to "  << apps.Get (i*2 + 1)->GetNode ()->GetId ();
           of_nodes << "\n";
@@ -220,7 +223,8 @@ main (int argc, char *argv[])
 
       CcnxTraceHelper traceHelper;
       traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", prefix + "consumers-seqs.log");
+      // traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", prefix + "consumers-seqs.log");
+      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerWindow", prefix + "consumers-seqs.log");
 
       experiment.Run (Seconds (200.0));
     }

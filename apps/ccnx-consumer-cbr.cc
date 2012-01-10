@@ -34,13 +34,6 @@
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
 
-#include <boost/ref.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-
-namespace ll = boost::lambda;
-
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumerCbr");
 
 namespace ns3
@@ -77,7 +70,7 @@ void
 CcnxConsumerCbr::UpdateMean ()
 {
   double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
-  m_randExp = ExponentialVariable (mean, 10000 * mean); // set upper limit to inter-arrival time
+  m_randExp = ExponentialVariable (mean, 100 * mean); // set upper limit to inter-arrival time
 }
 
 void
@@ -104,9 +97,12 @@ CcnxConsumerCbr::GetDesiredRate () const
 void
 CcnxConsumerCbr::ScheduleNextPacket ()
 {
+  // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
+
   if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (
                                        Seconds(m_randExp.GetValue ()),
+                                       // Seconds(mean),
                                        &CcnxConsumer::SendPacket, this);
 }
 

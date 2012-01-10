@@ -92,11 +92,6 @@ CcnxConsumer::GetTypeId (void)
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_exclude),
                    MakeCcnxNameComponentsChecker ())
 
-    .AddAttribute ("RTO",
-                   "Initial retransmission timeout",
-                   StringValue ("1s"),
-                   MakeTimeAccessor (&CcnxConsumer::m_rto),
-                   MakeTimeChecker ())
     .AddAttribute ("RetxTimer",
                    "Timeout defining how frequent retransmission timeouts should be checked",
                    StringValue ("1s"),
@@ -116,6 +111,8 @@ CcnxConsumer::CcnxConsumer ()
   , m_seq (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
+  
+  m_rtt = CreateObject<RttMeanDeviation> (); 
 }
 
 void
@@ -143,25 +140,21 @@ CcnxConsumer::CheckRetxTimeout ()
 
   boost::mutex::scoped_lock (m_seqTimeoutsGuard);
 
+  Time rto = m_rtt->RetransmitTimeout ();
+  
   while (!m_seqTimeouts.empty ())
     {
       SeqTimeoutsContainer::index<i_timestamp>::type::iterator entry =
         m_seqTimeouts.get<i_timestamp> ().begin ();
-      if (entry->time + m_rto <= now) // timeout expired?
+      if (entry->time + rto <= now) // timeout expired?
         {
-          m_retxSeqs.insert (entry->seq);
-          m_seqTimeouts.get<i_timestamp> ().modify (entry,
-                                                    ll::bind(&SeqTimeout::time, ll::_1) = now);
+          m_seqTimeouts.get<i_timestamp> ().erase (entry);
+          OnTimeout (entry->seq);
         }
       else
         break; // nothing else to do. All later packets need not be retransmitted
     }
 
-  if (m_retxSeqs.size () > 0)
-    {
-      ScheduleNextPacket ();
-    }
-  
   m_retxEvent = Simulator::Schedule (m_retxTimer,
                                      &CcnxConsumer::CheckRetxTimeout, this); 
 }
@@ -237,6 +230,12 @@ CcnxConsumer::SendPacket ()
   
   if (m_retxSeqs.size () != 0)
     {
+      // for (RetxSeqsContainer::const_iterator i=m_retxSeqs.begin (); i!=m_retxSeqs.end (); i++)
+      //   {
+      //     std::cout << *i << " ";
+      //   }
+      // std::cout << "\n";
+      
       seq = *m_retxSeqs.begin ();
       NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
       m_retxSeqs.erase (m_retxSeqs.begin ());
@@ -254,6 +253,8 @@ CcnxConsumer::SendPacket ()
       
       seq = m_seq++;
     }
+
+  // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
   
   //
   Ptr<CcnxNameComponents> nameWithSequence = Create<CcnxNameComponents> (m_interestName);
@@ -282,15 +283,10 @@ CcnxConsumer::SendPacket ()
 
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
   
-  std::pair<SeqTimeoutsContainer::iterator, bool>
-    res = m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
-  
-  if (!res.second)
-    m_seqTimeouts.modify (res.first,
-                          ll::bind(&SeqTimeout::time, ll::_1) = Simulator::Now ());
-  
+  m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
   m_transmittedInterests (&interestHeader, this, m_face);
 
+  m_rtt->SentSeq (SequenceNumber32 (seq), 1);
   ScheduleNextPacket ();
 }
 
@@ -326,6 +322,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 
   m_seqTimeouts.erase (seq);
   m_retxSeqs.erase (seq);
+
+  m_rtt->AckSeq (SequenceNumber32 (seq));
 }
 
 void
@@ -343,6 +341,7 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
   uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< NACK for " << seq);
+  // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << "NACK for " << seq << "\n"; 
 
   // put in the queue of interests to be retransmitted
   NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
@@ -350,6 +349,15 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
   NS_LOG_INFO ("After: " << m_retxSeqs.size ());
 
   ScheduleNextPacket ();
+}
+
+void
+CcnxConsumer::OnTimeout (uint32_t sequenceNumber)
+{
+  // std::cout << "TO: " << sequenceNumber << "\n";
+  // m_retxSeqs.insert (sequenceNumber);
+  // std::cout << "Current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
+  ScheduleNextPacket (); 
 }
 
 } // namespace ns3

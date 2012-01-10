@@ -27,6 +27,7 @@
 #include "ns3/ccnx-name-components.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
+#include "ns3/rtt-estimator.h"
 
 #include <set>
 
@@ -66,6 +67,8 @@ public:
   OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                    const Ptr<const Packet> &payload);
 
+  virtual void
+  OnTimeout (uint32_t sequenceNumber);
 
   // Simulator::Schedule doesn't work with protected members???
   void
@@ -127,9 +130,7 @@ protected:
   Time            m_retxTimer;
   EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
 
-  Time            m_rto;        ///< \brief Retransmission timeout
-  Time            m_rttVar;     ///< \brief RTT variance
-  Time            m_sRtt;       ///< \brief smoothed RTT
+  Ptr<RttEstimator> m_rtt;
   
   Time               m_offTime;             ///< \brief Time interval between packets
   CcnxNameComponents m_interestName;        ///< \brief CcnxName of the Interest (use CcnxNameComponents)
