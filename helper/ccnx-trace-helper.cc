@@ -40,6 +40,7 @@
 #include "tracers/ccnx-rate-l3-tracer.h"
 #include "tracers/ccnx-seqs-app-tracer.h"
 #include "tracers/ipv4-seqs-app-tracer.h"
+#include "tracers/ccnx-consumer-window-tracer.h"
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
@@ -57,6 +58,7 @@ CcnxTraceHelper::CcnxTraceHelper ()
   : m_l3RateTrace (0)
   , m_appSeqsTrace (0)
   , m_ipv4AppSeqsTrace (0)
+  , m_windowsTrace (0)
 {
 }
 
@@ -66,6 +68,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
   if (m_l3RateTrace != 0) delete m_l3RateTrace;
   if (m_appSeqsTrace != 0) delete m_appSeqsTrace;
   if (m_ipv4AppSeqsTrace != 0) delete m_ipv4AppSeqsTrace;
+  if (m_windowsTrace != 0) delete m_windowsTrace;
   
   if (m_apps.size () > 0)
     {
@@ -283,6 +286,44 @@ CcnxTraceHelper::EnableIpv4SeqsAppAll (const std::string &trace)
     {
       m_ipv4AppSeqs.front ()->PrintHeader (*m_ipv4AppSeqsTrace);
       *m_ipv4AppSeqsTrace << "\n";
+    }
+}
+
+void
+CcnxTraceHelper::EnableWindowsAll (const std::string &windowTrace)
+{
+  NS_LOG_FUNCTION (this);
+  m_windowsTrace = new ofstream (windowTrace.c_str (), ios::trunc);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      ObjectVectorValue apps;
+      (*node)->GetAttribute ("ApplicationList", apps);
+
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+      
+      uint32_t appId = 0;
+      for (ObjectVectorValue::Iterator app = apps.Begin ();
+           app != apps.End ();
+           app++, appId++)
+        {
+          if ((*app)->GetInstanceTypeId ().GetName () == "ns3::CcnxConsumerWindow")
+            {
+              Ptr<CcnxConsumerWindowTracer> trace = Create<CcnxConsumerWindowTracer> (boost::ref(*m_windowsTrace),
+                                                                                      *node,
+                                                                                      lexical_cast<string> (appId));
+              m_windows.push_back (trace);
+            }
+        }
+      
+    }
+
+  if (m_windows.size () > 0)
+    {
+      m_windows.front ()->PrintHeader (*m_windowsTrace);
+      *m_windowsTrace << "\n";
     }
 }
 

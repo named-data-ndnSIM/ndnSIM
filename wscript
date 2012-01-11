@@ -61,6 +61,7 @@ def build(bld):
         "helper/tracers/ipv4-app-tracer.h",
         "helper/tracers/ccnx-app-tracer.h",
         "helper/tracers/ccnx-l3-tracer.h",
+        "helper/tracers/ccnx-consumer-window-tracer.h",
         "helper/ccnx-face-container.h",
 
         "apps/ccnx-app.h",

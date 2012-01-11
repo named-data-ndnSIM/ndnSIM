@@ -23,6 +23,7 @@
 #define CCNX_CONSUMER_WINDOW_H
 
 #include "ccnx-consumer.h"
+#include "ns3/traced-value.h"
 
 namespace ns3 
 {
@@ -70,7 +71,7 @@ private:
   GetWindow () const;
   
 protected:
-  uint32_t m_window;
+  TracedValue<uint32_t> m_window;
   uint32_t m_inFlight;
 };
 

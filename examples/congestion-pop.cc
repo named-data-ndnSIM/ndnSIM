@@ -28,6 +28,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/internet-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/config-store.h"
 
 #include <iostream>
 #include <sstream>
@@ -256,6 +257,10 @@ main (int argc, char *argv[])
   
   Config::SetDefault ("ns3::BulkSendApplication::SendSize", StringValue ("1040"));
 
+  Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("attributes.xml"));
+  Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
+  Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
+  
   uint32_t maxRuns = 1;
   uint32_t startRun = 0;
   CommandLine cmd;
@@ -263,6 +268,9 @@ main (int argc, char *argv[])
   cmd.AddValue ("runs", "Number of runs", maxRuns);
   cmd.Parse (argc, argv);
 
+  // ConfigStore config;
+  // config.ConfigureDefaults ();
+  
   for (uint32_t run = startRun; run < startRun + maxRuns; run++)
     {
       Config::SetGlobal ("RngRun", IntegerValue (run));
@@ -299,7 +307,9 @@ main (int argc, char *argv[])
         // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
         // traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", prefix + "consumers-seqs.log");
         traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerWindow", prefix + "consumers-seqs.log");
+        traceHelper.EnableWindowsAll (prefix + "windows.log");
 
+        // config.ConfigureAttributes ();
         experiment.Run (Seconds (200.0));
       }
 

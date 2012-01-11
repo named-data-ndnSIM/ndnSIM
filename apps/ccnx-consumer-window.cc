@@ -46,6 +46,10 @@ CcnxConsumerWindow::GetTypeId (void)
                    StringValue ("1000"),
                    MakeUintegerAccessor (&CcnxConsumerWindow::GetWindow, &CcnxConsumerWindow::SetWindow),
                    MakeUintegerChecker<uint32_t> ())
+
+    .AddTraceSource ("WindowTrace",
+                     "Window that controls how many outstanding interests are allowed",
+                     MakeTraceSourceAccessor (&CcnxConsumerWindow::m_window))
     ;
 
   return tid;
@@ -71,7 +75,7 @@ CcnxConsumerWindow::GetWindow () const
 void
 CcnxConsumerWindow::ScheduleNextPacket ()
 {
-  if (m_window == 0 || m_inFlight >= m_window)
+  if (m_window == static_cast<uint32_t> (0) || m_inFlight >= m_window)
     {
       if (!m_sendEvent.IsRunning ())
         m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &CcnxConsumer::SendPacket, this);
@@ -106,7 +110,7 @@ CcnxConsumerWindow::OnNack (const Ptr<const CcnxInterestHeader> &interest)
   CcnxConsumer::OnNack (interest);
   if (m_inFlight > 0) m_inFlight--;
 
-  if (m_window > 0)
+  if (m_window > static_cast<uint32_t> (0))
     {
       // m_window = 0.5 * m_window;//m_window - 1;
       m_window = m_window - 1;
