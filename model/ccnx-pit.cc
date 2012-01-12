@@ -170,7 +170,7 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
     {
       CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
       NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
-                     "There should be at least default route set");
+                     "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
 
       entry = insert (end (),
                       CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
