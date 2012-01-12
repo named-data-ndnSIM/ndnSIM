@@ -31,6 +31,7 @@
 #include "ns3/object-vector.h"
 #include "ns3/simulator.h"
 #include "ns3/names.h"
+#include "ns3/tcp-l4-protocol.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
@@ -59,6 +60,7 @@ CcnxTraceHelper::CcnxTraceHelper ()
   , m_appSeqsTrace (0)
   , m_ipv4AppSeqsTrace (0)
   , m_windowsTrace (0)
+  , m_windowsTcpTrace (0)
 {
 }
 
@@ -69,6 +71,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
   if (m_appSeqsTrace != 0) delete m_appSeqsTrace;
   if (m_ipv4AppSeqsTrace != 0) delete m_ipv4AppSeqsTrace;
   if (m_windowsTrace != 0) delete m_windowsTrace;
+  if (m_windowsTcpTrace != 0) delete m_windowsTcpTrace;
   
   if (m_apps.size () > 0)
     {
@@ -327,5 +330,34 @@ CcnxTraceHelper::EnableWindowsAll (const std::string &windowTrace)
     }
 }
 
+void
+CcnxTraceHelper::TcpConnect (Ptr<Node> node)
+{
+  ObjectVectorValue sockets;
+  node->GetObject<TcpL4Protocol> ()->GetAttribute ("SocketList", sockets);
+  
+  uint32_t sockId = 0;      
+  for (ObjectVectorValue::Iterator socket = sockets.Begin ();
+       socket != sockets.End ();
+       socket++, sockId++)
+    {
+      // std::cout << "Node: " << node->GetId () << ", Socket " << sockId << "\n";
+          
+      Ptr<TcpCongestionWindowTracer> trace = Create<TcpCongestionWindowTracer> (boost::ref(*m_windowsTcpTrace),
+                                                                                node,
+                                                                                lexical_cast<string> (sockId));
+      m_windowsTcp.push_back (trace);
+    }
+}
+
+void
+CcnxTraceHelper::EnableWindowsTcpAll (const std::string &windowTrace)
+{
+  NS_LOG_FUNCTION (this);
+  m_windowsTcpTrace = new ofstream (windowTrace.c_str (), ios::trunc);
+
+  WindowTracer::PrintHeader (*m_windowsTcpTrace);
+  *m_windowsTcpTrace << "\n";
+}
 
 } // namespace ns3

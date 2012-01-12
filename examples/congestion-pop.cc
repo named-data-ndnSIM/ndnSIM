@@ -299,8 +299,8 @@ main (int argc, char *argv[])
 
         for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
           {
-            apps.Get (i*2)->SetStartTime (Seconds (i));
-            apps.Get (i*2 + 1)->SetStartTime (Seconds (i));
+            apps.Get (i*2)->SetStartTime (Seconds (1+i));
+            apps.Get (i*2 + 1)->SetStartTime (Seconds (1+i));
           }
 
         CcnxTraceHelper traceHelper;
@@ -320,14 +320,24 @@ main (int argc, char *argv[])
         experiment.InstallIpStack ();
         ApplicationContainer apps = experiment.AddTcpApplications ();
 
-        for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
-          {
-            apps.Get (i*2)->SetStartTime (Seconds (i));
-            apps.Get (i*2 + 1)->SetStartTime (Seconds (i));
-          }
-
         CcnxTraceHelper traceHelper;
         traceHelper.EnableIpv4SeqsAppAll (prefix + "tcp-consumers-seqs.log");
+        traceHelper.EnableWindowsTcpAll (prefix + "tcp-windows.log");
+
+        for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
+          {
+            apps.Get (i*2)->SetStartTime (Seconds (1+i));
+
+            apps.Get (i*2 + 1)->SetStartTime (Seconds (1+i));
+
+            // cout << "Node: " << apps.Get (i*2 + 1)->GetNode ()->GetId () << "\n";
+            // care only about BulkSender
+            Simulator::Schedule (Seconds (1+i+0.01),
+                                 &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2)->GetNode ());
+
+            Simulator::Schedule (Seconds (1+i+0.01),
+                                 &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2 + 1)->GetNode ());
+          }
 
         experiment.Run (Seconds (200.0));
       }

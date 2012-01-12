@@ -32,53 +32,55 @@ using namespace std;
 using namespace boost;
 
 namespace ns3 {
-    
-CcnxConsumerWindowTracer::CcnxConsumerWindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId)
+
+void
+CcnxConsumerWindowTracer::Connect ()
+{
+  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$ns3::CcnxConsumerWindow/WindowTrace",
+                   MakeCallback (&WindowTracer::OnWindowChange, this));
+}
+
+void
+TcpCongestionWindowTracer::Connect ()
+{
+  Config::Connect ("/NodeList/"+m_node+"/$ns3::TcpL4Protocol/SocketList/*/CongestionWindow",
+                   MakeCallback (&WindowTracer::OnWindowChange, this));
+}
+
+
+WindowTracer::WindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId)
   : m_appId (appId)
   , m_nodePtr (node)
   , m_os (os)
 {
   m_node = boost::lexical_cast<string> (m_nodePtr->GetId ());
 
-  Connect ();
-
   string name = Names::FindName (node);
   if (!name.empty ())
     {
-      m_node = name;
+      m_nodeName = name;
     }
-}
-
-void
-CcnxConsumerWindowTracer::Connect ()
-{
-  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$ns3::CcnxConsumerWindow/WindowTrace",
-                   MakeCallback (&CcnxConsumerWindowTracer::OnWindowChange, this));
+  else
+    m_nodeName = m_node;
 }
 
 
 void
-CcnxConsumerWindowTracer::PrintHeader (std::ostream &os) const
+WindowTracer::PrintHeader (std::ostream &os)
 {
   os << "Time\t"
      << "Node\t"
      << "AppId\t"
      << "Window";
 }
-  
-void
-CcnxConsumerWindowTracer::Print (std::ostream &os) const
-{
-  // do nothing
-}
 
 void
-CcnxConsumerWindowTracer::OnWindowChange (std::string context,
-                                          uint32_t oldValue, uint32_t newValue)
+WindowTracer::OnWindowChange (std::string context,
+                              uint32_t oldValue, uint32_t newValue)
 {
   m_os                                                             
     << Simulator::Now ().ToDouble (Time::S) << "\t"                   
-    << m_node << "\t"                                                 
+    << m_nodeName << "\t"                                                 
     << m_appId << "\t"
     << newValue << endl;
 }

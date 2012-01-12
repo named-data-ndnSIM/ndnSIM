@@ -43,12 +43,15 @@ CcnxConsumerWindow::GetTypeId (void)
     .AddConstructor<CcnxConsumerWindow> ()
 
     .AddAttribute ("Window", "Initial size of the window",
-                   StringValue ("1000"),
+                   StringValue ("1"),
                    MakeUintegerAccessor (&CcnxConsumerWindow::GetWindow, &CcnxConsumerWindow::SetWindow),
                    MakeUintegerChecker<uint32_t> ())
 
     .AddTraceSource ("WindowTrace",
                      "Window that controls how many outstanding interests are allowed",
+                     MakeTraceSourceAccessor (&CcnxConsumerWindow::m_window))
+    .AddTraceSource ("InFlight",
+                     "Current number of outstanding interests",
                      MakeTraceSourceAccessor (&CcnxConsumerWindow::m_window))
     ;
 
@@ -83,9 +86,11 @@ CcnxConsumerWindow::ScheduleNextPacket ()
     }
   
   // std::cout << "Window: " << m_window << ", InFlight: " << m_inFlight << "\n";
-  m_inFlight++;
   if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::ScheduleNow (&CcnxConsumer::SendPacket, this);
+    {
+      m_inFlight++;
+      m_sendEvent = Simulator::ScheduleNow (&CcnxConsumer::SendPacket, this);
+    }
 }
 
 ///////////////////////////////////////////////////
@@ -99,8 +104,8 @@ CcnxConsumerWindow::OnContentObject (const Ptr<const CcnxContentObjectHeader> &c
   CcnxConsumer::OnContentObject (contentObject, payload);
 
   m_window = m_window + 1;
-  
-  if (m_inFlight > 0) m_inFlight--;
+
+  if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
   ScheduleNextPacket ();
 }
 
@@ -108,7 +113,7 @@ void
 CcnxConsumerWindow::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 {
   CcnxConsumer::OnNack (interest);
-  if (m_inFlight > 0) m_inFlight--;
+  if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 
   if (m_window > static_cast<uint32_t> (0))
     {
@@ -120,7 +125,7 @@ CcnxConsumerWindow::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 void
 CcnxConsumerWindow::OnTimeout (uint32_t sequenceNumber)
 {
-  if (m_inFlight > 0) m_inFlight--;
+  if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
   CcnxConsumer::OnTimeout (sequenceNumber);
 }
 

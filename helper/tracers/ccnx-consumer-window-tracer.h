@@ -28,21 +28,15 @@ namespace ns3 {
 
 class Node;
 
-class CcnxConsumerWindowTracer : public SimpleRefCount<CcnxConsumerWindowTracer>
+class WindowTracer : public SimpleRefCount<WindowTracer>
 {
 public:
-  CcnxConsumerWindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*");
-  virtual ~CcnxConsumerWindowTracer ()  { };
-
-  void
-  Connect ();
-
-  virtual void
-  PrintHeader (std::ostream &os) const;
+  WindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*");
+  virtual ~WindowTracer () { };
+                
+  static void
+  PrintHeader (std::ostream &os);
   
-  virtual void
-  Print (std::ostream &os) const;
-
   virtual void
   OnWindowChange (std::string context,
                   uint32_t oldValue, uint32_t newValue);
@@ -50,19 +44,33 @@ public:
 protected:
   std::string m_appId;
   std::string m_node;
+  std::string m_nodeName;
   Ptr<Node> m_nodePtr;
   std::ostream& m_os;
 };
 
-inline std::ostream&
-operator << (std::ostream &os, const CcnxConsumerWindowTracer &tracer)
+class CcnxConsumerWindowTracer : public WindowTracer
 {
-  os << "# ";
-  tracer.PrintHeader (os);
-  os << "\n";
-  tracer.Print (os);
-  return os;
-}
+public:
+  CcnxConsumerWindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*")
+    : WindowTracer (os, node, appId)
+  { Connect (); }
+
+  void
+  Connect ();
+};
+
+class TcpCongestionWindowTracer : public WindowTracer
+{
+public:
+  TcpCongestionWindowTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*")
+    : WindowTracer (os, node, appId)
+  { Connect (); }
+
+  void
+  Connect ();
+};
+
 
 } // namespace ns3
 

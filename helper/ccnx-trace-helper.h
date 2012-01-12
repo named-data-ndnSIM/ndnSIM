@@ -28,10 +28,11 @@
 
 namespace ns3 {
 
+class Node;
 class CcnxAppTracer;
 class CcnxL3Tracer;
 class Ipv4AppTracer;
-class CcnxConsumerWindowTracer;
+class WindowTracer;
 
 class CcnxTraceHelper
 {
@@ -100,7 +101,15 @@ public:
    */
   void
   EnableWindowsAll (const std::string &windowTrace = "windows.log");
-  
+
+  /**
+   * @brief Enable tracing of congestion window changes in TcpNewReno
+   */
+  void
+  EnableWindowsTcpAll (const std::string &windowTrace);
+
+  void TcpConnect (Ptr<Node> node);
+
 private:
   std::string m_appTrace;
   std::list<Ptr<CcnxAppTracer> > m_apps;
@@ -117,8 +126,11 @@ private:
   std::list<Ptr<Ipv4AppTracer> > m_ipv4AppSeqs;
   std::ostream *m_ipv4AppSeqsTrace;
 
-  std::list<Ptr<CcnxConsumerWindowTracer> > m_windows;
+  std::list<Ptr<WindowTracer> > m_windows;
   std::ostream *m_windowsTrace;
+
+  std::list<Ptr<WindowTracer> > m_windowsTcp;
+  std::ostream *m_windowsTcpTrace;
 };
 
 

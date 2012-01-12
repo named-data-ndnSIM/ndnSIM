@@ -72,7 +72,7 @@ private:
   
 protected:
   TracedValue<uint32_t> m_window;
-  uint32_t m_inFlight;
+  TracedValue<uint32_t> m_inFlight;
 };
 
 } // namespace ns3
