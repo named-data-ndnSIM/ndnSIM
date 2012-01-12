@@ -126,8 +126,8 @@ def build(bld):
         #obj = bld.create_ns3_program('link-failure-abilene', ['NDNabstraction'])
         #obj.source = 'examples/link-failure-abilene.cc'
 
-        #obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
-        #obj.source = 'examples/blackhole-sprint.cc'
+        obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
+        obj.source = 'examples/blackhole-sprint.cc'
 
         #obj = bld.create_ns3_program('blackhole-abilene', ['NDNabstraction'])
         #obj.source = 'examples/blackhole-abilene.cc'
