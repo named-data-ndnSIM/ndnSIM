@@ -151,8 +151,8 @@ public:
    * \param faceId Face index
    * \param metric Routing metric
    */
-  void
-  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) const;
+  static void
+  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
 
   /**
    * \brief Add forwarding entry in FIB
@@ -162,8 +162,8 @@ public:
    * \param face   Face
    * \param metric Routing metric
    */
-  void
-  AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric) const;
+  static void
+  AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> face, int32_t metric);
 
   /**
    * \brief Set flag indicating necessity to install default routes in FIB
@@ -177,28 +177,36 @@ public:
    * This method adds fake routes to all nodes, where each route is /32 and IPv4 address equal to node number.
    * For example, node 5 will have direct route to 0.0.0.5.
    */
-  void
+  static void
   InstallFakeGlobalRoutes ();
 
-  void
+  static void
   InstallFakeGlobalRoutesImpl ();
   
   /**
-   * \brief Installs CCNx route to `node` based on fake IPv4 routes
+   * \brief Install CCNx route to `node` based on fake IPv4 routes
    *
    * Actual route is "/<nodeId>"
    *
    * \param node Pointer to a node, which should be reached from all other nodes
    */
-  void
+  static void
   InstallRouteTo (Ptr<Node> node);
 
   /**
-   * \brief Installs CCNx route to all nodes based on fake IPv4 routes
+   * \brief Install CCNx route to /prefix which is installed on `node'
+   *
+   * Normally, prefix is  /<node->GetId()>.  Other values may be used in black-holing scenarios
+   */
+  static void
+  InstallRouteTo (const std::string &prefix, Ptr<Node> node);
+
+  /**
+   * \brief Install CCNx route to all nodes based on fake IPv4 routes
    *
    * \see InstallRouteTo
    */
-  void
+  static void
   InstallRoutesToAll ();
 
 private:

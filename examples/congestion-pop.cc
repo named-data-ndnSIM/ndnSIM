@@ -30,13 +30,6 @@
 #include "ns3/applications-module.h"
 #include "ns3/config-store.h"
 
-#include <iostream>
-#include <sstream>
-#include <map>
-#include <list>
-#include <set>
-#include "ns3/rocketfuel-topology-reader.h"
-
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 
@@ -53,110 +46,11 @@ NS_LOG_COMPONENT_DEFINE ("Scenario");
 //   Simulator::Schedule (Seconds (1.0), PrintTime);
 // }
 
-class Experiment
+#include "base-experiment.h"
+
+class Experiment : public BaseExperiment
 {
 public:
-  Experiment ()
-    : m_rand (0,52)
-    , reader (0)
-  { }
-
-  ~Experiment ()
-  {
-    if (reader != 0) delete reader;
-  }
-    
-  void
-  ConfigureTopology ()
-  {
-    Names::Clear ();
-    cout << "Configure Topology\n";
-    if (reader != 0) delete reader;
-    reader = new RocketfuelWeightsReader ("/sprint");
-    
-    string weights   ("./src/NDNabstraction/examples/sprint-pops.weights");
-    string latencies ("./src/NDNabstraction/examples/sprint-pops.latencies");
-    string positions ("./src/NDNabstraction/examples/sprint-pops.positions");
-  
-    reader->SetFileName (positions);
-    reader->SetFileType (RocketfuelWeightsReader::POSITIONS);
-    reader->Read ();
-  
-    reader->SetFileName (weights);
-    reader->SetFileType (RocketfuelWeightsReader::WEIGHTS);    
-    reader->Read ();
-
-    reader->SetFileName (latencies);
-    reader->SetFileType (RocketfuelWeightsReader::LATENCIES);    
-    reader->Read ();
-    
-    reader->Commit ();
-  }
-
-  void InstallCcnxStack ()
-  {
-    InternetStackHelper stack;
-    Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-    stack.SetRoutingHelper (ipv4RoutingHelper);
-    stack.Install (reader->GetNodes ());
-
-    reader->AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
-    
-    // Install CCNx stack
-    cout << "Installing CCNx stack\n";
-    CcnxStackHelper ccnxHelper;
-    ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
-    ccnxHelper.EnableLimits (true, Seconds(0.1));
-    ccnxHelper.SetDefaultRoutes (false);
-    ccnxHelper.InstallAll ();
-
-    // // Populate FIB based on IPv4 global routing controller
-    ccnxHelper.InstallFakeGlobalRoutes ();
-    ccnxHelper.InstallRoutesToAll ();
-  }
-  
-  void InstallIpStack ()
-  {
-    InternetStackHelper stack;
-    stack.Install (reader->GetNodes ());
-    reader->AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
-
-    Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-  }
-
-  void
-  GenerateRandomPairs (uint16_t numStreams)
-  {
-    m_pairs.clear ();
-    // map<uint32_t, set<uint32_t> > streams;
-    set<uint32_t> usedNodes;
-    
-    uint16_t createdStreams = 0;
-    uint16_t guard = 0;
-    while (createdStreams < numStreams && guard < (numeric_limits<uint16_t>::max ()-1))
-      {
-        guard ++;
-
-        uint32_t node1_num = m_rand.GetValue ();
-        uint32_t node2_num = m_rand.GetValue ();
-
-        if (node1_num == node2_num)
-          continue;
-
-        if (usedNodes.count (node1_num) > 0 ||
-            usedNodes.count (node2_num) > 0 )
-          {
-            continue; // don't reuse nodes
-          }
-
-        usedNodes.insert (node1_num);
-        usedNodes.insert (node2_num);
-
-        m_pairs.push_back (make_tuple (node1_num, node2_num));
-        createdStreams ++;
-      }
-  }
-  
   ApplicationContainer
   AddCcnxApplications ()
   {
@@ -226,23 +120,6 @@ public:
 
     return apps;
   }
-
-
-  void
-  Run (const Time &finishTime)
-  {
-    cout << "Run Simulation.\n";
-    Simulator::Stop (finishTime);
-    // Simulator::Schedule (Seconds (1.0), PrintTime);
-    Simulator::Run ();
-    Simulator::Destroy ();
-    cout << "Done.\n";
-  }
-
-  UniformVariable m_rand;
-  RocketfuelWeightsReader *reader;
-
-  list<tuple<uint32_t,uint32_t> > m_pairs;
 };
 
 
