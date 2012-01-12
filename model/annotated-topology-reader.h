@@ -63,6 +63,12 @@ public:
   GetNodes () const;
     
   /**
+   * \brief Get links read by the reader
+   */  
+  std::list<Link>
+  GetLinks () const;
+  
+  /**
    * \brief Assign IPv4 addresses to all links
    *
    * Note, IPv4 stack should be installed on all nodes prior this call

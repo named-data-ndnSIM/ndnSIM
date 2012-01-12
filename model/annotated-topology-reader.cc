@@ -112,6 +112,11 @@ AnnotatedTopologyReader::GetNodes () const
   return m_nodes;
 }
 
+std::list<TopologyReader::Link>
+AnnotatedTopologyReader::GetLinks () const
+{
+  return m_linksList;
+}
 
 NodeContainer
 AnnotatedTopologyReader::Read (void)
