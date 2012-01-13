@@ -63,7 +63,7 @@ public:
     reader->Commit ();
   }
 
-  void InstallCcnxStack ()
+  void InstallCcnxStack (bool installFIBs = true)
   {
     InternetStackHelper stack;
     Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
@@ -80,9 +80,12 @@ public:
     ccnxHelper.SetDefaultRoutes (false);
     ccnxHelper.InstallAll ();
 
-    // // Populate FIB based on IPv4 global routing controller
     ccnxHelper.InstallFakeGlobalRoutes ();
-    ccnxHelper.InstallRoutesToAll ();
+    if (installFIBs)
+      {
+        // // Populate FIB based on IPv4 global routing controller
+        ccnxHelper.InstallRoutesToAll ();
+      }
   }
   
   void InstallIpStack ()

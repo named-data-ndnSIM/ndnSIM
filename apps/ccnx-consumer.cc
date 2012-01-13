@@ -355,8 +355,8 @@ void
 CcnxConsumer::OnTimeout (uint32_t sequenceNumber)
 {
   // std::cout << "TO: " << sequenceNumber << "\n";
-  // m_retxSeqs.insert (sequenceNumber);
   // std::cout << "Current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
+  m_retxSeqs.insert (sequenceNumber);
   ScheduleNextPacket (); 
 }
 

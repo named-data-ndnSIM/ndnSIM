@@ -63,6 +63,7 @@ public:
     list<string> prefixes;
 
     // Create Producers/Hijackers
+    uint32_t pair = 0;
     for (list<tuple<uint32_t,uint32_t> >::iterator i = m_pairs.begin (); i != m_pairs.end (); i++)
       {
         uint32_t node1_num = i->get<0> ();
@@ -74,7 +75,8 @@ public:
         // node1 legitimate producer
         // node2 "fake" producer
 
-        string prefix = "/" + lexical_cast<string> (node1->GetId ());
+        string prefix = "/bh/" + lexical_cast<string> (pair);
+        pair ++;
 
         CcnxAppHelper legitimateProducerHelper ("ns3::CcnxProducer");
         legitimateProducerHelper.SetPrefix (prefix);
@@ -87,6 +89,7 @@ public:
           (fakeProducerHelper.Install (node2));
         
         // one more trick. Need to install route to hijacker (aka "hijacker announces itself as a legitimate producer")
+        CcnxStackHelper::InstallRouteTo (prefix, node1);
         CcnxStackHelper::InstallRouteTo (prefix, node2);
 
         prefixes.push_back (prefix); // remember prefixes that consumers will be requesting
@@ -108,12 +111,14 @@ public:
         BOOST_FOREACH (const string &prefix, prefixes)
           {
             consumerHelper.SetPrefix (prefix);
-            consumerHelper.SetAttribute ("MeanRate", StringValue ("8Kbps")); // this is about 1 interest a second
+            consumerHelper.SetAttribute ("MeanRate", StringValue ("1000Kbps")); // this is about 1 interest a second
             consumerHelper.SetAttribute ("Size", DoubleValue(requestSize));
             
             apps.Add
               (consumerHelper.Install (*node));
           }
+
+        // break;
       }
     return apps;
   }
@@ -126,6 +131,7 @@ main (int argc, char *argv[])
   
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("100Mbps"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("2000"));
+  Config::SetDefault ("ns3::RttEstimator::InitialEstimation", StringValue ("1s"));
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
@@ -142,7 +148,7 @@ main (int argc, char *argv[])
   // config.ConfigureDefaults ();
 
   Experiment experiment;
-  for (uint32_t i = 0; i < 80; i++)
+  for (uint32_t i = startRun; i < maxRuns; i++)
     {
       Config::SetGlobal ("RngRun", IntegerValue (i));
       cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
@@ -151,18 +157,18 @@ main (int argc, char *argv[])
       experiment.GenerateRandomPairs (10);
       cout << "Run " << i << endl;
       
-      string prefix = "run-" + lexical_cast<string> (i) + "-";
+      string prefix = "blackhole-" + lexical_cast<string> (i) + "-";
   
       experiment.ConfigureTopology ();
-      experiment.InstallCcnxStack ();
+      experiment.InstallCcnxStack (false);
       ApplicationContainer apps = experiment.AddApplications ();
             
       //tracing
       CcnxTraceHelper traceHelper;
       // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", prefix + "consumers-seqs.log");
+      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", prefix + "consumers-seqs.log");
       
-      experiment.Run (Seconds(20.0));
+      experiment.Run (Seconds(40.0));
     }
 
   cout << "Finish blackhole scenario\n";
