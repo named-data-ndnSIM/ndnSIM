@@ -29,6 +29,7 @@ public:
   BaseExperiment ()
     : m_rand (0,52)
     , reader (0)
+    , m_numNodes (52)
   { }
 
   ~BaseExperiment ()
@@ -146,6 +147,7 @@ public:
 
   list<tuple<uint32_t,uint32_t> > m_pairs;
   set<uint32_t> m_usedNodes;
+  const int m_numNodes;
 };
 
 #endif

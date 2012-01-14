@@ -27,7 +27,8 @@
 #include "ns3/ccnx-name-components.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
-#include "ns3/rtt-estimator.h"
+#include "../../internet/model/rtt-estimator.h"
+//#include "ns3/internet-module.h"
 
 #include <set>
 
