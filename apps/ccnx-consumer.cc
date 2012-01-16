@@ -112,7 +112,7 @@ CcnxConsumer::CcnxConsumer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   
-  m_rtt = CreateObject<RttMeanDeviation> (); 
+  m_rtt = CreateObject<RttMeanDeviation> ();
 }
 
 void

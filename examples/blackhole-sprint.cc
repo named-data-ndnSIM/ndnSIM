@@ -294,6 +294,7 @@ public:
           continue;
 
         CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+        consumerHelper.SetAttribute ("LifeTime", StringValue("100s"));
         BOOST_FOREACH (const string &prefix, prefixes)
           {
             consumerHelper.SetPrefix (prefix);
@@ -317,7 +318,7 @@ main (int argc, char *argv[])
   
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("100Mbps"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("2000"));
-  Config::SetDefault ("ns3::RttEstimator::InitialEstimation", StringValue ("1s"));
+  Config::SetDefault ("ns3::RttEstimator::InitialEstimation", StringValue ("0.5s"));
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));

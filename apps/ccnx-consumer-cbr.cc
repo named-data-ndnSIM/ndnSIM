@@ -97,12 +97,13 @@ CcnxConsumerCbr::GetDesiredRate () const
 void
 CcnxConsumerCbr::ScheduleNextPacket ()
 {
-  // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
+  double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
+  // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
 
   if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (
-                                       Seconds(m_randExp.GetValue ()),
-                                       // Seconds(mean),
+                                       // Seconds(m_randExp.GetValue ()),
+                                       Seconds(mean),
                                        &CcnxConsumer::SendPacket, this);
 }
 

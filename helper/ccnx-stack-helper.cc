@@ -306,7 +306,6 @@ CcnxStackHelper::InstallRouteTo (const std::string &prefix, Ptr<Node> destNode)
     }
 }
 
-
 void
 CcnxStackHelper::InstallRoutesToAll ()
 {
