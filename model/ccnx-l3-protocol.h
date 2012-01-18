@@ -118,6 +118,9 @@ public:
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
   
+  virtual Ptr<NetDevice>
+  GetNetDeviceByFace (Ptr<CcnxFace> face) const;
+  
   Ptr<CcnxPit> GetPit();
   
   // void ScheduleLeakage();
