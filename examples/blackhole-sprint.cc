@@ -255,6 +255,8 @@ public:
         uint32_t node1_num = i->get<0> ();
         uint32_t node2_num = i->get<1> ();
 
+        cout << "Good: " << node1_num << ", bad: " << node2_num << "\n";
+        
         Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (node1_num));
         Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (node2_num));
 
@@ -271,19 +273,21 @@ public:
         
         CcnxAppHelper fakeProducerHelper ("ns3::CcnxHijacker");
         fakeProducerHelper.SetPrefix (prefix);
-        apps.Add
-          (fakeProducerHelper.Install (node2));
+        ApplicationContainer hijacker = fakeProducerHelper.Install (node2);
+        apps.Add (hijacker);
+        hijacker.Start (Seconds(1.0));
         
         // one more trick. Need to install route to hijacker (aka "hijacker announces itself as a legitimate producer")
         CcnxStackHelper::InstallRouteTo (prefix, node1);
-        CcnxStackHelper::InstallRouteTo (prefix, node2);
+        Simulator::Schedule (Seconds(1.0), CcnxStackHelper::InstallRouteTo, prefix, node2);
+        // CcnxStackHelper::InstallRouteTo (prefix, node2);
 
         prefixes.push_back (prefix); // remember prefixes that consumers will be requesting
       }
 
     // All consumers request exactly 10 packets, to convert number interests packets to requested size:
     // size = 1040 * (max_number_of_packets-1) / 1024 / 1024
-    double requestSize = 1040.0 * (10 - 1) / 1024.0 / 1024.0;
+    // double requestSize = 1040.0 * (10 - 1) / 1024.0 / 1024.0;
     
     // Create Consumers
     NodeContainer nodes = reader->GetNodes ();
@@ -293,16 +297,15 @@ public:
         if (m_usedNodes.count (namedId) > 0)
           continue;
 
-        CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+        CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
         consumerHelper.SetAttribute ("LifeTime", StringValue("100s"));
+        consumerHelper.SetAttribute ("Batches", StringValue("0s 10 2s 1"));
         BOOST_FOREACH (const string &prefix, prefixes)
           {
             consumerHelper.SetPrefix (prefix);
-            consumerHelper.SetAttribute ("MeanRate", StringValue ("1000Kbps")); // this is about 1 interest a second
-            consumerHelper.SetAttribute ("Size", DoubleValue(requestSize));
-            
-            apps.Add
-              (consumerHelper.Install (*node));
+
+            ApplicationContainer consumer = consumerHelper.Install (*node);
+            apps.Add (consumer);
           }
 
         // break;
@@ -335,18 +338,18 @@ main (int argc, char *argv[])
   // config.ConfigureDefaults ();
 
   Experiment experiment;
-  for (uint32_t i = startRun; i < maxRuns; i++)
+  for (uint32_t run = startRun; run < startRun + maxRuns; run++)
     {
-      Config::SetGlobal ("RngRun", IntegerValue (i));
+      Config::SetGlobal ("RngRun", IntegerValue (run));
       cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
 
       Experiment experiment;
-      experiment.GenerateRandomPairs (10);
+      experiment.GenerateRandomPairs (1);
       experiment.ComputeShortestWeightsPath(1,12);
       experiment.ComputeShortestDelayPath(1,12);
-      cout << "Run " << i << endl;
+      cout << "Run " << run << endl;
       
-      string prefix = "blackhole-" + lexical_cast<string> (i) + "-";
+      string prefix = "blackhole-" + lexical_cast<string> (run) + "-";
   
       experiment.ConfigureTopology ();
       experiment.InstallCcnxStack (false);
@@ -355,7 +358,7 @@ main (int argc, char *argv[])
       //tracing
       CcnxTraceHelper traceHelper;
       // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", prefix + "consumers-seqs.log");
+      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerBatches", prefix + "consumers-seqs.log");
       
       experiment.Run (Seconds(40.0));
     }

@@ -31,6 +31,9 @@
 #include "ns3/ccnx-fib.h"
 
 #include <boost/ref.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxProducer");
 
@@ -75,7 +78,13 @@ CcnxProducer::StartApplication ()
 
   CcnxApp::StartApplication ();
 
-  GetNode ()->GetObject<CcnxFib> ()->Add (m_prefix, m_face, 0);
+  Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
+  CcnxFibEntryContainer::type::iterator fibEntry = fib->Add (m_prefix, m_face, 0);
+
+  // make face green, so it will be used primarily
+  fib->m_fib.modify (fibEntry,
+                     ll::bind (&CcnxFibEntry::UpdateStatus,
+                               ll::_1, m_face, CcnxFibFaceMetric::NDN_FIB_GREEN));
 }
 
 void

@@ -47,6 +47,15 @@ CcnxConsumerWindow::GetTypeId (void)
                    MakeUintegerAccessor (&CcnxConsumerWindow::GetWindow, &CcnxConsumerWindow::SetWindow),
                    MakeUintegerChecker<uint32_t> ())
 
+    .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
+                   UintegerValue (1040),
+                   MakeUintegerAccessor (&CcnxConsumerWindow::GetPayloadSize, &CcnxConsumerWindow::SetPayloadSize),
+                   MakeUintegerChecker<uint32_t>())
+    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
+                   DoubleValue (-1), // don't impose limit by default
+                   MakeDoubleAccessor (&CcnxConsumerWindow::GetMaxSize, &CcnxConsumerWindow::SetMaxSize),
+                   MakeDoubleChecker<double> ())
+
     .AddTraceSource ("WindowTrace",
                      "Window that controls how many outstanding interests are allowed",
                      MakeTraceSourceAccessor (&CcnxConsumerWindow::m_window))
@@ -59,7 +68,8 @@ CcnxConsumerWindow::GetTypeId (void)
 }
 
 CcnxConsumerWindow::CcnxConsumerWindow ()
-  : m_inFlight (0)
+  : m_payloadSize (1040)
+  , m_inFlight (0)
 {
 }
 
@@ -74,6 +84,42 @@ CcnxConsumerWindow::GetWindow () const
 {
   return m_window;
 }
+
+uint32_t
+CcnxConsumerWindow::GetPayloadSize () const
+{
+  return m_payloadSize;
+}
+
+void
+CcnxConsumerWindow::SetPayloadSize (uint32_t payload)
+{
+  m_payloadSize = payload;
+}
+
+double
+CcnxConsumerWindow::GetMaxSize () const
+{
+  if (m_seqMax == 0)
+    return -1.0;
+
+  return m_maxSize;
+}
+
+void
+CcnxConsumerWindow::SetMaxSize (double size)
+{
+  m_maxSize = size;
+  if (m_maxSize < 0)
+    {
+      m_seqMax = 0;
+      return;
+    }
+
+  m_seqMax = floor(1.0 + m_maxSize * 1024.0 * 1024.0 / m_payloadSize);
+  NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
+}
+
 
 void
 CcnxConsumerWindow::ScheduleNextPacket ()

@@ -109,21 +109,8 @@ protected:
   Time
   GetRetxTimer () const;
   
-  virtual void
-  SetPayloadSize (uint32_t payload);
-
-  uint32_t
-  GetPayloadSize () const;
-
-  double
-  GetMaxSize () const;
-
-  void
-  SetMaxSize (double size);
-  
 protected:
   UniformVariable m_rand; // nonce generator
-  uint32_t            m_payloadSize; // expected payload size
 
   uint32_t        m_seq;
   uint32_t        m_seqMax;    // maximum number of sequence number

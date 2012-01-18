@@ -111,8 +111,8 @@ public:
       {
         guard ++;
 
-        uint32_t node1_num = m_rand.GetValue ();
-        uint32_t node2_num = m_rand.GetValue ();
+        uint32_t node1_num = m_rand.GetValue (); //43;//
+        uint32_t node2_num = m_rand.GetValue (); //38;//
 
         if (node1_num == node2_num)
           continue;

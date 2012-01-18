@@ -80,6 +80,8 @@ def build(bld):
 
         "model/rocketfuel-weights-reader.h",
         "model/annotated-topology-reader.h",
+
+        "model/batches.h"
         ]
 
     tests.source = bld.path.ant_glob('test/*.cc');

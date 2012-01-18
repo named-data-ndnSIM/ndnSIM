@@ -15,32 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
- *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef CCNX_CONSUMER_CBR_H
-#define CCNX_CONSUMER_CBR_H
+#ifndef CCNX_CONSUMER_BATCHES_H
+#define CCNX_CONSUMER_BATCHES_H
 
 #include "ccnx-consumer.h"
+#include "ns3/traced-value.h"
+#include "ns3/batches.h"
 
 namespace ns3 
 {
 
 /**
  * @ingroup ccnx
- * \brief CCNx application for sending out Interest packets at a "constant" rate (Poisson process)
+ * \brief CCNx application for sending out Interest packets in batches
  */
-class CcnxConsumerCbr: public CcnxConsumer
+class CcnxConsumerBatches: public CcnxConsumer
 {
 public: 
   static TypeId GetTypeId ();
         
   /**
    * \brief Default constructor 
-   * Sets up randomizer function and packet sequence number
    */
-  CcnxConsumerCbr ();
+  CcnxConsumerBatches ();
 
   // From CcnxApp
   // virtual void
@@ -53,29 +53,24 @@ public:
   // OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
+  // virtual void
+  // OnTimeout (uint32_t sequenceNumber);
+
+private:
+  Batches
+  GetBatch () const { return Batches(); }
+
+  void
+  SetBatch (const Batches &batch);
+  
+  void
+  AddBatch (uint32_t amount);
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying CCNx protocol
    */
   virtual void
   ScheduleNextPacket ();
-  
-private:
-  // void
-  // UpdateMean ();
-
-  // virtual void
-  // SetPayloadSize (uint32_t payload);
-
-  // void
-  // SetDesiredRate (DataRate rate);
-
-  // DataRate
-  // GetDesiredRate () const;
-  
-protected:
-  ExponentialVariable m_randExp; // packet inter-arrival time generation (Poisson process)
-  double              m_frequency; // Frequency of interest packets (in hertz)
 };
 
 } // namespace ns3

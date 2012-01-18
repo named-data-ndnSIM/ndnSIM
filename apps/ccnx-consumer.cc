@@ -58,15 +58,6 @@ CcnxConsumer::GetTypeId (void)
                    MakeIntegerAccessor(&CcnxConsumer::m_seq),
                    MakeIntegerChecker<int32_t>())
 
-    .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
-                   UintegerValue (1040),
-                   MakeUintegerAccessor (&CcnxConsumer::GetPayloadSize, &CcnxConsumer::SetPayloadSize),
-                   MakeUintegerChecker<uint32_t>())
-    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
-                   DoubleValue (-1), // don't impose limit by default
-                   MakeDoubleAccessor (&CcnxConsumer::GetMaxSize, &CcnxConsumer::SetMaxSize),
-                   MakeDoubleChecker<double> ())
-
     .AddAttribute ("Prefix","CcnxName of the Interest",
                    StringValue ("/"),
                    MakeCcnxNameComponentsAccessor (&CcnxConsumer::m_interestName),
@@ -94,7 +85,7 @@ CcnxConsumer::GetTypeId (void)
 
     .AddAttribute ("RetxTimer",
                    "Timeout defining how frequent retransmission timeouts should be checked",
-                   StringValue ("1s"),
+                   StringValue ("1ms"),
                    MakeTimeAccessor (&CcnxConsumer::GetRetxTimer, &CcnxConsumer::SetRetxTimer),
                    MakeTimeChecker ())
 
@@ -107,8 +98,8 @@ CcnxConsumer::GetTypeId (void)
     
 CcnxConsumer::CcnxConsumer ()
   : m_rand (0, std::numeric_limits<uint32_t>::max ())
-  , m_payloadSize (1040)
   , m_seq (0)
+  , m_seqMax (0) // don't request anything
 {
   NS_LOG_FUNCTION_NOARGS ();
   
@@ -157,40 +148,6 @@ CcnxConsumer::CheckRetxTimeout ()
 
   m_retxEvent = Simulator::Schedule (m_retxTimer,
                                      &CcnxConsumer::CheckRetxTimeout, this); 
-}
-
-uint32_t
-CcnxConsumer::GetPayloadSize () const
-{
-  return m_payloadSize;
-}
-
-void
-CcnxConsumer::SetPayloadSize (uint32_t payload)
-{
-  m_payloadSize = payload;
-}
-
-double
-CcnxConsumer::GetMaxSize () const
-{
-  if (m_seqMax == 0)
-    return -1.0;
-
-  return m_seqMax * m_payloadSize / 1024.0 / 1024.0;
-}
-
-void
-CcnxConsumer::SetMaxSize (double size)
-{
-  if (size < 0)
-    {
-      m_seqMax = 0;
-      return;
-    }
-
-  m_seqMax = floor(1.0 + size * 1024.0 * 1024.0 / m_payloadSize);
-  NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
 }
 
 // Application Methods
@@ -354,8 +311,8 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 void
 CcnxConsumer::OnTimeout (uint32_t sequenceNumber)
 {
-  // std::cout << "TO: " << sequenceNumber << "\n";
-  // std::cout << "Current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
+  std::cout << Simulator::Now () << ", TO: " << sequenceNumber << ", current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
+
   m_retxSeqs.insert (sequenceNumber);
   ScheduleNextPacket (); 
 }

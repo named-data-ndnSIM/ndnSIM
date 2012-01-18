@@ -48,62 +48,31 @@ CcnxConsumerCbr::GetTypeId (void)
     .SetParent<CcnxConsumer> ()
     .AddConstructor<CcnxConsumerCbr> ()
 
-    .AddAttribute ("MeanRate", "Mean data packet rate (relies on the PayloadSize parameter)",
-                   StringValue ("100Kbps"),
-                   MakeDataRateAccessor (&CcnxConsumerCbr::GetDesiredRate, &CcnxConsumerCbr::SetDesiredRate),
-                   MakeDataRateChecker ())
+    .AddAttribute ("Frequency", "Frequency of interest packets",
+                   StringValue ("1.0"),
+                   MakeDoubleAccessor (&CcnxConsumerCbr::m_frequency),
+                   MakeDoubleChecker<double> ())
     ;
 
   return tid;
 }
     
 CcnxConsumerCbr::CcnxConsumerCbr ()
-  : m_desiredRate ("100Kbps")
+  : m_frequency (1.0)
 {
   NS_LOG_FUNCTION_NOARGS ();
-
-  UpdateMean ();
 }
-
-
-void
-CcnxConsumerCbr::UpdateMean ()
-{
-  double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
-  m_randExp = ExponentialVariable (mean, 100 * mean); // set upper limit to inter-arrival time
-}
-
-void
-CcnxConsumerCbr::SetPayloadSize (uint32_t payload)
-{
-  CcnxConsumer::SetPayloadSize (payload);
-  UpdateMean ();
-}
-
-void
-CcnxConsumerCbr::SetDesiredRate (DataRate rate)
-{
-  m_desiredRate = rate;
-  UpdateMean ();
-}
-
-DataRate
-CcnxConsumerCbr::GetDesiredRate () const
-{
-  return m_desiredRate;
-}
-
 
 void
 CcnxConsumerCbr::ScheduleNextPacket ()
 {
-  double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
+  // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
   // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
 
   if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (
                                        // Seconds(m_randExp.GetValue ()),
-                                       Seconds(mean),
+                                       Seconds(1.0 / m_frequency),
                                        &CcnxConsumer::SendPacket, this);
 }
 
