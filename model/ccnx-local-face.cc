@@ -44,6 +44,8 @@ CcnxLocalFace::GetTypeId ()
   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
     .SetParent<CcnxFace> ()
     .SetGroupName ("Ccnx")
+    .AddTraceSource ("ReceivedPathStretchTags", "ReceivedPathStretchTags",
+                    MakeTraceSourceAccessor (&CcnxLocalFace::m_receivedPathStretchTags))
     ;
   return tid;
 }
@@ -106,7 +108,19 @@ CcnxLocalFace::SendImpl (Ptr<Packet> p)
             if (header->GetNack () > 0)
               m_app->OnNack (header);
             else
-              m_app->OnInterest (header);
+              {
+                WeightsPathStretchTag totalStretch;
+                
+                WeightsPathStretchTag pathStretch;
+                while(p->RemovePacketTag(pathStretch) == true)
+                {
+                    totalStretch.AddNewHop (pathStretch.GetValue ());
+                }
+                
+                m_receivedPathStretchTags (totalStretch,header,m_app);
+                
+                m_app->OnInterest (header);
+              }
           
             break;
           }

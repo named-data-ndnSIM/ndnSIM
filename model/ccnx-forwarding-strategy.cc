@@ -111,6 +111,14 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
       m_pit->modify (m_pit->iterator_to (pitEntry),
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
+      //update path stretch
+      WeightsPathStretchTag pathStretch;
+      //packet->PeekPacketTag(pathStretch);
+      
+      pathStretch.AddNewHop(metricFace.m_routingCost);
+      packet->AddPacketTag(pathStretch);
+
+      //transmission
       metricFace.m_face->Send (packet->Copy ());
       m_transmittedInterestsTrace (header, metricFace.m_face);
       

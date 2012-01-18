@@ -116,6 +116,15 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       //     NS_LOG_ERROR ("size: " << pitEntry.m_outgoing.size ());
       //   }
 
+
+      //update path stretch
+      WeightsPathStretchTag pathStretch;
+      //packet->PeekPacketTag(pathStretch);
+      
+      pathStretch.AddNewHop(metricFace.m_routingCost);
+      packet->AddPacketTag(pathStretch);
+      
+      //transmission
       metricFace.m_face->Send (packet->Copy ());
       m_transmittedInterestsTrace (header, metricFace.m_face);
       

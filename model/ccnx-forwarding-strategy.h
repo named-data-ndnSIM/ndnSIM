@@ -25,6 +25,7 @@
 #include "ns3/callback.h"
 #include "ns3/object.h"
 #include "ns3/traced-callback.h"
+#include "ccnx-path-stretch-tag.h"
 
 namespace ns3 {
 
