@@ -72,6 +72,7 @@ CcnxConsumerBatches::AddBatch (uint32_t amount)
 {
   // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
   m_seqMax += amount;
+  m_rtt->ClearSent (); // this is important, otherwise RTT estimation for the new batch will be affected by previous batch history
   ScheduleNextPacket ();
 }
 

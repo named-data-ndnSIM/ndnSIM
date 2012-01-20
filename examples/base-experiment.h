@@ -87,6 +87,8 @@ public:
         // // Populate FIB based on IPv4 global routing controller
         ccnxHelper.InstallRoutesToAll ();
       }
+    
+    reader->ApplyOspfMetric ();
   }
   
   void InstallIpStack ()
@@ -94,6 +96,7 @@ public:
     InternetStackHelper stack;
     stack.Install (reader->GetNodes ());
     reader->AssignIpv4Addresses (Ipv4Address ("10.0.0.0"));
+    reader->ApplyOspfMetric ();
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
   }
@@ -129,6 +132,29 @@ public:
         m_pairs.push_back (make_tuple (node1_num, node2_num));
         createdStreams ++;
       }
+  }
+
+  void
+  SetPair (uint32_t pairId)
+  {
+    m_pairs.clear ();
+    m_usedNodes.clear ();
+
+    uint32_t i = 0;
+    for (uint32_t node1_num = 0; node1_num < 52; node1_num++)
+      for (uint32_t node2_num = 0; node2_num < 52; node2_num++)
+        {
+          if (node1_num == node2_num) continue;
+
+          // std::cout << "i = " << i << ", pairId = " << pairId << "\n";
+          if (i++ != pairId) continue;
+          
+          m_usedNodes.insert (node1_num);
+          m_usedNodes.insert (node2_num);
+
+          m_pairs.push_back (make_tuple (node1_num, node2_num));
+          return;
+        }
   }
 
   void

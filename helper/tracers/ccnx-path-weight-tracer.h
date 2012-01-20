@@ -35,7 +35,7 @@ class CcnxApp;
 class CcnxPathWeightTracer : public SimpleRefCount<CcnxPathWeightTracer>
 {
 public:
-  CcnxPathWeightTracer (std::ostream &os, Ptr<Node> node, std::string appId);
+  CcnxPathWeightTracer (std::ostream &os, Ptr<Node> node);
   virtual ~CcnxPathWeightTracer () { };
 
   void
@@ -55,7 +55,6 @@ protected:
   std::ostream &m_os;
   std::string m_node;
   Ptr<Node> m_nodePtr;
-  std::string m_appId;
 };
 
 } // namespace ns3

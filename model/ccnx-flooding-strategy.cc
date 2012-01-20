@@ -118,7 +118,6 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       //   }
 
       Ptr<Packet> packetToSend = packet->Copy ();
-      TagPacket (packetToSend, metricFace);
 
       //transmission
       metricFace.m_face->Send (packetToSend);

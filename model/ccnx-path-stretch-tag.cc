@@ -105,11 +105,12 @@ void WeightsPathStretchTag::Print (std::ostream &os) const
       if (info != m_infos.begin ()) os << ",";
       NS_ASSERT (info->node != 0);
 
-      std::string name = Names::FindName (info->node);
-      if (!name.empty ())
-        os << name;
-      else
-        os << info->node->GetId ();
+      os << info->node->GetId () << "(" << Names::FindName (info->node) << ")";
+      // std::string name = Names::FindName (info->node);
+      // if (!name.empty ())
+      //   os << name;
+      // else
+      //   os << info->node->GetId ();
       os << ":" << info->weight;
     }
 }

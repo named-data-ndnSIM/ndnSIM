@@ -36,10 +36,9 @@ using namespace std;
 
 namespace ns3 {
     
-CcnxPathWeightTracer::CcnxPathWeightTracer (std::ostream &os, Ptr<Node> node, std::string appId)
+CcnxPathWeightTracer::CcnxPathWeightTracer (std::ostream &os, Ptr<Node> node)
   : m_os (os)
   , m_nodePtr (node)
-  , m_appId (appId)
 {
   m_node = boost::lexical_cast<string> (m_nodePtr->GetId ());
 
@@ -55,15 +54,12 @@ CcnxPathWeightTracer::CcnxPathWeightTracer (std::ostream &os, Ptr<Node> node, st
 void
 CcnxPathWeightTracer::Connect ()
 {
-  Config::Set ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/ForwardingStrategy/MetricTagging",
+  Config::Set ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/FaceList/*/MetricTagging",
                BooleanValue (true));
 
-  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/PathWeightsTrace",
+  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/*/PathWeightsTrace",
                    MakeCallback (&CcnxPathWeightTracer::InLocalFace, this));
-  // Config::Connect ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/FaceList/*/$ns3::CcnxLocalFace/PathWeightsTrace",
-  //                  MakeCallback (&CcnxPathWeightTracer::InLocalFace, this));
 }
-
 
 void
 CcnxPathWeightTracer::PrintHeader (std::ostream &os)

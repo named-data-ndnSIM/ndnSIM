@@ -27,7 +27,10 @@
 #include "ns3/assert.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
+#include "ns3/boolean.h"
 #include "ns3/simulator.h"
+
+#include "ccnx-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 
@@ -56,6 +59,10 @@ CcnxFace::GetTypeId ()
                    MakeDoubleAccessor (&CcnxFace::m_bucketLeak),
                    MakeDoubleChecker<double> ())
                    
+    .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CcnxFace::m_enableMetricTagging),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -74,6 +81,8 @@ CcnxFace::CcnxFace (Ptr<Node> node)
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_lastLeakTime (0)
+  , m_metric (0)
+  , m_enableMetricTagging (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -145,6 +154,24 @@ CcnxFace::Send (Ptr<Packet> packet)
   if (!IsUp ())
     return false;
 
+  if (m_enableMetricTagging)
+    {
+      // update path information
+      Ptr<const WeightsPathStretchTag> origTag = packet->RemovePacketTag<WeightsPathStretchTag> ();
+      Ptr<WeightsPathStretchTag> tag;
+      if (origTag == 0)
+        {
+          tag = CreateObject<WeightsPathStretchTag> (); // create a new tag
+        }
+      else
+        {
+          tag = CreateObject<WeightsPathStretchTag> (*origTag); // will update existing tag
+        }
+
+      tag->AddPathInfo (m_node, GetMetric ());
+      packet->AddPacketTag (tag);
+    }
+  
   SendImpl (packet);
   return true;
 }
@@ -198,19 +225,19 @@ CcnxFace::SetBucketLeak (double leak)
   m_bucketLeak = leak;
 }
 
-// void
-// CcnxFace::SetMetric (uint16_t metric)
-// {
-//   NS_LOG_FUNCTION (metric);
-//   m_metric = metric;
-// }
+void
+CcnxFace::SetMetric (uint16_t metric)
+{
+  NS_LOG_FUNCTION (metric);
+  m_metric = metric;
+}
 
-// uint16_t
-// CcnxFace::GetMetric (void) const
-// {
-//   NS_LOG_FUNCTION_NOARGS ();
-//   return m_metric;
-// }
+uint16_t
+CcnxFace::GetMetric (void) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_metric;
+}
 
 /**
  * These are face states and may be distinct from 

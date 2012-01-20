@@ -93,14 +93,10 @@ protected:
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
 
-  void
-  TagPacket (Ptr<Packet> packet, const CcnxFibFaceMetric &metricFace);
-  
   TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
   
 protected:  
   Ptr<CcnxPit> m_pit;
-  bool m_enableMetricTagging; 
 };
 
 } //namespace ns3

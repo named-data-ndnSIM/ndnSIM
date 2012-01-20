@@ -372,23 +372,15 @@ CcnxTraceHelper::EnablePathWeights (const std::string &pathWeights)
 
   CcnxPathWeightTracer::PrintHeader (*m_pathWeightsTrace);
   *m_pathWeightsTrace << "\n";
-}
 
-void
-CcnxTraceHelper::WeightsConnect (Ptr<Node> node, Ptr<Application> app)
-{
-  // small hack to find out app index
-  uint32_t appId = 0;
-  for (uint32_t appId = 0; appId < node->GetNApplications (); appId++)
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
     {
-      if (app == node->GetApplication (appId)) break;
+      Ptr<CcnxPathWeightTracer> trace = Create<CcnxPathWeightTracer> (boost::ref(*m_pathWeightsTrace),
+                                                                      *node);
+      m_pathWeights.push_back (trace);
     }
-  NS_ASSERT (appId != node->GetNApplications ());
-
-  Ptr<CcnxPathWeightTracer> trace = Create<CcnxPathWeightTracer> (boost::ref(*m_pathWeightsTrace),
-                                                                  node,
-                                                                  lexical_cast<string> (appId));
-  m_pathWeights.push_back (trace);
 }
 
 } // namespace ns3

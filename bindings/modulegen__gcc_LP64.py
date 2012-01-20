@@ -1354,10 +1354,6 @@ def register_Ns3CcnxTraceHelper_methods(root_module, cls):
     cls.add_method('TcpConnect', 
                    'void', 
                    [param('ns3::Ptr< ns3::Node >', 'node')])
-    ## ccnx-trace-helper.h (module 'NDNabstraction'): void ns3::CcnxTraceHelper::WeightsConnect(ns3::Ptr<ns3::Node> node, ns3::Ptr<ns3::Application> AppId) [member function]
-    cls.add_method('WeightsConnect', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::Ptr< ns3::Application >', 'AppId')])
     return
 
 def register_Ns3CcnxUnknownHeaderException_methods(root_module, cls):
@@ -4104,6 +4100,10 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
     cls.add_method('SetMobilityModel', 
                    'void', 
                    [param('std::string const &', 'model')])
+    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplyOspfMetric() [member function]
+    cls.add_method('ApplyOspfMetric', 
+                   'void', 
+                   [])
     ## annotated-topology-reader.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::AnnotatedTopologyReader::CreateNode(std::string const name) [member function]
     cls.add_method('CreateNode', 
                    'ns3::Ptr< ns3::Node >', 
@@ -4116,11 +4116,6 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
                    visibility='protected')
     ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplySettings() [member function]
     cls.add_method('ApplySettings', 
-                   'void', 
-                   [], 
-                   visibility='protected')
-    ## annotated-topology-reader.h (module 'NDNabstraction'): void ns3::AnnotatedTopologyReader::ApplyOspfMetric() [member function]
-    cls.add_method('ApplyOspfMetric', 
                    'void', 
                    [], 
                    visibility='protected')
@@ -4600,6 +4595,11 @@ def register_Ns3CcnxFace_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
+    ## ccnx-face.h (module 'NDNabstraction'): uint16_t ns3::CcnxFace::GetMetric() const [member function]
+    cls.add_method('GetMetric', 
+                   'uint16_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
     ## ccnx-face.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::CcnxFace::GetNode() const [member function]
     cls.add_method('GetNode', 
                    'ns3::Ptr< ns3::Node >', 
@@ -4653,6 +4653,11 @@ def register_Ns3CcnxFace_methods(root_module, cls):
     cls.add_method('SetId', 
                    'void', 
                    [param('uint32_t', 'id')])
+    ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetMetric(uint16_t metric) [member function]
+    cls.add_method('SetMetric', 
+                   'void', 
+                   [param('uint16_t', 'metric')], 
+                   is_virtual=True)
     ## ccnx-face.h (module 'NDNabstraction'): void ns3::CcnxFace::SetUp(bool up=true) [member function]
     cls.add_method('SetUp', 
                    'void', 
@@ -5081,17 +5086,17 @@ def register_Ns3CcnxNameComponentsValue_methods(root_module, cls):
 def register_Ns3CcnxPathWeightTracer_methods(root_module, cls):
     ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): ns3::CcnxPathWeightTracer::CcnxPathWeightTracer(ns3::CcnxPathWeightTracer const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxPathWeightTracer const &', 'arg0')])
-    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): ns3::CcnxPathWeightTracer::CcnxPathWeightTracer(std::ostream & os, ns3::Ptr<ns3::Node> node, std::string appId) [constructor]
-    cls.add_constructor([param('std::ostream &', 'os'), param('ns3::Ptr< ns3::Node >', 'node'), param('std::string', 'appId')])
+    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): ns3::CcnxPathWeightTracer::CcnxPathWeightTracer(std::ostream & os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('std::ostream &', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
     ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): void ns3::CcnxPathWeightTracer::Connect() [member function]
     cls.add_method('Connect', 
                    'void', 
                    [])
-    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): void ns3::CcnxPathWeightTracer::PrintHeader(std::ostream & os) const [member function]
+    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): static void ns3::CcnxPathWeightTracer::PrintHeader(std::ostream & os) [member function]
     cls.add_method('PrintHeader', 
                    'void', 
                    [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
+                   is_static=True)
     ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): void ns3::CcnxPathWeightTracer::InLocalFace(std::string context, ns3::Ptr<ns3::Node> src, ns3::Ptr<ns3::Node> dst, uint32_t seqno, uint32_t weight) [member function]
     cls.add_method('InLocalFace', 
                    'void', 

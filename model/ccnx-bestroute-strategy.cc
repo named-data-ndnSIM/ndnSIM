@@ -103,7 +103,6 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
       Ptr<Packet> packetToSend = packet->Copy ();
-      TagPacket (packetToSend, metricFace);
 
       //transmission
       metricFace.m_face->Send (packetToSend);

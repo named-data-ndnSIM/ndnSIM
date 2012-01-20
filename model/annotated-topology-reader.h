@@ -80,11 +80,27 @@ public:
   void
   AssignIpv4Addresses (Ipv4Address base);
 
+  /**
+   * \brief Set bounding box where nodes will be randomly places (if positions are unspecified)
+   * \param ulx Upper left x coordinate
+   * \param uly Upper left y coordinate
+   * \param lrx Lower right x coordinate
+   * \param lry Lower right y coordinate
+   */
   void
   SetBoundingBox (double ulx, double uly, double lrx, double lry);
 
+  /**
+   * \brief Set mobility model to be used on nodes
+   * \param model class name of the model
+   */
   void
   SetMobilityModel (const std::string &model);
+
+  /**
+   * \brief Apply OSPF metric on Ipv4 (if exists) and Ccnx (if exists) stacks
+   */
+  void ApplyOspfMetric ();
 
 protected:
   Ptr<Node>
@@ -100,7 +116,6 @@ protected:
    * NodeContainer from Read method
    */
   void ApplySettings ();
-  void ApplyOspfMetric ();
     
 protected:
   std::string m_path;

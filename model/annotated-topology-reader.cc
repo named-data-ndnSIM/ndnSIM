@@ -37,6 +37,8 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/ccnx.h"
+#include "ns3/ccnx-face.h"
 
 #include "ns3/constant-position-mobility-model.h"
 
@@ -219,8 +221,6 @@ AnnotatedTopologyReader::AssignIpv4Addresses (Ipv4Address base)
       base = Ipv4Address (base.Get () + 256);
       address.SetBase (base, Ipv4Mask ("/24"));
     }
-        
-  ApplyOspfMetric ();
 }
         
 void
@@ -233,22 +233,42 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
         
       {
         Ptr<Ipv4> ipv4 = link.GetFromNode ()->GetObject<Ipv4> ();
-        NS_ASSERT (ipv4 != 0);
+        if (ipv4 != 0)
+          {
+            int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetFromNetDevice ());
+            NS_ASSERT (interfaceId >= 0);
         
-        int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetFromNetDevice ());
-        NS_ASSERT (interfaceId >= 0);
-        
-        ipv4->SetMetric (interfaceId,metric);
+            ipv4->SetMetric (interfaceId,metric);
+          }
+
+        Ptr<Ccnx> ccnx = link.GetFromNode ()->GetObject<Ccnx> ();
+        if (ccnx != 0)
+          {
+            Ptr<CcnxFace> face = ccnx->GetFaceByNetDevice (link.GetFromNetDevice ());
+            NS_ASSERT (face != 0);
+            
+            face->SetMetric (metric);
+          }
       }
         
       {
         Ptr<Ipv4> ipv4 = link.GetToNode ()->GetObject<Ipv4> ();
-        NS_ASSERT (ipv4 != 0);
-        
-        int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetToNetDevice ());
-        NS_ASSERT (interfaceId >= 0);
+        if (ipv4 != 0)
+          {
+            int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetToNetDevice ());
+            NS_ASSERT (interfaceId >= 0);
 
-        ipv4->SetMetric (interfaceId,metric);
+            ipv4->SetMetric (interfaceId,metric);
+          }
+        
+        Ptr<Ccnx> ccnx = link.GetToNode ()->GetObject<Ccnx> ();
+        if (ccnx != 0)
+          {
+            Ptr<CcnxFace> face = ccnx->GetFaceByNetDevice (link.GetToNetDevice ());
+            NS_ASSERT (face != 0);
+            
+            face->SetMetric (metric);
+          }
       }
     }
 }

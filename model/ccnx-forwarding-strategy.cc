@@ -25,14 +25,11 @@
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ns3/double.h"
-#include "ns3/boolean.h"
 
 #include "ccnx-pit.h"
 #include "ccnx-pit-entry.h"
 
 #include "ccnx-interest-header.h"
-#include "ccnx-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
@@ -54,11 +51,6 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
 
-    .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&CcnxForwardingStrategy::m_enableMetricTagging),
-                   MakeBooleanChecker ())
-
     .AddTraceSource ("OutInterests", "Interests that were transmitted",
                     MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_transmittedInterestsTrace))
 
@@ -67,7 +59,6 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
 }
 
 CcnxForwardingStrategy::CcnxForwardingStrategy ()
-  : m_enableMetricTagging (false)
 {
 }
 
@@ -121,7 +112,6 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                      ll::bind (&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
       Ptr<Packet> packetToSend = packet->Copy ();
-      TagPacket (packetToSend, metricFace);
 
       //transmission
       metricFace.m_face->Send (packetToSend);
@@ -132,29 +122,6 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
     }
 
   return propagatedCount > 0;
-}
-
-void
-CcnxForwardingStrategy::TagPacket (Ptr<Packet> packet, const CcnxFibFaceMetric &metricFace)
-{
-  // if (m_enableMetricTagging)
-    {
-      // update path information
-
-      Ptr<const WeightsPathStretchTag> origTag = packet->RemovePacketTag<WeightsPathStretchTag> ();
-      Ptr<WeightsPathStretchTag> tag;
-      if (origTag == 0)
-        {
-          tag = CreateObject<WeightsPathStretchTag> (); // create a new tag
-        }
-      else
-        {
-          tag = CreateObject<WeightsPathStretchTag> (*origTag); // will update existing tag
-        }
-
-      tag->AddPathInfo (metricFace.m_face->GetNode (), metricFace.m_routingCost);
-      packet->AddPacketTag (tag);
-    }
 }
 
 } //namespace ns3

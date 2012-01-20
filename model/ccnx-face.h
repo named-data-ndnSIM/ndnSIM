@@ -111,19 +111,19 @@ public:
   Receive (const Ptr<const Packet> &p);
   ////////////////////////////////////////////////////////////////////
 
-  // /**
-  //  * \Brief Assign routing/forwarding metric with face
-  //  *
-  //  * \param metric configured routing metric (cost) of this face
-  //  */
-  // virtual void SetMetric (uint16_t metric);
+  /**
+   * \Brief Assign routing/forwarding metric with face
+   *
+   * \param metric configured routing metric (cost) of this face
+   */
+  virtual void SetMetric (uint16_t metric);
 
-  // /**
-  //  * \brief Get routing/forwarding metric assigned to the face
-  //  *
-  //  * \returns configured routing/forwarding metric (cost) of this face
-  //  */
-  // virtual uint16_t GetMetric (void) const;
+  /**
+   * \brief Get routing/forwarding metric assigned to the face
+   *
+   * \returns configured routing/forwarding metric (cost) of this face
+   */
+  virtual uint16_t GetMetric (void) const;
 
   /**
    * These are face states and may be distinct from actual lower-layer
@@ -228,7 +228,10 @@ private:
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to CCNx stack
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
   uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
-  Time m_lastLeakTime; 
+  Time m_lastLeakTime;
+  uint32_t m_metric; ///< \brief metric of the face
+
+  bool m_enableMetricTagging; 
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);

@@ -284,8 +284,8 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   if (tag != 0)
     {
       // Notify trace about path weights vector (e.g., for path-stretch calculation)
-      m_pathWeightsTrace (GetNode (), tag->GetDestinationNode (), seq, tag->GetTotalWeight ()); 
-      // std::cout << boost::cref(*tag) << "\n";
+      m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ()); 
+      // std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << "\n";
     }
 }
 
@@ -316,8 +316,9 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet>
 void
 CcnxConsumer::OnTimeout (uint32_t sequenceNumber)
 {
-  std::cout << Simulator::Now () << ", TO: " << sequenceNumber << ", current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
+  // std::cout << Simulator::Now () << ", TO: " << sequenceNumber << ", current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
 
+  m_rtt->SentSeq (SequenceNumber32 (sequenceNumber), 1); // make sure to disable RTT calculation for this sample
   m_retxSeqs.insert (sequenceNumber);
   ScheduleNextPacket (); 
 }

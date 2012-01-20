@@ -123,13 +123,6 @@ public:
   void
   EnablePathWeights (const std::string &pathWeights);
 
-  /**
-   * @brief Should be called with node pointer after TCP application
-   *
-   * Workaround because NS-3 needs object to exist before connecting trace
-   */
-  void WeightsConnect (Ptr<Node> node, Ptr<Application> AppId);
-
 private:
   std::string m_appTrace;
   std::list<Ptr<CcnxAppTracer> > m_apps;

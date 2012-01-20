@@ -240,6 +240,19 @@ public:
     return d[destinationNode];
   }
 
+  // hijacker is more than an application. just disable all faces
+  static void
+  InstallHijacker (std::string prefix, Ptr<Node> node)
+  {
+    Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
+    for (uint32_t i = 0; i < ccnx->GetNFaces (); i++)
+      {
+        Ptr<CcnxFace> face = ccnx->GetFace (i);
+        face->SetUp (false);
+      }
+    CcnxStackHelper::InstallRouteTo (prefix, node);
+  }
+
   //We are creating 10 pairs of producer-hijacker and everybody else is a consumer
   ApplicationContainer
   AddApplications ()
@@ -271,23 +284,12 @@ public:
         apps.Add
           (legitimateProducerHelper.Install (node1));
         
-        CcnxAppHelper fakeProducerHelper ("ns3::CcnxHijacker");
-        fakeProducerHelper.SetPrefix (prefix);
-        ApplicationContainer hijacker = fakeProducerHelper.Install (node2);
-        apps.Add (hijacker);
-        hijacker.Start (Seconds(1.0));
-        
         // one more trick. Need to install route to hijacker (aka "hijacker announces itself as a legitimate producer")
         CcnxStackHelper::InstallRouteTo (prefix, node1);
-        Simulator::Schedule (Seconds(1.0), CcnxStackHelper::InstallRouteTo, prefix, node2);
-        // CcnxStackHelper::InstallRouteTo (prefix, node2);
+        Simulator::Schedule (Seconds(10.0), Experiment::InstallHijacker, prefix, node2);
 
         prefixes.push_back (prefix); // remember prefixes that consumers will be requesting
       }
-
-    // All consumers request exactly 10 packets, to convert number interests packets to requested size:
-    // size = 1040 * (max_number_of_packets-1) / 1024 / 1024
-    // double requestSize = 1040.0 * (10 - 1) / 1024.0 / 1024.0;
     
     // Create Consumers
     NodeContainer nodes = reader->GetNodes ();
@@ -299,7 +301,7 @@ public:
 
         CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
         consumerHelper.SetAttribute ("LifeTime", StringValue("100s"));
-        consumerHelper.SetAttribute ("Batches", StringValue("0s 10 0.5s 1 2s 1"));
+        consumerHelper.SetAttribute ("Batches", StringValue("0s 10 6s 1 20s 1"));
         BOOST_FOREACH (const string &prefix, prefixes)
           {
             consumerHelper.SetPrefix (prefix + "/" + lexical_cast<string> (namedId)); // make sure we're requesting unique prefixes... this was a huge bug before                 
@@ -344,7 +346,8 @@ main (int argc, char *argv[])
       cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
 
       Experiment experiment;
-      experiment.GenerateRandomPairs (1);
+      // experiment.GenerateRandomPairs (1);
+      experiment.SetPair (run);
       experiment.ComputeShortestWeightsPath(1,12);
       experiment.ComputeShortestDelayPath(1,12);
       cout << "Run " << run << endl;
@@ -360,12 +363,9 @@ main (int argc, char *argv[])
       // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
       traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerBatches", prefix + "consumers-seqs.log");
 
-      traceHelper.EnablePathWeights (prefix + "weights.log");
+      // enable path weights some time from now (ensure that all faces are created)
+      Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnablePathWeights, &traceHelper, prefix + "weights.log");
       std::cout << "Total " << apps.GetN () << " applications\n";
-      for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); i++)
-        {
-          Simulator::Schedule (Seconds (0.45), &CcnxTraceHelper::WeightsConnect, &traceHelper, (*i)->GetNode (), *i);
-        }
 
       experiment.Run (Seconds(40.0));
     }
