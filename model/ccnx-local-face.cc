@@ -46,8 +46,6 @@ CcnxLocalFace::GetTypeId ()
   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
     .SetParent<CcnxFace> ()
     .SetGroupName ("Ccnx")
-    .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
-                    MakeTraceSourceAccessor (&CcnxLocalFace::m_pathWeightsTrace))
     ;
   return tid;
 }
@@ -96,15 +94,6 @@ void
 CcnxLocalFace::SendImpl (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  std::cout << Simulator::Now () << ", " << m_app->GetInstanceTypeId ().GetName () << "\n";
-
-  // Notify trace about path weights vector (e.g., for path-stretch calculation)
-  Ptr<const WeightsPathStretchTag> tag = p->RemovePacketTag<WeightsPathStretchTag> ();
-  if (tag != 0)
-    {
-      m_pathWeightsTrace (tag->GetTotalWeight (), tag->GetSourceNode (), m_app->GetNode ());
-      std::cout << boost::cref(*tag) << "\n";
-    }
 
   try
     {

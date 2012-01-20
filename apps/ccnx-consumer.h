@@ -37,8 +37,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <boost/thread/mutex.hpp>
-
 namespace ns3 
 {
 
@@ -169,13 +167,14 @@ protected:
     > { } ;
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
-  boost::mutex m_seqTimeoutsGuard;          ///< \brief mutex for safe work with the m_seqTimeouts
 
   /**
    * \brief A trace that is called after each transmitted Interest packet
    */
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
+  
+  TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
 };
 
 } // namespace ns3

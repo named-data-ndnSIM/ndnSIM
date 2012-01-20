@@ -76,8 +76,6 @@ private:
 
 private:
   Ptr<CcnxApp> m_app;
-  
-  TracedCallback<uint32_t, Ptr<Node>, Ptr<Node> > m_pathWeightsTrace;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);

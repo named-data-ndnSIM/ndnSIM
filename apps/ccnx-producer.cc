@@ -23,6 +23,7 @@
 #include "ns3/log.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+#include "ns3/ccnx-path-stretch-tag.h"
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"
@@ -113,7 +114,19 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Pac
   NS_LOG_INFO ("Respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
+  Ptr<const WeightsPathStretchTag> tag = origPacket->RemovePacketTag<WeightsPathStretchTag> ();
+  if (tag != 0)
+    {
+      // std::cout << Simulator::Now () << ", " << m_app->GetInstanceTypeId ().GetName () << "\n";
 
+      // echo back WeightsPathStretchTag
+      packet->AddPacketTag (CreateObject<WeightsPathStretchTag> (*tag));
+
+      // \todo
+      // packet->AddPacketTag should actually accept Ptr<const WeightsPathStretchTag> instead of
+      // Ptr<WeightsPathStretchTag>.  Echoing will be simplified after change is done
+    }
+  
   m_transmittedContentObjects (header, packet, this, m_face);
   
   packet->AddHeader (*header);

@@ -370,7 +370,7 @@ CcnxTraceHelper::EnablePathWeights (const std::string &pathWeights)
   NS_LOG_FUNCTION (this);
   m_pathWeightsTrace = new ofstream (pathWeights.c_str (), ios::trunc);
 
-  WindowTracer::PrintHeader (*m_pathWeightsTrace);
+  CcnxPathWeightTracer::PrintHeader (*m_pathWeightsTrace);
   *m_pathWeightsTrace << "\n";
 }
 

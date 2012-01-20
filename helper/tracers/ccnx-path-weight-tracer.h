@@ -41,15 +41,15 @@ public:
   void
   Connect ();
   
-  virtual void
-  PrintHeader (std::ostream &os) const;
+  static void
+  PrintHeader (std::ostream &os);
 
   /**
    * \brief Process packet weight upon reception of packet on a local face
    */
   virtual void
   InLocalFace (std::string context,
-               uint32_t weight, Ptr<Node> src, Ptr<Node> dst);
+               Ptr<Node> src, Ptr<Node> dst, uint32_t seqno, uint32_t weight);
 
 protected:
   std::ostream &m_os;

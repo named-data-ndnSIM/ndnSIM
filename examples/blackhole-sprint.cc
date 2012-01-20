@@ -299,10 +299,10 @@ public:
 
         CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
         consumerHelper.SetAttribute ("LifeTime", StringValue("100s"));
-        consumerHelper.SetAttribute ("Batches", StringValue("0s 10 2s 1"));
+        consumerHelper.SetAttribute ("Batches", StringValue("0s 10 0.5s 1 2s 1"));
         BOOST_FOREACH (const string &prefix, prefixes)
           {
-            consumerHelper.SetPrefix (prefix);
+            consumerHelper.SetPrefix (prefix + "/" + lexical_cast<string> (namedId)); // make sure we're requesting unique prefixes... this was a huge bug before                 
 
             ApplicationContainer consumer = consumerHelper.Install (*node);
             apps.Add (consumer);
@@ -364,7 +364,7 @@ main (int argc, char *argv[])
       std::cout << "Total " << apps.GetN () << " applications\n";
       for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); i++)
         {
-          Simulator::Schedule (Seconds (1.999999), &CcnxTraceHelper::WeightsConnect, &traceHelper, (*i)->GetNode (), *i);
+          Simulator::Schedule (Seconds (0.45), &CcnxTraceHelper::WeightsConnect, &traceHelper, (*i)->GetNode (), *i);
         }
 
       experiment.Run (Seconds(40.0));

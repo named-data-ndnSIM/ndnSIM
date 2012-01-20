@@ -50,10 +50,10 @@ TypeId WeightsPathStretchTag::GetTypeId ()
 //   return GetTypeId ();
 // }
 
-uint32_t
+uint64_t
 WeightsPathStretchTag::GetTotalWeight () const
 {
-  uint32_t total = 0;
+  uint64_t total = 0;
   for (std::list<NodeWeightPair>::const_iterator info = m_infos.begin (); info != m_infos.end (); info++)
     {
       total += info->weight;
@@ -66,6 +66,13 @@ WeightsPathStretchTag::GetSourceNode () const
 {
   NS_ASSERT (m_infos.size () > 0);
   return m_infos.front ().node;
+}
+
+Ptr<Node>
+WeightsPathStretchTag::GetDestinationNode () const
+{
+  NS_ASSERT (m_infos.size () > 0);
+  return m_infos.back ().node;
 }
 
 uint32_t WeightsPathStretchTag::GetSerializedSize (void) const

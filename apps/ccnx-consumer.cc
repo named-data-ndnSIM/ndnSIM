@@ -33,6 +33,7 @@
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+#include "ns3/ccnx-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
@@ -91,6 +92,9 @@ CcnxConsumer::GetTypeId (void)
 
     .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
                     MakeTraceSourceAccessor (&CcnxConsumer::m_transmittedInterests))
+
+    .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
+                    MakeTraceSourceAccessor (&CcnxConsumer::m_pathWeightsTrace))
     ;
 
   return tid;
@@ -128,8 +132,6 @@ void
 CcnxConsumer::CheckRetxTimeout ()
 {
   Time now = Simulator::Now ();
-
-  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
 
   Time rto = m_rtt->RetransmitTimeout ();
   
@@ -180,8 +182,6 @@ CcnxConsumer::SendPacket ()
   if (!m_active) return;
 
   NS_LOG_FUNCTION_NOARGS ();
-
-  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
 
   uint32_t seq;
   
@@ -267,8 +267,6 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
-  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
-  
   // SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
 
   //  NS_ASSERT_MSG (entry != m_seqTimeouts.end (),
@@ -281,6 +279,14 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   m_retxSeqs.erase (seq);
 
   m_rtt->AckSeq (SequenceNumber32 (seq));
+
+  Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
+  if (tag != 0)
+    {
+      // Notify trace about path weights vector (e.g., for path-stretch calculation)
+      m_pathWeightsTrace (GetNode (), tag->GetDestinationNode (), seq, tag->GetTotalWeight ()); 
+      // std::cout << boost::cref(*tag) << "\n";
+    }
 }
 
 void
@@ -291,7 +297,6 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet>
   CcnxApp::OnNack (interest, origPacket); // tracing inside
   
   NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
-  boost::mutex::scoped_lock (m_seqTimeoutsGuard);
 
   NS_LOG_FUNCTION (this << interest);
 

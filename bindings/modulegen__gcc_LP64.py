@@ -3866,6 +3866,8 @@ def register_Ns3TopologyReader_methods(root_module, cls):
 def register_Ns3TopologyReaderLink_methods(root_module, cls):
     ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link(ns3::TopologyReader::Link const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::TopologyReader::Link const &', 'arg0')])
+    ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link() [constructor]
+    cls.add_constructor([])
     ## topology-reader.h (module 'topology-read'): ns3::TopologyReader::Link::Link(ns3::Ptr<ns3::Node> fromPtr, std::string const & fromName, ns3::Ptr<ns3::Node> toPtr, std::string const & toName) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'fromPtr'), param('std::string const &', 'fromName'), param('ns3::Ptr< ns3::Node >', 'toPtr'), param('std::string const &', 'toName')])
     ## topology-reader.h (module 'topology-read'): std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > ns3::TopologyReader::Link::AttributesBegin() [member function]
@@ -4000,6 +4002,11 @@ def register_Ns3WeightsPathStretchTag_methods(root_module, cls):
                    'void', 
                    [param('ns3::TagBuffer', 'i')], 
                    is_virtual=True)
+    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::WeightsPathStretchTag::GetDestinationNode() const [member function]
+    cls.add_method('GetDestinationNode', 
+                   'ns3::Ptr< ns3::Node >', 
+                   [], 
+                   is_const=True)
     ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): std::list<ns3::WeightsPathStretchTag::NodeWeightPair, std::allocator<ns3::WeightsPathStretchTag::NodeWeightPair> > const & ns3::WeightsPathStretchTag::GetInfos() const [member function]
     cls.add_method('GetInfos', 
                    'std::list< ns3::WeightsPathStretchTag::NodeWeightPair > const &', 
@@ -4015,9 +4022,9 @@ def register_Ns3WeightsPathStretchTag_methods(root_module, cls):
                    'ns3::Ptr< ns3::Node >', 
                    [], 
                    is_const=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): uint32_t ns3::WeightsPathStretchTag::GetTotalWeight() const [member function]
+    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): uint64_t ns3::WeightsPathStretchTag::GetTotalWeight() const [member function]
     cls.add_method('GetTotalWeight', 
-                   'uint32_t', 
+                   'uint64_t', 
                    [], 
                    is_const=True)
     ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): static ns3::TypeId ns3::WeightsPathStretchTag::GetTypeId() [member function]
@@ -5085,10 +5092,10 @@ def register_Ns3CcnxPathWeightTracer_methods(root_module, cls):
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): void ns3::CcnxPathWeightTracer::InLocalFace(std::string context, uint32_t weight, ns3::Ptr<ns3::Node> src, ns3::Ptr<ns3::Node> dst) [member function]
+    ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): void ns3::CcnxPathWeightTracer::InLocalFace(std::string context, ns3::Ptr<ns3::Node> src, ns3::Ptr<ns3::Node> dst, uint32_t seqno, uint32_t weight) [member function]
     cls.add_method('InLocalFace', 
                    'void', 
-                   [param('std::string', 'context'), param('uint32_t', 'weight'), param('ns3::Ptr< ns3::Node >', 'src'), param('ns3::Ptr< ns3::Node >', 'dst')], 
+                   [param('std::string', 'context'), param('ns3::Ptr< ns3::Node >', 'src'), param('ns3::Ptr< ns3::Node >', 'dst'), param('uint32_t', 'seqno'), param('uint32_t', 'weight')], 
                    is_virtual=True)
     return
 

@@ -27,6 +27,7 @@
 #include "ns3/ccnx-app.h"
 #include "ns3/ccnx-face.h"
 #include "ns3/boolean.h"
+#include "ns3/simulator.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -57,25 +58,38 @@ CcnxPathWeightTracer::Connect ()
   Config::Set ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/ForwardingStrategy/MetricTagging",
                BooleanValue (true));
 
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/FaceList/*/$ns3::CcnxLocalFace/PathWeightsTrace",
+  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/PathWeightsTrace",
                    MakeCallback (&CcnxPathWeightTracer::InLocalFace, this));
+  // Config::Connect ("/NodeList/"+m_node+"/$ns3::CcnxL3Protocol/FaceList/*/$ns3::CcnxLocalFace/PathWeightsTrace",
+  //                  MakeCallback (&CcnxPathWeightTracer::InLocalFace, this));
 }
 
 
 void
-CcnxPathWeightTracer::PrintHeader (std::ostream &os) const
+CcnxPathWeightTracer::PrintHeader (std::ostream &os)
 {
-  os << "Node\t"
-     << "AppId\t"
-     << "PathWeight\t"
-     << "PathWeights\n";
+  os << "Time\t"
+     << "Src\t"
+     << "Dst\t"
+     << "SeqNo\t"
+     << "Weight";
 }
 
 void
 CcnxPathWeightTracer::InLocalFace (std::string context,
-                                   uint32_t weight, Ptr<Node> src, Ptr<Node> dst)
+                                   Ptr<Node> src, Ptr<Node> dst, uint32_t seqno, uint32_t weight)
 {
-  std::cout << "Path weights from " << Names::FindName (src) << " to "<< Names::FindName (dst) <<" : " << weight << "\n";
+  std::string srcName = Names::FindName (src);
+  std::string dstName = Names::FindName (dst);
+  if (srcName == "") srcName = boost::lexical_cast<std::string> (src->GetId ());
+  if (dstName == "") srcName = boost::lexical_cast<std::string> (dst->GetId ());
+  // std::cout << "Path weights from " << Names::FindName (src) << " to "<< Names::FindName (dst) <<" : " << weight << "\n";
+
+  m_os << Simulator::Now ().ToDouble (Time::S) << "\t"
+       << srcName << "\t"
+       << dstName << "\t"
+       << seqno << "\t"
+       << weight << "\n";
 }
 
 } // namespace ns3

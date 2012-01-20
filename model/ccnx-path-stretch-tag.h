@@ -52,11 +52,14 @@ public:
   void
   AddPathInfo (Ptr<Node> node, uint32_t weight);
 
-  uint32_t
+  uint64_t
   GetTotalWeight () const;
 
   Ptr<Node>
   GetSourceNode () const;
+
+  Ptr<Node>
+  GetDestinationNode () const;
 
   const std::list<NodeWeightPair> &
   GetInfos () const
