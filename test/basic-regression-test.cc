@@ -86,59 +86,59 @@ BasicRegressionTest::DoRun(void)
     // -- Read topology data.
     // --------------------------------------------
     
-    string input = NS_TEST_SOURCEDIR;
-    input += "/testtopology.txt";
+    // string input = NS_TEST_SOURCEDIR;
+    // input += "/testtopology.txt";
     
-    Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
-    reader->SetFileName (input);
+    // Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
+    // reader->SetFileName (input);
     
-    NodeContainer nodes;
-    if (reader != 0)
-    {
-        nodes = reader->Read ();
-    }
-    else
-    {
-        NS_TEST_ASSERT_MSG_EQ (true, false, "file not found");
-    }
+    // NodeContainer nodes;
+    // if (reader != 0)
+    // {
+    //     nodes = reader->Read ();
+    // }
+    // else
+    // {
+    //     NS_TEST_ASSERT_MSG_EQ (true, false, "file not found");
+    // }
     
-    NS_TEST_ASSERT_MSG_EQ (7, reader->LinksSize (), "link count is wrong");
-    
-    
-    // ------------------------------------------------------------
-    // -- Create nodes and network stacks
-    // --------------------------------------------
-    NS_LOG_INFO ("creating internet stack");
-    InternetStackHelper stack;
+    // NS_TEST_ASSERT_MSG_EQ (7, reader->LinksSize (), "link count is wrong");
     
     
-    //routing
-    /*Ipv4StaticRoutingHelper staticRouting;
-    Ipv4ListRoutingHelper listRH;
-    listRH.Add (staticRouting, 0);
-    stack.SetRoutingHelper (listRH);  // has effect on the next Install ()
-    stack.Install (nodes);
-    
-    NS_LOG_INFO ("creating ip4 addresses");
-    Ipv4AddressHelper address;
-    address.SetBase ("10.0.0.0", "255.255.255.252");*/
-    
-    int totlinks = reader->LinksSize ();
+    // // ------------------------------------------------------------
+    // // -- Create nodes and network stacks
+    // // --------------------------------------------
+    // NS_LOG_INFO ("creating internet stack");
+    // InternetStackHelper stack;
     
     
-    /// applying settings
-    NS_LOG_INFO ("creating node containers");
-    NodeContainer* nc = new NodeContainer[totlinks];
-    TopologyReader::ConstLinksIterator iter;
-    int i = 0;
-    for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
-    {
-        nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
-    }
+    // //routing
+    // /*Ipv4StaticRoutingHelper staticRouting;
+    // Ipv4ListRoutingHelper listRH;
+    // listRH.Add (staticRouting, 0);
+    // stack.SetRoutingHelper (listRH);  // has effect on the next Install ()
+    // stack.Install (nodes);
     
-    NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-    reader->ApplySettings(ndc,nc);
-    /// settings applied
+    // NS_LOG_INFO ("creating ip4 addresses");
+    // Ipv4AddressHelper address;
+    // address.SetBase ("10.0.0.0", "255.255.255.252");*/
+    
+    // int totlinks = reader->LinksSize ();
+    
+    
+    // /// applying settings
+    // NS_LOG_INFO ("creating node containers");
+    // NodeContainer* nc = new NodeContainer[totlinks];
+    // TopologyReader::ConstLinksIterator iter;
+    // int i = 0;
+    // for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
+    // {
+    //     nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
+    // }
+    
+    // NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
+    // reader->ApplySettings(ndc,nc);
+    // /// settings applied
     
     
     

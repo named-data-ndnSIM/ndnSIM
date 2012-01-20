@@ -254,7 +254,7 @@ CcnxConsumer::SendPacket ()
 
 void
 CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                               const Ptr<const Packet> &payload)
+                               Ptr<Packet> payload)
 {
   if (!m_active) return;
 
@@ -284,11 +284,11 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 }
 
 void
-CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
+CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> origPacket)
 {
   if (!m_active) return;
   
-  CcnxApp::OnNack (interest); // tracing inside
+  CcnxApp::OnNack (interest, origPacket); // tracing inside
   
   NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
   boost::mutex::scoped_lock (m_seqTimeoutsGuard);

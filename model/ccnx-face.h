@@ -67,6 +67,9 @@ public:
   CcnxFace (Ptr<Node> node);
   virtual ~CcnxFace();
 
+  Ptr<Node>
+  GetNode () const;
+
   ////////////////////////////////////////////////////////////////////
   
   /**

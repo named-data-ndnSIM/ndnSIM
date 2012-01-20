@@ -23,6 +23,7 @@
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/uinteger.h"
 #include "ns3/random-variable.h"
+#include "ns3/packet.h"
 #include <limits> 
 #include "ns3/ccnx-header-helper.h"
 #include "ns3/header.h"

@@ -33,6 +33,8 @@ class CcnxAppTracer;
 class CcnxL3Tracer;
 class Ipv4AppTracer;
 class WindowTracer;
+class CcnxPathWeightTracer;
+class Application;
 
 class CcnxTraceHelper
 {
@@ -108,7 +110,25 @@ public:
   void
   EnableWindowsTcpAll (const std::string &windowTrace);
 
+  /**
+   * @brief Should be called with node pointer after TCP application
+   *
+   * Workaround because NS-3 needs object to exist before connecting trace
+   */
   void TcpConnect (Ptr<Node> node);
+
+  /**
+   * @brief Enable tracing of path weights
+   */
+  void
+  EnablePathWeights (const std::string &pathWeights);
+
+  /**
+   * @brief Should be called with node pointer after TCP application
+   *
+   * Workaround because NS-3 needs object to exist before connecting trace
+   */
+  void WeightsConnect (Ptr<Node> node, Ptr<Application> AppId);
 
 private:
   std::string m_appTrace;
@@ -131,6 +151,9 @@ private:
 
   std::list<Ptr<WindowTracer> > m_windowsTcp;
   std::ostream *m_windowsTcpTrace;
+
+  std::list<Ptr<CcnxPathWeightTracer> > m_pathWeights;
+  std::ostream *m_pathWeightsTrace;
 };
 
 

@@ -25,7 +25,6 @@
 #include "ns3/callback.h"
 #include "ns3/object.h"
 #include "ns3/traced-callback.h"
-#include "ccnx-path-stretch-tag.h"
 
 namespace ns3 {
 
@@ -33,6 +32,7 @@ class CcnxFace;
 class CcnxInterestHeader;
 class CcnxPit;
 class CcnxPitEntry;
+class CcnxFibFaceMetric;
 
 /**
  * \ingroup ccnx
@@ -93,10 +93,14 @@ protected:
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
 
+  void
+  TagPacket (Ptr<Packet> packet, const CcnxFibFaceMetric &metricFace);
+  
   TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
   
 protected:  
   Ptr<CcnxPit> m_pit;
+  bool m_enableMetricTagging; 
 };
 
 } //namespace ns3

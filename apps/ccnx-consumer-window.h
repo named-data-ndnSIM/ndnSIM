@@ -47,11 +47,11 @@ public:
   // OnInterest (const Ptr<const CcnxInterestHeader> &interest);
 
   virtual void
-  OnNack (const Ptr<const CcnxInterestHeader> &interest);
+  OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> payload);
 
   virtual void
   OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                   const Ptr<const Packet> &payload);
+                   Ptr<Packet> payload);
 
   virtual void
   OnTimeout (uint32_t sequenceNumber);

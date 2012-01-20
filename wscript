@@ -62,6 +62,7 @@ def build(bld):
         "helper/tracers/ccnx-app-tracer.h",
         "helper/tracers/ccnx-l3-tracer.h",
         "helper/tracers/ccnx-consumer-window-tracer.h",
+        "helper/tracers/ccnx-path-weight-tracer.h",
         "helper/ccnx-face-container.h",
 
         "apps/ccnx-app.h",
@@ -73,6 +74,7 @@ def build(bld):
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
+        "model/ccnx-path-stretch-tag.h",
         "model/ccnx-fib.h",
 
         "utils/spring-mobility-model.h",

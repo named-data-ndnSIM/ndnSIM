@@ -359,7 +359,14 @@ main (int argc, char *argv[])
       CcnxTraceHelper traceHelper;
       // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
       traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerBatches", prefix + "consumers-seqs.log");
-      
+
+      traceHelper.EnablePathWeights (prefix + "weights.log");
+      std::cout << "Total " << apps.GetN () << " applications\n";
+      for (ApplicationContainer::Iterator i = apps.Begin (); i != apps.End (); i++)
+        {
+          Simulator::Schedule (Seconds (1.999999), &CcnxTraceHelper::WeightsConnect, &traceHelper, (*i)->GetNode (), *i);
+        }
+
       experiment.Run (Seconds(40.0));
     }
 

@@ -32,6 +32,7 @@
 #include "ns3/simulator.h"
 #include "ns3/names.h"
 #include "ns3/tcp-l4-protocol.h"
+#include "ns3/node.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
@@ -42,6 +43,7 @@
 #include "tracers/ccnx-seqs-app-tracer.h"
 #include "tracers/ipv4-seqs-app-tracer.h"
 #include "tracers/ccnx-consumer-window-tracer.h"
+#include "tracers/ccnx-path-weight-tracer.h"
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
@@ -61,6 +63,7 @@ CcnxTraceHelper::CcnxTraceHelper ()
   , m_ipv4AppSeqsTrace (0)
   , m_windowsTrace (0)
   , m_windowsTcpTrace (0)
+  , m_pathWeightsTrace (0)
 {
 }
 
@@ -72,6 +75,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
   if (m_ipv4AppSeqsTrace != 0) delete m_ipv4AppSeqsTrace;
   if (m_windowsTrace != 0) delete m_windowsTrace;
   if (m_windowsTcpTrace != 0) delete m_windowsTcpTrace;
+  if (m_pathWeightsTrace != 0) delete m_pathWeightsTrace;
   
   if (m_apps.size () > 0)
     {
@@ -358,6 +362,33 @@ CcnxTraceHelper::EnableWindowsTcpAll (const std::string &windowTrace)
 
   WindowTracer::PrintHeader (*m_windowsTcpTrace);
   *m_windowsTcpTrace << "\n";
+}
+
+void
+CcnxTraceHelper::EnablePathWeights (const std::string &pathWeights)
+{
+  NS_LOG_FUNCTION (this);
+  m_pathWeightsTrace = new ofstream (pathWeights.c_str (), ios::trunc);
+
+  WindowTracer::PrintHeader (*m_pathWeightsTrace);
+  *m_pathWeightsTrace << "\n";
+}
+
+void
+CcnxTraceHelper::WeightsConnect (Ptr<Node> node, Ptr<Application> app)
+{
+  // small hack to find out app index
+  uint32_t appId = 0;
+  for (uint32_t appId = 0; appId < node->GetNApplications (); appId++)
+    {
+      if (app == node->GetApplication (appId)) break;
+    }
+  NS_ASSERT (appId != node->GetNApplications ());
+
+  Ptr<CcnxPathWeightTracer> trace = Create<CcnxPathWeightTracer> (boost::ref(*m_pathWeightsTrace),
+                                                                  node,
+                                                                  lexical_cast<string> (appId));
+  m_pathWeights.push_back (trace);
 }
 
 } // namespace ns3

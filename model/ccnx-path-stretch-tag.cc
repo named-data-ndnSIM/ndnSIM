@@ -19,74 +19,93 @@
  */
  
 #include "ccnx-path-stretch-tag.h"
+#include "ns3/node.h"
+#include "ns3/names.h"
 
 namespace ns3 {
 
-WeightsPathStretchTag::WeightsPathStretchTag()
-    : m_weightPathStretch(0)
+WeightsPathStretchTag::WeightsPathStretchTag ()
 {
 }
 
-WeightsPathStretchTag::WeightsPathStretchTag(const WeightsPathStretchTag &o)
-    : m_weightPathStretch(o.m_weightPathStretch)
+void
+WeightsPathStretchTag::AddPathInfo (Ptr<Node> node, uint32_t weight)
 {
+  m_infos.push_back (NodeWeightPair (node, weight));
 }
 
-WeightsPathStretchTag &WeightsPathStretchTag::operator = (const WeightsPathStretchTag &o)
-{
-    if (this == &o)
-        return *this;
 
-    m_weightPathStretch = o.m_weightPathStretch;
-    return *this;
-}
-
-bool WeightsPathStretchTag::operator == (WeightsPathStretchTag const &o) const
+TypeId WeightsPathStretchTag::GetTypeId ()
 {
-    return (m_weightPathStretch == o.m_weightPathStretch);
+  static TypeId tid = TypeId("ns3::WeightsPathStretchTag")
+    .SetParent<Tag>()
+    .AddConstructor<WeightsPathStretchTag>()
+    ;
+  return tid;
 }
 
-TypeId WeightsPathStretchTag::GetTypeId(void)
+// TypeId
+// WeightsPathStretchTag::GetInstanceTypeId () const
+// {
+//   return GetTypeId ();
+// }
+
+uint32_t
+WeightsPathStretchTag::GetTotalWeight () const
 {
-    static TypeId tid = TypeId("ns3::WeightsPathStretchTag")
-        .SetParent<Tag>()
-        .AddConstructor<WeightsPathStretchTag>()
-        ;
-    return tid;
+  uint32_t total = 0;
+  for (std::list<NodeWeightPair>::const_iterator info = m_infos.begin (); info != m_infos.end (); info++)
+    {
+      total += info->weight;
+    }
+  return total;
 }
 
-TypeId WeightsPathStretchTag::GetInstanceTypeId(void) const
+Ptr<Node>
+WeightsPathStretchTag::GetSourceNode () const
 {
-    return GetTypeId();
+  NS_ASSERT (m_infos.size () > 0);
+  return m_infos.front ().node;
 }
 
-uint32_t WeightsPathStretchTag::GetSerializedSize(void) const
+uint32_t WeightsPathStretchTag::GetSerializedSize (void) const
 {
-    return sizeof(uint32_t);
+  return 0;
+  // return sizeof (GetPointer (m_value.node)) + sizeof (m_value.weight);
 }
 
-void WeightsPathStretchTag::Serialize(TagBuffer i) const
+void WeightsPathStretchTag::Serialize (TagBuffer i) const
 {
-    i.WriteU32(m_weightPathStretch);
+  NS_FATAL_ERROR ("Serialization is not supported for this tag");
+  // m_value.node->Ref ();
+  // i.WriteU64 (reinterpret_cast<uint64_t> (GetPointer (m_value.node)));
+  // i.WriteU32 (m_value.weight);
 }
 
-void WeightsPathStretchTag::Deserialize(TagBuffer i)
+void WeightsPathStretchTag::Deserialize (TagBuffer i)
 {
-    m_weightPathStretch = i.ReadU32();
+  NS_FATAL_ERROR ("Deserialization is not supported for this tag");
+  // m_value.node = Ptr<Node> (reinterpret_cast<Node*> (i.ReadU64 ()), false);
+  // m_value.weight = i.ReadU32 ();
 }
 
-void WeightsPathStretchTag::Print(std::ostream &os) const
+void WeightsPathStretchTag::Print (std::ostream &os) const
 {
-    os << "Path Stretch (Weights) = " << m_weightPathStretch << std::endl;
+  for (std::list<NodeWeightPair>::const_iterator info = m_infos.begin ();
+       info != m_infos.end ();
+       info ++)
+    {
+      if (info != m_infos.begin ()) os << ",";
+      NS_ASSERT (info->node != 0);
+
+      std::string name = Names::FindName (info->node);
+      if (!name.empty ())
+        os << name;
+      else
+        os << info->node->GetId ();
+      os << ":" << info->weight;
+    }
 }
 
-void WeightsPathStretchTag::AddNewHop(uint32_t weight)
-{
-    m_weightPathStretch +=weight;
-}
-uint32_t WeightsPathStretchTag::GetValue()
-{
-  return m_weightPathStretch;
-}
 } // namespace ns3
 

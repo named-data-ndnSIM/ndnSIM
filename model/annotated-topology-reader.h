@@ -65,7 +65,7 @@ public:
   /**
    * \brief Get links read by the reader
    */  
-  std::list<Link>
+  const std::list<Link>&
   GetLinks () const;
   
   /**

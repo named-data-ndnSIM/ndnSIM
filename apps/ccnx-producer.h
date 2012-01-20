@@ -39,7 +39,7 @@ public:
   CcnxProducer ();
 
   // inherited from CcnxApp
-  void OnInterest (const Ptr<const CcnxInterestHeader> &interest);
+  void OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet);
 
 protected:
   // inherited from Application base class.

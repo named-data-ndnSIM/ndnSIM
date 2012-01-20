@@ -236,16 +236,6 @@ CcnxL3Protocol::GetFaceByNetDevice (Ptr<NetDevice> netDevice) const
   return 0;
 }
 
-Ptr<NetDevice>
-CcnxL3Protocol::GetNetDeviceByFace(Ptr<CcnxFace> face) const
-{
-    Ptr<CcnxNetDeviceFace> netDeviceFace = DynamicCast<CcnxNetDeviceFace> (face);
-    if (netDeviceFace == 0) 
-      return 0;
-
-    return netDeviceFace->GetNetDevice ();
-}
-
 uint32_t 
 CcnxL3Protocol::GetNFaces (void) const
 {

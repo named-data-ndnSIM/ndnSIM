@@ -22,6 +22,7 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-pit.h"
 #include "ccnx-pit-entry.h"
+#include "ccnx-path-stretch-tag.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -116,16 +117,11 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       //     NS_LOG_ERROR ("size: " << pitEntry.m_outgoing.size ());
       //   }
 
+      Ptr<Packet> packetToSend = packet->Copy ();
+      TagPacket (packetToSend, metricFace);
 
-      //update path stretch
-      WeightsPathStretchTag pathStretch;
-      //packet->PeekPacketTag(pathStretch);
-      
-      pathStretch.AddNewHop(metricFace.m_routingCost);
-      packet->AddPacketTag(pathStretch);
-      
       //transmission
-      metricFace.m_face->Send (packet->Copy ());
+      metricFace.m_face->Send (packetToSend);
       m_transmittedInterestsTrace (header, metricFace.m_face);
       
       propagatedCount++;

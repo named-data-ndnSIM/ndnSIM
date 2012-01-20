@@ -84,14 +84,14 @@ CcnxApp::RegisterProtocolHandler (ProtocolHandler handler)
 }
     
 void
-CcnxApp::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
+CcnxApp::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedInterests (interest, this, m_face);
 }
 
 void
-CcnxApp::OnNack (const Ptr<const CcnxInterestHeader> &interest)
+CcnxApp::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedNacks (interest, this, m_face);
@@ -99,7 +99,7 @@ CcnxApp::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 
 void
 CcnxApp::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                          const Ptr<const Packet> &payload)
+                          Ptr<Packet> payload)
 {
   NS_LOG_FUNCTION (this << contentObject << payload);
   m_receivedContentObjects (contentObject, payload, this, m_face);

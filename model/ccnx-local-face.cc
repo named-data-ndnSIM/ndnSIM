@@ -26,12 +26,14 @@
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/assert.h"
+#include "ns3/simulator.h"
 
 #include "ns3/ccnx-header-helper.h"
 #include "ns3/ccnx-app.h"
 
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
+#include "ccnx-path-stretch-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 
@@ -44,8 +46,8 @@ CcnxLocalFace::GetTypeId ()
   static TypeId tid = TypeId ("ns3::CcnxLocalFace")
     .SetParent<CcnxFace> ()
     .SetGroupName ("Ccnx")
-    .AddTraceSource ("ReceivedPathStretchTags", "ReceivedPathStretchTags",
-                    MakeTraceSourceAccessor (&CcnxLocalFace::m_receivedPathStretchTags))
+    .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
+                    MakeTraceSourceAccessor (&CcnxLocalFace::m_pathWeightsTrace))
     ;
   return tid;
 }
@@ -89,11 +91,20 @@ CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 
   m_app->RegisterProtocolHandler (MakeCallback (&CcnxFace::Receive, this));
 }
-    
+
 void
 CcnxLocalFace::SendImpl (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
+  std::cout << Simulator::Now () << ", " << m_app->GetInstanceTypeId ().GetName () << "\n";
+
+  // Notify trace about path weights vector (e.g., for path-stretch calculation)
+  Ptr<const WeightsPathStretchTag> tag = p->RemovePacketTag<WeightsPathStretchTag> ();
+  if (tag != 0)
+    {
+      m_pathWeightsTrace (tag->GetTotalWeight (), tag->GetSourceNode (), m_app->GetNode ());
+      std::cout << boost::cref(*tag) << "\n";
+    }
 
   try
     {
@@ -106,21 +117,9 @@ CcnxLocalFace::SendImpl (Ptr<Packet> p)
             p->RemoveHeader (*header);
 
             if (header->GetNack () > 0)
-              m_app->OnNack (header);
+              m_app->OnNack (header, p);
             else
-              {
-                WeightsPathStretchTag totalStretch;
-                
-                WeightsPathStretchTag pathStretch;
-                while(p->RemovePacketTag(pathStretch) == true)
-                {
-                    totalStretch.AddNewHop (pathStretch.GetValue ());
-                }
-                
-                m_receivedPathStretchTags (totalStretch,header,m_app);
-                
-                m_app->OnInterest (header);
-              }
+              m_app->OnInterest (header, p);
           
             break;
           }

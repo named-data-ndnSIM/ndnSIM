@@ -94,6 +94,12 @@ CcnxFace& CcnxFace::operator= (const CcnxFace &)
   return *this;
 }
 
+Ptr<Node>
+CcnxFace::GetNode () const
+{
+  return m_node;
+}
+
 void
 CcnxFace::RegisterProtocolHandler (ProtocolHandler handler)
 {

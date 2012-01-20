@@ -24,7 +24,6 @@
 
 #include "ccnx-face.h"
 #include "ns3/traced-callback.h"
-#include "ccnx-path-stretch-tag.h"
 
 namespace ns3 
 {
@@ -78,8 +77,7 @@ private:
 private:
   Ptr<CcnxApp> m_app;
   
-  TracedCallback<WeightsPathStretchTag,Ptr<const CcnxInterestHeader>, 
-                  Ptr<CcnxApp> > m_receivedPathStretchTags;
+  TracedCallback<uint32_t, Ptr<Node>, Ptr<Node> > m_pathWeightsTrace;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);

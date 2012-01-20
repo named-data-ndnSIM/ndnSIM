@@ -34,53 +34,79 @@ class Packet;
 class WeightsPathStretchTag : public Tag
 {
 public:
-    WeightsPathStretchTag();
-    WeightsPathStretchTag(const WeightsPathStretchTag &o);
-    WeightsPathStretchTag &operator = (const WeightsPathStretchTag &o);
-
-    bool operator == (WeightsPathStretchTag const &o) const;
-
-    static TypeId GetTypeId(void);
-    virtual TypeId GetInstanceTypeId(void) const;
-
-    virtual uint32_t GetSerializedSize(void) const;
-    virtual void Serialize(TagBuffer i) const;
-    virtual void Deserialize(TagBuffer i);
-    virtual void Print(std::ostream &os) const;
-
-    void AddNewHop(uint32_t weight);
-    uint32_t GetValue();
+  struct NodeWeightPair
+  {
+    NodeWeightPair () : node (0), weight (0) { }
+    NodeWeightPair (Ptr<Node> _node, uint32_t _weight) : node (_node), weight (_weight) { }
     
+    Ptr<Node> node;
+    uint32_t  weight;
+  };
+  
+  static TypeId
+  GetTypeId ();
+
+  WeightsPathStretchTag ();
+  virtual ~WeightsPathStretchTag () { };
+
+  void
+  AddPathInfo (Ptr<Node> node, uint32_t weight);
+
+  uint32_t
+  GetTotalWeight () const;
+
+  Ptr<Node>
+  GetSourceNode () const;
+
+  const std::list<NodeWeightPair> &
+  GetInfos () const
+  { return m_infos; }
+
+  // from Tag
+  virtual uint32_t
+  GetSerializedSize (void) const;
+  
+  virtual void
+  Serialize (TagBuffer i) const;
+
+  virtual void
+  Deserialize (TagBuffer i);
+
+  virtual void
+  Print (std::ostream &os) const;
+  
 private:
-    uint32_t m_weightPathStretch;
+  std::list<NodeWeightPair> m_infos;
 };
 
-class DelaysPathStretchTag : public Tag
-{
-public:
-    DelaysPathStretchTag();
-    //PathSplicingPathTag(const PathSplicingPathTag &o);
-    //PathSplicingPathTag &operator = (const PathSplicingPathTag &o);
+// class DelaysPathStretchTag : public Tag
+// {
+// public:
+//   DelaysPathStretchTag();
 
-    //bool operator == (PathSplicingPathTag const &o) const;
+//   static TypeId GetTypeId(void);
+//   virtual TypeId GetInstanceTypeId(void) const;
 
-    static TypeId GetTypeId(void);
-    virtual TypeId GetInstanceTypeId(void) const;
+//   virtual uint32_t GetSerializedSize(void) const;
+//   virtual void Serialize(TagBuffer i) const;
+//   virtual void Deserialize(TagBuffer i);
+//   virtual void Print(std::ostream &os) const;
 
-    virtual uint32_t GetSerializedSize(void) const;
-    virtual void Serialize(TagBuffer i) const;
-    virtual void Deserialize(TagBuffer i);
-    virtual void Print(std::ostream &os) const;
+//   int GetNHops();
+//   void AddNewHop(double delay);
+//   int GetCurrentHop();
+//   void RemoveCurrentHop();
+//   //void RandomizeTags(UniformVariable &rand, uint32_t max);
 
-    int GetNHops();
-    void AddNewHop(double delay);
-    int GetCurrentHop();
-    void RemoveCurrentHop();
-    //void RandomizeTags(UniformVariable &rand, uint32_t max);
+// private:
+//   //PathSplicingPathTag(const PathSplicingPathTag &o);
+//   //PathSplicingPathTag &operator = (const PathSplicingPathTag &o);
 
-private:
-    std::list<double> m_delays;
-};
+//   //bool operator == (PathSplicingPathTag const &o) const;
+
+// private:
+//   std::list<double> m_delays;
+// };
 
 
 } // namespace ns3

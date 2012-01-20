@@ -98,9 +98,9 @@ CcnxProducer::StopApplication ()
 
 
 void
-CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
+CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> origPacket)
 {
-  CcnxApp::OnInterest (interest); // tracing inside
+  CcnxApp::OnInterest (interest, origPacket); // tracing inside
 
   NS_LOG_FUNCTION (this << interest);
 

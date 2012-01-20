@@ -98,9 +98,9 @@ CcnxHijacker::StopApplication ()
 
 
 void
-CcnxHijacker::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
+CcnxHijacker::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet)
 {
-  CcnxApp::OnInterest (interest); // tracing inside
+  CcnxApp::OnInterest (interest, packet); // tracing inside
 
   NS_LOG_FUNCTION (this << interest);
 

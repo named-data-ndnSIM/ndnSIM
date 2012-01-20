@@ -145,7 +145,7 @@ CcnxConsumerWindow::ScheduleNextPacket ()
 
 void
 CcnxConsumerWindow::OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                               const Ptr<const Packet> &payload)
+                                     Ptr<Packet> payload)
 {
   CcnxConsumer::OnContentObject (contentObject, payload);
 
@@ -156,9 +156,9 @@ CcnxConsumerWindow::OnContentObject (const Ptr<const CcnxContentObjectHeader> &c
 }
 
 void
-CcnxConsumerWindow::OnNack (const Ptr<const CcnxInterestHeader> &interest)
+CcnxConsumerWindow::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> payload)
 {
-  CcnxConsumer::OnNack (interest);
+  CcnxConsumer::OnNack (interest, payload);
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 
   if (m_window > static_cast<uint32_t> (0))

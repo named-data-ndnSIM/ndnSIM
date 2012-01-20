@@ -118,9 +118,6 @@ public:
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
   
-  virtual Ptr<NetDevice>
-  GetNetDeviceByFace (Ptr<CcnxFace> face) const;
-  
   Ptr<CcnxPit> GetPit();
   
   // void ScheduleLeakage();
@@ -210,7 +207,7 @@ private:
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
-  
+
   // Time    m_bucketLeakInterval;
   // EventId m_bucketLeakEvent;
 };

@@ -65,25 +65,27 @@ public:
   /**
    * @brief Method that will be called every time new Interest arrives
    * @param interest Interest header
+   * @param packet   "Payload" of the interests packet. The actual payload should be zero, but packet itself
+   *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest (const Ptr<const CcnxInterestHeader> &interest);
+  OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet);
 
   /**
    * @brief Method that will be called every time new NACK arrives
    * @param interest Interest header
    */
   virtual void
-  OnNack (const Ptr<const CcnxInterestHeader> &interest);
+  OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet);
   
   /**
    * @brief Method that will be called every time new ContentObject arrives
    * @param contentObject ContentObject header
-   * @param payload payload (potentially virtual) of the ContentObject packet
+   * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
    */
   virtual void
   OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
-                   const Ptr<const Packet> &payload);
+                   Ptr<Packet> payload);
         
 protected:
   virtual void

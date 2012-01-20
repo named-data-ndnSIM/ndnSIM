@@ -23,6 +23,7 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-pit.h"
 #include "ccnx-pit-entry.h"
+#include "ccnx-path-stretch-tag.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -101,15 +102,11 @@ CcnxBestRouteStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
       m_pit->modify (m_pit->iterator_to (pitEntry),
                      ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
-      //update path stretch
-      WeightsPathStretchTag pathStretch;
-      //packet->PeekPacketTag(pathStretch);
-      
-      pathStretch.AddNewHop(metricFace.m_routingCost);
-      packet->AddPacketTag(pathStretch);
+      Ptr<Packet> packetToSend = packet->Copy ();
+      TagPacket (packetToSend, metricFace);
 
       //transmission
-      metricFace.m_face->Send (packet->Copy ());
+      metricFace.m_face->Send (packetToSend);
       m_transmittedInterestsTrace (header, metricFace.m_face);
       
       propagatedCount++;
