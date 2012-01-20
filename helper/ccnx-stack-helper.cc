@@ -159,27 +159,24 @@ CcnxStackHelper::Install (Ptr<Node> node) const
         {
           NS_LOG_INFO ("Limits are enabled");
           Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
-          if (p2p == 0)
+          if (p2p != 0)
             {
-              NS_LOG_INFO ("Non p2p interface");
-              continue; // only PointToPointNetDevice supports limits
-            }
-
-          // Setup bucket filtering
-          // Assume that we know average data packet size, and this size is equal default size
-          // Set maximum buckets (averaging over 1 second)
+              // Setup bucket filtering
+              // Assume that we know average data packet size, and this size is equal default size
+              // Set maximum buckets (averaging over 1 second)
       
-          DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
+              DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
           
-          NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
+              NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
-          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
-          NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
-          NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+              double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
+              NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
+              NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
 
-          // Set bucket max to BDP
-          face->SetBucketMax (m_avgRtt.ToDouble (Time::S) * maxInterestPackets); // number of interests allowed
-          face->SetBucketLeak (maxInterestPackets);
+              // Set bucket max to BDP
+              face->SetBucketMax (m_avgRtt.ToDouble (Time::S) * maxInterestPackets); // number of interests allowed
+              face->SetBucketLeak (maxInterestPackets);
+            }
         }
         
       face->SetUp ();
