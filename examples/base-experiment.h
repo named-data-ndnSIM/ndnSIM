@@ -81,14 +81,14 @@ public:
     ccnxHelper.SetDefaultRoutes (false);
     ccnxHelper.InstallAll ();
 
+    reader->ApplyOspfMetric ();
+
     ccnxHelper.InstallFakeGlobalRoutes ();
     if (installFIBs)
       {
         // // Populate FIB based on IPv4 global routing controller
         ccnxHelper.InstallRoutesToAll ();
       }
-    
-    reader->ApplyOspfMetric ();
   }
   
   void InstallIpStack ()

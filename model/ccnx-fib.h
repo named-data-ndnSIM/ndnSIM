@@ -60,7 +60,7 @@ public:
    * \param face Face for which metric
    * \param cost Initial value for routing cost
    */
-  CcnxFibFaceMetric (Ptr<CcnxFace> face, int cost)
+  CcnxFibFaceMetric (Ptr<CcnxFace> face, int32_t cost)
     : m_face (face)
     , m_status (NDN_FIB_YELLOW)
     , m_routingCost (cost)
