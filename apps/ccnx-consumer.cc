@@ -143,8 +143,9 @@ CcnxConsumer::CheckRetxTimeout ()
         m_seqTimeouts.get<i_timestamp> ().begin ();
       if (entry->time + rto <= now) // timeout expired?
         {
+          uint32_t seqNo = entry->seq;
           m_seqTimeouts.get<i_timestamp> ().erase (entry);
-          OnTimeout (entry->seq);
+          OnTimeout (seqNo);
         }
       else
         break; // nothing else to do. All later packets need not be retransmitted
