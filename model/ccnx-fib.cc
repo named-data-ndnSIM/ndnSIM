@@ -289,7 +289,7 @@ std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric)
 {
   static const std::string statusString[] = {"","g","y","r"};
 
-  os << *metric.m_face << "(" << metric.m_routingCost << ","<< statusString [metric.m_status] << ")";
+  os << *metric.m_face << "(" << metric.m_routingCost << ","<< statusString [metric.m_status] << "," << metric.m_face->GetMetric () << ")";
   return os;
 }
 

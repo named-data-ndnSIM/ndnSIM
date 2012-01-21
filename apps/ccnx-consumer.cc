@@ -40,6 +40,8 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 
+#include "ns3/names.h"
+
 namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumer");
@@ -284,8 +286,9 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   if (tag != 0)
     {
       // Notify trace about path weights vector (e.g., for path-stretch calculation)
-      m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ()); 
-      // std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << "\n";
+      m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
+      // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
+      //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
     }
 }
 
