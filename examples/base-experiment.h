@@ -27,7 +27,7 @@ void PrintTime ()
 {
   cout << "Progress: " << Simulator::Now ().ToDouble (Time::S) << "s" << endl;
 
-  Simulator::Schedule (Seconds (1.0), PrintTime);
+  Simulator::Schedule (Seconds (5.0), PrintTime);
 }
 
 class BaseExperiment
