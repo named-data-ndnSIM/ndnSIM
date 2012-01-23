@@ -88,7 +88,7 @@ CcnxConsumer::GetTypeId (void)
 
     .AddAttribute ("RetxTimer",
                    "Timeout defining how frequent retransmission timeouts should be checked",
-                   StringValue ("1ms"),
+                   StringValue ("50ms"),
                    MakeTimeAccessor (&CcnxConsumer::GetRetxTimer, &CcnxConsumer::SetRetxTimer),
                    MakeTimeChecker ())
 
