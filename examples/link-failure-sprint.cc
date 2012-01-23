@@ -125,7 +125,16 @@ public:
 
                 face1->SetUp (false);
                 face2->SetUp (false);
-                
+
+                // set metric to max (for GlobalRouter to know what we want)
+                Ptr<Ipv4> ipv4_1 = ccnx1->GetObject<Ipv4> ();
+                Ptr<Ipv4> ipv4_2 = ccnx2->GetObject<Ipv4> ();
+
+                uint32_t if1 = ipv4_1->GetInterfaceForDevice (nd1);
+                uint32_t if2 = ipv4_2->GetInterfaceForDevice (nd2);
+
+                ipv4_1->SetMetric (if1, std::numeric_limits<uint16_t>::max ());
+                ipv4_2->SetMetric (if2, std::numeric_limits<uint16_t>::max ());
                 break;
               }
           }
@@ -226,6 +235,12 @@ public:
     return apps;
   }
 
+  void
+  RecalculateRouting ()
+  {
+    Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+  }
+
 private:
   vector<failures_t> m_failures;
 };
@@ -238,11 +253,14 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("100Mbps"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("2000"));
   Config::SetDefault ("ns3::RttEstimator::InitialEstimation", StringValue ("0.5s"));
+  // Config::SetDefault ("ns3::RttEstimator::MaxMultiplier", StringValue ("16.0")); // original default is 64.0
 
   Config::SetDefault ("ns3::ConfigStore::Filename", StringValue ("attributes.xml"));
   Config::SetDefault ("ns3::ConfigStore::Mode", StringValue ("Save"));
   Config::SetDefault ("ns3::ConfigStore::FileFormat", StringValue ("Xml"));
 
+  // Config::SetDefault ("ns3::CcnxConsumer::LifeTime", StringValue ("100s"));
+  
   uint32_t maxRuns = 1;
   uint32_t startRun = 0;
   std::string failures = "";
@@ -276,6 +294,7 @@ main (int argc, char *argv[])
       cout << "Total number of applications: " << apps.GetN () << "\n";
 
       Simulator::Schedule (Seconds (10.0), &Experiment::FailLinks, &experiment, run);
+      Simulator::Schedule (Seconds (39.0), &Experiment::RecalculateRouting, &experiment);
 
       //tracing
       CcnxTraceHelper traceHelper;
@@ -284,7 +303,7 @@ main (int argc, char *argv[])
       Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnablePathWeights, &traceHelper,
                            prefix + "weights.log");
 
-      experiment.Run (Seconds(40.0));
+      experiment.Run (Seconds(60.0));
     }
 
   cout << "Finish link failure scenario\n";

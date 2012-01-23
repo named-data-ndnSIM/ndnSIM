@@ -167,6 +167,7 @@ protected:
     > { } ;
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
+  SeqTimeoutsContainer m_seqLifetimes;
 
   /**
    * \brief A trace that is called after each transmitted Interest packet

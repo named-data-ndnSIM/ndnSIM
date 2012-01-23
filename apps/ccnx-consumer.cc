@@ -186,22 +186,25 @@ CcnxConsumer::SendPacket ()
 
   NS_LOG_FUNCTION_NOARGS ();
 
-  uint32_t seq;
-  
-  if (m_retxSeqs.size () != 0)
+  uint32_t seq=std::numeric_limits<uint32_t>::max (); //invalid
+
+  while (m_retxSeqs.size ())
     {
-      // for (RetxSeqsContainer::const_iterator i=m_retxSeqs.begin (); i!=m_retxSeqs.end (); i++)
-      //   {
-      //     std::cout << *i << " ";
-      //   }
-      // std::cout << "\n";
-      
       seq = *m_retxSeqs.begin ();
-      NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
       m_retxSeqs.erase (m_retxSeqs.begin ());
-      NS_LOG_INFO ("After: " << m_retxSeqs.size ());
+
+      // NS_ASSERT (m_seqLifetimes.find (seq) != m_seqLifetimes.end ());
+      // if (m_seqLifetimes.find (seq)->time <= Simulator::Now ())
+      //   {
+          
+      //     NS_LOG_DEBUG ("Expire " << seq);
+      //     m_seqLifetimes.erase (seq); // lifetime expired. Trying to find another unexpired sequence number
+      //     continue;
+      //   }
+      break;
     }
-  else
+
+  if (seq == std::numeric_limits<uint32_t>::max ())
     {
       if (m_seqMax > 0)
         {
@@ -244,6 +247,7 @@ CcnxConsumer::SendPacket ()
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
   
   m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
+  m_seqLifetimes.insert (SeqTimeout (seq, Simulator::Now () + m_interestLifeTime)); // only one insert will work. if entry exists, nothing will happen... nothing should happen
   m_transmittedInterests (&interestHeader, this, m_face);
 
   m_rtt->SentSeq (SequenceNumber32 (seq), 1);
@@ -278,6 +282,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   // if (entry != m_seqTimeouts.end ())
   //   m_seqTimeouts.erase (entry);
 
+  m_seqLifetimes.erase (seq);
   m_seqTimeouts.erase (seq);
   m_retxSeqs.erase (seq);
 
