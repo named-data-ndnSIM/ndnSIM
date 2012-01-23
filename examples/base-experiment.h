@@ -169,7 +169,7 @@ public:
   {
     cout << "Run Simulation.\n";
     Simulator::Stop (finishTime);
-    Simulator::Schedule (Seconds (1.0), PrintTime);
+    Simulator::Schedule (Seconds (5.0), PrintTime);
     Simulator::Run ();
     Simulator::Destroy ();
     cout << "Done.\n";

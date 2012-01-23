@@ -80,7 +80,7 @@ void
 CcnxConsumerBatches::ScheduleNextPacket ()
 {
   if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (Seconds(0.00001), &CcnxConsumer::SendPacket, this);
+    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &CcnxConsumer::SendPacket, this);
 }
 
 ///////////////////////////////////////////////////
