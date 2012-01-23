@@ -50,13 +50,6 @@ using namespace boost;
 
 NS_LOG_COMPONENT_DEFINE ("BlackholeSprint");
 
-void PrintTime ()
-{
-  cout << "Progress: " << Simulator::Now ().ToDouble (Time::S) << "s" << endl;
-
-  Simulator::Schedule (Seconds (1.0), PrintTime);
-}
-
 #include "base-experiment.h"
 
 class Experiment : public BaseExperiment

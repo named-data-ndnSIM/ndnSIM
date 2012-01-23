@@ -23,6 +23,13 @@
 
 #include "ns3/rocketfuel-topology-reader.h"
 
+void PrintTime ()
+{
+  cout << "Progress: " << Simulator::Now ().ToDouble (Time::S) << "s" << endl;
+
+  Simulator::Schedule (Seconds (1.0), PrintTime);
+}
+
 class BaseExperiment
 {
 public:
@@ -162,7 +169,7 @@ public:
   {
     cout << "Run Simulation.\n";
     Simulator::Stop (finishTime);
-    // Simulator::Schedule (Seconds (1.0), PrintTime);
+    Simulator::Schedule (Seconds (1.0), PrintTime);
     Simulator::Run ();
     Simulator::Destroy ();
     cout << "Done.\n";

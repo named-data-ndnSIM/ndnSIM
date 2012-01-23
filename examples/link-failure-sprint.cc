@@ -26,8 +26,9 @@
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/random-variable.h"
-#include "ns3/ccnx-l3-protocol.h"
+#include "ns3/ccnx.h"
 #include "ns3/topology-reader.h"
+#include "../model/ccnx-net-device-face.h"
 
 #include <iostream>
 #include <sstream>
@@ -45,30 +46,90 @@ using namespace boost;
 
 NS_LOG_COMPONENT_DEFINE ("LinkFailureSprint");
 
-void PrintTime ()
-{
-  cout << "Progress: " << Simulator::Now ().ToDouble (Time::S) << "s" << endl;
-
-  Simulator::Schedule (Seconds (1.0), PrintTime);
-}
-
-
 #include "base-experiment.h"
 
 class Experiment : public BaseExperiment
 {
 public:
+  typedef tuple<string, string> failure_t;
+  typedef list<failure_t> failures_t;
+  
+  Experiment (const string &file)
+  {
+    ifstream failures (("./src/NDNabstraction/examples/failures/failures-"+file).c_str ());
+    for(std::string line; std::getline(failures, line); )
+      {
+        if (line == "")
+          {
+            m_failures.push_back (failures_t ());
+            continue;
+          }
+
+        failures_t failures;
+        istringstream run (line);
+        while (!run.eof () && !run.bad ())
+          {
+            int32_t link1 = -1;
+            int32_t link2 = -1;
+            run >> link1;
+            run.get ();
+            run >> link2;
+            run.get ();
+            if (link1 < 0 || link2 < 0) continue;
+
+            // cout << link1 << " <-> " << link2 << "   ";
+            failures.push_back (failure_t (lexical_cast<string> (link1), lexical_cast<string> (link2)));
+          }
+        m_failures.push_back (failures);
+      }
+  }
+  
   // hijacker is more than an application. just disable all faces
-  static void
+  void
   FailLinks (uint32_t failId)
   {
-    // Ptr<Ccnx> ccnx = node->GetObject<Ccnx> ();
-    // for (uint32_t i = 0; i < ccnx->GetNFaces (); i++)
-    //   {
-    //     Ptr<CcnxFace> face = ccnx->GetFace (i);
-    //     face->SetUp (false);
-    //   }
-    // CcnxStackHelper::InstallRouteTo (prefix, node);
+    failures_t failures = m_failures [failId];
+    BOOST_FOREACH (failure_t failure, failures)
+      {
+        Ptr<Node> node1 = Names::Find<Node> ("/sprint", failure.get<0> ());
+        Ptr<Node> node2 = Names::Find<Node> ("/sprint", failure.get<1> ());
+        // cout << failure.get<0> () << " <-> " << failure.get<1> () << "   ";
+        // cout << node1 << ", " << node2 << "\n";
+
+        Ptr<Ccnx> ccnx1 = node1->GetObject<Ccnx> ();
+        Ptr<Ccnx> ccnx2 = node2->GetObject<Ccnx> ();
+        for (uint32_t faceId = 0; faceId < ccnx1->GetNFaces (); faceId++)
+          {
+            Ptr<CcnxFace> face = ccnx1->GetFace (faceId);
+            Ptr<CcnxNetDeviceFace> ndFace = face->GetObject<CcnxNetDeviceFace> ();
+            if (ndFace == 0) continue;
+
+            Ptr<PointToPointNetDevice> nd1 = ndFace->GetNetDevice ()->GetObject<PointToPointNetDevice> ();
+            if (nd1 == 0) continue;
+
+            Ptr<Channel> channel = nd1->GetChannel ();
+            if (channel == 0) continue;
+
+            Ptr<PointToPointChannel> ppChannel = DynamicCast<PointToPointChannel> (channel);
+
+            Ptr<NetDevice> nd2 = ppChannel->GetDevice (0);
+            if (nd2->GetNode () == node1)
+              nd2 = ppChannel->GetDevice (1);
+
+            if (Names::FindName (nd2->GetNode ()) == failure.get<1> ())
+              {
+                cout << "Failing " << failure.get<0> () << " <-> " << failure.get<1> () << " link\n";
+
+                Ptr<CcnxFace> face1 = ccnx1->GetFaceByNetDevice (nd1);
+                Ptr<CcnxFace> face2 = ccnx2->GetFaceByNetDevice (nd2);
+
+                face1->SetUp (false);
+                face2->SetUp (false);
+                
+                break;
+              }
+          }
+      }
   }
 
   // void
@@ -126,10 +187,12 @@ public:
   AddApplications()
   {
     NS_LOG_INFO ("Adding applications");
-    NS_LOG_INFO ("GetN = " << m_reader.GetNodes().GetN());
+    NS_LOG_INFO ("GetN = " << reader->GetNodes().GetN());
+
+    double delay = 0;
     
     ApplicationContainer apps;
-    for (uint32_t i = 0; i<m_reader.GetNodes().GetN(); i++)
+    for (uint32_t i = 0; i<reader->GetNodes().GetN(); i++)
     {
       NS_LOG_INFO("i="<<i);
       Ptr<Node> node1 = Names::Find<Node> ("/sprint", lexical_cast<string> (i));
@@ -141,9 +204,9 @@ public:
             
       CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
       consumerHelper.SetAttribute ("LifeTime", StringValue("100s"));
-      consumerHelper.SetAttribute ("Batches", StringValue("0s 10 6s 1 20s 1"));
+      consumerHelper.SetAttribute ("Batches", StringValue("0s 1 1s 1 2s 1 3s 1 6s 1 20s 1"));
       
-      for(uint32_t j = 0; j<m_reader.GetNodes().GetN();j++)
+      for(uint32_t j = 0; j<reader->GetNodes().GetN();j++)
       {
         NS_LOG_INFO("j="<<j);
         if(i==j)
@@ -152,12 +215,19 @@ public:
         Ptr<Node> node2 = Names::Find<Node> ("/sprint", lexical_cast<string> (j));
           
         consumerHelper.SetPrefix ("/" + lexical_cast<string> (node1->GetId ()) + "/" + lexical_cast<string> (node2->GetId ()));
-        apps.Add (consumerHelper.Install (node2));
+        ApplicationContainer consumer = consumerHelper.Install (node2);
+        consumer.Start (Seconds (delay));
+        apps.Add (consumer);
+
+        delay += 0.0001;
       }
     }
     
     return apps;
   }
+
+private:
+  vector<failures_t> m_failures;
 };
 
 int 
@@ -191,97 +261,31 @@ main (int argc, char *argv[])
   // ConfigStore config;
   // config.ConfigureDefaults ();
 
-  Experiment experiment;
+  Experiment experiment (failures);
   for (uint32_t run = startRun; run < startRun + maxRuns; run++)
     {
       Config::SetGlobal ("RngRun", IntegerValue (run));
       cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
 
-      Experiment experiment;
-      // experiment.GenerateRandomPairs (1);
-      experiment.FailLinks (run);
       cout << "Run " << run << endl;
-      
       string prefix = "link-failure-" + lexical_cast<string> (run) + "-";
   
       experiment.ConfigureTopology ();
-      experiment.InstallCcnxStack (false);
+      experiment.InstallCcnxStack (true);
       ApplicationContainer apps = experiment.AddApplications ();
-            
+      cout << "Total number of applications: " << apps.GetN () << "\n";
+
+      Simulator::Schedule (Seconds (10.0), &Experiment::FailLinks, &experiment, run);
+
       //tracing
       CcnxTraceHelper traceHelper;
-      // traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-      traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerBatches", prefix + "consumers-seqs.log");
+      Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnableSeqsAppAll, &traceHelper,
+                           "ns3::CcnxConsumerBatches", prefix + "consumers-seqs.log");
+      Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnablePathWeights, &traceHelper,
+                           prefix + "weights.log");
 
-      // enable path weights some time from now (ensure that all faces are created)
-      Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnablePathWeights, &traceHelper, prefix + "weights.log");
-      std::cout << "Total " << apps.GetN () << " applications\n";
-
-      experiment.Run (Seconds(40.0));
+      experiment.Run (Seconds(30.0));
     }
-
-
-
-  
-//   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("10Mbps"));
-//   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("100"));
-
-//   Time finishTime1 = Seconds (5.0);
-//   Time finishTime2 = Seconds (20.0);
-
-//   CommandLine cmd;
-//   cmd.AddValue ("finish", "Finish time", finishTime1);
-//   cmd.Parse (argc, argv);
-
-//   Experiment experiment;
-
-//   for (uint32_t i = 0; i < 80; i++)
-//     {
-//       Config::SetGlobal ("RngRun", IntegerValue (i));
-//       cout << "seed = " << SeedManager::GetSeed () << ", run = " << SeedManager::GetRun () << endl;
-
-//       Experiment experiment;
-//       cout << "Run " << i << endl;
-      
-//       string prefix = "run-" + lexical_cast<string> (i) + "-";
-  
-//       //before link failure
-//       experiment.ConfigureTopology ();
-//       ApplicationContainer apps = experiment.AddApplications ();
-//       experiment.ConfigureRouting ();
-//       //tracing
-//       //...
-//       //experiment.Run (finishTime1);
-      
-//       //after link failure 
-//       experiment.FailLinks(0.1);
-      
-//       //tracing
-//       CcnxTraceHelper traceHelper;
-//       traceHelper.EnableRateL3All (prefix + "rate-trace.log");
-//       traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", prefix + "consumers-seqs.log");
-//       //...
-//       experiment.Run (finishTime2);
-
-// /*
-//       for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
-//         {
-//           cout << "From " << apps.Get (i*2)->GetNode ()->GetId ()
-//                << " to "  << apps.Get (i*2 + 1)->GetNode ()->GetId ();
-//           cout << "\n";
-//         }*/
-  
-//       //CcnxTraceHelper traceHelper;
-//       // traceHelper.EnableAggregateAppAll ("ns3::CcnxConsumer");
-//       // traceHelper.EnableAggregateAppAll ("ns3::CcnxProducer");
-//       // traceHelper.EnableAggregateL3All ();
-//       // traceHelper.SetL3TraceFile ("trace-l3.log");
-//       // traceHelper.SetAppTraceFile ("trace-app.log");
-//       // traceHelper.EnableRateL3All ("rate-trace.log");
-//       //traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumer", "consumers-seqs.log");
-
-      
-//     }
 
   cout << "Finish link failure scenario\n";
   return 0;
