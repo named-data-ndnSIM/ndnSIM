@@ -284,7 +284,7 @@ main (int argc, char *argv[])
       Simulator::Schedule (Seconds (4.5), &CcnxTraceHelper::EnablePathWeights, &traceHelper,
                            prefix + "weights.log");
 
-      experiment.Run (Seconds(30.0));
+      experiment.Run (Seconds(40.0));
     }
 
   cout << "Finish link failure scenario\n";
