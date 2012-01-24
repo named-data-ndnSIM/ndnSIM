@@ -206,7 +206,7 @@ CcnxConsumer::SendPacket ()
 
   if (seq == std::numeric_limits<uint32_t>::max ())
     {
-      if (m_seqMax > 0)
+      if (m_seqMax != std::numeric_limits<uint32_t>::max ())
         {
           if (m_seq >= m_seqMax)
             {

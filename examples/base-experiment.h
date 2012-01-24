@@ -71,7 +71,7 @@ public:
     reader->Commit ();
   }
 
-  void InstallCcnxStack (bool installFIBs = true)
+  void InstallCcnxStackImpl ()
   {
     InternetStackHelper stack;
     Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
@@ -89,7 +89,13 @@ public:
     ccnxHelper.InstallAll ();
 
     reader->ApplyOspfMetric ();
+  }
+  
+  void InstallCcnxStack (bool installFIBs = true)
+  {
+    InstallCcnxStackImpl ();
 
+    CcnxStackHelper ccnxHelper;
     ccnxHelper.InstallFakeGlobalRoutes ();
     if (installFIBs)
       {

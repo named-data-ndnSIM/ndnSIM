@@ -113,6 +113,9 @@ def build(bld):
         obj = bld.create_ns3_program('link-failure', ['NDNabstraction'])
         obj.source = 'examples/link-failure-sprint.cc'
 
+        obj = bld.create_ns3_program('link-failure-base', ['NDNabstraction'])
+        obj.source = 'examples/link-failure-base.cc'
+
         obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
         obj.source = 'examples/blackhole-sprint.cc'
 
