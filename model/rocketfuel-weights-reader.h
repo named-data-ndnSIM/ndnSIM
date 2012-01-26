@@ -67,9 +67,6 @@ public:
       LATENCIES,
       POSITIONS
     };
-
-  void
-  SavePositions (const std::string &file) const;
   
 private:
   RocketfuelWeightsReader (const RocketfuelWeightsReader&);

@@ -102,6 +102,12 @@ public:
    */
   void ApplyOspfMetric ();
 
+  /**
+   * \brief Save positions (e.g., after manual modification using visualizer)
+   */
+  void
+  SavePositions (const std::string &file) const;
+
 protected:
   Ptr<Node>
   CreateNode (const std::string name);

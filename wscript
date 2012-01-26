@@ -118,5 +118,8 @@ def build(bld):
 
         obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
         obj.source = 'examples/blackhole-sprint.cc'
+        
+        obj = bld.create_ns3_program('congestion-zoom', ['NDNabstraction'])
+        obj.source = 'examples/congestion-zoom.cc'
 
     bld.ns3_python_bindings()

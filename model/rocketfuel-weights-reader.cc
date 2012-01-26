@@ -177,22 +177,4 @@ RocketfuelWeightsReader::Commit ()
   SpringMobilityHelper::InstallSprings (LinksBegin (), LinksEnd ());
 }
 
-void
-RocketfuelWeightsReader::SavePositions (const std::string &file) const
-{
-  ofstream os (file.c_str (), ios::trunc);
-  os << "router\n";
-  
-  for (NodeContainer::Iterator node = m_nodes.Begin ();
-       node != m_nodes.End ();
-       node++)
-    {
-      std::string name = Names::FindName (*node);
-      Ptr<MobilityModel> mobility = (*node)->GetObject<MobilityModel> ();
-      Vector position = mobility->GetPosition ();
-
-      os << name << "\t" << "unknown" << "\t" << -position.y << "\t" << position.x << "\n";
-    }
-}
-
 } /* namespace ns3 */

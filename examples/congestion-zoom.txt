@@ -1,0 +1,16 @@
+router
+#name			city	latitude	longitude
+client  		unknown 28.8967		-12.8654
+server  		unknown 28.8967  	51.3505
+clientProvider  	unknown 28.8967   	8.97413
+serverProvider  	unknown 28.8967 	37.5575
+provider1   		unknown 23.5641		32.6924
+provider2  		unknown 36.0641 	32.6924
+link
+#x	y	capacity(kbps)	OSPF    Delay		MaxPackets
+client	clientProvider	10Mbps	1	5ms		200
+server  serverProvider 10Mbps	2	6ms		200
+clientProvider provider1 1Mbps 	1  	50ms		20
+clientProvider provider2 1Mbps 	1  	50ms		20
+serverProvider provider1 1Mbps	1	5ms		20	
+serverProvider provider2 1Mbps	2	6ms		20
