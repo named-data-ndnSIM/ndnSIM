@@ -41,6 +41,7 @@
 #include "tracers/ccnx-aggregate-l3-tracer.h"
 #include "tracers/ccnx-rate-l3-tracer.h"
 #include "tracers/ccnx-seqs-app-tracer.h"
+#include "tracers/ipv4-rate-l3-tracer.h"
 #include "tracers/ipv4-seqs-app-tracer.h"
 #include "tracers/ccnx-consumer-window-tracer.h"
 #include "tracers/ccnx-path-weight-tracer.h"
@@ -76,6 +77,7 @@ CcnxTraceHelper::~CcnxTraceHelper ()
   if (m_windowsTrace != 0) delete m_windowsTrace;
   if (m_windowsTcpTrace != 0) delete m_windowsTcpTrace;
   if (m_pathWeightsTrace != 0) delete m_pathWeightsTrace;
+  if (m_ipv4RateTrace != 0) delete m_ipv4RateTrace;
   
   if (m_apps.size () > 0)
     {
@@ -203,7 +205,7 @@ CcnxTraceHelper::EnableRateL3All (const std::string &l3RateTrace)
       NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
 
       Ptr<CcnxRateL3Tracer> trace = Create<CcnxRateL3Tracer> (boost::ref(*m_l3RateTrace), *node);
-      trace->SetAveragingPeriod (Seconds (0.5));
+      trace->SetAveragingPeriod (Seconds (0.2));
       m_l3Rates.push_back (trace);
     }
 
@@ -214,6 +216,32 @@ CcnxTraceHelper::EnableRateL3All (const std::string &l3RateTrace)
       *m_l3RateTrace << "\n";
     }
 }
+
+void
+CcnxTraceHelper::EnableIpv4RateL3All (const std::string &file)
+{
+  NS_LOG_FUNCTION (this);
+  m_ipv4RateTrace = new ofstream (file.c_str (), ios::trunc);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+
+      Ptr<Ipv4RateL3Tracer> trace = Create<Ipv4RateL3Tracer> (boost::ref(*m_ipv4RateTrace), *node);
+      trace->SetAveragingPeriod (Seconds (0.2));
+      m_ipv4Rates.push_back (trace);
+    }
+
+  if (m_ipv4Rates.size () > 0)
+    {
+      // *m_ipv4RateTrace << "# "; // not necessary for R's read.table
+      m_ipv4Rates.front ()->PrintHeader (*m_ipv4RateTrace);
+      *m_ipv4RateTrace << "\n";
+    }
+}
+
 
 void
 CcnxTraceHelper::EnableSeqsAppAll (const std::string &appName, const std::string &trace)

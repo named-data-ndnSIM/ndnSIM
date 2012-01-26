@@ -126,7 +126,7 @@ public:
     
     CcnxAppHelper consumerHelper ("ns3::CcnxConsumerWindow");
     consumerHelper.SetPrefix ("/" + lexical_cast<string> (server->GetId ()));
-    consumerHelper.SetAttribute ("Size", StringValue ("100.0"));
+    consumerHelper.SetAttribute ("Size", StringValue ("2.0"));
 
     CcnxAppHelper producerHelper ("ns3::CcnxProducer");
     producerHelper.SetPrefix ("/" + lexical_cast<string> (server->GetId ()));
@@ -145,6 +145,26 @@ public:
   {
     ApplicationContainer apps;
 
+    Ptr<Node> client = Names::Find<Node> (prefix, lexical_cast<string> ("client"));
+    Ptr<Node> server = Names::Find<Node> (prefix, lexical_cast<string> ("server"));
+
+    Ptr<Ipv4> ipv4 = client->GetObject<Ipv4> ();
+
+    // to make sure we don't reuse the same port numbers for different flows, just make all port numbers unique
+    PacketSinkHelper consumerHelper ("ns3::TcpSocketFactory",
+                                     InetSocketAddress (Ipv4Address::GetAny (), 1024));
+
+    BulkSendHelper producerHelper ("ns3::TcpSocketFactory",
+                                   InetSocketAddress (ipv4->GetAddress (1, 0).GetLocal (), 1024));
+    // cout << "SendTo: " <<  ipv4->GetAddress (1, 0).GetLocal () << endl;
+    producerHelper.SetAttribute ("MaxBytes", UintegerValue (2081040)); // equal to 2001 ccnx packets
+
+    apps.Add
+      (consumerHelper.Install (client));
+
+    apps.Add
+      (producerHelper.Install (server));
+    
     // uint32_t streamId = 0;
     // const static uint32_t base_port = 10;
     // for (list<tuple<uint32_t,uint32_t> >::iterator i = m_pairs.begin (); i != m_pairs.end (); i++)
@@ -221,7 +241,7 @@ main (int argc, char *argv[])
   {
     experiment.ConfigureTopology ();
     experiment.InstallCcnxStack ();
-    ApplicationContainer apps = experiment.AddCcnxApplications ();
+    experiment.AddCcnxApplications ();
 
     // for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
     //   {
@@ -232,42 +252,43 @@ main (int argc, char *argv[])
     CcnxTraceHelper traceHelper;
     traceHelper.EnableRateL3All (prefix + "rate-trace.log");
     // traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerCbr", prefix + "consumers-seqs.log");
-    traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerWindow", prefix + "consumers-seqs.log");
-    traceHelper.EnableWindowsAll (prefix + "windows.log");
+    // traceHelper.EnableSeqsAppAll ("ns3::CcnxConsumerWindow", prefix + "consumers-seqs.log");
+    // traceHelper.EnableWindowsAll (prefix + "windows.log");
 
     // config.ConfigureAttributes ();
     experiment.Run (Seconds (50.0));
     // experiment.reader->SavePositions ("pos.log");
   }
 
-  // cout << "TCP experiment\n";
-  // // TCP
-  // {
-  //   experiment.ConfigureTopology ();
-  //   experiment.InstallIpStack ();
-  //   ApplicationContainer apps = experiment.AddTcpApplications ();
+  cout << "TCP experiment\n";
+  // TCP
+  {
+    experiment.ConfigureTopology ();
+    experiment.InstallIpStack ();
+    experiment.AddTcpApplications ();
 
-  //   CcnxTraceHelper traceHelper;
-  //   traceHelper.EnableIpv4SeqsAppAll (prefix + "tcp-consumers-seqs.log");
-  //   traceHelper.EnableWindowsTcpAll (prefix + "tcp-windows.log");
+    CcnxTraceHelper traceHelper;
+    traceHelper.EnableIpv4RateL3All (prefix + "ipv4-rate-trace.log");
+    // traceHelper.EnableIpv4SeqsAppAll (prefix + "tcp-consumers-seqs.log");
+    // traceHelper.EnableWindowsTcpAll (prefix + "tcp-windows.log");
 
-  //   for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
-  //     {
-  //       apps.Get (i*2)->SetStartTime (Seconds (1+i));
+    // for (uint32_t i = 0; i < apps.GetN () / 2; i++) 
+    //   {
+    //     apps.Get (i*2)->SetStartTime (Seconds (1+i));
 
-  //       apps.Get (i*2 + 1)->SetStartTime (Seconds (1+i));
+    //     apps.Get (i*2 + 1)->SetStartTime (Seconds (1+i));
 
-  //       // cout << "Node: " << apps.Get (i*2 + 1)->GetNode ()->GetId () << "\n";
-  //       // care only about BulkSender
-  //       Simulator::Schedule (Seconds (1+i+0.01),
-  //                            &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2)->GetNode ());
+    //     // cout << "Node: " << apps.Get (i*2 + 1)->GetNode ()->GetId () << "\n";
+    //     // care only about BulkSender
+    //     Simulator::Schedule (Seconds (1+i+0.01),
+    //                          &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2)->GetNode ());
 
-  //       Simulator::Schedule (Seconds (1+i+0.01),
-  //                            &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2 + 1)->GetNode ());
-  //     }
+    //     Simulator::Schedule (Seconds (1+i+0.01),
+    //                          &CcnxTraceHelper::TcpConnect, &traceHelper, apps.Get (i*2 + 1)->GetNode ());
+    //   }
 
-  //   experiment.Run (Seconds (50.0));
-  // }
+    experiment.Run (Seconds (50.0));
+  }
 
   return 0;
 }

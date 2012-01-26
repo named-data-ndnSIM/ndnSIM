@@ -31,6 +31,7 @@ namespace ns3 {
 class Node;
 class CcnxAppTracer;
 class CcnxL3Tracer;
+class Ipv4L3Tracer;
 class Ipv4AppTracer;
 class WindowTracer;
 class CcnxPathWeightTracer;
@@ -99,6 +100,12 @@ public:
   EnableIpv4SeqsAppAll (const std::string &appSeqsTrace = "app-seqs.log");
 
   /**
+   * @brief Enable network-level IPv4 rate tracing on all IPv4-enabled nodes
+   */
+  void
+  EnableIpv4RateL3All (const std::string &ipv4RateTrace = "ipv4-rate.log");
+
+  /**
    * @brief Enable tracing of window changes in CcnxConsumerWindow
    */
   void
@@ -135,6 +142,9 @@ private:
 
   std::list<Ptr<CcnxAppTracer> > m_appSeqs;
   std::ostream *m_appSeqsTrace;
+
+  std::list<Ptr<Ipv4L3Tracer> > m_ipv4Rates;
+  std::ostream *m_ipv4RateTrace;
 
   std::list<Ptr<Ipv4AppTracer> > m_ipv4AppSeqs;
   std::ostream *m_ipv4AppSeqsTrace;
