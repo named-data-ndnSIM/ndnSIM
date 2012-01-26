@@ -188,6 +188,8 @@ CcnxConsumer::SendPacket ()
 
   uint32_t seq=std::numeric_limits<uint32_t>::max (); //invalid
 
+  // std::cout << Simulator::Now ().ToDouble (Time::S) << "s max -> " << m_seqMax << "\n";
+
   while (m_retxSeqs.size ())
     {
       seq = *m_retxSeqs.begin ();
@@ -319,7 +321,7 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet>
   m_retxSeqs.insert (seq);
   NS_LOG_INFO ("After: " << m_retxSeqs.size ());
 
-  m_rtt->IncreaseMultiplier ();             // Double the next RTO ??
+  // m_rtt->IncreaseMultiplier ();             // Double the next RTO ??
   ScheduleNextPacket ();
 }
 
