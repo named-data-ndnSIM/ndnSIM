@@ -109,8 +109,10 @@ CcnxFace::IsBelowLimit ()
 
   /// \todo Implement tracing, if requested
   
-  if (!IsUp ())
+  if (!IsUp ()){
+    NS_LOG_INFO("CcnxFace is not up.");
     return false;
+  }
 
   LeakBucket ();
   
