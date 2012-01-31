@@ -3,3 +3,7 @@
 in-progress/
 waf
 *~
+*#
+*.txt
+*.pdf
+*.dot
