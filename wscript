@@ -123,4 +123,7 @@ def build(bld):
         obj = bld.create_ns3_program('congestion-zoom', ['NDNabstraction'])
         obj.source = 'examples/congestion-zoom.cc'
 
+        obj = bld.create_ns3_program('vanet-ccnx', ['NDNabstraction', 'highway-mobility'])
+        obj.source = 'examples/vanet-ccnx.cc'
+
     bld.ns3_python_bindings()

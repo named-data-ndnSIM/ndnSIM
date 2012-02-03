@@ -61,6 +61,7 @@ CcnxConsumerCbr::CcnxConsumerCbr ()
   : m_frequency (1.0)
 {
   NS_LOG_FUNCTION_NOARGS ();
+  m_seqMax = std::numeric_limits<uint32_t>::max ();
 }
 
 void
