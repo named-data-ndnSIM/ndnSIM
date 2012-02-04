@@ -17,8 +17,8 @@ main (int argc, char *argv[])
   cmd.Parse (argc,argv);
   NodeContainer producerNode;
   producerNode.Create (1);
-  NodeContainer consumerNode;
-  consumerNode.Create(1);
+  NodeContainer consumerNodes;
+  consumerNodes.Create(2);
   YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
   YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
   phy.SetChannel (channel.Create ());
@@ -36,23 +36,21 @@ main (int argc, char *argv[])
                "Ssid", SsidValue (ssid));
   */
   NetDeviceContainer consumerDevices;
-  consumerDevices = wifi.Install (phy, mac, consumerNode);
+  consumerDevices = wifi.Install (phy, mac, consumerNodes);
 
   MobilityHelper mobility;
-  mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
-                                 "MinX", DoubleValue (0.0),
-                                 "MinY", DoubleValue (0.0),
-                                 "DeltaX", DoubleValue (300.0),
-                                 "DeltaY", DoubleValue (10.0),
-                                 "GridWidth", UintegerValue (3),
-                                 "LayoutType", StringValue ("RowFirst"));
+  mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
+				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
+				 "Direction", DoubleValue(0.0),
+				 "Length", DoubleValue(1000.0));
+  
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
 			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
   mobility.Install (producerNode);
 
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(-26.8224, 0, 0)));
-  mobility.Install (consumerNode);
+			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
+  mobility.Install (consumerNodes);
 
 
   // 1. Set RoutingHelper to support prefix
@@ -91,7 +89,7 @@ main (int argc, char *argv[])
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
   consumerHelper.SetPrefix (prefix.str ());
   consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
-  ApplicationContainer consumers = consumerHelper.Install (consumerNode);
+  ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);

@@ -101,7 +101,7 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest)
   Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
   header->SetName (Create<CcnxNameComponents> (interest->GetName ()));
 
-  NS_LOG_INFO ("Respodning with ContentObject:\n" << boost::cref(*header));
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
 

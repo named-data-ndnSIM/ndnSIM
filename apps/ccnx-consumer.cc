@@ -315,7 +315,7 @@ CcnxConsumer::SendPacket ()
   interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
         
   // NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
-  NS_LOG_INFO ("> Interest for " << seq);
+  NS_LOG_DEBUG ("node("<< GetNode()->GetId() <<") sending Interest for sequence " << seq);
 
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader (interestHeader);
@@ -354,7 +354,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
   // NS_LOG_INFO ("Received content object: " << boost::cref(*contentObject));
   
   uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
-  NS_LOG_INFO ("< DATA for " << seq);
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") get DATA for sequence " << seq);
 
   boost::mutex::scoped_lock (m_seqTimeoutsGuard);
   
@@ -384,7 +384,7 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest)
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
   uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ().GetComponents ().back ());
-  NS_LOG_INFO ("< NACK for " << seq);
+  NS_LOG_DEBUG ("node("<< GetNode()->GetId() <<") < NACK for " << seq);
 
   // put in the queue of interests to be retransmitted
   NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
