@@ -61,6 +61,7 @@ namespace ns3 {
 CcnxTraceHelper::CcnxTraceHelper ()
   : m_l3RateTrace (0)
   , m_appSeqsTrace (0)
+  , m_ipv4RateTrace (0)
   , m_ipv4AppSeqsTrace (0)
   , m_windowsTrace (0)
   , m_windowsTcpTrace (0)
