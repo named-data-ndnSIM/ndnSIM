@@ -108,7 +108,7 @@ CcnxConsumer::CcnxConsumer ()
   , m_seqMax (0) // don't request anything
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   m_rtt = CreateObject<RttMeanDeviation> ();
 }
 
@@ -136,7 +136,7 @@ CcnxConsumer::CheckRetxTimeout ()
   Time now = Simulator::Now ();
 
   Time rto = m_rtt->RetransmitTimeout ();
-  
+
   while (!m_seqTimeouts.empty ())
     {
       SeqTimeoutsContainer::index<i_timestamp>::type::iterator entry =
@@ -189,7 +189,7 @@ CcnxConsumer::SendPacket ()
   uint32_t seq=std::numeric_limits<uint32_t>::max (); //invalid
 
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s max -> " << m_seqMax << "\n";
-
+  
   while (m_retxSeqs.size ())
     {
       seq = *m_retxSeqs.begin ();
@@ -218,7 +218,7 @@ CcnxConsumer::SendPacket ()
       
       seq = m_seq++;
     }
-
+  
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
   
   //
@@ -297,7 +297,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
       m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
       // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
       //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
-    }
+}
 }
 
 void

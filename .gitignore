@@ -4,3 +4,7 @@ in-progress/
 waf
 *~
 .DS_Store
+*\#
+*.txt
+*.pdf
+*.dot

@@ -126,4 +126,8 @@ def build(bld):
         obj = bld.create_ns3_program('vanet-ccnx', ['NDNabstraction', 'highway-mobility'])
         obj.source = 'examples/vanet-ccnx.cc'
 
+        obj = bld.create_ns3_program('car2car-wifi', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
+        obj.source = 'examples/car2car-wifi.cc'
+
+
     bld.ns3_python_bindings()
