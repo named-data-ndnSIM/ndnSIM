@@ -53,49 +53,26 @@ main (int argc, char *argv[])
   mobility.Install (consumerNodes);
 
 
-  // 1. Set RoutingHelper to support prefix
-  //InternetStackHelper stack;
-  //Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-  //stack.SetRoutingHelper (ipv4RoutingHelper);
-
+  
   // 2. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
-  std::string strategy = "ns3::CcnxFloodingStrategy";
-  ccnxHelper.SetForwardingStrategy (strategy);
   ccnxHelper.SetDefaultRoutes(true);
-  //ccnxHelper.EnableLimits (false, Seconds(0.1));
   ccnxHelper.InstallAll ();
-
-  // 3. Install IP stack
-  //stack.Install (consumerNode);
-  //stack.Install (producerNode);
-
-  // 4. Assign Addresses
-  //Ipv4AddressHelper address;
-  //address.SetBase ("10.1.3.0", "255.255.255.0");
-  //address.Assign (consumerDevices);
-  //Ipv4InterfaceContainer producerInterface = address.Assign (producerDevices);
-
-  // 5. Populate FIB based on IPv4 global routing controller
-  //ccnxHelper.InstallFakeGlobalRoutes ();
-  //ccnxHelper.InstallRouteTo (producerNode.Get(0));
 
   // 6. Set up applications
   NS_LOG_INFO ("Installing Applications");
-  std::ostringstream prefix;
-  prefix << "/" << producerNode.Get(0)->GetId ();
   
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumer");
-  consumerHelper.SetPrefix (prefix.str ());
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+  consumerHelper.SetPrefix ("/");
+  consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);
     
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
-  producerHelper.SetPrefix (prefix.str ());
+  producerHelper.SetPrefix ("/");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producerNode);
 
