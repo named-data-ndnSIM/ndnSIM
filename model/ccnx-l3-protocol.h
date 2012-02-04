@@ -208,6 +208,8 @@ private:
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
+  bool m_nacksEnabled;
+  
   // Time    m_bucketLeakInterval;
   // EventId m_bucketLeakEvent;
 };

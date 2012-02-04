@@ -75,12 +75,10 @@ CcnxL3Protocol::GetTypeId (void)
                    MakePointerAccessor (&CcnxL3Protocol::SetForwardingStrategy, &CcnxL3Protocol::GetForwardingStrategy),
                    MakePointerChecker<CcnxForwardingStrategy> ())
     
-    // .AddAttribute ("BucketLeakInterval",
-    //                "Interval to leak buckets",
-    //                StringValue ("100ms"),
-    //                MakeTimeAccessor (&CcnxL3Protocol::GetBucketLeakInterval,
-    //                                  &CcnxL3Protocol::SetBucketLeakInterval),
-    //                MakeTimeChecker ())
+    .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&CcnxL3Protocol::m_nacksEnabled),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -410,14 +408,17 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
        * Every time interest is satisfied, PIT entry (with empty incoming and outgoing faces)
        * is kept for another small chunk of time.
        */
-      
-      NS_LOG_DEBUG ("Sending NACK_LOOP");
-      header->SetNack (CcnxInterestHeader::NACK_LOOP);
-      Ptr<Packet> nack = Create<Packet> ();
-      nack->AddHeader (*header);
 
-      incomingFace->Send (nack);
-      m_outNacks (header, incomingFace);
+      if (m_nacksEnabled)
+        {
+          NS_LOG_DEBUG ("Sending NACK_LOOP");
+          header->SetNack (CcnxInterestHeader::NACK_LOOP);
+          Ptr<Packet> nack = Create<Packet> ();
+          nack->AddHeader (*header);
+
+          incomingFace->Send (nack);
+          m_outNacks (header, incomingFace);
+        }
       
       return;
     }
@@ -610,16 +611,20 @@ void
 CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
                                 Ptr<CcnxInterestHeader> header)
 {
-  Ptr<Packet> packet = Create<Packet> ();
-  header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
-  packet->AddHeader (*header);
-
-  BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
+  if (m_nacksEnabled)
     {
-      incoming.m_face->Send (packet->Copy ());
+      Ptr<Packet> packet = Create<Packet> ();
+      header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
+      packet->AddHeader (*header);
 
-      m_outNacks (header, incoming.m_face);
+      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
+        {
+          incoming.m_face->Send (packet->Copy ());
+
+          m_outNacks (header, incoming.m_face);
+        }
     }
+  
   // All incoming interests cannot be satisfied. Remove them
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
@@ -633,38 +638,5 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
                  ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
                            Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
 }
-
-// void
-// CcnxL3Protocol::SetBucketLeakInterval (Time interval)
-// {
-//   m_bucketLeakInterval = interval;
-  
-//   if (m_bucketLeakEvent.IsRunning ())
-//     m_bucketLeakEvent.Cancel ();
-
-//   m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
-//                                            &CcnxL3Protocol::LeakBuckets, this);
-// }
-
-// Time
-// CcnxL3Protocol::GetBucketLeakInterval () const
-// {
-//   return m_bucketLeakInterval;
-// }
-
-// void 
-// CcnxL3Protocol::LeakBuckets ()
-// {
-//   // NS_LOG_FUNCTION (this);
-
-//   BOOST_FOREACH (const Ptr<CcnxFace> &face, m_faces)
-//     {
-//       face->LeakBucket (m_bucketLeakInterval);
-//     }
-
-//   m_bucketLeakEvent = Simulator::Schedule (m_bucketLeakInterval,
-//                                            &CcnxL3Protocol::LeakBuckets,
-//                                            this);
-// }
 
 } //namespace ns3
