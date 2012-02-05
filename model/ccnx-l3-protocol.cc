@@ -79,6 +79,10 @@ CcnxL3Protocol::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&CcnxL3Protocol::m_nacksEnabled),
                    MakeBooleanChecker ())
+    .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CcnxL3Protocol::m_cacheUnsolicitedData),
+                   MakeBooleanChecker ())
   ;
   return tid;
 }
@@ -559,11 +563,18 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         {
           // Unsolicited data, but we're interested in it... should we get it?
           // Potential hole for attacks
-          
-          NS_LOG_ERROR ("Node "<< m_node->GetId() <<
-                       ". PIT entry for "<< header->GetName ()<<" is valid, "
-                        "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
 
+          if (m_cacheUnsolicitedData)
+            {
+              // Optimistically add or update entry in the content store
+              m_contentStore->Add (header, payload);
+            }
+          else
+            {
+              NS_LOG_ERROR ("Node "<< m_node->GetId() <<
+                            ". PIT entry for "<< header->GetName ()<<" is valid, "
+                            "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
+            }
           // ignore unsolicited data
           return;
         }
@@ -598,11 +609,19 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
     }
   catch (CcnxPitEntryNotFound)
     {
-      // 2. Drop data packet if PIT entry is not found
-      //    (unsolicited data packets should not "poison" content store)
+      if (m_cacheUnsolicitedData)
+        {
+          // Optimistically add or update entry in the content store
+          m_contentStore->Add (header, payload);
+        }
+      else
+        {
+          // Drop data packet if PIT entry is not found
+          // (unsolicited data packets should not "poison" content store)
       
-      //drop dulicated or not requested data packet
-      m_dropData (header, payload, UNSOLICITED, incomingFace);
+          //drop dulicated or not requested data packet
+          m_dropData (header, payload, UNSOLICITED, incomingFace);
+        }
       return; // do not process unsoliced data packets
     }
 }
@@ -611,6 +630,7 @@ void
 CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
                                 Ptr<CcnxInterestHeader> header)
 {
+  NS_LOG_FUNCTION (this << &pitEntry);
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
@@ -619,6 +639,7 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
+          NS_LOG_DEBUG ("Send NACK for " << boost::cref (header->GetName ()) << " to " << boost::cref (*incoming.m_face));
           incoming.m_face->Send (packet->Copy ());
 
           m_outNacks (header, incoming.m_face);

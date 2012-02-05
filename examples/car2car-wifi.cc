@@ -13,30 +13,47 @@ NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
 int 
 main (int argc, char *argv[])
 {
+  // disable fragmentation
+  Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("2200"));
+  Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
+
+  // vanet hacks to CcnxL3Protocol
+  Config::SetDefault ("ns3::CcnxL3Protocol::EnableNACKs", StringValue ("false"));
+  Config::SetDefault ("ns3::CcnxL3Protocol::CacheUnsolicitedData", StringValue ("true"));
+
   CommandLine cmd;
   cmd.Parse (argc,argv);
+
+  //////////////////////
+  //////////////////////
+  //////////////////////
+  
+  WifiHelper wifi = WifiHelper::Default ();
+  // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+  wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
+  wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
+                                "DataMode", StringValue ("OfdmRate54Mbps"));
+
+  YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
+
+  YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
+  wifiPhy.SetChannel (wifiChannel.Create ());
+
+  NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
+  wifiMac.SetType("ns3::AdhocWifiMac");
+
+  //////////////////////
+  //////////////////////
+  //////////////////////
+
+  
   NodeContainer producerNode;
   producerNode.Create (1);
   NodeContainer consumerNodes;
   consumerNodes.Create(2);
-  YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
-  YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
-  phy.SetChannel (channel.Create ());
-  WifiHelper wifi = WifiHelper::Default ();
-  wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
-  NqosWifiMacHelper mac = NqosWifiMacHelper::Default ();
-  /*Ssid ssid = Ssid ("ns-3-ssid");
-  mac.SetType ("ns3::StaWifiMac",
-               "Ssid", SsidValue (ssid),
-               "ActiveProbing", BooleanValue (false));*/
-  mac.SetType("ns3::AdhocWifiMac");
-  NetDeviceContainer producerDevices;
-  producerDevices = wifi.Install (phy, mac, producerNode);
-  /*mac.SetType ("ns3::ApWifiMac",
-               "Ssid", SsidValue (ssid));
-  */
-  NetDeviceContainer consumerDevices;
-  consumerDevices = wifi.Install (phy, mac, consumerNodes);
+
+  wifi.Install (wifiPhy, wifiMac, producerNode);
+  wifi.Install (wifiPhy, wifiMac, consumerNodes);
 
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
@@ -45,13 +62,12 @@ main (int argc, char *argv[])
 				 "Length", DoubleValue(1000.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
   mobility.Install (producerNode);
 
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
   mobility.Install (consumerNodes);
-
 
   
   // 2. Install CCNx stack
@@ -66,7 +82,7 @@ main (int argc, char *argv[])
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix ("/");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
-  ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
+  ApplicationContainer consumers = consumerHelper.Install (consumerNodes.Get (0));
   
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);

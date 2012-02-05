@@ -209,6 +209,7 @@ private:
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
   bool m_nacksEnabled;
+  bool m_cacheUnsolicitedData;
   
   // Time    m_bucketLeakInterval;
   // EventId m_bucketLeakEvent;
