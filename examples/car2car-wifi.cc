@@ -10,6 +10,51 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
 
+
+
+void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
+
+  //////////////////////
+  //////////////////////
+  //////////////////////
+
+  
+  NodeContainer producerNode;
+  producerNode.Create (1);
+  NodeContainer consumerNodes;
+  consumerNodes.Create(2);
+
+  wifi.Install (wifiPhy, wifiMac, producerNode);
+  wifi.Install (wifiPhy, wifiMac, consumerNodes);
+
+  mobility.Install (producerNode);
+  mobility.Install (consumerNodes);
+
+  // 2. Install CCNx stack
+  NS_LOG_INFO ("Installing CCNx stack");
+  CcnxStackHelper ccnxHelper;
+  ccnxHelper.SetDefaultRoutes(true);
+  ccnxHelper.Install(producerNode);
+  ccnxHelper.Install(consumerNodes);
+
+  // 6. Set up applications
+  NS_LOG_INFO ("Installing Applications");
+  
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+  consumerHelper.SetPrefix ("/");
+  consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
+  ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
+  
+  static int highway_run = 1;
+  if(highway_run == 2){
+    CcnxAppHelper producerHelper ("ns3::CcnxProducer");
+    producerHelper.SetPrefix ("/");
+    producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+    ApplicationContainer producers = producerHelper.Install (producerNode);
+  }
+  highway_run++;
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -27,7 +72,6 @@ main (int argc, char *argv[])
   //////////////////////
   //////////////////////
   //////////////////////
-  
   WifiHelper wifi = WifiHelper::Default ();
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
@@ -41,56 +85,30 @@ main (int argc, char *argv[])
 
   NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
   wifiMac.SetType("ns3::AdhocWifiMac");
-
-  //////////////////////
-  //////////////////////
-  //////////////////////
-
   
-  NodeContainer producerNode;
-  producerNode.Create (1);
-  NodeContainer consumerNodes;
-  consumerNodes.Create(2);
 
-  wifi.Install (wifiPhy, wifiMac, producerNode);
-  wifi.Install (wifiPhy, wifiMac, consumerNodes);
-
+  // Setup the first highway going in the direction of left -> right
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
-				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
+				 "Start", VectorValue(Vector(520.0, 0.0, 0.0)),
+				 "Direction", DoubleValue(0.0),
+				 "Length", DoubleValue(1000.0));
+  
+  mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
+			    "ConstantVelocity", VectorValue(Vector(0, 0, 0)));
+
+  SetupHighway(mobility, wifi, wifiPhy, wifiMac);
+  /*26.8224*/
+  // Set up the second highway going in the direction of left <- right
+  mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
+				 "Start", VectorValue(Vector(500.0, 5.0, 0.0)),
 				 "Direction", DoubleValue(0.0),
 				 "Length", DoubleValue(1000.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
 			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
-  mobility.Install (producerNode);
 
-  mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
-  mobility.Install (consumerNodes);
-
-  
-  // 2. Install CCNx stack
-  NS_LOG_INFO ("Installing CCNx stack");
-  CcnxStackHelper ccnxHelper;
-  ccnxHelper.SetDefaultRoutes(true);
-  ccnxHelper.InstallAll ();
-
-  // 6. Set up applications
-  NS_LOG_INFO ("Installing Applications");
-  
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  consumerHelper.SetPrefix ("/");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
-  ApplicationContainer consumers = consumerHelper.Install (consumerNodes.Get (0));
-  
-  // consumers.Start (Seconds (0.0));
-  // consumers.Stop (finishTime);
-    
-  CcnxAppHelper producerHelper ("ns3::CcnxProducer");
-  producerHelper.SetPrefix ("/");
-  producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
-  ApplicationContainer producers = producerHelper.Install (producerNode);
+  SetupHighway(mobility, wifi, wifiPhy, wifiMac);
 
   Simulator::Stop (Seconds (10.0));
   Simulator::Run ();
