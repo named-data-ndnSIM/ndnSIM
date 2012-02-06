@@ -17,12 +17,14 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   //////////////////////
   //////////////////////
   //////////////////////
-
+  static int highway_run = 1;
   
   NodeContainer producerNode;
   producerNode.Create (1);
+  
   NodeContainer consumerNodes;
-  consumerNodes.Create(2);
+  if(highway_run == 2)
+    consumerNodes.Create(2);
 
   wifi.Install (wifiPhy, wifiMac, producerNode);
   wifi.Install (wifiPhy, wifiMac, consumerNodes);
@@ -45,11 +47,11 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
-  static int highway_run = 1;
+
   if(highway_run == 2){
     CcnxAppHelper producerHelper ("ns3::CcnxProducer");
     producerHelper.SetPrefix ("/");
-    producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+    producerHelper.SetAttribute ("PayloadSize", StringValue("100"));
     ApplicationContainer producers = producerHelper.Install (producerNode);
   }
   highway_run++;
