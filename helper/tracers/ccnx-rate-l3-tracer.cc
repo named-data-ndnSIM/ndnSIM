@@ -186,7 +186,7 @@ CcnxRateL3Tracer::DropNacks (std::string context,
 void
 CcnxRateL3Tracer::OutData  (std::string context,
                             Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
-                            bool fromCache, Ptr<const CcnxFace> face)
+                            Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_inData ++;
   m_stats[face].get<1> ().m_inData += header->GetSerializedSize () + payload->GetSize ();

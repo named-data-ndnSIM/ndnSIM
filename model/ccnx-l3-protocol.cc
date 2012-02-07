@@ -41,6 +41,7 @@
 #include "ccnx-content-object-header.h"
 
 #include "ccnx-net-device-face.h"
+#include "ccnx-cache-face.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -109,6 +110,7 @@ CcnxL3Protocol::SetNode (Ptr<Node> node)
   NS_ASSERT_MSG (m_fib != 0, "FIB should be created and aggregated to a node before calling Ccnx::SetNode");
 
   m_pit->SetFib (m_fib);
+  m_cacheFace = CreateObject<CcnxCacheFace> (node);
 }
 
 /*
@@ -295,7 +297,7 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 
 void
 CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
-                        Ptr<CcnxInterestHeader> &header,
+                        const Ptr<const CcnxInterestHeader> &header,
                         const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
@@ -368,19 +370,20 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
 
   Ptr<Packet> nonNackInterest = Create<Packet> ();
-  header->SetNack (CcnxInterestHeader::NORMAL_INTEREST);
-  nonNackInterest->AddHeader (*header);
+  Ptr<CcnxInterestHeader> nonNackHeader = Create<CcnxInterestHeader> (*header);
+  nonNackHeader->SetNack (CcnxInterestHeader::NORMAL_INTEREST);
+  nonNackInterest->AddHeader (*nonNackHeader);
   
   bool propagated = m_forwardingStrategy->
-    PropagateInterest (pitEntry, incomingFace, header, nonNackInterest);
+    PropagateInterest (pitEntry, incomingFace, nonNackHeader, nonNackInterest);
 
   // // ForwardingStrategy will try its best to forward packet to at least one interface.
   // // If no interests was propagated, then there is not other option for forwarding or
   // // ForwardingStrategy failed to find it. 
   if (!propagated)
     {
-      m_dropNacks (header, NO_FACES, incomingFace); // this headers doesn't have NACK flag set
-      GiveUpInterest (pitEntry, header);
+      m_dropNacks (header, NO_FACES, incomingFace);
+      GiveUpInterest (pitEntry, nonNackHeader);
     }
 }
 
@@ -389,7 +392,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
 // !!! Key point.
 // !!! All interests should be answerred!!! Either later with data, immediately with data, or immediately with NACK
 void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
-                                 Ptr<CcnxInterestHeader> &header,
+                                 const Ptr<const CcnxInterestHeader> &header,
                                  const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
@@ -416,46 +419,22 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       if (m_nacksEnabled)
         {
           NS_LOG_DEBUG ("Sending NACK_LOOP");
-          header->SetNack (CcnxInterestHeader::NACK_LOOP);
+          Ptr<CcnxInterestHeader> nackHeader = Create<CcnxInterestHeader> (*header);
+          nackHeader->SetNack (CcnxInterestHeader::NACK_LOOP);
           Ptr<Packet> nack = Create<Packet> ();
-          nack->AddHeader (*header);
+          nack->AddHeader (*nackHeader);
 
           incomingFace->Send (nack);
-          m_outNacks (header, incomingFace);
+          m_outNacks (nackHeader, incomingFace);
         }
       
       return;
     }
-
-  Ptr<Packet> contentObject;
-  Ptr<const CcnxContentObjectHeader> contentObjectHeader; // used for tracing
-  Ptr<const Packet> payload; // used for tracing
-  tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
-  if (contentObject != 0)
-    {
-      NS_ASSERT (contentObjectHeader != 0);
-      
-      NS_LOG_LOGIC("Found in cache");
-        
-      incomingFace->Send (contentObject);
-      m_outData (contentObjectHeader, payload, true, incomingFace);
-
-      // Set pruning timout on PIT entry (instead of deleting the record)
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
-        
-      return;
-    }
-
-  // \todo Detect retransmissions. Not yet sure how...
   
-  // Data is not in cache
+  // Trying to check whether interest is retransmitted or not
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
-  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
 
-  bool isRetransmitted = false;
-  
+  bool isRetransmitted = false; 
   if (inFace != pitEntry.m_incoming.end ())
     {
       // CcnxPitEntryIncomingFace.m_arrivalTime keeps track arrival time of the first packet... why?
@@ -475,7 +454,28 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::UpdateLifetime, ll::_1,
                            header->GetInterestLifetime ()));
+
+  // Check cache
+  Ptr<Packet> contentObject;
+  Ptr<const CcnxContentObjectHeader> contentObjectHeader; // used for tracing
+  Ptr<const Packet> payload; // used for tracing
+  tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
+  if (contentObject != 0)
+    {
+      NS_ASSERT (contentObjectHeader != 0);
+      NS_LOG_LOGIC("Found in cache");
+
+      OnData (m_cacheFace, contentObjectHeader, payload, contentObject);
+        
+      // Set pruning timout on PIT entry (instead of deleting the record)
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+        
+      return;
+    }
   
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
   if (outFace != pitEntry.m_outgoing.end ())
     {
       // got a non-duplicate interest from the face we have sent interest to
@@ -533,8 +533,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 // Processing ContentObjects
 void
 CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
-                        Ptr<CcnxContentObjectHeader> &header,
-                        Ptr<Packet> &payload,
+                        const Ptr<const CcnxContentObjectHeader> &header,
+                        const Ptr<const Packet> &payload,
                         const Ptr<const Packet> &packet)
 {
     
@@ -593,7 +593,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           if (incoming.m_face != incomingFace)
             {
               incoming.m_face->Send (packet->Copy ());
-              m_outData (header, payload, false, incoming.m_face);
+              m_outData (header, payload, incoming.m_face);
             }
 
           // successfull forwarded data trace
@@ -628,21 +628,22 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 
 void
 CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
-                                Ptr<CcnxInterestHeader> header)
+                                const Ptr<const CcnxInterestHeader> header)
 {
   NS_LOG_FUNCTION (this << &pitEntry);
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
-      header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
-      packet->AddHeader (*header);
+      Ptr<CcnxInterestHeader> nackHeader = Create<CcnxInterestHeader> (*header);
+      nackHeader->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
+      packet->AddHeader (*nackHeader);
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
-          NS_LOG_DEBUG ("Send NACK for " << boost::cref (header->GetName ()) << " to " << boost::cref (*incoming.m_face));
+          NS_LOG_DEBUG ("Send NACK for " << boost::cref (nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
           incoming.m_face->Send (packet->Copy ());
 
-          m_outNacks (header, incoming.m_face);
+          m_outNacks (nackHeader, incoming.m_face);
         }
     }
   

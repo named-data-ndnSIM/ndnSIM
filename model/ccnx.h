@@ -198,7 +198,6 @@ protected:
   ////////////////////////////////////////////////////////////////////
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 bool /*from cache*/,
                  Ptr<const CcnxFace> > m_outData;
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,

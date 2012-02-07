@@ -49,7 +49,7 @@ public:
   virtual bool
   PropagateInterest (const CcnxPitEntry  &pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> &header,
+                     const Ptr<const CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet);
 };
     

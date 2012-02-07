@@ -72,7 +72,7 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InData   (std::string context,

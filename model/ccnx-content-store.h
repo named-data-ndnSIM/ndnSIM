@@ -68,7 +68,7 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+  CcnxContentStoreEntry (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet);
 
   /**
    * \brief Get prefix of the stored entry
@@ -105,8 +105,8 @@ public:
 //   CcnxContentStoreEntry& operator= (const CcnxContentStoreEntry&); ///< disabled copy operator
   
 private:
-  Ptr<CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
-  Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
+  Ptr<const CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
+  Ptr<const Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
 };
 
 /**
@@ -188,7 +188,7 @@ public:
    * promoted to the top of the MRU hash
    */
   void
-  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+  Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet);
 
   /**
    * \brief Set maximum size of content store

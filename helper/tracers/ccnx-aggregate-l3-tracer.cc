@@ -174,7 +174,7 @@ CcnxAggregateL3Tracer::DropNacks (std::string context,
 void
 CcnxAggregateL3Tracer::OutData  (std::string context,
                                  Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
-                                 bool fromCache, Ptr<const CcnxFace>)
+                                 Ptr<const CcnxFace>)
 {
   m_packets.m_outData++;
   m_bytes.m_outData += header->GetSerializedSize () + payload->GetSize ();

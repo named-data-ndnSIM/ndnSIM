@@ -135,7 +135,7 @@ private:
    */
   void
   OnInterest (const Ptr<CcnxFace> &face,
-              Ptr<CcnxInterestHeader> &header,
+              const Ptr<const CcnxInterestHeader> &header,
               const Ptr<const Packet> &p);
 
   /**
@@ -148,7 +148,7 @@ private:
    */
   void
   OnNack (const Ptr<CcnxFace> &face,
-          Ptr<CcnxInterestHeader> &header,
+          const Ptr<const CcnxInterestHeader> &header,
           const Ptr<const Packet> &p);
   
   /**
@@ -162,8 +162,8 @@ private:
    */
   void
   OnData (const Ptr<CcnxFace> &face,
-          Ptr<CcnxContentObjectHeader> &header,
-          Ptr<Packet> &payload,
+          const Ptr<const CcnxContentObjectHeader> &header,
+          const Ptr<const Packet> &payload,
           const Ptr<const Packet> &packet);
 
 protected:
@@ -193,7 +193,7 @@ private:
 
   void
   GiveUpInterest (const CcnxPitEntry &pitEntry,
-                  Ptr<CcnxInterestHeader> header);
+                  const Ptr<const CcnxInterestHeader> header);
 
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
@@ -206,8 +206,10 @@ private:
   // Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
-  Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
+  Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
+  Ptr<CcnxFace>         m_cacheFace; ///< \brief Virtual cache face (doesn't really do anything right now, only for tracing/interface purposes)
+  
   bool m_nacksEnabled;
   bool m_cacheUnsolicitedData;
   
