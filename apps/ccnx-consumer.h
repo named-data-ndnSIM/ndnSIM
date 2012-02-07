@@ -54,6 +54,7 @@ public:
    * Sets up randomizer function and packet sequence number
    */
   CcnxConsumer ();
+  virtual ~CcnxConsumer () {};
 
   // From CcnxApp
   // virtual void

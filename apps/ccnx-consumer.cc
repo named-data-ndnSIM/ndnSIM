@@ -243,6 +243,7 @@ CcnxConsumer::SendPacket ()
 
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader (interestHeader);
+  NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
 
   m_protocolHandler (packet);
 

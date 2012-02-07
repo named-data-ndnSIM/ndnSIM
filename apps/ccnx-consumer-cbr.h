@@ -41,6 +41,7 @@ public:
    * Sets up randomizer function and packet sequence number
    */
   CcnxConsumerCbr ();
+  virtual ~CcnxConsumerCbr ();
 
   // From CcnxApp
   // virtual void
@@ -59,6 +60,12 @@ protected:
    */
   virtual void
   ScheduleNextPacket ();
+
+  void
+  SetRandomize (const std::string &value);
+
+  std::string
+  GetRandomize () const;
   
 private:
   // void
@@ -74,8 +81,10 @@ private:
   // GetDesiredRate () const;
   
 protected:
-  ExponentialVariable m_randExp; // packet inter-arrival time generation (Poisson process)
   double              m_frequency; // Frequency of interest packets (in hertz)
+  bool                m_firstTime;
+  RandomVariable      *m_random;
+  std::string         m_randomType;
 };
 
 } // namespace ns3

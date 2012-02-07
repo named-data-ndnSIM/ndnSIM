@@ -52,6 +52,10 @@ CcnxConsumerCbr::GetTypeId (void)
                    StringValue ("1.0"),
                    MakeDoubleAccessor (&CcnxConsumerCbr::m_frequency),
                    MakeDoubleChecker<double> ())
+    .AddAttribute ("Randomize", "Type of send time randomization: none (default), uniform, exponential",
+                   StringValue ("none"),
+                   MakeStringAccessor (&CcnxConsumerCbr::SetRandomize, &CcnxConsumerCbr::GetRandomize),
+                   MakeStringChecker ())
     ;
 
   return tid;
@@ -59,9 +63,17 @@ CcnxConsumerCbr::GetTypeId (void)
     
 CcnxConsumerCbr::CcnxConsumerCbr ()
   : m_frequency (1.0)
+  , m_firstTime (true)
+  , m_random (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_seqMax = std::numeric_limits<uint32_t>::max ();
+}
+
+CcnxConsumerCbr::~CcnxConsumerCbr ()
+{
+  if (m_random)
+    delete m_random;
 }
 
 void
@@ -70,12 +82,47 @@ CcnxConsumerCbr::ScheduleNextPacket ()
   // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
   // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
 
-  if (!m_sendEvent.IsRunning ())
+  if (m_firstTime)
+    {
+      m_sendEvent = Simulator::Schedule (Seconds (0.0),
+                                         &CcnxConsumer::SendPacket, this);
+      m_firstTime = false;
+    }
+  else if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (
-                                       // Seconds(m_randExp.GetValue ()),
-                                       Seconds(1.0 / m_frequency),
+                                       (m_random == 0) ?
+                                         Seconds(1.0 / m_frequency)
+                                       :
+                                         Seconds(m_random->GetValue ()),
                                        &CcnxConsumer::SendPacket, this);
 }
+
+void
+CcnxConsumerCbr::SetRandomize (const std::string &value)
+{
+  if (m_random)
+    delete m_random;
+
+  else if (value == "uniform")
+    {
+      m_random = new UniformVariable (0.0, 2 * 1.0 / m_frequency);
+    }
+  else if (value == "exponential")
+    {
+      m_random = new ExponentialVariable (1.0 / m_frequency, 50 * 1.0 / m_frequency);
+    }
+  else
+    m_random = 0;
+
+  m_randomType = value;  
+}
+
+std::string
+CcnxConsumerCbr::GetRandomize () const
+{
+  return m_randomType;
+}
+
 
 ///////////////////////////////////////////////////
 //          Process incoming packets             //
