@@ -23,8 +23,8 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   producerNode.Create (1);
   
   NodeContainer consumerNodes;
-  if(highway_run == 2)
-    consumerNodes.Create(2);
+  //if(highway_run == 2)
+  consumerNodes.Create(30);
 
   wifi.Install (wifiPhy, wifiMac, producerNode);
   wifi.Install (wifiPhy, wifiMac, consumerNodes);
@@ -48,7 +48,7 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
 
-  if(highway_run == 2){
+  if(highway_run == 2){ // there is only one producer in the scenario on the second highway 
     CcnxAppHelper producerHelper ("ns3::CcnxProducer");
     producerHelper.SetPrefix ("/");
     producerHelper.SetAttribute ("PayloadSize", StringValue("100"));
@@ -90,27 +90,30 @@ main (int argc, char *argv[])
   
 
   // Setup the first highway going in the direction of left -> right
+  //bool static_cars = true;
+
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
-				 "Start", VectorValue(Vector(520.0, 0.0, 0.0)),
+				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
 				 "Direction", DoubleValue(0.0),
 				 "Length", DoubleValue(1000.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(0, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
 
   SetupHighway(mobility, wifi, wifiPhy, wifiMac);
   /*26.8224*/
   // Set up the second highway going in the direction of left <- right
   mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
-				 "Start", VectorValue(Vector(500.0, 5.0, 0.0)),
+				 "Start", VectorValue(Vector(1000.0, 5.0, 0.0)),
 				 "Direction", DoubleValue(0.0),
 				 "Length", DoubleValue(1000.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(-26.8224, 0, 0)));
 
   SetupHighway(mobility, wifi, wifiPhy, wifiMac);
+
 
   Simulator::Stop (Seconds (10.0));
   Simulator::Run ();

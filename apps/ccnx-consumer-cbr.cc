@@ -33,6 +33,7 @@
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+#include "ns3/random-variable.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxConsumerCbr");
 
@@ -70,10 +71,15 @@ CcnxConsumerCbr::ScheduleNextPacket ()
   // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
   // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
 
+  // Lucas: need to add some jitter to prevent all consumers send out interests at the same time.
+  UniformVariable jitter_gen (-0.1, 0.1);
+  double jitter = jitter_gen.GetValue();
+
   if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (
                                        // Seconds(m_randExp.GetValue ()),
-                                       Seconds(1.0 / m_frequency),
+                                       //Seconds(1.0 / m_frequency),
+                                       Seconds((1.0 / m_frequency) + jitter),
                                        &CcnxConsumer::SendPacket, this);
 }
 
