@@ -10,12 +10,20 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
 
+static void
+ExactTimePrinter (std::ostream &os)
+{
+  os << Simulator::Now ();
+}
+
+
 int 
 main (int argc, char *argv[])
 {
   // disable fragmentation
   Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("2200"));
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
+  Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode", StringValue ("OfdmRate24Mbps"));
 
   // vanet hacks to CcnxL3Protocol
   Config::SetDefault ("ns3::CcnxL3Protocol::EnableNACKs", StringValue ("false"));
@@ -32,7 +40,7 @@ main (int argc, char *argv[])
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                "DataMode", StringValue ("OfdmRate54Mbps"));
+                                "DataMode", StringValue ("OfdmRate24Mbps"));
 
   YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 
@@ -80,9 +88,12 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  consumerHelper.SetPrefix ("/");
+  consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
-  ApplicationContainer consumers = consumerHelper.Install (consumerNodes.Get (0));
+  consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
+  consumerHelper.Install (consumerNodes.Get (0));
+  
+  consumerHelper.Install (consumerNodes.Get (1));
   
   // consumers.Start (Seconds (0.0));
   // consumers.Stop (finishTime);
@@ -92,7 +103,10 @@ main (int argc, char *argv[])
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producerNode);
 
-  Simulator::Stop (Seconds (10.0));
+  Simulator::Schedule (Seconds(0.0), LogSetTimePrinter, ExactTimePrinter);
+
+  
+  Simulator::Stop (Seconds (10));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
