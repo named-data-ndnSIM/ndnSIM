@@ -57,7 +57,7 @@ TypeId HighwayPositionAllocator::GetTypeId (void){
 				    &HighwayPositionAllocator::GetMinGap),
                  MakeDoubleChecker<double> ()).
     AddAttribute("MaxGap", "the maximum gap between two vehicles",
-		 DoubleValue (100.0),
+		 DoubleValue (10000.0),
 		 MakeDoubleAccessor(&HighwayPositionAllocator::SetMaxGap,
 				    &HighwayPositionAllocator::GetMaxGap),
                  MakeDoubleChecker<double> ());

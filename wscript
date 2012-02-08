@@ -129,5 +129,8 @@ def build(bld):
         obj = bld.create_ns3_program('car2car-wifi', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
         obj.source = 'examples/car2car-wifi.cc'
 
+        obj = bld.create_ns3_program('car-relay', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
+        obj.source = 'examples/car-relay.cc'
+
 
     bld.ns3_python_bindings()
