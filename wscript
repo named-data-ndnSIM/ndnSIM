@@ -71,6 +71,7 @@ def build(bld):
         "model/hash-helper.h",
         "model/ccnx.h",
         "model/ccnx-face.h",
+        "model/ccnx-net-device-face.h",
 
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",

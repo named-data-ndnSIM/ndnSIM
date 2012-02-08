@@ -41,14 +41,15 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  consumerHelper.SetPrefix ("/");
+  //consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
+  consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
 
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix ("/");
-  producerHelper.SetAttribute ("PayloadSize", StringValue("100"));
+  producerHelper.SetAttribute ("PayloadSize", StringValue("300"));
   ApplicationContainer producers = producerHelper.Install (producerNode);
 }
 
@@ -58,6 +59,7 @@ main (int argc, char *argv[])
   // disable fragmentation
   Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("2200"));
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
+  Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode", StringValue ("OfdmRate24Mbps"));
 
   // vanet hacks to CcnxL3Protocol
   Config::SetDefault ("ns3::CcnxL3Protocol::EnableNACKs", StringValue ("false"));
@@ -73,7 +75,7 @@ main (int argc, char *argv[])
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                "DataMode", StringValue ("OfdmRate54Mbps"));
+                                "DataMode", StringValue ("OfdmRate24Mbps"));
 
   YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 
@@ -92,8 +94,8 @@ main (int argc, char *argv[])
 				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
 				 "Direction", DoubleValue(0.0),
 				 "Length", DoubleValue(1000.0),
-				 "MinGap", DoubleValue(80.0),
-				 "MaxGap", DoubleValue(80.0));
+				 "MinGap", DoubleValue(50.0),
+				 "MaxGap", DoubleValue(50.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
 			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
@@ -113,7 +115,7 @@ main (int argc, char *argv[])
   */
 
 
-  Simulator::Stop (Seconds (10.0));
+  Simulator::Stop (Seconds (30.0));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;

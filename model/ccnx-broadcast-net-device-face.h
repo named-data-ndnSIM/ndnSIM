@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2012 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -18,19 +18,20 @@
  * Authors: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef CCNX_NET_DEVICE_FACE_H
-#define CCNX_NET_DEVICE_FACE_H
+#ifndef CCNX_BROADCAST_NET_DEVICE_FACE_H
+#define CCNX_BROADCAST_NET_DEVICE_FACE_H
 
-#include "ccnx-face.h"
-#include "ns3/net-device.h"
+#include "ns3/nstime.h"
+#include "ns3/event-id.h"
+#include "ns3/random-variable.h"
+
+#include "ns3/ccnx-net-device-face.h"
 
 namespace ns3 {
 
-class Address;
-  
 /**
  * \ingroup ccnx-face
- * \brief Implementation of layer-2 (Ethernet) CCNx face
+ * \brief Implementation of layer-2 broadcast (Ethernet) CCNx face
  *
  * This class defines basic functionality of CCNx face. Face is core
  * component responsible for actual delivery of data packet to and
@@ -40,9 +41,12 @@ class Address;
  * object and this object cannot be changed for the lifetime of the
  * face
  *
+ * The only difference from the base class is that CcnxBroadcastNetDevice
+ * makes additional consideration for overheard information.
+ *
  * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
-class CcnxNetDeviceFace  : public CcnxFace
+class CcnxBroadcastNetDeviceFace  : public CcnxNetDeviceFace
 {
 public:
   static TypeId
@@ -54,13 +58,8 @@ public:
    * \param netDevice a smart pointer to NetDevice object to which
    * this face will be associate
    */
-  CcnxNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
-  virtual ~CcnxNetDeviceFace();
-
-  ////////////////////////////////////////////////////////////////////
-  // methods overloaded from CcnxFace
-  virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
+  CcnxBroadcastNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
+  virtual ~CcnxBroadcastNetDeviceFace();
 
 protected:
   // also from CcnxFace
@@ -70,18 +69,10 @@ protected:
 public:
   virtual std::ostream&
   Print (std::ostream &os) const;
-  ////////////////////////////////////////////////////////////////////
-
-  /**
-   * \brief Get NetDevice associated with the face
-   *
-   * \returns smart pointer to NetDevice associated with the face
-   */
-  Ptr<NetDevice> GetNetDevice () const;
 
 private:
-  CcnxNetDeviceFace (const CcnxNetDeviceFace &); ///< \brief Disabled copy constructor
-  CcnxNetDeviceFace& operator= (const CcnxNetDeviceFace &); ///< \brief Disabled copy operator
+  CcnxBroadcastNetDeviceFace (const CcnxBroadcastNetDeviceFace &); ///< \brief Disabled copy constructor
+  CcnxBroadcastNetDeviceFace& operator= (const CcnxBroadcastNetDeviceFace &); ///< \brief Disabled copy operator
 
   /// \brief callback from lower layers
   virtual void
@@ -92,10 +83,34 @@ private:
                         const Address &to,
                         NetDevice::PacketType packetType);
 
+  void
+  SendFromQueue ();
+
+  void
+  SetMaxDelay (const Time &value);
+
+  Time
+  GetMaxDelay () const;
+  
 private:
-  Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
+  EventId m_scheduledSend;
+  Time m_totalWaitPeriod;
+  UniformVariable m_randomPeriod;
+  Time m_maxWaitPeriod;
+
+  struct Item
+  {
+    Item (const Time &_gap, const Ptr<Packet> &_packet)
+      : gap (_gap), packet (_packet)
+    { }
+    
+    Time gap;
+    Ptr<Packet> packet;
+  };
+
+  std::list<Item> m_queue;  
 };
 
 } // namespace ns3
 
-#endif //CCNX_NET_DEVICE_FACE_H
+#endif //CCNX_BROADCAST_NET_DEVICE_FACE_H

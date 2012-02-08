@@ -80,7 +80,7 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>);
 
   virtual void
   InData   (std::string context,

@@ -60,7 +60,7 @@ CcnxFloodingStrategy::CcnxFloodingStrategy ()
 bool
 CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
                                          const Ptr<CcnxFace> &incomingFace,
-                                         Ptr<CcnxInterestHeader> &header,
+                                         const Ptr<const CcnxInterestHeader> &header,
                                          const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);

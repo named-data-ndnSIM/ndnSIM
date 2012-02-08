@@ -5125,10 +5125,10 @@ def register_Ns3CcnxL3Tracer_methods(root_module, cls):
                    'void', 
                    [param('std::string', 'context'), param('ns3::Ptr< ns3::CcnxInterestHeader const >', 'arg1'), param('ns3::Ptr< ns3::CcnxFace const >', 'arg2')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ccnx-l3-tracer.h (module 'NDNabstraction'): void ns3::CcnxL3Tracer::OutData(std::string context, ns3::Ptr<const ns3::CcnxContentObjectHeader> arg1, ns3::Ptr<const ns3::Packet> arg2, bool fromCache, ns3::Ptr<const ns3::CcnxFace> arg4) [member function]
+    ## ccnx-l3-tracer.h (module 'NDNabstraction'): void ns3::CcnxL3Tracer::OutData(std::string context, ns3::Ptr<const ns3::CcnxContentObjectHeader> arg1, ns3::Ptr<const ns3::Packet> arg2, ns3::Ptr<const ns3::CcnxFace> arg4) [member function]
     cls.add_method('OutData', 
                    'void', 
-                   [param('std::string', 'context'), param('ns3::Ptr< ns3::CcnxContentObjectHeader const >', 'arg1'), param('ns3::Ptr< ns3::Packet const >', 'arg2'), param('bool', 'fromCache'), param('ns3::Ptr< ns3::CcnxFace const >', 'arg4')], 
+                   [param('std::string', 'context'), param('ns3::Ptr< ns3::CcnxContentObjectHeader const >', 'arg1'), param('ns3::Ptr< ns3::Packet const >', 'arg2'), param('ns3::Ptr< ns3::CcnxFace const >', 'arg3')], 
                    is_pure_virtual=True, is_virtual=True)
     ## ccnx-l3-tracer.h (module 'NDNabstraction'): void ns3::CcnxL3Tracer::OutInterests(std::string context, ns3::Ptr<const ns3::CcnxInterestHeader> arg1, ns3::Ptr<const ns3::CcnxFace> arg2) [member function]
     cls.add_method('OutInterests', 

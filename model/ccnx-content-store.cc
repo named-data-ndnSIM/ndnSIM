@@ -98,7 +98,7 @@ struct CcnxContentStoreOrderedPrefix
 
 //////////////////////////////////////////////////////////////////////
 
-CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
   : m_header (header)
 {
   static CcnxContentObjectTail tail; ///< \internal for optimization purposes
@@ -168,7 +168,7 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 }   
     
 void 
-CcnxContentStore::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << header->GetName ());
   CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (header->GetName ());

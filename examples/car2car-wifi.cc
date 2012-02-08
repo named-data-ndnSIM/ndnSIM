@@ -10,8 +10,6 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
 
-
-
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
 
   //////////////////////
@@ -43,19 +41,27 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  consumerHelper.SetPrefix ("/");
+  consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
+  consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
 
   if(highway_run == 2){ // there is only one producer in the scenario on the second highway 
     CcnxAppHelper producerHelper ("ns3::CcnxProducer");
     producerHelper.SetPrefix ("/");
-    producerHelper.SetAttribute ("PayloadSize", StringValue("100"));
+    producerHelper.SetAttribute ("PayloadSize", StringValue("300"));
     ApplicationContainer producers = producerHelper.Install (producerNode);
   }
   highway_run++;
 }
+
+static void
+ExactTimePrinter (std::ostream &os)
+{
+  os << Simulator::Now ();
+}
+
 
 int 
 main (int argc, char *argv[])
@@ -63,6 +69,7 @@ main (int argc, char *argv[])
   // disable fragmentation
   Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("2200"));
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("2200"));
+  Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode", StringValue ("OfdmRate24Mbps"));
 
   // vanet hacks to CcnxL3Protocol
   Config::SetDefault ("ns3::CcnxL3Protocol::EnableNACKs", StringValue ("false"));
@@ -78,7 +85,7 @@ main (int argc, char *argv[])
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                "DataMode", StringValue ("OfdmRate54Mbps"));
+                                "DataMode", StringValue ("OfdmRate24Mbps"));
 
   YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 
@@ -118,7 +125,10 @@ main (int argc, char *argv[])
   */
 
 
-  Simulator::Stop (Seconds (10.0));
+  Simulator::Schedule (Seconds(0.0), LogSetTimePrinter, ExactTimePrinter);
+
+  
+  Simulator::Stop (Seconds (10));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
