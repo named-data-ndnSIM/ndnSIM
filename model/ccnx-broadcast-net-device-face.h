@@ -29,6 +29,8 @@
 
 namespace ns3 {
 
+class CcnxNameComponents;
+
 /**
  * \ingroup ccnx-face
  * \brief Implementation of layer-2 broadcast (Ethernet) CCNx face
@@ -100,12 +102,11 @@ private:
 
   struct Item
   {
-    Item (const Time &_gap, const Ptr<Packet> &_packet)
-      : gap (_gap), packet (_packet)
-    { }
+    Item (const Time &_gap, const Ptr<Packet> &_packet);
     
     Time gap;
     Ptr<Packet> packet;
+    Ptr<const CcnxNameComponents> name;
   };
 
   typedef std::list<Item> ItemQueue;

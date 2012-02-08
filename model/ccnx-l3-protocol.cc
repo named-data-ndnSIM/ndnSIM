@@ -267,11 +267,6 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
             packet->RemoveHeader (*header);
             NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
-            if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
-              {
-                packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
-              }
-
             if (header->GetNack () > 0)
               OnNack (face, header, p/*original packet*/);
             else
@@ -290,6 +285,7 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 
             if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
               {
+                NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
                 packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
               }
 
@@ -585,9 +581,9 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
               NS_LOG_ERROR ("Node "<< m_node->GetId() <<
                             ". PIT entry for "<< *header->GetName ()<<" is valid, "
                             "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
+              // ignore unsolicited data
+              return;
             }
-          // ignore unsolicited data
-          return;
         }
 
       // Update metric status for the incoming interface in the corresponding FIB entry
@@ -603,7 +599,14 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         {
           if (incoming.m_face != incomingFace)
             {
-              incoming.m_face->Send (packet->Copy ());
+              Ptr<Packet> packetCopy = packet->Copy ();
+              if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+                {
+                  NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                  packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+                }
+
+              incoming.m_face->Send (packetCopy);
               m_outData (header, payload, incoming.m_face);
             }
 

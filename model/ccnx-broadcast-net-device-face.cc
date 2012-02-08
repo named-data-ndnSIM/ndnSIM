@@ -23,13 +23,13 @@
 #include "ccnx-l3-protocol.h"
 #include "ccnx-name-components-tag.h"
 
+#include "ns3/ccnx-header-helper.h"
+
 #include "ns3/net-device.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/simulator.h"
-
-#include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxBroadcastNetDeviceFace");
 
@@ -73,6 +73,8 @@ CcnxBroadcastNetDeviceFace& CcnxBroadcastNetDeviceFace::operator= (const CcnxBro
 void
 CcnxBroadcastNetDeviceFace::SetMaxDelay (const Time &value)
 {
+  NS_LOG_FUNCTION (this << value);
+
   m_maxWaitPeriod = value;
   m_randomPeriod = UniformVariable (0, m_maxWaitPeriod.ToDouble (Time::S));
 }
@@ -83,29 +85,59 @@ CcnxBroadcastNetDeviceFace::GetMaxDelay () const
   return m_maxWaitPeriod;
 }
 
+
+CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_packet)
+  : gap (_gap), packet (_packet)
+{
+  NS_LOG_FUNCTION (this << _gap << _packet);
+  
+  Ptr<const CcnxNameComponentsTag> tag = packet->PeekPacketTag<CcnxNameComponentsTag> ();
+  NS_LOG_DEBUG ("Tag: " << tag);
+  NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
+  name = tag->GetName ();
+}
+
 void
 CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
 
-  Time gap = Seconds (m_randomPeriod.GetValue ());
-  if (m_totalWaitPeriod < m_maxWaitPeriod)
+  CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (packet);
+  if (type == CcnxHeaderHelper::INTEREST)
     {
-      gap = std::min (m_maxWaitPeriod - m_totalWaitPeriod, gap);
+      // send immediately, don't delay
+      
+      //////////////////////////////
+      CcnxNetDeviceFace::SendImpl (packet);
+      //////////////////////////////
+    }
+  else if (type == CcnxHeaderHelper::CONTENT_OBJECT)
+    {
+      Time gap = Seconds (m_randomPeriod.GetValue ());
+      if (m_totalWaitPeriod < m_maxWaitPeriod)
+        {
+          gap = std::min (m_maxWaitPeriod - m_totalWaitPeriod, gap);
+        }
+      else
+        gap = Time (0);
+
+      m_queue.push_back (Item (gap, packet));
+      m_maxWaitPeriod += gap;
+  
+      if (!m_scheduledSend.IsRunning ())
+        m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
     }
   else
-    gap = Time (0);
-
-  m_queue.push_back (Item (gap, packet));
-  m_maxWaitPeriod += gap;
-  
-  if (!m_scheduledSend.IsRunning ())
-    m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
+    {
+      NS_FATAL_ERROR ("Unknown CCNX header type");
+    } 
 }
 
 void
 CcnxBroadcastNetDeviceFace::SendFromQueue ()
 {
+  NS_LOG_FUNCTION (this);
+
   NS_ASSERT (m_queue.size () > 0);
   Item &item = m_queue.front ();
   
@@ -131,15 +163,36 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 {
   NS_LOG_FUNCTION (device << p << protocol << from << to << packetType);
 
-  // BOOST_FOREACH (const Item &item, m_queue)
-  //   {
-  //     // if (*item.packet == *p)
-  //     //   {
-  //     //     // do something
-  //     //   }
-  //   }
-  
-  Receive (p);
+  CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
+  if (type == CcnxHeaderHelper::INTEREST)
+    {
+      Receive (p);
+    }
+  else if (type == CcnxHeaderHelper::CONTENT_OBJECT)
+    {
+      Ptr<const CcnxNameComponentsTag> tag = p->PeekPacketTag<CcnxNameComponentsTag> ();
+      NS_LOG_DEBUG ("Info: " << p << tag);
+      NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
+      Ptr<const CcnxNameComponents> name = tag->GetName ();
+
+      for (ItemQueue::iterator item = m_queue.begin (); item != m_queue.end (); item++)
+        {
+          if (*item->name == *name)
+            {
+              // do something
+              m_totalWaitPeriod -= item->gap;
+              m_queue.erase (item);
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
+              return;
+            }
+        }
+      Receive (p);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unknown CCNX header type");
+    }
 }
 
 

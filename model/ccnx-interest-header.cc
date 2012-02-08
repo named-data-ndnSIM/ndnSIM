@@ -218,7 +218,7 @@ CcnxInterestHeader::GetInstanceTypeId (void) const
 void
 CcnxInterestHeader::Print (std::ostream &os) const
 {
-  os << "<Interest>\n  <Name>" << GetName () << "</Name>\n";
+  os << "<Interest>\n  <Name>" << *GetName () << "</Name>\n";
   if (GetNack ()>0)
     {
       os << "  <NACK>";

@@ -89,7 +89,7 @@ CcnxContentObjectHeader::GetInstanceTypeId (void) const
 void
 CcnxContentObjectHeader::Print (std::ostream &os) const
 {
-  os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
+  os << "<ContentObject><Name>" << *GetName () << "</Name><Content>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -33,7 +33,7 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
+NS_LOG_COMPONENT_DEFINE ("CcnxCacheFace");
 
 namespace ns3 
 {
