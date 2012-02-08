@@ -150,7 +150,7 @@ public:
    *
    * Gets name of the interest.
    **/
-  const CcnxNameComponents&
+  Ptr<const CcnxNameComponents>
   GetName () const;
 
   /**

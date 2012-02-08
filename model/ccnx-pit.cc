@@ -146,7 +146,7 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
   // NS_LOG_FUNCTION_NOARGS ();
 
   CcnxPitEntryContainer::type::iterator entry =
-    get<i_prefix> ().find (header.GetName ());
+    get<i_prefix> ().find (*header.GetName ());
 
   if (entry == end ())
     throw CcnxPitEntryNotFound();
@@ -164,16 +164,16 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
   bool isNew = true;
 
   CcnxPitEntryContainer::type::iterator entry =
-    get<i_prefix> ().find (header.GetName ());
+    get<i_prefix> ().find (*header.GetName ());
 
   if (entry == end ())
     {
       CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
       NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
-                     "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
+                     "There should be at least default route set" << " Prefix = "<<*header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
 
       entry = insert (end (),
-                      CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
+                      CcnxPitEntry (header.GetName (),
                                     header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
                                     :                                       header.GetInterestLifetime (),
                                     *fibEntry));

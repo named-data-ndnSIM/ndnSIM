@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");
 namespace ns3
 {
 
-CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
+CcnxPitEntry::CcnxPitEntry (Ptr<const CcnxNameComponents> prefix,
                             const Time &expireTime,
                             const CcnxFibEntry &fibEntry)
   : m_prefix (prefix)

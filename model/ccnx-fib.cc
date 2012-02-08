@@ -115,8 +115,13 @@ CcnxFibEntry::UpdateStatus (Ptr<CcnxFace> face, CcnxFibFaceMetric::Status status
   NS_LOG_FUNCTION (this << boost::cref(*face) << status);
 
   CcnxFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
-  NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
-                 "Update status can be performed only on existing faces of CcxnFibEntry");
+  if (record == m_faces.get<i_face> ().end ())
+    {
+      // do nothing.  This will be the case for virtual cache faces
+      return;
+    }
+  // NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
+  //                "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
                   (&ll::_1)->*&CcnxFibFaceMetric::m_status = status);
@@ -179,7 +184,7 @@ CcnxFib::DoDispose (void)
 CcnxFibEntryContainer::type::iterator
 CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
-  const CcnxNameComponents &name = interest.GetName ();
+  const CcnxNameComponents &name = *interest.GetName ();
   for (size_t componentsCount = name.GetComponents ().size ()+1;
        componentsCount > 0;
        componentsCount--)

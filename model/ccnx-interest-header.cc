@@ -66,11 +66,11 @@ CcnxInterestHeader::SetName (const Ptr<CcnxNameComponents> &name)
   m_name = name;
 }
 
-const CcnxNameComponents&
+Ptr<const CcnxNameComponents>
 CcnxInterestHeader::GetName () const
 {
   if (m_name==0) throw CcnxInterestHeaderException();
-  return *m_name;
+  return m_name;
 }
 
 void
@@ -218,7 +218,7 @@ CcnxInterestHeader::GetInstanceTypeId (void) const
 void
 CcnxInterestHeader::Print (std::ostream &os) const
 {
-  os << "<Interest>\n  <Name>" << GetName () << "</Name>\n";
+  os << "<Interest>\n  <Name>" << *GetName () << "</Name>\n";
   if (GetNack ()>0)
     {
       os << "  <NACK>";

@@ -241,7 +241,7 @@ operator<< (std::ostream &os, const CcnxContentStore &cs)
 const CcnxNameComponents&
 CcnxContentStoreEntry::GetName () const
 {
-  return m_header->GetName ();
+  return *m_header->GetName ();
 }
 
 Ptr<const CcnxContentObjectHeader>

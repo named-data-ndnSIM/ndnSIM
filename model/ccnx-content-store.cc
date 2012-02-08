@@ -44,7 +44,7 @@ CcnxContentStore::GetTypeId (void)
     .AddConstructor<CcnxContentStore> ()
     .AddAttribute ("Size",
                    "Maximum number of packets that content storage can hold",
-                   UintegerValue (100),
+                   UintegerValue (1000),
                    MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
                                          &CcnxContentStore::GetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
@@ -153,8 +153,8 @@ CcnxContentStore& CcnxContentStore::operator= (const CcnxContentStore &o)
 boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> >
 CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
-  NS_LOG_FUNCTION (this << interest->GetName ());
-  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (interest->GetName ());
+  NS_LOG_FUNCTION (this << *interest->GetName ());
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (*interest->GetName ());
   if (it != m_contentStore.end ())
     {
       // promote entry to the top
@@ -168,13 +168,13 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
 }   
     
 void 
-CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload)
 {
-  NS_LOG_FUNCTION (this << header->GetName ());
-  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (header->GetName ());
+  NS_LOG_FUNCTION (this << *header->GetName ());
+  CcnxContentStoreContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (*header->GetName ());
   if (it == m_contentStore.end ())
     { // add entry to the top
-      m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, packet));
+      m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, payload));
       if (m_contentStore.size () > m_maxSize)
         m_contentStore.get<i_mru> ().pop_back ();
     }

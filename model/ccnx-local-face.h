@@ -55,6 +55,9 @@ public:
   CcnxLocalFace (Ptr<CcnxApp> app);
   virtual ~CcnxLocalFace();
   
+  virtual std::ostream&
+  Print (std::ostream &os) const;
+
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
   virtual void
@@ -64,11 +67,6 @@ protected:
   virtual void
   SendImpl (Ptr<Packet> p);
 
-public:
-  virtual std::ostream&
-  Print (std::ostream &os) const;
-  ////////////////////////////////////////////////////////////////////
- 
 private:
   CcnxLocalFace ();
   CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor

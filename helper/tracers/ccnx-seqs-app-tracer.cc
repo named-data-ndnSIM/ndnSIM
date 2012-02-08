@@ -72,7 +72,7 @@ CcnxSeqsAppTracer::Print (std::ostream &os) const
  << m_app << "\t"                                                  \
  << m_appId << "\t"                                                \
  << type << "\t"                                                   \
- << header->GetName ().GetLastComponent () << std::endl;
+ << header->GetName ()->GetLastComponent () << std::endl;
 
 void
 CcnxSeqsAppTracer::OutInterests (std::string context,

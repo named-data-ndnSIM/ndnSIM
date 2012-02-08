@@ -68,7 +68,7 @@ public:
   void
   SetName (const Ptr<CcnxNameComponents> &name);
 
-  const CcnxNameComponents&
+  Ptr<const CcnxNameComponents>
   GetName () const;
 
   // void
