@@ -50,6 +50,16 @@ TypeId HighwayPositionAllocator::GetTypeId (void){
 		 DoubleValue (0.0),
 		 MakeDoubleAccessor(&HighwayPositionAllocator::SetLength,
 				    &HighwayPositionAllocator::GetLength),
+                 MakeDoubleChecker<double> ()).
+    AddAttribute("MinGap", "the minimum gap between two vehicles",
+		 DoubleValue (1.0),
+		 MakeDoubleAccessor(&HighwayPositionAllocator::SetMinGap,
+				    &HighwayPositionAllocator::GetMinGap),
+                 MakeDoubleChecker<double> ()).
+    AddAttribute("MaxGap", "the maximum gap between two vehicles",
+		 DoubleValue (100.0),
+		 MakeDoubleAccessor(&HighwayPositionAllocator::SetMaxGap,
+				    &HighwayPositionAllocator::GetMaxGap),
                  MakeDoubleChecker<double> ());
 
   return tid;
@@ -60,7 +70,7 @@ HighwayPositionAllocator::HighwayPositionAllocator (){
 }
 
 Vector HighwayPositionAllocator::GetNext (void) const{
-  UniformVariable random_gap_var (1.0, 10.0);
+  UniformVariable random_gap_var (m_min_gap, m_max_gap);
   double random_gap = random_gap_var.GetValue();
   
   double delta_x = random_gap * cos(m_direction);
@@ -99,5 +109,22 @@ void HighwayPositionAllocator::SetLength(double length){
 double HighwayPositionAllocator::GetLength(void) const {
   return m_length;
 }
+
+void HighwayPositionAllocator::SetMinGap(double min_gap){
+  m_min_gap = min_gap;
+}
+
+double HighwayPositionAllocator::GetMinGap(void) const {
+  return m_min_gap;
+}
+
+void HighwayPositionAllocator::SetMaxGap(double max_gap){
+  m_max_gap = max_gap;
+}
+
+double HighwayPositionAllocator::GetMaxGap(void) const {
+  return m_max_gap;
+}
+
 
 }

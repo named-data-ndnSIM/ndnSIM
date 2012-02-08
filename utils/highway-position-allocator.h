@@ -42,11 +42,18 @@ public:
   void SetLength(double length);
   double GetLength(void) const ;
 
+  void SetMinGap(double min_gap);
+  double GetMinGap(void) const;
+  void SetMaxGap(double max_gap);
+  double GetMaxGap(void) const;
+
 private:
   mutable Vector m_previous_position; // previously generated vehicle position
   Vector m_start; // highway starting point
   double m_direction; //highway direction
   double m_length; // highway length
+  double m_min_gap;
+  double m_max_gap;
 };
 }
 
