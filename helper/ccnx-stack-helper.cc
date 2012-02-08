@@ -33,9 +33,11 @@
 #include "ns3/core-config.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-helper.h"
+#include "ns3/wifi-net-device.h"
 
 #include "../model/ccnx-forwarding-strategy.h"
 #include "../model/ccnx-net-device-face.h"
+#include "../model/ccnx-broadcast-net-device-face.h"
 #include "../model/ccnx-l3-protocol.h"
 #include "../model/ccnx-fib.h"
 
@@ -144,7 +146,17 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       if (DynamicCast<LoopbackNetDevice> (device) != 0)
         continue; // don't create face for a LoopbackNetDevice
 
-      Ptr<CcnxNetDeviceFace> face = CreateObject<CcnxNetDeviceFace> (node, device);
+      Ptr<CcnxNetDeviceFace> face;
+      if (DynamicCast<WifiNetDevice> (device) != 0)
+        {
+          // broadcast face
+          face = CreateObject<CcnxBroadcastNetDeviceFace> (node, device);
+        }
+      else
+        {
+          // non-broadcast face
+          face = CreateObject<CcnxNetDeviceFace> (node, device);
+        }
 
       ccnx->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added CcnxNetDeviceFace as face #" << *face);

@@ -56,12 +56,11 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   highway_run++;
 }
 
-static void
-ExactTimePrinter (std::ostream &os)
-{
-  os << Simulator::Now ();
-}
-
+// static void
+// ExactTimePrinter (std::ostream &os)
+// {
+//   os << Simulator::Now ();
+// }
 
 int 
 main (int argc, char *argv[])
@@ -81,6 +80,7 @@ main (int argc, char *argv[])
   //////////////////////
   //////////////////////
   //////////////////////
+  
   WifiHelper wifi = WifiHelper::Default ();
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard (WIFI_PHY_STANDARD_80211a);
@@ -94,11 +94,11 @@ main (int argc, char *argv[])
 
   NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
   wifiMac.SetType("ns3::AdhocWifiMac");
-  
+
 
   // Setup the first highway going in the direction of left -> right
   //bool static_cars = true;
-
+  
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
 				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
@@ -123,9 +123,9 @@ main (int argc, char *argv[])
 
   SetupHighway(mobility, wifi, wifiPhy, wifiMac);
   */
+  
 
-
-  Simulator::Schedule (Seconds(0.0), LogSetTimePrinter, ExactTimePrinter);
+  // Simulator::Schedule (Seconds(0.0), LogSetTimePrinter, ExactTimePrinter);
 
   
   Simulator::Stop (Seconds (10));

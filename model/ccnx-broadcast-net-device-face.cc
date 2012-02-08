@@ -92,9 +92,9 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   NS_LOG_FUNCTION (this << _gap << _packet);
   
   Ptr<const CcnxNameComponentsTag> tag = packet->PeekPacketTag<CcnxNameComponentsTag> ();
-  NS_LOG_DEBUG ("Tag: " << tag);
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
+  NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission");
 }
 
 void
@@ -123,7 +123,7 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
 
       m_queue.push_back (Item (gap, packet));
       m_maxWaitPeriod += gap;
-  
+
       if (!m_scheduledSend.IsRunning ())
         m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
     }
@@ -166,12 +166,13 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
   CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
   if (type == CcnxHeaderHelper::INTEREST)
     {
+      NS_LOG_DEBUG ("Interest");
       Receive (p);
     }
   else if (type == CcnxHeaderHelper::CONTENT_OBJECT)
     {
+      NS_LOG_DEBUG ("ContentObject");
       Ptr<const CcnxNameComponentsTag> tag = p->PeekPacketTag<CcnxNameComponentsTag> ();
-      NS_LOG_DEBUG ("Info: " << p << tag);
       NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
       Ptr<const CcnxNameComponents> name = tag->GetName ();
 
@@ -182,6 +183,10 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
               // do something
               m_totalWaitPeriod -= item->gap;
               m_queue.erase (item);
+              if (m_queue.size () == 0)
+                {
+                  m_scheduledSend.Cancel ();
+                }
 
               NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
               return;

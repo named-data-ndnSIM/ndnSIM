@@ -127,11 +127,13 @@ def build(bld):
         obj = bld.create_ns3_program('vanet-ccnx', ['NDNabstraction', 'highway-mobility'])
         obj.source = 'examples/vanet-ccnx.cc'
 
-        obj = bld.create_ns3_program('car2car-wifi', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
+        obj = bld.create_ns3_program('car2car-wifi', ['internet', 'NDNabstraction'])
         obj.source = 'examples/car2car-wifi.cc'
 
-        obj = bld.create_ns3_program('car-relay', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
+        obj = bld.create_ns3_program('car-relay', ['internet', 'NDNabstraction'])
         obj.source = 'examples/car-relay.cc'
 
+        obj = bld.create_ns3_program('car-interference', ['internet', 'NDNabstraction'])
+        obj.source = 'examples/car-interference.cc'
 
     bld.ns3_python_bindings()
