@@ -567,6 +567,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           if (m_cacheUnsolicitedData)
             {
               // Optimistically add or update entry in the content store
+              NS_LOG_INFO(" < Caching unsolicited data " << header->GetName());
               m_contentStore->Add (header, payload);
             }
           else
