@@ -36,7 +36,7 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
   
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG); // <Name>
-  written += AppendNameComponents (start, interest.GetName());                // <Component>...</Component>...
+  written += AppendNameComponents (start, *interest.GetName());                // <Component>...</Component>...
   written += AppendCloser (start);                               // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
@@ -107,7 +107,7 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxInterestHeader &interest)
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>
   
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Name); // <Name>
-  written += EstimateNameComponents (interest.GetName()); // <Component>...</Component>...
+  written += EstimateNameComponents (*interest.GetName()); // <Component>...</Component>...
   written += 1; // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
@@ -183,7 +183,7 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHe
   written += AppendCloser (start);                                    // </Signature>  
 
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
-  written += AppendNameComponents (start, contentObject.GetName()); //   <Component>...</Component>...
+  written += AppendNameComponents (start, *contentObject.GetName()); //   <Component>...</Component>...
   written += AppendCloser (start);                                  // </Name>  
 
   // fake signature
@@ -218,7 +218,7 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxContentObjectHeader &contentObj
   written += 1;                                    // </Signature>  
 
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>
-  written += EstimateNameComponents (contentObject.GetName()); //   <Component>...</Component>...
+  written += EstimateNameComponents (*contentObject.GetName()); //   <Component>...</Component>...
   written += 1;                                  // </Name>  
 
   // fake signature

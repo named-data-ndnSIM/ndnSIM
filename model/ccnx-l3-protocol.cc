@@ -42,6 +42,7 @@
 
 #include "ccnx-net-device-face.h"
 #include "ccnx-cache-face.h"
+#include "ccnx-name-components-tag.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -266,6 +267,11 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
             packet->RemoveHeader (*header);
             NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
+            if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              {
+                packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+              }
+
             if (header->GetNack () > 0)
               OnNack (face, header, p/*original packet*/);
             else
@@ -281,6 +287,11 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);
             packet->RemoveTrailer (contentObjectTrailer);
+
+            if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              {
+                packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+              }
 
             OnData (face, header, packet/*payload*/, p/*original packet*/);  
             break;
@@ -572,7 +583,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           else
             {
               NS_LOG_ERROR ("Node "<< m_node->GetId() <<
-                            ". PIT entry for "<< header->GetName ()<<" is valid, "
+                            ". PIT entry for "<< *header->GetName ()<<" is valid, "
                             "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
             }
           // ignore unsolicited data
@@ -640,7 +651,7 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
-          NS_LOG_DEBUG ("Send NACK for " << boost::cref (nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
+          NS_LOG_DEBUG ("Send NACK for " << boost::cref (*nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
           incoming.m_face->Send (packet->Copy ());
 
           m_outNacks (nackHeader, incoming.m_face);

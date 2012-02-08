@@ -108,7 +108,7 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &offsetTime, const CcnxFibEntry &fibEntry);
+  CcnxPitEntry (Ptr<const CcnxNameComponents> prefix, const Time &offsetTime, const CcnxFibEntry &fibEntry);
   
   /**
    * @brief Update lifetime of PIT entry
@@ -245,7 +245,7 @@ private:
   CcnxPitEntry () : m_fibEntry(*((CcnxFibEntry*)0)) {};
   
 public:
-  Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
+  Ptr<const CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
   const CcnxFibEntry &m_fibEntry; ///< \brief FIB entry related to this prefix
   std::set<uint32_t> m_seenNonces; ///< \brief map of nonces that were seen for this prefix
   

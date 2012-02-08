@@ -108,7 +108,8 @@ private:
     Ptr<Packet> packet;
   };
 
-  std::list<Item> m_queue;  
+  typedef std::list<Item> ItemQueue;
+  ItemQueue m_queue;  
 };
 
 } // namespace ns3

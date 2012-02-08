@@ -308,6 +308,8 @@ def register_types(module):
     module.add_class('CcnxNameComponentsChecker', parent=root_module['ns3::AttributeChecker'])
     ## ccnx-name-components.h (module 'NDNabstraction'): ns3::CcnxNameComponentsValue [class]
     module.add_class('CcnxNameComponentsValue', parent=root_module['ns3::AttributeValue'])
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::CcnxNetDeviceFace [class]
+    module.add_class('CcnxNetDeviceFace', parent=root_module['ns3::CcnxFace'])
     ## ccnx-path-weight-tracer.h (module 'NDNabstraction'): ns3::CcnxPathWeightTracer [class]
     module.add_class('CcnxPathWeightTracer', parent=root_module['ns3::SimpleRefCount< ns3::CcnxPathWeightTracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxPathWeightTracer> >'])
     ## attribute.h (module 'core'): ns3::EmptyAttributeValue [class]
@@ -576,6 +578,7 @@ def register_methods(root_module):
     register_Ns3CcnxNameComponents_methods(root_module, root_module['ns3::CcnxNameComponents'])
     register_Ns3CcnxNameComponentsChecker_methods(root_module, root_module['ns3::CcnxNameComponentsChecker'])
     register_Ns3CcnxNameComponentsValue_methods(root_module, root_module['ns3::CcnxNameComponentsValue'])
+    register_Ns3CcnxNetDeviceFace_methods(root_module, root_module['ns3::CcnxNetDeviceFace'])
     register_Ns3CcnxPathWeightTracer_methods(root_module, root_module['ns3::CcnxPathWeightTracer'])
     register_Ns3EmptyAttributeValue_methods(root_module, root_module['ns3::EmptyAttributeValue'])
     register_Ns3EventImpl_methods(root_module, root_module['ns3::EventImpl'])
@@ -2699,6 +2702,11 @@ def register_Ns3Vector2D_methods(root_module, cls):
     cls.add_constructor([param('double', '_x'), param('double', '_y')])
     ## vector.h (module 'core'): ns3::Vector2D::Vector2D() [constructor]
     cls.add_constructor([])
+    ## vector.h (module 'core'): double ns3::Vector2D::GetLength() const [member function]
+    cls.add_method('GetLength', 
+                   'double', 
+                   [], 
+                   is_const=True)
     ## vector.h (module 'core'): ns3::Vector2D::x [variable]
     cls.add_instance_attribute('x', 'double', is_const=False)
     ## vector.h (module 'core'): ns3::Vector2D::y [variable]
@@ -2721,6 +2729,11 @@ def register_Ns3Vector3D_methods(root_module, cls):
     cls.add_constructor([param('double', '_x'), param('double', '_y'), param('double', '_z')])
     ## vector.h (module 'core'): ns3::Vector3D::Vector3D() [constructor]
     cls.add_constructor([])
+    ## vector.h (module 'core'): double ns3::Vector3D::GetLength() const [member function]
+    cls.add_method('GetLength', 
+                   'double', 
+                   [], 
+                   is_const=True)
     ## vector.h (module 'core'): ns3::Vector3D::x [variable]
     cls.add_instance_attribute('x', 'double', is_const=False)
     ## vector.h (module 'core'): ns3::Vector3D::y [variable]
@@ -4662,9 +4675,9 @@ def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxContentObjectHeader::GetName() const [member function]
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::Ptr<const ns3::CcnxNameComponents> ns3::CcnxContentObjectHeader::GetName() const [member function]
     cls.add_method('GetName', 
-                   'ns3::CcnxNameComponents const &', 
+                   'ns3::Ptr< ns3::CcnxNameComponents const >', 
                    [], 
                    is_const=True)
     ## ccnx-content-object-header.h (module 'NDNabstraction'): uint32_t ns3::CcnxContentObjectHeader::GetSerializedSize() const [member function]
@@ -4991,9 +5004,9 @@ def register_Ns3CcnxInterestHeader_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxNameComponents const & ns3::CcnxInterestHeader::GetName() const [member function]
+    ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::Ptr<const ns3::CcnxNameComponents> ns3::CcnxInterestHeader::GetName() const [member function]
     cls.add_method('GetName', 
-                   'ns3::CcnxNameComponents const &', 
+                   'ns3::Ptr< ns3::CcnxNameComponents const >', 
                    [], 
                    is_const=True)
     ## ccnx-interest-header.h (module 'NDNabstraction'): uint32_t ns3::CcnxInterestHeader::GetNonce() const [member function]
@@ -5125,7 +5138,7 @@ def register_Ns3CcnxL3Tracer_methods(root_module, cls):
                    'void', 
                    [param('std::string', 'context'), param('ns3::Ptr< ns3::CcnxInterestHeader const >', 'arg1'), param('ns3::Ptr< ns3::CcnxFace const >', 'arg2')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ccnx-l3-tracer.h (module 'NDNabstraction'): void ns3::CcnxL3Tracer::OutData(std::string context, ns3::Ptr<const ns3::CcnxContentObjectHeader> arg1, ns3::Ptr<const ns3::Packet> arg2, ns3::Ptr<const ns3::CcnxFace> arg4) [member function]
+    ## ccnx-l3-tracer.h (module 'NDNabstraction'): void ns3::CcnxL3Tracer::OutData(std::string context, ns3::Ptr<const ns3::CcnxContentObjectHeader> arg1, ns3::Ptr<const ns3::Packet> arg2, ns3::Ptr<const ns3::CcnxFace> arg3) [member function]
     cls.add_method('OutData', 
                    'void', 
                    [param('std::string', 'context'), param('ns3::Ptr< ns3::CcnxContentObjectHeader const >', 'arg1'), param('ns3::Ptr< ns3::Packet const >', 'arg2'), param('ns3::Ptr< ns3::CcnxFace const >', 'arg3')], 
@@ -5227,6 +5240,41 @@ def register_Ns3CcnxNameComponentsValue_methods(root_module, cls):
     cls.add_method('Set', 
                    'void', 
                    [param('ns3::CcnxNameComponents const &', 'value')])
+    return
+
+def register_Ns3CcnxNetDeviceFace_methods(root_module, cls):
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxNetDeviceFace::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::CcnxNetDeviceFace::CcnxNetDeviceFace(ns3::Ptr<ns3::Node> node, ns3::Ptr<ns3::NetDevice> const & netDevice) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::Ptr< ns3::NetDevice > const &', 'netDevice')])
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): void ns3::CcnxNetDeviceFace::RegisterProtocolHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxFace> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
+    cls.add_method('RegisterProtocolHandler', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')], 
+                   is_virtual=True)
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): std::ostream & ns3::CcnxNetDeviceFace::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'std::ostream &', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): ns3::Ptr<ns3::NetDevice> ns3::CcnxNetDeviceFace::GetNetDevice() const [member function]
+    cls.add_method('GetNetDevice', 
+                   'ns3::Ptr< ns3::NetDevice >', 
+                   [], 
+                   is_const=True)
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): void ns3::CcnxNetDeviceFace::SendImpl(ns3::Ptr<ns3::Packet> p) [member function]
+    cls.add_method('SendImpl', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet >', 'p')], 
+                   visibility='protected', is_virtual=True)
+    ## ccnx-net-device-face.h (module 'NDNabstraction'): void ns3::CcnxNetDeviceFace::ReceiveFromNetDevice(ns3::Ptr<ns3::NetDevice> device, ns3::Ptr<const ns3::Packet> p, uint16_t protocol, ns3::Address const & from, ns3::Address const & to, ns3::NetDevice::PacketType packetType) [member function]
+    cls.add_method('ReceiveFromNetDevice', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::NetDevice >', 'device'), param('ns3::Ptr< ns3::Packet const >', 'p'), param('uint16_t', 'protocol'), param('ns3::Address const &', 'from'), param('ns3::Address const &', 'to'), param('ns3::NetDevice::PacketType', 'packetType')], 
+                   visibility='private', is_virtual=True)
     return
 
 def register_Ns3CcnxPathWeightTracer_methods(root_module, cls):

@@ -79,7 +79,6 @@ CcnxLocalFace& CcnxLocalFace::operator= (const CcnxLocalFace &)
   return *((CcnxLocalFace*)0);
 }
 
-
 void
 CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 {

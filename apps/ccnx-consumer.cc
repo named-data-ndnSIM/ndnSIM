@@ -274,7 +274,7 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 
   // NS_LOG_INFO ("Received content object: " << boost::cref(*contentObject));
   
-  uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
+  uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ()->GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
   // SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
@@ -313,7 +313,7 @@ CcnxConsumer::OnNack (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet>
   NS_LOG_FUNCTION (this << interest);
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
-  uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ().GetComponents ().back ());
+  uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ()->GetComponents ().back ());
   NS_LOG_INFO ("< NACK for " << seq);
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << "NACK for " << seq << "\n"; 
 

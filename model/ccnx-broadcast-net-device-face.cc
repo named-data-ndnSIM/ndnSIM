@@ -21,12 +21,15 @@
 
 #include "ccnx-broadcast-net-device-face.h"
 #include "ccnx-l3-protocol.h"
+#include "ccnx-name-components-tag.h"
 
 #include "ns3/net-device.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/simulator.h"
+
+#include <boost/foreach.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxBroadcastNetDeviceFace");
 
@@ -127,6 +130,15 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
                                                   NetDevice::PacketType packetType)
 {
   NS_LOG_FUNCTION (device << p << protocol << from << to << packetType);
+
+  // BOOST_FOREACH (const Item &item, m_queue)
+  //   {
+  //     // if (*item.packet == *p)
+  //     //   {
+  //     //     // do something
+  //     //   }
+  //   }
+  
   Receive (p);
 }
 

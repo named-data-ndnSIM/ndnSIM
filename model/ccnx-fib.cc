@@ -179,7 +179,7 @@ CcnxFib::DoDispose (void)
 CcnxFibEntryContainer::type::iterator
 CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
-  const CcnxNameComponents &name = interest.GetName ();
+  const CcnxNameComponents &name = *interest.GetName ();
   for (size_t componentsCount = name.GetComponents ().size ()+1;
        componentsCount > 0;
        componentsCount--)

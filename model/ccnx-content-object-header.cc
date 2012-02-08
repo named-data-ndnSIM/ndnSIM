@@ -54,11 +54,11 @@ CcnxContentObjectHeader::SetName (const Ptr<CcnxNameComponents> &name)
   m_name = name;
 }
 
-const CcnxNameComponents&
+Ptr<const CcnxNameComponents>
 CcnxContentObjectHeader::GetName () const
 {
   if (m_name==0) throw CcnxContentObjectHeaderException();
-  return *m_name;
+  return m_name;
 }
 
 uint32_t
