@@ -8,21 +8,26 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
+NS_LOG_COMPONENT_DEFINE ("CarRelay");
 
+void
+CourseChange (std::string context, Ptr<const MobilityModel> model)
+{
+  Vector position = model->GetPosition ();
+  NS_LOG_UNCOND (context <<
+		 " x = " << position.x << ", y = " << position.y);
+}
 
 
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
 
-  //////////////////////
-  //////////////////////
-  //////////////////////
-   NodeContainer producerNode;
+  int nConsumers = 3;
+  NodeContainer producerNode;
   producerNode.Create (1);
   
   NodeContainer consumerNodes;
   //if(highway_run == 2)
-  consumerNodes.Create(3);
+  consumerNodes.Create(nConsumers);
 
   wifi.Install (wifiPhy, wifiMac, producerNode);
   wifi.Install (wifiPhy, wifiMac, consumerNodes);
@@ -41,11 +46,17 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  //consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
+  consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
   consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
-  
+
+  std::ostringstream oss;
+  oss <<
+    "/NodeList/" << consumerNodes.Get (nConsumers - 1)->GetId () <<
+    "/$ns3::MobilityModel/CourseChange";
+
+  Config::Connect (oss.str (), MakeCallback (&CourseChange));
 
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix ("/");
@@ -98,7 +109,7 @@ main (int argc, char *argv[])
 				 "MaxGap", DoubleValue(50.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
 
   SetupHighway(mobility, wifi, wifiPhy, wifiMac);
   /*26.8224*/
