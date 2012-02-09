@@ -110,7 +110,9 @@ private:
   };
 
   typedef std::list<Item> ItemQueue;
-  ItemQueue m_queue;  
+  ItemQueue m_queue;
+
+  uint32_t m_maxPacketsInQueue;
 };
 
 } // namespace ns3
