@@ -51,12 +51,6 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
 
-  std::ostringstream oss;
-  oss <<
-    "/NodeList/" << consumerNodes.Get (nConsumers - 1)->GetId () <<
-    "/$ns3::MobilityModel/CourseChange";
-
-  Config::Connect (oss.str (), MakeCallback (&CourseChange));
 
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix ("/");
@@ -127,6 +121,15 @@ main (int argc, char *argv[])
 
 
   Simulator::Stop (Seconds (30.0));
+
+
+  std::ostringstream oss;
+  oss <<
+    "/NodeList/0" << 
+    "/$ns3::MobilityModel/CourseChange";
+
+  Config::Connect (oss.str (), MakeCallback (&CourseChange));
+
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
