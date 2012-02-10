@@ -30,6 +30,8 @@
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/simulator.h"
+#include "ns3/pointer.h"
+#include "ns3/uinteger.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxBroadcastNetDeviceFace");
 
@@ -56,8 +58,40 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
  */
 CcnxBroadcastNetDeviceFace::CcnxBroadcastNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice)
   : CcnxNetDeviceFace (node, netDevice)
+  , m_maxPacketsInQueue (100)
 {
   NS_LOG_FUNCTION (this << node << netDevice);
+
+  PointerValue pointer;
+  bool ok = netDevice->GetAttributeFailSafe ("Mac", pointer);
+  if (!ok)
+    {
+      NS_LOG_DEBUG ("Cannot get `Mac` thing from NetDevice");
+      return;
+    }
+  pointer.Get<Object> () ->GetAttributeFailSafe ("DcaTxop", pointer);
+  if (!ok)
+    {
+      NS_LOG_DEBUG ("Cannot get `DcaTxop` thing from WifiMac");
+      return;
+    }
+  pointer.Get<Object> () ->GetAttributeFailSafe ("Queue", pointer);
+  if (!ok)
+    {
+      NS_LOG_DEBUG ("Cannot get `Queue` thing from DcaTxop");
+      return;
+    }
+  
+  UintegerValue value;
+  pointer.Get<Object> () ->GetAttributeFailSafe ("MaxPacketNumber", value);
+  if (!ok)
+    {
+      NS_LOG_DEBUG ("Cannot get `MaxPacketNumber` thing from Queue");
+      return;
+    }
+
+  NS_LOG_DEBUG ("Number of packets obtained from WifiMac/DcaTxop/Queue: " << value.Get ());
+  m_maxPacketsInQueue = value.Get ();  
 }
 
 CcnxBroadcastNetDeviceFace::~CcnxBroadcastNetDeviceFace ()
@@ -113,6 +147,13 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
     }
   else if (type == CcnxHeaderHelper::CONTENT_OBJECT)
     {
+      if (m_queue.size () >= m_maxPacketsInQueue)
+        {
+          // \todo Maybe add tracing
+          NS_LOG_INFO ("Dropping data packet that exceed queue size");
+          return;
+        }
+      
       Time gap = Seconds (m_randomPeriod.GetValue ());
       if (m_totalWaitPeriod < m_maxWaitPeriod)
         {
