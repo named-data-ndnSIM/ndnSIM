@@ -14,14 +14,14 @@ void
 CourseChange (std::string context, Ptr<const MobilityModel> model)
 {
   Vector position = model->GetPosition ();
-  NS_LOG_UNCOND (context <<
+  NS_LOG_INFO (context <<
 		 " x = " << position.x << ", y = " << position.y);
 }
 
 
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
 
-  int nConsumers = 3;
+  int nConsumers = 20;
   NodeContainer producerNode;
   producerNode.Create (1);
   
@@ -29,25 +29,36 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   //if(highway_run == 2)
   consumerNodes.Create(nConsumers);
 
+  // 1. Install Wifi
   wifi.Install (wifiPhy, wifiMac, producerNode);
   wifi.Install (wifiPhy, wifiMac, consumerNodes);
 
+  // 2. Install Mobility model
   mobility.Install (producerNode);
   mobility.Install (consumerNodes);
+  //    set up position change callback
+  NodeContainer::Iterator it = consumerNodes.Begin();
+  for(; it != consumerNodes.End(); it++){
+    std::ostringstream oss;
+    oss << "/NodeList/" << (*it)->GetId() <<
+      "/$ns3::MobilityModel/CourseChange";
+    Config::Connect (oss.str (), MakeCallback (&CourseChange));
+  }
 
-  // 2. Install CCNx stack
+
+  // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
   ccnxHelper.SetDefaultRoutes(true);
   ccnxHelper.Install(producerNode);
   ccnxHelper.Install(consumerNodes);
 
-  // 6. Set up applications
+  // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
+  consumerHelper.SetAttribute ("Frequency", StringValue ("5"));
   consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
 
@@ -123,12 +134,6 @@ main (int argc, char *argv[])
   Simulator::Stop (Seconds (30.0));
 
 
-  std::ostringstream oss;
-  oss <<
-    "/NodeList/0" << 
-    "/$ns3::MobilityModel/CourseChange";
-
-  Config::Connect (oss.str (), MakeCallback (&CourseChange));
 
   Simulator::Run ();
   Simulator::Destroy ();
