@@ -76,6 +76,11 @@ CcnxL3Protocol::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&CcnxL3Protocol::SetForwardingStrategy, &CcnxL3Protocol::GetForwardingStrategy),
                    MakePointerChecker<CcnxForwardingStrategy> ())
+    .AddAttribute ("ContentStore", "Pointer to content store object",
+                   TypeId::ATTR_GET,
+                   PointerValue (),
+                   MakePointerAccessor (&CcnxL3Protocol::m_contentStore),
+                   MakePointerChecker<CcnxContentStore> ())
     
     .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
                    BooleanValue (true),
@@ -95,7 +100,7 @@ CcnxL3Protocol::CcnxL3Protocol()
   NS_LOG_FUNCTION (this);
   
   m_pit = CreateObject<CcnxPit> ();
-  m_contentStore = CreateObject<CcnxContentStore> ();
+  m_contentStore = CreateObject<CcnxContentStore> (this);
 }
 
 CcnxL3Protocol::~CcnxL3Protocol ()

@@ -20,7 +20,12 @@ CourseChange (std::string context, Ptr<const MobilityModel> model)
 
 void InData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
 	     Ptr<const CcnxFace> face){
-  NS_LOG_INFO(face->GetNode()->GetId() << " has got data " << *(header->GetName()));
+  NS_LOG_INFO(face->GetNode()->GetId() << " has got data seq#" << header->GetName()->GetLastComponent ());
+}
+
+void InCache (std::string context, Ptr<Ccnx> ccnx, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+{
+  std::cout << Simulator::Now ().ToDouble (Time::S) << " sec \tNode #" << ccnx->GetObject<Node> ()->GetId () << " cached seq#" << header->GetName ()->GetLastComponent () << "\n";
 }
 
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac)
@@ -59,7 +64,8 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   ccnxHelper.Install(nodes);
 
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/InData", MakeCallback (&InData));
-
+  Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/ContentStore/InCache", MakeCallback (&InCache));
+  
   // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
   

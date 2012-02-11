@@ -160,10 +160,11 @@ public:
   static TypeId GetTypeId ();
 
   /**
-   * Default constructor
+   * \brief Constructor
+   * \param ccnx Pointer to CCNx object (for reference purposes)
    */
-  CcnxContentStore( );
-  virtual ~CcnxContentStore( );
+  CcnxContentStore (Ptr<Ccnx> ccnx);
+  virtual ~CcnxContentStore ();
             
   /**
    * \brief Find corresponding CS entry for the given interest
@@ -223,6 +224,7 @@ private:
   CcnxContentStore& operator= (const CcnxContentStore &o); ///< Disabled copy operator
  
 private:
+  Ptr<Ccnx> m_ccnx;
   size_t m_maxSize; ///< \brief maximum number of entries in cache \internal
   // string_key_hash_t<CsEntry>  m_contentStore;     ///< \brief actual content store \internal
 
@@ -231,6 +233,9 @@ private:
    * \internal
    */
   CcnxContentStoreContainer::type m_contentStore;
+
+  TracedCallback<Ptr<Ccnx>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> > m_inCache;
+  TracedCallback<Ptr<Ccnx>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> > m_dropCache;
 };
 
 inline std::ostream&

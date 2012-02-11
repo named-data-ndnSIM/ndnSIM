@@ -41,13 +41,17 @@ CcnxContentStore::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CcnxContentStore")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
-    .AddConstructor<CcnxContentStore> ()
     .AddAttribute ("Size",
                    "Maximum number of packets that content storage can hold",
                    UintegerValue (1000),
                    MakeUintegerAccessor (&CcnxContentStore::SetMaxSize,
                                          &CcnxContentStore::GetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
+
+    .AddTraceSource ("InCache", "Will trigger every time a new packet is added to cache",
+                     MakeTraceSourceAccessor (&CcnxContentStore::m_inCache))
+    .AddTraceSource ("DropCache", "Will trigger every time an existing piece is moved out of cache",
+                     MakeTraceSourceAccessor (&CcnxContentStore::m_dropCache))
     ;
 
   return tid;
@@ -130,10 +134,11 @@ CcnxContentStoreEntry::GetFullyFormedCcnxPacket () const
 //   return *this;
 // }
 
-
-
-CcnxContentStore::CcnxContentStore( )
-  : m_maxSize(100) { } // this value shouldn't matter, NS-3 should call SetSize with default value specified in AddAttribute earlier
+CcnxContentStore::CcnxContentStore (Ptr<Ccnx> ccnx)
+  : m_ccnx (ccnx)
+  , m_maxSize (100)
+{
+}
         
 CcnxContentStore::~CcnxContentStore( ) 
 { }
@@ -175,8 +180,14 @@ CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Pack
   if (it == m_contentStore.end ())
     { // add entry to the top
       m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, payload));
+      m_inCache (m_ccnx, header, payload);
       if (m_contentStore.size () > m_maxSize)
-        m_contentStore.get<i_mru> ().pop_back ();
+        {
+          m_dropCache (m_ccnx,
+                       m_contentStore.get<i_mru> ().back ().GetHeader (),
+                       m_contentStore.get<i_mru> ().back ().GetPacket ());
+          m_contentStore.get<i_mru> ().pop_back ();
+        }
       return true;
     }
   else
