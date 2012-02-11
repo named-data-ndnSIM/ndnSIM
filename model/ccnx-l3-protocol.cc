@@ -624,6 +624,18 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       m_pit->modify (m_pit->iterator_to (pitEntry),
                      ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
                                   Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+
+      // Try to push new packet further with lowest priority possible on all L3 faces
+      BOOST_FOREACH (Ptr<CcnxFace> face, m_faces)
+        {
+          Ptr<Packet> packetCopy = packet->Copy ();
+          if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+            {
+              NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+              packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+            }
+          face->SendLowPriority (packetCopy);
+        }
     }
   catch (CcnxPitEntryNotFound)
     {
@@ -634,14 +646,17 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 
           if (newEntry)
             {
-              // Try to push new packet further with lowest priority possible
-              Ptr<Packet> packetCopy = packet->Copy ();
-              if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              // Try to push new packet further with lowest priority possible on all L3 faces
+              BOOST_FOREACH (Ptr<CcnxFace> face, m_faces)
                 {
-                  NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
-                  packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+                  Ptr<Packet> packetCopy = packet->Copy ();
+                  if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+                    {
+                      NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                      packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+                    }
+                  face->SendLowPriority (packetCopy);
                 }
-              incomingFace->SendLowPriority (packetCopy);
             }
         }
       else

@@ -103,7 +103,7 @@ private:
 
   Time
   GetMaxDelayLowPriority () const;
-  
+
 private:
   struct Item
   {

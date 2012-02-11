@@ -54,6 +54,7 @@ CcnxConsumerBatches::GetTypeId (void)
 }
 
 CcnxConsumerBatches::CcnxConsumerBatches ()
+  : m_firstTime (true)
 {
 }
 
@@ -73,13 +74,20 @@ CcnxConsumerBatches::AddBatch (uint32_t amount)
   // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
   m_seqMax += amount;
   m_rtt->ClearSent (); // this is important, otherwise RTT estimation for the new batch will be affected by previous batch history
+  m_firstTime = true;
   ScheduleNextPacket ();
 }
 
 void
 CcnxConsumerBatches::ScheduleNextPacket ()
 {
-  if (!m_sendEvent.IsRunning ())
+  if (m_firstTime)
+    {
+      m_sendEvent = Simulator::Schedule (Seconds (0.0),
+                                         &CcnxConsumer::SendPacket, this);
+      m_firstTime = false;
+    }
+  else if (!m_sendEvent.IsRunning ())
     m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &CcnxConsumer::SendPacket, this);
 }
 

@@ -40,6 +40,8 @@ NS_LOG_COMPONENT_DEFINE ("CcnxBroadcastNetDeviceFace");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (CcnxBroadcastNetDeviceFace);
+
 TypeId
 CcnxBroadcastNetDeviceFace::GetTypeId ()
 {
@@ -152,7 +154,7 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   Ptr<const CcnxNameComponentsTag> tag = packet->PeekPacketTag<CcnxNameComponentsTag> ();
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
-  NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission");
+  NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission after " << _gap);
 }
 
 void
@@ -169,11 +171,6 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
     }
   
   Ptr<const GeoTag> tag = packet->PeekPacketTag<GeoTag> ();
-  if (tag == 0)
-    {
-      NS_FATAL_ERROR ("GeoTag has to be present in the packet");
-      return;
-    }
 
   Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
   if (mobility == 0)
@@ -182,17 +179,26 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
       return;
     }
   
-  double distance = CalculateDistance (tag->GetPosition (), mobility->GetPosition ());
-  distance = std::min (1.0, distance);
+  double distance = m_maxDistance;
+  if (tag != 0) // if tag == 0, it means that packet came from application
+    {
+      // NS_LOG_DEBUG ("Tag is OK, distance is " << CalculateDistance (tag->GetPosition (), mobility->GetPosition ()));
+      distance = CalculateDistance (tag->GetPosition (), mobility->GetPosition ());
+      distance = std::min (m_maxDistance, distance);
+    }
 
+  // NS_LOG_DEBUG ("Distance: " << distance);
+  
   // Mean waiting time.  Reversely proportional to the distance from the original transmitter
   // Closer guys will tend to wait longer than guys far away
-  double meanWaiting = std::min (m_maxWaitLowPriority.ToDouble (Time::S),
-                                 m_maxWaitLowPriority.ToDouble (Time::S) * m_maxDistance / distance);
+  double meanWaiting = m_maxWaitLowPriority.ToDouble (Time::S) * (m_maxDistance - distance) / m_maxDistance;
+  // NS_LOG_DEBUG ("Mean waiting: " << meanWaiting);
   
-  TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), meanWaiting);
+  TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), (meanWaiting+m_maxWaitLowPriority.ToDouble (Time::S))/3.0);
+  // NS_LOG_DEBUG ("Sample: " << randomLowPriority.GetValue ());
 
-  Time gap = Seconds (randomLowPriority.GetValue ());
+  // Actual gap will be defined by Triangular distribution based on Geo metric + Uniform distribution that is aimed to avoid collisions
+  Time gap = Seconds (randomLowPriority.GetValue () + m_randomPeriod.GetValue ());
   m_lowPriorityQueue.push_back (Item (gap, packet));
 
   if (!m_scheduledSend.IsRunning ())
@@ -263,7 +269,7 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
     }
   else if (m_lowPriorityQueue.size () > 0) // no reason for this check, just for readability
     {
-      Item &item = m_queue.front ();
+      Item &item = m_lowPriorityQueue.front ();
   
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet);
@@ -302,11 +308,39 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
       NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
       Ptr<const CcnxNameComponents> name = tag->GetName ();
 
-      for (ItemQueue::iterator item = m_queue.begin (); item != m_queue.end (); item++)
+      bool cancelled = false;
+      ItemQueue::iterator item = m_lowPriorityQueue.begin ();
+      while (item != m_lowPriorityQueue.end ())
         {
           if (*item->name == *name)
             {
-              // do something
+              cancelled = true;
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
+              m_lowPriorityQueue.erase (item);
+              if (m_queue.size () + m_lowPriorityQueue.size () == 0)
+                {
+                  m_scheduledSend.Cancel ();
+                }              
+
+              item = tmp;
+            }
+          else
+            item ++;
+        }
+
+      item = m_queue.begin ();
+      while (item != m_queue.end ())
+        {
+          if (*item->name == *name)
+            {
+              cancelled = true;
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
               m_totalWaitPeriod -= item->gap;
               m_queue.erase (item);
               if (m_queue.size () == 0)
@@ -314,11 +348,16 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
                   m_scheduledSend.Cancel ();
                 }
 
-              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
-              return;
+              item = tmp;
             }
+          else
+            item ++;
         }
-      Receive (p);
+
+      if (cancelled)
+        return;
+      else
+        Receive (p);
     }
   else
     {

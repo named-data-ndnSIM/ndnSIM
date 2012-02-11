@@ -71,6 +71,9 @@ protected:
    */
   virtual void
   ScheduleNextPacket ();
+
+private:
+  bool m_firstTime;  
 };
 
 } // namespace ns3

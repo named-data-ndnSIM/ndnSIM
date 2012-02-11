@@ -19,54 +19,50 @@ CourseChange (std::string context, Ptr<const MobilityModel> model)
 }
 
 
-void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
-
-  int nConsumers = 20;
-  NodeContainer producerNode;
-  producerNode.Create (1);
-  
-  NodeContainer consumerNodes;
-  //if(highway_run == 2)
-  consumerNodes.Create(nConsumers);
+void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac)
+{
+  NodeContainer nodes;
+  nodes.Create (10);
 
   // 1. Install Wifi
-  wifi.Install (wifiPhy, wifiMac, producerNode);
-  wifi.Install (wifiPhy, wifiMac, consumerNodes);
+  wifi.Install (wifiPhy, wifiMac, nodes);
 
   // 2. Install Mobility model
-  mobility.Install (producerNode);
-  mobility.Install (consumerNodes);
+  mobility.Install (nodes);
+
   //    set up position change callback
-  NodeContainer::Iterator it = consumerNodes.Begin();
-  for(; it != consumerNodes.End(); it++){
+  NodeContainer::Iterator it = nodes.Begin ();
+  for(; it != nodes.End (); it++){
     std::ostringstream oss;
-    oss << "/NodeList/" << (*it)->GetId() <<
+    oss << "/NodeList/" << (*it)->GetId () <<
       "/$ns3::MobilityModel/CourseChange";
     Config::Connect (oss.str (), MakeCallback (&CourseChange));
   }
-
 
   // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
   ccnxHelper.SetDefaultRoutes(true);
-  ccnxHelper.Install(producerNode);
-  ccnxHelper.Install(consumerNodes);
+  ccnxHelper.Install(nodes);
 
   // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
   
-  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+  CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
   consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("5"));
-  consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
-  ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
-
+  consumerHelper.SetAttribute ("Batches", StringValue ("2s 1"));
+  // consumerHelper.SetAttribute ("Frequency", StringValue ("5"));
+  // consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
 
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix ("/");
   producerHelper.SetAttribute ("PayloadSize", StringValue("300"));
-  ApplicationContainer producers = producerHelper.Install (producerNode);
+
+  // install producer and consumer on the same node
+  consumerHelper.Install (nodes.Get (0));
+  producerHelper.Install (nodes.Get (0));
+
+  // gradient push mechanism should push data to the fartherest car... hopefully it will not explode
 }
 
 int 
@@ -80,7 +76,10 @@ main (int argc, char *argv[])
   // vanet hacks to CcnxL3Protocol
   Config::SetDefault ("ns3::CcnxL3Protocol::EnableNACKs", StringValue ("false"));
   Config::SetDefault ("ns3::CcnxL3Protocol::CacheUnsolicitedData", StringValue ("true"));
-
+  Config::SetDefault ("ns3::CcnxBroadcastNetDeviceFace::MaxDelay", StringValue ("2ms"));
+  Config::SetDefault ("ns3::CcnxBroadcastNetDeviceFace::MaxDelayLowPriority", StringValue ("5ms"));
+  Config::SetDefault ("ns3::CcnxBroadcastNetDeviceFace::MaxDistance", StringValue ("40"));
+  
   CommandLine cmd;
   cmd.Parse (argc,argv);
 
@@ -132,8 +131,6 @@ main (int argc, char *argv[])
 
 
   Simulator::Stop (Seconds (30.0));
-
-
 
   Simulator::Run ();
   Simulator::Destroy ();
