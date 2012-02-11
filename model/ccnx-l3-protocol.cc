@@ -545,7 +545,8 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                         const Ptr<const Packet> &packet)
 {
     
-  NS_LOG_FUNCTION (incomingFace << header << payload << packet);
+  //NS_LOG_FUNCTION (incomingFace << header << payload << packet);
+  NS_LOG_FUNCTION ("< DATA " << *(header->GetName()));
   m_inData (header, payload, incomingFace);
 
   // 1. Lookup PIT entry

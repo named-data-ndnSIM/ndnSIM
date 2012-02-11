@@ -18,6 +18,10 @@ CourseChange (std::string context, Ptr<const MobilityModel> model)
 		 " x = " << position.x << ", y = " << position.y);
 }
 
+void InData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
+	     Ptr<const CcnxFace> face){
+  NS_LOG_INFO(face->GetNode()->GetId() << " has got data " << *(header->GetName()));
+}
 
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac)
 {
@@ -30,20 +34,31 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   // 2. Install Mobility model
   mobility.Install (nodes);
 
-  //    set up position change callback
-  NodeContainer::Iterator it = nodes.Begin ();
+  Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange", MakeCallback (&CourseChange));
+
+
+  /*NodeContainer::Iterator it = nodes.Begin ();
   for(; it != nodes.End (); it++){
-    std::ostringstream oss;
-    oss << "/NodeList/" << (*it)->GetId () <<
+    // set up location logging
+    std::ostringstream location_oss;
+    location_oss << "/NodeList/" << (*it)->GetId () <<
       "/$ns3::MobilityModel/CourseChange";
-    Config::Connect (oss.str (), MakeCallback (&CourseChange));
-  }
+    Config::Connect (location_oss.str (), MakeCallback (&CourseChange));
+
+    // set up data reception logging
+    std::ostringstream data_oss;
+    data_oss << "/NodeList/" << (*it)->GetId () <<
+      "/$ns3::CcnxL3Protocol/InData";
+    
+      }*/
 
   // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
   ccnxHelper.SetDefaultRoutes(true);
   ccnxHelper.Install(nodes);
+
+  Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/InData", MakeCallback (&InData));
 
   // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
@@ -59,6 +74,8 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   producerHelper.SetAttribute ("PayloadSize", StringValue("300"));
 
   // install producer and consumer on the same node
+  NS_LOG_INFO("Making node("<< nodes.Get(0)->GetId() <<") both a consumer and producer. "<<
+	      "It will pull data from it self and then data will be propagated out.");
   consumerHelper.Install (nodes.Get (0));
   producerHelper.Install (nodes.Get (0));
 
