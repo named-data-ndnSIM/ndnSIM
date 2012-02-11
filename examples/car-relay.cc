@@ -8,44 +8,60 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("ThirdScriptExample");
+NS_LOG_COMPONENT_DEFINE ("CarRelay");
 
+void
+CourseChange (std::string context, Ptr<const MobilityModel> model)
+{
+  Vector position = model->GetPosition ();
+  NS_LOG_INFO (context <<
+		 " x = " << position.x << ", y = " << position.y);
+}
 
 
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac){
 
-  //////////////////////
-  //////////////////////
-  //////////////////////
-   NodeContainer producerNode;
+  int nConsumers = 20;
+  NodeContainer producerNode;
   producerNode.Create (1);
   
   NodeContainer consumerNodes;
   //if(highway_run == 2)
-  consumerNodes.Create(3);
+  consumerNodes.Create(nConsumers);
 
+  // 1. Install Wifi
   wifi.Install (wifiPhy, wifiMac, producerNode);
   wifi.Install (wifiPhy, wifiMac, consumerNodes);
 
+  // 2. Install Mobility model
   mobility.Install (producerNode);
   mobility.Install (consumerNodes);
+  //    set up position change callback
+  NodeContainer::Iterator it = consumerNodes.Begin();
+  for(; it != consumerNodes.End(); it++){
+    std::ostringstream oss;
+    oss << "/NodeList/" << (*it)->GetId() <<
+      "/$ns3::MobilityModel/CourseChange";
+    Config::Connect (oss.str (), MakeCallback (&CourseChange));
+  }
 
-  // 2. Install CCNx stack
+
+  // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
   ccnxHelper.SetDefaultRoutes(true);
   ccnxHelper.Install(producerNode);
   ccnxHelper.Install(consumerNodes);
 
-  // 6. Set up applications
+  // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  //consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("1"));
+  consumerHelper.SetPrefix ("/very-long-prefix-requested-by-client/this-interest-hundred-bytes-long-");
+  consumerHelper.SetAttribute ("Frequency", StringValue ("5"));
   consumerHelper.SetAttribute ("Randomize", StringValue ("exponential"));
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
-  
+
 
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix ("/");
@@ -98,7 +114,7 @@ main (int argc, char *argv[])
 				 "MaxGap", DoubleValue(50.0));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
-			    "ConstantVelocity", VectorValue(Vector(0/*26.8224*/, 0, 0)));
+			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
 
   SetupHighway(mobility, wifi, wifiPhy, wifiMac);
   /*26.8224*/
@@ -116,6 +132,9 @@ main (int argc, char *argv[])
 
 
   Simulator::Stop (Seconds (30.0));
+
+
+
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
