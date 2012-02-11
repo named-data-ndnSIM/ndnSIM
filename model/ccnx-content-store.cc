@@ -167,7 +167,7 @@ CcnxContentStore::Lookup (Ptr<const CcnxInterestHeader> interest)
   return boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
 }   
     
-void 
+bool 
 CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload)
 {
   NS_LOG_FUNCTION (this << *header->GetName ());
@@ -177,12 +177,14 @@ CcnxContentStore::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Pack
       m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, payload));
       if (m_contentStore.size () > m_maxSize)
         m_contentStore.get<i_mru> ().pop_back ();
+      return true;
     }
   else
     {
       // promote entry to the top
       m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
                                            m_contentStore.project<i_mru> (it));
+      return false;
     }
 }
     

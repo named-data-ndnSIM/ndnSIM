@@ -27,6 +27,9 @@
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/pointer.h"
+#include "ns3/mobility-model.h"
+
+#include "geo-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 
@@ -92,6 +95,13 @@ CcnxNetDeviceFace::SendImpl (Ptr<Packet> packet)
                  << m_netDevice->GetMtu ()
                  << " for Ccnx; fragmentation not supported");
 
+  Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+  if (mobility != 0)
+    {
+      packet->RemovePacketTag<GeoTag> ();
+      packet->AddPacketTag (CreateObject<GeoTag> (mobility->GetPosition ()));
+    }
+  
   m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
                      CcnxL3Protocol::ETHERNET_FRAME_TYPE);
 }

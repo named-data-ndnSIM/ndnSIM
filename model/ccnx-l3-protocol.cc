@@ -390,7 +390,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   if (!propagated)
     {
       m_dropNacks (header, NO_FACES, incomingFace);
-      GiveUpInterest (pitEntry, nonNackHeader);
+      GiveUpInterest (pitEntry, nonNackHeader, nonNackInterest);
     }
 }
 
@@ -533,7 +533,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     {
       NS_LOG_DEBUG ("Not propagated");
       m_dropInterests (header, NO_FACES, incomingFace);
-      GiveUpInterest (pitEntry, header);
+      GiveUpInterest (pitEntry, header, packet);
     }
 }
 
@@ -555,46 +555,49 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 
       // Note that with MultiIndex we need to modify entries indirectly
 
-      CcnxPitEntryOutgoingFaceContainer::type::iterator out = pitEntry.m_outgoing.find (incomingFace);
+      if (incomingFace->GetInstanceTypeId () != CcnxCacheFace::GetTypeId ())
+        {
+          CcnxPitEntryOutgoingFaceContainer::type::iterator out = pitEntry.m_outgoing.find (incomingFace);
   
-      // If we have sent interest for this data via this face, then update stats.
-      if (out != pitEntry.m_outgoing.end ())
-        {
-          m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
-                               ll::bind (&CcnxFibEntry::UpdateFaceRtt,
-                                         ll::_1,
-                                         incomingFace,
-                                         Simulator::Now () - out->m_sendTime));
-        }
-      else
-        {
-          // Unsolicited data, but we're interested in it... should we get it?
-          // Potential hole for attacks
-
-          if (m_cacheUnsolicitedData)
+          // If we have sent interest for this data via this face, then update stats.
+          if ( out != pitEntry.m_outgoing.end ())
             {
-              // Optimistically add or update entry in the content store
-              NS_LOG_INFO(" < Caching unsolicited data " << header->GetName());
-              m_contentStore->Add (header, payload);
+              m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                                   ll::bind (&CcnxFibEntry::UpdateFaceRtt,
+                                             ll::_1,
+                                             incomingFace,
+                                             Simulator::Now () - out->m_sendTime));
             }
           else
             {
-              NS_LOG_ERROR ("Node "<< m_node->GetId() <<
-                            ". PIT entry for "<< *header->GetName ()<<" is valid, "
-                            "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
-              // ignore unsolicited data
-              return;
+              // Unsolicited data, but we're interested in it... should we get it?
+              // Potential hole for attacks
+
+              if (m_cacheUnsolicitedData) 
+                {
+                  // Optimistically add or update entry in the content store
+                  NS_LOG_INFO(" < Caching unsolicited data " << header->GetName());
+                  m_contentStore->Add (header, payload);
+                }
+              else
+                {
+                  NS_LOG_ERROR ("Node "<< m_node->GetId() <<
+                                ". PIT entry for "<< *header->GetName ()<<" is valid, "
+                                "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
+                  // ignore unsolicited data
+                  return;
+                }
             }
-        }
 
-      // Update metric status for the incoming interface in the corresponding FIB entry
-      m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
-                           ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
-                                     incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
+          // Update metric status for the incoming interface in the corresponding FIB entry
+          m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+                               ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
+                                         incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
-      // Add or update entry in the content store
-      m_contentStore->Add (header, payload);
-
+          // Add or update entry in the content store
+          m_contentStore->Add (header, payload);
+        }
+      
       //satisfy all pending incoming Interests
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
@@ -627,7 +630,19 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       if (m_cacheUnsolicitedData)
         {
           // Optimistically add or update entry in the content store
-          m_contentStore->Add (header, payload);
+          bool newEntry = m_contentStore->Add (header, payload);
+
+          if (newEntry)
+            {
+              // Try to push new packet further with lowest priority possible
+              Ptr<Packet> packetCopy = packet->Copy ();
+              if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+                {
+                  NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                  packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+                }
+              incomingFace->SendLowPriority (packetCopy);
+            }
         }
       else
         {
@@ -643,20 +658,21 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 
 void
 CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
-                                const Ptr<const CcnxInterestHeader> header)
+                                const Ptr<const CcnxInterestHeader> &header,
+                                const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this << &pitEntry);
   if (m_nacksEnabled)
     {
-      Ptr<Packet> packet = Create<Packet> ();
+      Ptr<Packet> nackPacket = Create<Packet> ();
       Ptr<CcnxInterestHeader> nackHeader = Create<CcnxInterestHeader> (*header);
       nackHeader->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
-      packet->AddHeader (*nackHeader);
+      nackPacket->AddHeader (*nackHeader);
 
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
         {
           NS_LOG_DEBUG ("Send NACK for " << boost::cref (*nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
-          incoming.m_face->Send (packet->Copy ());
+          incoming.m_face->Send (nackPacket->Copy ());
 
           m_outNacks (nackHeader, incoming.m_face);
         }
@@ -674,6 +690,19 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
   m_pit->modify (m_pit->iterator_to (pitEntry),
                  ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
                            Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+
+
+  // Push interest using low-priority send method
+  BOOST_FOREACH (const CcnxFibFaceMetric &face, pitEntry.m_fibEntry.m_faces)
+    {
+      Ptr<Packet> packetCopy = packet->Copy ();
+      if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+        {
+          NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+          packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+        }
+      face.m_face->SendLowPriority (packetCopy);
+    }
 }
 
 } //namespace ns3

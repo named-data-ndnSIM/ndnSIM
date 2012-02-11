@@ -25,6 +25,7 @@
 #include "ns3/integer.h"
 #include "ns3/header.h"
 #include "ns3/trailer.h"
+#include "ns3/vector.h"
 
 #include <string>
 #include <vector>
@@ -82,6 +83,18 @@ public:
 
   // ?
   // GetSignedInfo () const;
+
+  /**
+   * \brief Set position vector
+   */
+  void
+  SetPosition (const Vector &position);
+  
+  /**
+   * \brief Get position vector
+   */
+  const Vector &
+  GetPosition () const;
   
   //////////////////////////////////////////////////////////////////
   
@@ -96,6 +109,7 @@ private:
   Ptr<CcnxNameComponents> m_name;
   // m_signature;
   // m_signedInfo;
+  Vector m_position;
 };
 
 /**

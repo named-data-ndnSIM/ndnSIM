@@ -61,6 +61,18 @@ CcnxContentObjectHeader::GetName () const
   return m_name;
 }
 
+void
+CcnxContentObjectHeader::SetPosition (const Vector &position)
+{
+  m_position = position;
+}
+  
+const Vector &
+CcnxContentObjectHeader::GetPosition () const
+{
+  return m_position;
+}
+
 uint32_t
 CcnxContentObjectHeader::GetSerializedSize (void) const
 {
@@ -89,7 +101,11 @@ CcnxContentObjectHeader::GetInstanceTypeId (void) const
 void
 CcnxContentObjectHeader::Print (std::ostream &os) const
 {
-  os << "<ContentObject><Name>" << *GetName () << "</Name><Content>";
+  os << "<ContentObject>\n  <Name>" << *GetName () << "</Name>";
+  if (m_position.x != 0 && m_position.y != 0 && m_position.z != 0)
+    os << "  <Position>" << GetPosition () << "</Position>";
+
+  os << "  <Content>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +133,7 @@ CcnxContentObjectTail::GetInstanceTypeId (void) const
 void
 CcnxContentObjectTail::Print (std::ostream &os) const
 {
-  os << "</Content></ContentObject>";
+  os << "</Content>\n</ContentObject>";
 }
 
 uint32_t

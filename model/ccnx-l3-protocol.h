@@ -193,7 +193,8 @@ private:
 
   void
   GiveUpInterest (const CcnxPitEntry &pitEntry,
-                  const Ptr<const CcnxInterestHeader> header);
+                  const Ptr<const CcnxInterestHeader> &header,
+                  const Ptr<const Packet> &packet);
 
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack

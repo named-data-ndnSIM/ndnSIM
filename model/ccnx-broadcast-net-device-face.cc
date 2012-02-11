@@ -22,9 +22,11 @@
 #include "ccnx-broadcast-net-device-face.h"
 #include "ccnx-l3-protocol.h"
 #include "ccnx-name-components-tag.h"
+#include "geo-tag.h"
 
 #include "ns3/ccnx-header-helper.h"
 
+#include "ns3/mobility-model.h"
 #include "ns3/net-device.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -32,6 +34,7 @@
 #include "ns3/simulator.h"
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
+#include "ns3/double.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxBroadcastNetDeviceFace");
 
@@ -48,6 +51,15 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    TimeValue (Seconds (0.002)),
                    MakeTimeAccessor (&CcnxBroadcastNetDeviceFace::SetMaxDelay, &CcnxBroadcastNetDeviceFace::GetMaxDelay),
                    MakeTimeChecker ())
+
+    .AddAttribute ("MaxDelayLowPriority", "Maximum delay for low-priority queue ('gradient' pushing queue)",
+                   TimeValue (Seconds (0.005)),
+                   MakeTimeAccessor (&CcnxBroadcastNetDeviceFace::SetMaxDelayLowPriority, &CcnxBroadcastNetDeviceFace::GetMaxDelayLowPriority),
+                   MakeTimeChecker ())
+    .AddAttribute ("MaxDistance", "Normalization distance for gradient pushing calculation",
+                   DoubleValue (300.0),
+                   MakeDoubleAccessor (&CcnxBroadcastNetDeviceFace::m_maxDistance),
+                   MakeDoubleChecker<double> ())
     ;
   return tid;
 }
@@ -119,6 +131,18 @@ CcnxBroadcastNetDeviceFace::GetMaxDelay () const
   return m_maxWaitPeriod;
 }
 
+void
+CcnxBroadcastNetDeviceFace::SetMaxDelayLowPriority (const Time &value)
+{
+  m_maxWaitLowPriority = value;
+}
+
+Time
+CcnxBroadcastNetDeviceFace::GetMaxDelayLowPriority () const
+{
+  return m_maxWaitLowPriority;
+}
+
 
 CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_packet)
   : gap (_gap), packet (_packet)
@@ -129,6 +153,50 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
   NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission");
+}
+
+void
+CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
+{
+  NS_LOG_FUNCTION (this << packet);
+  
+  if (m_queue.size () >= m_maxPacketsInQueue ||
+      m_lowPriorityQueue.size () >= m_maxPacketsInQueue)
+    {
+      // \todo Maybe add tracing
+      NS_LOG_DEBUG ("Too many packets enqueue already. Don't do anything");
+      return;
+    }
+  
+  Ptr<const GeoTag> tag = packet->PeekPacketTag<GeoTag> ();
+  if (tag == 0)
+    {
+      NS_FATAL_ERROR ("GeoTag has to be present in the packet");
+      return;
+    }
+
+  Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+  if (mobility == 0)
+    {
+      NS_FATAL_ERROR ("Mobility model has to be installed on the node");
+      return;
+    }
+  
+  double distance = CalculateDistance (tag->GetPosition (), mobility->GetPosition ());
+  distance = std::min (1.0, distance);
+
+  // Mean waiting time.  Reversely proportional to the distance from the original transmitter
+  // Closer guys will tend to wait longer than guys far away
+  double meanWaiting = std::min (m_maxWaitLowPriority.ToDouble (Time::S),
+                                 m_maxWaitLowPriority.ToDouble (Time::S) * m_maxDistance / distance);
+  
+  TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), meanWaiting);
+
+  Time gap = Seconds (randomLowPriority.GetValue ());
+  m_lowPriorityQueue.push_back (Item (gap, packet));
+
+  if (!m_scheduledSend.IsRunning ())
+    m_scheduledSend = Simulator::Schedule (m_lowPriorityQueue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
 }
 
 void
@@ -179,18 +247,35 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT (m_queue.size () > 0);
-  Item &item = m_queue.front ();
+  NS_ASSERT ((m_queue.size () + m_lowPriorityQueue.size ()) > 0);
+
+  // If high-priority queue is not empty, send data from it
+  if (m_queue.size () > 0)
+    {
+      Item &item = m_queue.front ();
   
-  //////////////////////////////
-  CcnxNetDeviceFace::SendImpl (item.packet);
-  //////////////////////////////
+      //////////////////////////////
+      CcnxNetDeviceFace::SendImpl (item.packet);
+      //////////////////////////////
   
-  m_totalWaitPeriod -= item.gap;
-  m_queue.pop_front ();
+      m_totalWaitPeriod -= item.gap;
+      m_queue.pop_front ();
+    }
+  else if (m_lowPriorityQueue.size () > 0) // no reason for this check, just for readability
+    {
+      Item &item = m_queue.front ();
   
+      //////////////////////////////
+      CcnxNetDeviceFace::SendImpl (item.packet);
+      //////////////////////////////
+
+      m_lowPriorityQueue.pop_front ();
+    }
+
   if (m_queue.size () > 0)
     m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
+  else if (m_lowPriorityQueue.size () > 0)
+    m_scheduledSend = Simulator::Schedule (m_lowPriorityQueue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
 }
 
 // callback

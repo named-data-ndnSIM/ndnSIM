@@ -25,6 +25,7 @@
 #include "ns3/integer.h"
 #include "ns3/header.h"
 #include "ns3/nstime.h"
+#include "ns3/vector.h"
 
 #include <string>
 #include <vector>
@@ -343,6 +344,19 @@ public:
   uint32_t
   GetNack () const;
 
+
+  /**
+   * \brief Set position vector
+   */
+  void
+  SetPosition (const Vector &position);
+  
+  /**
+   * \brief Get position vector
+   */
+  const Vector &
+  GetPosition () const;
+
   //////////////////////////////////////////////////////////////////
   
   static TypeId GetTypeId (void);
@@ -384,6 +398,7 @@ private:
   Time  m_interestLifetime;           ///< InterestLifetime
   uint32_t m_nonce;                   ///< Nonce. not used if zero
   uint32_t m_nackType;                ///< Negative Acknowledgement type
+  Vector m_position;
 };
 
 /**

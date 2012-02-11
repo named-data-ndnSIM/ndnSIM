@@ -63,8 +63,12 @@ public:
   CcnxBroadcastNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
   virtual ~CcnxBroadcastNetDeviceFace();
 
+  // from CcnxFace
+  virtual void
+  SendLowPriority (Ptr<Packet> p);
+  
 protected:
-  // also from CcnxFace
+  // from CcnxFace
   virtual void
   SendImpl (Ptr<Packet> p);
 
@@ -93,13 +97,14 @@ private:
 
   Time
   GetMaxDelay () const;
+
+  void
+  SetMaxDelayLowPriority (const Time &value);
+
+  Time
+  GetMaxDelayLowPriority () const;
   
 private:
-  EventId m_scheduledSend;
-  Time m_totalWaitPeriod;
-  UniformVariable m_randomPeriod;
-  Time m_maxWaitPeriod;
-
   struct Item
   {
     Item (const Time &_gap, const Ptr<Packet> &_packet);
@@ -108,11 +113,21 @@ private:
     Ptr<Packet> packet;
     Ptr<const CcnxNameComponents> name;
   };
-
   typedef std::list<Item> ItemQueue;
+
+  EventId m_scheduledSend;
+
+  // Primary queue (for requested ContentObject packets)
+  Time m_totalWaitPeriod;
+  UniformVariable m_randomPeriod;
+  Time m_maxWaitPeriod;
+  uint32_t m_maxPacketsInQueue;
   ItemQueue m_queue;
 
-  uint32_t m_maxPacketsInQueue;
+  // Low-priority queue (for pushing Interest and ContentObject packets)
+  Time m_maxWaitLowPriority;
+  double m_maxDistance;
+  ItemQueue m_lowPriorityQueue;
 };
 
 } // namespace ns3

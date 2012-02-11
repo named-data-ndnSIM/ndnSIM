@@ -186,8 +186,10 @@ public:
    *
    * If entry with the same prefix exists, the old entry will be
    * promoted to the top of the MRU hash
+   *
+   * \returns true if new entry is added, false otherwise
    */
-  void
+  bool
   Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet);
 
   /**

@@ -87,7 +87,7 @@ public:
    *
    * @returns true if Interest limit is not yet reached
    */
-  bool
+  virtual bool
   IsBelowLimit ();
   
   /**
@@ -99,15 +99,23 @@ public:
    *
    * @return false if either limit is reached
    */ 
-  bool
+  virtual bool
   Send (Ptr<Packet> p);
+
+  /**
+   * \brief Send packet on a face with lowest priority possible
+   *
+   * By default does nothing.  Broadcast-type faces may perform gradient-metric pushing if nothing else is scheduled.
+   */
+  virtual void
+  SendLowPriority (Ptr<Packet> p);
 
   /**
    * \brief Receive packet from application or another node and forward it to the CCNx stack
    *
    * \todo The only reason for this call is to handle tracing, if requested
    */
-  bool
+  virtual bool
   Receive (const Ptr<const Packet> &p);
   ////////////////////////////////////////////////////////////////////
 

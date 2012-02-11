@@ -26,8 +26,19 @@
 
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
 
 namespace ns3 {
+
+inline bool
+IsZero (const Vector &vector)
+{
+  // should work only if vector wasn't initialized. Otherwise, double values will not be zeros.
+  return (vector.x == 0 && vector.y == 0 && vector.z == 0);
+}
 
 size_t
 CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader &interest)
@@ -95,6 +106,15 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
       written += AppendNumber (start, interest.GetNack ());
       written += AppendCloser (start);
     }
+
+  if (IsZero (interest.GetPosition ()))
+    {
+      string position = lexical_cast<string> (interest.GetPosition ());
+      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Position,
+                                   reinterpret_cast<const uint8_t*> (position.c_str()),
+                                   position.size () + 1);
+    }
+  
   written += AppendCloser (start); // </Interest>
 
   return written;
@@ -162,6 +182,11 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxInterestHeader &interest)
         written += EstimateNumber (interest.GetNack ());
         written += 1;
     }
+  if (IsZero (interest.GetPosition ()))
+    {
+      std::string position = lexical_cast<string> (interest.GetPosition ());
+      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Position, position.size () + 1);
+    }
 
   written += 1; // </Interest>
 
@@ -197,6 +222,14 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHe
   written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0, 0); // <PublisherPublicKeyDigest />
   written += AppendCloser (start);                                     // </SignedInfo>
 
+  if (IsZero (contentObject.GetPosition ()))
+    {
+      std::string position = lexical_cast<string> (contentObject.GetPosition ());
+      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Position,
+                                   reinterpret_cast<const uint8_t*> (position.c_str()),
+                                   position.size () + 1);
+    }
+  
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Content, CcnbParser::CCN_DTAG); // <Content>
 
   // there are no closing tags !!!
@@ -231,6 +264,12 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxContentObjectHeader &contentObj
   //                KeyLocator?
   written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0); // <PublisherPublicKeyDigest />
   written += 1;                                     // </SignedInfo>
+
+  if (IsZero (contentObject.GetPosition ()))
+    {
+      std::string position = lexical_cast<string> (contentObject.GetPosition ());
+      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Position, position.size () + 1);
+    }
 
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Content); // <Content>
 

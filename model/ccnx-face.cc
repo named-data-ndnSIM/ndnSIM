@@ -178,6 +178,12 @@ CcnxFace::Send (Ptr<Packet> packet)
   return true;
 }
 
+void
+CcnxFace::SendLowPriority (Ptr<Packet> p)
+{
+  // does nothing in general. Other faces may do something more genious
+}
+
 bool
 CcnxFace::Receive (const Ptr<const Packet> &packet)
 {

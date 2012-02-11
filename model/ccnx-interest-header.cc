@@ -188,6 +188,19 @@ CcnxInterestHeader::GetNack () const
   return m_nackType;
 }
 
+void
+CcnxInterestHeader::SetPosition (const Vector &position)
+{
+  m_position = position;
+}
+  
+const Vector &
+CcnxInterestHeader::GetPosition () const
+{
+  return m_position;
+}
+
+
 uint32_t
 CcnxInterestHeader::GetSerializedSize (void) const
 {
@@ -252,6 +265,8 @@ CcnxInterestHeader::Print (std::ostream &os) const
     os << "  <InterestLifetime>" << GetInterestLifetime () << "</InterestLifetime>\n";
   if (GetNonce ()>0)
     os << "  <Nonce>" << GetNonce () << "</Nonce>\n";
+  if (m_position.x != 0 && m_position.y != 0 && m_position.z != 0)
+    os << "  <Position>" << GetPosition () << "</Position>";
   os << "</Interest>";
 }
 
