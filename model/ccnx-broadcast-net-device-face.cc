@@ -237,7 +237,7 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
         gap = Time (0);
 
       m_queue.push_back (Item (gap, packet));
-      m_maxWaitPeriod += gap;
+      m_totalWaitPeriod += gap;
 
       if (!m_scheduledSend.IsRunning ())
         m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
