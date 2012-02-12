@@ -194,12 +194,16 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
   double meanWaiting = m_maxWaitLowPriority.ToDouble (Time::S) * (m_maxDistance - distance) / m_maxDistance;
   // NS_LOG_DEBUG ("Mean waiting: " << meanWaiting);
   
-  TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), (meanWaiting+m_maxWaitLowPriority.ToDouble (Time::S))/3.0);
-  // NS_LOG_DEBUG ("Sample: " << randomLowPriority.GetValue ());
+  // TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), (meanWaiting+m_maxWaitLowPriority.ToDouble (Time::S))/3.0);
+
+  NormalVariable randomLowPriority = NormalVariable (meanWaiting, /* mean */
+                                                     m_maxWaitPeriod.ToDouble (Time::S)*m_maxWaitPeriod.ToDouble (Time::S), /*variance*/
+                                                     m_maxWaitLowPriority.ToDouble (Time::S)/*bound*/);
+  double sample = std::abs (randomLowPriority.GetValue ());
+  NS_LOG_DEBUG ("Sample: " << sample);
 
   // Actual gap will be defined by Triangular distribution based on Geo metric + Uniform distribution that is aimed to avoid collisions
-  Time gap = Seconds (randomLowPriority.GetValue () + m_randomPeriod.GetValue ());
-  m_lowPriorityQueue.push_back (Item (gap, packet));
+  m_lowPriorityQueue.push_back (Item (Seconds (sample), packet));
 
   if (!m_scheduledSend.IsRunning ())
     m_scheduledSend = Simulator::Schedule (m_lowPriorityQueue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
