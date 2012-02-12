@@ -104,14 +104,28 @@ private:
   Time
   GetMaxDelayLowPriority () const;
 
+  void
+  ProcessRetx ();
+
+  Time
+  GetPriorityQueueGap () const;
+
 private:
   struct Item
   {
     Item (const Time &_gap, const Ptr<Packet> &_packet);
+    Item (const Item &item);
+
+    Item &
+    operator ++ ();
+
+    Item &
+    Gap (const Time &time);
     
     Time gap;
     Ptr<Packet> packet;
     Ptr<const CcnxNameComponents> name;
+    uint32_t retxCount;
   };
   typedef std::list<Item> ItemQueue;
 
@@ -128,6 +142,12 @@ private:
   Time m_maxWaitLowPriority;
   double m_maxDistance;
   ItemQueue m_lowPriorityQueue;
+
+  // Retransmission queue for low-priority pushing
+  EventId m_retxEvent;
+  Time m_maxWaitRetransmission;
+  ItemQueue m_retxQueue;
+  uint32_t m_maxRetxAttempts;
 };
 
 } // namespace ns3

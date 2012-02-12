@@ -62,6 +62,15 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    DoubleValue (300.0),
                    MakeDoubleAccessor (&CcnxBroadcastNetDeviceFace::m_maxDistance),
                    MakeDoubleChecker<double> ())
+
+    .AddAttribute ("MaxDelayRetransmission", "Maximum delay between successive retransmissions of low-priority pushed packets",
+                   TimeValue (Seconds (0.050)),
+                   MakeTimeAccessor (&CcnxBroadcastNetDeviceFace::m_maxWaitRetransmission),
+                   MakeTimeChecker ())
+    .AddAttribute ("MaxRetransmissionAttempts", "Maximum number of retransmission attempts for low-priority pushed packets",
+                   UintegerValue (7),
+                   MakeUintegerAccessor (&CcnxBroadcastNetDeviceFace::m_maxRetxAttempts),
+                   MakeUintegerChecker<uint32_t> ())
     ;
   return tid;
 }
@@ -147,7 +156,7 @@ CcnxBroadcastNetDeviceFace::GetMaxDelayLowPriority () const
 
 
 CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_packet)
-  : gap (_gap), packet (_packet)
+  : gap (_gap), packet (_packet), retxCount (0)
 {
   NS_LOG_FUNCTION (this << _gap << _packet);
   
@@ -155,6 +164,39 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
   NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission after " << _gap);
+}
+
+CcnxBroadcastNetDeviceFace::Item::Item (const Item &item)
+  : gap (item.gap), packet (item.packet), name (item.name), retxCount (item.retxCount)
+{
+}
+
+CcnxBroadcastNetDeviceFace::Item &
+CcnxBroadcastNetDeviceFace::Item::operator ++ ()
+{
+  retxCount ++;
+  return *this;
+}
+
+CcnxBroadcastNetDeviceFace::Item &
+CcnxBroadcastNetDeviceFace::Item::Gap (const Time &time)
+{
+  gap = time;
+  return *this;
+}
+
+Time
+CcnxBroadcastNetDeviceFace::GetPriorityQueueGap () const
+{
+  Time gap = Seconds (m_randomPeriod.GetValue ());
+  if (m_totalWaitPeriod < m_maxWaitPeriod)
+    {
+      gap = std::min (m_maxWaitPeriod - m_totalWaitPeriod, gap);
+    }
+  else
+    gap = Time (0);
+
+  return gap;
 }
 
 void
@@ -232,14 +274,7 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
           return;
         }
       
-      Time gap = Seconds (m_randomPeriod.GetValue ());
-      if (m_totalWaitPeriod < m_maxWaitPeriod)
-        {
-          gap = std::min (m_maxWaitPeriod - m_totalWaitPeriod, gap);
-        }
-      else
-        gap = Time (0);
-
+      Time gap = GetPriorityQueueGap ();
       m_queue.push_back (Item (gap, packet));
       m_totalWaitPeriod += gap;
 
@@ -265,9 +300,12 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
       Item &item = m_queue.front ();
   
       //////////////////////////////
-      CcnxNetDeviceFace::SendImpl (item.packet);
+      CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
       //////////////////////////////
-  
+
+      if (item.retxCount < m_maxRetxAttempts)
+        m_retxQueue.push_back (++(item.Gap (m_maxWaitRetransmission)));
+      
       m_totalWaitPeriod -= item.gap;
       m_queue.pop_front ();
     }
@@ -276,8 +314,11 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
       Item &item = m_lowPriorityQueue.front ();
   
       //////////////////////////////
-      CcnxNetDeviceFace::SendImpl (item.packet);
+      CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
       //////////////////////////////
+
+      if (item.retxCount < m_maxRetxAttempts)
+        m_retxQueue.push_back (++(item.Gap (m_maxWaitRetransmission)));
 
       m_lowPriorityQueue.pop_front ();
     }
@@ -286,6 +327,31 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
     m_scheduledSend = Simulator::Schedule (m_queue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
   else if (m_lowPriorityQueue.size () > 0)
     m_scheduledSend = Simulator::Schedule (m_lowPriorityQueue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
+
+  if (!m_retxEvent.IsRunning () && m_retxQueue.size () > 0)
+    {
+      m_retxEvent = Simulator::Schedule (m_retxQueue.front ().gap, &CcnxBroadcastNetDeviceFace::ProcessRetx, this);
+    }
+}
+
+void
+CcnxBroadcastNetDeviceFace::ProcessRetx ()
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT (m_retxQueue.size () > 0);
+
+  Time gap = GetPriorityQueueGap ();
+  Item item (gap, m_retxQueue.front ().packet);
+  item.retxCount = m_retxQueue.front ().retxCount;
+  m_lowPriorityQueue.push_back (item);
+
+  m_retxQueue.pop_front ();
+  
+  if (!m_scheduledSend.IsRunning ())
+    m_scheduledSend = Simulator::Schedule (m_lowPriorityQueue.front ().gap, &CcnxBroadcastNetDeviceFace::SendFromQueue, this);
+  
+  if (m_retxQueue.size () > 0)
+    m_retxEvent = Simulator::Schedule (m_retxQueue.front ().gap, &CcnxBroadcastNetDeviceFace::ProcessRetx, this);
 }
 
 // callback
@@ -350,6 +416,29 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
               if (m_queue.size () == 0)
                 {
                   m_scheduledSend.Cancel ();
+                }
+
+              item = tmp;
+            }
+          else
+            item ++;
+        }
+
+      item = m_retxQueue.begin ();
+      while (item != m_retxQueue.end ())
+        {
+          if (*item->name == *name)
+            {
+              cancelled = true;
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
+              m_retxQueue.erase (item);
+              if (m_retxQueue.size () == 0)
+                {
+                  NS_LOG_INFO ("Canceling the retx processing event");
+                  m_retxEvent.Cancel ();
                 }
 
               item = tmp;
