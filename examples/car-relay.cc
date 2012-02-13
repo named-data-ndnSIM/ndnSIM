@@ -5,10 +5,69 @@
 #include "ns3/mobility-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/NDNabstraction-module.h"
+#include <boost/regex.hpp>
+#include "stdlib.h"
+#include <iostream>
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("CarRelay");
+
+typedef bool LINE_CALLBACK(string line);
+
+class ScenarioConf{
+public:
+  ScenarioConf();
+  long car_number;
+  double car_distance;
+};
+
+ScenarioConf::ScenarioConf(){
+  car_number = 0;
+  car_distance = 0;
+}
+
+ScenarioConf globalConf;
+
+/*
+ * @Return whether to terminate the loop process
+ **/
+bool process_conf_line(string line){
+  string pattern = "car_distance\\((\\d+)\\):\\s*(\\d+)";
+  boost::regex re;
+  try{
+    re.assign(pattern, boost::regex_constants::icase);
+  }catch ( boost::regex_error& e){
+    std::cout<< pattern << " is not a valid pattern" << endl;
+  }
+  boost::cmatch matches;      
+  if(boost::regex_search(line.c_str(), matches, re)){
+    NS_LOG_INFO("Cars(" << matches[1] << "), Distance(" << matches[2] << ")");
+    globalConf.car_number = strtol(matches[1].str().c_str(), NULL, 10);
+    globalConf.car_distance = strtod(matches[2].str().c_str(), NULL);
+    return true;
+  }else{
+    std::cout << "Cannot match line " << line << endl;
+    return false;
+  }
+}
+
+void go_through(string fileName, LINE_CALLBACK cb){
+  string line;
+  ifstream myfile (fileName.c_str());
+  if (myfile.is_open())
+  {
+    while ( myfile.good() )
+    {
+      getline (myfile,line);
+      if(cb(line)){
+	break;
+      }
+    }
+    myfile.close();
+  }
+}
+
 
 void
 CourseChange (std::string context, Ptr<const MobilityModel> model)
@@ -23,6 +82,11 @@ void InData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr
   NS_LOG_INFO(face->GetNode()->GetId() << " has got data seq#" << header->GetName()->GetLastComponent ());
 }
 
+void OutData (std::string context, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet,
+	     Ptr<const CcnxFace> face){
+  NS_LOG_INFO(face->GetNode()->GetId() << " sends out data seq#" << header->GetName()->GetLastComponent ());
+}
+
 void InCache (std::string context, Ptr<Ccnx> ccnx, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
   std::cout << Simulator::Now ().ToDouble (Time::S) << " sec \tNode #" << ccnx->GetObject<Node> ()->GetId () << " cached seq#" << header->GetName ()->GetLastComponent () << "\n";
@@ -31,7 +95,7 @@ void InCache (std::string context, Ptr<Ccnx> ccnx, Ptr<const CcnxContentObjectHe
 void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& wifiPhy, NqosWifiMacHelper wifiMac)
 {
   NodeContainer nodes;
-  nodes.Create (10);
+  nodes.Create (globalConf.car_number);
 
   // 1. Install Wifi
   wifi.Install (wifiPhy, wifiMac, nodes);
@@ -42,21 +106,6 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange", MakeCallback (&CourseChange));
 
 
-  /*NodeContainer::Iterator it = nodes.Begin ();
-  for(; it != nodes.End (); it++){
-    // set up location logging
-    std::ostringstream location_oss;
-    location_oss << "/NodeList/" << (*it)->GetId () <<
-      "/$ns3::MobilityModel/CourseChange";
-    Config::Connect (location_oss.str (), MakeCallback (&CourseChange));
-
-    // set up data reception logging
-    std::ostringstream data_oss;
-    data_oss << "/NodeList/" << (*it)->GetId () <<
-      "/$ns3::CcnxL3Protocol/InData";
-    
-      }*/
-
   // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
@@ -64,6 +113,7 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   ccnxHelper.Install(nodes);
 
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/InData", MakeCallback (&InData));
+  Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/OutData", MakeCallback (&OutData));
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/ContentStore/InCache", MakeCallback (&InCache));
   
   // 4. Set up applications
@@ -88,6 +138,17 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   // gradient push mechanism should push data to the fartherest car... hopefully it will not explode
 }
 
+
+void init(int argc, char** argv){
+  CommandLine cmd;
+  string confFile;
+  cmd.AddValue ("conf", "XML file for scenario parameter configuration", confFile);
+  assert(confFile != "");
+
+  cmd.Parse (argc,argv);
+  go_through(confFile, process_conf_line);
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -103,8 +164,9 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::CcnxBroadcastNetDeviceFace::MaxDelayLowPriority", StringValue ("5ms"));
   Config::SetDefault ("ns3::CcnxBroadcastNetDeviceFace::MaxDistance", StringValue ("40"));
   
-  CommandLine cmd;
-  cmd.Parse (argc,argv);
+  init(argc, argv);
+  assert(globalConf.car_number != 0);
+  assert(globalConf.car_distance != 0);
 
   //////////////////////
   //////////////////////
@@ -132,8 +194,8 @@ main (int argc, char *argv[])
 				 "Start", VectorValue(Vector(0.0, 0.0, 0.0)),
 				 "Direction", DoubleValue(0.0),
 				 "Length", DoubleValue(1000.0),
-				 "MinGap", DoubleValue(50.0),
-				 "MaxGap", DoubleValue(50.0));
+				 "MinGap", DoubleValue(globalConf.car_distance),
+				 "MaxGap", DoubleValue(globalConf.car_distance));
   
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
 			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));

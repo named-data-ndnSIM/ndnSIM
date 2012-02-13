@@ -641,6 +641,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
               packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
             }
           face->SendLowPriority (packetCopy);
+          m_outData (header, payload, face);
         }
     }
   catch (CcnxPitEntryNotFound)
@@ -662,6 +663,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                       packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
                     }
                   face->SendLowPriority (packetCopy);
+                  m_outData (header, payload, face);
                 }
             }
         }

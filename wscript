@@ -131,6 +131,7 @@ def build(bld):
         obj.source = 'examples/car2car-wifi.cc'
 
         obj = bld.create_ns3_program('car-relay', ['internet', 'NDNabstraction'])
+        obj.env.append_value('LIB', 'boost_regex')
         obj.source = 'examples/car-relay.cc'
 
         obj = bld.create_ns3_program('car-interference', ['internet', 'NDNabstraction'])
