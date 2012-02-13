@@ -8,6 +8,7 @@
 #include <boost/regex.hpp>
 #include "stdlib.h"
 #include <iostream>
+#include <sstream>
 
 using namespace ns3;
 
@@ -18,27 +19,31 @@ typedef bool LINE_CALLBACK(string line);
 class ScenarioConf{
 public:
   ScenarioConf();
+  int scenario_id; // this value is not used for now
   long car_number;
   double car_distance;
 };
 
 ScenarioConf::ScenarioConf(){
+  scenario_id = -1;
   car_number = 0;
   car_distance = 0;
 }
 
+int global_scenario_id = -1;
 ScenarioConf globalConf;
 
 /*
  * @Return whether to terminate the loop process
  **/
 bool process_conf_line(string line){
-  string pattern = "car_distance\\((\\d+)\\):\\s*(\\d+)";
+  std::stringstream ss_pattern;
+  ss_pattern << global_scenario_id << "\\s+car_distance\\((\\d+)\\):\\s*(\\d+)";
   boost::regex re;
   try{
-    re.assign(pattern, boost::regex_constants::icase);
+    re.assign(ss_pattern.str(), boost::regex_constants::icase);
   }catch ( boost::regex_error& e){
-    std::cout<< pattern << " is not a valid pattern" << endl;
+    std::cout<< ss_pattern.str() << " is not a valid pattern" << endl;
   }
   boost::cmatch matches;      
   if(boost::regex_search(line.c_str(), matches, re)){
@@ -143,7 +148,9 @@ void init(int argc, char** argv){
   CommandLine cmd;
   string confFile;
   cmd.AddValue ("conf", "XML file for scenario parameter configuration", confFile);
+  cmd.AddValue ("s_id", "The scenario id to be used", global_scenario_id);
   assert(confFile != "");
+  assert(global_scenario_id != -1);
 
   cmd.Parse (argc,argv);
   go_through(confFile, process_conf_line);
