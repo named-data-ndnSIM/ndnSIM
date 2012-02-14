@@ -71,6 +71,9 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    UintegerValue (7),
                    MakeUintegerAccessor (&CcnxBroadcastNetDeviceFace::m_maxRetxAttempts),
                    MakeUintegerChecker<uint32_t> ())
+
+    .AddTraceSource ("WaitingTimeVsDistanceTrace", "On every low-priority packet trace the waiting gap and distance",
+                    MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_waitingTimeVsDistanceTrace))
     ;
   return tid;
 }
@@ -244,6 +247,8 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
   double sample = std::abs (randomLowPriority.GetValue ());
   NS_LOG_DEBUG ("Sample: " << sample);
 
+  m_waitingTimeVsDistanceTrace (distance, sample);
+  
   // Actual gap will be defined by Triangular distribution based on Geo metric + Uniform distribution that is aimed to avoid collisions
   m_lowPriorityQueue.push_back (Item (Seconds (sample), packet));
 
