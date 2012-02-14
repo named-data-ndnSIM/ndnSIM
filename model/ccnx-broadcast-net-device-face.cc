@@ -55,7 +55,7 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    MakeTimeChecker ())
 
     .AddAttribute ("MaxDelayLowPriority", "Maximum delay for low-priority queue ('gradient' pushing queue)",
-                   TimeValue (Seconds (0.005)),
+                   TimeValue (Seconds (0.010)),
                    MakeTimeAccessor (&CcnxBroadcastNetDeviceFace::SetMaxDelayLowPriority, &CcnxBroadcastNetDeviceFace::GetMaxDelayLowPriority),
                    MakeTimeChecker ())
     .AddAttribute ("MaxDistance", "Normalization distance for gradient pushing calculation",
@@ -241,9 +241,12 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
   
   // TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), (meanWaiting+m_maxWaitLowPriority.ToDouble (Time::S))/3.0);
 
-  NormalVariable randomLowPriority = NormalVariable (meanWaiting, /* mean */
-                                                     m_maxWaitPeriod.ToDouble (Time::S)*m_maxWaitPeriod.ToDouble (Time::S), /*variance*/
-                                                     m_maxWaitLowPriority.ToDouble (Time::S)/*bound*/);
+  // NormalVariable randomLowPriority = NormalVariable (meanWaiting, /* mean */
+  //                                                    m_maxWaitPeriod.ToDouble (Time::S) * m_maxWaitPeriod.ToDouble (Time::S), /*variance*/
+  //                                                    meanWaiting + m_maxWaitPeriod.ToDouble (Time::S)/*bound*/);
+
+  UniformVariable randomLowPriority (meanWaiting, meanWaiting + m_maxWaitPeriod.ToDouble (Time::S));
+  
   double sample = std::abs (randomLowPriority.GetValue ());
   NS_LOG_DEBUG ("Sample: " << sample);
 
