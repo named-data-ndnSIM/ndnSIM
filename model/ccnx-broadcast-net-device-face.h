@@ -24,6 +24,7 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 #include "ns3/random-variable.h"
+#include "ns3/traced-callback.h"
 
 #include "ns3/ccnx-net-device-face.h"
 
@@ -148,6 +149,8 @@ private:
   Time m_maxWaitRetransmission;
   ItemQueue m_retxQueue;
   uint32_t m_maxRetxAttempts;
+
+  TracedCallback<double, double> m_waitingTimeVsDistanceTrace;
 };
 
 } // namespace ns3

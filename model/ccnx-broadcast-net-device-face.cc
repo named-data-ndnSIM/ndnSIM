@@ -55,7 +55,7 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    MakeTimeChecker ())
 
     .AddAttribute ("MaxDelayLowPriority", "Maximum delay for low-priority queue ('gradient' pushing queue)",
-                   TimeValue (Seconds (0.005)),
+                   TimeValue (Seconds (0.010)),
                    MakeTimeAccessor (&CcnxBroadcastNetDeviceFace::SetMaxDelayLowPriority, &CcnxBroadcastNetDeviceFace::GetMaxDelayLowPriority),
                    MakeTimeChecker ())
     .AddAttribute ("MaxDistance", "Normalization distance for gradient pushing calculation",
@@ -71,6 +71,9 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    UintegerValue (7),
                    MakeUintegerAccessor (&CcnxBroadcastNetDeviceFace::m_maxRetxAttempts),
                    MakeUintegerChecker<uint32_t> ())
+
+    .AddTraceSource ("WaitingTimeVsDistanceTrace", "On every low-priority packet trace the waiting gap and distance",
+                    MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_waitingTimeVsDistanceTrace))
     ;
   return tid;
 }
@@ -238,12 +241,17 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
   
   // TriangularVariable randomLowPriority = TriangularVariable (0, m_maxWaitLowPriority.ToDouble (Time::S), (meanWaiting+m_maxWaitLowPriority.ToDouble (Time::S))/3.0);
 
-  NormalVariable randomLowPriority = NormalVariable (meanWaiting, /* mean */
-                                                     m_maxWaitPeriod.ToDouble (Time::S)*m_maxWaitPeriod.ToDouble (Time::S), /*variance*/
-                                                     m_maxWaitLowPriority.ToDouble (Time::S)/*bound*/);
+  // NormalVariable randomLowPriority = NormalVariable (meanWaiting, /* mean */
+  //                                                    m_maxWaitPeriod.ToDouble (Time::S) * m_maxWaitPeriod.ToDouble (Time::S), /*variance*/
+  //                                                    meanWaiting + m_maxWaitPeriod.ToDouble (Time::S)/*bound*/);
+
+  UniformVariable randomLowPriority (meanWaiting, meanWaiting + m_maxWaitPeriod.ToDouble (Time::S));
+  
   double sample = std::abs (randomLowPriority.GetValue ());
   NS_LOG_DEBUG ("Sample: " << sample);
 
+  m_waitingTimeVsDistanceTrace (distance, sample);
+  
   // Actual gap will be defined by Triangular distribution based on Geo metric + Uniform distribution that is aimed to avoid collisions
   m_lowPriorityQueue.push_back (Item (Seconds (sample), packet));
 
