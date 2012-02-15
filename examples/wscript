@@ -4,3 +4,5 @@ def build(bld):
     obj = bld.create_ns3_program('ccnx-simple', ['NDNabstraction'])
     obj.source = 'ccnx-simple.cc'
 
+    obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'internet', 'point-to-point', 'point-to-point-layout'])
+    obj.source = 'ccnx-grid.cc'
