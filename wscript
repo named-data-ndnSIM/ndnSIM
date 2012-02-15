@@ -30,7 +30,7 @@ def configure(conf):
 def build(bld):
     deps = ['core', 'network', 'point-to-point',
             'topology-read','internet','applications',
-            'point-to-point-layout', 'netanim']
+            'point-to-point-layout']
     if bld.env['ENABLE_PYTHON_BINDINGS']:
         deps.append ('visualizer')
 
@@ -89,45 +89,7 @@ def build(bld):
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
-    if True or bld.env['ENABLE_EXAMPLES']:
-        obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction'])
-        obj.source = 'examples/ccnx-routing-simple.cc'
-        
-        obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction'])
-        obj.source = 'examples/ccnx-grid.cc'
-
-        obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction'])
-        obj.source = 'examples/annotated-topology-read-example.cc'
-
-        obj = bld.create_ns3_program('ccnx-sprint-topology', ['NDNabstraction'])
-        obj.source = 'examples/sprint-topology.cc'
-
-        obj = bld.create_ns3_program('ccnx-abilene-topology', ['NDNabstraction'])
-        obj.source = 'examples/abilene-topology.cc'
-
-        obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
-        obj.source = 'examples/synthetic-topology.cc'
-
-        obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
-        obj.source = 'examples/congestion-pop.cc'
-
-        obj = bld.create_ns3_program('link-failure', ['NDNabstraction'])
-        obj.source = 'examples/link-failure-sprint.cc'
-
-        obj = bld.create_ns3_program('link-failure-base', ['NDNabstraction'])
-        obj.source = 'examples/link-failure-base.cc'
-
-        obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
-        obj.source = 'examples/blackhole-sprint.cc'
-        
-        obj = bld.create_ns3_program('congestion-zoom', ['NDNabstraction'])
-        obj.source = 'examples/congestion-zoom.cc'
-
-        obj = bld.create_ns3_program('vanet-ccnx', ['NDNabstraction', 'highway-mobility'])
-        obj.source = 'examples/vanet-ccnx.cc'
-
-        obj = bld.create_ns3_program('car2car-wifi', ['internet', 'applications', 'visualizer', 'NDNabstraction'])
-        obj.source = 'examples/car2car-wifi.cc'
-
+    if bld.env.ENABLE_EXAMPLES:
+        bld.add_subdirs('examples')
 
     bld.ns3_python_bindings()
