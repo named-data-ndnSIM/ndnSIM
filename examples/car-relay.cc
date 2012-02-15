@@ -92,6 +92,11 @@ void OutData (std::string context, Ptr<const CcnxContentObjectHeader> header, Pt
   NS_LOG_INFO(face->GetNode()->GetId() << " sends out data seq#" << header->GetName()->GetLastComponent ());
 }
 
+void PhyRxInterferenceDrop(string context, Ptr<const Packet> packet){
+  std::cout << "Dropping packet" << endl;
+  //NS_LOG_INFO(" Dropping packet ");
+}
+
 void InCache (std::string context, Ptr<Ccnx> ccnx, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
   std::cout << Simulator::Now ().ToDouble (Time::S) << " sec \tNode #" << ccnx->GetObject<Node> ()->GetId () << " cached seq#" << header->GetName ()->GetLastComponent () << "\n";
@@ -108,8 +113,7 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   // 2. Install Mobility model
   mobility.Install (nodes);
 
-  Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange", MakeCallback (&CourseChange));
-
+  Config::Connect ("/NodeList/*/DeviceList/*/Phy/PhyRxInterferenceDrop", MakeCallback (&PhyRxInterferenceDrop));
 
   // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
@@ -147,6 +151,10 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
 void init(int argc, char** argv){
   CommandLine cmd;
   string confFile;
+  if(argc != 3){
+	  std::cerr << "Usage: car-relay --conf=conf_file --s_id=id." << endl;
+	  exit(3);
+  }
   cmd.AddValue ("conf", "XML file for scenario parameter configuration", confFile);
   cmd.AddValue ("s_id", "The scenario id to be used", global_scenario_id);
   assert(confFile != "");
@@ -184,10 +192,14 @@ main (int argc, char *argv[])
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
                                 "DataMode", StringValue ("OfdmRate24Mbps"));
 
-  YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
+  YansWifiChannelHelper wifiChannel;// = YansWifiChannelHelper::Default ();
+  wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  wifiChannel.AddPropagationLoss ("ns3::NakagamiPropagationLossModel");
 
-  YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
-  wifiPhy.SetChannel (wifiChannel.Create ());
+
+  //YansWifiPhy wifiPhy = YansWifiPhy::Default();
+  YansWifiPhyHelper wifiPhyHelper = YansWifiPhyHelper::Default ();
+  wifiPhyHelper.SetChannel (wifiChannel.Create ());
 
   NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
   wifiMac.SetType("ns3::AdhocWifiMac");
@@ -207,7 +219,7 @@ main (int argc, char *argv[])
   mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel",
 			    "ConstantVelocity", VectorValue(Vector(26.8224, 0, 0)));
 
-  SetupHighway(mobility, wifi, wifiPhy, wifiMac);
+  SetupHighway(mobility, wifi, wifiPhyHelper, wifiMac);
   /*26.8224*/
   // Set up the second highway going in the direction of left <- right
   /*mobility.SetPositionAllocator ("ns3::HighwayPositionAllocator",
