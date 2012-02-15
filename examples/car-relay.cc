@@ -92,9 +92,8 @@ void OutData (std::string context, Ptr<const CcnxContentObjectHeader> header, Pt
   NS_LOG_INFO(face->GetNode()->GetId() << " sends out data seq#" << header->GetName()->GetLastComponent ());
 }
 
-void PhyRxInterferenceDrop(string context, Ptr<const Packet> packet){
+void Drop(Ptr<const Packet> packet){
   std::cout << "Dropping packet" << endl;
-  //NS_LOG_INFO(" Dropping packet ");
 }
 
 void InCache (std::string context, Ptr<Ccnx> ccnx, Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
@@ -108,12 +107,11 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   nodes.Create (globalConf.car_number);
 
   // 1. Install Wifi
-  wifi.Install (wifiPhy, wifiMac, nodes);
+  NetDeviceContainer wifiNetDevices = wifi.Install (wifiPhy, wifiMac, nodes);
+
 
   // 2. Install Mobility model
   mobility.Install (nodes);
-
-  Config::Connect ("/NodeList/*/DeviceList/*/Phy/PhyRxInterferenceDrop", MakeCallback (&PhyRxInterferenceDrop));
 
   // 3. Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
@@ -124,7 +122,12 @@ void SetupHighway(MobilityHelper mobility, WifiHelper& wifi, YansWifiPhyHelper& 
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/InData", MakeCallback (&InData));
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/OutData", MakeCallback (&OutData));
   Config::Connect ("/NodeList/*/$ns3::CcnxL3Protocol/ContentStore/InCache", MakeCallback (&InCache));
-  
+  //connecting to interference drop traces
+  /*for(NetDeviceContainer::Iterator it = wifiNetDevices.Begin(); it != wifiNetDevices.End(); it++){
+    ((WifiNetDevice*)(&(*it)))->GetPhy()->TraceConnectWithoutContext("PhyRxInterferenceDrop", MakeCallback (&Drop));
+    }*/
+  Config::Connect ("/NodiList/*/$ns3::DeviceList/*/$ns3:WifiNetDevice/Phy/PhyRxInteferenceDrop", MakeCallback( &Drop ));
+
   // 4. Set up applications
   NS_LOG_INFO ("Installing Applications");
   
@@ -194,12 +197,13 @@ main (int argc, char *argv[])
 
   YansWifiChannelHelper wifiChannel;// = YansWifiChannelHelper::Default ();
   wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  wifiChannel.AddPropagationLoss ("ns3::ThreeLogDistancePropagationLossModel");
   wifiChannel.AddPropagationLoss ("ns3::NakagamiPropagationLossModel");
-
 
   //YansWifiPhy wifiPhy = YansWifiPhy::Default();
   YansWifiPhyHelper wifiPhyHelper = YansWifiPhyHelper::Default ();
   wifiPhyHelper.SetChannel (wifiChannel.Create ());
+  wifiPhyHelper.TraceConnectWithoutContext("PhyRxInterferenceDrop", MakeCallback(&Drop));
 
   NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
   wifiMac.SetType("ns3::AdhocWifiMac");
