@@ -83,7 +83,7 @@ CcnxL3Protocol::GetTypeId (void)
                    MakePointerChecker<CcnxContentStore> ())
     
     .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
-                   BooleanValue (true),
+                   BooleanValue (false),
                    MakeBooleanAccessor (&CcnxL3Protocol::m_nacksEnabled),
                    MakeBooleanChecker ())
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
