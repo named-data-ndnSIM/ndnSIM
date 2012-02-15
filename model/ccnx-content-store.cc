@@ -31,7 +31,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxContentStore");
 namespace ns3
 {
 
-// NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
+NS_OBJECT_ENSURE_REGISTERED (CcnxContentStore);
 
 using namespace __ccnx_private;
 

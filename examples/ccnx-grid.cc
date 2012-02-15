@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #include "ns3/core-module.h"
@@ -24,40 +25,43 @@
 #include "ns3/NDNabstraction-module.h"
 #include "ns3/point-to-point-grid.h"
 #include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/netanim-module.h"
-
-#include <iostream>
-#include <sstream>
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
 
-uint32_t nGrid = 3;
-Time finishTime = Seconds (20.0); 
+/**
+ * This scenario simulates a grid topology (using PointToPointGrid module)
+ *
+ * (consumer) -- ( ) ----- ( )
+ *     |          |         |
+ *    ( ) ------ ( ) ----- ( )
+ *     |          |         |
+ *    ( ) ------ ( ) -- (producer)
+ *
+ * Grid size could be specified using --nGrid parameter (default 3)
+ *
+ * All links are 1Mbps with propagation 10ms delay. 
+ *
+ * FIB is populated based on hacks of GlobalRoutingController: in
+ * addition to normal assignment of IP addresses for every NetDevice
+ * interface, every node is assigned an IP address that numerically
+ * equals to node id (i.e., if node id is 15, the special address is
+ * 0.0.0.15/255.255.255.255).
+ *
+ * Consumer requests data from producer with frequency 10 interests per second
+ * (interests contain constantly increasing sequence number).
+ *
+ * For every received interest, producer replies with a data packet, containing
+ * 1024 bytes of virtual payload.
+ *
+ * Simulation time is 20 seconds, unless --finish parameter is specified
+ *
+ * To run scenario and see what is happening, use the following command:
+ *
+ *     NS_LOG=CcnxSimple:CcnxConsumer ./waf --run=ccnx-grid
+ */
 
-void PrintTime ()
-{
-  NS_LOG_INFO (Simulator::Now ());
-
-  Simulator::Schedule (Seconds (10.0), PrintTime);
-}
-
-void PrintFIBs ()
-{
-  NS_LOG_INFO ("Outputing FIBs into [fibs.log]");
-  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> ("fibs.log", std::ios::out);
-  for (NodeList::Iterator node = NodeList::Begin ();
-       node != NodeList::End ();
-       node++)
-    {
-      *routingStream->GetStream () << "Node " << (*node)->GetId () << "\n";
-
-      Ptr<CcnxFib> fib = (*node)->GetObject<CcnxFib> ();
-      NS_ASSERT_MSG (fib != 0, "Fire alarm");
-      *routingStream->GetStream () << *fib << "\n\n";
-    }
-}
 
 int 
 main (int argc, char *argv[])
@@ -65,18 +69,16 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
-    
-  Packet::EnableChecking();
-  Packet::EnablePrinting();
 
-  std::string animationFile = "";
-  std::string strategy = "ns3::CcnxFloodingStrategy";
+  // Set maximum number of packets that will be cached (default 100)
+  Config::SetDefault ("ns3::CcnxContentStore::Size", StringValue ("1000"));
+  
+  uint32_t nGrid = 3;
+  Time finishTime = Seconds (20.0); 
 
   CommandLine cmd;
   cmd.AddValue ("nGrid", "Number of grid nodes", nGrid);
   cmd.AddValue ("finish", "Finish time", finishTime);
-  cmd.AddValue ("netanim", "NetAnim filename", animationFile);
-  cmd.AddValue ("strategy", "CCNx forwarding strategy", strategy);
   cmd.Parse (argc, argv);
 
   PointToPointHelper p2p;
@@ -84,15 +86,13 @@ main (int argc, char *argv[])
   InternetStackHelper stack;
   Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
   stack.SetRoutingHelper (ipv4RoutingHelper);
-    
+
   PointToPointGridHelper grid (nGrid, nGrid, p2p);
   grid.BoundingBox(100,100,200,200);
 
   // Install CCNx stack
   NS_LOG_INFO ("Installing CCNx stack");
   CcnxStackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy (strategy);
-  ccnxHelper.EnableLimits (true, Seconds(0.1));
   ccnxHelper.InstallAll ();
 
   // Install IP stack (necessary to populate FIB)
@@ -117,43 +117,20 @@ main (int argc, char *argv[])
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix (prefix.str ());
-  consumerHelper.SetAttribute ("MeanRate", StringValue ("1Mbps"));
+  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
-  // consumers.Start (Seconds (0.0));
-  // consumers.Stop (finishTime);
-    
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   producerHelper.SetPrefix (prefix.str ());
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producer);
   
-  // producers.Start(Seconds(0.0));
-  // producers.Stop(finishTime);
-
-  Simulator::Schedule (Seconds (1.0), PrintFIBs);
-
-  Simulator::Schedule (Seconds (10.0), PrintTime);
-  
-  // NS_LOG_INFO ("FIB dump:\n" << *c.Get(0)->GetObject<CcnxFib> ());
-  // NS_LOG_INFO ("FIB dump:\n" << *c.Get(1)->GetObject<CcnxFib> ());
-    
   Simulator::Stop (finishTime);
     
-  AnimationInterface *anim = 0;
-  if (animationFile != "")
-    {
-      anim = new AnimationInterface (animationFile);
-      anim->SetMobilityPollInterval (Seconds (1));
-    }
-
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done!");
     
-  if (anim != 0)
-    delete anim;
-  
   return 0;
 }
