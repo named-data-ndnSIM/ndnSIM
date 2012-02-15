@@ -7,16 +7,7 @@ import Options
 
 from waflib.Errors import WafError
 
-def options(opt):
-    opt.tool_options('boost', tooldir=["waf-tools"])
-
 def configure(conf):
-    try:
-        conf.check_tool('boost')
-        conf.check_boost(lib = 'iostreams')
-    except WafError:
-        conf.env['LIB_BOOST'] = []
-
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndn-abstract", "NDN abstraction", False,
                                      "Required boost libraries not found")
@@ -35,7 +26,7 @@ def build(bld):
         deps.append ('visualizer')
 
     module = bld.create_ns3_module ('NDNabstraction', deps)
-    module.uselib = 'BOOST BOOST_IOSTREAMS'
+    module.uselib = 'BOOST BOOST_IOSTREAMS BOOST_REGEX'
 
     tests = bld.create_ns3_module_test_library('NDNabstraction')
     headers = bld.new_task_gen(features=['ns3header'])
@@ -89,52 +80,5 @@ def build(bld):
         ]
 
     tests.source = bld.path.ant_glob('test/*.cc');
-
-    if True or bld.env['ENABLE_EXAMPLES']:
-        obj = bld.create_ns3_program('ccnx-routing-simple', ['NDNabstraction'])
-        obj.source = 'examples/ccnx-routing-simple.cc'
-        
-        obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction'])
-        obj.source = 'examples/ccnx-grid.cc'
-
-        obj = bld.create_ns3_program('annotated-topology', ['NDNabstraction'])
-        obj.source = 'examples/annotated-topology-read-example.cc'
-
-        obj = bld.create_ns3_program('ccnx-sprint-topology', ['NDNabstraction'])
-        obj.source = 'examples/sprint-topology.cc'
-
-        obj = bld.create_ns3_program('ccnx-abilene-topology', ['NDNabstraction'])
-        obj.source = 'examples/abilene-topology.cc'
-
-        obj = bld.create_ns3_program('ccnx-synthetic-topology', ['NDNabstraction'])
-        obj.source = 'examples/synthetic-topology.cc'
-
-        obj = bld.create_ns3_program('congestion-pop', ['NDNabstraction'])
-        obj.source = 'examples/congestion-pop.cc'
-
-        obj = bld.create_ns3_program('link-failure', ['NDNabstraction'])
-        obj.source = 'examples/link-failure-sprint.cc'
-
-        obj = bld.create_ns3_program('link-failure-base', ['NDNabstraction'])
-        obj.source = 'examples/link-failure-base.cc'
-
-        obj = bld.create_ns3_program('blackhole-sprint', ['NDNabstraction'])
-        obj.source = 'examples/blackhole-sprint.cc'
-        
-        obj = bld.create_ns3_program('congestion-zoom', ['NDNabstraction'])
-        obj.source = 'examples/congestion-zoom.cc'
-
-        obj = bld.create_ns3_program('vanet-ccnx', ['NDNabstraction', 'highway-mobility'])
-        obj.source = 'examples/vanet-ccnx.cc'
-
-        obj = bld.create_ns3_program('car2car-wifi', ['internet', 'NDNabstraction'])
-        obj.source = 'examples/car2car-wifi.cc'
-
-        obj = bld.create_ns3_program('car-relay', ['internet', 'NDNabstraction'])
-        obj.env.append_value('LIB', 'boost_regex')
-        obj.source = 'examples/car-relay.cc'
-
-        obj = bld.create_ns3_program('car-interference', ['internet', 'NDNabstraction'])
-        obj.source = 'examples/car-interference.cc'
 
     bld.ns3_python_bindings()
