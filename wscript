@@ -21,7 +21,7 @@ def configure(conf):
 def build(bld):
     deps = ['core', 'network', 'point-to-point',
             'topology-read','internet','applications',
-            'point-to-point-layout', 'netanim']
+            'point-to-point-layout']
     if bld.env['ENABLE_PYTHON_BINDINGS']:
         deps.append ('visualizer')
 
