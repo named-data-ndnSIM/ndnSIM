@@ -81,4 +81,7 @@ def build(bld):
 
     tests.source = bld.path.ant_glob('test/*.cc');
 
+    if bld.env.ENABLE_EXAMPLES:
+        bld.add_subdirs('examples')
+
     bld.ns3_python_bindings()
