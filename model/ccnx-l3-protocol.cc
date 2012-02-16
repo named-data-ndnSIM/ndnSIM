@@ -582,8 +582,14 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
               if (m_cacheUnsolicitedData) 
                 {
                   // Optimistically add or update entry in the content store
-                  NS_LOG_INFO(" < Caching unsolicited data " << header->GetName());
-                  m_contentStore->Add (header, payload);
+                  NS_LOG_DEBUG(" < (existing PIT) Caching unsolicited data " << header->GetName());
+                  bool newEntry = m_contentStore->Add (header, payload);
+                  if (!newEntry)
+                    {
+                      NS_LOG_DEBUG ("ContentObject is already in cache. Stop low-priority processing");
+                      // stop processing if data was already in cache
+                      return;
+                    }
                 }
               else
                 {
@@ -648,6 +654,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
     {
       if (m_cacheUnsolicitedData)
         {
+          NS_LOG_DEBUG(" < (no existing PIT) Caching unsolicited data " << header->GetName());
           // Optimistically add or update entry in the content store
           bool newEntry = m_contentStore->Add (header, payload);
 
@@ -665,6 +672,10 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                   face->SendLowPriority (packetCopy);
                   m_outData (header, payload, face);
                 }
+            }
+          else
+            {
+              NS_LOG_DEBUG ("ContentObject is already in cache. Stop low-priority processing");
             }
         }
       else
