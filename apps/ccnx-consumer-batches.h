@@ -72,8 +72,13 @@ protected:
   virtual void
   ScheduleNextPacket ();
 
+  // from CcnxConsumer
+  virtual void
+  StartApplication ();
+
 private:
-  bool m_firstTime;  
+  bool m_firstTime;
+  Batches m_batches;
 };
 
 } // namespace ns3

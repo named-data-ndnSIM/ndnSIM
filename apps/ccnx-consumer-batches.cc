@@ -59,13 +59,21 @@ CcnxConsumerBatches::CcnxConsumerBatches ()
 }
 
 void
+CcnxConsumerBatches::StartApplication ()
+{
+  CcnxConsumer::StartApplication ();
+
+  for (Batches::const_iterator i = m_batches.begin (); i != m_batches.end (); i++)
+    {
+      Simulator::ScheduleWithContext (GetNode ()->GetId (), i->get<0> (), &CcnxConsumerBatches::AddBatch, this, i->get<1> ());
+    }
+}
+
+void
 CcnxConsumerBatches::SetBatch (const Batches &batches)
 {
   // std::cout << "Batches: " << batches << "\n";
-  for (Batches::const_iterator i = batches.begin (); i != batches.end (); i++)
-    {
-      Simulator::Schedule (i->get<0> (), &CcnxConsumerBatches::AddBatch, this, i->get<1> ());
-    }
+  m_batches = batches;
 }
 
 void
