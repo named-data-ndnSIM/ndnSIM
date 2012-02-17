@@ -31,6 +31,8 @@
 namespace ns3 {
 
 class CcnxNameComponents;
+class Vector3D;
+typedef Vector3D Vector;
 
 /**
  * \ingroup ccnx-face
@@ -111,6 +113,9 @@ private:
   Time
   GetPriorityQueueGap () const;
 
+  void
+  NotifyJumpDistanceTrace (const Ptr<Packet> packet);
+  
 private:
   struct Item
   {
@@ -151,6 +156,8 @@ private:
   uint32_t m_maxRetxAttempts;
 
   TracedCallback<double, double> m_waitingTimeVsDistanceTrace;
+  TracedCallback<Ptr<Node>, double> m_jumpDistanceTrace;
+  TracedCallback<Ptr<Node>, Ptr<Packet>, const Vector&> m_tx;
 };
 
 } // namespace ns3

@@ -73,7 +73,11 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                    MakeUintegerChecker<uint32_t> ())
 
     .AddTraceSource ("WaitingTimeVsDistanceTrace", "On every low-priority packet trace the waiting gap and distance",
-                    MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_waitingTimeVsDistanceTrace))
+                     MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_waitingTimeVsDistanceTrace))
+    .AddTraceSource ("JumpDistance", "Fired just before packet is actually transmitted if GeoTag is present and distance is more than 0",
+                     MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_jumpDistanceTrace))
+    .AddTraceSource ("Tx", "Fired every time packet is send out of face",
+                     MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_tx))
     ;
   return tid;
 }
@@ -162,8 +166,9 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   : gap (_gap), packet (_packet), retxCount (0)
 {
   NS_LOG_FUNCTION (this << _gap << _packet);
-  
+
   Ptr<const CcnxNameComponentsTag> tag = packet->PeekPacketTag<CcnxNameComponentsTag> ();
+  
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
   NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission after " << _gap);
@@ -177,6 +182,9 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Item &item)
 CcnxBroadcastNetDeviceFace::Item &
 CcnxBroadcastNetDeviceFace::Item::operator ++ ()
 {
+  // remote GeoTag when packet is scheduled for retransmission
+  packet->RemovePacketTag<GeoTag> ();
+
   retxCount ++;
   return *this;
 }
@@ -296,6 +304,26 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
 }
 
 void
+CcnxBroadcastNetDeviceFace::NotifyJumpDistanceTrace (const Ptr<Packet> packet)
+{
+  Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+  if (mobility == 0)
+    {
+      NS_FATAL_ERROR ("Mobility model has to be installed on the node");
+      return;
+    }
+
+  m_tx (m_node, packet, mobility->GetPosition ());
+
+  Ptr<const GeoTag> tag = packet->PeekPacketTag<GeoTag> ();
+  if (tag == 0) return;
+  
+  double distance = CalculateDistance (tag->GetPosition (), mobility->GetPosition ());
+
+  m_jumpDistanceTrace (m_node, distance);
+}
+
+void
 CcnxBroadcastNetDeviceFace::SendFromQueue ()
 {
   NS_LOG_FUNCTION (this);
@@ -306,7 +334,9 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
   if (m_queue.size () > 0)
     {
       Item &item = m_queue.front ();
-  
+
+      NotifyJumpDistanceTrace (item.packet);
+      
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
       //////////////////////////////
@@ -321,6 +351,8 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
     {
       Item &item = m_lowPriorityQueue.front ();
   
+      NotifyJumpDistanceTrace (item.packet);
+
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
       //////////////////////////////
