@@ -48,10 +48,16 @@ CcnxConsumerBatches::GetTypeId (void)
                    StringValue (""),
                    MakeBatchesAccessor (&CcnxConsumerBatches::GetBatch, &CcnxConsumerBatches::SetBatch),
                    MakeBatchesChecker ())
+    .AddAttribute ("InterestRate", "The number of interests to be generated per second",
+                   UintegerValue(5),
+                   MakeUintegerAccessor(&CcnxConsumerBatches::m_interestRate),
+                   MakeUintegerChecker<uint32_t>()
+                   )
     ;
 
   return tid;
 }
+
 
 CcnxConsumerBatches::CcnxConsumerBatches ()
   : m_firstTime (true)
@@ -86,6 +92,16 @@ CcnxConsumerBatches::AddBatch (uint32_t amount)
   ScheduleNextPacket ();
 }
 
+uint32_t
+CcnxConsumerBatches::GetRate (){
+  return m_interestRate;
+}
+
+void
+CcnxConsumerBatches::SetRate (uint32_t rate){
+  m_interestRate = rate;
+}
+
 void
 CcnxConsumerBatches::ScheduleNextPacket ()
 {
@@ -96,7 +112,8 @@ CcnxConsumerBatches::ScheduleNextPacket ()
       m_firstTime = false;
     }
   else if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &CcnxConsumer::SendPacket, this);
+    //m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &CcnxConsumer::SendPacket, this);
+    m_sendEvent = Simulator::Schedule (Seconds (1.0 / m_interestRate), &CcnxConsumer::SendPacket, this);
 }
 
 ///////////////////////////////////////////////////

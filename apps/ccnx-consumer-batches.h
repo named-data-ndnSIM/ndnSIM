@@ -65,6 +65,10 @@ private:
   
   void
   AddBatch (uint32_t amount);
+
+  uint32_t GetRate();
+  
+  void SetRate(uint32_t m);
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying CCNx protocol
@@ -79,6 +83,7 @@ protected:
 private:
   bool m_firstTime;
   Batches m_batches;
+  uint32_t m_interestRate;
 };
 
 } // namespace ns3
