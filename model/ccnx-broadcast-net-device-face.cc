@@ -304,7 +304,7 @@ CcnxBroadcastNetDeviceFace::SendImpl (Ptr<Packet> packet)
 }
 
 void
-CcnxBroadcastNetDeviceFace::NotifyJumpDistanceTrace (const Ptr<Packet> packet)
+CcnxBroadcastNetDeviceFace::NotifyJumpDistanceTrace (Ptr<const Packet> packet)
 {
   Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
   if (mobility == 0)
@@ -335,7 +335,7 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
     {
       Item &item = m_queue.front ();
 
-      NotifyJumpDistanceTrace (item.packet);
+
       
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
@@ -351,7 +351,6 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
     {
       Item &item = m_lowPriorityQueue.front ();
   
-      NotifyJumpDistanceTrace (item.packet);
 
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
@@ -489,8 +488,10 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 
       if (cancelled)
         return;
-      else
+      else{
+        NotifyJumpDistanceTrace (p);
         Receive (p);
+      }
     }
   else
     {

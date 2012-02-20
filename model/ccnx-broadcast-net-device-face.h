@@ -114,7 +114,7 @@ private:
   GetPriorityQueueGap () const;
 
   void
-  NotifyJumpDistanceTrace (const Ptr<Packet> packet);
+  NotifyJumpDistanceTrace (const Ptr<const Packet> packet);
   
 private:
   struct Item
@@ -156,8 +156,8 @@ private:
   uint32_t m_maxRetxAttempts;
 
   TracedCallback<double, double> m_waitingTimeVsDistanceTrace;
-  TracedCallback<Ptr<Node>, double> m_jumpDistanceTrace;
-  TracedCallback<Ptr<Node>, Ptr<Packet>, const Vector&> m_tx;
+  TracedCallback<Ptr<const Node>, double> m_jumpDistanceTrace;
+  TracedCallback<Ptr<Node>, Ptr<const Packet>, const Vector&> m_tx;
 };
 
 } // namespace ns3
