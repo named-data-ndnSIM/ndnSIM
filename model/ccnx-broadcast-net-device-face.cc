@@ -417,6 +417,23 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
       NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
       Ptr<const CcnxNameComponents> name = tag->GetName ();
 
+      Ptr<const GeoSrcTag> srcTag = p->PeekPacketTag<GeoSrcTag> ();
+      Ptr<const GeoTransmissionTag> transmissionTag = p->PeekPacketTag<GeoTransmissionTag> ();
+      Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+
+
+      //   src  -----   <transmission>  ---- <mobility>
+      bool needToCancel = true;
+      if (mobility && srcTag && transmissionTag)
+        {
+          if (CalculateDistance (srcTag->GetPosition (), transmissionTag->GetPosition ())
+              <
+              CalculateDistance (srcTag->GetPosition (), mobility->GetPosition ()))
+            {
+              needToCancel = false;
+            }
+        }
+
       bool cancelled = false;
       ItemQueue::iterator item = m_lowPriorityQueue.begin ();
       while (item != m_lowPriorityQueue.end ())
@@ -424,17 +441,25 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
           if (*item->name == *name)
             {
               cancelled = true;
-              ItemQueue::iterator tmp = item;
-              tmp ++;
 
-              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
-              m_lowPriorityQueue.erase (item);
-              if (m_queue.size () + m_lowPriorityQueue.size () == 0)
+              if (needToCancel)
                 {
-                  m_scheduledSend.Cancel ();
-                }              
+                  ItemQueue::iterator tmp = item;
+                  tmp ++;
 
-              item = tmp;
+                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
+                  m_lowPriorityQueue.erase (item);
+                  if (m_queue.size () + m_lowPriorityQueue.size () == 0)
+                    {
+                      m_scheduledSend.Cancel ();
+                    }              
+
+                  item = tmp;
+                }
+              else
+                {
+                  item ++;
+                }
             }
           else
             item ++;
@@ -446,18 +471,24 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
           if (*item->name == *name)
             {
               cancelled = true;
-              ItemQueue::iterator tmp = item;
-              tmp ++;
 
-              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
-              m_totalWaitPeriod -= item->gap;
-              m_queue.erase (item);
-              if (m_queue.size () == 0)
+              if (needToCancel)
                 {
-                  m_scheduledSend.Cancel ();
-                }
+                  ItemQueue::iterator tmp = item;
+                  tmp ++;
 
-              item = tmp;
+                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
+                  m_totalWaitPeriod -= item->gap;
+                  m_queue.erase (item);
+                  if (m_queue.size () == 0)
+                    {
+                      m_scheduledSend.Cancel ();
+                    }
+
+                  item = tmp;
+                }
+              else
+                item ++;
             }
           else
             item ++;
@@ -469,25 +500,36 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
           if (*item->name == *name)
             {
               cancelled = true;
-              ItemQueue::iterator tmp = item;
-              tmp ++;
-
-              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
-              m_retxQueue.erase (item);
-              if (m_retxQueue.size () == 0)
+              if (needToCancel)
                 {
-                  NS_LOG_INFO ("Canceling the retx processing event");
-                  m_retxEvent.Cancel ();
-                }
+                  ItemQueue::iterator tmp = item;
+                  tmp ++;
 
-              item = tmp;
+                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
+                  m_retxQueue.erase (item);
+                  if (m_retxQueue.size () == 0)
+                    {
+                      NS_LOG_INFO ("Canceling the retx processing event");
+                      m_retxEvent.Cancel ();
+                    }
+
+                  item = tmp;
+                }
+              else
+                item ++;
             }
           else
             item ++;
         }
-
+      
       if (cancelled)
-        return;
+        {
+          if (!needToCancel)
+            {
+              NS_LOG_DEBUG ("Ignoring cancellation from a backwards node");
+            }
+          return;
+        }
       else{
         NotifyJumpDistanceTrace (p);
         Receive (p);

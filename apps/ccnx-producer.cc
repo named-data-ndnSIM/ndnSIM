@@ -27,6 +27,8 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"
+#include "ns3/mobility-model.h"
+#include "../model/geo-tag.h"
 
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-fib.h"
@@ -114,6 +116,14 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Pac
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
+
+  Ptr<MobilityModel> model = GetNode ()->GetObject<MobilityModel> ();
+  Vector position;
+  if (model)
+    position = model->GetPosition ();
+  
+  packet->AddPacketTag (CreateObject<GeoSrcTag> (position));
+  
   // Ptr<const WeightsPathStretchTag> tag = origPacket->RemovePacketTag<WeightsPathStretchTag> ();
   // if (tag != 0)
   //   {
