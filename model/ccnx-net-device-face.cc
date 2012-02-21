@@ -98,8 +98,8 @@ CcnxNetDeviceFace::SendImpl (Ptr<Packet> packet)
   Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
   if (mobility != 0)
     {
-      packet->RemovePacketTag<GeoTag> ();
-      packet->AddPacketTag (CreateObject<GeoTag> (mobility->GetPosition ()));
+      packet->RemovePacketTag<GeoTransmissionTag> ();
+      packet->AddPacketTag (CreateObject<GeoTransmissionTag> (mobility->GetPosition ()));
     }
   
   m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 

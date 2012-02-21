@@ -71,7 +71,24 @@ private:
   Vector m_position;
 };
 
-  
+class GeoTransmissionTag : public GeoTag
+{
+public:
+  static TypeId
+  GetTypeId ();
+
+  GeoTransmissionTag (const Vector &position) : GeoTag(position) {}
+};
+
+class GeoSrcTag : public GeoTag
+{
+public:
+  static TypeId
+  GetTypeId ();
+
+  GeoSrcTag (const Vector &position) : GeoTag(position) {}
+};
+
 } // namespace ns3
 
 #endif // CCNX_GEO_TAG_H

@@ -183,7 +183,7 @@ CcnxBroadcastNetDeviceFace::Item &
 CcnxBroadcastNetDeviceFace::Item::operator ++ ()
 {
   // remote GeoTag when packet is scheduled for retransmission
-  packet->RemovePacketTag<GeoTag> ();
+  packet->RemovePacketTag<GeoTransmissionTag> ();
 
   retxCount ++;
   return *this;
@@ -223,7 +223,7 @@ CcnxBroadcastNetDeviceFace::SendLowPriority (Ptr<Packet> packet)
       return;
     }
   
-  Ptr<const GeoTag> tag = packet->PeekPacketTag<GeoTag> ();
+  Ptr<const GeoTransmissionTag> tag = packet->PeekPacketTag<GeoTransmissionTag> ();
 
   Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
   if (mobility == 0)
@@ -315,7 +315,7 @@ CcnxBroadcastNetDeviceFace::NotifyJumpDistanceTrace (Ptr<const Packet> packet)
 
   m_tx (m_node, packet, mobility->GetPosition ());
 
-  Ptr<const GeoTag> tag = packet->PeekPacketTag<GeoTag> ();
+  Ptr<const GeoTransmissionTag> tag = packet->PeekPacketTag<GeoTransmissionTag> ();
   if (tag == 0) return;
   
   double distance = CalculateDistance (tag->GetPosition (), mobility->GetPosition ());

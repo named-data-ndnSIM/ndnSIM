@@ -32,6 +32,24 @@ GeoTag::GetTypeId ()
   return tid;
 }
 
+TypeId
+GeoTransmissionTag::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::GeoTransmissionTag")
+    .SetParent<GeoTag> ()
+  ;
+  return tid;
+}
+
+TypeId
+GeoSrcTag::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::GeoSrcTag")
+    .SetParent<GeoTag> ()
+  ;
+  return tid;
+}
+
 GeoTag::GeoTag (const Vector &position)
   : m_position (position)
 {
