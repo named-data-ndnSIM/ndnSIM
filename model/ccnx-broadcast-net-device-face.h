@@ -127,9 +127,10 @@ private:
 
     Item &
     Gap (const Time &time);
-    
+
     Time gap;
     Ptr<Packet> packet;
+    TypeId type;
     Ptr<const CcnxNameComponents> name;
     uint32_t retxCount;
   };

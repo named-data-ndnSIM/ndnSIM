@@ -171,11 +171,28 @@ CcnxBroadcastNetDeviceFace::Item::Item (const Time &_gap, const Ptr<Packet> &_pa
   
   NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
   name = tag->GetName ();
-  NS_LOG_DEBUG ("Schedule ContentObject with " << *tag->GetName () << " for delayed transmission after " << _gap);
+
+  CcnxHeaderHelper::Type guessedType = CcnxHeaderHelper::GetCcnxHeaderType (packet);
+  if (guessedType == CcnxHeaderHelper::INTEREST)
+    {
+      type = CcnxInterestHeader::GetTypeId ();
+      NS_LOG_DEBUG ("Schedule low-priority Interest with ");
+    }
+  else if (guessedType == CcnxHeaderHelper::CONTENT_OBJECT)
+    {
+      type = CcnxContentObjectHeader::GetTypeId ();
+      NS_LOG_DEBUG ("Schedule low-priority ContentObject with ");
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unknown CCNX header type");
+    }
+
+  NS_LOG_DEBUG ("     " << *tag->GetName () << " for delayed transmission after " << _gap);
 }
 
 CcnxBroadcastNetDeviceFace::Item::Item (const Item &item)
-  : gap (item.gap), packet (item.packet), name (item.name), retxCount (item.retxCount)
+  : gap (item.gap), packet (item.packet), type (item.type), name (item.name), retxCount (item.retxCount)
 {
 }
 
@@ -313,8 +330,6 @@ CcnxBroadcastNetDeviceFace::NotifyJumpDistanceTrace (Ptr<const Packet> packet)
       return;
     }
 
-  m_tx (m_node, packet, mobility->GetPosition ());
-
   Ptr<const GeoTransmissionTag> tag = packet->PeekPacketTag<GeoTransmissionTag> ();
   if (tag == 0) return;
   
@@ -330,15 +345,21 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
 
   NS_ASSERT ((m_queue.size () + m_lowPriorityQueue.size ()) > 0);
 
+  Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+  if (mobility == 0)
+    {
+      NS_FATAL_ERROR ("Mobility model has to be installed on the node");
+      return;
+    }
+
   // If high-priority queue is not empty, send data from it
   if (m_queue.size () > 0)
     {
       Item &item = m_queue.front ();
-
-
       
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
+      m_tx (m_node, item.packet, mobility->GetPosition ());  
       //////////////////////////////
 
       if (item.retxCount < m_maxRetxAttempts)
@@ -354,6 +375,7 @@ CcnxBroadcastNetDeviceFace::SendFromQueue ()
 
       //////////////////////////////
       CcnxNetDeviceFace::SendImpl (item.packet->Copy ());
+      m_tx (m_node, item.packet, mobility->GetPosition ());  
       //////////////////////////////
 
       if (item.retxCount < m_maxRetxAttempts)
@@ -395,150 +417,151 @@ CcnxBroadcastNetDeviceFace::ProcessRetx ()
 
 // callback
 void
-CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
+CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
                                                   Ptr<const Packet> p,
-                                                  uint16_t protocol,
-                                                  const Address &from,
-                                                  const Address &to,
-                                                  NetDevice::PacketType packetType)
+                                                  uint16_t,
+                                                  const Address &,
+                                                  const Address &,
+                                                  NetDevice::PacketType)
 {
-  NS_LOG_FUNCTION (device << p << protocol << from << to << packetType);
+  NS_LOG_FUNCTION (this << p);
 
+  TypeId packetType;  
   CcnxHeaderHelper::Type type = CcnxHeaderHelper::GetCcnxHeaderType (p);
   if (type == CcnxHeaderHelper::INTEREST)
     {
-      NS_LOG_DEBUG ("Interest");
-      Receive (p);
+      packetType = CcnxInterestHeader::GetTypeId ();
     }
   else if (type == CcnxHeaderHelper::CONTENT_OBJECT)
     {
-      NS_LOG_DEBUG ("ContentObject");
-      Ptr<const CcnxNameComponentsTag> tag = p->PeekPacketTag<CcnxNameComponentsTag> ();
-      NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
-      Ptr<const CcnxNameComponents> name = tag->GetName ();
-
-      Ptr<const GeoSrcTag> srcTag = p->PeekPacketTag<GeoSrcTag> ();
-      Ptr<const GeoTransmissionTag> transmissionTag = p->PeekPacketTag<GeoTransmissionTag> ();
-      Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
-
-
-      //   src  -----   <transmission>  ---- <mobility>
-      bool needToCancel = true;
-      if (mobility && srcTag && transmissionTag)
-        {
-          if (CalculateDistance (srcTag->GetPosition (), transmissionTag->GetPosition ())
-              <
-              CalculateDistance (srcTag->GetPosition (), mobility->GetPosition ()))
-            {
-              needToCancel = false;
-            }
-        }
-
-      bool cancelled = false;
-      ItemQueue::iterator item = m_lowPriorityQueue.begin ();
-      while (item != m_lowPriorityQueue.end ())
-        {
-          if (*item->name == *name)
-            {
-              cancelled = true;
-
-              if (needToCancel)
-                {
-                  ItemQueue::iterator tmp = item;
-                  tmp ++;
-
-                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
-                  m_lowPriorityQueue.erase (item);
-                  if (m_queue.size () + m_lowPriorityQueue.size () == 0)
-                    {
-                      m_scheduledSend.Cancel ();
-                    }              
-
-                  item = tmp;
-                }
-              else
-                {
-                  item ++;
-                }
-            }
-          else
-            item ++;
-        }
-
-      item = m_queue.begin ();
-      while (item != m_queue.end ())
-        {
-          if (*item->name == *name)
-            {
-              cancelled = true;
-
-              if (needToCancel)
-                {
-                  ItemQueue::iterator tmp = item;
-                  tmp ++;
-
-                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
-                  m_totalWaitPeriod -= item->gap;
-                  m_queue.erase (item);
-                  if (m_queue.size () == 0)
-                    {
-                      m_scheduledSend.Cancel ();
-                    }
-
-                  item = tmp;
-                }
-              else
-                item ++;
-            }
-          else
-            item ++;
-        }
-
-      item = m_retxQueue.begin ();
-      while (item != m_retxQueue.end ())
-        {
-          if (*item->name == *name)
-            {
-              cancelled = true;
-              if (needToCancel)
-                {
-                  ItemQueue::iterator tmp = item;
-                  tmp ++;
-
-                  NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
-                  m_retxQueue.erase (item);
-                  if (m_retxQueue.size () == 0)
-                    {
-                      NS_LOG_INFO ("Canceling the retx processing event");
-                      m_retxEvent.Cancel ();
-                    }
-
-                  item = tmp;
-                }
-              else
-                item ++;
-            }
-          else
-            item ++;
-        }
-      
-      if (cancelled)
-        {
-          if (!needToCancel)
-            {
-              NS_LOG_DEBUG ("Ignoring cancellation from a backwards node");
-            }
-          return;
-        }
-      else{
-        NotifyJumpDistanceTrace (p);
-        Receive (p);
-      }
+      packetType = CcnxContentObjectHeader::GetTypeId ();
     }
   else
     {
       NS_FATAL_ERROR ("Unknown CCNX header type");
     }
+
+  Ptr<const CcnxNameComponentsTag> tag = p->PeekPacketTag<CcnxNameComponentsTag> ();
+  NS_ASSERT_MSG (tag != 0, "CcnxNameComponentsTag should be set somewhere");
+  Ptr<const CcnxNameComponents> name = tag->GetName ();
+
+  Ptr<const GeoSrcTag> srcTag = p->PeekPacketTag<GeoSrcTag> ();
+  Ptr<const GeoTransmissionTag> transmissionTag = p->PeekPacketTag<GeoTransmissionTag> ();
+  Ptr<MobilityModel> mobility = m_node->GetObject<MobilityModel> ();
+
+
+  //   src  -----   <transmission>  ---- <mobility>
+  bool needToCancel = true;
+  if (mobility && srcTag && transmissionTag)
+    {
+      if (CalculateDistance (srcTag->GetPosition (), transmissionTag->GetPosition ())
+          <
+          CalculateDistance (srcTag->GetPosition (), mobility->GetPosition ()))
+        {
+          needToCancel = false;
+        }
+    }
+
+  bool cancelled = false;
+  ItemQueue::iterator item = m_lowPriorityQueue.begin ();
+  while (item != m_lowPriorityQueue.end ())
+    {
+      if (item->type == packetType && *item->name == *name)
+        {
+          cancelled = true;
+
+          if (needToCancel)
+            {
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
+              m_lowPriorityQueue.erase (item);
+              if (m_queue.size () + m_lowPriorityQueue.size () == 0)
+                {
+                  m_scheduledSend.Cancel ();
+                }              
+
+              item = tmp;
+            }
+          else
+            {
+              item ++;
+            }
+        }
+      else
+        item ++;
+    }
+
+  item = m_queue.begin ();
+  while (item != m_queue.end ())
+    {
+      if (item->type == packetType && *item->name == *name)
+        {
+          cancelled = true;
+
+          if (needToCancel)
+            {
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
+              m_totalWaitPeriod -= item->gap;
+              m_queue.erase (item);
+              if (m_queue.size () == 0)
+                {
+                  m_scheduledSend.Cancel ();
+                }
+
+              item = tmp;
+            }
+          else
+            item ++;
+        }
+      else
+        item ++;
+    }
+
+  item = m_retxQueue.begin ();
+  while (item != m_retxQueue.end ())
+    {
+      if (item->type == packetType && *item->name == *name)
+        {
+          cancelled = true;
+          if (needToCancel)
+            {
+              ItemQueue::iterator tmp = item;
+              tmp ++;
+
+              NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
+              m_retxQueue.erase (item);
+              if (m_retxQueue.size () == 0)
+                {
+                  NS_LOG_INFO ("Canceling the retx processing event");
+                  m_retxEvent.Cancel ();
+                }
+
+              item = tmp;
+            }
+          else
+            item ++;
+        }
+      else
+        item ++;
+    }
+      
+  if (cancelled)
+    {
+      if (!needToCancel)
+        {
+          NS_LOG_DEBUG ("Ignoring cancellation from a backwards node");
+        }
+      return;
+    }
+  else{
+    NotifyJumpDistanceTrace (p);
+    Receive (p);
+  }
 }
 
 
