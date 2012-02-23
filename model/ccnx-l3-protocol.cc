@@ -258,6 +258,7 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
   NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
 
+  Ptr<Packet> rwPacket = p->Copy (); // extra copy just to add extra tag if it is missing
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
   try
     {
@@ -272,10 +273,22 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
             packet->RemoveHeader (*header);
             NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
+            if (rwPacket->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              {
+                NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                rwPacket->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+              }
+
+            if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              {
+                NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+              }
+            
             if (header->GetNack () > 0)
-              OnNack (face, header, p/*original packet*/);
+              OnNack (face, header, rwPacket/*original packet*/);
             else
-              OnInterest (face, header, p/*original packet*/);  
+              OnInterest (face, header, rwPacket/*original packet*/);  
             break;
           }
         case CcnxHeaderHelper::CONTENT_OBJECT:
@@ -288,13 +301,19 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
             packet->RemoveHeader (*header);
             packet->RemoveTrailer (contentObjectTrailer);
 
+            if (rwPacket->PeekPacketTag<CcnxNameComponentsTag> () == 0)
+              {
+                NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
+                rwPacket->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
+              }
+
             if (packet->PeekPacketTag<CcnxNameComponentsTag> () == 0)
               {
                 NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
                 packet->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
               }
 
-            OnData (face, header, packet/*payload*/, p/*original packet*/);  
+            OnData (face, header, packet/*payload*/, rwPacket/*original packet*/);  
             break;
           }
         }
@@ -616,12 +635,6 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
           if (incoming.m_face != incomingFace)
             {
               Ptr<Packet> packetCopy = packet->Copy ();
-              if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
-                {
-                  NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
-                  packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
-                }
-
               incoming.m_face->Send (packetCopy);
               m_outData (header, payload, incoming.m_face);
             }
@@ -641,11 +654,6 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       BOOST_FOREACH (Ptr<CcnxFace> face, m_faces)
         {
           Ptr<Packet> packetCopy = packet->Copy ();
-          if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
-            {
-              NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
-              packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
-            }
           face->SendLowPriority (packetCopy);
           m_outData (header, payload, face);
         }
@@ -664,11 +672,6 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
               BOOST_FOREACH (Ptr<CcnxFace> face, m_faces)
                 {
                   Ptr<Packet> packetCopy = packet->Copy ();
-                  if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
-                    {
-                      NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
-                      packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
-                    }
                   face->SendLowPriority (packetCopy);
                   m_outData (header, payload, face);
                 }
@@ -730,11 +733,6 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
   BOOST_FOREACH (const CcnxFibFaceMetric &face, pitEntry.m_fibEntry.m_faces)
     {
       Ptr<Packet> packetCopy = packet->Copy ();
-      if (packetCopy->PeekPacketTag<CcnxNameComponentsTag> () == 0)
-        {
-          NS_LOG_DEBUG ("Adding CcnxNameComponentsTag");
-          packetCopy->AddPacketTag (CreateObject<CcnxNameComponentsTag> (header->GetName ()));
-        }
       face.m_face->SendLowPriority (packetCopy);
     }
 }
