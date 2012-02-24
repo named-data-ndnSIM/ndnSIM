@@ -119,10 +119,10 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Pac
 
   Ptr<MobilityModel> model = GetNode ()->GetObject<MobilityModel> ();
   Vector position;
-  if (model)
+  if (model){
     position = model->GetPosition ();
-  
-  packet->AddPacketTag (CreateObject<GeoSrcTag> (position));
+    packet->AddPacketTag (CreateObject<GeoSrcTag> (position));
+  }
   
   // Ptr<const WeightsPathStretchTag> tag = origPacket->RemovePacketTag<WeightsPathStretchTag> ();
   // if (tag != 0)

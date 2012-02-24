@@ -28,7 +28,8 @@
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-
+#include "ns3/mobility-model.h"
+#include "../model/geo-tag.h"
 #include "ns3/ccnx.h"
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-interest-header.h"
@@ -243,6 +244,14 @@ CcnxConsumer::SendPacket ()
 
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader (interestHeader);
+
+  Ptr<MobilityModel> model = GetNode ()->GetObject<MobilityModel> ();
+  Vector position;
+  if (model){
+    position = model->GetPosition ();
+    packet->AddPacketTag (CreateObject<GeoSrcTag> (position));
+  }
+
   NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
 
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
