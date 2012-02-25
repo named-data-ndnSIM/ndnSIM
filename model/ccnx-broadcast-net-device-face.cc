@@ -468,9 +468,9 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
   ItemQueue::iterator item = m_lowPriorityQueue.begin ();
   while (item != m_lowPriorityQueue.end ())
     {
-      if (item->type == packetType && *item->name == *name)
+      if ((packetType==CcnxContentObjectHeader::GetTypeId () || item->type == packetType) && *item->name == *name)
         {
-          cancelled = true;
+          cancelled = item->type == packetType;
 
           if (needToCancel)
             {
@@ -500,9 +500,9 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
   item = m_queue.begin ();
   while (item != m_queue.end ())
     {
-      if (item->type == packetType && *item->name == *name)
+      if ((packetType==CcnxContentObjectHeader::GetTypeId () || item->type == packetType) && *item->name == *name)
         {
-          cancelled = true;
+          cancelled = item->type == packetType;
 
           if (needToCancel)
             {
@@ -531,9 +531,9 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
   item = m_retxQueue.begin ();
   while (item != m_retxQueue.end ())
     {
-      if (item->type == packetType && *item->name == *name)
+      if ((packetType==CcnxContentObjectHeader::GetTypeId () || item->type == packetType) && *item->name == *name)
         {
-          cancelled = true;
+          cancelled = item->type == packetType;
           if (needToCancel)
             {
               ItemQueue::iterator tmp = item;
