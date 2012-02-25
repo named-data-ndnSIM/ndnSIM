@@ -78,6 +78,8 @@ CcnxBroadcastNetDeviceFace::GetTypeId ()
                      MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_jumpDistanceTrace))
     .AddTraceSource ("Tx", "Fired every time packet is send out of face",
                      MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_tx))
+    .AddTraceSource ("Canceling", "Fired every time transmission is cancelled",
+                     MakeTraceSourceAccessor (&CcnxBroadcastNetDeviceFace::m_cancelling))
     ;
   return tid;
 }
@@ -476,6 +478,8 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
               tmp ++;
 
               NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for low-priority transmission");
+              m_cancelling (m_node, item->packet);
+
               m_lowPriorityQueue.erase (item);
               if (m_queue.size () + m_lowPriorityQueue.size () == 0)
                 {
@@ -506,6 +510,8 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
               tmp ++;
 
               NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is scheduled for transmission");
+              m_cancelling (m_node, item->packet);
+              
               m_totalWaitPeriod -= item->gap;
               m_queue.erase (item);
               if (m_queue.size () == 0)
@@ -534,6 +540,8 @@ CcnxBroadcastNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice>,
               tmp ++;
 
               NS_LOG_INFO ("Canceling ContentObject with name " << *name << ", which is planned for retransmission");
+              m_cancelling (m_node, item->packet);
+
               m_retxQueue.erase (item);
               if (m_retxQueue.size () == 0)
                 {

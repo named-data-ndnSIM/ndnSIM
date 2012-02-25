@@ -159,6 +159,7 @@ private:
   TracedCallback<double, double> m_waitingTimeVsDistanceTrace;
   TracedCallback<Ptr<const Node>, double> m_jumpDistanceTrace;
   TracedCallback<Ptr<Node>, Ptr<const Packet>, const Vector&> m_tx;
+  TracedCallback<Ptr<Node>, Ptr<const Packet> > m_cancelling;
 };
 
 } // namespace ns3

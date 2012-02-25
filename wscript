@@ -67,6 +67,7 @@ def build(bld):
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
+        "model/ccnx-name-components-tag.h",
         "model/ccnx-path-stretch-tag.h",
         "model/ccnx-fib.h",
 
