@@ -427,7 +427,6 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (incomingFace << header << packet);
-  m_inInterests (header, incomingFace);
 
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
@@ -461,6 +460,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       
       return;
     }
+  m_inInterests (header, incomingFace);
   
   // Trying to check whether interest is retransmitted or not
   CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
