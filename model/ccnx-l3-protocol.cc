@@ -398,7 +398,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
   CcnxPitEntry const& pitEntry = ret.get<0> ();
-  // bool isNew = ret.get<1> ();
+  bool isNew = ret.get<1> ();
   bool isDuplicated = ret.get<2> ();
 
   // NS_LOG_DEBUG ("isNew: " << isNew << ", isDup: " << isDuplicated);
@@ -469,7 +469,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                      ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
     }
 
-  NS_LOG_DEBUG ("IsRetx: " << isRetransmitted);
+  // NS_LOG_DEBUG ("IsRetx: " << isRetransmitted);
+  // NS_LOG_DEBUG (*m_pit);
 
   // update PIT entry lifetime
   m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -478,6 +479,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   
   if (outFace != pitEntry.m_outgoing.end ())
     {
+      NS_LOG_DEBUG ("Non duplicate interests from the face we have sent interest to");
       // got a non-duplicate interest from the face we have sent interest to
       // Probably, there is no point in waiting data from that face... Not sure yet
 
@@ -491,10 +493,19 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                     ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
     }
 
-  if (!isRetransmitted &&
-      pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
-    { // Suppress this interest if we're still expecting data from some other face
+  // if (!isNew &&
+  //     !isRetransmitted &&
+  //     pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
+  //   { // Suppress this interest if we're still expecting data from some other face
+  //     NS_LOG_DEBUG ("Suppress interests");
+  //     m_dropInterests (header, SUPPRESSED, incomingFace);
+  //     return;
+  //   }
 
+  if (!isNew && !isRetransmitted)
+    {
+      // Suppress this interest if we're still expecting data from some other face
+      NS_LOG_DEBUG ("Suppress interests");
       m_dropInterests (header, SUPPRESSED, incomingFace);
       return;
     }
