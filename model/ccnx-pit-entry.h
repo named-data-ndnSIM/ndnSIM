@@ -257,6 +257,8 @@ public:
   uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
 };
 
+std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
+
 } // namespace ns3
 
 #endif // _CCNX_PIT_ENTRY_H_

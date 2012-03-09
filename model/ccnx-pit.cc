@@ -196,4 +196,14 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
   return make_tuple (cref(*entry), isNew, isDuplicate);
 }
 
+std::ostream& operator<< (std::ostream& os, const CcnxPit &pit)
+{
+  BOOST_FOREACH (const CcnxPitEntry &entry, pit)
+    {
+      os << entry;
+    }
+
+  return os;
+}
+
 } // namespace ns3

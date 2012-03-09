@@ -184,23 +184,12 @@ private:
   Time    m_PitEntryDefaultLifetime;
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
-  // PitBucket    m_bucketsPerFace; ///< \brief pending interface counter per face
-
-  // /**
-  //  * \brief maximum number of buckets. Automatically computed based on link capacity
-  //  * averaging over 1 second (bandwidth * 1second)
-  //  */
-  // PitBucket    maxBucketsPerFace;
-  
-  // PitBucket    leakSize; ///< size of a periodic bucket leak
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-std::ostream& operator<< (std::ostream& os, const CcnxPit &fib);
-std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
-// std::ostream& operator<< (std::ostream& os, const CcnxFibFaceMetric &metric);
+std::ostream& operator<< (std::ostream& os, const CcnxPit &pit);
 
 class CcnxPitEntryNotFound {};
 

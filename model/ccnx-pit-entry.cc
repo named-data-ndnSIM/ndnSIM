@@ -144,4 +144,35 @@ CcnxPitEntry::IncreaseAllowedRetxCount ()
   m_maxRetxCount++;
 }
 
+std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry)
+{
+  os << "Prefix: " << *entry.m_prefix << "\n";
+  os << "In: ";
+  bool first = true;
+  BOOST_FOREACH (const CcnxPitEntryIncomingFace &face, entry.m_incoming)
+    {
+      if (!first)
+        os << ",";
+      else
+        first = false;
+      
+      os << *face.m_face;
+    }
+
+  os << "\nOut: ";
+  first = true;
+  BOOST_FOREACH (const CcnxPitEntryOutgoingFace &face, entry.m_outgoing)
+    {
+      if (!first)
+        os << ",";
+      else
+        first = false;
+      
+      os << *face.m_face;
+    }
+
+  return os;
+}
+
+
 }
