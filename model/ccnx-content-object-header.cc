@@ -61,6 +61,31 @@ CcnxContentObjectHeader::GetName () const
   return *m_name;
 }
 
+void
+CcnxContentObjectHeader::SetTimestamp (const Time &timestamp)
+{
+  m_signedInfo.m_timestamp = timestamp;
+}
+
+Time
+CcnxContentObjectHeader::GetTimestamp () const
+{
+  return m_signedInfo.m_timestamp;
+}
+
+void
+CcnxContentObjectHeader::SetFreshness (const Time &freshness)
+{
+  m_signedInfo.m_freshness = freshness;
+}
+
+Time
+CcnxContentObjectHeader::GetFreshness () const
+{
+  return m_signedInfo.m_freshness;
+}
+
+
 uint32_t
 CcnxContentObjectHeader::GetSerializedSize (void) const
 {

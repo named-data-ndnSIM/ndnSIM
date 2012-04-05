@@ -25,6 +25,7 @@
 #include "ns3/integer.h"
 #include "ns3/header.h"
 #include "ns3/trailer.h"
+#include "ns3/nstime.h"
 
 #include <string>
 #include <vector>
@@ -77,11 +78,17 @@ public:
   // ?
   // GetSignature () const;
 
-  // void
-  // SetSignedInfo ();
+  void
+  SetTimestamp (const Time &timestamp);
 
-  // ?
-  // GetSignedInfo () const;
+  Time
+  GetTimestamp () const;
+  
+  void
+  SetFreshness (const Time &freshness);
+
+  Time
+  GetFreshness () const;
   
   //////////////////////////////////////////////////////////////////
   
@@ -92,10 +99,20 @@ public:
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
+  struct SignedInfo
+  {
+    // PublisherPublicKeyDigest
+    Time m_timestamp;
+    // Type (ContentType)
+    Time m_freshness;
+    // FinalBlockID
+    // KeyLocator
+  };
+  
 private:
-  Ptr<CcnxNameComponents> m_name;
   // m_signature;
-  // m_signedInfo;
+  Ptr<CcnxNameComponents> m_name;
+  SignedInfo m_signedInfo;
 };
 
 /**

@@ -20,16 +20,21 @@
 
 #include "ccnb-parser-content-object-visitor.h"
 #include "ccnb-parser-name-components-visitor.h"
+#include "ccnb-parser-non-negative-integer-visitor.h"
+#include "ccnb-parser-timestamp-visitor.h"
 
 #include "../syntax-tree/ccnb-parser-block.h"
 #include "../syntax-tree/ccnb-parser-dtag.h"
 
 #include "ns3/ccnx-name-components.h"
 #include "ns3/assert.h"
+#include "ns3/log.h"
 
 #include "ns3/ccnx-content-object-header.h"
 
 #include <boost/foreach.hpp>
+
+NS_LOG_COMPONENT_DEFINE ("CcnbParserContentObjectVisitor");
 
 namespace ns3 {
 namespace CcnbParser {
@@ -41,6 +46,8 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
   static NameComponentsVisitor nameComponentsVisitor;
+  static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
+  static TimestampVisitor          timestampVisitor;
   
   CcnxContentObjectHeader &contentObject = *(boost::any_cast<CcnxContentObjectHeader*> (param));
   
@@ -65,13 +72,50 @@ ContentObjectVisitor::visit (Dtag &n, boost::any param/*should be CcnxContentObj
         contentObject.SetName (name);
         break;
       }
+
     case CCN_DTAG_Signature: // ignoring
       break;
-    case CCN_DTAG_SignedInfo: // ignoring
+
+    case CCN_DTAG_SignedInfo:
+      // process nested blocks
+      BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+        {
+          block->accept (*this, param);
+        }      
       break;
+      
+    case CCN_DTAG_Timestamp:
+      NS_LOG_DEBUG ("Timestamp");
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
+
+      contentObject.SetTimestamp (
+               boost::any_cast<Time> (
+                                      (*n.m_nestedTags.begin())->accept(
+                                                                        timestampVisitor
+                                                                        )));
+      break;
+
+    case CCN_DTAG_FreshnessSeconds:
+      NS_LOG_DEBUG ("FreshnessSeconds");
+      
+      if (n.m_nestedTags.size()!=1) // should be exactly one UDATA inside this tag
+        throw CcnbDecodingException ();
+      contentObject.SetFreshness (
+          Seconds (
+               boost::any_cast<uint32_t> (
+                                          (*n.m_nestedTags.begin())->accept(
+                                                                           nonNegativeIntegerVisitor
+                                                                           ))));
+      
+      break;
+      
     case CCN_DTAG_Content: // !!! HACK
       // This hack was necessary for memory optimizations (i.e., content is virtual payload)
       NS_ASSERT_MSG (n.m_nestedTags.size() == 0, "Parser should have stopped just after processing <Content> tag");
+      break;
+      
+    default: // ignore all other stuff
       break;
     }
 }

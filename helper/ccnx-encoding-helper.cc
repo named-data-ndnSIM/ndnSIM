@@ -194,6 +194,19 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHe
   //                FreshnessSeconds?
   //                FinalBlockID?
   //                KeyLocator?
+  if (!contentObject.GetTimestamp ().IsZero())
+    {
+      written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Timestamp, CcnbParser::CCN_DTAG);
+      written += AppendTimestampBlob (start, contentObject.GetTimestamp ());
+      written += AppendCloser (start);
+    }
+  if (contentObject.GetFreshness () >= Seconds(0))
+    {
+      written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_FreshnessSeconds, CcnbParser::CCN_DTAG);
+      written += AppendNumber (start, contentObject.GetFreshness ().ToInteger (Time::S));
+      written += AppendCloser (start);
+    }
+  
   written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0, 0); // <PublisherPublicKeyDigest />
   written += AppendCloser (start);                                     // </SignedInfo>
 
@@ -229,6 +242,19 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxContentObjectHeader &contentObj
   //                FreshnessSeconds?
   //                FinalBlockID?
   //                KeyLocator?
+  if (!contentObject.GetTimestamp ().IsZero())
+    {
+      written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Timestamp);
+      written += EstimateTimestampBlob (contentObject.GetTimestamp ());
+      written += 1;
+    }
+  if (contentObject.GetFreshness () >= Seconds(0))
+    {
+      written += EstimateBlockHeader (CcnbParser::CCN_DTAG_FreshnessSeconds);
+      written += EstimateNumber (contentObject.GetFreshness ().ToInteger (Time::S));
+      written += 1;
+    }
+
   written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0); // <PublisherPublicKeyDigest />
   written += 1;                                     // </SignedInfo>
 

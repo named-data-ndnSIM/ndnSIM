@@ -330,6 +330,8 @@ def register_types(module):
     module.add_class('CcnxConsumerWindowTracer', parent=root_module['ns3::WindowTracer'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader [class]
     module.add_class('CcnxContentObjectHeader', parent=root_module['ns3::Header'])
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo [struct]
+    module.add_class('SignedInfo', outer_class=root_module['ns3::CcnxContentObjectHeader'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectTail [class]
     module.add_class('CcnxContentObjectTail', parent=root_module['ns3::Trailer'])
     ## ccnx-face.h (module 'NDNabstraction'): ns3::CcnxFace [class]
@@ -624,6 +626,7 @@ def register_methods(root_module):
     register_Ns3CcnxAppTracer_methods(root_module, root_module['ns3::CcnxAppTracer'])
     register_Ns3CcnxConsumerWindowTracer_methods(root_module, root_module['ns3::CcnxConsumerWindowTracer'])
     register_Ns3CcnxContentObjectHeader_methods(root_module, root_module['ns3::CcnxContentObjectHeader'])
+    register_Ns3CcnxContentObjectHeaderSignedInfo_methods(root_module, root_module['ns3::CcnxContentObjectHeader::SignedInfo'])
     register_Ns3CcnxContentObjectTail_methods(root_module, root_module['ns3::CcnxContentObjectTail'])
     register_Ns3CcnxFace_methods(root_module, root_module['ns3::CcnxFace'])
     register_Ns3CcnxFaceContainer_methods(root_module, root_module['ns3::CcnxFaceContainer'])
@@ -2539,11 +2542,6 @@ def register_Ns3Simulator_methods(root_module, cls):
                    'bool', 
                    [], 
                    is_static=True)
-    ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::Next() [member function]
-    cls.add_method('Next', 
-                   'ns3::Time', 
-                   [], 
-                   is_static=True, deprecated=True)
     ## simulator.h (module 'core'): static ns3::Time ns3::Simulator::Now() [member function]
     cls.add_method('Now', 
                    'ns3::Time', 
@@ -2554,11 +2552,6 @@ def register_Ns3Simulator_methods(root_module, cls):
                    'void', 
                    [param('ns3::EventId const &', 'id')], 
                    is_static=True)
-    ## simulator.h (module 'core'): static void ns3::Simulator::RunOneEvent() [member function]
-    cls.add_method('RunOneEvent', 
-                   'void', 
-                   [], 
-                   is_static=True, deprecated=True)
     ## simulator.h (module 'core'): static void ns3::Simulator::SetImplementation(ns3::Ptr<ns3::SimulatorImpl> impl) [member function]
     cls.add_method('SetImplementation', 
                    'void', 
@@ -5039,6 +5032,11 @@ def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::Time ns3::CcnxContentObjectHeader::GetFreshness() const [member function]
+    cls.add_method('GetFreshness', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::TypeId ns3::CcnxContentObjectHeader::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
@@ -5054,6 +5052,11 @@ def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::Time ns3::CcnxContentObjectHeader::GetTimestamp() const [member function]
+    cls.add_method('GetTimestamp', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
     ## ccnx-content-object-header.h (module 'NDNabstraction'): static ns3::TypeId ns3::CcnxContentObjectHeader::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -5069,10 +5072,29 @@ def register_Ns3CcnxContentObjectHeader_methods(root_module, cls):
                    'void', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True, is_virtual=True)
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): void ns3::CcnxContentObjectHeader::SetFreshness(ns3::Time const & freshness) [member function]
+    cls.add_method('SetFreshness', 
+                   'void', 
+                   [param('ns3::Time const &', 'freshness')])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): void ns3::CcnxContentObjectHeader::SetName(ns3::Ptr<ns3::CcnxNameComponents> const & name) [member function]
     cls.add_method('SetName', 
                    'void', 
                    [param('ns3::Ptr< ns3::CcnxNameComponents > const &', 'name')])
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): void ns3::CcnxContentObjectHeader::SetTimestamp(ns3::Time const & timestamp) [member function]
+    cls.add_method('SetTimestamp', 
+                   'void', 
+                   [param('ns3::Time const &', 'timestamp')])
+    return
+
+def register_Ns3CcnxContentObjectHeaderSignedInfo_methods(root_module, cls):
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo::SignedInfo() [constructor]
+    cls.add_constructor([])
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo::SignedInfo(ns3::CcnxContentObjectHeader::SignedInfo const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CcnxContentObjectHeader::SignedInfo const &', 'arg0')])
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo::m_freshness [variable]
+    cls.add_instance_attribute('m_freshness', 'ns3::Time', is_const=False)
+    ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo::m_timestamp [variable]
+    cls.add_instance_attribute('m_timestamp', 'ns3::Time', is_const=False)
     return
 
 def register_Ns3CcnxContentObjectTail_methods(root_module, cls):
