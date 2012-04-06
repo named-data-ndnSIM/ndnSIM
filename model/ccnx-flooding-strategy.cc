@@ -27,6 +27,7 @@
 #include "ns3/assert.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/boolean.h"
 
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
@@ -49,6 +50,12 @@ TypeId CcnxFloodingStrategy::GetTypeId (void)
     .SetGroupName ("Ccnx")
     .SetParent <CcnxForwardingStrategy> ()
     .AddConstructor <CcnxFloodingStrategy> ()
+
+    .AddAttribute ("SmartFlooding",
+                   "If true then if a GREEN face exists, Interests will be sent only to such face (!only to one green face!)",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CcnxFloodingStrategy::m_smartFlooding),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -65,18 +72,22 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
 {
   NS_LOG_FUNCTION (this);
 
-  // Try to work out with just green faces
-  bool greenOk = PropagateInterestViaGreen (pitEntry, incomingFace, header, packet);
-  if (greenOk)
-    return true;
+  if (m_smartFlooding)
+    {
+      // Try to work out with just green faces
+      bool greenOk = PropagateInterestViaGreen (pitEntry, incomingFace, header, packet);
+      if (greenOk)
+        return true;
+      
+      // boo... :(
+    }
 
-  // boo... :(
   int propagatedCount = 0;
 
   BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
-      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
+      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
       
       if (metricFace.m_face == incomingFace) 

@@ -51,6 +51,9 @@ public:
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet);
+
+private:
+  bool m_smartFlooding;
 };
     
 } //namespace ns3
