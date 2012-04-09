@@ -111,6 +111,13 @@ protected:
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                  Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedContentObjects;
+
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedContentObjects;
 };
 
 } // namespace ns3

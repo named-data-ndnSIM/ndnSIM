@@ -92,9 +92,6 @@ CcnxConsumer::GetTypeId (void)
                    MakeTimeAccessor (&CcnxConsumer::GetRetxTimer, &CcnxConsumer::SetRetxTimer),
                    MakeTimeChecker ())
 
-    .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
-                    MakeTraceSourceAccessor (&CcnxConsumer::m_transmittedInterests))
-
     .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
                     MakeTraceSourceAccessor (&CcnxConsumer::m_pathWeightsTrace))
     ;

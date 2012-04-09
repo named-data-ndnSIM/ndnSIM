@@ -169,12 +169,6 @@ protected:
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
   SeqTimeoutsContainer m_seqLifetimes;
-
-  /**
-   * \brief A trace that is called after each transmitted Interest packet
-   */
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
   
   TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
 };

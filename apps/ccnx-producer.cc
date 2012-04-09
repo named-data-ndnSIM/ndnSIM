@@ -57,9 +57,6 @@ CcnxProducer::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor(&CcnxProducer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
-    
-    .AddTraceSource ("TransmittedContentObjects", "TransmittedContentObjects",
-                    MakeTraceSourceAccessor (&CcnxProducer::m_transmittedContentObjects))
     ;
         
   return tid;
@@ -127,12 +124,12 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Pac
   //     // Ptr<WeightsPathStretchTag>.  Echoing will be simplified after change is done
   //   }
   
-  m_transmittedContentObjects (header, packet, this, m_face);
-  
   packet->AddHeader (*header);
   packet->AddTrailer (tail);
 
   m_protocolHandler (packet);
+  
+  m_transmittedContentObjects (header, packet, this, m_face);
 }
 
 } // namespace ns3

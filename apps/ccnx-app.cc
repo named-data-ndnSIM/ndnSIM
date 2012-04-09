@@ -51,6 +51,12 @@ CcnxApp::GetTypeId (void)
     
     .AddTraceSource ("ReceivedContentObjects", "ReceivedContentObjects",
                     MakeTraceSourceAccessor (&CcnxApp::m_receivedContentObjects))
+
+    .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
+                    MakeTraceSourceAccessor (&CcnxApp::m_transmittedInterests))
+
+    .AddTraceSource ("TransmittedContentObjects", "TransmittedContentObjects",
+                    MakeTraceSourceAccessor (&CcnxApp::m_transmittedContentObjects))
     ;
   return tid;
 }
