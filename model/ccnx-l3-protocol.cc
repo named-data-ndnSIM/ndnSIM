@@ -479,7 +479,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   
   if (outFace != pitEntry.m_outgoing.end ())
     {
-      NS_LOG_DEBUG ("Non duplicate interests from the face we have sent interest to");
+      NS_LOG_DEBUG ("Non duplicate interests from the face we have sent interest to. Don't suppress");
       // got a non-duplicate interest from the face we have sent interest to
       // Probably, there is no point in waiting data from that face... Not sure yet
 
@@ -492,23 +492,14 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                           ll::bind (&CcnxFibEntry::UpdateStatus,
                                     ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
     }
-
-  // if (!isNew &&
-  //     !isRetransmitted &&
-  //     pitEntry.AreTherePromisingOutgoingFacesExcept (incomingFace))
-  //   { // Suppress this interest if we're still expecting data from some other face
-  //     NS_LOG_DEBUG ("Suppress interests");
-  //     m_dropInterests (header, SUPPRESSED, incomingFace);
-  //     return;
-  //   }
-
-  if (!isNew && !isRetransmitted)
-    {
-      // Suppress this interest if we're still expecting data from some other face
-      NS_LOG_DEBUG ("Suppress interests");
-      m_dropInterests (header, SUPPRESSED, incomingFace);
-      return;
-    }
+  else
+    if (!isNew && !isRetransmitted)
+      {
+        // Suppress this interest if we're still expecting data from some other face
+        NS_LOG_DEBUG ("Suppress interests");
+        m_dropInterests (header, SUPPRESSED, incomingFace);
+        return;
+      }
   
   /////////////////////////////////////////////////////////////////////
   // Propagate

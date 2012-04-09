@@ -96,11 +96,11 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           continue; // same face as incoming, don't forward
         }
 
-      if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
-        {
-          NS_LOG_DEBUG ("continue (same as previous incoming)");
-          continue; // don't forward to face that we received interest from
-        }
+      // if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
+      //   {
+      //     NS_LOG_DEBUG ("continue (same as previous incoming)");
+      //     continue; // don't forward to face that we received interest from
+      //   }
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
         pitEntry.m_outgoing.find (metricFace.m_face);
