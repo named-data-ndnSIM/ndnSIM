@@ -145,9 +145,21 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
   // NS_LOG_FUNCTION_NOARGS ();
 
-  CcnxPitEntryContainer::type::iterator entry =
-    get<i_prefix> ().find (header.GetName ());
+  CcnxPitEntryContainer::type::iterator entry = end ();
 
+  // do the longest prefix match
+  const CcnxNameComponents &name = header.GetName ();
+  for (size_t componentsCount = name.GetComponents ().size ()+1;
+       componentsCount > 0;
+       componentsCount--)
+    {
+      CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount-1));
+
+      entry = get<i_prefix> ().find (subPrefix);
+      if (entry != end())
+        return *entry;
+    }
+  
   if (entry == end ())
     throw CcnxPitEntryNotFound();
 
