@@ -171,44 +171,6 @@ public:
   void
   SetDefaultRoutes (bool needSet);
 
-  /**
-   * \brief Install fake IPv4 routes that could be used to find nexthops for CCNx routes
-   *
-   * This method adds fake routes to all nodes, where each route is /32 and IPv4 address equal to node number.
-   * For example, node 5 will have direct route to 0.0.0.5.
-   */
-  static void
-  InstallFakeGlobalRoutes ();
-
-  static void
-  InstallFakeGlobalRoutesImpl ();
-  
-  /**
-   * \brief Install CCNx route to `node` based on fake IPv4 routes
-   *
-   * Actual route is "/<nodeId>"
-   *
-   * \param node Pointer to a node, which should be reached from all other nodes
-   */
-  static void
-  InstallRouteTo (Ptr<Node> node);
-
-  /**
-   * \brief Install CCNx route to /prefix which is installed on `node'
-   *
-   * Normally, prefix is  /<node->GetId()>.  Other values may be used in black-holing scenarios
-   */
-  static void
-  InstallRouteTo (const std::string &prefix, Ptr<Node> node);
-
-  /**
-   * \brief Install CCNx route to all nodes based on fake IPv4 routes
-   *
-   * \see InstallRouteTo
-   */
-  static void
-  InstallRoutesToAll ();
-
 private:
   CcnxStackHelper (const CcnxStackHelper &);
   CcnxStackHelper &operator = (const CcnxStackHelper &o);
@@ -219,56 +181,7 @@ private:
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;
   uint32_t m_avgInterestSize;
-  bool m_needSetDefaultRoutes;
-  
-  // /**
-  //  * @brief Enable pcap output the indicated Ccnx and interface pair.
-  //  * @internal
-  //  *
-  //  * @param prefix Filename prefix to use for pcap files.
-  //  * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
-  //  * @param interface Interface ID on the Ccnx on which you want to enable tracing.
-  //  */
-  // virtual void EnablePcapCcnxInternal (std::string prefix, 
-  //                                      Ptr<Ccnx> ccnx, 
-  //                                      uint32_t interface,
-  //                                      bool explicitFilename);
-
-  // /**
-  //  * @brief Enable ascii trace output on the indicated Ccnx and interface pair.
-  //  * @internal
-  //  *
-  //  * @param stream An OutputStreamWrapper representing an existing file to use
-  //  *               when writing trace data.
-  //  * @param prefix Filename prefix to use for ascii trace files.
-  //  * @param ccnx Ptr to the Ccnx interface on which you want to enable tracing.
-  //  * @param interface Interface ID on the Ccnx on which you want to enable tracing.
-  //  */
-  // virtual void EnableAsciiCcnxInternal (Ptr<OutputStreamWrapper> stream, 
-  //                                       std::string prefix, 
-  //                                       Ptr<Ccnx> ccnx, 
-  //                                       uint32_t interface,
-  //                                       bool explicitFilename);
-
-  // // /**
-  // //  * \internal
-  // //  */
-  // // static void CreateAndAggregateObjectFromTypeId (Ptr<Node> node, const std::string typeId);
-
-  // /**
-  //  * \internal
-  //  */
-  // static void Cleanup (void);
-
-  // /**
-  //  * \internal
-  //  */
-  // bool PcapHooked (Ptr<Ccnx> ccnx);
-
-  // /**
-  //  * \internal
-  //  */
-  // bool AsciiHooked (Ptr<Ccnx> ccnx);
+  bool m_needSetDefaultRoutes;  
 };
 
 } // namespace ns3

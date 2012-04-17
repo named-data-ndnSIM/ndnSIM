@@ -24,6 +24,7 @@
 #include "../model/ccnx-net-device-face.h"
 #include "../model/ccnx-global-router.h"
 #include "ns3/ccnx-name-components.h"
+#include "ns3/ccnx-fib.h"
 
 #include "ns3/node.h"
 #include "ns3/net-device.h"
@@ -35,6 +36,7 @@
 #include "ns3/channel-list.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 #include <boost/concept/assert.hpp>
 // #include <boost/graph/graph_concepts.hpp>
 // #include <boost/graph/adjacency_list.hpp>
@@ -179,21 +181,20 @@ CcnxGlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string
 void
 CcnxGlobalRoutingHelper::CalculateRoutes ()
 {
-  NS_LOG_DEBUG ("Enter");
+  /**
+   * Implementation of route calculation is heavily based on Boost Graph Library
+   * See http://www.boost.org/doc/libs/1_49_0/libs/graph/doc/table_of_contents.html for more details
+   */
+  
   BOOST_CONCEPT_ASSERT(( VertexListGraphConcept< CcnxGlobalRouterGraph > ));
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< CcnxGlobalRouterGraph > ));
-  // BOOST_CONCEPT_ASSERT(( ReadablePropertyMapConcept< CcnxGlobalRouterGraph,
-  // 						     graph_traits < CcnxGlobalRouterGraph >::edge_descriptor > ));
-  // BOOST_CONCEPT_ASSERT(( PropertyGraphConcept< CcnxGlobalRouterGraph,
-  // 					       graph_traits < CcnxGlobalRouterGraph >::edge_descriptor,
-  // 					       edge_weight_t> ));
-  // BOOST_CONCEPT_ASSERT(( PropertyMapConcept< CcnxGlobalRouterGraph, edge_weight_t,
-  // 					     graph_traits < CcnxGlobalRouterGraph >::edge_descriptor> ));
-
   
   CcnxGlobalRouterGraph graph;
   typedef graph_traits < CcnxGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
 
+  // For now we doing Dijkstra for every node.  Can be replaced with Bellman-Ford or Floyd-Warshall.
+  // Other algorithms should be faster, but they need additional EdgeListGraph concept provided by the graph, which
+  // is not obviously how implement in an efficient manner
   for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
     {
       Ptr<CcnxGlobalRouter> source = (*node)->GetObject<CcnxGlobalRouter> ();
@@ -203,7 +204,6 @@ CcnxGlobalRoutingHelper::CalculateRoutes ()
 	  continue;
 	}
   
-      // PredecessorsMap predecessors;
       DistancesMap    distances;
 
       dijkstra_shortest_paths (graph, source,
@@ -221,8 +221,12 @@ CcnxGlobalRoutingHelper::CalculateRoutes ()
 			       );
 
       // NS_LOG_DEBUG (predecessors.size () << ", " << distances.size ());
-  
-      cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
+
+      Ptr<CcnxFib>  fib  = source->GetObject<CcnxFib> ();
+      fib->InvalidateAll ();
+      NS_ASSERT (fib != 0);
+      
+      // cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
       for (DistancesMap::iterator i = distances.begin ();
 	   i != distances.end ();
 	   i++)
@@ -231,17 +235,24 @@ CcnxGlobalRoutingHelper::CalculateRoutes ()
 	    continue;
 	  else
 	    {
-	      cout << "  Node " << i->first->GetObject<Node> ()->GetId ();
-	      if (distances[i->first].get<0> () == 0)
-		cout << " is unreachable" << endl;
+	      // cout << "  Node " << i->first->GetObject<Node> ()->GetId ();
+	      if (i->second.get<0> () == 0)
+		{
+		  // cout << " is unreachable" << endl;
+		}
 	      else
-		cout << " reachable via face " << *i->second.get<0> ()
-		     << " with distance " << i->second.get<1> () << endl;
+		{
+		// cout << " reachable via face " << *i->second.get<0> ()
+		//      << " with distance " << i->second.get<1> () << endl;
+
+		BOOST_FOREACH (const Ptr<const CcnxNameComponents> &prefix, i->first->GetLocalPrefixes ())
+		  {
+		    fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
+		  }
+		}
 	    }
 	}
-
     }
-  // NS_LOG_DEBUG ("Exit");
 }
 
 

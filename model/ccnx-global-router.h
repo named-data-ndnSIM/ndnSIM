@@ -39,6 +39,7 @@ class CcnxGlobalRouter : public Object
 public:
   typedef boost::tuple< Ptr< CcnxGlobalRouter >, Ptr< CcnxFace >, Ptr< CcnxGlobalRouter > > Incidency;
   typedef std::list< Incidency > IncidencyList;
+  typedef std::list< Ptr<CcnxNameComponents> > LocalPrefixList;
   
   /**
    * \brief Interface ID
@@ -68,6 +69,9 @@ public:
   IncidencyList &
   GetIncidencies ();
 
+  const LocalPrefixList &
+  GetLocalPrefixes () const;
+
   // ??
 protected:
   virtual void
@@ -77,7 +81,7 @@ private:
   uint32_t m_id;
   
   Ptr<Ccnx> m_ccnx;
-  std::list< Ptr<CcnxNameComponents> > m_localPrefixes;
+  LocalPrefixList m_localPrefixes;
   IncidencyList m_incidencies;
 
   static uint32_t m_idCounter;

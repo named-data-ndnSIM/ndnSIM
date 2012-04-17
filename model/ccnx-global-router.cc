@@ -90,6 +90,12 @@ CcnxGlobalRouter::GetIncidencies ()
   return m_incidencies;
 }
 
+const CcnxGlobalRouter::LocalPrefixList &
+CcnxGlobalRouter::GetLocalPrefixes () const
+{
+  return m_localPrefixes;
+}
+
 // void
 // CcnxGlobalRouter::AddIncidencyChannel (Ptr< CcnxFace > face, Ptr< Channel > channel)
 // {

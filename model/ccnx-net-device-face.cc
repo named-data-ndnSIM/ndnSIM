@@ -115,7 +115,7 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 std::ostream&
 CcnxNetDeviceFace::Print (std::ostream& os) const
 {
-  os << "dev=net(" << GetId () << ")";
+  os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId () << ")";
   return os;
 }
 

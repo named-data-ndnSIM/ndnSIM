@@ -33,6 +33,7 @@
 #define NDN_RTO_BETA 0.25
 #define NDN_RTO_K 4
 
+#include <boost/ref.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
@@ -138,12 +139,34 @@ CcnxFibEntry::AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric)
     }
   else
   {
-    m_faces.modify (record,
-                    (&ll::_1)->*&CcnxFibFaceMetric::m_routingCost = metric);
+    // don't update metric to higher value
+    if (record->m_routingCost > metric || record->m_status == CcnxFibFaceMetric::NDN_FIB_RED)
+      {
+        m_faces.modify (record,
+                        (&ll::_1)->*&CcnxFibFaceMetric::m_routingCost = metric);
+
+        m_faces.modify (record,
+                        (&ll::_1)->*&CcnxFibFaceMetric::m_status = CcnxFibFaceMetric::NDN_FIB_YELLOW);
+      }
   }
   
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
+}
+
+void
+CcnxFibEntry::Invalidate ()
+{
+  for (CcnxFibFaceMetricByFace::type::iterator face = m_faces.begin ();
+       face != m_faces.end ();
+       face++)
+    {
+      m_faces.modify (face,
+                      (&ll::_1)->*&CcnxFibFaceMetric::m_routingCost = std::numeric_limits<uint16_t>::max ());
+
+      m_faces.modify (face,
+                      (&ll::_1)->*&CcnxFibFaceMetric::m_status = CcnxFibFaceMetric::NDN_FIB_RED);
+    }
 }
 
 const CcnxFibFaceMetric &
@@ -197,9 +220,15 @@ CcnxFib::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 CcnxFibEntryContainer::type::iterator
 CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric)
 {
+  return Add (Create<CcnxNameComponents> (prefix), face, metric);
+}
+  
+CcnxFibEntryContainer::type::iterator
+CcnxFib::Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric)
+{
 // CcnxFibFaceMetric
-  NS_LOG_FUNCTION(this << prefix << face << metric);
-  CcnxFibEntryContainer::type::iterator entry = m_fib.find (prefix);
+  NS_LOG_FUNCTION(this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
+  CcnxFibEntryContainer::type::iterator entry = m_fib.find (*prefix);
   if (entry == m_fib.end ())
     {
       entry = m_fib.insert (m_fib.end (), CcnxFibEntry (prefix));
@@ -212,7 +241,43 @@ CcnxFib::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metr
     
   return entry;
 }
-    
+
+void
+CcnxFib::Remove (const Ptr<const CcnxNameComponents> &prefix)
+{
+  NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
+  CcnxFibEntryContainer::type::iterator entry = m_fib.find (*prefix);
+  if (entry != m_fib.end ())
+    m_fib.erase (entry);
+}
+
+void
+CcnxFib::Invalidate (const Ptr<const CcnxNameComponents> &prefix)
+{
+  NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
+
+  CcnxFibEntryContainer::type::iterator entry = m_fib.find (*prefix);
+  if (entry == m_fib.end ())
+    return; // nothing to invalidate
+
+  m_fib.modify (entry,
+                ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
+}
+
+void
+CcnxFib::InvalidateAll ()
+{
+  NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId ());
+
+  for (CcnxFibEntryContainer::type::iterator entry = m_fib.begin ();
+       entry != m_fib.end ();
+       entry ++)
+    {
+      m_fib.modify (entry,
+                    ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
+    }
+}
+
 void
 CcnxFib::Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face)
 {
@@ -232,7 +297,8 @@ CcnxFib::RemoveFromAll (Ptr<CcnxFace> face)
   NS_LOG_FUNCTION (this);
 
   for_each (m_fib.begin (), m_fib.end (), 
-            ll::bind (&CcnxFib::Remove, this, ll::_1, face));
+            ll::bind (static_cast< void (CcnxFib::*) (const CcnxFibEntry &, Ptr<CcnxFace>) > (&CcnxFib::Remove),
+                      this, ll::_1, face));
 }
 
 /**

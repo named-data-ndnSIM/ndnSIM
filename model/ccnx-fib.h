@@ -147,20 +147,20 @@ struct CcnxFibFaceMetricContainer
  * \brief Structure for FIB table entry, holding indexed list of
  *        available faces and their respective metrics
  */
-class CcnxFibEntry : public SimpleRefCount<CcnxFibEntry>
+class CcnxFibEntry // : public SimpleRefCount<CcnxFibEntry>
 {
 public:
   class NoFaces {};
   
   /**
    * \brief Constructor
-   * \param prefix Prefix for the FIB entry
+   * \param prefix smart pointer to the prefix for the FIB entry
    */
-  CcnxFibEntry (const CcnxNameComponents &prefix)
-  : m_prefix (Create<CcnxNameComponents> (prefix))
+  CcnxFibEntry (const Ptr<const CcnxNameComponents> &prefix)
+  : m_prefix (prefix)
   , m_needsProbing (false)
   { }
-	
+  
   /**
    * \brief Update status of FIB next hop
    * \param status Status to set on the FIB entry
@@ -173,6 +173,14 @@ public:
    * Initial status of the next hop is set to YELLOW
    */
   void AddOrUpdateRoutingMetric (Ptr<CcnxFace> face, int32_t metric);
+
+  /**
+   * @brief Invalidate face
+   *
+   * Set routing metric on all faces to max and status to RED
+   */
+  void
+  Invalidate ();
 
   /**
    * @brief Update RTT averages for the face
@@ -207,7 +215,7 @@ private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFibEntry &entry);
 
 public:
-  Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the FIB entry
+  Ptr<const CcnxNameComponents> m_prefix; ///< \brief Prefix of the FIB entry
   CcnxFibFaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
   bool m_needsProbing;      ///< \brief flag indicating that probing should be performed 
@@ -288,6 +296,46 @@ public:
   CcnxFibEntryContainer::type::iterator
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
+  /**
+   * \brief Add or update FIB entry using smart pointer to prefix
+   *
+   * If the entry exists, metric will be updated. Otherwise, new entry will be created
+   *
+   * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
+   *
+   * @param name	Smart pointer to prefix
+   * @param face	Forwarding face
+   * @param metric	Routing metric
+   */
+  CcnxFibEntryContainer::type::iterator
+  Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric);
+
+  /**
+   * @brief Remove FIB entry
+   *
+   * ! ATTENTION ! Use with caution.  All PIT entries referencing the corresponding FIB entry will become invalid.
+   * So, simulation may crash.
+   *
+   * @param name	Smart pointer to prefix
+   */
+  void
+  Remove (const Ptr<const CcnxNameComponents> &prefix);
+
+  /**
+   * @brief Invalidate FIB entry ("Safe" version of Remove)
+   *
+   * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
+   * @param name	Smart pointer to prefix
+   */
+  void
+  Invalidate (const Ptr<const CcnxNameComponents> &prefix);
+
+  /**
+   * @brief Invalidate all FIB entries
+   */
+  void
+  InvalidateAll ();
+  
   /**
    * @brief Remove reference to a face from the entry. If entry had only this face, the whole
    * entry will be removed
