@@ -23,7 +23,7 @@
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
-#include "ns3/ccnx-path-stretch-tag.h"
+#include "ns3/weights-path-stretch-tag.h"
 #include <list>
 
 namespace ns3 {

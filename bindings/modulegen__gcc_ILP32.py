@@ -296,9 +296,9 @@ def register_types(module):
     module.add_class('TraceSourceAccessor', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> >'])
     ## trailer.h (module 'network'): ns3::Trailer [class]
     module.add_class('Trailer', import_from_module='ns.network', parent=root_module['ns3::Chunk'])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag [class]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag [class]
     module.add_class('WeightsPathStretchTag', parent=root_module['ns3::Tag'])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair [struct]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair [struct]
     module.add_class('NodeWeightPair', outer_class=root_module['ns3::WeightsPathStretchTag'])
     ## ccnx-consumer-window-tracer.h (module 'NDNabstraction'): ns3::WindowTracer [class]
     module.add_class('WindowTracer', parent=root_module['ns3::SimpleRefCount< ns3::WindowTracer, ns3::empty, ns3::DefaultDeleter<ns3::WindowTracer> >'])
@@ -1372,10 +1372,14 @@ def register_Ns3CcnxGlobalRoutingHelper_methods(root_module, cls):
     cls.add_method('Install', 
                    'void', 
                    [param('ns3::Ptr< ns3::Node >', 'node')])
-    ## ccnx-global-routing-helper.h (module 'NDNabstraction'): void ns3::CcnxGlobalRoutingHelper::Install(ns3::Ptr<ns3::Channel> channel) [member function]
+    ## ccnx-global-routing-helper.h (module 'NDNabstraction'): void ns3::CcnxGlobalRoutingHelper::Install(ns3::NodeContainer const & nodes) [member function]
     cls.add_method('Install', 
                    'void', 
-                   [param('ns3::Ptr< ns3::Channel >', 'channel')])
+                   [param('ns3::NodeContainer const &', 'nodes')])
+    ## ccnx-global-routing-helper.h (module 'NDNabstraction'): void ns3::CcnxGlobalRoutingHelper::InstallAll() [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [])
     return
 
 def register_Ns3CcnxHeaderHelper_methods(root_module, cls):
@@ -1628,9 +1632,9 @@ def register_Ns3Ipv4Address_methods(root_module, cls):
                    'ns3::Ipv4Address', 
                    [param('uint8_t const *', 'buf')], 
                    is_static=True)
-    ## ipv4-address.h (module 'network'): uint32_t const & ns3::Ipv4Address::Get() const [member function]
+    ## ipv4-address.h (module 'network'): uint32_t ns3::Ipv4Address::Get() const [member function]
     cls.add_method('Get', 
-                   'uint32_t const &', 
+                   'uint32_t', 
                    [], 
                    is_const=True)
     ## ipv4-address.h (module 'network'): static ns3::Ipv4Address ns3::Ipv4Address::GetAny() [member function]
@@ -4542,55 +4546,55 @@ def register_Ns3Trailer_methods(root_module, cls):
     return
 
 def register_Ns3WeightsPathStretchTag_methods(root_module, cls):
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::WeightsPathStretchTag(ns3::WeightsPathStretchTag const & arg0) [copy constructor]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::WeightsPathStretchTag(ns3::WeightsPathStretchTag const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::WeightsPathStretchTag const &', 'arg0')])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::WeightsPathStretchTag() [constructor]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::WeightsPathStretchTag() [constructor]
     cls.add_constructor([])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::AddPathInfo(ns3::Ptr<ns3::Node> node, uint32_t weight) [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::AddPathInfo(ns3::Ptr<ns3::Node> node, uint32_t weight) [member function]
     cls.add_method('AddPathInfo', 
                    'void', 
                    [param('ns3::Ptr< ns3::Node >', 'node'), param('uint32_t', 'weight')])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Deserialize(ns3::TagBuffer i) [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Deserialize(ns3::TagBuffer i) [member function]
     cls.add_method('Deserialize', 
                    'void', 
                    [param('ns3::TagBuffer', 'i')], 
                    is_virtual=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::WeightsPathStretchTag::GetDestinationNode() const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::WeightsPathStretchTag::GetDestinationNode() const [member function]
     cls.add_method('GetDestinationNode', 
                    'ns3::Ptr< ns3::Node >', 
                    [], 
                    is_const=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): std::list<ns3::WeightsPathStretchTag::NodeWeightPair, std::allocator<ns3::WeightsPathStretchTag::NodeWeightPair> > const & ns3::WeightsPathStretchTag::GetInfos() const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): std::list<ns3::WeightsPathStretchTag::NodeWeightPair, std::allocator<ns3::WeightsPathStretchTag::NodeWeightPair> > const & ns3::WeightsPathStretchTag::GetInfos() const [member function]
     cls.add_method('GetInfos', 
                    'std::list< ns3::WeightsPathStretchTag::NodeWeightPair > const &', 
                    [], 
                    is_const=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): uint32_t ns3::WeightsPathStretchTag::GetSerializedSize() const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): uint32_t ns3::WeightsPathStretchTag::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::WeightsPathStretchTag::GetSourceNode() const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::Ptr<ns3::Node> ns3::WeightsPathStretchTag::GetSourceNode() const [member function]
     cls.add_method('GetSourceNode', 
                    'ns3::Ptr< ns3::Node >', 
                    [], 
                    is_const=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): uint64_t ns3::WeightsPathStretchTag::GetTotalWeight() const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): uint64_t ns3::WeightsPathStretchTag::GetTotalWeight() const [member function]
     cls.add_method('GetTotalWeight', 
                    'uint64_t', 
                    [], 
                    is_const=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): static ns3::TypeId ns3::WeightsPathStretchTag::GetTypeId() [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): static ns3::TypeId ns3::WeightsPathStretchTag::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Print(std::ostream & os) const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Serialize(ns3::TagBuffer i) const [member function]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): void ns3::WeightsPathStretchTag::Serialize(ns3::TagBuffer i) const [member function]
     cls.add_method('Serialize', 
                    'void', 
                    [param('ns3::TagBuffer', 'i')], 
@@ -4598,15 +4602,15 @@ def register_Ns3WeightsPathStretchTag_methods(root_module, cls):
     return
 
 def register_Ns3WeightsPathStretchTagNodeWeightPair_methods(root_module, cls):
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair(ns3::WeightsPathStretchTag::NodeWeightPair const & arg0) [copy constructor]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair(ns3::WeightsPathStretchTag::NodeWeightPair const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::WeightsPathStretchTag::NodeWeightPair const &', 'arg0')])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair() [constructor]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair() [constructor]
     cls.add_constructor([])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair(ns3::Ptr<ns3::Node> _node, uint32_t _weight) [constructor]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::NodeWeightPair(ns3::Ptr<ns3::Node> _node, uint32_t _weight) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::Node >', '_node'), param('uint32_t', '_weight')])
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::node [variable]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::node [variable]
     cls.add_instance_attribute('node', 'ns3::Ptr< ns3::Node >', is_const=False)
-    ## ccnx-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::weight [variable]
+    ## weights-path-stretch-tag.h (module 'NDNabstraction'): ns3::WeightsPathStretchTag::NodeWeightPair::weight [variable]
     cls.add_instance_attribute('weight', 'uint32_t', is_const=False)
     return
 

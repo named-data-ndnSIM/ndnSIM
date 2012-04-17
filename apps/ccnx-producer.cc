@@ -23,7 +23,6 @@
 #include "ns3/log.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
-// #include "ns3/ccnx-path-stretch-tag.h"
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"

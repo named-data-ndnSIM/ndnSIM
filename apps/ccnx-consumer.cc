@@ -33,7 +33,7 @@
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
-#include "ns3/ccnx-path-stretch-tag.h"
+#include "ns3/weights-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>

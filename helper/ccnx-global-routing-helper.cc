@@ -27,6 +27,7 @@
 #include "ns3/ccnx-fib.h"
 
 #include "ns3/node.h"
+#include "ns3/node-container.h"
 #include "ns3/net-device.h"
 #include "ns3/channel.h"
 #include "ns3/log.h"
@@ -157,6 +158,24 @@ CcnxGlobalRoutingHelper::Install (Ptr<Channel> channel)
       gr->AddIncidency (0, grOther);
     }
 }
+
+void
+CcnxGlobalRoutingHelper::Install (const NodeContainer &nodes)
+{
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node ++)
+    {
+      Install (*node);
+    }
+}
+
+void
+CcnxGlobalRoutingHelper::InstallAll ()
+{
+  Install (NodeContainer::GetGlobal ());
+}
+
 
 void
 CcnxGlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
