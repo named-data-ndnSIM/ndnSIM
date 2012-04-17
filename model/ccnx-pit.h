@@ -25,7 +25,7 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 
-#include "hash-helper.h"
+#include "ccnx-name-components-hash-helper.h"
 #include "ccnx-pit-entry.h"
 
 #include <boost/multi_index_container.hpp>

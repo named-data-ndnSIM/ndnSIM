@@ -21,7 +21,7 @@
 #ifndef _CCNX_FIB_H_
 #define	_CCNX_FIB_H_
 
-#include "hash-helper.h"
+#include "ccnx-name-components-hash-helper.h"
 #include "ccnx-face.h"
 #include "ccnx.h"
 #include "ns3/nstime.h"

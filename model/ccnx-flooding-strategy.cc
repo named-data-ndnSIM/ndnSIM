@@ -22,7 +22,7 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-pit.h"
 #include "ccnx-pit-entry.h"
-#include "ccnx-path-stretch-tag.h"
+#include "ns3/weights-path-stretch-tag.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"

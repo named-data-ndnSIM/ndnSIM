@@ -69,23 +69,20 @@ def build(bld):
 
         "apps/ccnx-app.h",
 
-        "model/hash-helper.h",
         "model/ccnx.h",
+        "model/ccnx-fib.h",
         "model/ccnx-face.h",
-
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
-        "model/ccnx-path-stretch-tag.h",
-        "model/ccnx-fib.h",
+        "model/ccnx-name-components-hash-helper.h",
 
+        "utils/batches.h",
+        "utils/weights-path-stretch-tag.h",
         "utils/spring-mobility-model.h",
         "utils/spring-mobility-helper.h",
-
-        "model/rocketfuel-weights-reader.h",
-        "model/annotated-topology-reader.h",
-
-        "model/batches.h"
+        "utils/rocketfuel-weights-reader.h",
+        "utils/annotated-topology-reader.h",
         ]
 
     tests.source = bld.path.ant_glob('test/*.cc');

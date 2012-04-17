@@ -33,7 +33,7 @@
 
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
-#include "ccnx-path-stretch-tag.h"
+#include "ns3/weights-path-stretch-tag.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
 

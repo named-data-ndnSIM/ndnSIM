@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
  
-#include "ccnx-path-stretch-tag.h"
+#include "weights-path-stretch-tag.h"
 #include "ns3/node.h"
 #include "ns3/names.h"
 

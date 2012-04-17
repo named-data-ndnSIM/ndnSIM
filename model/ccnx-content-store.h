@@ -38,7 +38,7 @@
 #include <boost/tuple/tuple.hpp>
 
 #include "ccnx.h"
-#include "hash-helper.h"
+#include "ccnx-name-components-hash-helper.h"
 #include "ccnx-content-object-header.h"
 #include "ccnx-interest-header.h"
 #include "ccnx-name-components.h"

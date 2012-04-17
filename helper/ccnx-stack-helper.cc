@@ -41,13 +41,7 @@
 
 #include "ns3/node-list.h"
 #include "ns3/loopback-net-device.h"
-#include "ns3/global-router-interface.h"
-#include "ns3/ipv4.h"
-#include "ns3/ipv4-global-routing.h"
-#include "../utils/ipv4-global-routing-ordered-nexthops.h"
 
-#include "ns3/ipv4-routing-helper.h"
-#include "ns3/ipv4-global-routing-helper.h"
 #include "ns3/data-rate.h"
 
 #include "ccnx-face-container.h"

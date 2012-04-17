@@ -30,7 +30,7 @@
 #include "ns3/boolean.h"
 #include "ns3/simulator.h"
 
-#include "ccnx-path-stretch-tag.h"
+#include "ns3/weights-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 
