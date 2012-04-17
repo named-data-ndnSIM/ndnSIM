@@ -65,6 +65,7 @@ def build(bld):
         "helper/tracers/ccnx-consumer-window-tracer.h",
         "helper/tracers/ccnx-path-weight-tracer.h",
         "helper/ccnx-face-container.h",
+        "helper/ccnx-global-routing-helper.h",
 
         "apps/ccnx-app.h",
 

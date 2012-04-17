@@ -24,7 +24,9 @@
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/properties.hpp>
+#include <boost/ref.hpp>
 
+#include "ns3/ccnx-face.h"
 #include "ns3/node-list.h"
 #include "ns3/channel-list.h"
 #include "../model/ccnx-global-router.h"
@@ -202,12 +204,65 @@ template<>
 struct property_traits< EdgeWeights >
 {
   // Metric property map
-  typedef uint16_t value_type;
-  typedef uint16_t reference;
+  typedef tuple< ns3::Ptr<ns3::CcnxFace>, uint16_t > value_type;
+  typedef tuple< ns3::Ptr<ns3::CcnxFace>, uint16_t > reference;
   typedef ns3::CcnxGlobalRouter::Incidency key_type;
   typedef readable_property_map_tag category;
 };
 
+const property_traits< EdgeWeights >::value_type WeightZero (0, 0);
+const property_traits< EdgeWeights >::value_type WeightInf (0, std::numeric_limits<uint16_t>::max ());
+
+struct WeightCompare :
+    public std::binary_function<property_traits< EdgeWeights >::reference,
+                                property_traits< EdgeWeights >::reference,
+                                bool>
+{
+  bool
+  operator () (property_traits< EdgeWeights >::reference a,
+               property_traits< EdgeWeights >::reference b) const
+  {
+    return a.get<1> () < b.get<1> ();
+  }
+
+  bool
+  operator () (property_traits< EdgeWeights >::reference a,
+               uint32_t b) const
+  {
+    return a.get<1> () < b;
+  }
+  
+  bool
+  operator () (uint32_t a,
+               uint32_t b) const
+  {
+    return a < b;
+  }
+
+};
+
+struct WeightCombine :
+    public std::binary_function<uint32_t,
+                                property_traits< EdgeWeights >::reference,
+                                uint32_t>
+{
+  uint32_t
+  operator () (uint32_t a, property_traits< EdgeWeights >::reference b) const
+  {
+    return a + b.get<1> ();
+  }
+
+  tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t >
+  operator () (tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t > a,
+               property_traits< EdgeWeights >::reference b) const
+  {
+    if (a.get<0> () == 0)
+      return make_tuple (b.get<0> (), a.get<1> () + b.get<1> ());
+    else
+      return make_tuple (a.get<0> (), a.get<1> () + b.get<1> ());
+  }
+};
+  
 template<>
 struct property_traits< VertexIds >
 {
@@ -234,12 +289,12 @@ get(vertex_index_t,
   return VertexIds (g);
 }
 
-template<class K, class V>
+template<class M, class K, class V>
 inline void
-put (std::map<K,V> &mapp,
+put (reference_wrapper< M > mapp,
      K a, V p)
 {
-  mapp[a] = p;
+  mapp.get ()[a] = p;
 }
 
 // void
@@ -251,15 +306,14 @@ get (const boost::VertexIds&, ns3::Ptr<ns3::CcnxGlobalRouter> &gr)
   return gr->GetId ();
 }
 
-inline uint16_t
+inline property_traits< EdgeWeights >::reference
 get(const boost::EdgeWeights&, ns3::CcnxGlobalRouter::Incidency &edge)
 {
   if (edge.get<1> () == 0)
-    return 0;
+    return property_traits< EdgeWeights >::reference (0, 0);
   else
-    return edge.get<1> ()->GetMetric ();
+    return property_traits< EdgeWeights >::reference (edge.get<1> (), edge.get<1> ()->GetMetric ());
 }
-
 
 struct PredecessorsMap :
   public std::map< ns3::Ptr< ns3::CcnxGlobalRouter >, ns3::Ptr< ns3::CcnxGlobalRouter > >
@@ -267,7 +321,7 @@ struct PredecessorsMap :
 };
 
 template<>
-struct property_traits< PredecessorsMap >
+struct property_traits< reference_wrapper<PredecessorsMap> >
 {
   // Metric property map
   typedef ns3::Ptr< ns3::CcnxGlobalRouter > value_type;
@@ -278,26 +332,26 @@ struct property_traits< PredecessorsMap >
 
 
 struct DistancesMap :
-  public std::map< ns3::Ptr< ns3::CcnxGlobalRouter >, uint32_t >
+  public std::map< ns3::Ptr< ns3::CcnxGlobalRouter >, tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t > >
 {
 };
 
 template<>
-struct property_traits< DistancesMap >
+struct property_traits< reference_wrapper<DistancesMap> >
 {
   // Metric property map
-  typedef uint32_t value_type;
-  typedef uint32_t reference;
+  typedef tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t > value_type;
+  typedef tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t > reference;
   typedef ns3::Ptr< ns3::CcnxGlobalRouter > key_type;
   typedef read_write_property_map_tag category;
 };
 
-inline uint32_t
+inline tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t >
 get (DistancesMap &map, ns3::Ptr<ns3::CcnxGlobalRouter> key)
 {
   boost::DistancesMap::iterator i = map.find (key);
   if (i == map.end ())
-    return std::numeric_limits<uint32_t>::max ();
+    return tuple< ns3::Ptr<ns3::CcnxFace>, uint32_t > (0, std::numeric_limits<uint32_t>::max ());
   else
     return i->second;
 }

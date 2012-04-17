@@ -52,6 +52,8 @@ CcnxNetDeviceFace::CcnxNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netD
 {
   NS_LOG_FUNCTION (this << netDevice);
 
+  SetMetric (1); // default metric
+
   NS_ASSERT_MSG (m_netDevice != 0, "CcnxNetDeviceFace needs to be assigned a valid NetDevice");
 }
 

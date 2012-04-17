@@ -35,6 +35,11 @@
 #include "ns3/channel-list.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/concept/assert.hpp>
+// #include <boost/graph/graph_concepts.hpp>
+// #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+
 #include "boost-graph-ccnx-global-routing-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxGlobalRoutingHelper");
@@ -171,20 +176,10 @@ CcnxGlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string
   AddOrigin (prefix, node);
 }
 
-} // namespace ns3
-
-
-
-#include <boost/concept/assert.hpp>
-#include <boost/graph/graph_concepts.hpp>
-// #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-
-namespace ns3 {
-
 void
 CcnxGlobalRoutingHelper::CalculateRoutes ()
 {
+  NS_LOG_DEBUG ("Enter");
   BOOST_CONCEPT_ASSERT(( VertexListGraphConcept< CcnxGlobalRouterGraph > ));
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< CcnxGlobalRouterGraph > ));
   // BOOST_CONCEPT_ASSERT(( ReadablePropertyMapConcept< CcnxGlobalRouterGraph,
@@ -197,61 +192,56 @@ CcnxGlobalRoutingHelper::CalculateRoutes ()
 
   
   CcnxGlobalRouterGraph graph;
-  Ptr<CcnxGlobalRouter> source = (*NodeList::Begin ())->GetObject<CcnxGlobalRouter> ();
-  
   typedef graph_traits < CcnxGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
 
-  PredecessorsMap predecessors;
-  DistancesMap    distances;
-  // std::map< vertex_descriptor, int > distances;
-  // std::vector<uint32_t> d (num_vertices (graph));
-  // std::vector<int> distances;
-  // std::map< vertex_descriptor, std::
-
-  dijkstra_shortest_paths (graph, source,
-  			   predecessor_map (predecessors)
-			   .
-  			   distance_map (distances)
-  			   );
-
-  // BOOST_CONCEPT_ASSERT(( BidirectionalGraphConcept<CcnxGlobalRouterGraph> ));
-  // BOOST_CONCEPT_ASSERT(( MutableGraphConcept<CcnxGlobalRouterGraph> ));
-
-  // typedef adjacency_list < listS, vecS, undirectedS, no_property, property < edge_weight_t, uint16_t > > Graph;
-  // typedef Graph::vertex_descriptor Vertex;
-
-  // class Graph
-  // {
-  // public:
-  //   typedef Ptr<CcnxGlobalRouter> vertex_descriptor;
-  //   typedef pair< Ptr<CcnxGlobalRouter>, Ptr<CcnxGlobalRouter> > edge_descriptor;
-  //   typedef directed_tag directed_category;
-  //   typedef disallow_parallel_edge_tag edge_parallel_category;
-  //   typedef adjacency_graph_tag traversal_category;
-
-  //   typedef CcnxGlobalRouter::Incidency adjacency_iterator;
-
-  //   // null_vertex() ???
-  //   // adjacent_vertices(v, g) ???
-  // };
+  for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
+    {
+      Ptr<CcnxGlobalRouter> source = (*node)->GetObject<CcnxGlobalRouter> ();
+      if (source == 0)
+	{
+	  NS_LOG_DEBUG ("Node " << (*node)->GetId () << " does not export CcnxGlobalRouter interface");
+	  continue;
+	}
   
-  // Graph graph;
+      // PredecessorsMap predecessors;
+      DistancesMap    distances;
 
-  // for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
-  //   {
-  //     Ptr<CcnxGlobalRouter> gr = (*node)->GetObject<CcnxGlobalRouter> ();
-  //     if (gr == 0)
-  // 	continue;
+      dijkstra_shortest_paths (graph, source,
+			       // predecessor_map (boost::ref(predecessors))
+			       // .
+			       distance_map (boost::ref(distances))
+			       .
+			       distance_inf (WeightInf)
+			       .
+			       distance_zero (WeightZero)
+			       .
+			       distance_compare (boost::WeightCompare ())
+			       .
+			       distance_combine (boost::WeightCombine ())
+			       );
 
-  //     for (CcnxGlobalRouter::IncidencyList::const_iterator i = gr->GetIncidencies ().begin ();
-  // 	   i != gr->GetIncidencies ().end ();
-  // 	   i++)
-  // 	{
-  // 	  add_edge (gr, i->get<1> (), 10, graph);
-  // 	}
-  //     break;
-  //   }
+      // NS_LOG_DEBUG (predecessors.size () << ", " << distances.size ());
   
+      cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
+      for (DistancesMap::iterator i = distances.begin ();
+	   i != distances.end ();
+	   i++)
+	{
+	  if (i->first == source)
+	    continue;
+	  else
+	    {
+	      cout << "  Node " << i->first->GetObject<Node> ()->GetId ();
+	      if (distances[i->first].get<0> () == 0)
+		cout << " is unreachable" << endl;
+	      else
+		cout << " reachable via face " << *i->second.get<0> ()
+		     << " with distance " << i->second.get<1> () << endl;
+	    }
+	}
+
+    }
+  // NS_LOG_DEBUG ("Exit");
 }
 
 
