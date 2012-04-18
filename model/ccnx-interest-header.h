@@ -24,6 +24,7 @@
 
 #include "ns3/integer.h"
 #include "ns3/header.h"
+#include "ns3/simple-ref-count.h"
 #include "ns3/nstime.h"
 
 #include <string>
@@ -125,7 +126,7 @@ namespace ns3
    - InterestLifetime: ?
    - Nonce: 32 bit random integer.  If value is 0, will not be serialized
  */
-class CcnxInterestHeader : public Header
+class CcnxInterestHeader : public SimpleRefCount<CcnxInterestHeader,Header>
 {
 public:
   /**
