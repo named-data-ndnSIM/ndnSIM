@@ -152,8 +152,6 @@ def register_types(module):
     module.add_class('SeedManager', import_from_module='ns.core')
     ## random-variable.h (module 'core'): ns3::SequentialVariable [class]
     module.add_class('SequentialVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Chunk', 'ns3::ObjectBase', 'ns3::DefaultDeleter<ns3::Chunk>'], parent=root_module['ns3::ObjectBase'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Object', 'ns3::ObjectBase', 'ns3::ObjectDeleter'], parent=root_module['ns3::ObjectBase'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simulator.h (module 'core'): ns3::Simulator [class]
@@ -197,7 +195,7 @@ def register_types(module):
     ## int64x64-double.h (module 'core'): ns3::int64x64_t [class]
     module.add_class('int64x64_t', import_from_module='ns.core')
     ## chunk.h (module 'network'): ns3::Chunk [class]
-    module.add_class('Chunk', import_from_module='ns.network', parent=root_module['ns3::SimpleRefCount< ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >'])
+    module.add_class('Chunk', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## random-variable.h (module 'core'): ns3::ConstantVariable [class]
     module.add_class('ConstantVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## random-variable.h (module 'core'): ns3::DeterministicVariable [class]
@@ -244,8 +242,12 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::CallbackImplBase', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CallbackImplBase>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxAppTracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxAppTracer> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxAppTracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxAppTracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxContentObjectHeader', 'ns3::Header', 'ns3::DefaultDeleter<ns3::CcnxContentObjectHeader>'], parent=root_module['ns3::Header'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxFaceContainer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxFaceContainer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::CcnxInterestHeader', 'ns3::Header', 'ns3::DefaultDeleter<ns3::CcnxInterestHeader>'], parent=root_module['ns3::Header'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxL3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxL3Tracer> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::CcnxL3Tracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::CcnxL3Tracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> > [class]
@@ -333,7 +335,7 @@ def register_types(module):
     ## ccnx-consumer-window-tracer.h (module 'NDNabstraction'): ns3::CcnxConsumerWindowTracer [class]
     module.add_class('CcnxConsumerWindowTracer', parent=root_module['ns3::WindowTracer'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader [class]
-    module.add_class('CcnxContentObjectHeader', parent=root_module['ns3::Header'])
+    module.add_class('CcnxContentObjectHeader', parent=root_module['ns3::SimpleRefCount< ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> >'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectHeader::SignedInfo [struct]
     module.add_class('SignedInfo', outer_class=root_module['ns3::CcnxContentObjectHeader'])
     ## ccnx-content-object-header.h (module 'NDNabstraction'): ns3::CcnxContentObjectTail [class]
@@ -345,7 +347,7 @@ def register_types(module):
     ## ccnx-fib.h (module 'NDNabstraction'): ns3::CcnxFib [class]
     module.add_class('CcnxFib', parent=root_module['ns3::Object'])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeader [class]
-    module.add_class('CcnxInterestHeader', parent=root_module['ns3::Header'])
+    module.add_class('CcnxInterestHeader', parent=root_module['ns3::SimpleRefCount< ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> >'])
     ## ccnx-interest-header.h (module 'NDNabstraction'): ns3::CcnxInterestHeader [enumeration]
     module.add_enum('', ['NORMAL_INTEREST', 'NACK_LOOP', 'NACK_CONGESTION', 'NACK_GIVEUP_PIT'], outer_class=root_module['ns3::CcnxInterestHeader'])
     ## ccnx-l3-tracer.h (module 'NDNabstraction'): ns3::CcnxL3Tracer [class]
@@ -548,7 +550,6 @@ def register_methods(root_module):
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
     register_Ns3SeedManager_methods(root_module, root_module['ns3::SeedManager'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
-    register_Ns3SimpleRefCount__Ns3Chunk_Ns3ObjectBase_Ns3DefaultDeleter__lt__ns3Chunk__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
     register_Ns3Simulator_methods(root_module, root_module['ns3::Simulator'])
     register_Ns3SpringMobilityHelper_methods(root_module, root_module['ns3::SpringMobilityHelper'])
@@ -588,7 +589,9 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3AttributeValue_Ns3Empty_Ns3DefaultDeleter__lt__ns3AttributeValue__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
     register_Ns3SimpleRefCount__Ns3CcnxAppTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxAppTracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxAppTracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxAppTracer> >'])
+    register_Ns3SimpleRefCount__Ns3CcnxContentObjectHeader_Ns3Header_Ns3DefaultDeleter__lt__ns3CcnxContentObjectHeader__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> >'])
     register_Ns3SimpleRefCount__Ns3CcnxFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFaceContainer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >'])
+    register_Ns3SimpleRefCount__Ns3CcnxInterestHeader_Ns3Header_Ns3DefaultDeleter__lt__ns3CcnxInterestHeader__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> >'])
     register_Ns3SimpleRefCount__Ns3CcnxL3Tracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxL3Tracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxL3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxL3Tracer> >'])
     register_Ns3SimpleRefCount__Ns3CcnxNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxNameComponents__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxNameComponents, ns3::empty, ns3::DefaultDeleter<ns3::CcnxNameComponents> >'])
     register_Ns3SimpleRefCount__Ns3CcnxPathWeightTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxPathWeightTracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CcnxPathWeightTracer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxPathWeightTracer> >'])
@@ -2233,21 +2236,6 @@ def register_Ns3NodeContainer_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## node-container.h (module 'network'): ns3::NodeContainer & ns3::NodeContainer::operator()(ns3::NodeContainer other) [member operator]
-    cls.add_method('operator()', 
-                   'ns3::NodeContainer &', 
-                   [param('ns3::NodeContainer', 'other')], 
-                   custom_name='__call__')
-    ## node-container.h (module 'network'): ns3::NodeContainer & ns3::NodeContainer::operator()(ns3::Ptr<ns3::Node> node) [member operator]
-    cls.add_method('operator()', 
-                   'ns3::NodeContainer &', 
-                   [param('ns3::Ptr< ns3::Node >', 'node')], 
-                   custom_name='__call__')
-    ## node-container.h (module 'network'): ns3::NodeContainer & ns3::NodeContainer::operator()(std::string nodeName) [member operator]
-    cls.add_method('operator()', 
-                   'ns3::NodeContainer &', 
-                   [param('std::string', 'nodeName')], 
-                   custom_name='__call__')
     return
 
 def register_Ns3ObjectBase_methods(root_module, cls):
@@ -2529,18 +2517,6 @@ def register_Ns3SequentialVariable_methods(root_module, cls):
     cls.add_constructor([param('double', 'f'), param('double', 'l'), param('double', 'i', default_value='1'), param('uint32_t', 'c', default_value='1')])
     ## random-variable.h (module 'core'): ns3::SequentialVariable::SequentialVariable(double f, double l, ns3::RandomVariable const & i, uint32_t c=1) [constructor]
     cls.add_constructor([param('double', 'f'), param('double', 'l'), param('ns3::RandomVariable const &', 'i'), param('uint32_t', 'c', default_value='1')])
-    return
-
-def register_Ns3SimpleRefCount__Ns3Chunk_Ns3ObjectBase_Ns3DefaultDeleter__lt__ns3Chunk__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >::SimpleRefCount(ns3::SimpleRefCount<ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter< ns3::Chunk > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::Chunk, ns3::ObjectBase, ns3::DefaultDeleter<ns3::Chunk> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
     return
 
 def register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, cls):
@@ -3780,12 +3756,36 @@ def register_Ns3SimpleRefCount__Ns3CcnxAppTracer_Ns3Empty_Ns3DefaultDeleter__lt_
                    is_static=True)
     return
 
+def register_Ns3SimpleRefCount__Ns3CcnxContentObjectHeader_Ns3Header_Ns3DefaultDeleter__lt__ns3CcnxContentObjectHeader__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter< ns3::CcnxContentObjectHeader > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnxContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxContentObjectHeader> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3CcnxFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3CcnxFaceContainer__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> > const & o) [copy constructor]
     cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter< ns3::CcnxFaceContainer > > const &', 'o')])
     ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnxFaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::CcnxFaceContainer> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
+def register_Ns3SimpleRefCount__Ns3CcnxInterestHeader_Ns3Header_Ns3DefaultDeleter__lt__ns3CcnxInterestHeader__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> >::SimpleRefCount(ns3::SimpleRefCount<ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter< ns3::CcnxInterestHeader > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::CcnxInterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::CcnxInterestHeader> >::Cleanup() [member function]
     cls.add_method('Cleanup', 
                    'void', 
                    [], 
