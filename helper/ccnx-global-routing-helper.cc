@@ -189,6 +189,17 @@ CcnxGlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
 }
 
 void
+CcnxGlobalRoutingHelper::AddOrigins (const std::string &prefix, const NodeContainer &nodes)
+{
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      AddOrigin (prefix, *node);
+    }
+}
+
+void
 CcnxGlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string &nodeName)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);

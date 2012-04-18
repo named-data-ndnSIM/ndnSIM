@@ -91,7 +91,7 @@ protected:
   virtual void
   DoDispose ();
 
-  // inherited from Application base class.
+  // inherited from Application base class. Originally they were private
   virtual void
   StartApplication ();    // Called at time specified by Start
 

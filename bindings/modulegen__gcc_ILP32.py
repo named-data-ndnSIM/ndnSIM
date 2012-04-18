@@ -1364,6 +1364,10 @@ def register_Ns3CcnxGlobalRoutingHelper_methods(root_module, cls):
     cls.add_method('AddOrigin', 
                    'void', 
                    [param('std::string const &', 'prefix'), param('std::string const &', 'nodeName')])
+    ## ccnx-global-routing-helper.h (module 'NDNabstraction'): void ns3::CcnxGlobalRoutingHelper::AddOrigins(std::string const & prefix, ns3::NodeContainer const & nodes) [member function]
+    cls.add_method('AddOrigins', 
+                   'void', 
+                   [param('std::string const &', 'prefix'), param('ns3::NodeContainer const &', 'nodes')])
     ## ccnx-global-routing-helper.h (module 'NDNabstraction'): void ns3::CcnxGlobalRoutingHelper::CalculateRoutes() [member function]
     cls.add_method('CalculateRoutes', 
                    'void', 
@@ -4728,12 +4732,12 @@ def register_Ns3Application_methods(root_module, cls):
     cls.add_method('StartApplication', 
                    'void', 
                    [], 
-                   visibility='protected', is_virtual=True)
+                   visibility='private', is_virtual=True)
     ## application.h (module 'network'): void ns3::Application::StopApplication() [member function]
     cls.add_method('StopApplication', 
                    'void', 
                    [], 
-                   visibility='protected', is_virtual=True)
+                   visibility='private', is_virtual=True)
     return
 
 def register_Ns3AttributeAccessor_methods(root_module, cls):

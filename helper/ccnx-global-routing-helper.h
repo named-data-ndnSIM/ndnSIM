@@ -72,6 +72,14 @@ public:
   AddOrigin (const std::string &prefix, Ptr<Node> node);
 
   /**
+   * @brief Add `prefix' as origin on all `nodes'
+   * @param prefix Prefix that is originated by nodes
+   * @param nodes NodeContainer
+   */
+  void
+  AddOrigins (const std::string &prefix, const NodeContainer &nodes);
+  
+  /**
    * @brief Add `prefix' as origin on node `nodeName'
    * @param prefix     Prefix that is originated by node, e.g., node is a producer for this prefix
    * @param nodeName   Name of the node that is associated with Ptr<Node> using ns3::Names
