@@ -24,7 +24,6 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/NDNabstraction-module.h"
 #include "ns3/point-to-point-grid.h"
-#include "ns3/ipv4-global-routing-helper.h"
 
 using namespace ns3;
 
@@ -83,47 +82,41 @@ main (int argc, char *argv[])
 
   PointToPointHelper p2p;
 
-  InternetStackHelper stack;
-  Ipv4GlobalRoutingHelper ipv4RoutingHelper ("ns3::Ipv4GlobalRoutingOrderedNexthops");
-  stack.SetRoutingHelper (ipv4RoutingHelper);
-
   PointToPointGridHelper grid (nGrid, nGrid, p2p);
   grid.BoundingBox(100,100,200,200);
 
-  // Install CCNx stack
-  NS_LOG_INFO ("Installing CCNx stack");
+  // Install CCNx stack on all nodes
+  NS_LOG_INFO ("Installing CCNx stack on all nodes");
   CcnxStackHelper ccnxHelper;
   ccnxHelper.InstallAll ();
 
-  // Install IP stack (necessary to populate FIB)
-  NS_LOG_INFO ("Installing IP stack");
-  grid.InstallStack (stack);
-  grid.AssignIpv4Addresses (
-                            Ipv4AddressHelper("10.1.0.0", "255.255.255.0"),
-                            Ipv4AddressHelper("10.2.0.0", "255.255.255.0")
-                            );
-
+  CcnxGlobalRoutingHelper ccnxGlobalRoutingHelper;
+  ccnxGlobalRoutingHelper.InstallAll ();
+  
+  // Getting containers for the consumer/producer
   Ptr<Node> producer = grid.GetNode (nGrid-1, nGrid-1);
   NodeContainer consumerNodes;
   consumerNodes.Add (grid.GetNode (0,0));
   
-  // Populate FIB based on IPv4 global routing controller
-  ccnxHelper.InstallFakeGlobalRoutes ();
-  ccnxHelper.InstallRouteTo (producer);
-
+  // Install CCNx applications
   NS_LOG_INFO ("Installing Applications");
-  std::ostringstream prefix;
-  prefix << "/" << producer->GetId ();
+  std::string prefix = "/prefix";
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
-  consumerHelper.SetPrefix (prefix.str ());
+  consumerHelper.SetPrefix (prefix);
   consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
-  producerHelper.SetPrefix (prefix.str ());
+  producerHelper.SetPrefix (prefix);
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producer);
+
+  // Add /prefix origins to CcnxGlobalRouter
+  ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+
+  // Calculate and install FIBs
+  ccnxGlobalRoutingHelper.CalculateRoutes ();
   
   Simulator::Stop (finishTime);
     
