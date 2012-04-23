@@ -540,7 +540,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
                         const Ptr<const Packet> &packet)
 {
     
-  NS_LOG_FUNCTION (incomingFace << header << payload << packet);
+  NS_LOG_FUNCTION (incomingFace << header->GetName () << payload << packet);
   m_inData (header, payload, incomingFace);
 
   // 1. Lookup PIT entry
@@ -596,8 +596,13 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
             {
               incoming.m_face->Send (packet->Copy ());
               m_outData (header, payload, false, incoming.m_face);
+              NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
             }
-
+          else
+            {
+              NS_LOG_DEBUG ("Ignore incoming interests from ourselves (" << *incoming.m_face << ")");
+            }
+          
           // successfull forwarded data trace
         }
       // All incoming interests are satisfied. Remove them
@@ -611,6 +616,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
     }
   catch (CcnxPitEntryNotFound)
     {
+      NS_LOG_DEBUG ("Pit entry not found");
       if (m_cacheUnsolicitedData)
         {
           // Optimistically add or update entry in the content store
@@ -646,20 +652,20 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
 
           m_outNacks (header, incoming.m_face);
         }
-    }
   
-  // All incoming interests cannot be satisfied. Remove them
-  m_pit->modify (m_pit->iterator_to (pitEntry),
-                 ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
+      // All incoming interests cannot be satisfied. Remove them
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
 
-  // Remove also outgoing
-  m_pit->modify (m_pit->iterator_to (pitEntry),
-                 ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
+      // Remove also outgoing
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
   
-  // Set pruning timout on PIT entry (instead of deleting the record)
-  m_pit->modify (m_pit->iterator_to (pitEntry),
-                 ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+      // Set pruning timout on PIT entry (instead of deleting the record)
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                               Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+    }
 }
 
 } //namespace ns3

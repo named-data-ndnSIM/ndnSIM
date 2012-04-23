@@ -140,8 +140,7 @@ public:
    * @param expireTime absolute simulation time of when the record should expire
    */
   void
-  SetExpireTime (const Time &expireTime)
-  { m_expireTime = expireTime; }
+  SetExpireTime (const Time &expireTime);
   
   /**
    * @brief Check if nonce `nonce` for the same prefix has already been seen
