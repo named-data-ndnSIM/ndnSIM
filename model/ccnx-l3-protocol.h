@@ -195,6 +195,11 @@ private:
   GiveUpInterest (const CcnxPitEntry &pitEntry,
                   Ptr<CcnxInterestHeader> header);
 
+  void
+  OnDataDelayed (Ptr<CcnxContentObjectHeader> header,
+                 Ptr<Packet> payload,
+                 const Ptr<const Packet> &packet);
+  
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
@@ -210,6 +215,7 @@ private:
 
   bool m_nacksEnabled;
   bool m_cacheUnsolicitedData;
+  bool m_delayingDataProcessing;
   
   // Time    m_bucketLeakInterval;
   // EventId m_bucketLeakEvent;

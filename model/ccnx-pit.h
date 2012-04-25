@@ -123,7 +123,7 @@ public:
    * \returns const reference to Pit entry. If record not found,
    *          CcnxPitEntryNotFound exception will be thrown
    */
-  const CcnxPitEntry&
+  CcnxPitEntryContainer::type::iterator
   Lookup (const CcnxContentObjectHeader &header) const;
 
   /**

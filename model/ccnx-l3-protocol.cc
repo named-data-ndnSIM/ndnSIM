@@ -32,6 +32,7 @@
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 #include "ns3/simulator.h"
+#include "ns3/random-variable.h"
 
 #include "ns3/ccnx-header-helper.h"
 
@@ -82,6 +83,10 @@ CcnxL3Protocol::GetTypeId (void)
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
                    BooleanValue (false),
                    MakeBooleanAccessor (&CcnxL3Protocol::m_cacheUnsolicitedData),
+                   MakeBooleanChecker ())
+    .AddAttribute ("RandomDataDelaying", "Delaying data processing",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CcnxL3Protocol::m_delayingDataProcessing),
                    MakeBooleanChecker ())
   ;
   return tid;
@@ -392,8 +397,9 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  Ptr<CcnxInterestHeader> &header,
                                  const Ptr<const Packet> &packet)
 {
-  NS_LOG_FUNCTION (incomingFace << header << packet);
+  NS_LOG_FUNCTION (incomingFace << header << packet << header->GetName ());
   m_inInterests (header, incomingFace);
+  // NS_LOG_DEBUG (*m_pit);
 
   // Lookup of Pit (and associated Fib) entry for this Interest 
   tuple<const CcnxPitEntry&,bool,bool> ret = m_pit->Lookup (*header);
@@ -532,6 +538,55 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
 }
 
+void
+CcnxL3Protocol::OnDataDelayed (Ptr<CcnxContentObjectHeader> header,
+                               Ptr<Packet> payload,
+                               const Ptr<const Packet> &packet)
+{
+  if (m_delayingDataProcessing)
+    {
+      NS_LOG_DEBUG ("Delayed processing " << header->GetName ());
+      // NS_LOG_DEBUG (*m_pit);
+    }
+  
+  // 1. Lookup PIT entry
+  try
+    {
+      CcnxPitEntryContainer::type::iterator pitEntry = m_pit->Lookup (*header);
+      
+      //satisfy all pending incoming Interests
+      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->m_incoming)
+        {
+          incoming.m_face->Send (packet->Copy ());
+          m_outData (header, payload, false, incoming.m_face);
+          NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+          
+          // successfull forwarded data trace
+        }
+
+      if (pitEntry->m_incoming.size () > 0)
+        {
+          // All incoming interests are satisfied. Remove them
+          m_pit->modify (pitEntry,
+                         ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
+
+          // Remove all outgoing faces
+          m_pit->modify (pitEntry,
+                         ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
+          
+          // Set pruning timout on PIT entry (instead of deleting the record)
+          m_pit->modify (pitEntry,
+                         ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                                   Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+        }
+    }
+  catch (CcnxPitEntryNotFound)
+    {
+      NS_LOG_DEBUG ("Pit entry not found (was satisfied and removed before)");
+      return; // do not process unsoliced data packets
+    }
+}
+
 // Processing ContentObjects
 void
 CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
@@ -542,20 +597,21 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
     
   NS_LOG_FUNCTION (incomingFace << header->GetName () << payload << packet);
   m_inData (header, payload, incomingFace);
-
+  // NS_LOG_DEBUG (*m_pit);
+  
   // 1. Lookup PIT entry
   try
     {
-      const CcnxPitEntry &pitEntry = m_pit->Lookup (*header);
+      CcnxPitEntryContainer::type::iterator pitEntry = m_pit->Lookup (*header);
 
       // Note that with MultiIndex we need to modify entries indirectly
 
-      CcnxPitEntryOutgoingFaceContainer::type::iterator out = pitEntry.m_outgoing.find (incomingFace);
+      CcnxPitEntryOutgoingFaceContainer::type::iterator out = pitEntry->m_outgoing.find (incomingFace);
   
       // If we have sent interest for this data via this face, then update stats.
-      if (out != pitEntry.m_outgoing.end ())
+      if (out != pitEntry->m_outgoing.end ())
         {
-          m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+          m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry->m_fibEntry),
                                ll::bind (&CcnxFibEntry::UpdateFaceRtt,
                                          ll::_1,
                                          incomingFace,
@@ -582,37 +638,37 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         }
 
       // Update metric status for the incoming interface in the corresponding FIB entry
-      m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry.m_fibEntry),
+      m_fib->m_fib.modify (m_fib->m_fib.iterator_to (pitEntry->m_fibEntry),
                            ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
                                      incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
   
       // Add or update entry in the content store
       m_contentStore->Add (header, payload);
 
-      //satisfy all pending incoming Interests
-      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry.m_incoming)
+      m_pit->modify (pitEntry,
+                     ll::bind (&CcnxPitEntry::RemoveIncoming, ll::_1, incomingFace));
+
+      if (pitEntry->m_incoming.size () == 0)
         {
-          if (incoming.m_face != incomingFace)
+          // Set pruning timout on PIT entry (instead of deleting the record)
+          m_pit->modify (pitEntry,
+                         ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                                   Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
+        }
+      else
+        {
+          if (!m_delayingDataProcessing)
             {
-              incoming.m_face->Send (packet->Copy ());
-              m_outData (header, payload, false, incoming.m_face);
-              NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+              OnDataDelayed (header, payload, packet);
             }
           else
             {
-              NS_LOG_DEBUG ("Ignore incoming interests from ourselves (" << *incoming.m_face << ")");
+              NS_LOG_DEBUG ("Delaying Data forwarding " << header->GetName ());
+              UniformVariable delay (0.0001, 0.002);
+              Simulator::Schedule (Seconds (delay.GetValue ()),
+                                   &CcnxL3Protocol::OnDataDelayed, this, header, payload, packet);
             }
-          
-          // successfull forwarded data trace
         }
-      // All incoming interests are satisfied. Remove them
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
-      
-      // Set pruning timout on PIT entry (instead of deleting the record)
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                                  Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
     }
   catch (CcnxPitEntryNotFound)
     {
@@ -639,6 +695,7 @@ CcnxL3Protocol::GiveUpInterest (const CcnxPitEntry &pitEntry,
                                 Ptr<CcnxInterestHeader> header)
 {
   NS_LOG_FUNCTION (this << &pitEntry);
+  // NS_LOG_DEBUG (*m_pit);
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();

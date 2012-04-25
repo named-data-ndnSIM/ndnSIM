@@ -49,7 +49,7 @@ CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
 void
 CcnxPitEntry::SetExpireTime (const Time &expireTime)
 {
-  NS_LOG_FUNCTION (expireTime);
+  NS_LOG_FUNCTION (expireTime.ToDouble (Time::S));
   m_expireTime = expireTime;
 }
 
@@ -57,11 +57,13 @@ CcnxPitEntry::SetExpireTime (const Time &expireTime)
 void
 CcnxPitEntry::UpdateLifetime (const Time &offsetTime)
 {
+  NS_LOG_FUNCTION (offsetTime.ToDouble (Time::S));
+  
   Time newExpireTime = Simulator::Now () + offsetTime;
   if (newExpireTime > m_expireTime)
     m_expireTime = newExpireTime;
   
-  NS_LOG_DEBUG ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
+  NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
 }
 
 CcnxPitEntryIncomingFaceContainer::type::iterator

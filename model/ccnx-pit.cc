@@ -140,7 +140,7 @@ CcnxPit::SetFib (Ptr<CcnxFib> fib)
   m_fib = fib;
 }
 
-const CcnxPitEntry&
+CcnxPitEntryContainer::type::iterator
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
   // NS_LOG_FUNCTION_NOARGS ();
@@ -157,19 +157,16 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 
       entry = get<i_prefix> ().find (subPrefix);
       if (entry != end())
-        return *entry;
+        return entry;
     }
   
-  if (entry == end ())
-    throw CcnxPitEntryNotFound();
-
-  return *entry;
+  throw CcnxPitEntryNotFound();
 }
 
 boost::tuple<const CcnxPitEntry&, bool, bool>
 CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (header.GetName ());
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
 
   bool isDuplicate = false;
@@ -195,7 +192,17 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
     }
   else
     {
-      isNew = false;
+      NS_LOG_INFO ("ExpireTime: " << entry->m_expireTime.ToDouble (Time::S));
+      if (entry->m_expireTime - Simulator::Now () < MilliSeconds (10))
+        {
+          modify (entry,
+                  boost::bind(&CcnxPitEntry::ClearIncoming, boost::lambda::_1));
+          
+          modify (entry,
+                  boost::bind(&CcnxPitEntry::ClearOutgoing, boost::lambda::_1));
+        }
+      
+      isNew = entry->m_incoming.size () == 0 && entry->m_outgoing.size () == 0; // entry was preserved to detect loops, but technically removed
       isDuplicate = entry->IsNonceSeen (header.GetNonce ());
     }
 
@@ -212,7 +219,7 @@ std::ostream& operator<< (std::ostream& os, const CcnxPit &pit)
 {
   BOOST_FOREACH (const CcnxPitEntry &entry, pit)
     {
-      os << entry;
+      os << entry << std::endl;
     }
 
   return os;
