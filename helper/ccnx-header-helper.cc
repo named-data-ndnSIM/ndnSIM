@@ -43,6 +43,7 @@ CcnxHeaderHelper::GetCcnxHeaderType (Ptr<const Packet> packet)
 
   if (read!=2) throw CcnxUnknownHeaderException();
 
+  NS_LOG_DEBUG (*packet);
   if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
     {
       return CcnxHeaderHelper::INTEREST;
@@ -52,6 +53,7 @@ CcnxHeaderHelper::GetCcnxHeaderType (Ptr<const Packet> packet)
       return CcnxHeaderHelper::CONTENT_OBJECT;
     }
 
+  NS_LOG_DEBUG (*packet);
   throw CcnxUnknownHeaderException();
 }
 

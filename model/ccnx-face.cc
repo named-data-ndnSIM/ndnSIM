@@ -150,6 +150,7 @@ bool
 CcnxFace::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
+  NS_LOG_DEBUG (*packet);
 
   /// \todo Implement tracing, if requested
 

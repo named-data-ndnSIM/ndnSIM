@@ -260,6 +260,11 @@ CcnxL3Protocol::GetNFaces (void) const
 void 
 CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
 {
+  if (!face->IsUp ())
+    return;
+
+  NS_LOG_DEBUG (*p);
+  
   NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
@@ -302,6 +307,8 @@ CcnxL3Protocol::Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p)
   catch (CcnxUnknownHeaderException)
     {
       NS_ASSERT_MSG (false, "Unknown CCNx header. Should not happen");
+      NS_LOG_ERROR ("Unknown CCNx header. Should not happen");
+      return;
     }
 }
 
@@ -483,7 +490,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
       NS_ASSERT (contentObjectHeader != 0);      
       NS_LOG_LOGIC("Found in cache");
 
-      OnDataDelayed (contentObjectHeader, contentObject, payload);
+      OnDataDelayed (contentObjectHeader, payload, contentObject);
       return;
     }
 
@@ -525,7 +532,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   bool propagated = m_forwardingStrategy->
     PropagateInterest (pitEntry, incomingFace, header, packet);
 
-  if (isRetransmitted) //give another chance if retransmitted
+  if (!propagated && isRetransmitted) //give another chance if retransmitted
     {
       // increase max number of allowed retransmissions
       m_pit->modify (m_pit->iterator_to (pitEntry),
