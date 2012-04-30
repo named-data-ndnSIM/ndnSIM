@@ -153,12 +153,12 @@ void
 CcnxPitEntry::IncreaseAllowedRetxCount ()
 {
   NS_LOG_ERROR (this);
-  // if (Simulator::Now () - m_lastRetransmission >= MilliSeconds (10))
+  if (Simulator::Now () - m_lastRetransmission >= MilliSeconds (100))
     {
       // cheat:
-      // don't allow retransmission faster than every 10ms
+      // don't allow retransmission faster than every 100ms
       m_maxRetxCount++;
-      // m_lastRetransmission = Simulator::Now ();
+      m_lastRetransmission = Simulator::Now ();
     }
 }
 
