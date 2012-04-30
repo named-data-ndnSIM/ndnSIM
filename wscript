@@ -70,6 +70,10 @@ def build(bld):
         "apps/ccnx-app.h",
 
         "model/ccnx.h",
+        "model/ccnx-pit.h",
+        "model/ccnx-pit-entry.h",
+        "model/ccnx-pit-entry-incoming-face.h",
+        "model/ccnx-pit-entry-outgoing-face.h",
         "model/ccnx-fib.h",
         "model/ccnx-face.h",
         "model/ccnx-interest-header.h",

@@ -253,6 +253,7 @@ public:
 
   Time m_expireTime;         ///< \brief Time when PIT entry will be removed
 
+  Time m_lastRetransmission; ///< @brief Last time when number of retransmissions were increased
   uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
 };
 

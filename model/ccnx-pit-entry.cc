@@ -153,7 +153,13 @@ void
 CcnxPitEntry::IncreaseAllowedRetxCount ()
 {
   NS_LOG_ERROR (this);
-  m_maxRetxCount++;
+  // if (Simulator::Now () - m_lastRetransmission >= MilliSeconds (10))
+    {
+      // cheat:
+      // don't allow retransmission faster than every 10ms
+      m_maxRetxCount++;
+      // m_lastRetransmission = Simulator::Now ();
+    }
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry)
@@ -181,6 +187,17 @@ std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry)
         first = false;
       
       os << *face.m_face;
+    }
+  os << "\nNonces: ";
+  first = true;
+  BOOST_FOREACH (uint32_t nonce, entry.m_seenNonces)
+    {
+      if (!first)
+        os << ",";
+      else
+        first = false;
+      
+      os << nonce;
     }
 
   return os;

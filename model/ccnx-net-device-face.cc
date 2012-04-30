@@ -28,6 +28,9 @@
 #include "ns3/node.h"
 #include "ns3/pointer.h"
 
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/channel.h"
+
 NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 
 namespace ns3 {
@@ -115,7 +118,11 @@ CcnxNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 std::ostream&
 CcnxNetDeviceFace::Print (std::ostream& os) const
 {
-  os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId () << ")";
+  os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId () << ",";
+  os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (0)->GetNode ()->GetId ();
+  os << "-";
+  os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (1)->GetNode ()->GetId ();
+  os << ")";
   return os;
 }
 

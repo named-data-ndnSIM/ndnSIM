@@ -27,6 +27,7 @@
 #include "ns3/ptr.h"
 #include "ns3/ccnx.h"
 #include "ns3/nstime.h"
+#include "ns3/type-id.h"
 
 namespace ns3 {
 

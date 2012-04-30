@@ -219,6 +219,9 @@ std::ostream& operator<< (std::ostream& os, const CcnxPit &pit)
 {
   BOOST_FOREACH (const CcnxPitEntry &entry, pit)
     {
+      if (entry.m_incoming.size () == 0 && entry.m_outgoing.size () == 0)
+        continue; // these are stale to-be-removed records, so there is no need to print them out
+      
       os << entry << std::endl;
     }
 

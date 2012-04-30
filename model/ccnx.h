@@ -34,6 +34,7 @@ class CcnxForwardingStrategy;
 class CcnxFace;
 class CcnxContentObjectHeader;
 class CcnxInterestHeader;
+class CcnxPit;
 
 /**
  * \internal
@@ -145,11 +146,16 @@ public:
   RemoveFace (Ptr<CcnxFace> face) = 0;
 
   /**
-   * Get face for NetDevice
+   * \brief Get face for NetDevice
    */
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const = 0;
 
+  /**
+   * \brief Get PIT associated with Node 
+   */
+  virtual Ptr<CcnxPit>
+  GetPit() const = 0;
 
   /**
    * \enum DropReason

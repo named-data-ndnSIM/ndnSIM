@@ -118,7 +118,8 @@ public:
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
   
-  Ptr<CcnxPit> GetPit();
+  virtual Ptr<CcnxPit>
+  GetPit () const;
   
   // void ScheduleLeakage();
 private:
@@ -196,8 +197,8 @@ private:
                   Ptr<CcnxInterestHeader> header);
 
   void
-  OnDataDelayed (Ptr<CcnxContentObjectHeader> header,
-                 Ptr<Packet> payload,
+  OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
+                 Ptr<const Packet> payload,
                  const Ptr<const Packet> &packet);
   
 private:

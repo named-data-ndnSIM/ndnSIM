@@ -172,6 +172,13 @@ CcnxL3Protocol::GetForwardingStrategy (void) const
   return m_forwardingStrategy;
 }
 
+Ptr<CcnxPit>
+CcnxL3Protocol::GetPit () const
+{
+  return m_pit;
+}
+
+
 uint32_t 
 CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
 {
@@ -397,7 +404,6 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
                                  Ptr<CcnxInterestHeader> &header,
                                  const Ptr<const Packet> &packet)
 {
-  NS_LOG_FUNCTION (incomingFace << header << packet << header->GetName ());
   m_inInterests (header, incomingFace);
   // NS_LOG_DEBUG (*m_pit);
 
@@ -409,8 +415,43 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 
   // NS_LOG_DEBUG ("isNew: " << isNew << ", isDup: " << isDuplicated);
   
+  NS_LOG_FUNCTION (header->GetName () << header->GetNonce () << boost::cref (*incomingFace) << isDuplicated);
+
+  /////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
+  //                                                                                     //
+  // !!!! IMPORTANT CHANGE !!!! Duplicate interests will create incoming face entry !!!! //
+  //                                                                                     //
+  /////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////
+  
+  // Data is not in cache
+  CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
+
+  bool isRetransmitted = false;
+  
+  if (inFace != pitEntry.m_incoming.end ())
+    {
+      // CcnxPitEntryIncomingFace.m_arrivalTime keeps track arrival time of the first packet... why?
+
+      isRetransmitted = true;
+      // this is almost definitely a retransmission. But should we trust the user on that?
+    }
+  else
+    {
+      m_pit->modify (m_pit->iterator_to (pitEntry),
+                     ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
+    }
+  //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
+  
   if (isDuplicated) 
     {
+      NS_LOG_DEBUG ("Received duplicatie interest on " << *incomingFace);
       m_dropInterests (header, DUPLICATED, incomingFace);
 
       /**
@@ -439,44 +480,12 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
   if (contentObject != 0)
     {
-      NS_ASSERT (contentObjectHeader != 0);
-      
+      NS_ASSERT (contentObjectHeader != 0);      
       NS_LOG_LOGIC("Found in cache");
-        
-      incomingFace->Send (contentObject);
-      m_outData (contentObjectHeader, payload, true, incomingFace);
 
-      // Set pruning timout on PIT entry (instead of deleting the record)
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                           Simulator::Now () + m_pit->GetPitEntryPruningTimeout ()));
-        
+      OnDataDelayed (contentObjectHeader, contentObject, payload);
       return;
     }
-
-  // \todo Detect retransmissions. Not yet sure how...
-  
-  // Data is not in cache
-  CcnxPitEntryIncomingFaceContainer::type::iterator inFace = pitEntry.m_incoming.find (incomingFace);
-  CcnxPitEntryOutgoingFaceContainer::type::iterator outFace = pitEntry.m_outgoing.find (incomingFace);
-
-  bool isRetransmitted = false;
-  
-  if (inFace != pitEntry.m_incoming.end ())
-    {
-      // CcnxPitEntryIncomingFace.m_arrivalTime keeps track arrival time of the first packet... why?
-
-      isRetransmitted = true;
-      // this is almost definitely a retransmission. But should we trust the user on that?
-    }
-  else
-    {
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
-    }
-
-  // NS_LOG_DEBUG ("IsRetx: " << isRetransmitted);
-  // NS_LOG_DEBUG (*m_pit);
 
   // update PIT entry lifetime
   m_pit->modify (m_pit->iterator_to (pitEntry),
@@ -539,8 +548,8 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-CcnxL3Protocol::OnDataDelayed (Ptr<CcnxContentObjectHeader> header,
-                               Ptr<Packet> payload,
+CcnxL3Protocol::OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
+                               Ptr<const Packet> payload,
                                const Ptr<const Packet> &packet)
 {
   if (m_delayingDataProcessing)

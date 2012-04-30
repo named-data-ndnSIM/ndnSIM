@@ -146,7 +146,7 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       if (m_needSetDefaultRoutes)
         {
           // default route with lowest priority possible
-          AddRoute (node, "/", face, std::numeric_limits<int32_t>::max ()); 
+          AddRoute (node, "/bcast", face, std::numeric_limits<int32_t>::max ()); 
         }
       
       if (m_limitsEnabled)
