@@ -1,0 +1,105 @@
+diff --git a/apps/ccnx-consumer.cc b/apps/ccnx-consumer.cc
+index 1ddc0b1..ac60412 100644
+--- a/apps/ccnx-consumer.cc
++++ b/apps/ccnx-consumer.cc
+@@ -33,7 +33,7 @@
+ #include "../model/ccnx-local-face.h"
+ #include "ns3/ccnx-interest-header.h"
+ #include "ns3/ccnx-content-object-header.h"
+-// #include "ns3/weights-path-stretch-tag.h"
++#include "ns3/weights-path-stretch-tag.h"
+ 
+ #include <boost/ref.hpp>
+ #include <boost/lexical_cast.hpp>
+@@ -288,14 +288,14 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
+ 
+   m_rtt->AckSeq (SequenceNumber32 (seq));
+ 
+-  // Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
+-  // if (tag != 0)
+-  //   {
+-  //     // Notify trace about path weights vector (e.g., for path-stretch calculation)
+-  //     m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
+-  //     // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
+-  //     //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
+-  //   }
++  Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
++  if (tag != 0)
++    {
++      // Notify trace about path weights vector (e.g., for path-stretch calculation)
++      m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
++      // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
++      //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
++}
+ }
+ 
+ void
+diff --git a/model/ccnx-face.cc b/model/ccnx-face.cc
+index 86daa26..25cc0a5 100644
+--- a/model/ccnx-face.cc
++++ b/model/ccnx-face.cc
+@@ -30,7 +30,7 @@
+ #include "ns3/boolean.h"
+ #include "ns3/simulator.h"
+ 
+-// #include "ns3/weights-path-stretch-tag.h"
++#include "ns3/weights-path-stretch-tag.h"
+ 
+ #include <boost/ref.hpp>
+ 
+@@ -59,10 +59,10 @@ CcnxFace::GetTypeId ()
+                    MakeDoubleAccessor (&CcnxFace::m_bucketLeak),
+                    MakeDoubleChecker<double> ())
+                    
+-    // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
+-    //                BooleanValue (false),
+-    //                MakeBooleanAccessor (&CcnxFace::m_enableMetricTagging),
+-    //                MakeBooleanChecker ())
++    .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
++                   BooleanValue (false),
++                   MakeBooleanAccessor (&CcnxFace::m_enableMetricTagging),
++                   MakeBooleanChecker ())
+     ;
+   return tid;
+ }
+@@ -157,23 +157,23 @@ CcnxFace::Send (Ptr<Packet> packet)
+   if (!IsUp ())
+     return false;
+ 
+-  // if (m_enableMetricTagging)
+-  //   {
+-  //     // update path information
+-  //     Ptr<const WeightsPathStretchTag> origTag = packet->RemovePacketTag<WeightsPathStretchTag> ();
+-  //     Ptr<WeightsPathStretchTag> tag;
+-  //     if (origTag == 0)
+-  //       {
+-  //         tag = CreateObject<WeightsPathStretchTag> (); // create a new tag
+-  //       }
+-  //     else
+-  //       {
+-  //         tag = CreateObject<WeightsPathStretchTag> (*origTag); // will update existing tag
+-  //       }
+-
+-  //     tag->AddPathInfo (m_node, GetMetric ());
+-  //     packet->AddPacketTag (tag);
+-  //   }
++  if (m_enableMetricTagging)
++    {
++      // update path information
++      Ptr<const WeightsPathStretchTag> origTag = packet->RemovePacketTag<WeightsPathStretchTag> ();
++      Ptr<WeightsPathStretchTag> tag;
++      if (origTag == 0)
++        {
++          tag = CreateObject<WeightsPathStretchTag> (); // create a new tag
++        }
++      else
++        {
++          tag = CreateObject<WeightsPathStretchTag> (*origTag); // will update existing tag
++        }
++
++      tag->AddPathInfo (m_node, GetMetric ());
++      packet->AddPacketTag (tag);
++    }
+   
+   SendImpl (packet);
+   return true;
