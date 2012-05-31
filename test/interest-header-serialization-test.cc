@@ -19,7 +19,6 @@
  */
 
 #include "ns3/test.h"
-#include "ns3/annotated-topology-reader.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/uinteger.h"
 #include "ns3/random-variable.h"
@@ -44,15 +43,15 @@ NS_LOG_COMPONENT_DEFINE ("InterestHeaderSerializationTest");
 class InterestHeaderSerializationTest : public TestCase
 {
 public:
-    InterestHeaderSerializationTest ();
-    virtual ~InterestHeaderSerializationTest ();
+  InterestHeaderSerializationTest ();
+  virtual ~InterestHeaderSerializationTest ();
     
 private:
-    virtual void DoRun (void);
+  virtual void DoRun (void);
 };
 
 InterestHeaderSerializationTest::InterestHeaderSerializationTest ()
-: TestCase ("Interest Header Serialization Test")
+  : TestCase ("Interest Header Serialization Test")
 {
 }
 
@@ -63,64 +62,64 @@ InterestHeaderSerializationTest::~InterestHeaderSerializationTest ()
 void
 InterestHeaderSerializationTest::DoRun(void)
 {
-    Packet packet (0);
+  Packet packet (0);
     
-    uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
-    Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
-    (*testname) ("test") ("test2");
+  uint32_t randomNonce = UniformVariable().GetInteger(1, std::numeric_limits<uint32_t>::max ());
+  Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
+  (*testname) ("test") ("test2");
     
-    Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
-    (*exclude) ("exclude") ("exclude2");
+  Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
+  (*exclude) ("exclude") ("exclude2");
     
-    Time lifetime = Seconds(4.0);
-    bool child = true;
+  Time lifetime = Seconds(4.0);
+  bool child = true;
     
-    uint32_t maxSuffixComponents = 40;
-    uint32_t minSuffixComponents = 20;
+  uint32_t maxSuffixComponents = 40;
+  uint32_t minSuffixComponents = 20;
     
-    CcnxInterestHeader interestHeader;
-    interestHeader.SetNonce(randomNonce);
-    interestHeader.SetName(testname);
-    interestHeader.SetInterestLifetime(lifetime);
-    interestHeader.SetChildSelector(child);
-    interestHeader.SetExclude(exclude);
-    interestHeader.SetMaxSuffixComponents(maxSuffixComponents);
-    interestHeader.SetMinSuffixComponents(minSuffixComponents);
+  CcnxInterestHeader interestHeader;
+  interestHeader.SetNonce(randomNonce);
+  interestHeader.SetName(testname);
+  interestHeader.SetInterestLifetime(lifetime);
+  interestHeader.SetChildSelector(child);
+  interestHeader.SetExclude(exclude);
+  interestHeader.SetMaxSuffixComponents(maxSuffixComponents);
+  interestHeader.SetMinSuffixComponents(minSuffixComponents);
 
-    //serialization
-    packet.AddHeader (interestHeader);
+  //serialization
+  packet.AddHeader (interestHeader);
 	
-	//deserialization
-    CcnxInterestHeader target;
-	packet.RemoveHeader (target);
+  //deserialization
+  CcnxInterestHeader target;
+  packet.RemoveHeader (target);
 
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetNonce(), randomNonce, "Interest Header nonce deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetNonce(), randomNonce, "Interest Header nonce deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetName(), *testname, "Interest Header name deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetName(), *testname, "Interest Header name deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetInterestLifetime(), lifetime, "Interest Header lifetime deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetInterestLifetime(), lifetime, "Interest Header lifetime deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.IsEnabledChildSelector(), child, "Interest Header childselector deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.IsEnabledChildSelector(), child, "Interest Header childselector deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetExclude(), *exclude, "Interest Header exclude deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetExclude(), *exclude, "Interest Header exclude deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetMaxSuffixComponents(), (int)maxSuffixComponents, "Interest Header maxSuffixComponents deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetMaxSuffixComponents(), (int)maxSuffixComponents, "Interest Header maxSuffixComponents deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (target.GetMinSuffixComponents(), (int)minSuffixComponents, "Interest Header minSuffixComponents deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (target.GetMinSuffixComponents(), (int)minSuffixComponents, "Interest Header minSuffixComponents deserialization failed");
 }
 
 class InterestHeaderSerializationTestSuite : public TestSuite
 {
 public:
-    InterestHeaderSerializationTestSuite ();
+  InterestHeaderSerializationTestSuite ();
 };
 
 InterestHeaderSerializationTestSuite::InterestHeaderSerializationTestSuite ()
-: TestSuite ("interest-header-serialization-test-suite", UNIT)
+  : TestSuite ("interest-header-serialization-test-suite", UNIT)
 {
-    SetDataDir (NS_TEST_SOURCEDIR);
-    AddTestCase (new InterestHeaderSerializationTest);
+  SetDataDir (NS_TEST_SOURCEDIR);
+  AddTestCase (new InterestHeaderSerializationTest);
 }
 
 static InterestHeaderSerializationTestSuite suite;

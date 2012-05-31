@@ -1,0 +1,44 @@
+From ebfeccd51ba1259e01a5bef3925719a88c3ac040 Mon Sep 17 00:00:00 2001
+From: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Date: Mon, 23 Apr 2012 13:45:51 -0700
+Subject: [PATCH] visualizer: temporary fix for the visualizer-related bugs
+ (asserts)
+
+---
+ src/core/model/type-id.cc     |    3 ++-
+ src/visualizer/model/pyviz.cc |    5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/core/model/type-id.cc b/src/core/model/type-id.cc
+index e51e1e9..1368b85 100644
+--- a/src/core/model/type-id.cc
++++ b/src/core/model/type-id.cc
+@@ -149,7 +149,8 @@ IidManager::AddConstructor (uint16_t uid, ns3::Callback<ns3::ObjectBase *> callb
+   struct IidInformation *information = LookupInformation (uid);
+   if (information->hasConstructor)
+     {
+-      NS_FATAL_ERROR (information->name<<" already has a constructor.");
++      return;
++      // NS_FATAL_ERROR (information->name<<" already has a constructor.");
+     }
+   information->hasConstructor = true;
+   information->constructor = callback;
+diff --git a/src/visualizer/model/pyviz.cc b/src/visualizer/model/pyviz.cc
+index 1e500b2..739d8c4 100644
+--- a/src/visualizer/model/pyviz.cc
++++ b/src/visualizer/model/pyviz.cc
+@@ -317,8 +317,9 @@ PyViz::SimulatorRunUntil (Time time)
+   // events just appear to "jump" big chunks of time.
+   NS_LOG_LOGIC ("Schedule dummy callback to be called in " << (time - Simulator::Now ()));
+   m_stop = false;
+-  Simulator::Cancel (m_stopCallbackEvent);
+-  m_stopCallbackEvent = Simulator::Schedule (time - Simulator::Now (), &PyViz::CallbackStopSimulation, this);
++  // Simulator::Cancel (m_stopCallbackEvent);
++  // m_stopCallbackEvent =
++  Simulator::ScheduleWithContext (-1, time - Simulator::Now (), &PyViz::CallbackStopSimulation, this);
+ 
+   Ptr<SimulatorImpl> impl = Simulator::GetImplementation ();
+   Ptr<VisualSimulatorImpl> visualImpl = DynamicCast<VisualSimulatorImpl> (impl);
+-- 
+1.7.10.2
+

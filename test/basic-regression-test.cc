@@ -19,7 +19,6 @@
  */
 
 #include "ns3/test.h"
-#include "ns3/annotated-topology-reader.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/uinteger.h"
 #include "ns3/random-variable.h"
@@ -41,7 +40,7 @@
 #include "ns3/application.h"
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-list-routing-helper.h"
-#include "ns3/annotated-topology-reader.h"
+
 #include <list>
 
 
@@ -54,15 +53,15 @@ class BasicRegressionTest : public TestCase
 {
 public:
     
-    BasicRegressionTest ();
-    virtual ~BasicRegressionTest ();
+  BasicRegressionTest ();
+  virtual ~BasicRegressionTest ();
     
 private:
-    virtual void DoRun (void);
+  virtual void DoRun (void);
 };
 
 BasicRegressionTest::BasicRegressionTest ()
-: TestCase ("Basic regression test")
+  : TestCase ("Basic regression test")
 {
 }
 
@@ -73,83 +72,83 @@ BasicRegressionTest::~BasicRegressionTest ()
 void
 BasicRegressionTest::DoRun(void)
 {
-    //string input ("/Users/iliamo/ns3-abstract-ndn/ns-3.11/src/NDNabstraction/examples/simpletopology.txt");
+  //string input ("/Users/iliamo/ns3-abstract-ndn/ns-3.11/src/NDNabstraction/examples/simpletopology.txt");
     
-    // Set up command line parameters used to control the experiment.
-    //CommandLine cmd;
-    //cmd.AddValue ("input", "Name of the input file.",
-    //              input);
-    //cmd.Parse (argc, argv);
-    
-    
-    // ------------------------------------------------------------
-    // -- Read topology data.
-    // --------------------------------------------
-    
-    // string input = NS_TEST_SOURCEDIR;
-    // input += "/testtopology.txt";
-    
-    // Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
-    // reader->SetFileName (input);
-    
-    // NodeContainer nodes;
-    // if (reader != 0)
-    // {
-    //     nodes = reader->Read ();
-    // }
-    // else
-    // {
-    //     NS_TEST_ASSERT_MSG_EQ (true, false, "file not found");
-    // }
-    
-    // NS_TEST_ASSERT_MSG_EQ (7, reader->LinksSize (), "link count is wrong");
+  // Set up command line parameters used to control the experiment.
+  //CommandLine cmd;
+  //cmd.AddValue ("input", "Name of the input file.",
+  //              input);
+  //cmd.Parse (argc, argv);
     
     
-    // // ------------------------------------------------------------
-    // // -- Create nodes and network stacks
-    // // --------------------------------------------
-    // NS_LOG_INFO ("creating internet stack");
-    // InternetStackHelper stack;
+  // ------------------------------------------------------------
+  // -- Read topology data.
+  // --------------------------------------------
+    
+  // string input = NS_TEST_SOURCEDIR;
+  // input += "/testtopology.txt";
+    
+  // Ptr<AnnotatedTopologyReader> reader = CreateObject<AnnotatedTopologyReader> ();
+  // reader->SetFileName (input);
+    
+  // NodeContainer nodes;
+  // if (reader != 0)
+  // {
+  //     nodes = reader->Read ();
+  // }
+  // else
+  // {
+  //     NS_TEST_ASSERT_MSG_EQ (true, false, "file not found");
+  // }
+    
+  // NS_TEST_ASSERT_MSG_EQ (7, reader->LinksSize (), "link count is wrong");
     
     
-    // //routing
-    // /*Ipv4StaticRoutingHelper staticRouting;
-    // Ipv4ListRoutingHelper listRH;
-    // listRH.Add (staticRouting, 0);
-    // stack.SetRoutingHelper (listRH);  // has effect on the next Install ()
-    // stack.Install (nodes);
-    
-    // NS_LOG_INFO ("creating ip4 addresses");
-    // Ipv4AddressHelper address;
-    // address.SetBase ("10.0.0.0", "255.255.255.252");*/
-    
-    // int totlinks = reader->LinksSize ();
+  // // ------------------------------------------------------------
+  // // -- Create nodes and network stacks
+  // // --------------------------------------------
+  // NS_LOG_INFO ("creating internet stack");
+  // InternetStackHelper stack;
     
     
-    // /// applying settings
-    // NS_LOG_INFO ("creating node containers");
-    // NodeContainer* nc = new NodeContainer[totlinks];
-    // TopologyReader::ConstLinksIterator iter;
-    // int i = 0;
-    // for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
-    // {
-    //     nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
-    // }
+  // //routing
+  // /*Ipv4StaticRoutingHelper staticRouting;
+  // Ipv4ListRoutingHelper listRH;
+  // listRH.Add (staticRouting, 0);
+  // stack.SetRoutingHelper (listRH);  // has effect on the next Install ()
+  // stack.Install (nodes);
     
-    // NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
-    // reader->ApplySettings(ndc,nc);
-    // /// settings applied
+  // NS_LOG_INFO ("creating ip4 addresses");
+  // Ipv4AddressHelper address;
+  // address.SetBase ("10.0.0.0", "255.255.255.252");*/
     
+  // int totlinks = reader->LinksSize ();
     
     
+  // /// applying settings
+  // NS_LOG_INFO ("creating node containers");
+  // NodeContainer* nc = new NodeContainer[totlinks];
+  // TopologyReader::ConstLinksIterator iter;
+  // int i = 0;
+  // for ( iter = reader->LinksBegin (); iter != reader->LinksEnd (); iter++, i++ )
+  // {
+  //     nc[i] = NodeContainer (iter->GetFromNode (), iter->GetToNode ());
+  // }
     
-    // it creates little subnets, one for each couple of nodes.
-    /*NS_LOG_INFO ("creating ipv4 interfaces");
+  // NetDeviceContainer* ndc = new NetDeviceContainer[totlinks];
+  // reader->ApplySettings(ndc,nc);
+  // /// settings applied
+    
+    
+    
+    
+  // it creates little subnets, one for each couple of nodes.
+  /*NS_LOG_INFO ("creating ipv4 interfaces");
     Ipv4InterfaceContainer* ipic = new Ipv4InterfaceContainer[totlinks];
     for (int i = 0; i < totlinks; i++)
     {
-        ipic[i] = address.Assign (ndc[i]);
-        address.NewNetwork ();
+    ipic[i] = address.Assign (ndc[i]);
+    address.NewNetwork ();
     }
     
     // ------------------------------------------------------------
@@ -166,20 +165,20 @@ BasicRegressionTest::DoRun(void)
     
     NS_LOG_INFO ("Done.");
     
-    */
+  */
 }
 
 class BasicRegressionTestSuite : public TestSuite
 {
 public:
-    BasicRegressionTestSuite ();
+  BasicRegressionTestSuite ();
 };
 
 BasicRegressionTestSuite::BasicRegressionTestSuite ()
-: TestSuite ("ccnx-basic-regression-test-suite", UNIT)
+  : TestSuite ("ccnx-basic-regression-test-suite", UNIT)
 {
-    SetDataDir (NS_TEST_SOURCEDIR);
-    AddTestCase (new BasicRegressionTest);
+  SetDataDir (NS_TEST_SOURCEDIR);
+  AddTestCase (new BasicRegressionTest);
 }
 
 static BasicRegressionTestSuite suite;

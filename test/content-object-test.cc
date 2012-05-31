@@ -19,7 +19,6 @@
  */
 
 #include "ns3/test.h"
-#include "ns3/annotated-topology-reader.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/uinteger.h"
 #include "ns3/random-variable.h"
@@ -44,15 +43,15 @@ NS_LOG_COMPONENT_DEFINE ("ContentObjectTest");
 class ContentObjectTest : public TestCase
 {
 public:
-    ContentObjectTest ();
-    virtual ~ContentObjectTest ();
+  ContentObjectTest ();
+  virtual ~ContentObjectTest ();
     
 private:
-    virtual void DoRun (void);
+  virtual void DoRun (void);
 };
 
 ContentObjectTest::ContentObjectTest ()
-: TestCase ("Content Obejct Serialization Test")
+  : TestCase ("Content Obejct Serialization Test")
 {
 }
 
@@ -63,49 +62,49 @@ ContentObjectTest::~ContentObjectTest ()
 void
 ContentObjectTest::DoRun(void)
 {
-    Packet::EnablePrinting ();
-	Packet::EnableChecking (); 
-    Packet packet (10);
+  Packet::EnablePrinting ();
+  Packet::EnableChecking (); 
+  Packet packet (10);
 	
-    CcnxContentObjectHeader header;
-	CcnxContentObjectTail   trailer;
+  CcnxContentObjectHeader header;
+  CcnxContentObjectTail   trailer;
 	
-    Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
-    (*testname) ("iwant")("icecream");
-    header.SetName(testname);
+  Ptr<CcnxNameComponents> testname = Create<CcnxNameComponents> ();
+  (*testname) ("iwant")("icecream");
+  header.SetName(testname);
     
-	NS_LOG_INFO ("Source: \n" << header << trailer);
+  NS_LOG_INFO ("Source: \n" << header << trailer);
     
-	packet.AddHeader (header);
-	packet.AddTrailer (trailer);
+  packet.AddHeader (header);
+  packet.AddTrailer (trailer);
     
-	// NS_LOG_INFO ("Deserialized packet: \n" << packet);
+  // NS_LOG_INFO ("Deserialized packet: \n" << packet);
     
-	NS_LOG_INFO ("Removing and deserializing individual headers");
+  NS_LOG_INFO ("Removing and deserializing individual headers");
 	
-    CcnxContentObjectHeader targetHeader;
-	CcnxContentObjectTail   targetTrailer;
+  CcnxContentObjectHeader targetHeader;
+  CcnxContentObjectTail   targetTrailer;
     
-	packet.RemoveHeader (targetHeader);
-	packet.RemoveTrailer (targetTrailer);
+  packet.RemoveHeader (targetHeader);
+  packet.RemoveTrailer (targetTrailer);
     
     
-    NS_TEST_ASSERT_MSG_EQ (targetHeader.GetName(), *testname, "Content Object name deserialization failed");
+  NS_TEST_ASSERT_MSG_EQ (targetHeader.GetName(), *testname, "Content Object name deserialization failed");
     
-    NS_TEST_ASSERT_MSG_EQ (packet.GetSize(), 10, "Content Object size inequality");
+  NS_TEST_ASSERT_MSG_EQ (packet.GetSize(), 10, "Content Object size inequality");
 }
 
 class ContentObjectTestSuite : public TestSuite
 {
 public:
-    ContentObjectTestSuite ();
+  ContentObjectTestSuite ();
 };
 
 ContentObjectTestSuite::ContentObjectTestSuite ()
-: TestSuite ("content-object-test-suite", UNIT)
+  : TestSuite ("content-object-test-suite", UNIT)
 {
-    SetDataDir (NS_TEST_SOURCEDIR);
-    AddTestCase (new ContentObjectTest);
+  SetDataDir (NS_TEST_SOURCEDIR);
+  AddTestCase (new ContentObjectTest);
 }
 
 static ContentObjectTestSuite suite;

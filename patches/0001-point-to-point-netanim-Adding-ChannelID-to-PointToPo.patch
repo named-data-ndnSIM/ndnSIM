@@ -1,0 +1,72 @@
+From 9ed23508a72afd3780b041b2fd00a50e1ff91b4c Mon Sep 17 00:00:00 2001
+From: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Date: Mon, 23 Apr 2012 13:49:37 -0700
+Subject: [PATCH] point-to-point, netanim: Adding ChannelID to
+ PointToPointChannel trace
+
+---
+ src/netanim/model/animation-interface.cc           |    4 +++-
+ src/netanim/model/animation-interface.h            |    3 ++-
+ src/point-to-point/model/point-to-point-channel.cc |    2 +-
+ src/point-to-point/model/point-to-point-channel.h  |    3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/netanim/model/animation-interface.cc b/src/netanim/model/animation-interface.cc
+index d6a3551..9215abf 100644
+--- a/src/netanim/model/animation-interface.cc
++++ b/src/netanim/model/animation-interface.cc
+@@ -676,7 +676,9 @@ void AnimationInterface::WriteDummyPacket ()
+ 
+ 
+ }
+-void AnimationInterface::DevTxTrace (std::string context, Ptr<const Packet> p,
++void AnimationInterface::DevTxTrace (std::string context,
++                                     uint32_t, // channel
++                                     Ptr<const Packet> p,
+                                      Ptr<NetDevice> tx, Ptr<NetDevice> rx,
+                                      Time txTime, Time rxTime)
+ {
+diff --git a/src/netanim/model/animation-interface.h b/src/netanim/model/animation-interface.h
+index 4a3ffb9..db58d89 100644
+--- a/src/netanim/model/animation-interface.h
++++ b/src/netanim/model/animation-interface.h
+@@ -288,7 +288,8 @@ private:
+   bool ServerPortSet;
+ 
+   void DevTxTrace (std::string context,
+-                   Ptr<const Packet> p,
++                   uint32_t,
++		   Ptr<const Packet> p,
+                    Ptr<NetDevice> tx,
+                    Ptr<NetDevice> rx,
+                    Time txTime,
+diff --git a/src/point-to-point/model/point-to-point-channel.cc b/src/point-to-point/model/point-to-point-channel.cc
+index d6a6938..5bc4c9c 100644
+--- a/src/point-to-point/model/point-to-point-channel.cc
++++ b/src/point-to-point/model/point-to-point-channel.cc
+@@ -98,7 +98,7 @@ PointToPointChannel::TransmitStart (
+                                   m_link[wire].m_dst, p);
+ 
+   // Call the tx anim callback on the net device
+-  m_txrxPointToPoint (p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
++  m_txrxPointToPoint (GetId (), p, src, m_link[wire].m_dst, txTime, txTime + m_delay);
+   return true;
+ }
+ 
+diff --git a/src/point-to-point/model/point-to-point-channel.h b/src/point-to-point/model/point-to-point-channel.h
+index 4b0b777..a364ab9 100644
+--- a/src/point-to-point/model/point-to-point-channel.h
++++ b/src/point-to-point/model/point-to-point-channel.h
+@@ -137,7 +137,8 @@ private:
+    *
+    * @see class CallBackTraceSource
+    */
+-  TracedCallback<Ptr<const Packet>, // Packet being transmitted
++  TracedCallback<uint32_t,          // channel ID
++                 Ptr<const Packet>, // Packet being transmitted
+                  Ptr<NetDevice>,    // Transmitting NetDevice
+                  Ptr<NetDevice>,    // Receiving NetDevice
+                  Time,              // Amount of time to transmit the pkt
+-- 
+1.7.10.2
+

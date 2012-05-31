@@ -1,0 +1,73 @@
+From 63e2f7d75601540169f62dea0b8aa17fda34812a Mon Sep 17 00:00:00 2001
+From: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Date: Wed, 29 Feb 2012 10:07:08 -0800
+Subject: [PATCH] core+openflow: Moving `boost`-related configuration to main
+ wscript.
+
+There is a problem when two different modules require different boost
+libs.  Only requirements of the last module are actually picked up by
+the build system.
+---
+ src/openflow/wscript |   10 +---------
+ wscript              |    9 +++++++++
+ 2 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/src/openflow/wscript b/src/openflow/wscript
+index b18d2c1..21c483a 100644
+--- a/src/openflow/wscript
++++ b/src/openflow/wscript
+@@ -2,23 +2,15 @@
+ 
+ import os
+ import Options
++import Logs
+ from waflib.Errors import WafError
+ 
+ def options(opt):
+     opt.add_option('--with-openflow',
+ 		   help=('Path to OFSID source for NS-3 OpenFlow Integration support'),
+ 		   default='', dest='with_openflow')
+-    opt.tool_options('boost', tooldir=["waf-tools"])
+ 
+ def configure(conf):
+-    try:
+-        conf.check_tool('boost')
+-        conf.check_boost(lib='signals filesystem')
+-        if not conf.env.LIB_BOOST:
+-            conf.check_boost(lib='signals filesystem', libpath="/usr/lib64")
+-    except WafError:
+-        conf.env['LIB_BOOST'] = []
+-
+     if not conf.env.LIB_BOOST:
+ 	conf.report_optional_feature("openflow", "NS-3 OpenFlow Integration", False,
+ 				     "Required boost libraries not found")
+diff --git a/wscript b/wscript
+index 05440fa..c60fd18 100644
+--- a/wscript
++++ b/wscript
+@@ -125,6 +125,7 @@ def options(opt):
+     opt.load('compiler_cxx')
+     opt.load('cflags')
+     opt.load('gnu_dirs')
++    opt.tool_options('boost', tooldir=["waf-tools"])
+ 
+     opt.add_option('--cwd',
+                    help=('Set the working directory for a program.'),
+@@ -364,6 +365,14 @@ def configure(conf):
+                 conf.report_optional_feature("static", "Static build", False,
+                                              "Link flag -Wl,--whole-archive,-Bstatic does not work")
+ 
++    try:
++        conf.check_tool('boost')
++        conf.check_boost(lib='signals filesystem iostreams regex')
++        if not conf.env.LIB_BOOST:
++            conf.check_boost(lib='signals filesystem iostreams regex', libpath="/usr/lib64")
++    except WafError:
++        conf.env['LIB_BOOST'] = []
++
+     # Set this so that the lists won't be printed at the end of this
+     # configure command.
+     conf.env['PRINT_BUILT_MODULES_AT_END'] = False
+-- 
+1.7.10.2
+

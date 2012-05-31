@@ -1,0 +1,49 @@
+From 4a928511196fd80e9e9c43646d916e2d6fbc3190 Mon Sep 17 00:00:00 2001
+From: Ilya Moiseenko <iliamo@ucla.edu>
+Date: Thu, 1 Sep 2011 17:41:00 -0700
+Subject: [PATCH] point-to-point: Add support of PPP->Ethernet and
+ Ethernet->PPP frame type conversion for CCNx protocol
+
+point-to-point: Adding support for CCNx payload in PppHeader::Print method
+---
+ src/point-to-point/model/point-to-point-net-device.cc |    2 ++
+ src/point-to-point/model/ppp-header.cc                |    3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/src/point-to-point/model/point-to-point-net-device.cc b/src/point-to-point/model/point-to-point-net-device.cc
+index ca81c53..775ef00 100644
+--- a/src/point-to-point/model/point-to-point-net-device.cc
++++ b/src/point-to-point/model/point-to-point-net-device.cc
+@@ -607,6 +607,7 @@ PointToPointNetDevice::PppToEther (uint16_t proto)
+     {
+     case 0x0021: return 0x0800;   //IPv4
+     case 0x0057: return 0x86DD;   //IPv6
++    case 0x0077: return 0x7777;   //CCNx
+     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
+     }
+   return 0;
+@@ -619,6 +620,7 @@ PointToPointNetDevice::EtherToPpp (uint16_t proto)
+     {
+     case 0x0800: return 0x0021;   //IPv4
+     case 0x86DD: return 0x0057;   //IPv6
++    case 0x7777: return 0x0077;   //CCNx
+     default: NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
+     }
+   return 0;
+diff --git a/src/point-to-point/model/ppp-header.cc b/src/point-to-point/model/ppp-header.cc
+index 4650fb0..7e000bd 100644
+--- a/src/point-to-point/model/ppp-header.cc
++++ b/src/point-to-point/model/ppp-header.cc
+@@ -66,6 +66,9 @@ PppHeader::Print (std::ostream &os) const
+     case 0x0057: /* IPv6 */
+       proto = "IPv6 (0x0057)";
+       break;
++    case 0x0077: /* CCNx */
++      proto = "CCNx (0x0077)";
++      break;
+     default:
+       NS_ASSERT_MSG (false, "PPP Protocol number not defined!");
+     }
+-- 
+1.7.10.2
+
