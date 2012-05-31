@@ -9,6 +9,9 @@ from waflib.Errors import WafError
 
 def options(opt):
     opt.tool_options('boost', tooldir=["waf-tools"])
+    opt.add_option('--enable-ndn-plugins',
+                   help=("Enable NDN plugins (may require patching)"),
+                   dest='enable_ndn_plugins')
 
 def configure(conf):
     try:
@@ -23,6 +26,10 @@ def configure(conf):
         conf.env['ENABLE_NDN_ABSTRACT']=False;
         conf.env['MODULES_NOT_BUILT'].append('NDNabstraction')
         return
+
+    conf.env['NDN_plugins'] = []
+    if Options.options.enable_ndn_plugins:
+        conf.env['NDN_plugins'] = Options.options.enable_ndn_plugins.split(',')
     
     conf.env['ENABLE_NDN_ABSTRACT']=True;
 
@@ -89,6 +96,20 @@ def build(bld):
         # "utils/annotated-topology-reader.h",
         ]
 
+    if 'topology' in bld.env['NDN_plugins']:
+        headers.source.extend ([
+            "plugins/topology/rocketfuel-weights-reader.h",
+            "plugins/topology/annotated-topology-reader.h",
+            ])
+        module.source.extend (bld.path.ant_glob(['plugins/topology/*.cc']))
+
+    if 'mobility' in bld.env['NDN_plugins']:
+        headers.source.extend ([
+            "plugins/mobility/spring-mobility-model.h",
+            "plugins/mobility/spring-mobility-helper.h",
+            ])
+        module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
+    
     tests.source = bld.path.ant_glob('test/*.cc');
 
     if bld.env.ENABLE_EXAMPLES:

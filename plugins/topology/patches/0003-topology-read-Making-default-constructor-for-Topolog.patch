@@ -1,0 +1,35 @@
+From 4fd8af52681dc3ab641e93a28b8f2c044272bb16 Mon Sep 17 00:00:00 2001
+From: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Date: Thu, 19 Jan 2012 16:57:13 -0800
+Subject: [PATCH 3/3] topology-read: Making default constructor for
+ TopologyReader::Link public.
+
+This is necessary for some STL containers operations.
+---
+ src/topology-read/model/topology-reader.h |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/topology-read/model/topology-reader.h b/src/topology-read/model/topology-reader.h
+index 94eb37a..d748989 100644
+--- a/src/topology-read/model/topology-reader.h
++++ b/src/topology-read/model/topology-reader.h
+@@ -59,6 +59,8 @@ public:
+    */
+     typedef std::map<std::string, std::string>::const_iterator ConstAttributesIterator;
+ 
++    Link (); // default constructor
++    
+     /**
+      * \brief Constructor
+      * \param fromPtr Ptr to the node the link is orginating from
+@@ -140,7 +142,6 @@ public:
+     ConstAttributesIterator AttributesEnd (void);
+ 
+ private:
+-    Link ();
+     std::string m_fromName;
+     Ptr< Node > m_fromPtr;
+     std::string m_toName;
+-- 
+1.7.10.2
+

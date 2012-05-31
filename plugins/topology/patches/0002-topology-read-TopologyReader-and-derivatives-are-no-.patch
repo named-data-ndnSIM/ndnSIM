@@ -1,0 +1,299 @@
+From cd1527f264045510fd79f3a6bd44ce5c48a8278d Mon Sep 17 00:00:00 2001
+From: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Date: Tue, 13 Dec 2011 13:17:25 -0800
+Subject: [PATCH 2/3] topology-read: TopologyReader and derivatives are no
+ longer Objects
+
+To allow smart pointers, TopologyReader is just inherited from
+SimpleRefCount<TopologyReader> class
+---
+ src/topology-read/helper/topology-reader-helper.cc |    7 +++----
+ src/topology-read/helper/topology-reader-helper.h  |    5 ++---
+ src/topology-read/model/inet-topology-reader.cc    |   20 ++++++++++----------
+ src/topology-read/model/inet-topology-reader.h     |    2 +-
+ src/topology-read/model/orbis-topology-reader.cc   |   20 ++++++++++----------
+ src/topology-read/model/orbis-topology-reader.h    |    2 +-
+ .../model/rocketfuel-topology-reader.cc            |   20 ++++++++++----------
+ .../model/rocketfuel-topology-reader.h             |    3 +--
+ src/topology-read/model/topology-reader.cc         |   19 +++++++++----------
+ src/topology-read/model/topology-reader.h          |    8 +++-----
+ 10 files changed, 50 insertions(+), 56 deletions(-)
+
+diff --git a/src/topology-read/helper/topology-reader-helper.cc b/src/topology-read/helper/topology-reader-helper.cc
+index ea4a9b2..c4678d1 100644
+--- a/src/topology-read/helper/topology-reader-helper.cc
++++ b/src/topology-read/helper/topology-reader-helper.cc
+@@ -47,7 +47,6 @@ TopologyReaderHelper::SetFileType (const std::string fileType)
+   m_fileType = fileType;
+ }
+ 
+-
+ Ptr<TopologyReader>
+ TopologyReaderHelper::GetTopologyReader ()
+ {
+@@ -59,17 +58,17 @@ TopologyReaderHelper::GetTopologyReader ()
+       if (m_fileType == "Orbis")
+         {
+           NS_LOG_INFO ("Creating Orbis formatted data input.");
+-          m_inFile = CreateObject<OrbisTopologyReader> ();
++          m_inFile = Create<OrbisTopologyReader> ();
+         }
+       else if (m_fileType == "Inet")
+         {
+           NS_LOG_INFO ("Creating Inet formatted data input.");
+-          m_inFile = CreateObject<InetTopologyReader> ();
++          m_inFile = Create<InetTopologyReader> ();
+         }
+       else if (m_fileType == "Rocketfuel")
+         {
+           NS_LOG_INFO ("Creating Rocketfuel formatted data input.");
+-          m_inFile = CreateObject<RocketfuelTopologyReader> ();
++          m_inFile = Create<RocketfuelTopologyReader> ();
+         }
+       else
+         {
+diff --git a/src/topology-read/helper/topology-reader-helper.h b/src/topology-read/helper/topology-reader-helper.h
+index c4bfbbe..c1cc198 100644
+--- a/src/topology-read/helper/topology-reader-helper.h
++++ b/src/topology-read/helper/topology-reader-helper.h
+@@ -22,11 +22,10 @@
+ #ifndef TOPOLOGY_READER_HELPER_H
+ #define TOPOLOGY_READER_HELPER_H
+ 
+-#include "ns3/topology-reader.h"
+-#include <string>
+-
+ namespace ns3 {
+ 
++class TopologyReader;
++
+ /**
+  * \ingroup topology
+  *
+diff --git a/src/topology-read/model/inet-topology-reader.cc b/src/topology-read/model/inet-topology-reader.cc
+index ab1cc5d..10d1ac3 100644
+--- a/src/topology-read/model/inet-topology-reader.cc
++++ b/src/topology-read/model/inet-topology-reader.cc
+@@ -28,19 +28,19 @@
+ 
+ using namespace std;
+ 
+-namespace ns3 {
+-
+ NS_LOG_COMPONENT_DEFINE ("InetTopologyReader");
+ 
+-NS_OBJECT_ENSURE_REGISTERED (InetTopologyReader);
++namespace ns3 {
++
++// NS_OBJECT_ENSURE_REGISTERED (InetTopologyReader);
+ 
+-TypeId InetTopologyReader::GetTypeId (void)
+-{
+-  static TypeId tid = TypeId ("ns3::InetTopologyReader")
+-    .SetParent<Object> ()
+-  ;
+-  return tid;
+-}
++// TypeId InetTopologyReader::GetTypeId (void)
++// {
++//   static TypeId tid = TypeId ("ns3::InetTopologyReader")
++//     .SetParent<Object> ()
++//   ;
++//   return tid;
++// }
+ 
+ InetTopologyReader::InetTopologyReader ()
+ {
+diff --git a/src/topology-read/model/inet-topology-reader.h b/src/topology-read/model/inet-topology-reader.h
+index 31aa4a0..d235370 100644
+--- a/src/topology-read/model/inet-topology-reader.h
++++ b/src/topology-read/model/inet-topology-reader.h
+@@ -47,7 +47,7 @@ namespace ns3 {
+ class InetTopologyReader : public TopologyReader
+ {
+ public:
+-  static TypeId GetTypeId (void);
++  // static TypeId GetTypeId (void);
+ 
+   InetTopologyReader ();
+   virtual ~InetTopologyReader ();
+diff --git a/src/topology-read/model/orbis-topology-reader.cc b/src/topology-read/model/orbis-topology-reader.cc
+index 04dbaf9..bdcd139 100644
+--- a/src/topology-read/model/orbis-topology-reader.cc
++++ b/src/topology-read/model/orbis-topology-reader.cc
+@@ -29,19 +29,19 @@
+ 
+ using namespace std;
+ 
+-namespace ns3 {
+-
+ NS_LOG_COMPONENT_DEFINE ("OrbisTopologyReader");
+ 
+-NS_OBJECT_ENSURE_REGISTERED (OrbisTopologyReader);
++namespace ns3 {
++
++// NS_OBJECT_ENSURE_REGISTERED (OrbisTopologyReader);
+ 
+-TypeId OrbisTopologyReader::GetTypeId (void)
+-{
+-  static TypeId tid = TypeId ("ns3::OrbisTopologyReader")
+-    .SetParent<Object> ()
+-  ;
+-  return tid;
+-}
++// TypeId OrbisTopologyReader::GetTypeId (void)
++// {
++//   static TypeId tid = TypeId ("ns3::OrbisTopologyReader")
++//     .SetParent<Object> ()
++//   ;
++//   return tid;
++// }
+ 
+ OrbisTopologyReader::OrbisTopologyReader ()
+ {
+diff --git a/src/topology-read/model/orbis-topology-reader.h b/src/topology-read/model/orbis-topology-reader.h
+index 21b32cf..b25db15 100644
+--- a/src/topology-read/model/orbis-topology-reader.h
++++ b/src/topology-read/model/orbis-topology-reader.h
+@@ -44,7 +44,7 @@ namespace ns3 {
+ class OrbisTopologyReader : public TopologyReader
+ {
+ public:
+-  static TypeId GetTypeId (void);
++  // static TypeId GetTypeId (void);
+ 
+   OrbisTopologyReader ();
+   virtual ~OrbisTopologyReader ();
+diff --git a/src/topology-read/model/rocketfuel-topology-reader.cc b/src/topology-read/model/rocketfuel-topology-reader.cc
+index d048148..c103271 100644
+--- a/src/topology-read/model/rocketfuel-topology-reader.cc
++++ b/src/topology-read/model/rocketfuel-topology-reader.cc
+@@ -28,19 +28,19 @@
+ #include "ns3/unused.h"
+ #include "rocketfuel-topology-reader.h"
+ 
+-namespace ns3 {
+-
+ NS_LOG_COMPONENT_DEFINE ("RocketfuelTopologyReader");
+ 
+-NS_OBJECT_ENSURE_REGISTERED (RocketfuelTopologyReader);
++namespace ns3 {
++
++// NS_OBJECT_ENSURE_REGISTERED (RocketfuelTopologyReader);
+ 
+-TypeId RocketfuelTopologyReader::GetTypeId (void)
+-{
+-  static TypeId tid = TypeId ("ns3::RocketfuelTopologyReader")
+-    .SetParent<Object> ()
+-  ;
+-  return tid;
+-}
++// TypeId RocketfuelTopologyReader::GetTypeId (void)
++// {
++//   static TypeId tid = TypeId ("ns3::RocketfuelTopologyReader")
++//     .SetParent<Object> ()
++//   ;
++//   return tid;
++// }
+ 
+ RocketfuelTopologyReader::RocketfuelTopologyReader ()
+ {
+diff --git a/src/topology-read/model/rocketfuel-topology-reader.h b/src/topology-read/model/rocketfuel-topology-reader.h
+index afb667d..c512ea0 100644
+--- a/src/topology-read/model/rocketfuel-topology-reader.h
++++ b/src/topology-read/model/rocketfuel-topology-reader.h
+@@ -21,7 +21,6 @@
+ #ifndef ROCKETFUEL_TOPOLOGY_READER_H
+ #define ROCKETFUEL_TOPOLOGY_READER_H
+ 
+-#include "ns3/nstime.h"
+ #include "topology-reader.h"
+ 
+ namespace ns3 {
+@@ -43,7 +42,7 @@ namespace ns3 {
+ class RocketfuelTopologyReader : public TopologyReader
+ {
+ public:
+-  static TypeId GetTypeId (void);
++  // static TypeId GetTypeId (void);
+ 
+   RocketfuelTopologyReader ();
+   virtual ~RocketfuelTopologyReader ();
+diff --git a/src/topology-read/model/topology-reader.cc b/src/topology-read/model/topology-reader.cc
+index 82a8343..a2e66cb 100644
+--- a/src/topology-read/model/topology-reader.cc
++++ b/src/topology-read/model/topology-reader.cc
+@@ -19,24 +19,23 @@
+  * Author: Valerio Sartini (valesar@gmail.com)
+  */
+ 
+-#include "ns3/log.h"
+-
+ #include "topology-reader.h"
+ 
++#include "ns3/log.h"
+ 
+ namespace ns3 {
+ 
+ NS_LOG_COMPONENT_DEFINE ("TopologyReader");
+ 
+-NS_OBJECT_ENSURE_REGISTERED (TopologyReader);
++// NS_OBJECT_ENSURE_REGISTERED (TopologyReader);
+ 
+-TypeId TopologyReader::GetTypeId (void)
+-{
+-  static TypeId tid = TypeId ("ns3::TopologyReader")
+-    .SetParent<Object> ()
+-  ;
+-  return tid;
+-}
++// TypeId TopologyReader::GetTypeId (void)
++// {
++//   static TypeId tid = TypeId ("ns3::TopologyReader")
++//     .SetParent<Object> ()
++//   ;
++//   return tid;
++// }
+ 
+ TopologyReader::TopologyReader ()
+ {
+diff --git a/src/topology-read/model/topology-reader.h b/src/topology-read/model/topology-reader.h
+index 48c0c1d..94eb37a 100644
+--- a/src/topology-read/model/topology-reader.h
++++ b/src/topology-read/model/topology-reader.h
+@@ -22,13 +22,11 @@
+ #ifndef TOPOLOGY_READER_H
+ #define TOPOLOGY_READER_H
+ 
+-#include <string>
+ #include <map>
+ #include <list>
+ 
+-#include "ns3/object.h"
+ #include "ns3/node-container.h"
+-
++#include "ns3/simple-ref-count.h"
+ 
+ namespace ns3 {
+ 
+@@ -42,7 +40,7 @@ class NetDevice;
+  * This interface perform the shared tasks among all possible input file readers.
+  * Each different file format is handled by its own topology reader.
+  */
+-class TopologyReader : public Object
++class TopologyReader : public SimpleRefCount<TopologyReader>
+ {
+ 
+ public:
+@@ -157,7 +155,7 @@ private:
+    */
+   typedef std::list< Link >::const_iterator ConstLinksIterator;
+ 
+-  static TypeId GetTypeId (void);
++  // static TypeId GetTypeId (void);
+ 
+   TopologyReader ();
+   virtual ~TopologyReader ();
+-- 
+1.7.10.2
+

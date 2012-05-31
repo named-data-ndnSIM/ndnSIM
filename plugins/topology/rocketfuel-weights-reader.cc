@@ -45,7 +45,6 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include "../utils/spring-mobility-helper.h"
 
 #include <iomanip>
 #include <set>
@@ -60,7 +59,13 @@ RocketfuelWeightsReader::RocketfuelWeightsReader (const std::string &path/*=""*/
   : AnnotatedTopologyReader (path)
 {
   NS_LOG_FUNCTION (this);
-  SetMobilityModel ("ns3::SpringMobilityModel");
+
+  // TypeId tid;
+  // bool ok = TypeId::LookupByNameFailSafe ("ns3::SpringMobilityModel", &tid);
+  // if (ok)
+  //   SetMobilityModel ("ns3::SpringMobilityModel");
+  // else
+  //   Use default mobility model (supplied by AnnotatedTopologyReader)
 }
     
 RocketfuelWeightsReader::~RocketfuelWeightsReader ()
@@ -174,7 +179,7 @@ RocketfuelWeightsReader::Commit ()
 {
   ApplySettings ();
 
-  SpringMobilityHelper::InstallSprings (LinksBegin (), LinksEnd ());
+  // SpringMobilityHelper::InstallSprings (LinksBegin (), LinksEnd ());
 }
 
 } /* namespace ns3 */
