@@ -33,7 +33,7 @@
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
-#include "ns3/weights-path-stretch-tag.h"
+// #include "ns3/weights-path-stretch-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
@@ -288,14 +288,14 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
 
   m_rtt->AckSeq (SequenceNumber32 (seq));
 
-  Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
-  if (tag != 0)
-    {
-      // Notify trace about path weights vector (e.g., for path-stretch calculation)
-      m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
-      // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
-      //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
-}
+  // Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
+  // if (tag != 0)
+  //   {
+  //     // Notify trace about path weights vector (e.g., for path-stretch calculation)
+  //     m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
+  //     // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
+  //     //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
+  //   }
 }
 
 void
