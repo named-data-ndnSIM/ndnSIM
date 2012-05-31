@@ -65,6 +65,16 @@ public:
   virtual boost::any accept( Visitor &v, boost::any param ) = 0;
 };
 
+// Necessary until Buffer::Iterator gets PeekU8 call
+inline
+uint8_t
+BufferIteratorPeekU8 (Buffer::Iterator &i)
+{
+  uint8_t ret = i.ReadU8 ();
+  i.Prev ();
+  return ret;
+}
+
 }
 }
 

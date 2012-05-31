@@ -41,7 +41,7 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
     return; // hack #1. Do not process nesting block for <Content>
   
   // parse attributes until first nested block reached
-  while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
+  while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
     {
       Ptr<Block> block = Block::ParseBlock (start);
       if (DynamicCast<BaseAttr> (block)!=0)
@@ -54,7 +54,7 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
 	}
 
   // parse the rest of nested blocks
-  while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
+  while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
     {
       // hack #2. Stop processing nested blocks if last block was <Content>
       if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>

@@ -1,0 +1,13 @@
+This folder contains several extensions that can be used in simulation scenarios.
+
+tracers/
+  an extensive set of tracers that can be used in NDN scenarios
+  * Some tracers require patching of NDN module code (patch provided)
+
+topology/
+  extension of topology reader
+  * requires patching of topology module (patch provided)
+
+mobility/
+  several custom mobility models and position allocator. 
+  * necessary for topology extensions

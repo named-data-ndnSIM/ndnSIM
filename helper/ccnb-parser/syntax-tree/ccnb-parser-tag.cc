@@ -37,7 +37,7 @@ Tag::Tag (Buffer::Iterator &start, uint32_t length)
     throw CcnbDecodingException ();
   
   // parse attributes until first nested block reached
-  while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
+  while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
     {
       Ptr<Block> block = Block::ParseBlock (start);
       if (DynamicCast<BaseAttr> (block)!=0)
@@ -50,7 +50,7 @@ Tag::Tag (Buffer::Iterator &start, uint32_t length)
 	}
 
   // parse the rest of nested blocks
-  while (!start.IsEnd () && start.PeekU8 ()!=CCN_CLOSE)
+  while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
     {
       Ptr<Block> block = Block::ParseBlock (start);
 	  m_nestedTags.push_back (block);

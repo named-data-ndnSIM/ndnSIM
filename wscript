@@ -57,13 +57,13 @@ def build(bld):
         "helper/ccnx-stack-helper.h",
         "helper/ccnx-app-helper.h",
         "helper/ccnx-header-helper.h",
-        "helper/ccnx-trace-helper.h",
-        "helper/tracers/ipv4-app-tracer.h",
-        "helper/tracers/ipv4-l3-tracer.h",
-        "helper/tracers/ccnx-app-tracer.h",
-        "helper/tracers/ccnx-l3-tracer.h",
-        "helper/tracers/ccnx-consumer-window-tracer.h",
-        "helper/tracers/ccnx-path-weight-tracer.h",
+        # "helper/ccnx-trace-helper.h",
+        # "helper/tracers/ipv4-app-tracer.h",
+        # "helper/tracers/ipv4-l3-tracer.h",
+        # "helper/tracers/ccnx-app-tracer.h",
+        # "helper/tracers/ccnx-l3-tracer.h",
+        # "helper/tracers/ccnx-consumer-window-tracer.h",
+        # "helper/tracers/ccnx-path-weight-tracer.h",
         "helper/ccnx-face-container.h",
         "helper/ccnx-global-routing-helper.h",
 
@@ -82,11 +82,11 @@ def build(bld):
         "model/ccnx-name-components-hash-helper.h",
 
         "utils/batches.h",
-        "utils/weights-path-stretch-tag.h",
-        "utils/spring-mobility-model.h",
-        "utils/spring-mobility-helper.h",
-        "utils/rocketfuel-weights-reader.h",
-        "utils/annotated-topology-reader.h",
+        # "utils/weights-path-stretch-tag.h",
+        # "utils/spring-mobility-model.h",
+        # "utils/spring-mobility-helper.h",
+        # "utils/rocketfuel-weights-reader.h",
+        # "utils/annotated-topology-reader.h",
         ]
 
     tests.source = bld.path.ant_glob('test/*.cc');

@@ -167,8 +167,8 @@ CcnxTraceHelper::EnableAggregateAppAll (const std::string &appName)
            app != apps.End ();
            app++, appId++)
         {
-          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app)->GetInstanceTypeId ().GetName ());
-          if ((*app)->GetInstanceTypeId ().GetName () == appName)
+          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app).second->GetInstanceTypeId ().GetName ());
+          if ((*app).second->GetInstanceTypeId ().GetName () == appName)
             {
               m_apps.push_back (Create<CcnxAggregateAppTracer> (appName,
                                                                 *node,
@@ -264,8 +264,8 @@ CcnxTraceHelper::EnableSeqsAppAll (const std::string &appName, const std::string
            app != apps.End ();
            app++, appId++)
         {
-          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app)->GetInstanceTypeId ().GetName ());
-          if ((*app)->GetInstanceTypeId ().GetName () == appName)
+          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app).second->GetInstanceTypeId ().GetName ());
+          if ((*app).second->GetInstanceTypeId ().GetName () == appName)
             {
               Ptr<CcnxSeqsAppTracer> trace = Create<CcnxSeqsAppTracer> (boost::ref(*m_appSeqsTrace),
                                                                         appName,
@@ -305,9 +305,9 @@ CcnxTraceHelper::EnableIpv4SeqsAppAll (const std::string &trace)
            app != apps.End ();
            app++, appId++)
         {
-          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app)->GetInstanceTypeId ().GetName ());
-          if ((*app)->GetInstanceTypeId ().GetName () == "ns3::PacketSink" ||
-              (*app)->GetInstanceTypeId ().GetName () == "ns3::BulkSendApplication")
+          NS_LOG_DEBUG ("App: " << lexical_cast<string> (appId) << ", typeId: " << (*app).second->GetInstanceTypeId ().GetName ());
+          if ((*app).second->GetInstanceTypeId ().GetName () == "ns3::PacketSink" ||
+              (*app).second->GetInstanceTypeId ().GetName () == "ns3::BulkSendApplication")
             {
               Ptr<Ipv4SeqsAppTracer> trace = Create<Ipv4SeqsAppTracer> (boost::ref(*m_ipv4AppSeqsTrace),
                                                                         *node,
@@ -345,7 +345,7 @@ CcnxTraceHelper::EnableWindowsAll (const std::string &windowTrace)
            app != apps.End ();
            app++, appId++)
         {
-          if ((*app)->GetInstanceTypeId ().GetName () == "ns3::CcnxConsumerWindow")
+          if ((*app).second->GetInstanceTypeId ().GetName () == "ns3::CcnxConsumerWindow")
             {
               Ptr<CcnxConsumerWindowTracer> trace = Create<CcnxConsumerWindowTracer> (boost::ref(*m_windowsTrace),
                                                                                       *node,
