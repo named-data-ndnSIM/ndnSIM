@@ -21,7 +21,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
-#include "ns3/NDNabstraction-module.h"
+#include "ns3/ndnSIM-module.h"
 
 using namespace ns3;
 
