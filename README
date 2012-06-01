@@ -1,2 +1,8 @@
 NDN module requires a number of patches to be applied on NS-3.
 Patches are in patches/ folder
+
+
+Depending on which base NS-3 is used, you may need to rescan python binding
+
+./waf --apiscan=ndnSIM
+

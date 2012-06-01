@@ -24,7 +24,7 @@ def configure(conf):
         conf.report_optional_feature("ndn-abstract", "NDN abstraction", False,
                                      "Required boost libraries not found")
         conf.env['ENABLE_NDN_ABSTRACT']=False;
-        conf.env['MODULES_NOT_BUILT'].append('NDNabstraction')
+        conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
     conf.env['NDN_plugins'] = []
@@ -35,21 +35,23 @@ def configure(conf):
 
 
 def build(bld):
-    deps = ['core', 'network', 'point-to-point',
-            'topology-read','internet','applications',
-            'point-to-point-layout']
+    deps = ['core', 'network', 'point-to-point']
+    deps.append ('internet') # Until RttEstimator is moved to network module
     if bld.env['ENABLE_PYTHON_BINDINGS']:
         deps.append ('visualizer')
 
-    module = bld.create_ns3_module ('NDNabstraction', deps)
+    if 'topology' in bld.env['NDN_plugins']:
+        deps.append ('topology-read')
+
+    module = bld.create_ns3_module ('ndnSIM', deps)
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
-    tests = bld.create_ns3_module_test_library('NDNabstraction')
+    tests = bld.create_ns3_module_test_library('ndnSIM')
     headers = bld.new_task_gen(features=['ns3header'])
-    headers.module = 'NDNabstraction'
+    headers.module = 'ndnSIM'
 
     if not bld.env['ENABLE_NDN_ABSTRACT']:
-        bld.env['MODULES_NOT_BUILT'].append('NDNabstraction')
+        bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
    
     module.source = bld.path.ant_glob(['model/*.cc', 'apps/*.cc', 
@@ -90,10 +92,6 @@ def build(bld):
 
         "utils/batches.h",
         # "utils/weights-path-stretch-tag.h",
-        # "utils/spring-mobility-model.h",
-        # "utils/spring-mobility-helper.h",
-        # "utils/rocketfuel-weights-reader.h",
-        # "utils/annotated-topology-reader.h",
         ]
 
     if 'topology' in bld.env['NDN_plugins']:

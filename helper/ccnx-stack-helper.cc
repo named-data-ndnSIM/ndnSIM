@@ -40,7 +40,7 @@
 #include "../model/ccnx-fib.h"
 
 #include "ns3/node-list.h"
-#include "ns3/loopback-net-device.h"
+// #include "ns3/loopback-net-device.h"
 
 #include "ns3/data-rate.h"
 
@@ -135,8 +135,10 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
       Ptr<NetDevice> device = node->GetDevice (index);
-      if (DynamicCast<LoopbackNetDevice> (device) != 0)
-        continue; // don't create face for a LoopbackNetDevice
+      // This check does not make sense: LoopbackNetDevice is installed only if IP stack is installed,
+      // Normally, ndnSIM works without IP stack, so no reason to check
+      // if (DynamicCast<LoopbackNetDevice> (device) != 0)
+      //   continue; // don't create face for a LoopbackNetDevice
 
       Ptr<CcnxNetDeviceFace> face = CreateObject<CcnxNetDeviceFace> (node, device);
 
