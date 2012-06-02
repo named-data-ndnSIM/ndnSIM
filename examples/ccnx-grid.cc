@@ -42,11 +42,7 @@ NS_LOG_COMPONENT_DEFINE ("CcnxGrid");
  *
  * All links are 1Mbps with propagation 10ms delay. 
  *
- * FIB is populated based on hacks of GlobalRoutingController: in
- * addition to normal assignment of IP addresses for every NetDevice
- * interface, every node is assigned an IP address that numerically
- * equals to node id (i.e., if node id is 15, the special address is
- * 0.0.0.15/255.255.255.255).
+ * FIB is populated using CcnxGlobalRoutingHelper.
  *
  * Consumer requests data from producer with frequency 10 interests per second
  * (interests contain constantly increasing sequence number).
