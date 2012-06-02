@@ -1,1 +1,5 @@
 build/
+doxygen/
+introspected-doxygen.h
+ndnSIM.tag
+

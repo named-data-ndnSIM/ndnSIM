@@ -46,6 +46,7 @@ TypeId
 CcnxProducer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxProducer")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxApp> ()
     .AddConstructor<CcnxProducer> ()
     .AddAttribute ("Prefix","Prefix, for which producer has the data",

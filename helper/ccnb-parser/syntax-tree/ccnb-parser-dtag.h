@@ -43,7 +43,7 @@ public:
    *
    * DTAG parsing is slightly hacked to provide memory optimization
    * for NS-3 simulations.  Parsing will be stopped after encountering
-   * <Content> dtag.  Actual content (including virtual payload) will
+   * "Content" dtag.  Actual content (including virtual payload) will
    * be stored in Packet buffer
    *
    * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html

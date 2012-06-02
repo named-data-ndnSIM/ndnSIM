@@ -36,6 +36,7 @@ class CcnxContentObjectHeader;
 class CcnxInterestHeader;
 class CcnxPit;
 
+/// @cond include_hidden
 /**
  * \internal
  * \brief Private namespace for CCNx content store implementation
@@ -49,6 +50,7 @@ class i_prefix {};
 class i_ordered {}; ///< tag for Boost.MultiIndex container (ordered by prefix)
 class i_mru {};
 }
+/// @endcond
 
 // default data size
 // #define NDN_DEFAULT_DATA_SIZE   1024

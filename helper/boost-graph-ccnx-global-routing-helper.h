@@ -22,6 +22,8 @@
 #ifndef BOOST_GRAPH_CCNX_GLOBAL_ROUTING_HELPER_H
 #define BOOST_GRAPH_CCNX_GLOBAL_ROUTING_HELPER_H
 
+/// @cond include_hidden
+
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/ref.hpp>
@@ -357,5 +359,7 @@ get (DistancesMap &map, ns3::Ptr<ns3::CcnxGlobalRouter> key)
 }
 
 } // namespace boost
+
+/// @endcond
 
 #endif // BOOST_GRAPH_CCNX_GLOBAL_ROUTING_HELPER_H

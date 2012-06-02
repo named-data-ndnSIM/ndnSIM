@@ -127,6 +127,7 @@ protected:
   bool               m_childSelector;       ///< \brief ChildSelector. See CcnxInterestHeader for more information
   CcnxNameComponents m_exclude;             ///< \brief Exclude. See CcnxInterestHeader for more information
 
+/// @cond include_hidden  
   /**
    * \struct This struct contains sequence numbers of packets to be retransmitted
    */
@@ -145,10 +146,14 @@ protected:
     uint32_t seq;
     Time time;
   };
-
+/// @endcond
+  
+/// @cond include_hidden
   class i_seq { };
   class i_timestamp { }; 
+/// @endcond
   
+/// @cond include_hidden
   /**
    * \struct This struct contains a multi-index for the set of SeqTimeout structs
    */
@@ -166,6 +171,7 @@ protected:
         >
       >
     > { } ;
+/// @endcond
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
   SeqTimeoutsContainer m_seqLifetimes;

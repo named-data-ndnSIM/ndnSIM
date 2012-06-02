@@ -27,7 +27,7 @@ namespace ns3 {
 namespace CcnbParser {
 
 /**
- * \ingrou ccnx-ccnb
+ * \ingroup ccnx-ccnb
  * \brief Depth-first visitor that takes one argument and returns nothing
  */
 class VoidDepthFirstVisitor : public VoidVisitor

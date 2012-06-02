@@ -195,10 +195,6 @@ CcnxNameComponents::operator< (const CcnxNameComponents &prefix) const
 }
 
     
-/**
-* \class ns3::ComponentsValue
-* \brief hold objects of type ns3:CcnxNameComponents
-*/
 ATTRIBUTE_HELPER_HEADER (CcnxNameComponents);
 } // namespace ns3
 

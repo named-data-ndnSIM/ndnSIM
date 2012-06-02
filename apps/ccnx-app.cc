@@ -40,6 +40,7 @@ TypeId
 CcnxApp::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxApp")
+    .SetGroupName ("Ccnx")
     .SetParent<Application> ()
     .AddConstructor<CcnxApp> ()
 

@@ -33,7 +33,7 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
   /**
    * Hack
    *
-   * Stop processing after encountering <Content> dtag.  Actual
+   * Stop processing after encountering "Content" dtag.  Actual
    * content (including virtual payload) will be stored in Packet
    * buffer
    */

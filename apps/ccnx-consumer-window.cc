@@ -39,6 +39,7 @@ TypeId
 CcnxConsumerWindow::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumerWindow")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxConsumer> ()
     .AddConstructor<CcnxConsumerWindow> ()
 

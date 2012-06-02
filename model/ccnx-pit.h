@@ -47,6 +47,7 @@ class CcnxFace;
 class CcnxContentObjectHeader;
 class CcnxInterestHeader;
 
+/// @cond include_hidden
 /**
  * \ingroup ccnx
  * \private
@@ -57,6 +58,7 @@ namespace __ccnx_private
 // class i_prefix{}; ///< tag for prefix hash
 class i_timestamp {}; ///< tag for timestamp-ordered records (for cleanup optimization)  
 };
+/// @endcond
 
 /**
  * \ingroup ccnx

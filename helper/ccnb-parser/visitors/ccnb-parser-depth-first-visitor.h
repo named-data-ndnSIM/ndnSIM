@@ -27,7 +27,7 @@ namespace ns3 {
 namespace CcnbParser {
 
 /**
- * \ingrou ccnx-ccnb
+ * \ingroup ccnx-ccnb
  * \brief Depth-first visitor that takes boot::any as argument and returns boost::any value
  */
 class DepthFirstVisitor : public Visitor

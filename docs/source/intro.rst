@@ -123,7 +123,7 @@ or::
 Logging
 -----------------
 
-Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of CcnxFace and CcnxConsumer will show everything what happens on CcnxFace and CcnxConsumer classes::
+Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` will show everything what happens on :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` classes::
 
     NS_LOG=CcnxFace:CcnxConsumer ./waf --run=ccnx-simple
 
@@ -134,7 +134,7 @@ Documentation
 
 Overall structure of ndnSIM is described in our technical report.
 
-It is also possible to build doxygen documentation of ndnSIM API (in ns-3/doc/html/), provided that doxygen and graphviz modules are installed on system::
+It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/html/``), provided that ``doxygen`` and ``graphviz`` modules are installed on system::
 
     ./waf doxygen
 
@@ -142,23 +142,28 @@ It is also possible to build doxygen documentation of ndnSIM API (in ns-3/doc/ht
 A very short guide to the code
 ==============================
 
-All the NDN related code is in ns-3/src/ndnSIM
+All the NDN related code is in ``ns-3/src/ndnSIM``
 
 +-----------------+---------------------------------------------------------------------+
 | Folder          | Description                                                         |
 +=================+=====================================================================+
-| ``examples/``   | contain several example scenarios                                   |
+| ``model/``      | implementation of NDN base: :ndnsim:`CcnxL3Protocol`, faces         |
+|                 | (:ndnsim:`CcnxFace`, :ndnsim:`CcnxNetDeviceFace`, forwarding        |
+|                 | :ndnsim:`CcnxLocalFace`),                                           |
+|                 | strategies (:ndnsim:`CcnxForwardingStrategy`,                       |
+|                 | :ndnsim:`CcnxFloodingStrategy`, :ndnsim:`CcnxBestRouteStrategy`),   |
+|                 | etc.                                                                |
 +-----------------+---------------------------------------------------------------------+
 | ``apps/``       | applications (in NS-3 sense) that can be installed on the nodes.    |
-|                 | Right now we have one producer (``CcnxProducer``) and a collection  |
-|                 | of consumer (``CcnxConsumerCbr``, ``CcnxConsumerWindow``,           |
-|                 | ``CcnxConsumerBatches``).  See doxygen documentation or source      |
-|                 | code for details                                                    |
+|                 | Right now we have one producer (:ndnsim:`CcnxProducer`) and a       |
+|                 | collection  of consumer (:ndnsim:`CcnxConsumerCbr`,                 |
+|                 | :ndnsim:`CcnxConsumerWindow`,                                       |
+|                 | :ndnsim:`CcnxConsumerBatches`).  See doxygen documentation or       |
+|                 | source  code for details                                            |
 +-----------------+---------------------------------------------------------------------+
-| ``helper/``     | a number of useful helpers                                          |
+| ``helper/``     | a number of :doc:`useful helpers <helpers>`                         |
 +-----------------+---------------------------------------------------------------------+
-| ``model/``      | implementation of NDN base: L3 protocol, faces, forwarding          |
-|                 | strategies, etc.                                                    |
+| ``examples/``   | contain :doc:`several example scenarios <examples>`                 |
 +-----------------+---------------------------------------------------------------------+
 | ``utils/``      | helper classes                                                      |
 +-----------------+---------------------------------------------------------------------+

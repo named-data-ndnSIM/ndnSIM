@@ -43,10 +43,12 @@ namespace ns3 {
 class CcnxFace;
 class CcnxNameComponents;
 
+/// @cond include_hidden
 namespace __ccnx_private
 {
 class i_retx {};
 }
+/// @endcond
 
 /**
  * \ingroup ccnx

@@ -55,6 +55,7 @@ TypeId
 CcnxConsumer::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumer")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxApp> ()
     .AddAttribute ("StartSeq", "Initial sequence number",
                    IntegerValue (0),

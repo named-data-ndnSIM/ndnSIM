@@ -45,6 +45,7 @@ TypeId
 CcnxConsumerCbr::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumerCbr")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxConsumer> ()
     .AddConstructor<CcnxConsumerCbr> ()
 

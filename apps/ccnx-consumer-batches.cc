@@ -40,6 +40,7 @@ TypeId
 CcnxConsumerBatches::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::CcnxConsumerBatches")
+    .SetGroupName ("Ccnx")
     .SetParent<CcnxConsumer> ()
     .AddConstructor<CcnxConsumerBatches> ()
 

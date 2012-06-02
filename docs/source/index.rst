@@ -6,8 +6,9 @@ Welcome to ndnSIM NS-3 based NDN simulator
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    intro
    helpers
+   applications
    examples
