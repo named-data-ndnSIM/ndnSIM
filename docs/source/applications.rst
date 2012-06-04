@@ -108,7 +108,7 @@ This applications has the following attributes:
 
   Amount of data to be requested (will stop issuing Interests after ``Size`` data is received)
 
-  If ```Size`` is set to -1, Interests will be requested till the end of the simulation.
+  If ``Size`` is set to -1, Interests will be requested till the end of the simulation.
 
 CcnxProducer
 ^^^^^^^^^^^^
@@ -124,13 +124,109 @@ CcnxProducer
 Custom applications
 +++++++++++++++++++
 
-Applications interact with the core of the system using AppFace realization of Face abstraction. 
-To simplify implementation of specific NDN application, ndnSIM provides a base CcnxApp class that takes care of creating CcnxAppFace and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
+Applications interact with the core of the system using :ndnsim:`CcnxLocalFace` realization of Face abstraction. 
+To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`CcnxApp` class that takes care of creating :ndnsim:`CcnxLocalFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
 
-Base CcnxApp class
-^^^^^^^^^^^^^^^^^^
+.. Base CcnxApp class
+.. ^^^^^^^^^^^^^^^^^^
 
 
 
 Example
 ^^^^^^^
+
+The following code shows how a simple ndnSIM application can be created.  For details refer to API documentation of ndnSIM and NS-3.
+
+.. code-block:: c++
+
+    class CustomApp : public CcnxApp
+    {
+    public:
+      // overridden from CcnxApp
+
+      // Processing upon start of the application
+      virtual void
+      StartApplication ()
+      {
+        // initialize CcnxApp
+        CcnxApp::StartApplication ();
+        
+        // Create a name components object for name ``/prefix/sub``
+	Ptr<CcnxNameComponents> prefix = Create<CcnxNameComponents> (); // now prefix contains ``/``
+	prefix->Add ("prefix"); // now prefix contains ``/prefix``
+	prefix->Add ("sub"); // now prefix contains ``/prefix/sub``
+
+        /////////////////////////////////////////////////////////////////////////////
+        // Creating FIB entry that ensures that we will receive incoming Interests //
+        /////////////////////////////////////////////////////////////////////////////
+
+        // Get FIB object        
+        Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
+
+        // Add entry to FIB
+        // Note that ``m_face`` is cretaed by CcnxApp
+        CcnxFibEntryContainer::type::iterator fibEntry = fib->Add (*prefix, m_face, 0);
+      
+        /////////////////////////////////////
+	// Sending one Interest packet out //
+        /////////////////////////////////////
+
+        // Create and configure CcnxInterestHeader
+        CcnxInterestHeader interestHeader;
+        UniformVariable rand (0,std::numeric_limits<uint32_t>::max ());
+        interestHeader.SetNonce            (rand.GetValue ());
+        interestHeader.SetName             (prefix);
+        interestHeader.SetInterestLifetime (Seconds (1.0));
+      
+        // Create packet and add CcnxInterestHeader
+        Ptr<Packet> packet = Create<Packet> ();
+        packet->AddHeader (interestHeader);
+
+        // Forward packet to lower (network) layer       
+        m_protocolHandler (packet);
+      
+        // Call trace (for logging purposes)
+        m_transmittedInterests (&interestHeader, this, m_face);
+      }
+    
+      // Processing when application is stopped
+      virtual void
+      StopApplication ()
+      {
+        // cleanup CcnxApp
+        CcnxApp::StopApplication ();
+      }
+    
+      // Callback that will be called when Interest arrives
+      virtual void
+      OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet)
+      {
+        // Create and configure CcnxContentObjectHeader and CcnxContentObjectTail
+        // (header is added in front of the packet, tail is added at the end of the packet)
+        
+        CcnxContentObjectHeader data;
+        data.SetName (Create<CcnxNameComponents> (interest->GetName ())); // data will have the same name as Interests
+      
+        CcnxContentObjectTail trailer; // doesn't require any configuration
+
+        // Create packet and add header and trailer
+        Ptr<Packet> packet = Create<Packet> (1024);
+        packet->AddHeader (data);
+        packet->AddTrailer (trailer);
+      
+        // Forward packet to lower (network) layer       
+        m_protocolHandler (packet);
+      
+        // Call trace (for logging purposes)
+        m_transmittedInterests (&interestHeader, this, m_face);
+        m_transmittedContentObjects (&data, packet, this, m_face);
+      }
+     
+      // Callback that will be called when Data arrives
+      virtual void
+      OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
+                       Ptr<Packet> payload)
+      {
+        std::cout << "DATA received for name " << contentObject->GetName () << std::endl; 
+      }
+    };

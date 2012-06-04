@@ -64,10 +64,10 @@ order to run `visualizer`_ module, the following should be installed:
 .. _visualizer: http://www.nsnam.org/wiki/index.php/PyViz
 
 Downloading ndnSIM source
-=========================
+-------------------------
 
 Only ndnSIM
---------------
++++++++++++
 
 Download NS-3 simulator. For example::
 
@@ -86,7 +86,7 @@ After cloning, a number of patches need to be applied to the base NS-3 to make s
 
 
 Custom (unsupported) branch of NS-3
--------------------------------------------
++++++++++++++++++++++++++++++++++++
 
 Alternatively, it is possible to download a custom (unsupported) branch of NS-3 that contains all necessary patches and more::
 
@@ -101,7 +101,7 @@ The first command is to create a directory, which will contain everything NS-3 r
 There are quite a few modification to the base NS-3 code that are necessary to run ndnSIM, and the code is periodically synchronized with the official developer branch.  Eventually, all the changes will be merged to the official branch, but for the time being, it is necessary to use the customized branch.
 
 Compiling and running ndnSIM
-============================
+----------------------------
 
 ndnSIM uses standard NS-3 compilation procedure.  For example::
 
@@ -120,17 +120,9 @@ or::
 .. note::
    Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
 
-Logging
------------------
-
-Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` will show everything what happens on :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` classes::
-
-    NS_LOG=CcnxFace:CcnxConsumer ./waf --run=ccnx-simple
-
-Refer to the source code and NS-3 documentation to see what logging interfaces are available and about details how enable one or more logging interfaces.
 
 Documentation
-------------------------
+=============
 
 Overall structure of ndnSIM is described in our technical report.
 
@@ -140,7 +132,7 @@ It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/
 
 
 A very short guide to the code
-==============================
+------------------------------
 
 All the NDN related code is in ``ns-3/src/ndnSIM``
 
@@ -170,6 +162,14 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 | ``plugins/``    | a number of plugins that may be helpful to run simulation scenarios |
 +-----------------+---------------------------------------------------------------------+
 
+Logging
+-----------------
+
+Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` will show everything what happens on :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` classes::
+
+    NS_LOG=CcnxFace:CcnxConsumer ./waf --run=ccnx-simple
+
+Refer to the source code and NS-3 documentation to see what logging interfaces are available and about details how enable one or more logging interfaces.
 
 .. Indices and tables
 .. ==================
