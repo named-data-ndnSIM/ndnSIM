@@ -25,7 +25,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [ "sphinx.ext.autodoc", "sphinxcontrib.doxylink", "sphinxcontrib.aafig" ]
+extensions = [ "sphinx.ext.autodoc", "sphinxcontrib.doxylink", "sphinxcontrib.aafig", "sphinxcontrib.googleanalytics" ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -242,6 +242,10 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 doxylink = {
-  'ndnsim' : ('ndnSIM.tag', '../../doxygen/html/'),
+  'ndnsim' : ('ndnSIM.tag', 'doxygen/'),
 }
+
+googleanalytics_id = "UA-21372502-8"
+
+googleanalytics_enabled = True
 

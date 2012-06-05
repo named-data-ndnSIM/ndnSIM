@@ -7,19 +7,57 @@
 Introduction
 ==============
 
-The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (Project CCNx).  
+The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (Project CCNx).
 
-Following the NDN architecture, ndnSIM is implemented as a new network-layer protocol model, which can run on top of any available link-layer protocol model (point-to-point, CSMA, wireless, etc.).  
+Following the NDN architecture, ndnSIM is implemented as a new network-layer protocol model, which can run on top of any available link-layer protocol model (point-to-point, CSMA, wireless, etc.).
 
 .. note::
-    It will also be possible to run ndnSIM on top of network-layer (IPv4, IPv6) and transport-layer (TCP, UDP) protocols. 
+    It will also be possible to run ndnSIM on top of network-layer (IPv4, IPv6) and transport-layer (TCP, UDP) protocols.
     However, it is not yet implemented and patches are welcome.
 
 .. This flexibility allows ndnSIM to simulate scenarios of various homogeneous and heterogeneous networks (e.g., NDN-only, NDN-over-IP, etc.).
 
-The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: pending Interest table (PIT), forwarding information base (FIB), content store, network and application interfaces, Interest forwarding strategies, etc.
+The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <CcnxPit>`, :ndnsim:`forwarding information base (FIB) <CcnxFib>`, :ndnsim:`content store <CcnxContentStore>`, :ndnsim:`network <CcnxNetDeviceFace>` and :ndnsim:`application <CcnxLocalFace>` interfaces, :ndnsim:`Interest forwarding strategies <CcnxForwardingStrategy>`, etc.
 This modular structure allows any component to be easily modified or replaced with no or minimal impact on other components.
 In addition, the simulator provides an extensive collection of interfaces and helpers to perform detailed tracing behavior of every component, as well as NDN traffic flow.
+
+
+.. aafig::
+    :aspect: 60
+    :scale: 120
+
+             +----------------+			      +-----------+
+             | "Applications" |			      | NetDevice |
+             +----------------+			      +-----------+
+		     ^ 					    ^
+    .................|......................................|......................
+    .		     v			     	            v			  .
+    .		+------------------+	     +----------------------+		  .
+    .           |    "CcnxFace"    |	     |      "CcnxFace"      |		  .
+    .           | "(CcnxLocalFace)"|	     | "(CcnxNetDeviceFace)"|		  .
+    .		+------------------+         +----------------------+		  .
+    .		               ^                   ^				  .
+    .			       |                   |				  .
+    .			       v                   v				  .
+    .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
+    .			    XX                         XX			  .
+    .			    XX    Core NDN protocol    XX  			  .
+    .                       XX    "(CcnxL3Protocol)"   XX
+    .			    XX                         XX			  .
+    .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
+    .			      ^       ^       ^       ^				  .
+    .			      |	      |	      |	      |				  .
+    .     +-------------------+   +---+       +---+   +------------+		  .
+    .	  | 		    	  |		  |    		   |		  .
+    .	  v			  v		  v		   v		  .
+    . +-------------------+      +-------+      +-------+        +-------------+  .
+    . | "CcnxContentStore"|      |  PIT  |      |  FIB  |        | "Pluggable" |  .
+    . +-------------------+      +-------+      +-------+        | "Forwarding"|  .
+    .							         | "Strategy"  |  .
+    .							         +-------------+  .
+    .										  .
+    ...............................................................................
+
 
 The wire format of Interest and Data packets follows the format of the existing `CCNx Project's NDN implementation`_ (CCNx Binary Encoding), allowing reuse of the existing traffic analysis tools, as well as driving simulations using real NDN traffic traces.
 
@@ -31,12 +69,12 @@ Getting Started
 Portability
 ------------
 
-ndnSIM has been successfully compiled and used under Ubuntu Linux 11.04 (stock gcc), Mac OS 10.6/10.7 (gcc-4.2 apple/llvm, macports gcc 4.6), FreeBSD 8.2 (requires gcc from ports - the stock gcc will not work!).  
+ndnSIM has been successfully compiled and used under Ubuntu Linux 11.04 (stock gcc), Mac OS 10.6/10.7 (gcc-4.2 apple/llvm, macports gcc 4.6), FreeBSD 8.2 (requires gcc from ports - the stock gcc will not work!).
 
 Requirements
 -------------
 
-1. ndnSIM requires the latest version of NS-3 simulator (as of May 31st, 2012, development branch of NS-3). 
+1. ndnSIM requires the latest version of NS-3 simulator (as of May 31st, 2012, development branch of NS-3).
 
 2. ndnSIM requires boost libraries:
 
@@ -54,7 +92,7 @@ order to run `visualizer`_ module, the following should be installed:
    * For Ubuntu::
 
        sudo apt-get install python-dev python-pygraphviz python-kiwi
-       sudo apt-get install python-pygoocanvas python-gnome2 
+       sudo apt-get install python-pygoocanvas python-gnome2
        sudo apt-get install python-gnomedesktop python-rsvg ipython
 
    * For MacOS (macports)::
@@ -126,9 +164,11 @@ Documentation
 
 Overall structure of ndnSIM is described in our technical report.
 
-It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/html/``), provided that ``doxygen`` and ``graphviz`` modules are installed on system::
+`ndnSIM API documentation <doxygen/index.html>`_
 
-    ./waf doxygen
+.. It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/html/``), provided that ``doxygen`` and ``graphviz`` modules are installed on system::
+
+..     ./waf doxygen
 
 
 A very short guide to the code
