@@ -58,14 +58,8 @@ public:
    */
   static size_t
   GetSerializedSize (const CcnxInterestHeader &interest);
-
-  static size_t
-  Serialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject);
-
-  static size_t
-  GetSerializedSize (const CcnxContentObjectHeader &contentObject);
   
-private:
+public:
   static size_t
   AppendBlockHeader (Buffer::Iterator &start, size_t value, CcnbParser::ccn_tt block_type);
 
@@ -120,7 +114,50 @@ private:
   
   static size_t
   EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size);
+
+  /**
+   * Append value as a tagged BLOB (templated version)
+   *
+   * This is a ccnb-encoded element with containing the BLOB as content
+   *
+   * Data will be reinterpret_cast<const uint8_t*> and size will be obtained using sizeof
+   *
+   * @param start start iterator of  the buffer to append to.
+   * @param dtag is the element's dtab
+   * @param data a value to add
+   *
+   * @returns written length
+   */
+  template<class T>
+  static inline size_t
+  AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag, const T &data);
+
+  /**
+   * Append a tagged string (should be a valid UTF-8 coded string)
+   *
+   * This is a ccnb-encoded element with containing UDATA as content
+   *
+   * @param start start iterator of  the buffer to append to.
+   * @param dtag is the element's dtab
+   * @param string UTF-8 string to be written
+   *
+   * @returns written length
+   */
+  static size_t
+  AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
+                const std::string &string);
+
+  static size_t
+  EstimateString (CcnbParser::ccn_dtag dtag, const std::string &string);
 };
+
+
+template<class T>
+size_t
+CcnxEncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag, const T &data)
+{
+  return AppendTaggedBlob (start, dtag, reinterpret_cast<const uint8_t*> (&data), sizeof (data));
+}
 
 } // namespace ns3
 

@@ -51,10 +51,158 @@ namespace ns3
  * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
  * 
  */
-  
 class CcnxContentObjectHeader : public SimpleRefCount<CcnxContentObjectHeader,Header>
 {
 public:
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  /**
+   * @brief Class representing Signature section of the content object
+   */
+  class Signature
+  {
+  public:
+    /**
+     * @brief Default constructor. Creates a fake-type signature
+     */
+    inline Signature ();
+
+    inline const std::string &
+    GetDigestAlgorithm () const;
+
+    inline void
+    SetDigestAlgorithm (const std::string &digestAlgorithm);
+
+    inline uint32_t
+    GetSignatureBits () const;
+
+    inline void
+    SetSignatureBits (uint32_t signatureBits);
+
+    static const std::string DefaultDigestAlgorithm; // = "2.16.840.1.101.3.4.2.1";
+    
+  private:
+    std::string m_digestAlgorithm; // if value is `2.16.840.1.101.3.4.2.1`, then SHA-256 (not supported)
+                                   // in NS-3 value `99.0` represents a fake digest
+    // Witness // not used in NS-3
+    uint32_t m_signatureBits; // in NS-3 a fake signature is a just 32-bits
+  };
+  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+
+  enum ContentType
+    {
+      DATA = 0x0C04C0, // default value. If ContentObject is type of DATA, then ContentType tag will be omitted
+      ENCR = 0x10D091,
+      GONE = 0x18E344,
+      KEY  = 0x28463F,
+      LINK = 0x2C834A,
+      NACK = 0x34008A
+    };
+
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+
+  /**
+   * @brief Class representing SignedInfo section of the content object
+   */
+  class SignedInfo
+  {
+  public:
+    /**
+     * @brief Default constructor
+     */
+    SignedInfo (); 
+    
+    /**
+     * @brief Set PublisherPublicKey digest
+     * @param digest a fake 32-bit digest is supported
+     */
+    void
+    SetPublisherPublicKeyDigest (uint32_t digest);
+
+    /**
+     * @brief Get PublisherPublicKey digest
+     */
+    uint32_t
+    GetPublisherPublicKeyDigest () const;
+
+    /**
+     * @brief Set content object timestamp
+     * @param timestamp timestamp
+     */
+    void
+    SetTimestamp (const Time &timestamp);
+
+    /**
+     * @brief Get timestamp of the content object
+     */
+    Time
+    GetTimestamp () const;
+
+    /**
+     * @brief Set ContentObject type
+     * @param type type of the content object
+     */
+    void
+    SetContentType (ContentType type);
+
+    /**
+     * @brief Get ContentObject type
+     */
+    ContentType
+    GetContentType () const;
+    
+    /**
+     * @brief Set freshness of the content object
+     * @param freshness Freshness, 0s means infinity
+     */
+    void
+    SetFreshness (const Time &freshness);
+
+    /**
+     * @brief Get freshness of the content object
+     */
+    Time
+    GetFreshness () const;
+
+    /**
+     * @brief Set key locator
+     * @param keyLocator name of the key
+     *
+     * Note that only <KeyName> option for the key locator is supported
+     */
+    void
+    SetKeyLocator (Ptr<const CcnxNameComponents> keyLocator);
+
+    /**
+     * @brief Get key locator
+     *
+     * Note that only <KeyName> option for the key locator is supported
+     */
+    Ptr<const CcnxNameComponents>
+    GetKeyLocator () const;
+    
+  private:
+    uint32_t m_publisherPublicKeyDigest; // fake publisher key digest
+    Time m_timestamp;
+    ContentType m_type;
+    Time m_freshness;
+    // FinalBlockID
+    Ptr<const CcnxNameComponents> m_keyLocator; // support only <KeyName> option for KeyLocator
+  };
+
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////  
+
   /**
    * Constructor
    *
@@ -63,33 +211,42 @@ public:
   CcnxContentObjectHeader ();
 
   /**
-   * \brief Set interest name
+   * \brief Set content object name
    *
-   * Sets name of the interest. For example, SetName( CcnxNameComponents("prefix")("postfix") );
+   * Sets name of the content object. For example, SetName( CcnxNameComponents("prefix")("postfix") );
    **/
   void
   SetName (const Ptr<CcnxNameComponents> &name);
 
+  /**
+   * @brief Get name of the content object
+   */
   const CcnxNameComponents&
   GetName () const;
 
-  // void
-  // SetSignature ();
+  /**
+   * @brief Get editable reference to content object's Signature
+   */
+  inline Signature &
+  GetSignature ();
 
-  // ?
-  // GetSignature () const;
+  /**
+   * @brief Get read-only reference to content object's Signature
+   */
+  inline const Signature &
+  GetSignature () const;
 
-  void
-  SetTimestamp (const Time &timestamp);
+  /**
+   * @brief Get editable reference to content object's SignedInfo
+   */
+  inline SignedInfo &
+  GetSignedInfo ();
 
-  Time
-  GetTimestamp () const;
-  
-  void
-  SetFreshness (const Time &freshness);
-
-  Time
-  GetFreshness () const;
+  /**
+   * @brief Get read-only reference to content object's SignedInfo
+   */
+  inline const SignedInfo &
+  GetSignedInfo () const;
   
   //////////////////////////////////////////////////////////////////
   
@@ -99,19 +256,9 @@ public:
   virtual uint32_t GetSerializedSize (void) const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
-
-  struct SignedInfo
-  {
-    // PublisherPublicKeyDigest
-    Time m_timestamp;
-    // Type (ContentType)
-    Time m_freshness;
-    // FinalBlockID
-    // KeyLocator
-  };
   
 private:
-  // m_signature;
+  Signature  m_signature;
   Ptr<CcnxNameComponents> m_name;
   SignedInfo m_signedInfo;
 };
@@ -134,8 +281,64 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 };
 
+
+CcnxContentObjectHeader::Signature::Signature ()
+  : m_digestAlgorithm ("99.0")
+  , m_signatureBits (0)
+{
+}
+
+const std::string &
+CcnxContentObjectHeader::Signature::GetDigestAlgorithm () const
+{
+  return m_digestAlgorithm;
+}
+
+void
+CcnxContentObjectHeader::Signature::SetDigestAlgorithm (const std::string &digestAlgorithm)
+{
+  m_digestAlgorithm = digestAlgorithm;
+}
+
+uint32_t
+CcnxContentObjectHeader::Signature::GetSignatureBits () const
+{
+  return m_signatureBits;
+}
+
+inline void
+CcnxContentObjectHeader::Signature::SetSignatureBits (uint32_t signature)
+{
+  m_signatureBits = signature;
+}
+
+
+CcnxContentObjectHeader::Signature &
+CcnxContentObjectHeader::GetSignature ()
+{
+  return m_signature;
+}
+
+const CcnxContentObjectHeader::Signature &
+CcnxContentObjectHeader::GetSignature () const
+{
+  return m_signature;
+}
+
+CcnxContentObjectHeader::SignedInfo &
+CcnxContentObjectHeader::GetSignedInfo ()
+{
+  return m_signedInfo;
+}
+
+const CcnxContentObjectHeader::SignedInfo &
+CcnxContentObjectHeader::GetSignedInfo () const
+{
+  return m_signedInfo;
+}
+
 class CcnxContentObjectHeaderException {};
-  
+
 } // namespace ns3
 
 #endif // _CCNX_CONTENT_OBJECT_HEADER_H_

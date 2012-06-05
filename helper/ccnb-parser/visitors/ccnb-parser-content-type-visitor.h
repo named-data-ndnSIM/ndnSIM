@@ -18,28 +18,31 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ccnb-parser-nonce-visitor.h"
-#include "../syntax-tree/ccnb-parser-blob.h"
+#ifndef _CCNB_PARSER_CONTENT_TYPE_VISITOR_H_
+#define _CCNB_PARSER_CONTENT_TYPE_VISITOR_H_
+
+#include "ccnb-parser-no-argu-depth-first-visitor.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
-boost::any
-NonceVisitor::visit (Blob &n) 
+/**
+ * \ingroup ccnx-ccnb
+ * \brief Visitor to obtain nonce value from BLOB block
+ *
+ * Note, only first 32 bits will be actually parsed into nonce. If
+ * original Nonce contains more, the rest will be ignored
+ *
+ * Will return empty boost::any() if called on anything except BLOB block
+ */
+class ContentTypeVisitor : public NoArguDepthFirstVisitor
 {
-  // Buffer n.m_blob;
-  if (n.m_blobSize < 4)
-    throw CcnbDecodingException ();
-     
-  return boost::any (*(reinterpret_cast<uint32_t*> (n.m_blob)));
+public:
+  virtual boost::any visit (Blob &n); 
+  virtual boost::any visit (Udata &n); ///< Throws parsing error if BLOB object is encountered
+};
+
+}
 }
 
-boost::any
-NonceVisitor::visit (Udata &n)
-{
-  // std::string n.m_udata;
-  throw CcnbDecodingException ();
-}
-
-}
-}
+#endif // _CCNB_PARSER_CONTENT_TYPE_VISITOR_H_

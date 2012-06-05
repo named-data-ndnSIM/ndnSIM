@@ -18,8 +18,8 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNB_PARSER_NONCE_VISITOR_H_
-#define _CCNB_PARSER_NONCE_VISITOR_H_
+#ifndef _CCNB_PARSER_UINT32T_BLOB_VISITOR_H_
+#define _CCNB_PARSER_UINT32T_BLOB_VISITOR_H_
 
 #include "ccnb-parser-no-argu-depth-first-visitor.h"
 
@@ -35,7 +35,7 @@ namespace CcnbParser {
  *
  * Will return empty boost::any() if called on anything except BLOB block
  */
-class NonceVisitor : public NoArguDepthFirstVisitor
+class Uint32tBlobVisitor : public NoArguDepthFirstVisitor
 {
 public:
   virtual boost::any visit (Blob &n); 
@@ -45,4 +45,4 @@ public:
 }
 }
 
-#endif // _CCNB_PARSER_NONCE_VISITOR_H_
+#endif // _CCNB_PARSER_UINT32T_BLOB_VISITOR_H_

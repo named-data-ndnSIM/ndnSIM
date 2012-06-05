@@ -32,7 +32,7 @@
 #include "ccnb-parser-name-components-visitor.h"
 #include "ccnb-parser-non-negative-integer-visitor.h"
 #include "ccnb-parser-timestamp-visitor.h"
-#include "ccnb-parser-nonce-visitor.h"
+#include "ccnb-parser-uint32t-blob-visitor.h"
 
 #include <boost/foreach.hpp>
 
@@ -53,7 +53,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
   static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
   static NameComponentsVisitor     nameComponentsVisitor;
   static TimestampVisitor          timestampVisitor;
-  static NonceVisitor              nonceVisitor;
+  static Uint32tBlobVisitor        nonceVisitor;
   
   CcnxInterestHeader &interest = *(boost::any_cast<CcnxInterestHeader*> (param));
 

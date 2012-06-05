@@ -21,10 +21,8 @@
 #include "ccnx-decoding-helper.h"
 
 #include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-content-object-header.h"
 
 #include "ccnb-parser/visitors/ccnb-parser-interest-visitor.h"
-#include "ccnb-parser/visitors/ccnb-parser-content-object-visitor.h"
 
 #include "ccnb-parser/syntax-tree/ccnb-parser-block.h"
 #include "ccnb-parser/syntax-tree/ccnb-parser-dtag.h"
@@ -47,16 +45,16 @@ CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxInterestHeader &int
   return i.GetDistanceFrom (start);
 }
 
-size_t
-CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxContentObjectHeader &contentObject)
-{
-  static CcnbParser::ContentObjectVisitor contentObjectVisitor;
+// size_t
+// CcnxDecodingHelper::Deserialize (Buffer::Iterator start, CcnxContentObjectHeader &contentObject)
+// {
+//   static CcnbParser::ContentObjectVisitor contentObjectVisitor;
 
-  Buffer::Iterator i = start;
-  Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
-  root->accept (contentObjectVisitor, &contentObject);
+//   Buffer::Iterator i = start;
+//   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
+//   root->accept (contentObjectVisitor, &contentObject);
 
-  return i.GetDistanceFrom (start);
-}
+//   return i.GetDistanceFrom (start);
+// }
 
 } // namespace ns3

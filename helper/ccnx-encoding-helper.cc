@@ -84,9 +84,7 @@ CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxInterestHeader 
   if (interest.GetNonce()>0)
     {
       uint32_t nonce = interest.GetNonce();
-      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Nonce,
-                                   reinterpret_cast<const uint8_t*>(&nonce),
-                                   sizeof(nonce));
+      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Nonce, nonce);
     }
     
   if (interest.GetNack ()>0)
@@ -165,102 +163,6 @@ CcnxEncodingHelper::GetSerializedSize (const CcnxInterestHeader &interest)
 
   written += 1; // </Interest>
 
-  return written;
-}
-
-size_t
-CcnxEncodingHelper::Serialize (Buffer::Iterator start, const CcnxContentObjectHeader &contentObject)
-{
-  size_t written = 0;
-  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_ContentObject, CcnbParser::CCN_DTAG); // <ContentObject>
-
-  // fake signature
-  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Signature, CcnbParser::CCN_DTAG); // <Signature>
-  // Signature ::= DigestAlgorithm? 
-  //               Witness?         
-  //               SignatureBits   
-  written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_SignatureBits, 0, 0);      // <SignatureBits />
-  written += AppendCloser (start);                                    // </Signature>  
-
-  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
-  written += AppendNameComponents (start, contentObject.GetName()); //   <Component>...</Component>...
-  written += AppendCloser (start);                                  // </Name>  
-
-  // fake signature
-  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_SignedInfo, CcnbParser::CCN_DTAG); // <SignedInfo>
-  // SignedInfo ::= PublisherPublicKeyDigest
-  //                Timestamp
-  //                Type?
-  //                FreshnessSeconds?
-  //                FinalBlockID?
-  //                KeyLocator?
-  if (!contentObject.GetTimestamp ().IsZero())
-    {
-      written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Timestamp, CcnbParser::CCN_DTAG);
-      written += AppendTimestampBlob (start, contentObject.GetTimestamp ());
-      written += AppendCloser (start);
-    }
-  if (contentObject.GetFreshness () >= Seconds(0))
-    {
-      written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_FreshnessSeconds, CcnbParser::CCN_DTAG);
-      written += AppendNumber (start, contentObject.GetFreshness ().ToInteger (Time::S));
-      written += AppendCloser (start);
-    }
-  
-  written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0, 0); // <PublisherPublicKeyDigest />
-  written += AppendCloser (start);                                     // </SignedInfo>
-
-  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Content, CcnbParser::CCN_DTAG); // <Content>
-
-  // there are no closing tags !!!
-  return written;
-}
-
-size_t
-CcnxEncodingHelper::GetSerializedSize (const CcnxContentObjectHeader &contentObject)
-{
-  size_t written = 0;
-  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_ContentObject); // <ContentObject>
-
-  // fake signature
-  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Signature); // <Signature>
-  // Signature ::= DigestAlgorithm? 
-  //               Witness?         
-  //               SignatureBits   
-  written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_SignatureBits, 0);      // <SignatureBits />
-  written += 1;                                    // </Signature>  
-
-  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>
-  written += EstimateNameComponents (contentObject.GetName()); //   <Component>...</Component>...
-  written += 1;                                  // </Name>  
-
-  // fake signature
-  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_SignedInfo); // <SignedInfo>
-  // SignedInfo ::= PublisherPublicKeyDigest
-  //                Timestamp
-  //                Type?
-  //                FreshnessSeconds?
-  //                FinalBlockID?
-  //                KeyLocator?
-  if (!contentObject.GetTimestamp ().IsZero())
-    {
-      written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Timestamp);
-      written += EstimateTimestampBlob (contentObject.GetTimestamp ());
-      written += 1;
-    }
-  if (contentObject.GetFreshness () >= Seconds(0))
-    {
-      written += EstimateBlockHeader (CcnbParser::CCN_DTAG_FreshnessSeconds);
-      written += EstimateNumber (contentObject.GetFreshness ().ToInteger (Time::S));
-      written += 1;
-    }
-
-  written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_PublisherPublicKeyDigest, 0); // <PublisherPublicKeyDigest />
-  written += 1;                                     // </SignedInfo>
-
-  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Content); // <Content>
-
-  // there are no closing tags !!!
   return written;
 }
 
@@ -423,6 +325,26 @@ CcnxEncodingHelper::EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size)
     return EstimateBlockHeader (dtag) + 1;
 }
 
+size_t
+CcnxEncodingHelper::AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
+                                  const std::string &string)
+{
+  size_t written = AppendBlockHeader (start, dtag, CcnbParser::CCN_DTAG);
+  {
+    written += AppendBlockHeader (start, string.size (), CcnbParser::CCN_UDATA);
+    start.Write (reinterpret_cast<const uint8_t*> (string.c_str ()), string.size ());
+    written += string.size ();
+  }
+  written += AppendCloser (start);
+
+  return written;
+}
+
+size_t
+CcnxEncodingHelper::EstimateString (CcnbParser::ccn_dtag dtag, const std::string &string)
+{
+  return EstimateBlockHeader (dtag) + EstimateBlockHeader (string.size ()) + string.size () + 1;
+}
 
 
 } // namespace ns3

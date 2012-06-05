@@ -25,10 +25,28 @@
 #include "../helper/ccnx-encoding-helper.h"
 #include "../helper/ccnx-decoding-helper.h"
 
+#include "../helper/ccnb-parser/ccnb-parser-common.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-void-depth-first-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-name-components-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-non-negative-integer-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-timestamp-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-string-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-uint32t-blob-visitor.h"
+#include "../helper/ccnb-parser/visitors/ccnb-parser-content-type-visitor.h"
+
+#include "../helper/ccnb-parser/syntax-tree/ccnb-parser-block.h"
+#include "../helper/ccnb-parser/syntax-tree/ccnb-parser-dtag.h"
+
+#include <boost/foreach.hpp>
+
 NS_LOG_COMPONENT_DEFINE ("CcnxContentObjectHeader");
+
+using namespace ns3::CcnbParser;
 
 namespace ns3
 {
+
+const std::string CcnxContentObjectHeader::Signature::DefaultDigestAlgorithm = "2.16.840.1.101.3.4.2.1";
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxContentObjectHeader);
 NS_OBJECT_ENSURE_REGISTERED (CcnxContentObjectTail);
@@ -61,48 +79,324 @@ CcnxContentObjectHeader::GetName () const
   return *m_name;
 }
 
-void
-CcnxContentObjectHeader::SetTimestamp (const Time &timestamp)
-{
-  m_signedInfo.m_timestamp = timestamp;
-}
+#define CCNB CcnxEncodingHelper // just to simplify writing
 
-Time
-CcnxContentObjectHeader::GetTimestamp () const
-{
-  return m_signedInfo.m_timestamp;
-}
-
-void
-CcnxContentObjectHeader::SetFreshness (const Time &freshness)
-{
-  m_signedInfo.m_freshness = freshness;
-}
-
-Time
-CcnxContentObjectHeader::GetFreshness () const
-{
-  return m_signedInfo.m_freshness;
-}
-
-
-uint32_t
-CcnxContentObjectHeader::GetSerializedSize (void) const
-{
-  // unfortunately, we don't know exact header size in advance
-  return CcnxEncodingHelper::GetSerializedSize (*this);
-}
-    
 void
 CcnxContentObjectHeader::Serialize (Buffer::Iterator start) const
 {
-  CcnxEncodingHelper::Serialize (start, *this);
+  size_t written = 0;
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_ContentObject, CcnbParser::CCN_DTAG); // <ContentObject>
+
+  // fake signature
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Signature, CcnbParser::CCN_DTAG); // <Signature>
+  // Signature ::= √DigestAlgorithm? 
+  //               Witness?         
+  //               √SignatureBits
+  if (GetSignature ().GetDigestAlgorithm () != Signature::DefaultDigestAlgorithm)
+    {
+      written += CCNB::AppendString (start, CCN_DTAG_DigestAlgorithm, GetSignature ().GetDigestAlgorithm ());
+    }
+  written += CCNB::AppendTaggedBlob (start, CCN_DTAG_SignatureBits, GetSignature ().GetSignatureBits ()); // <SignatureBits />
+  written += CCNB::AppendCloser (start);                                    // </Signature>  
+
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);    // <Name>
+  written += CCNB::AppendNameComponents (start, GetName()); //   <Component>...</Component>...
+  written += CCNB::AppendCloser (start);                                  // </Name>  
+
+  // fake signature
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_SignedInfo, CCN_DTAG); // <SignedInfo>
+  // SignedInfo ::= √PublisherPublicKeyDigest
+  //                √Timestamp
+  //                √Type?
+  //                √FreshnessSeconds?
+  //                FinalBlockID?
+  //                KeyLocator?
+  written += CCNB::AppendTaggedBlob (start, CCN_DTAG_PublisherPublicKeyDigest,         // <PublisherPublicKeyDigest>...
+                                     GetSignedInfo ().GetPublisherPublicKeyDigest ());
+  
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Timestamp, CCN_DTAG);            // <Timestamp>...
+  written += CCNB::AppendTimestampBlob (start, GetSignedInfo ().GetTimestamp ());
+  written += CCNB::AppendCloser (start);
+
+  if (GetSignedInfo ().GetContentType () != DATA)
+    {
+      uint8_t type[3];
+      type[0] = (GetSignedInfo ().GetContentType () >> 16) & 0xFF;
+      type[1] = (GetSignedInfo ().GetContentType () >> 8 ) & 0xFF;
+      type[2] = (GetSignedInfo ().GetContentType ()      ) & 0xFF;
+      
+      written += CCNB::AppendTaggedBlob (start, CCN_DTAG_Type, type, 3);
+    }
+  if (GetSignedInfo ().GetFreshness () >= Seconds(0))
+    {
+      written += CCNB::AppendBlockHeader (start, CCN_DTAG_FreshnessSeconds, CCN_DTAG);
+      written += CCNB::AppendNumber (start, GetSignedInfo ().GetFreshness ().ToInteger (Time::S));
+      written += CCNB::AppendCloser (start);
+    }
+  if (GetSignedInfo ().GetKeyLocator ()->size () > 0)
+    {
+      written += CCNB::AppendBlockHeader (start, CCN_DTAG_KeyLocator, CCN_DTAG); // <KeyLocator>
+      {
+        written += CCNB::AppendBlockHeader (start, CCN_DTAG_KeyName, CCN_DTAG);    // <KeyName>
+        {
+          written += CCNB::AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);       // <Name>
+          written += CCNB::AppendNameComponents (start, GetName());                  //   <Component>...</Component>...
+          written += CCNB::AppendCloser (start);                                     // </Name>
+        }
+        written += CCNB::AppendCloser (start);                                     // </KeyName>
+      }
+      written += CCNB::AppendCloser (start);                                     // </KeyLocator>
+    }
+  
+  written += CCNB::AppendCloser (start);                                     // </SignedInfo>
+
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Content, CCN_DTAG); // <Content>
+
+  // there are no closing tags !!!
+  // The closing tag is handled by CcnxContentObjectTail
 }
+
+uint32_t
+CcnxContentObjectHeader::GetSerializedSize () const
+{
+  size_t written = 0;
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_ContentObject); // <ContentObject>
+
+  // fake signature
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_Signature); // <Signature>
+  // Signature ::= DigestAlgorithm? 
+  //               Witness?         
+  //               SignatureBits   
+  if (GetSignature ().GetDigestAlgorithm () != Signature::DefaultDigestAlgorithm)
+    {
+      written += CCNB::EstimateString (CCN_DTAG_DigestAlgorithm, GetSignature ().GetDigestAlgorithm ());
+    }
+  written += CCNB::EstimateTaggedBlob (CCN_DTAG_SignatureBits,
+                                       sizeof (GetSignature ().GetSignatureBits ()));      // <SignatureBits />
+  written += 1;                                    // </Signature>  
+
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_Name);    // <Name>
+  written += CCNB::EstimateNameComponents (GetName()); //   <Component>...</Component>...
+  written += 1;                                  // </Name>  
+
+  // fake signature
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_SignedInfo); // <SignedInfo>
+  // SignedInfo ::= √PublisherPublicKeyDigest
+  //                √Timestamp
+  //                √Type?
+  //                √FreshnessSeconds?
+  //                FinalBlockID?
+  //                KeyLocator?
+  
+  written += CCNB::EstimateTaggedBlob (CCN_DTAG_PublisherPublicKeyDigest,                          // <PublisherPublicKeyDigest>...
+                                       sizeof (GetSignedInfo ().GetPublisherPublicKeyDigest ()));
+  
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_Timestamp);                  // <Timestamp>...
+  written += CCNB::EstimateTimestampBlob (GetSignedInfo ().GetTimestamp ());
+  written += 1;
+
+  if (GetSignedInfo ().GetContentType () != DATA)
+    {
+      written += CCNB::EstimateTaggedBlob (CCN_DTAG_Type, 3);
+    }
+  if (GetSignedInfo ().GetFreshness () >= Seconds(0))
+    {
+      written += CCNB::EstimateBlockHeader (CCN_DTAG_FreshnessSeconds);
+      written += CCNB::EstimateNumber (GetSignedInfo ().GetFreshness ().ToInteger (Time::S));
+      written += 1;
+    }
+
+  if (GetSignedInfo ().GetKeyLocator ()->size () > 0)
+    {
+      written += CCNB::EstimateBlockHeader (CCN_DTAG_KeyLocator); // <KeyLocator>
+      {
+        written += CCNB::EstimateBlockHeader (CCN_DTAG_KeyName);    // <KeyName>
+        {
+          written += CCNB::EstimateBlockHeader (CCN_DTAG_Name);       // <Name>
+          written += CCNB::EstimateNameComponents (GetName());        //   <Component>...</Component>...
+          written += 1;                                               // </Name>
+        }
+        written += 1;                                               // </KeyName>
+      }
+      written += 1;                                               // </KeyLocator>
+    }
+  
+  written += 1; // </SignedInfo>
+
+  written += CCNB::EstimateBlockHeader (CCN_DTAG_Content); // <Content>
+
+  // there are no closing tags !!!
+  // The closing tag is handled by CcnxContentObjectTail
+  return written;
+}
+#undef CCNB
+
+class ContentObjectVisitor : public VoidDepthFirstVisitor
+{
+public:
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader* */)
+  {
+    // uint32_t n.m_dtag;
+    // std::list<Ptr<Block> > n.m_nestedBlocks;
+    static NameComponentsVisitor nameComponentsVisitor;
+    static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
+    static TimestampVisitor          timestampVisitor;
+    static StringVisitor     stringVisitor;
+    static Uint32tBlobVisitor uint32tBlobVisitor;
+    static ContentTypeVisitor contentTypeVisitor;
+  
+    CcnxContentObjectHeader &contentObject = *(boost::any_cast<CcnxContentObjectHeader*> (param));
+  
+    switch (n.m_dtag)
+      {
+      case CCN_DTAG_ContentObject:
+        // process nested blocks
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+          {
+            block->accept (*this, param);
+          }
+        break;
+      case CCN_DTAG_Name:
+        {
+          // process name components
+          Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
+        
+          BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+            {
+              block->accept (nameComponentsVisitor, &(*name));
+            }
+          contentObject.SetName (name);
+          break;
+        }
+
+      case CCN_DTAG_Signature: 
+        // process nested blocks
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+          {
+            block->accept (*this, param);
+          }      
+        break;
+
+      case CCN_DTAG_DigestAlgorithm:
+        NS_LOG_DEBUG ("DigestAlgorithm");
+        if (n.m_nestedTags.size ()!=1) // should be exactly one UDATA inside this tag
+          throw CcnbDecodingException ();
+        
+        contentObject.GetSignature ().SetDigestAlgorithm
+          (boost::any_cast<std::string> ((*n.m_nestedTags.begin())->accept
+                                         (stringVisitor)));
+        break;
+
+      case CCN_DTAG_SignatureBits:
+        NS_LOG_DEBUG ("SignatureBits");
+        if (n.m_nestedTags.size ()!=1) // should be only one nested tag
+          throw CcnbDecodingException ();
+
+        contentObject.GetSignature ().SetSignatureBits
+          (boost::any_cast<uint32_t> ((*n.m_nestedTags.begin())->accept
+                                      (uint32tBlobVisitor)));
+        break;
+
+      case CCN_DTAG_SignedInfo:
+        // process nested blocks
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+          {
+            block->accept (*this, param);
+          }      
+        break;
+      
+      case CCN_DTAG_PublisherPublicKeyDigest:
+        NS_LOG_DEBUG ("PublisherPublicKeyDigest");
+        if (n.m_nestedTags.size ()!=1) // should be only one nested tag
+          throw CcnbDecodingException ();
+
+        contentObject.GetSignedInfo ().SetPublisherPublicKeyDigest
+          (boost::any_cast<uint32_t> ((*n.m_nestedTags.begin())->accept
+                                      (uint32tBlobVisitor)));
+        break;
+
+      case CCN_DTAG_Timestamp:
+        NS_LOG_DEBUG ("Timestamp");
+        if (n.m_nestedTags.size()!=1) // should be exactly one nested tag
+          throw CcnbDecodingException ();
+
+        contentObject.GetSignedInfo ().SetTimestamp
+          (boost::any_cast<Time> ((*n.m_nestedTags.begin())->accept
+                                  (timestampVisitor)));
+        break;
+
+      case CCN_DTAG_Type:
+        NS_LOG_DEBUG ("Type");
+        if (n.m_nestedTags.size ()!=1) // should be only one nested tag
+          throw CcnbDecodingException ();
+
+        contentObject.GetSignedInfo ().SetContentType
+          (static_cast<CcnxContentObjectHeader::ContentType>
+           (boost::any_cast<uint32_t> ((*n.m_nestedTags.begin())->accept
+                                       (contentTypeVisitor))));
+        break;
+        
+      case CCN_DTAG_FreshnessSeconds:
+        NS_LOG_DEBUG ("FreshnessSeconds");
+      
+        if (n.m_nestedTags.size()!=1) // should be exactly one nested tag
+          throw CcnbDecodingException ();
+        
+        contentObject.GetSignedInfo ().SetFreshness
+          (Seconds
+           (boost::any_cast<uint32_t> ((*n.m_nestedTags.begin())->accept
+                                       (nonNegativeIntegerVisitor))));
+        break;
+      
+      case CCN_DTAG_KeyLocator:
+        // process nested blocks
+        BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
+          {
+            block->accept (*this, param);
+          }      
+        break;
+
+      case CCN_DTAG_KeyName:
+        {
+          if (n.m_nestedTags.size ()!=1) // should be exactly one nested tag
+            throw CcnbDecodingException ();
+
+          Ptr<BaseTag> nameTag = DynamicCast<BaseTag>(n.m_nestedTags.front ());
+          if (nameTag == 0)
+            throw CcnbDecodingException ();
+
+          // process name components
+          Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
+        
+          BOOST_FOREACH (Ptr<Block> block, nameTag->m_nestedTags)
+            {
+              block->accept (nameComponentsVisitor, &(*name));
+            }
+          contentObject.GetSignedInfo ().SetKeyLocator (name);
+          break;
+        }
+
+      case CCN_DTAG_Content: // !!! HACK
+        // This hack was necessary for memory optimizations (i.e., content is virtual payload)
+        NS_ASSERT_MSG (n.m_nestedTags.size() == 0, "Parser should have stopped just after processing <Content> tag");
+        break;
+      
+      default: // ignore all other stuff
+        break;
+      }
+  }
+};
 
 uint32_t
 CcnxContentObjectHeader::Deserialize (Buffer::Iterator start)
 {
-  return CcnxDecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
+  static ContentObjectVisitor contentObjectVisitor;
+
+  Buffer::Iterator i = start;
+  Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
+  root->accept (contentObjectVisitor, this);
+
+  return i.GetDistanceFrom (start);
 }
   
 TypeId
@@ -176,5 +470,79 @@ CcnxContentObjectTail::Deserialize (Buffer::Iterator start)
 
   return 2;
 }
-  
+
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+CcnxContentObjectHeader::SignedInfo::SignedInfo ()
+  : m_publisherPublicKeyDigest (0)
+  // ,  m_timestamp
+  , m_type (DATA)
+  // , m_freshness
+  // , FinalBlockID
+  // , KeyLocator
+{
+}
+
+void
+CcnxContentObjectHeader::SignedInfo::SetPublisherPublicKeyDigest (uint32_t digest)
+{
+  m_publisherPublicKeyDigest = digest;
+}
+
+uint32_t
+CcnxContentObjectHeader::SignedInfo::GetPublisherPublicKeyDigest () const
+{
+  return m_publisherPublicKeyDigest;
+}
+
+void
+CcnxContentObjectHeader::SignedInfo::SetTimestamp (const Time &timestamp)
+{
+  m_timestamp = timestamp;
+}
+
+Time
+CcnxContentObjectHeader::SignedInfo::GetTimestamp () const
+{
+  return m_timestamp;
+}
+
+void
+CcnxContentObjectHeader::SignedInfo::SetContentType (CcnxContentObjectHeader::ContentType type)
+{
+  m_type = type;
+}
+
+CcnxContentObjectHeader::ContentType
+CcnxContentObjectHeader::SignedInfo::GetContentType () const
+{
+  return m_type;
+}
+
+void
+CcnxContentObjectHeader::SignedInfo::SetFreshness (const Time &freshness)
+{
+  m_freshness = freshness;
+}
+
+Time
+CcnxContentObjectHeader::SignedInfo::GetFreshness () const
+{
+  return m_freshness;
+}
+
+void
+CcnxContentObjectHeader::SignedInfo::SetKeyLocator (Ptr<const CcnxNameComponents> keyLocator)
+{
+  m_keyLocator = keyLocator;
+}
+
+Ptr<const CcnxNameComponents>
+CcnxContentObjectHeader::SignedInfo::GetKeyLocator () const
+{
+  return m_keyLocator;
+}
+
 } // namespace ns3

@@ -18,33 +18,33 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_
-#define _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_
-
-#include "ccnb-parser-void-depth-first-visitor.h"
+#include "ccnb-parser-content-type-visitor.h"
+#include "../syntax-tree/ccnb-parser-blob.h"
 
 namespace ns3 {
 namespace CcnbParser {
 
-/**
- * \ingroup ccnx-ccnb
- * \brief Visitor that fills fields in CcnxContentObjectHeader
- *
- * Usage example:
- * \code
- *   Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
- *   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
- *   ContentObjectVisitor visitor;
- *   root->accept (visitor, *header); 
- * \endcode
- */
-class ContentObjectVisitor : public VoidDepthFirstVisitor
+boost::any
+ContentTypeVisitor::visit (Blob &n) 
 {
-public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxContentObjectHeader* */);
-};
+  // Buffer n.m_blob;
+  if (n.m_blobSize != 3)
+    throw CcnbDecodingException ();
+
+  uint32_t type =
+    (n.m_blob [0] << 16) |
+    (n.m_blob [1] << 8 ) |
+    (n.m_blob [2]      );
+    
+  return boost::any (type);
+}
+
+boost::any
+ContentTypeVisitor::visit (Udata &n)
+{
+  // std::string n.m_udata;
+  throw CcnbDecodingException ();
+}
 
 }
 }
-
-#endif // _CCNB_PARSER_CONTENT_OBJECT_VISITOR_H_
