@@ -26,6 +26,7 @@
 
 #include "ns3/ptr.h"
 #include "ns3/ccnx-name-components.h"
+#include "ns3/ccnx-content-object-header.h"
 
 namespace ns3 
 {
@@ -52,6 +53,9 @@ protected:
 private:
   CcnxNameComponents m_prefix;
   uint32_t m_virtualPayloadSize;
+  
+  uint32_t m_signatureBits;
+  // CcnxContentObjectHeader::SignedInfo m_signedInfo;
 };
 
 }

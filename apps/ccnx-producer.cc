@@ -26,6 +26,7 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"
+#include "ns3/simulator.h"
 
 #include "../model/ccnx-local-face.h"
 #include "ns3/ccnx-fib.h"
@@ -57,6 +58,12 @@ CcnxProducer::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor(&CcnxProducer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
+
+    // optional attributes
+    .AddAttribute ("SignatureBits", "SignatureBits field",
+                   UintegerValue (0),
+                   MakeUintegerAccessor(&CcnxProducer::m_signatureBits),
+                   MakeUintegerChecker<uint32_t> ())
     ;
         
   return tid;
@@ -107,6 +114,8 @@ CcnxProducer::OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Pac
   static CcnxContentObjectTail tail;
   Ptr<CcnxContentObjectHeader> header = Create<CcnxContentObjectHeader> ();
   header->SetName (Create<CcnxNameComponents> (interest->GetName ()));
+  header->GetSignedInfo ().SetTimestamp (Simulator::Now ());
+  header->GetSignature ().SetSignatureBits (m_signatureBits);
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   

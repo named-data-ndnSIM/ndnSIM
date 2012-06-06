@@ -127,13 +127,13 @@ CcnxContentObjectHeader::Serialize (Buffer::Iterator start) const
       
       written += CCNB::AppendTaggedBlob (start, CCN_DTAG_Type, type, 3);
     }
-  if (GetSignedInfo ().GetFreshness () >= Seconds(0))
+  if (GetSignedInfo ().GetFreshness () > Seconds(0))
     {
       written += CCNB::AppendBlockHeader (start, CCN_DTAG_FreshnessSeconds, CCN_DTAG);
       written += CCNB::AppendNumber (start, GetSignedInfo ().GetFreshness ().ToInteger (Time::S));
       written += CCNB::AppendCloser (start);
     }
-  if (GetSignedInfo ().GetKeyLocator ()->size () > 0)
+  if (GetSignedInfo ().GetKeyLocator () != 0)
     {
       written += CCNB::AppendBlockHeader (start, CCN_DTAG_KeyLocator, CCN_DTAG); // <KeyLocator>
       {
@@ -199,14 +199,14 @@ CcnxContentObjectHeader::GetSerializedSize () const
     {
       written += CCNB::EstimateTaggedBlob (CCN_DTAG_Type, 3);
     }
-  if (GetSignedInfo ().GetFreshness () >= Seconds(0))
+  if (GetSignedInfo ().GetFreshness () > Seconds(0))
     {
       written += CCNB::EstimateBlockHeader (CCN_DTAG_FreshnessSeconds);
       written += CCNB::EstimateNumber (GetSignedInfo ().GetFreshness ().ToInteger (Time::S));
       written += 1;
     }
 
-  if (GetSignedInfo ().GetKeyLocator ()->size () > 0)
+  if (GetSignedInfo ().GetKeyLocator () != 0)
     {
       written += CCNB::EstimateBlockHeader (CCN_DTAG_KeyLocator); // <KeyLocator>
       {
