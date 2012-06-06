@@ -38,6 +38,8 @@ NS_LOG_COMPONENT_DEFINE ("CcnxFace");
 
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (CcnxFace);
+
 TypeId
 CcnxFace::GetTypeId ()
 {
@@ -63,6 +65,13 @@ CcnxFace::GetTypeId ()
     //                BooleanValue (false),
     //                MakeBooleanAccessor (&CcnxFace::m_enableMetricTagging),
     //                MakeBooleanChecker ())
+
+    .AddTraceSource ("CcnxTx", "Transmitted packet trace",
+                     MakeTraceSourceAccessor (&CcnxFace::m_ccnxTxTrace))
+    .AddTraceSource ("CcnxRx", "Received packet trace",
+                     MakeTraceSourceAccessor (&CcnxFace::m_ccnxRxTrace))
+    .AddTraceSource ("CcnxDrop", "Dropped packet trace",
+                     MakeTraceSourceAccessor (&CcnxFace::m_ccnxDropTrace))
     ;
   return tid;
 }
@@ -82,7 +91,7 @@ CcnxFace::CcnxFace (Ptr<Node> node)
   , m_id ((uint32_t)-1)
   , m_lastLeakTime (0)
   , m_metric (0)
-  , m_enableMetricTagging (false)
+  // , m_enableMetricTagging (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -152,10 +161,11 @@ CcnxFace::Send (Ptr<Packet> packet)
   NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
   NS_LOG_DEBUG (*packet);
 
-  /// \todo Implement tracing, if requested
-
   if (!IsUp ())
-    return false;
+    {
+      m_ccnxDropTrace (packet);
+      return false;
+    }
 
   // if (m_enableMetricTagging)
   //   {
@@ -174,7 +184,8 @@ CcnxFace::Send (Ptr<Packet> packet)
   //     tag->AddPathInfo (m_node, GetMetric ());
   //     packet->AddPacketTag (tag);
   //   }
-  
+
+  m_ccnxTxTrace (packet);
   SendImpl (packet);
   return true;
 }
@@ -184,11 +195,13 @@ CcnxFace::Receive (const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
 
-  /// \todo Implement tracing, if requested
-
   if (!IsUp ())
-    return false;
+    {
+      // no tracing here. If we were off while receiving, we shouldn't even know that something was there
+      return false;
+    }
 
+  m_ccnxRxTrace (packet);
   m_protocolHandler (this, packet);
   
   return true;

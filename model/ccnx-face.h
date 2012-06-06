@@ -232,7 +232,11 @@ private:
   Time m_lastLeakTime;
   uint32_t m_metric; ///< \brief metric of the face
 
-  bool m_enableMetricTagging; 
+  // bool m_enableMetricTagging;
+
+  TracedCallback<Ptr<const Packet> > m_ccnxTxTrace;
+  TracedCallback<Ptr<const Packet> > m_ccnxRxTrace;
+  TracedCallback<Ptr<const Packet> > m_ccnxDropTrace;
 };
 
 std::ostream& operator<< (std::ostream& os, const CcnxFace &face);
