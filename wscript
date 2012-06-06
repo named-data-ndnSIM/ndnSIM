@@ -85,6 +85,8 @@ def build(bld):
         "model/ccnx-pit-entry-outgoing-face.h",
         "model/ccnx-fib.h",
         "model/ccnx-face.h",
+        "model/ccnx-app-face.h",
+        "model/ccnx-net-device-face.h",
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",

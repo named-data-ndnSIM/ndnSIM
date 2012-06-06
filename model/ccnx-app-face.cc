@@ -20,7 +20,7 @@
  *
  */
 
-#include "ccnx-local-face.h"
+#include "ccnx-app-face.h"
 
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -34,22 +34,22 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("CcnxLocalFace");
+NS_LOG_COMPONENT_DEFINE ("CcnxAppFace");
 
 namespace ns3 
 {
 
 TypeId
-CcnxLocalFace::GetTypeId ()
+CcnxAppFace::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::CcnxLocalFace")
+  static TypeId tid = TypeId ("ns3::CcnxAppFace")
     .SetParent<CcnxFace> ()
     .SetGroupName ("Ccnx")
     ;
   return tid;
 }
 
-CcnxLocalFace::CcnxLocalFace (Ptr<CcnxApp> app)
+CcnxAppFace::CcnxAppFace (Ptr<CcnxApp> app)
   : CcnxFace (app->GetNode ())
   , m_app (app)
 {
@@ -58,29 +58,29 @@ CcnxLocalFace::CcnxLocalFace (Ptr<CcnxApp> app)
   NS_ASSERT (m_app != 0);
 }
 
-CcnxLocalFace::~CcnxLocalFace ()
+CcnxAppFace::~CcnxAppFace ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-CcnxLocalFace::CcnxLocalFace ()
+CcnxAppFace::CcnxAppFace ()
   : CcnxFace (0)
 {
 }
 
-CcnxLocalFace::CcnxLocalFace (const CcnxLocalFace &)
+CcnxAppFace::CcnxAppFace (const CcnxAppFace &)
   : CcnxFace (0)
 {
 }
 
-CcnxLocalFace& CcnxLocalFace::operator= (const CcnxLocalFace &)
+CcnxAppFace& CcnxAppFace::operator= (const CcnxAppFace &)
 {
-  return *((CcnxLocalFace*)0);
+  return *((CcnxAppFace*)0);
 }
 
 
 void
-CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
+CcnxAppFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
   NS_LOG_FUNCTION (this);
 
@@ -90,7 +90,7 @@ CcnxLocalFace::RegisterProtocolHandler (ProtocolHandler handler)
 }
 
 void
-CcnxLocalFace::SendImpl (Ptr<Packet> p)
+CcnxAppFace::SendImpl (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
 
@@ -129,7 +129,7 @@ CcnxLocalFace::SendImpl (Ptr<Packet> p)
     }
 }
 
-std::ostream& CcnxLocalFace::Print (std::ostream& os) const
+std::ostream& CcnxAppFace::Print (std::ostream& os) const
 {
   os << "dev=local(" << GetId() << ")";
   return os;

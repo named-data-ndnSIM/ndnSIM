@@ -19,8 +19,8 @@
                 Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef CCNX_LOCAL_FACE_H
-#define CCNX_LOCAL_FACE_H
+#ifndef CCNX_APP_FACE_H
+#define CCNX_APP_FACE_H
 
 #include "ccnx-face.h"
 #include "ns3/traced-callback.h"
@@ -41,9 +41,9 @@ class CcnxApp;
  * component responsible for actual delivery of data packet to and
  * from CCNx stack
  *
- * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
+ * \see CcnxAppFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
-class CcnxLocalFace  : public CcnxFace
+class CcnxAppFace  : public CcnxFace
 {
 public:
   static TypeId
@@ -52,8 +52,8 @@ public:
   /**
    * \brief Default constructor
    */
-  CcnxLocalFace (Ptr<CcnxApp> app);
-  virtual ~CcnxLocalFace();
+  CcnxAppFace (Ptr<CcnxApp> app);
+  virtual ~CcnxAppFace();
   
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from CcnxFace
@@ -70,16 +70,16 @@ public:
   ////////////////////////////////////////////////////////////////////
  
 private:
-  CcnxLocalFace ();
-  CcnxLocalFace (const CcnxLocalFace &); ///< \brief Disabled copy constructor
-  CcnxLocalFace& operator= (const CcnxLocalFace &); ///< \brief Disabled copy operator
+  CcnxAppFace ();
+  CcnxAppFace (const CcnxAppFace &); ///< \brief Disabled copy constructor
+  CcnxAppFace& operator= (const CcnxAppFace &); ///< \brief Disabled copy operator
 
 private:
   Ptr<CcnxApp> m_app;
 };
 
-std::ostream& operator<< (std::ostream& os, const CcnxLocalFace &localFace);
+std::ostream& operator<< (std::ostream& os, const CcnxAppFace &localFace);
 
 } // namespace ns3
 
-#endif
+#endif // CCNX_APP_FACE_H

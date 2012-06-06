@@ -30,7 +30,7 @@
 #include "ns3/double.h"
 
 #include "ns3/ccnx.h"
-#include "../model/ccnx-local-face.h"
+#include "ns3/ccnx-app-face.h"
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
 

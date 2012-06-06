@@ -17,7 +17,7 @@ Following the NDN architecture, ndnSIM is implemented as a new network-layer pro
 
 .. This flexibility allows ndnSIM to simulate scenarios of various homogeneous and heterogeneous networks (e.g., NDN-only, NDN-over-IP, etc.).
 
-The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <CcnxPit>`, :ndnsim:`forwarding information base (FIB) <CcnxFib>`, :ndnsim:`content store <CcnxContentStore>`, :ndnsim:`network <CcnxNetDeviceFace>` and :ndnsim:`application <CcnxLocalFace>` interfaces, :ndnsim:`Interest forwarding strategies <CcnxForwardingStrategy>`, etc.
+The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <CcnxPit>`, :ndnsim:`forwarding information base (FIB) <CcnxFib>`, :ndnsim:`content store <CcnxContentStore>`, :ndnsim:`network <CcnxNetDeviceFace>` and :ndnsim:`application <CcnxAppFace>` interfaces, :ndnsim:`Interest forwarding strategies <CcnxForwardingStrategy>`, etc.
 This modular structure allows any component to be easily modified or replaced with no or minimal impact on other components.
 In addition, the simulator provides an extensive collection of interfaces and helpers to perform detailed tracing behavior of every component, as well as NDN traffic flow.
 
@@ -34,7 +34,7 @@ In addition, the simulator provides an extensive collection of interfaces and he
     .		     v			     	            v			  .
     .		+------------------+	     +----------------------+		  .
     .           |    "CcnxFace"    |	     |      "CcnxFace"      |		  .
-    .           | "(CcnxLocalFace)"|	     | "(CcnxNetDeviceFace)"|		  .
+    .           |  "(CcnxAppFace)" |	     | "(CcnxNetDeviceFace)"|		  .
     .		+------------------+         +----------------------+		  .
     .		               ^                   ^				  .
     .			       |                   |				  .
@@ -181,7 +181,7 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 +=================+=====================================================================+
 | ``model/``      | implementation of NDN base: :ndnsim:`CcnxL3Protocol`, faces         |
 |                 | (:ndnsim:`CcnxFace`, :ndnsim:`CcnxNetDeviceFace`, forwarding        |
-|                 | :ndnsim:`CcnxLocalFace`),                                           |
+|                 | :ndnsim:`CcnxAppFace`),                                             |
 |                 | strategies (:ndnsim:`CcnxForwardingStrategy`,                       |
 |                 | :ndnsim:`CcnxFloodingStrategy`, :ndnsim:`CcnxBestRouteStrategy`),   |
 |                 | etc.                                                                |

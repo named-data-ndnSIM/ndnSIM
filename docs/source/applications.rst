@@ -124,8 +124,8 @@ CcnxProducer
 Custom applications
 +++++++++++++++++++
 
-Applications interact with the core of the system using :ndnsim:`CcnxLocalFace` realization of Face abstraction. 
-To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`CcnxApp` class that takes care of creating :ndnsim:`CcnxLocalFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
+Applications interact with the core of the system using :ndnsim:`CcnxAppFace` realization of Face abstraction. 
+To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`CcnxApp` class that takes care of creating :ndnsim:`CcnxAppFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
 
 .. Base CcnxApp class
 .. ^^^^^^^^^^^^^^^^^^

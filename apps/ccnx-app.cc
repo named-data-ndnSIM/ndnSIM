@@ -27,7 +27,7 @@
 #include "ns3/ccnx-content-object-header.h"
 #include "ns3/ccnx.h"
 #include "ns3/ccnx-fib.h"
-#include "../model/ccnx-local-face.h"
+#include "ns3/ccnx-app-face.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxApp");
 
@@ -125,7 +125,7 @@ CcnxApp::StartApplication () // Called at time specified by Start
                  "Ccnx stack should be installed on the node " << GetNode ());
 
   // step 1. Create a face
-  m_face = CreateObject<CcnxLocalFace> (/*Ptr<CcnxApp> (this)*/this);
+  m_face = CreateObject<CcnxAppFace> (/*Ptr<CcnxApp> (this)*/this);
     
   // step 2. Add face to the CCNx stack
   GetNode ()->GetObject<Ccnx> ()->AddFace (m_face);

@@ -28,7 +28,7 @@
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 
-#include "../model/ccnx-local-face.h"
+#include "ns3/ccnx-app-face.h"
 #include "ns3/ccnx-fib.h"
 
 #include <boost/ref.hpp>
