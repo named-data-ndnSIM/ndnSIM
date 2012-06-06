@@ -181,25 +181,25 @@ protected:
   // transmittedInterestTrace is inside ForwardingStrategy
   
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inInterests;
+                 Ptr<const CcnxFace> > m_inInterests; ///< @brief trace of incoming Interests
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  DropReason,
-                 Ptr<const CcnxFace> > m_dropInterests;
+                 Ptr<const CcnxFace> > m_dropInterests; ///< @brief trace of dropped Interests
   
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_outNacks;
+                 Ptr<const CcnxFace> > m_outNacks; ///< @brief trace of outgoing NACKs
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inNacks;
+                 Ptr<const CcnxFace> > m_inNacks; ///< @brief trace of incoming NACKs
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  DropReason,
-                 Ptr<const CcnxFace> > m_dropNacks;
+                 Ptr<const CcnxFace> > m_dropNacks; ///< @brief trace of dropped NACKs
 
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
@@ -207,14 +207,14 @@ protected:
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                  bool /*from cache*/,
-                 Ptr<const CcnxFace> > m_outData;
+                 Ptr<const CcnxFace> > m_outData; ///< @brief trace of outgoing Data
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<const CcnxFace> > m_inData;
+                 Ptr<const CcnxFace> > m_inData; ///< @brief trace of incoming Data
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
                   DropReason,
-                  Ptr<const CcnxFace> > m_dropData;  
+                  Ptr<const CcnxFace> > m_dropData;  ///< @brief trace of dropped Data
 };
 
 } // namespace ns3 

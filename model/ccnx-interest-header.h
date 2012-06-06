@@ -115,17 +115,17 @@ namespace ns3
  **/
 
 /**
-  * NDN InterestHeader and routines to serialize/deserialize
-
-   Simplifications:
-   - Name:  binary name components are not supported
-   - MinSuffixComponents and MasSuffixComponents: if value is negative (default), will not be serialized
-   - ChildSelector, AnswerOriginKind: 0 - false, 1 - true, -1 not set
-   - Publisher* elements are not supported
-   - Exclude: only simple name matching is supported (Bloom support has been deprecated in CCNx)
-   - InterestLifetime: ?
-   - Nonce: 32 bit random integer.  If value is 0, will not be serialized
- */
+  * @brief NDN InterestHeader and routines to serialize/deserialize
+  *
+  * Simplifications:
+  * - Name:  binary name components are not supported
+  * - MinSuffixComponents and MasSuffixComponents: if value is negative (default), will not be serialized
+  * - ChildSelector, AnswerOriginKind: 0 - false, 1 - true, -1 not set
+  * - Publisher* elements are not supported
+  * - Exclude: only simple name matching is supported (Bloom support has been deprecated in CCNx)
+  * - InterestLifetime: ?
+  * - Nonce: 32 bit random integer.  If value is 0, will not be serialized
+  **/
 class CcnxInterestHeader : public SimpleRefCount<CcnxInterestHeader,Header>
 {
 public:
@@ -314,8 +314,8 @@ public:
   GetNonce () const;
   
   /**
-   * \enum NACK Type
-   * \brief Specifies the type of Interest packet
+   * @brief NACK Type
+   * Specifies the type of Interest packet
    */
   enum
     {
@@ -345,9 +345,9 @@ public:
   GetNack () const;
 
   //////////////////////////////////////////////////////////////////
-  
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
+
+  static TypeId GetTypeId (void); ///< @brief Get TypeId of the class
+  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
   
   /**
    * \brief Print Interest packet 
@@ -388,7 +388,7 @@ private:
 };
 
 /**
- * \brief Exception class for CcnxInterestHeader
+ * @brief Class for Interest parsing exception 
  */
 class CcnxInterestHeaderException {};
 

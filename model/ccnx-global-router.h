@@ -34,11 +34,23 @@ class Ccnx;
 class CcnxFace;
 class CcnxNameComponents;
 
+/**
+ * @brief Class representing global router interface for ndnSIM
+ */
 class CcnxGlobalRouter : public Object
 {
 public:
+  /**
+   * @brief Graph edge
+   */
   typedef boost::tuple< Ptr< CcnxGlobalRouter >, Ptr< CcnxFace >, Ptr< CcnxGlobalRouter > > Incidency;
+  /**
+   * @brief List of graph edges
+   */
   typedef std::list< Incidency > IncidencyList;
+  /**
+   * @brief List of locally exported prefixes
+   */
   typedef std::list< Ptr<CcnxNameComponents> > LocalPrefixList;
   
   /**
@@ -49,33 +61,54 @@ public:
   static TypeId
   GetTypeId ();
 
+  /**
+   * @brief Default constructor
+   */
   CcnxGlobalRouter ();
 
+  /**
+   * @brief Get numeric ID of the node (internally assigned)
+   */
   uint32_t
   GetId () const;
-  
+
+  /**
+   * @brief Helper function to get smart pointer to Ccnx object (basically, self)
+   */
   Ptr<Ccnx>
   GetCcnx () const;
-  
+
+  /**
+   * @brief Add new locally exported prefix
+   * @param prefix Prefix
+   */
   void
   AddLocalPrefix (Ptr< CcnxNameComponents > prefix);
 
   /**
-   * 
+   * @brief Add edge to the node
+   * @param face Face of the edge
+   * @param ccnx CcnxGlobalRouter of another node
    */
   void
   AddIncidency (Ptr< CcnxFace > face, Ptr< CcnxGlobalRouter > ccnx);
 
+  /**
+   * @brief Get list of edges that are connected to this node
+   */
   IncidencyList &
   GetIncidencies ();
 
+  /**
+   * @brief Get list of locally exported prefixes
+   */
   const LocalPrefixList &
   GetLocalPrefixes () const;
 
   // ??
 protected:
   virtual void
-  NotifyNewAggregate ();
+  NotifyNewAggregate (); ///< @brief Notify when the object is aggregated to another object (e.g., Node)
   
 private:
   uint32_t m_id;

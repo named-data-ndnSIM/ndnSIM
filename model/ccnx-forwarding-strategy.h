@@ -93,10 +93,11 @@ protected:
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
 
+  /// @brief Transmitted interests trace
   TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
   
 protected:  
-  Ptr<CcnxPit> m_pit;
+  Ptr<CcnxPit> m_pit; ///< \brief Reference to PIT to which this forwarding strategy is associated
 };
 
 } //namespace ns3

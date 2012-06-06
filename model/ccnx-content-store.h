@@ -121,6 +121,7 @@ private:
  */
 struct CcnxContentStoreContainer
 {
+  /// @cond include_hidden
   typedef
   boost::multi_index::multi_index_container<
     CcnxContentStoreEntry,
@@ -143,6 +144,7 @@ struct CcnxContentStoreContainer
 #endif
       >
     > type;
+  /// @endcond
 };
 
 /**

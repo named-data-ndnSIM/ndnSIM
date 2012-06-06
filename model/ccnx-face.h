@@ -68,6 +68,9 @@ public:
   CcnxFace (Ptr<Node> node);
   virtual ~CcnxFace();
 
+  /**
+   * @brief Get node to which this face is associated
+   */
   Ptr<Node>
   GetNode () const;
 
@@ -143,7 +146,11 @@ public:
    */
   virtual bool
   IsUp () const;
-  
+
+  /**
+   * @brief Print information about the face into the stream
+   * @param os stream to write information to
+   */
   virtual std::ostream&
   Print (std::ostream &os) const;
 

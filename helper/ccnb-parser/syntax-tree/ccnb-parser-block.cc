@@ -35,10 +35,12 @@ NS_LOG_COMPONENT_DEFINE ("CcnbParserBlock");
 namespace ns3 {
 namespace CcnbParser {
 
+/// @cond include_hidden
 const uint8_t CCN_TT_BITS = 3;
 const uint8_t CCN_TT_MASK = ((1 << CCN_TT_BITS) - 1);
 const uint8_t CCN_MAX_TINY= ((1 << (7-CCN_TT_BITS)) - 1);
 const uint8_t CCN_TT_HBIT = ((uint8_t)(1 << 7));
+/// @endcond
 
 // int Block::counter = 0;
 

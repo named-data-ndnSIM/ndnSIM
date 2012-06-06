@@ -31,6 +31,14 @@
 namespace ns3 
 {
 
+/**
+ * @brief A simple Interest-sink applia simple Interest-sink application
+ *
+ * A simple Interest-sink applia simple Interest-sink application,
+ * which replying every incoming Interest with Data packet with a specified
+ * size and name same as in Interest.cation, which replying every incoming Interest
+ * with Data packet with a specified size and name same as in Interest.
+ */
 class CcnxProducer : public CcnxApp
 {
 public: 

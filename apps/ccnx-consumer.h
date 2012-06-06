@@ -67,10 +67,16 @@ public:
   OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
                    Ptr<Packet> payload);
 
+  /**
+   * @brief Timeout event
+   * @param sequenceNumber time outed sequence number
+   */
   virtual void
   OnTimeout (uint32_t sequenceNumber);
 
-  // Simulator::Schedule doesn't work with protected members???
+  /**
+   * @brief Actually send packet
+   */
   void
   SendPacket ();
   
@@ -109,15 +115,15 @@ protected:
   GetRetxTimer () const;
   
 protected:
-  UniformVariable m_rand; // nonce generator
+  UniformVariable m_rand; ///< @brief nonce generator
 
-  uint32_t        m_seq;
-  uint32_t        m_seqMax;    // maximum number of sequence number
-  EventId         m_sendEvent; // Eventid of pending "send packet" event
-  Time            m_retxTimer;
-  EventId         m_retxEvent; // Event to check whether or not retransmission should be performed
+  uint32_t        m_seq;  ///< @brief currently requested sequence number
+  uint32_t        m_seqMax;    ///< @brief maximum number of sequence number
+  EventId         m_sendEvent; ///< @brief EventId of pending "send packet" event
+  Time            m_retxTimer; ///< @brief Currently estimated retransmission timer
+  EventId         m_retxEvent; ///< @brief Event to check whether or not retransmission should be performed
 
-  Ptr<RttEstimator> m_rtt;
+  Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
   
   Time               m_offTime;             ///< \brief Time interval between packets
   CcnxNameComponents m_interestName;        ///< \brief CcnxName of the Interest (use CcnxNameComponents)
@@ -171,12 +177,12 @@ protected:
         >
       >
     > { } ;
-/// @endcond
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
   SeqTimeoutsContainer m_seqLifetimes;
   
   TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
+/// @endcond
 };
 
 } // namespace ns3

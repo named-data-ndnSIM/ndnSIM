@@ -50,6 +50,9 @@ class CcnxInterestHeader;
 class CcnxFibFaceMetric
 {
 public:
+  /**
+   * @brief Color codes for FIB face status
+   */
   enum Status { NDN_FIB_GREEN = 1,
                 NDN_FIB_YELLOW = 2,
                 NDN_FIB_RED = 3 };
@@ -74,9 +77,15 @@ public:
   bool
   operator< (const CcnxFibFaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
 
+  /**
+   * @brief Comparison between CcnxFibFaceMetric and CcnxFace
+   */
   bool
   operator< (const Ptr<CcnxFace> &face) const { return *m_face < *face; } 
 
+  /**
+   * @brief Return CcnxFace associated with CcnxFibFaceMetric
+   */
   Ptr<CcnxFace>
   GetFace () const { return m_face; }
 
@@ -115,6 +124,7 @@ public:
  */
 struct CcnxFibFaceMetricContainer
 {
+  /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
     CcnxFibFaceMetric,
     boost::multi_index::indexed_by<
@@ -140,6 +150,7 @@ struct CcnxFibFaceMetricContainer
       >
     >
    > type;
+  /// @endcond
 };
 
 /**
@@ -150,7 +161,7 @@ struct CcnxFibFaceMetricContainer
 class CcnxFibEntry // : public SimpleRefCount<CcnxFibEntry>
 {
 public:
-  class NoFaces {};
+  class NoFaces {}; ///< @brief Exception class for the case when FIB entry is not found
   
   /**
    * \brief Constructor
@@ -233,6 +244,7 @@ public:
  */
 struct CcnxFibEntryContainer 
 {
+  /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
     CcnxFibEntry,
     boost::multi_index::indexed_by<
@@ -249,6 +261,7 @@ struct CcnxFibEntryContainer
         >
       >
     > type;
+  /// @endcond
 };
 
 /**
@@ -269,7 +282,6 @@ public:
    * \brief Constructor
    */
   CcnxFib ();
-   // * \param node smart pointer to Ccnx stack associated with particular node
 
   /**
    * \brief Perform longest prefix match
@@ -363,12 +375,12 @@ public:
   GetCcnxFibEntry (uint32_t index);
 
 public:
-  CcnxFibEntryContainer::type m_fib;
+  CcnxFibEntryContainer::type m_fib; ///< @brief Internal container
 
 protected:
   // inherited from Object class
-  virtual void NotifyNewAggregate ();
-  virtual void DoDispose ();
+  virtual void NotifyNewAggregate (); ///< @brief Notify when object is aggregated
+  virtual void DoDispose (); ///< @brief Perform cleanup
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);

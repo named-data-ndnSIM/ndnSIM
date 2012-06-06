@@ -73,6 +73,7 @@ class i_timestamp {}; ///< tag for timestamp-ordered records (for cleanup optimi
  */
 struct CcnxPitEntryContainer
 {
+  /// @cond include_hidden
   typedef
   boost::multi_index::multi_index_container<
     CcnxPitEntry,
@@ -90,6 +91,7 @@ struct CcnxPitEntryContainer
         >
       >
     > type;
+  /// @endcond
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,7 +141,10 @@ public:
    */
   boost::tuple<const CcnxPitEntry&, bool, bool>
   Lookup (const CcnxInterestHeader &header);
-  
+
+  /**
+   * @brief Get pruning timeout for PIT entries (configuration parameter)
+   */
   Time GetPitEntryPruningTimeout () const
   {
     return m_PitEntryPruningTimout;
@@ -152,8 +157,8 @@ public:
 
 protected:
   // inherited from Object class                                                                                                                                                        
-  virtual void NotifyNewAggregate ();
-  virtual void DoDispose ();
+  virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
+  virtual void DoDispose (); ///< @brief Do cleanup
   	
 private:
   /** \brief Remove expired records from PIT */
@@ -193,6 +198,9 @@ private:
 
 std::ostream& operator<< (std::ostream& os, const CcnxPit &pit);
 
+/**
+ * @brief Class for exception when PIT entry is not found
+ */
 class CcnxPitEntryNotFound {};
 
 } // namespace ns3

@@ -50,7 +50,10 @@ class Packet;
 class CcnxHeaderHelper
 {
 public:
-  enum Type {INTEREST, CONTENT_OBJECT};
+  /**
+     @brief enum for Ccnx packet types
+   */
+  enum Type {INTEREST, CONTENT_OBJECT}; 
 
   /**
    * Static function to create an appropriate CCNx header

@@ -29,11 +29,22 @@
 
 namespace ns3 {
 
+/**
+ * @brief Class representing sets of (time, number) tuples with support of reading writing to streams
+ */
 class Batches : public std::list<boost::tuple<Time, uint32_t> >
 {
 public:
+  /**
+   * @brief Default constructor
+   */
   Batches () { };
 
+  /**
+   * @brief Add tuple
+   * @param when   time for the tuple
+   * @param amount number for the tuple
+   */
   void
   Add (const Time &when, uint32_t amount)
   {
@@ -43,6 +54,11 @@ public:
 
 ATTRIBUTE_HELPER_HEADER (Batches);
 
+/**
+ * @brief Output contents of the Batches to the std::ostream
+ * @param os reference to std::ostream
+ * @param batch constant reference to Batch object
+ */
 std::ostream &
 operator << (std::ostream &os, const Batches &batch);
 

@@ -83,6 +83,9 @@ public:
   const std::list<std::string> &
   GetComponents () const;
 
+  /**
+   * @brief Helper call to get the last component of the name
+   */
   std::string
   GetLastComponent () const;
 

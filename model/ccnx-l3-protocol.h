@@ -168,7 +168,7 @@ private:
           const Ptr<const Packet> &packet);
 
 protected:
-  virtual void DoDispose (void);
+  virtual void DoDispose (void); ///< @brief Do cleanup
 
   /**
    * This function will notify other components connected to the node that a new stack member is now connected

@@ -59,13 +59,17 @@ public:
 
   virtual ~Block ();
   
-  virtual void accept( VoidNoArguVisitor &v )               = 0;
-  virtual void accept( VoidVisitor &v, boost::any param )   = 0;
-  virtual boost::any accept( NoArguVisitor &v )             = 0;
-  virtual boost::any accept( Visitor &v, boost::any param ) = 0;
+  virtual void accept( VoidNoArguVisitor &v )               = 0; ///< @brief Accept visitor void(*)()
+  virtual void accept( VoidVisitor &v, boost::any param )   = 0; ///< @brief Accept visitor void(*)(boost::any)
+  virtual boost::any accept( NoArguVisitor &v )             = 0; ///< @brief Accept visitor boost::any(*)()
+  virtual boost::any accept( Visitor &v, boost::any param ) = 0; ///< @brief Accept visitor boost::any(*)(boost::any)
 };
 
-// Necessary until Buffer::Iterator gets PeekU8 call
+/**
+ * @brief Necessary until Buffer::Iterator gets PeekU8 call
+ * @param i buffer iterator
+ * @return peeked uint8_t value
+ */
 inline
 uint8_t
 BufferIteratorPeekU8 (Buffer::Iterator &i)

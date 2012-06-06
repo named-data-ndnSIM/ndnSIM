@@ -52,7 +52,7 @@ public:
   virtual boost::any accept( Visitor &v, boost::any param ) { return v.visit( *this, param ); }
 
   char* m_blob; ///< \brief field holding a parsed BLOB value of the block
-  uint32_t  m_blobSize;
+  uint32_t  m_blobSize; ///< @brief field representing size of the BLOB field stored
 };
 
 }

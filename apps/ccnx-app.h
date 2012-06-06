@@ -44,7 +44,7 @@ class CcnxApp: public Application
 {
 public:
   /**
-   * \typedef A callback to pass packets to underlying CCNx protocol
+   * @brief A callback to pass packets to underlying CCNx protocol
    */
   typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
   
@@ -88,36 +88,39 @@ public:
                    Ptr<Packet> payload);
         
 protected:
+  /**
+   * @brief Do cleanup when application is destroyed
+   */
   virtual void
   DoDispose ();
 
   // inherited from Application base class. Originally they were private
   virtual void
-  StartApplication ();    // Called at time specified by Start
+  StartApplication ();    ///< @brief Called at time specified by Start
 
   virtual void
-  StopApplication ();     // Called at time specified by Stop
+  StopApplication ();     ///< @brief Called at time specified by Stop
 
 protected:
-  ProtocolHandler m_protocolHandler;      ///< \brief A callback to pass packets to underlying CCNx protocol
-  bool m_active; 
-  Ptr<CcnxFace> m_face;   // local face that is created 
+  ProtocolHandler m_protocolHandler; ///< @brief A callback to pass packets to underlying CCNx protocol
+  bool m_active;  ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
+  Ptr<CcnxFace> m_face;   ///< @brief automatically created application face through which application communicates
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedInterests;
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedInterests; ///< @brief App-level trace of received Interests
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedNacks;
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedContentObjects;
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_receivedContentObjects; ///< @brief App-level trace of received Data
 
 
   TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests;
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
   TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedContentObjects;
+                 Ptr<CcnxApp>, Ptr<CcnxFace> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
 };
 
 } // namespace ns3

@@ -46,7 +46,14 @@ public:
    */
   CcnxPitEntryIncomingFace (Ptr<CcnxFace> face);
 
+  /**
+   * @brief Compare two CcnxPitEntryIncomingFace
+   */
   bool operator== (const CcnxPitEntryIncomingFace &dst) { return *m_face==*(dst.m_face); }
+
+  /**
+   * @brief Compare CcnxPitEntryIncomingFace with CcnxFace
+   */
   bool operator== (Ptr<CcnxFace> face) { return *m_face==*face; }
 
   /**

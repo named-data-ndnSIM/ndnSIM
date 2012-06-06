@@ -68,6 +68,9 @@ protected:
   SendImpl (Ptr<Packet> p);
 
 public:
+  /**
+   * @brief Print out name of the CcnxFace to the stream
+   */
   virtual std::ostream&
   Print (std::ostream &os) const;
   ////////////////////////////////////////////////////////////////////

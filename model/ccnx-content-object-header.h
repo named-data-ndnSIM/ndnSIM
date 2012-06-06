@@ -68,18 +68,33 @@ public:
      */
     inline Signature ();
 
+    /**
+     * @brief Get digest algorithm
+     */
     inline const std::string &
     GetDigestAlgorithm () const;
 
+    /**
+     * @brief Set digest algorithm
+     */
     inline void
     SetDigestAlgorithm (const std::string &digestAlgorithm);
 
+    /**
+     * @brief Get signature bits
+     */
     inline uint32_t
     GetSignatureBits () const;
 
+    /**
+     * @brief Set signature bits
+     */
     inline void
     SetSignatureBits (uint32_t signatureBits);
 
+    /**
+     * @brief Default digest algorithm ("2.16.840.1.101.3.4.2.1")
+     */
     static const std::string DefaultDigestAlgorithm; // = "2.16.840.1.101.3.4.2.1";
     
   private:
@@ -93,6 +108,9 @@ public:
   ////////////////////////////////////////////////////////////////////////////  
   ////////////////////////////////////////////////////////////////////////////  
 
+  /**
+   * @brief Options for the data packet Type
+   */
   enum ContentType
     {
       DATA = 0x0C04C0, // default value. If ContentObject is type of DATA, then ContentType tag will be omitted
@@ -250,12 +268,12 @@ public:
   
   //////////////////////////////////////////////////////////////////
   
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual void Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+  static TypeId GetTypeId (void); ///< @brief Get TypeId
+  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
+  virtual void Print (std::ostream &os) const; ///< @brief Print out information about the Header into the stream
+  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Header
+  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Header
+  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
   
 private:
   Signature  m_signature;
@@ -273,12 +291,12 @@ public:
   CcnxContentObjectTail ();
   //////////////////////////////////////////////////////////////////
   
-  static TypeId GetTypeId (void);
-  virtual TypeId GetInstanceTypeId (void) const;
-  virtual void Print (std::ostream &os) const;
-  virtual uint32_t GetSerializedSize (void) const;
-  virtual void Serialize (Buffer::Iterator start) const;
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+  static TypeId GetTypeId (void); ///< @brief Get TypeId
+  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
+  virtual void Print (std::ostream &os) const; ///< @brief Print out information about Tail into the stream
+  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Tail
+  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Tail
+  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Tail
 };
 
 
@@ -337,6 +355,9 @@ CcnxContentObjectHeader::GetSignedInfo () const
   return m_signedInfo;
 }
 
+/**
+ * @brief Class for ContentObject parsing exception 
+ */
 class CcnxContentObjectHeaderException {};
 
 } // namespace ns3

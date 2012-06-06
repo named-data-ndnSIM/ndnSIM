@@ -39,6 +39,9 @@ namespace ns3
  */
 struct CcnxPrefixHash : public std::unary_function<CcnxNameComponents, std::size_t>
 {
+  /**
+   * @brief Compute hash of the name prefix
+   */
   std::size_t
   operator() (const CcnxNameComponents &prefix) const
   {

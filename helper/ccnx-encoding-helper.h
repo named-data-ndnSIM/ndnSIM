@@ -37,7 +37,6 @@ class CcnxContentObjectHeader;
   
 /**
  * \brief Helper to encode/decode ccnb formatted CCNx message
- *
  */
 class CcnxEncodingHelper
 {
@@ -60,24 +59,67 @@ public:
   GetSerializedSize (const CcnxInterestHeader &interest);
   
 public:
+  /**
+   * @brief Append CCNB block header
+   * @param start Buffer to store serialized CcnxInterestHeader
+   * @param value dictionary id of the block header
+   * @param block_type Type of CCNB block
+   *
+   * @returns written length
+   */
   static size_t
   AppendBlockHeader (Buffer::Iterator &start, size_t value, CcnbParser::ccn_tt block_type);
 
+  /**
+   * @brief Estimate size of the CCNB block header
+   * @param value dictionary id of the block header
+   * @returns estimated length
+   */
   static size_t
   EstimateBlockHeader (size_t value);
 
+  /**
+   * @brief Add number in CCNB encoding
+   * @param start Buffer to store serialized CcnxInterestHeader
+   * @param number Number to be written
+   *
+   * @returns written length
+   */
   static size_t
   AppendNumber (Buffer::Iterator &start, uint32_t number);
 
+  /**
+   * @brief Estimate size of the number in CCNB encoding
+   * @param number Number to be written
+   * @returns estimated length
+   */
   static size_t
   EstimateNumber (uint32_t number);
 
+  /**
+   * @brief Append CCNB closer tag (estimated size is 1)
+   * @param start Buffer to store serialized CcnxInterestHeader
+   *
+   * @returns written length
+   */
   static size_t
   AppendCloser (Buffer::Iterator &start);
 
+  /**
+   * @brief Append CcnxNameComponents in CCNB encoding
+   * @param start Buffer to store serialized CcnxInterestHeader
+   * @param name constant reference to CcnxNameComponents object
+   *
+   * @returns written length
+   */
   static size_t
   AppendNameComponents (Buffer::Iterator &start, const CcnxNameComponents &name);
 
+  /**
+   * @brief Estimate size of CcnxNameComponents in CCNB encoding
+   * @param name constant reference to CcnxNameComponents object
+   * @returns estimated length
+   */
   static size_t
   EstimateNameComponents (const CcnxNameComponents &name);
 
@@ -93,6 +135,11 @@ public:
   static size_t
   AppendTimestampBlob (Buffer::Iterator &start, const Time &time);
 
+  /**
+   * @brief Estimate size of a binary timestamp as a BLOB using CCNB enconding
+   * @param time - Time object
+   * @returns estimated length
+   */
   static size_t
   EstimateTimestampBlob (const Time &time);
 
@@ -112,6 +159,12 @@ public:
   AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
                     const uint8_t *data, size_t size);
   
+  /**
+   * @brief Estimate size of a tagged BLOB in CCNB enconding
+   * @param dtag is the element's dtab
+   * @param size is the size of the data, in bytes
+   * @returns estimated length
+   */
   static size_t
   EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size);
 
@@ -147,6 +200,12 @@ public:
   AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
                 const std::string &string);
 
+  /**
+   * @brief Estimate size of the string in CCNB encoding
+   * @param dtag is the element's dtab
+   * @param string UTF-8 string to be written
+   * @returns estimated length
+   */
   static size_t
   EstimateString (CcnbParser::ccn_dtag dtag, const std::string &string);
 };

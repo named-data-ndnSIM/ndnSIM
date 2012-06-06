@@ -59,6 +59,7 @@ class i_retx {};
  */
 struct CcnxPitEntryIncomingFaceContainer
 {
+  /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
     CcnxPitEntryIncomingFace,
     boost::multi_index::indexed_by<
@@ -69,6 +70,7 @@ struct CcnxPitEntryIncomingFaceContainer
       >
     >
    > type;
+  /// @endcond
 };
 
 /**
@@ -80,6 +82,7 @@ struct CcnxPitEntryIncomingFaceContainer
  */
 struct CcnxPitEntryOutgoingFaceContainer
 {
+  /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
     CcnxPitEntryOutgoingFace,
     boost::multi_index::indexed_by<
@@ -94,6 +97,7 @@ struct CcnxPitEntryOutgoingFaceContainer
       >    
     >
    > type;
+  /// @endcond
 };
 
 
@@ -122,7 +126,10 @@ public:
    */
   void
   UpdateLifetime (const Time &offsetTime);
-  
+
+  /**
+   * @brief Get prefix of the PIT entry
+   */
   const CcnxNameComponents &
   GetPrefix () const
   { return *m_prefix; }
@@ -223,7 +230,7 @@ public:
   bool
   AreAllOutgoingInVain () const;
 
-  /*
+  /**
    * @brief Similar to AreAllOutgoingInVain, but ignores `face`
    * \see AreAllOutgoingInVain
    **/

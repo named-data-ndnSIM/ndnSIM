@@ -61,9 +61,17 @@ protected:
   virtual void
   ScheduleNextPacket ();
 
+  /**
+   * @brief Set type of frequency randomization
+   * @param value Either 'none', 'uniform', or 'exponential'
+   */
   void
   SetRandomize (const std::string &value);
 
+  /**
+   * @brief Get type of frequency randomization
+   * @returns either 'none', 'uniform', or 'exponential'
+   */
   std::string
   GetRandomize () const;
   
@@ -80,7 +88,7 @@ private:
   // DataRate
   // GetDesiredRate () const;
   
-protected:
+private:
   double              m_frequency; // Frequency of interest packets (in hertz)
   bool                m_firstTime;
   RandomVariable      *m_random;

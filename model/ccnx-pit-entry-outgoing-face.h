@@ -42,6 +42,10 @@ struct CcnxPitEntryOutgoingFace
   bool m_waitingInVain;     ///< \brief when flag is set, we do not expect data for this interest, only a small hope that it will happen
 	
 public:
+  /**
+   * @brief Constructor to create CcnxPitEntryOutgoingFace
+   * \param face face of the outgoing interest
+   */
   CcnxPitEntryOutgoingFace (Ptr<CcnxFace> face);
 
   /**
@@ -50,7 +54,14 @@ public:
   void
   UpdateOnRetransmit ();
 
+  /**
+   * @brief Compare to CcnxPitEntryOutgoingFace
+   */
   bool operator== (const CcnxPitEntryOutgoingFace &dst) { return *m_face==*dst.m_face; }
+
+  /**
+   * @brief Compare CcnxPitEntryOutgoingFace with CcnxFace
+   */
   bool operator== (Ptr<CcnxFace> face) { return *m_face==*face; }
 
   /**

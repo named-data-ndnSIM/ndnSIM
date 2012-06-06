@@ -31,6 +31,9 @@ namespace ns3
 /**
  * @ingroup ccnx
  * \brief CCNx application for sending out Interest packets (window-based)
+ *
+ * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the simulator.
+ * Behavior may be unpredictable if used incorrectly.
  */
 class CcnxConsumerWindow: public CcnxConsumer
 {
@@ -82,7 +85,7 @@ private:
   void
   SetMaxSize (double size);
   
-protected:
+private:
   uint32_t m_payloadSize; // expected payload size
   double   m_maxSize; // max size to request
 
