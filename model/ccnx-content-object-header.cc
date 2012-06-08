@@ -462,10 +462,10 @@ CcnxContentObjectTail::Deserialize (Buffer::Iterator start)
   Buffer::Iterator i = start;
   i.Prev (2); // Trailer interface requires us to go backwards
 
-  uint8_t __attribute__ ((unused)) closing_tag_content = i.ReadU8 ();
+  uint8_t closing_tag_content = i.ReadU8 ();
   NS_ASSERT_MSG (closing_tag_content==0, "Should be a closing tag </Content> (0x00)");
 
-  uint8_t __attribute__ ((unused)) closing_tag_content_object = i.ReadU8 ();
+  uint8_t closing_tag_content_object = i.ReadU8 ();
   NS_ASSERT_MSG (closing_tag_content_object==0, "Should be a closing tag </ContentObject> (0x00)");
 
   return 2;

@@ -68,18 +68,23 @@ public:
   virtual ~CcnxStackHelper ();
 
   /**
-   * @brief Set forwarding strategy helper
+   * @brief Set forwarding strategy class
+   * @param forwardingStrategy string containing name of the forwarding strategy class
    *
-   * \param forwarding a new forwarding helper
+   * Valid options are "ns3::CcnxFloodingStrategy" (default) and "ns3::CcnxBestRouteStrategy"
    *
-   * Set the forwarding helper to use during Install. The forwarding helper is
-   * really an object factory which is used to create an object of type
-   * ns3::CcnxL3Protocol per node. This forwarding object is then associated to
-   * a single ns3::Ccnx object through its ns3::Ccnx::SetforwardingProtocol.
+   * Other strategies can be implemented, inheriting ns3::CcnxForwardingStrategy class
    */
   void
-  SetForwardingStrategy (std::string forwardingStrategy);
+  SetForwardingStrategy (const std::string &forwardingStrategy);
 
+  /**
+   * @brief Set content store class
+   * @param contentStore string, representing class of the content store
+   */
+  void
+  SetContentStore (const std::string &contentStore);
+  
   /**
    * @brief Enable Interest limits (disabled by default)
    *
@@ -177,6 +182,7 @@ private:
   
 private:
   ObjectFactory m_strategyFactory;
+  ObjectFactory m_contentStoreFactory;
   bool m_limitsEnabled;
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;

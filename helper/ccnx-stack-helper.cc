@@ -61,6 +61,7 @@ CcnxStackHelper::CcnxStackHelper ()
   , m_needSetDefaultRoutes (false)
 {
   m_strategyFactory.SetTypeId ("ns3::CcnxFloodingStrategy");
+  m_contentStoreFactory.SetTypeId ("ns3::CcnxContentStoreLru");
 }
     
 CcnxStackHelper::~CcnxStackHelper ()
@@ -68,11 +69,16 @@ CcnxStackHelper::~CcnxStackHelper ()
 }
 
 void 
-CcnxStackHelper::SetForwardingStrategy (std::string strategy)
+CcnxStackHelper::SetForwardingStrategy (const std::string &strategy)
 {
   m_strategyFactory.SetTypeId (strategy);
 }
 
+void
+CcnxStackHelper::SetContentStore (const std::string &contentStore)
+{
+  m_contentStoreFactory.SetTypeId (contentStore);
+}
 
 void
 CcnxStackHelper::SetDefaultRoutes (bool needSet)

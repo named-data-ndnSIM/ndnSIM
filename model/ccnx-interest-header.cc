@@ -26,6 +26,7 @@
 #include "ccnx-interest-header.h"
 
 #include "ns3/log.h"
+#include "ns3/unused.h"
 #include "../helper/ccnx-encoding-helper.h"
 #include "../helper/ccnx-decoding-helper.h"
 
@@ -198,8 +199,8 @@ CcnxInterestHeader::GetSerializedSize (void) const
 void
 CcnxInterestHeader::Serialize (Buffer::Iterator start) const
 {
-  size_t size __attribute__ ((__unused__)) = CcnxEncodingHelper::Serialize (start, *this);
-  
+  size_t size = CcnxEncodingHelper::Serialize (start, *this);
+  NS_UNUSED (size);
   NS_LOG_INFO ("Serialize size = " << size);
 }
 

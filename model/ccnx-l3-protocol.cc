@@ -98,7 +98,6 @@ CcnxL3Protocol::CcnxL3Protocol()
   NS_LOG_FUNCTION (this);
   
   m_pit = CreateObject<CcnxPit> ();
-  m_contentStore = CreateObject<CcnxContentStore> ();
 }
 
 CcnxL3Protocol::~CcnxL3Protocol ()
@@ -125,7 +124,7 @@ CcnxL3Protocol::NotifyNewAggregate ()
 {
   if (m_node == 0)
     {
-      Ptr<Node>node = this->GetObject<Node>();
+      Ptr<Node> node = this->GetObject<Node>();
       // verify that it's a valid node and that
       // the node has not been set before
       if (node != 0)
@@ -133,6 +132,11 @@ CcnxL3Protocol::NotifyNewAggregate ()
           this->SetNode (node);
         }
     }
+  if (m_contentStore == 0)
+    {
+      m_contentStore = this->GetObject<CcnxContentStore> ();
+    }
+
   Object::NotifyNewAggregate ();
 }
 

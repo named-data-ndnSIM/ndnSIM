@@ -1,6 +1,6 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2011,2012 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #ifndef CCNX_CONTENT_STORE_H
@@ -23,28 +24,16 @@
 
 #include "ns3/object.h"
 #include "ns3/ptr.h"
-#include "ns3/packet.h"
-
-#include <list>
-#include <string>
-#include <iostream>
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/tag.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/sequenced_index.hpp>
-#include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/mem_fun.hpp>
 #include <boost/tuple/tuple.hpp>
-
-#include "ccnx.h"
-#include "ccnx-name-components-hash-helper.h"
-#include "ccnx-content-object-header.h"
-#include "ccnx-interest-header.h"
-#include "ccnx-name-components.h"
 
 namespace  ns3
 {
+
+class Packet;
+class CcnxContentObjectHeader;
+class CcnxInterestHeader;
+class CcnxNameComponents;
+
 /**
  * \ingroup ccnx
  * \brief NDN content store entry
@@ -74,21 +63,21 @@ public:
    * \brief Get prefix of the stored entry
    * \returns prefix of the stored entry
    */
-  inline const CcnxNameComponents&
+  const CcnxNameComponents&
   GetName () const;
 
   /**
    * \brief Get CcnxContentObjectHeader of the stored entry
    * \returns CcnxContentObjectHeader of the stored entry
    */
-  inline Ptr<const CcnxContentObjectHeader>
+  Ptr<const CcnxContentObjectHeader>
   GetHeader () const;
 
   /**
    * \brief Get content of the stored entry
    * \returns content of the stored entry
    */
-  inline Ptr<const Packet>
+  Ptr<const Packet>
   GetPacket () const;
 
   /**
@@ -98,58 +87,17 @@ public:
   Ptr<Packet>
   GetFullyFormedCcnxPacket () const;
 
-// Copy constructor is required by the container. Though, we're
-// storing only two pointers, so shouldn't be a problem
-// private:
-//   CcnxContentStoreEntry (const CcnxContentStoreEntry &); ///< disabled copy constructor
-//   CcnxContentStoreEntry& operator= (const CcnxContentStoreEntry&); ///< disabled copy operator
-  
 private:
   Ptr<CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
   Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
 };
 
-/**
- * \ingroup ccnx
- * \brief Typedef for content store container implemented as a Boost.MultiIndex container
- *
- * - First index (tag<prefix>) is a unique hash index based on NDN prefix of the stored content.
- * - Second index (tag<mru>) is a sequential index used to maintain up to m_maxSize most recent used (MRU) entries in the content store
- * - Third index (tag<ordered>) is just a helper to provide stored prefixes in ordered way. Should be disabled in production build
- *
- * \see http://www.boost.org/doc/libs/1_46_1/libs/multi_index/doc/ for more information on Boost.MultiIndex library
- */
-struct CcnxContentStoreContainer
-{
-  /// @cond include_hidden
-  typedef
-  boost::multi_index::multi_index_container<
-    CcnxContentStoreEntry,
-    boost::multi_index::indexed_by<
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private::i_prefix>,
-        boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const CcnxNameComponents&,
-                                          &CcnxContentStoreEntry::GetName>,
-        CcnxPrefixHash>,
-      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private::i_mru> >
-#ifdef _DEBUG
-      ,
-      boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private::i_ordered>,
-        boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const CcnxNameComponents&,
-                                          &CcnxContentStoreEntry::GetName>
-          >
-#endif
-      >
-    > type;
-  /// @endcond
-};
 
 /**
  * \ingroup ccnx
- * \brief NDN content store entry
+ * \brief Base class for NDN content store
+ *
+ * Particular implementations should implement Lookup, Add, and Print methods
  */
 class CcnxContentStore : public Object
 {
@@ -159,13 +107,13 @@ public:
    *
    * \return interface ID
    */
-  static TypeId GetTypeId ();
+  static
+  TypeId GetTypeId ();
 
   /**
-   * Default constructor
+   * @brief Virtual destructor
    */
-  CcnxContentStore( );
-  virtual ~CcnxContentStore( );
+  virtual ~CcnxContentStore ();
             
   /**
    * \brief Find corresponding CS entry for the given interest
@@ -176,8 +124,8 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> >
-  Lookup (Ptr<const CcnxInterestHeader> interest);
+  virtual boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> >
+  Lookup (Ptr<const CcnxInterestHeader> interest) = 0;
             
   /**
    * \brief Add a new content to the content store.
@@ -185,28 +133,19 @@ public:
    * \param header Fully parsed CcnxContentObjectHeader
    * \param packet Fully formed CCNx packet to add to content store
    * (will be copied and stripped down of headers)
-   *
-   * If entry with the same prefix exists, the old entry will be
-   * promoted to the top of the MRU hash
+   * @returns true if an existing entry was updated, false otherwise
    */
-  void
-  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+  virtual bool
+  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet) = 0;
 
-  /**
-   * \brief Set maximum size of content store
-   *
-   * \param size size in packets
-   */
-  inline void
-  SetMaxSize (uint32_t maxSize);
-
-  /**
-   * \brief Get maximum size of content store
-   *
-   * \returns size in packets
-   */
-  inline uint32_t
-  GetMaxSize () const;
+  // /**
+  //  * \brief Add a new content to the content store.
+  //  *
+  //  * \param header Interest header for which an entry should be removed
+  //  * @returns true if an existing entry was removed, false otherwise
+  //  */
+  // virtual bool
+  // Remove (Ptr<CcnxInterestHeader> header) = 0;
   
   /**
    * \brief Print out content store entries
@@ -216,21 +155,8 @@ public:
    *
    * Release build dumps everything in MRU order
    */
-  void Print () const;
-
-private:
-  CcnxContentStore (const CcnxContentStore &o); ///< Disabled copy constructor
-  CcnxContentStore& operator= (const CcnxContentStore &o); ///< Disabled copy operator
- 
-private:
-  size_t m_maxSize; ///< \brief maximum number of entries in cache \internal
-  // string_key_hash_t<CsEntry>  m_contentStore;     ///< \brief actual content store \internal
-
-  /**
-   * \brief Content store implemented as a Boost.MultiIndex container
-   * \internal
-   */
-  CcnxContentStoreContainer::type m_contentStore;
+  virtual void
+  Print () const = 0;
 };
 
 inline std::ostream&
@@ -240,37 +166,6 @@ operator<< (std::ostream &os, const CcnxContentStore &cs)
   return os;
 }
 
-const CcnxNameComponents&
-CcnxContentStoreEntry::GetName () const
-{
-  return m_header->GetName ();
-}
-
-Ptr<const CcnxContentObjectHeader>
-CcnxContentStoreEntry::GetHeader () const
-{
-  return m_header;
-}
-
-Ptr<const Packet>
-CcnxContentStoreEntry::GetPacket () const
-{
-  return m_packet;
-}
-
-
-inline void
-CcnxContentStore::SetMaxSize (uint32_t maxSize)
-{
-  m_maxSize = maxSize;
-}
-
-inline uint32_t
-CcnxContentStore::GetMaxSize () const
-{
-  return m_maxSize;
-}
-
-} //namespace ns3
+} // namespace ns3
 
 #endif // CCNX_CONTENT_STORE_H
