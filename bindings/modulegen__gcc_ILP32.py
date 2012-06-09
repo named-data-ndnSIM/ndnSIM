@@ -1312,10 +1312,14 @@ def register_Ns3CcnxPitEntryOutgoingFaceContainer_methods(root_module, cls):
 def register_Ns3CcnxStackHelper_methods(root_module, cls):
     ## ccnx-stack-helper.h (module 'ndnSIM'): ns3::CcnxStackHelper::CcnxStackHelper() [constructor]
     cls.add_constructor([])
-    ## ccnx-stack-helper.h (module 'ndnSIM'): void ns3::CcnxStackHelper::SetForwardingStrategy(std::string forwardingStrategy) [member function]
+    ## ccnx-stack-helper.h (module 'ndnSIM'): void ns3::CcnxStackHelper::SetForwardingStrategy(std::string const & forwardingStrategy) [member function]
     cls.add_method('SetForwardingStrategy', 
                    'void', 
-                   [param('std::string', 'forwardingStrategy')])
+                   [param('std::string const &', 'forwardingStrategy')])
+    ## ccnx-stack-helper.h (module 'ndnSIM'): void ns3::CcnxStackHelper::SetContentStore(std::string const & contentStore) [member function]
+    cls.add_method('SetContentStore', 
+                   'void', 
+                   [param('std::string const &', 'contentStore')])
     ## ccnx-stack-helper.h (module 'ndnSIM'): void ns3::CcnxStackHelper::EnableLimits(bool enable=true, ns3::Time avgRtt=ns3::Seconds( ), uint32_t avgContentObject=1100, uint32_t avgInterest=40) [member function]
     cls.add_method('EnableLimits', 
                    'void', 
@@ -1436,9 +1440,9 @@ def register_Ns3Ipv4Address_methods(root_module, cls):
                    'ns3::Ipv4Address', 
                    [param('uint8_t const *', 'buf')], 
                    is_static=True)
-    ## ipv4-address.h (module 'network'): uint32_t const & ns3::Ipv4Address::Get() const [member function]
+    ## ipv4-address.h (module 'network'): uint32_t ns3::Ipv4Address::Get() const [member function]
     cls.add_method('Get', 
-                   'uint32_t const &', 
+                   'uint32_t', 
                    [], 
                    is_const=True)
     ## ipv4-address.h (module 'network'): static ns3::Ipv4Address ns3::Ipv4Address::GetAny() [member function]
