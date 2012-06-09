@@ -24,6 +24,8 @@
 
 #include "ns3/object.h"
 #include "ns3/ptr.h"
+#include "ns3/traced-callback.h"
+
 #include <boost/tuple/tuple.hpp>
 
 namespace  ns3
@@ -157,6 +159,12 @@ public:
    */
   virtual void
   Print () const = 0;
+
+protected:
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxContentObjectHeader> > m_cacheHitsTrace; ///< @brief trace of cache hits
+    
+  TracedCallback<Ptr<const CcnxInterestHeader> > m_cacheMissesTrace; ///< @brief trace of cache misses
 };
 
 inline std::ostream&

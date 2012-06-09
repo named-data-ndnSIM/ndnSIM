@@ -136,7 +136,11 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
   node->AggregateObject (ccnx);
 
+  // Create and set forwarding strategy
   ccnx->SetForwardingStrategy (m_strategyFactory.Create<CcnxForwardingStrategy> ());
+
+  // Create and set content store
+  node->AggregateObject (m_contentStoreFactory.Create ());
   
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {

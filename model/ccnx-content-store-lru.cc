@@ -80,37 +80,6 @@ struct CcnxContentStoreByPrefix
   type;
 };
 
-/**
- * \ingroup ccnx
- * \brief Typedef for MRU index of content store container
- */
-struct CcnxContentStoreByMru
-{
-  typedef
-  CcnxContentStoreLruContainer::type::index<i_mru>::type
-  type;
-};
-
-#ifdef _DEBUG
-#define DUMP_INDEX_TAG i_ordered
-#define DUMP_INDEX     CcnxContentStoreOrderedPrefix
-/**
- * \ingroup ccnx
- * \brief Typedef for ordered index of content store container
- */
-struct CcnxContentStoreOrderedPrefix
-{
-  typedef
-  CcnxContentStoreLruContainer::type::index<i_ordered>::type
-  type;
-};
-#else
-#define DUMP_INDEX_TAG i_mru
-#define DUMP_INDEX     CcnxContentStoreByMru
-#endif
-
-
-
 CcnxContentStoreLru::CcnxContentStoreLru ()
   : m_maxSize (100)
 { } // this value shouldn't matter, NS-3 should call SetSize with default value specified in AddAttribute earlier
@@ -130,9 +99,12 @@ CcnxContentStoreLru::Lookup (Ptr<const CcnxInterestHeader> interest)
       m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
                                            m_contentStore.project<i_mru> (it));
 
+      m_cacheHitsTrace (interest, it->GetHeader ());
+      
       // return fully formed CCNx packet
       return boost::make_tuple (it->GetFullyFormedCcnxPacket (), it->GetHeader (), it->GetPacket ());
     }
+  m_cacheMissesTrace (interest);
   return boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
 }   
     
@@ -161,12 +133,9 @@ CcnxContentStoreLru::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet>
 void 
 CcnxContentStoreLru::Print() const
 {
-  for( DUMP_INDEX::type::iterator it=m_contentStore.get<DUMP_INDEX_TAG> ().begin ();
-       it != m_contentStore.get<DUMP_INDEX_TAG> ().end ();
-       it++
-       )
+  BOOST_FOREACH (const CcnxContentStoreEntry &entry, m_contentStore.get<i_mru> ())
     {
-      NS_LOG_INFO (it->GetName ());
+      NS_LOG_INFO (entry.GetName ());
     }
 }
 

@@ -29,13 +29,9 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
-#include <boost/tuple/tuple.hpp>
 
 #include "ccnx.h"
 #include "ccnx-name-components-hash-helper.h"
-// #include "ccnx-content-object-header.h"
-// #include "ccnx-interest-header.h"
-// #include "ccnx-name-components.h"
 
 namespace  ns3
 {
@@ -45,7 +41,6 @@ namespace  ns3
  *
  * - First index (tag<prefix>) is a unique hash index based on NDN prefix of the stored content.
  * - Second index (tag<mru>) is a sequential index used to maintain up to m_maxSize most recent used (MRU) entries in the content store
- * - Third index (tag<ordered>) is just a helper to provide stored prefixes in ordered way. Should be disabled in production build
  *
  * \see http://www.boost.org/doc/libs/1_46_1/libs/multi_index/doc/ for more information on Boost.MultiIndex library
  */
@@ -63,15 +58,6 @@ struct CcnxContentStoreLruContainer
                                           &CcnxContentStoreEntry::GetName>,
         CcnxPrefixHash>,
       boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private::i_mru> >
-#ifdef _DEBUG
-      ,
-      boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private::i_ordered>,
-        boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const CcnxNameComponents&,
-                                          &CcnxContentStoreEntry::GetName>
-          >
-#endif
       >
     > type;
   /// @endcond

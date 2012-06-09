@@ -40,6 +40,11 @@ CcnxContentStore::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::CcnxContentStore")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
+
+    .AddTraceSource ("CacheHits", "Trace called every time there is a cache hit",
+                     MakeTraceSourceAccessor (&CcnxContentStore::m_cacheHitsTrace))
+    .AddTraceSource ("CacheMisses", "Trace called every time there is a cache miss",
+                     MakeTraceSourceAccessor (&CcnxContentStore::m_cacheMissesTrace))
     ;
 
   return tid;
