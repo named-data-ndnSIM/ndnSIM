@@ -1,8 +1,11 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('ccnx-simple', ['NDNabstraction'])
+    obj = bld.create_ns3_program('ccnx-simple', ['ndnSIM'])
     obj.source = 'ccnx-simple.cc'
 
-    obj = bld.create_ns3_program('ccnx-grid', ['NDNabstraction', 'internet', 'point-to-point', 'point-to-point-layout'])
+    obj = bld.create_ns3_program('ccnx-grid', ['ndnSIM', 'point-to-point', 'point-to-point-layout'])
     obj.source = 'ccnx-grid.cc'
+
+    obj = bld.create_ns3_program('trie', ['ndnSIM'])
+    obj.source = 'trie.cc'

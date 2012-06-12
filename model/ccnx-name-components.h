@@ -46,6 +46,9 @@ namespace ns3 {
 class CcnxNameComponents : public SimpleRefCount<CcnxNameComponents>
 {
 public:
+  typedef std::list<std::string>::iterator       iterator;            
+  typedef std::list<std::string>::const_iterator const_iterator;
+
   /**
    * \brief Constructor 
    * Creates a prefix with zero components (can be looked as root "/")
@@ -109,6 +112,30 @@ public:
   size () const;
 
   /**
+   * @brief Get read-write begin() iterator
+   */
+  inline iterator
+  begin ();
+
+  /**
+   * @brief Get read-only begin() iterator
+   */
+  inline const_iterator
+  begin () const;
+
+  /**
+   * @brief Get read-write end() iterator
+   */
+  inline iterator
+  end ();
+
+  /**
+   * @brief Get read-only end() iterator
+   */
+  inline const_iterator
+  end () const;
+
+  /**
    * \brief Equality operator for CcnxNameComponents
    */
   inline bool
@@ -119,12 +146,11 @@ public:
    */
   inline bool
   operator< (const CcnxNameComponents &prefix) const;
+
+  typedef std::string partial_type;
   
 private:
   std::list<std::string> m_prefix;                              ///< \brief a list of strings (components)
-
-  typedef std::list<std::string>::iterator iterator;            
-  typedef std::list<std::string>::const_iterator const_iterator;
 };
 
 /**
@@ -148,6 +174,40 @@ CcnxNameComponents::size () const
 {
   return m_prefix.size ();
 }
+
+CcnxNameComponents::iterator
+CcnxNameComponents::begin ()
+{
+  return m_prefix.begin ();
+}
+
+/**
+ * @brief Get read-only begin() iterator
+ */
+CcnxNameComponents::const_iterator
+CcnxNameComponents::begin () const
+{
+  return m_prefix.begin ();
+}  
+
+/**
+ * @brief Get read-write end() iterator
+ */
+CcnxNameComponents::iterator
+CcnxNameComponents::end ()
+{
+  return m_prefix.end ();
+}
+
+/**
+ * @brief Get read-only end() iterator
+ */
+CcnxNameComponents::const_iterator
+CcnxNameComponents::end () const
+{
+  return m_prefix.end ();
+}
+
 
 /**
  * \brief Generic constructor operator
