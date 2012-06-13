@@ -30,43 +30,71 @@ class Integer : public ns3::SimpleRefCount<Integer>
 {
 public:
   Integer (int value) : value_ (value) {}
-  
+
+  operator int () const { return value_; }
 private:
   int value_;
 };
 
+std::ostream &
+operator << (std::ostream &os, const Integer &i)
+{
+  os << (int)i;
+  return os;
+}
+
 int
 main (int argc, char *argv[])
 {
-  trie<ns3::CcnxNameComponents, Integer, smart_pointer_payload_traits<Integer> > *x =
-    new trie<ns3::CcnxNameComponents, Integer, smart_pointer_payload_traits<Integer> >("root");
-
-  ns3::CcnxNameComponents n1,n2,n3,n5;
+  typedef indexed_trie<ns3::CcnxNameComponents, Integer, smart_pointer_payload_traits<Integer> > trie;
+  trie x;
+  x.getPolicy ().set_max_size (2);
+  
+  // x.getTrie ().PrintStat (std::cout);
+  
+  ns3::CcnxNameComponents n1,n2,n3,n4;
   n1("a")("b")("c");
-  n2("a")("c");
-  n3("b")("c");
-  n5("a")("b");
+  n2("a")("b")("d");
+  n3("a")("b")("f");
+  n4("a")("b");
 
   ns3::Ptr<Integer> i = ns3::Create<Integer> (1);
-  x->insert (n1, i);
-  x->insert (n2, i);
-  x->insert (n3, i);
-  x->insert (n5, i);
+  x.insert (n4, ns3::Create<Integer> (4));
 
-  ns3::CcnxNameComponents n4;
-  n4("a")("c");
+
+  
+  x.insert (n3, ns3::Create<Integer> (3));
+  
+  std::pair< trie::iterator, bool > item =
+    x.insert (n2, ns3::Create<Integer> (2));
+  x.erase (item.first);
+
+  x.insert (n1, ns3::Create<Integer> (1));
+  x.find (n1);
+  x.insert (n4, ns3::Create<Integer> (4));
+
+  // std::cout << x.getTrie ();
+  BOOST_FOREACH (const trie::parent_trie &item, x.getPolicy ())
+    {
+      std::cout << *item.payload () << " " << std::endl;
+    }
+
+  // ns3::CcnxNameComponents n4;
+  // n4("a")("c");
     
-  // std::cout << *x->find (n4).get<0> ();
+  // // std::cout << *x->find (n4).get<0> ();
 
-  x->prune ();
-  // x->find (n5).get<0> ()->erase ();
-  x->find (n1).get<0> ()->erase ();
+  // x->prune ();
+  // // x->find (n5).get<0> ()->erase ();
+  // x->find (n1).get<0> ()->erase ();
     
-  std::cout << "digraph trie {\n";
-  std::cout << *x;
-  std::cout << "}\n";
+  // std::cout << "digraph trie {\n";
+  // std::cout << *x;
+  // std::cout << "}\n";
 
-  delete x;
+  // x->PrintStat (std::cout);
+
+  // delete x;
   
   return 0;
 }
