@@ -70,7 +70,6 @@ main (int argc, char *argv[])
   x.erase (item.first);
 
   x.insert (n1, ns3::Create<Integer> (1));
-  x.find (n1);
   x.insert (n4, ns3::Create<Integer> (4));
 
   // std::cout << x.getTrie ();

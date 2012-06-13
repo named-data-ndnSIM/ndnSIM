@@ -23,45 +23,22 @@
 
 #include "ccnx-content-store.h"
 
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/tag.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/sequenced_index.hpp>
-#include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/mem_fun.hpp>
-
 #include "ccnx.h"
 #include "ccnx-name-components-hash-helper.h"
+
+#include "../utils/trie.h"
 
 namespace  ns3
 {
 /**
  * \ingroup ccnx
- * \brief Typedef for content store container implemented as a Boost.MultiIndex container
- *
- * - First index (tag<prefix>) is a unique hash index based on NDN prefix of the stored content.
- * - Second index (tag<mru>) is a sequential index used to maintain up to m_maxSize most recent used (MRU) entries in the content store
- *
- * \see http://www.boost.org/doc/libs/1_46_1/libs/multi_index/doc/ for more information on Boost.MultiIndex library
+ * \brief Typedef for content store container implemented as trie with configurable replacement policy
  */
-struct CcnxContentStoreLruContainer
-{
-  /// @cond include_hidden
-  typedef
-  boost::multi_index::multi_index_container<
-    CcnxContentStoreEntry,
-    boost::multi_index::indexed_by<
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private::i_prefix>,
-        boost::multi_index::const_mem_fun<CcnxContentStoreEntry,
-                                          const CcnxNameComponents&,
-                                          &CcnxContentStoreEntry::GetName>,
-        CcnxPrefixHash>,
-      boost::multi_index::sequenced<boost::multi_index::tag<__ccnx_private::i_mru> >
-      >
-    > type;
-  /// @endcond
-};
+typedef indexed_trie<CcnxNameComponents,
+                     CcnxContentStoreEntry, smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                     lru_policy_traits<CcnxNameComponents,
+                                       CcnxContentStoreEntry,
+                                       smart_pointer_payload_traits<CcnxContentStoreEntry> > > CcnxContentStoreLruContainer;
 
 /**
  * \ingroup ccnx
@@ -116,7 +93,7 @@ private:
    * \brief Content store implemented as a Boost.MultiIndex container
    * \internal
    */
-  CcnxContentStoreLruContainer::type m_contentStore;
+  CcnxContentStoreLruContainer m_contentStore;
 };
 
 } //namespace ns3

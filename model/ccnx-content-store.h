@@ -47,7 +47,7 @@ class CcnxNameComponents;
  *
  * GetFullyFormedCcnxPacket method provided as a convenience
  */
-class CcnxContentStoreEntry
+class CcnxContentStoreEntry : public SimpleRefCount<CcnxContentStoreEntry>
 {
 public:
   /**

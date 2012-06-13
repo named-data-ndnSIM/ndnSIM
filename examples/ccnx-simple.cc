@@ -80,9 +80,15 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Installing CCNx applications");
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   // Consumer will request /prefix/0, /prefix/1, ...
-  consumerHelper.SetPrefix ("/prefix");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetPrefix ("/prefix/0");
+  consumerHelper.SetAttribute ("Frequency", StringValue ("1")); // 10 interests a second
   ApplicationContainer consumers = consumerHelper.Install (nodes.Get (0)); // first node
+  consumers.Stop (Seconds (0.3));
+
+  consumerHelper.SetPrefix ("/prefix");
+  consumers = consumerHelper.Install (nodes.Get (0)); // first node
+  consumers.Start (Seconds (1));
+  consumers.Stop  (Seconds (1.3));
   
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");
   // Producer will reply to all requests starting with /prefix

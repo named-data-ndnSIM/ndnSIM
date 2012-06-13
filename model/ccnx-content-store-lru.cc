@@ -33,8 +33,6 @@ namespace ns3
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxContentStoreLru);
 
-using namespace __ccnx_private;
-
 TypeId 
 CcnxContentStoreLru::GetTypeId (void)
 {
@@ -57,6 +55,7 @@ void
 CcnxContentStoreLru::SetMaxSize (uint32_t maxSize)
 {
   m_maxSize = maxSize;
+  m_contentStore.getPolicy ().set_max_size (maxSize);
 }
 
 uint32_t
@@ -73,12 +72,6 @@ CcnxContentStoreLru::GetMaxSize () const
  * \ingroup ccnx
  * \brief Typedef for hash index of content store container
  */
-struct CcnxContentStoreByPrefix
-{
-  typedef
-  CcnxContentStoreLruContainer::type::index<i_prefix>::type
-  type;
-};
 
 CcnxContentStoreLru::CcnxContentStoreLru ()
   : m_maxSize (100)
@@ -92,50 +85,45 @@ boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> 
 CcnxContentStoreLru::Lookup (Ptr<const CcnxInterestHeader> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
-  CcnxContentStoreLruContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (interest->GetName ());
-  if (it != m_contentStore.end ())
-    {
-      // promote entry to the top
-      m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
-                                           m_contentStore.project<i_mru> (it));
 
-      m_cacheHitsTrace (interest, it->GetHeader ());
-      
-      // return fully formed CCNx packet
-      return boost::make_tuple (it->GetFullyFormedCcnxPacket (), it->GetHeader (), it->GetPacket ());
+  /// @todo Change to search with predicate
+  CcnxContentStoreLruContainer::iterator node =
+    m_contentStore.deepest_prefix_match (interest->GetName ());
+  
+  if (node != m_contentStore.end ())
+    {
+      m_cacheHitsTrace (interest, node->payload ()->GetHeader ());
+
+      NS_LOG_DEBUG ("cache hit with " << node->payload ()->GetHeader ()->GetName ());
+      return boost::make_tuple (node->payload ()->GetFullyFormedCcnxPacket (),
+                                node->payload ()->GetHeader (),
+                                node->payload ()->GetPacket ());
     }
-  m_cacheMissesTrace (interest);
-  return boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
+  else
+    {
+      NS_LOG_DEBUG ("cache miss for " << interest->GetName ());
+      m_cacheMissesTrace (interest);
+      return boost::tuple<Ptr<Packet>, Ptr<CcnxContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
+    }
 }   
     
 bool 
 CcnxContentStoreLru::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << header->GetName ());
-  CcnxContentStoreLruContainer::type::iterator it = m_contentStore.get<i_prefix> ().find (header->GetName ());
-  if (it == m_contentStore.end ())
-    { // add entry to the top
-      m_contentStore.get<i_mru> ().push_front (CcnxContentStoreEntry (header, packet));
-      if (m_contentStore.size () > m_maxSize)
-        m_contentStore.get<i_mru> ().pop_back ();
-      return false;
-    }
-  else
-    {
-      /// @todo Wrong!!! Record should be updated and relocated, not just relocated
-      // promote entry to the top
-      m_contentStore.get<i_mru> ().relocate (m_contentStore.get<i_mru> ().begin (),
-                                             m_contentStore.project<i_mru> (it));
-      return true;
-    }
+
+  return
+    m_contentStore
+    .insert (header->GetName (), Create<CcnxContentStoreEntry> (header, packet))
+    .second;
 }
     
 void 
-CcnxContentStoreLru::Print() const
+CcnxContentStoreLru::Print () const
 {
-  BOOST_FOREACH (const CcnxContentStoreEntry &entry, m_contentStore.get<i_mru> ())
+  BOOST_FOREACH (const CcnxContentStoreLruContainer::parent_trie &item, m_contentStore.getPolicy ())
     {
-      NS_LOG_INFO (entry.GetName ());
+      NS_LOG_INFO (item.payload ()->GetName ());
     }
 }
 

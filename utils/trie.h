@@ -340,7 +340,7 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
     return this;
 
   typedef trie<FullKey, Payload, PayloadTraits> trie;
-  BOOST_FOREACH (const trie &subnode, children_)
+  BOOST_FOREACH (trie &subnode, children_)
     {
       iterator value = subnode.find ();
       if (value != 0)
@@ -373,7 +373,8 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
 
 template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
 inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>::erase ()
+trie<FullKey, Payload, PayloadTraits, PolicyHook>
+::erase ()
 {
   payload_ = PayloadTraits::empty_payload;
   prune ();
@@ -381,7 +382,8 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>::erase ()
 
 template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
 inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>::prune ()
+trie<FullKey, Payload, PayloadTraits, PolicyHook>
+::prune ()
 {
   if (payload_ == 0 && children_.size () == 0)
     {
@@ -414,7 +416,8 @@ operator << (std::ostream &os, const trie<FullKey, Payload, PayloadTraits, Polic
 
 template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
 inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>::PrintStat (std::ostream &os) const
+trie<FullKey, Payload, PayloadTraits, PolicyHook>
+::PrintStat (std::ostream &os) const
 {
   os << "# " << key_ << ((payload_ != 0)?"*":"") << ": " << children_.size() << " children" << std::endl;
   for (size_t bucket = 0, maxbucket = children_.bucket_count ();
@@ -548,7 +551,7 @@ public:
     else
       {
         item.first->set_payload (payload);
-        // policy_traits::update (*item.first);
+        policy_.update (s_iterator_to (item.first));
       }
     
     return item;
@@ -564,26 +567,132 @@ public:
   }
 
   /**
-   * @brief Perform the longest prefix match
-   * @param key the key for which to perform the longest prefix match
-   *
-   * For subsequent direct searches, policy_.lookup () should be called manually
-   *
-   * @return ->second is true if prefix in ->first is longer than key
-   *         ->third is always last node searched
+   * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)
    */
-  inline boost::tuple< iterator, bool, iterator >
-  find (const FullKey &key)
+  inline iterator
+  longest_prefix_match (const FullKey &key)
   {
     boost::tuple< iterator, bool, iterator > item = trie_.find (key);
     if (item.template get<0> () != trie_.end ())
       {
         policy_.lookup (s_iterator_to (item.template get<0> ()));
       }
-    return boost::make_tuple (s_iterator_to (item.template get<0> ()),
-                              item.template get<1> (),
-                              s_iterator_to (item.template get<2> ()));
+    return item.template get<0> ();
   }
+
+  /**
+   * @brief Find a node that has prefix at least as the key (cache lookup)
+   */
+  inline iterator
+  deepest_prefix_match (const FullKey &key)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+
+    // guard in case we don't have anything in the trie
+    if (lastItem == trie_.end ())
+      return trie_.end ();
+    
+    if (reachLast)
+      {
+        if (foundItem == trie_.end ())
+          {
+            foundItem = lastItem->find (); // should be something
+          }
+        policy_.lookup (s_iterator_to (foundItem));
+        return foundItem;
+      }
+    else
+      { // couldn't find a node that has prefix at least as key
+        return trie_.end ();
+      }
+  }
+
+  /**
+   * @brief Find a node that has prefix at least as the key
+   */
+  template<class Predicate>
+  inline iterator
+  deepest_prefix_match (const FullKey &key, Predicate pred)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+
+    // guard in case we don't have anything in the trie
+    if (lastItem == trie_.end ())
+      return trie_.end ();
+    
+    if (reachLast)
+      {
+        foundItem = lastItem->find_if (pred); // may or may not find something
+        if (foundItem == trie_.end ())
+          {
+            return trie_.end ();
+          }
+        policy_.lookup (s_iterator_to (foundItem));
+        return foundItem;
+      }
+    else
+      { // couldn't find a node that has prefix at least as key
+        return trie_.end ();
+      }
+  }
+  
+  // /**
+  //  * @brief Perform the longest prefix match
+  //  * @param key the key for which to perform the longest prefix match
+  //  *
+  //  * @return ->second is true if prefix in ->first is longer than key
+  //  *         ->third is always last node searched
+  //  */
+  // inline boost::tuple< iterator, bool, iterator >
+  // find (const FullKey &key)
+  // {
+  //   boost::tuple< iterator, bool, iterator > item = trie_.find (key);
+  //   if (item.template get<0> () != trie_.end ())
+  //     {
+  //       policy_.lookup (s_iterator_to (item.template get<0> ()));
+  //     }
+  //   return boost::make_tuple (s_iterator_to (item.template get<0> ()),
+  //                             item.template get<1> (),
+  //                             s_iterator_to (item.template get<2> ()));
+  // }
+
+  // /**
+  //  * @brief Find next payload of the sub-trie
+  //  * @param start Start for the search (root for the sub-trie)
+  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
+  //  */
+  // inline iterator
+  // find (iterator start)
+  // {
+  //   iterator item = start->find ();
+  //   if (item != trie_.end ())
+  //     {
+  //       policy_.lookup (s_iterator_to (item));
+  //     }
+  //   return item;
+  // }
+
+  // /**
+  //  * @brief Find next payload of the sub-trie satisfying the predicate
+  //  * @param start Start for the search (root for the sub-trie)
+  //  * @param pred predicate
+  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
+  //  */
+  // template<class Predicate>
+  // inline iterator
+  // find_if (iterator start, Predicate pred)
+  // {
+  //   iterator item = start->find (pred);
+  //   if (item != trie_.end ())
+  //     {
+  //       policy_.lookup (s_iterator_to (item));
+  //     }
+  //   return item;
+  // }
 
   iterator end ()
   {
