@@ -78,8 +78,6 @@ private:
   Ptr<CcnxApp> m_app;
 };
 
-std::ostream& operator<< (std::ostream& os, const CcnxAppFace &localFace);
-
 } // namespace ns3
 
 #endif // CCNX_APP_FACE_H

@@ -3907,6 +3907,24 @@ def register_Ns3CcnxNameComponents_methods(root_module, cls):
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True)
+    ## ccnx-name-components.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::CcnxNameComponents::begin() [member function]
+    cls.add_method('begin', 
+                   'std::_List_iterator< std::string >', 
+                   [])
+    ## ccnx-name-components.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::CcnxNameComponents::begin() const [member function]
+    cls.add_method('begin', 
+                   'std::_List_const_iterator< std::string >', 
+                   [], 
+                   is_const=True)
+    ## ccnx-name-components.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::CcnxNameComponents::end() [member function]
+    cls.add_method('end', 
+                   'std::_List_iterator< std::string >', 
+                   [])
+    ## ccnx-name-components.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::CcnxNameComponents::end() const [member function]
+    cls.add_method('end', 
+                   'std::_List_const_iterator< std::string >', 
+                   [], 
+                   is_const=True)
     ## ccnx-name-components.h (module 'ndnSIM'): size_t ns3::CcnxNameComponents::size() const [member function]
     cls.add_method('size', 
                    'size_t', 
@@ -4824,24 +4842,23 @@ def register_Ns3AddressValue_methods(root_module, cls):
     return
 
 def register_Ns3CcnxAppFace_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ccnx-app-face.h (module 'ndnSIM'): ns3::CcnxAppFace::CcnxAppFace(ns3::Ptr<ns3::CcnxApp> app) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxApp >', 'app')])
     ## ccnx-app-face.h (module 'ndnSIM'): static ns3::TypeId ns3::CcnxAppFace::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ccnx-app-face.h (module 'ndnSIM'): std::ostream & ns3::CcnxAppFace::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'std::ostream &', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
+    ## ccnx-app-face.h (module 'ndnSIM'): ns3::CcnxAppFace::CcnxAppFace(ns3::Ptr<ns3::CcnxApp> app) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::CcnxApp >', 'app')])
     ## ccnx-app-face.h (module 'ndnSIM'): void ns3::CcnxAppFace::RegisterProtocolHandler(ns3::Callback<void, ns3::Ptr<ns3::CcnxFace> const&, ns3::Ptr<ns3::Packet const> const&, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> handler) [member function]
     cls.add_method('RegisterProtocolHandler', 
                    'void', 
                    [param('ns3::Callback< void, ns3::Ptr< ns3::CcnxFace >, ns3::Ptr< ns3::Packet const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'handler')], 
                    is_virtual=True)
+    ## ccnx-app-face.h (module 'ndnSIM'): std::ostream & ns3::CcnxAppFace::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'std::ostream &', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
     ## ccnx-app-face.h (module 'ndnSIM'): void ns3::CcnxAppFace::SendImpl(ns3::Ptr<ns3::Packet> p) [member function]
     cls.add_method('SendImpl', 
                    'void', 
