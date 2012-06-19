@@ -66,7 +66,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
 
   // Set maximum number of packets that will be cached (default 100)
-  Config::SetDefault ("ns3::CcnxContentStore::Size", StringValue ("1000"));
+  Config::SetDefault ("ns3::CcnxContentStoreLru::Size", StringValue ("1000"));
   
   uint32_t nGrid = 3;
   Time finishTime = Seconds (20.0); 
