@@ -132,9 +132,9 @@ Alternatively, it is possible to download a custom (unsupported) branch of NS-3 
 
 	mkdir ndnSIM
 	cd ndnSIM
-	git clone gitolite@git.irl.cs.ucla.edu:ndn/ndnSIM.git ns-3/src/ndnSIM
+	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
 	git clone git://github.com/cawka/pybindgen.git pybindgen
-	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+	git clone gitolite@git.irl.cs.ucla.edu:ndn/ndnSIM.git ns-3/src/ndnSIM
 
 The first command is to create a directory, which will contain everything NS-3 related.  The bare minimum is just base NS-3 (the first clone above). The second clone gets a module necessary to build python bindings, which are necessary for the visualizer module.  The third clone gets actual ndnSIM code and places it in src/ directory.
 
