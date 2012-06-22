@@ -164,7 +164,7 @@ or::
 Documentation
 =============
 
-Overall structure of ndnSIM is described in our technical report.
+Overall structure of ndnSIM is described in our `technical report <http://lasr.cs.ucla.edu/afanasyev/data/files/Afanasyev/ndnSIM-TR.pdf>`_.
 
 `ndnSIM API documentation <doxygen/index.html>`_
 
