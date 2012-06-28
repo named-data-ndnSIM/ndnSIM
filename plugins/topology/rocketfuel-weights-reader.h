@@ -39,7 +39,7 @@ namespace ns3 {
 class RocketfuelWeightsReader : public AnnotatedTopologyReader
 {
 public:
-  RocketfuelWeightsReader (const std::string &path="");
+  RocketfuelWeightsReader (const std::string &path="", double scale=1.0);
   virtual ~RocketfuelWeightsReader ();
 
   void
@@ -63,6 +63,7 @@ public:
 
   enum
     {
+      LINKS,
       WEIGHTS,
       LATENCIES,
       POSITIONS

@@ -329,7 +329,7 @@ AnnotatedTopologyReader::SavePositions (const std::string &file) const
       Ptr<MobilityModel> mobility = (*node)->GetObject<MobilityModel> ();
       Vector position = mobility->GetPosition ();
 
-      os << name << "\t" << "unknown" << "\t" << -position.y << "\t" << position.x << "\n";
+      os << name << "\t" << "NA" << "\t" << -position.y << "\t" << position.x << "\n";
     }
 }
 

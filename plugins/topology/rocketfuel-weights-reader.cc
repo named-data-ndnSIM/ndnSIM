@@ -55,8 +55,8 @@ NS_LOG_COMPONENT_DEFINE ("RocketfuelWeightsReader");
 
 namespace ns3 {
     
-RocketfuelWeightsReader::RocketfuelWeightsReader (const std::string &path/*=""*/)
-  : AnnotatedTopologyReader (path)
+RocketfuelWeightsReader::RocketfuelWeightsReader (const std::string &path/*=""*/, double scale/*=1.0*/)
+  : AnnotatedTopologyReader (path, scale)
 {
   NS_LOG_FUNCTION (this);
 
@@ -144,13 +144,24 @@ RocketfuelWeightsReader::Read ()
 
       switch (m_inputType)
         {
+        case LINKS:
+          {
+            // links only
+            // do nothing
+            break;
+          }
         case WEIGHTS:
           {
+            if (attribute == "")
+              attribute = "1";
             uint16_t metric = boost::lexical_cast<uint16_t> (attribute);
             link->SetAttribute ("OSPF", boost::lexical_cast<string> (metric));
             break;
           }
         case LATENCIES:
+          if (attribute == "")
+            attribute = "1";
+            
           link->SetAttribute ("Delay", attribute+"ms");
           break;
         default:
