@@ -66,14 +66,6 @@ public:
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet) = 0;
     
-  /**
-   * @brief Set link to PIT for the forwarding strategy
-   *
-   * @param pit pointer to PIT
-   */
-  void
-  SetPit (Ptr<CcnxPit> pit);
-  
 protected:
   /**
    * @brief Propagate interest via a green interface. Fail, if no green interfaces available
@@ -95,6 +87,11 @@ protected:
 
   /// @brief Transmitted interests trace
   TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+
+protected:
+  // inherited from Object class                                                                                                                                                        
+  virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
+  virtual void DoDispose (); ///< @brief Do cleanup
   
 protected:  
   Ptr<CcnxPit> m_pit; ///< \brief Reference to PIT to which this forwarding strategy is associated

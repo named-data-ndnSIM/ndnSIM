@@ -90,29 +90,7 @@ public:
    */
   static TypeId GetTypeId ();
   virtual ~Ccnx ();
-
-  /**
-   * \brief Register a new forwarding strategy to be used by this Ccnx
-   * stack
-   *
-   * This call will replace any forwarding strategy that has been
-   * previously registered.
-   * 
-   * \param forwardingStrategy smart pointer to CcnxForwardingStrategy
-   * object
-   */
-  virtual void
-  SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy) = 0;
-
-  /**
-   * \brief Get the forwarding strategy being used by this Ccnx stack
-   * 
-   * \returns smart pointer to CcnxForwardingStrategy object, or null
-   * pointer if none
-   */
-  virtual Ptr<CcnxForwardingStrategy>
-  GetForwardingStrategy (void) const = 0;
-
+  
   /**
    * \brief Add face to CCNx stack
    *
@@ -152,12 +130,6 @@ public:
    */
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const = 0;
-
-  /**
-   * \brief Get PIT associated with Node 
-   */
-  virtual Ptr<CcnxPit>
-  GetPit() const = 0;
 
   /**
    * \enum DropReason

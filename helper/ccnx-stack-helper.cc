@@ -60,24 +60,103 @@ CcnxStackHelper::CcnxStackHelper ()
   : m_limitsEnabled (false)
   , m_needSetDefaultRoutes (false)
 {
-  m_strategyFactory.SetTypeId ("ns3::CcnxFloodingStrategy");
+  m_ccnxFactory.        SetTypeId ("ns3::CcnxL3Protocol");
+  m_strategyFactory.    SetTypeId ("ns3::CcnxFloodingStrategy");
   m_contentStoreFactory.SetTypeId ("ns3::CcnxContentStoreLru");
+  m_fibFactory.         SetTypeId ("ns3::CcnxFib");
+  m_pitFactory.         SetTypeId ("ns3::CcnxPit");
 }
     
 CcnxStackHelper::~CcnxStackHelper ()
 {
 }
 
+void
+CcnxStackHelper::SetCcnxAttributes (const std::string &attr1, const std::string &value1,
+                                    const std::string &attr2, const std::string &value2,
+                                    const std::string &attr3, const std::string &value3,
+                                    const std::string &attr4, const std::string &value4)
+{
+  if (attr1 != "")
+      m_ccnxFactory.Set (attr1, StringValue (value1));
+  if (attr2 != "")
+      m_ccnxFactory.Set (attr2, StringValue (value2));
+  if (attr3 != "")
+      m_ccnxFactory.Set (attr3, StringValue (value3));
+  if (attr4 != "")
+      m_ccnxFactory.Set (attr4, StringValue (value4));
+}
+
 void 
-CcnxStackHelper::SetForwardingStrategy (const std::string &strategy)
+CcnxStackHelper::SetForwardingStrategy (const std::string &strategy,
+                                        const std::string &attr1, const std::string &value1,
+                                        const std::string &attr2, const std::string &value2,
+                                        const std::string &attr3, const std::string &value3,
+                                        const std::string &attr4, const std::string &value4)
 {
   m_strategyFactory.SetTypeId (strategy);
+  if (attr1 != "")
+      m_strategyFactory.Set (attr1, StringValue (value1));
+  if (attr2 != "")
+      m_strategyFactory.Set (attr2, StringValue (value2));
+  if (attr3 != "")
+      m_strategyFactory.Set (attr3, StringValue (value3));
+  if (attr4 != "")
+      m_strategyFactory.Set (attr4, StringValue (value4));
 }
 
 void
-CcnxStackHelper::SetContentStore (const std::string &contentStore)
+CcnxStackHelper::SetContentStore (const std::string &contentStore,
+                                  const std::string &attr1, const std::string &value1,
+                                  const std::string &attr2, const std::string &value2,
+                                  const std::string &attr3, const std::string &value3,
+                                  const std::string &attr4, const std::string &value4)
 {
   m_contentStoreFactory.SetTypeId (contentStore);
+  if (attr1 != "")
+      m_contentStoreFactory.Set (attr1, StringValue (value1));
+  if (attr2 != "")
+      m_contentStoreFactory.Set (attr2, StringValue (value2));
+  if (attr3 != "")
+      m_contentStoreFactory.Set (attr3, StringValue (value3));
+  if (attr4 != "")
+      m_contentStoreFactory.Set (attr4, StringValue (value4));
+}
+
+void
+CcnxStackHelper::SetPit (const std::string &pitClass,
+                         const std::string &attr1, const std::string &value1,
+                         const std::string &attr2, const std::string &value2,
+                         const std::string &attr3, const std::string &value3,
+                         const std::string &attr4, const std::string &value4)
+{
+  m_pitFactory.SetTypeId (pitClass);
+  if (attr1 != "")
+      m_pitFactory.Set (attr1, StringValue (value1));
+  if (attr2 != "")
+      m_pitFactory.Set (attr2, StringValue (value2));
+  if (attr3 != "")
+      m_pitFactory.Set (attr3, StringValue (value3));
+  if (attr4 != "")
+      m_pitFactory.Set (attr4, StringValue (value4));
+}
+
+void
+CcnxStackHelper::SetFib (const std::string &fibClass,
+                         const std::string &attr1, const std::string &value1,
+                         const std::string &attr2, const std::string &value2,
+                         const std::string &attr3, const std::string &value3,
+                         const std::string &attr4, const std::string &value4)
+{
+  m_fibFactory.SetTypeId (fibClass);
+  if (attr1 != "")
+      m_fibFactory.Set (attr1, StringValue (value1));
+  if (attr2 != "")
+      m_fibFactory.Set (attr2, StringValue (value2));
+  if (attr3 != "")
+      m_fibFactory.Set (attr3, StringValue (value3));
+  if (attr4 != "")
+      m_fibFactory.Set (attr4, StringValue (value4));
 }
 
 void
@@ -130,17 +209,23 @@ CcnxStackHelper::Install (Ptr<Node> node) const
       return 0;
     }
 
-  Ptr<CcnxFib> fib = CreateObject<CcnxFib> ();
-  node->AggregateObject (fib);
+  // Create CcnxL3Protocol
+  Ptr<Ccnx> ccnx = m_ccnxFactory.Create<Ccnx> ();
 
-  Ptr<CcnxL3Protocol> ccnx = CreateObject<CcnxL3Protocol> ();
+  // Create and aggregate FIB
+  ccnx->AggregateObject (m_fibFactory.Create<CcnxFib> ());
+
+  // Create and aggregate PIT
+  ccnx->AggregateObject (m_pitFactory.Create<CcnxPit> ());
+  
+  // Create and aggregate forwarding strategy
+  ccnx->AggregateObject (m_strategyFactory.Create<CcnxForwardingStrategy> ());
+
+  // Create and aggregate content store
+  ccnx->AggregateObject (m_contentStoreFactory.Create<CcnxContentStore> ());
+
+  // Aggregate CcnxL3Protocol on node
   node->AggregateObject (ccnx);
-
-  // Create and set forwarding strategy
-  ccnx->SetForwardingStrategy (m_strategyFactory.Create<CcnxForwardingStrategy> ());
-
-  // Create and set content store
-  node->AggregateObject (m_contentStoreFactory.Create ());
   
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {

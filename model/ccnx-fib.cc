@@ -38,8 +38,11 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
+NS_LOG_COMPONENT_DEFINE ("CcnxFib");
+
 namespace ns3 {
 
+NS_OBJECT_ENSURE_REGISTERED (CcnxFib);
 
 //////////////////////////////////////////////////////////////////////
 // Helpers
@@ -55,7 +58,6 @@ struct CcnxFibFaceMetricByFace
 }
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-NS_LOG_COMPONENT_DEFINE ("CcnxFib");
     
 using namespace __ccnx_private;
 

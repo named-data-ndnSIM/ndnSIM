@@ -150,11 +150,6 @@ public:
     return m_PitEntryPruningTimout;
   }
   
-  /**
-   * \brief Set FIB table
-   */
-  void SetFib (Ptr<CcnxFib> fib);
-
 protected:
   // inherited from Object class                                                                                                                                                        
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
@@ -189,6 +184,8 @@ private:
   // configuration variables. Check implementation of GetTypeId for more details
   Time    m_PitEntryPruningTimout;
   Time    m_PitEntryDefaultLifetime;
+
+  uint32_t m_maxSize;
 
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
 };

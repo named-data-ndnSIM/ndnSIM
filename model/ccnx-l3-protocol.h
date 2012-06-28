@@ -83,25 +83,8 @@ public:
   CcnxL3Protocol();
   virtual ~CcnxL3Protocol ();
 
-  /**
-   * \brief Assigns node to the CCNx stack
-   *
-   * \param node Simulation node
-   */
-  void SetNode (Ptr<Node> node);
-
   ////////////////////////////////////////////////////////////////////
   // functions defined in base class Ccnx
-  
-  void SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy);
-  Ptr<CcnxForwardingStrategy> GetForwardingStrategy () const;
-
-  // virtual void SendInterest (const Ptr<CcnxFace> &face,
-  //                            const Ptr<const CcnxInterestHeader> &header,
-  //                            const Ptr<Packet> &packet);
-  // virtual void SendContentObject (const Ptr<CcnxFace> &face,
-  //                                 const Ptr<const CcnxContentObjectHeader> &header,
-  //                                 const Ptr<Packet> &packet);
 
   virtual uint32_t
   AddFace (const Ptr<CcnxFace> &face);
@@ -117,9 +100,6 @@ public:
 
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
-  
-  virtual Ptr<CcnxPit>
-  GetPit () const;
   
   // void ScheduleLeakage();
 private:
@@ -206,20 +186,15 @@ private:
   typedef std::vector<Ptr<CcnxFace> > CcnxFaceList;
   CcnxFaceList m_faces; ///< \brief list of faces that belongs to ccnx stack on this node
 
+  // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
-
-  // Ptr<CcnxRit> m_rit; ///< \brief RIT (recently interest table)
   Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
   bool m_nacksEnabled;
   bool m_cacheUnsolicitedData;
-  bool m_delayingDataProcessing;
-  
-  // Time    m_bucketLeakInterval;
-  // EventId m_bucketLeakEvent;
 };
   
 } // Namespace ns3

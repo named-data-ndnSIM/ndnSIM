@@ -71,11 +71,6 @@ CcnxL3Protocol::GetTypeId (void)
                    MakeObjectVectorAccessor (&CcnxL3Protocol::m_faces),
                    MakeObjectVectorChecker<CcnxFace> ())
 
-    .AddAttribute ("ForwardingStrategy", "Forwarding strategy used by CCNx stack",
-                   PointerValue (),
-                   MakePointerAccessor (&CcnxL3Protocol::SetForwardingStrategy, &CcnxL3Protocol::GetForwardingStrategy),
-                   MakePointerChecker<CcnxForwardingStrategy> ())
-    
     .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
                    BooleanValue (false),
                    MakeBooleanAccessor (&CcnxL3Protocol::m_nacksEnabled),
@@ -83,10 +78,6 @@ CcnxL3Protocol::GetTypeId (void)
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
                    BooleanValue (false),
                    MakeBooleanAccessor (&CcnxL3Protocol::m_cacheUnsolicitedData),
-                   MakeBooleanChecker ())
-    .AddAttribute ("RandomDataDelaying", "Delaying data processing",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&CcnxL3Protocol::m_delayingDataProcessing),
                    MakeBooleanChecker ())
   ;
   return tid;
@@ -96,23 +87,11 @@ CcnxL3Protocol::CcnxL3Protocol()
 : m_faceCounter (0)
 {
   NS_LOG_FUNCTION (this);
-  
-  m_pit = CreateObject<CcnxPit> ();
 }
 
 CcnxL3Protocol::~CcnxL3Protocol ()
 {
   NS_LOG_FUNCTION (this);
-}
-
-void
-CcnxL3Protocol::SetNode (Ptr<Node> node)
-{
-  m_node = node;
-  m_fib = m_node->GetObject<CcnxFib> ();
-  NS_ASSERT_MSG (m_fib != 0, "FIB should be created and aggregated to a node before calling Ccnx::SetNode");
-
-  m_pit->SetFib (m_fib);
 }
 
 /*
@@ -122,19 +101,31 @@ CcnxL3Protocol::SetNode (Ptr<Node> node)
 void
 CcnxL3Protocol::NotifyNewAggregate ()
 {
+  // not really efficient, but this will work only once
   if (m_node == 0)
     {
-      Ptr<Node> node = this->GetObject<Node>();
-      // verify that it's a valid node and that
-      // the node has not been set before
-      if (node != 0)
+      m_node = GetObject<Node> ();
+      if (m_node != 0)
         {
-          this->SetNode (node);
+          NS_ASSERT_MSG (m_pit != 0 && m_fib != 0 && m_contentStore != 0 && m_forwardingStrategy != 0,
+                         "PIT, FIB, and ContentStore should be aggregated before CcnxL3Protocol");
         }
+    }
+  if (m_pit == 0)
+    {
+      m_pit = GetObject<CcnxPit> ();
+    }
+  if (m_fib == 0)
+    {
+      m_fib = GetObject<CcnxFib> ();
+    }
+  if (m_forwardingStrategy == 0)
+    {
+      m_forwardingStrategy = GetObject<CcnxForwardingStrategy> ();
     }
   if (m_contentStore == 0)
     {
-      m_contentStore = this->GetObject<CcnxContentStore> ();
+      m_contentStore = GetObject<CcnxContentStore> ();
     }
 
   Object::NotifyNewAggregate ();
@@ -158,30 +149,8 @@ CcnxL3Protocol::DoDispose (void)
   m_contentStore = 0;
   m_fib = 0;
 
-  // m_forwardingStrategy = 0;
   Object::DoDispose ();
 }
-
-void
-CcnxL3Protocol::SetForwardingStrategy (Ptr<CcnxForwardingStrategy> forwardingStrategy)
-{
-  NS_LOG_FUNCTION (this);
-  m_forwardingStrategy = forwardingStrategy;
-  m_forwardingStrategy->SetPit (m_pit);
-}
-
-Ptr<CcnxForwardingStrategy>
-CcnxL3Protocol::GetForwardingStrategy (void) const
-{
-  return m_forwardingStrategy;
-}
-
-Ptr<CcnxPit>
-CcnxL3Protocol::GetPit () const
-{
-  return m_pit;
-}
-
 
 uint32_t 
 CcnxL3Protocol::AddFace (const Ptr<CcnxFace> &face)
@@ -388,8 +357,6 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
       return;
     }
   
-  NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
-
   Ptr<Packet> nonNackInterest = Create<Packet> ();
   header->SetNack (CcnxInterestHeader::NORMAL_INTEREST);
   nonNackInterest->AddHeader (*header);
@@ -531,8 +498,6 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   // Propagate
   /////////////////////////////////////////////////////////////////////
   
-  NS_ASSERT_MSG (m_forwardingStrategy != 0, "Need a forwarding protocol object to process packets");
-  
   bool propagated = m_forwardingStrategy->
     PropagateInterest (pitEntry, incomingFace, header, packet);
 
@@ -563,12 +528,6 @@ CcnxL3Protocol::OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
                                Ptr<const Packet> payload,
                                const Ptr<const Packet> &packet)
 {
-  if (m_delayingDataProcessing)
-    {
-      NS_LOG_DEBUG ("Delayed processing " << header->GetName ());
-      // NS_LOG_DEBUG (*m_pit);
-    }
-  
   // 1. Lookup PIT entry
   try
     {
@@ -677,17 +636,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
         }
       else
         {
-          if (!m_delayingDataProcessing)
-            {
-              OnDataDelayed (header, payload, packet);
-            }
-          else
-            {
-              NS_LOG_DEBUG ("Delaying Data forwarding " << header->GetName ());
-              UniformVariable delay (0.0001, 0.002);
-              Simulator::Schedule (Seconds (delay.GetValue ()),
-                                   &CcnxL3Protocol::OnDataDelayed, this, header, payload, packet);
-            }
+          OnDataDelayed (header, payload, packet);
         }
     }
   catch (CcnxPitEntryNotFound)

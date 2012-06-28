@@ -68,23 +68,63 @@ public:
   virtual ~CcnxStackHelper ();
 
   /**
-   * @brief Set forwarding strategy class
-   * @param forwardingStrategy string containing name of the forwarding strategy class
+   * @brief Set parameters of CcnxL3Protocol
+   */
+  void
+  SetCcnxAttributes (const std::string &attr1 = "", const std::string &value1 = "",
+                     const std::string &attr2 = "", const std::string &value2 = "",
+                     const std::string &attr3 = "", const std::string &value3 = "",
+                     const std::string &attr4 = "", const std::string &value4 = "");
+  
+  
+  /**
+   * @brief Set forwarding strategy class and its attributes
+   * @param forwardingStrategyClass string containing name of the forwarding strategy class
    *
    * Valid options are "ns3::CcnxFloodingStrategy" (default) and "ns3::CcnxBestRouteStrategy"
    *
    * Other strategies can be implemented, inheriting ns3::CcnxForwardingStrategy class
    */
   void
-  SetForwardingStrategy (const std::string &forwardingStrategy);
+  SetForwardingStrategy (const std::string &forwardingStrategyClass,
+                         const std::string &attr1 = "", const std::string &value1 = "",
+                         const std::string &attr2 = "", const std::string &value2 = "",
+                         const std::string &attr3 = "", const std::string &value3 = "",
+                         const std::string &attr4 = "", const std::string &value4 = "");
 
   /**
-   * @brief Set content store class
-   * @param contentStore string, representing class of the content store
+   * @brief Set content store class and its attributes
+   * @param contentStoreClass string, representing class of the content store
    */
   void
-  SetContentStore (const std::string &contentStore);
+  SetContentStore (const std::string &contentStoreClass,
+                   const std::string &attr1 = "", const std::string &value1 = "",
+                   const std::string &attr2 = "", const std::string &value2 = "",
+                   const std::string &attr3 = "", const std::string &value3 = "",
+                   const std::string &attr4 = "", const std::string &value4 = "");
+
+  /**
+   * @brief Set PIT class and its attributes
+   * @param pitClass string, representing class of PIT
+   */
+  void
+  SetPit (const std::string &pitClass,
+          const std::string &attr1 = "", const std::string &value1 = "",
+          const std::string &attr2 = "", const std::string &value2 = "",
+          const std::string &attr3 = "", const std::string &value3 = "",
+          const std::string &attr4 = "", const std::string &value4 = "");
   
+  /**
+   * @brief Set FIB class and its attributes
+   * @param pitClass string, representing class of FIB
+   */
+  void
+  SetFib (const std::string &fibClass,
+          const std::string &attr1 = "", const std::string &value1 = "",
+          const std::string &attr2 = "", const std::string &value2 = "",
+          const std::string &attr3 = "", const std::string &value3 = "",
+          const std::string &attr4 = "", const std::string &value4 = "");
+
   /**
    * @brief Enable Interest limits (disabled by default)
    *
@@ -181,8 +221,12 @@ private:
   CcnxStackHelper &operator = (const CcnxStackHelper &o);
   
 private:
+  ObjectFactory m_ccnxFactory;
   ObjectFactory m_strategyFactory;
   ObjectFactory m_contentStoreFactory;
+  ObjectFactory m_pitFactory;
+  ObjectFactory m_fibFactory;
+  
   bool m_limitsEnabled;
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;

@@ -67,9 +67,18 @@ CcnxForwardingStrategy::~CcnxForwardingStrategy ()
 }
 
 void
-CcnxForwardingStrategy::SetPit (Ptr<CcnxPit> pit)
+CcnxForwardingStrategy::NotifyNewAggregate ()
 {
-  m_pit = pit;
+  if (m_pit == 0)
+    {
+      m_pit = GetObject<CcnxPit> ();
+    }
+}
+
+void
+CcnxForwardingStrategy::DoDispose ()
+{
+  // nothing to do...
 }
 
 bool
@@ -79,6 +88,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
                                                    const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (m_pit != 0, "PIT should be aggregated with forwarding strategy");
 
   int propagatedCount = 0;
   

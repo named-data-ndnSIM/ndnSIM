@@ -21,6 +21,7 @@
 #include "ccnx-pit.h"
 #include "ns3/log.h"
 #include "ns3/string.h"
+#include "ns3/uinteger.h"
 #include "ns3/simulator.h"
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
@@ -63,6 +64,12 @@ CcnxPit::GetTypeId ()
                    StringValue("4s"),
                    MakeTimeAccessor (&CcnxPit::m_PitEntryDefaultLifetime),
                    MakeTimeChecker ())
+
+    .AddAttribute ("MaxSize",
+                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
+                   StringValue ("0"),
+                   MakeUintegerAccessor (&CcnxPit::m_maxSize),
+                   MakeUintegerChecker<uint32_t> ())
     ;
 
   return tid;
@@ -74,12 +81,15 @@ CcnxPit::CcnxPit ()
 
 CcnxPit::~CcnxPit ()
 {
-  DoDispose ();
 }
 
 void 
 CcnxPit::NotifyNewAggregate ()
 {
+  if (m_fib == 0)
+    {
+      m_fib = GetObject<CcnxFib> ();
+    }
 }
 
 void 
@@ -134,12 +144,6 @@ void CcnxPit::CleanExpired ()
                                         &CcnxPit::CleanExpired, this); 
 }
 
-void
-CcnxPit::SetFib (Ptr<CcnxFib> fib)
-{
-  m_fib = fib;
-}
-
 CcnxPitEntryContainer::type::iterator
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
@@ -177,6 +181,13 @@ CcnxPit::Lookup (const CcnxInterestHeader &header)
 
   if (entry == end ())
     {
+      if (m_maxSize > 0 &&
+          size () >= m_maxSize)
+        {
+          // remove old record
+          get<i_timestamp> ().erase (get<i_timestamp> ().begin ());
+        }
+      
       CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
       NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
                      "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
