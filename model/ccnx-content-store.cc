@@ -43,6 +43,7 @@ CcnxContentStore::GetTypeId (void)
 
     .AddTraceSource ("CacheHits", "Trace called every time there is a cache hit",
                      MakeTraceSourceAccessor (&CcnxContentStore::m_cacheHitsTrace))
+
     .AddTraceSource ("CacheMisses", "Trace called every time there is a cache miss",
                      MakeTraceSourceAccessor (&CcnxContentStore::m_cacheMissesTrace))
     ;

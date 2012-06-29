@@ -142,7 +142,8 @@ public:
       NO_FACES,    // Interests
       NON_DUPLICATED, // Nacks
       AFTER_SATISFIED, // Nacks
-      UNSOLICITED      // data
+      UNSOLICITED,      // data
+      PIT_LIMIT         // PIT limit reached
     };
   
 protected:

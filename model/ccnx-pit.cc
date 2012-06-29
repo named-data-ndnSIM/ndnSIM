@@ -26,13 +26,14 @@
 #include "ccnx-interest-header.h"
 #include "ccnx-content-object-header.h"
 
-#include <boost/bind.hpp>
+#include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
 NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
 using namespace boost::tuples;
 using namespace boost;
+namespace ll = boost::lambda;
 
 namespace ns3 {
 
@@ -121,7 +122,7 @@ CcnxPit::GetCleanupTimeout () const
 
 void CcnxPit::CleanExpired ()
 {
-  NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
+  // NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
   Time now = Simulator::Now ();
 
   // uint32_t count = 0;
@@ -137,19 +138,15 @@ void CcnxPit::CleanExpired ()
         break; // nothing else to do. All later records will not be stale
     }
 
-  // NS_LOG_LOGIC ("Cleaned " << count << " records. Total: " << size ());
-  // schedule next even
-  
+  // schedule next event  
   m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
                                         &CcnxPit::CleanExpired, this); 
 }
 
-CcnxPitEntryContainer::type::iterator
+CcnxPit::iterator
 CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
 {
-  // NS_LOG_FUNCTION_NOARGS ();
-
-  CcnxPitEntryContainer::type::iterator entry = end ();
+  iterator entry = end ();
 
   // do the longest prefix match
   const CcnxNameComponents &name = header.GetName ();
@@ -163,68 +160,69 @@ CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
       if (entry != end())
         return entry;
     }
-  
-  throw CcnxPitEntryNotFound();
+
+  return end ();
 }
 
-boost::tuple<const CcnxPitEntry&, bool, bool>
+CcnxPit::iterator
 CcnxPit::Lookup (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION (header.GetName ());
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
 
-  bool isDuplicate = false;
-  bool isNew = true;
-
-  CcnxPitEntryContainer::type::iterator entry =
-    get<i_prefix> ().find (header.GetName ());
-
+  iterator entry = get<i_prefix> ().find (header.GetName ());
   if (entry == end ())
-    {
-      if (m_maxSize > 0 &&
-          size () >= m_maxSize)
-        {
-          // remove old record
-          get<i_timestamp> ().erase (get<i_timestamp> ().begin ());
-        }
-      
-      CcnxFibEntryContainer::type::iterator fibEntry = m_fib->LongestPrefixMatch (header);
-      NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
-                     "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
+    return end ();
+   
+  return entry;
+}
 
-      entry = insert (end (),
-                      CcnxPitEntry (Create<CcnxNameComponents> (header.GetName ()),
-                                    header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
-                                    :                                       header.GetInterestLifetime (),
-                                    *fibEntry));
-
-      // isDuplicate = false; // redundant
-      // isNew = true; // also redundant
-    }
-  else
-    {
-      NS_LOG_INFO ("ExpireTime: " << entry->m_expireTime.ToDouble (Time::S));
-      if (entry->m_expireTime - Simulator::Now () < MilliSeconds (10))
-        {
-          modify (entry,
-                  boost::bind(&CcnxPitEntry::ClearIncoming, boost::lambda::_1));
-          
-          modify (entry,
-                  boost::bind(&CcnxPitEntry::ClearOutgoing, boost::lambda::_1));
-        }
-      
-      isNew = entry->m_incoming.size () == 0 && entry->m_outgoing.size () == 0; // entry was preserved to detect loops, but technically removed
-      isDuplicate = entry->IsNonceSeen (header.GetNonce ());
-    }
-
-  if (!isDuplicate)
+bool
+CcnxPit::CheckIfDuplicate (CcnxPit::iterator entry, const CcnxInterestHeader &header)
+{
+  if (!entry->IsNonceSeen (header.GetNonce ()))
     {
       modify (entry,
-              boost::bind(&CcnxPitEntry::AddSeenNonce, boost::lambda::_1, header.GetNonce ()));
+              boost::bind(&CcnxPitEntry::AddSeenNonce, ll::_1, header.GetNonce ()));
+      return false;
     }
-
-  return make_tuple (cref(*entry), isNew, isDuplicate);
+  else
+    return true;
 }
+
+CcnxPit::iterator
+CcnxPit::Create (const CcnxInterestHeader &header)
+{
+  NS_ASSERT_MSG (get<i_prefix> ().find (header.GetName ()) == end (),
+                 "Entry already exists, Create must not be called!!!");
+  
+  if (m_maxSize > 0 &&
+      size () >= m_maxSize)
+    {
+      // remove old record
+      get<i_timestamp> ().erase (get<i_timestamp> ().begin ());
+    }
+      
+  CcnxFib::iterator fibEntry = m_fib->LongestPrefixMatch (header);
+  // NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
+  //                "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
+
+  return insert (end (),
+                 CcnxPitEntry (ns3::Create<CcnxNameComponents> (header.GetName ()),
+                               header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
+                               :                                       header.GetInterestLifetime (),
+                               fibEntry));
+}
+
+
+void
+CcnxPit::MarkErased (CcnxPit::iterator entry)
+{
+  modify (entry,
+          ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
+                    Simulator::Now () + m_PitEntryPruningTimout));
+}
+
 
 std::ostream& operator<< (std::ostream& os, const CcnxPit &pit)
 {

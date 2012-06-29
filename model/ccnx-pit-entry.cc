@@ -36,12 +36,10 @@ namespace ns3
 
 CcnxPitEntry::CcnxPitEntry (Ptr<CcnxNameComponents> prefix,
                             const Time &expireTime,
-                            const CcnxFibEntry &fibEntry)
+                            CcnxFib::iterator fibEntry)
   : m_prefix (prefix)
   , m_fibEntry (fibEntry)
   , m_expireTime (Simulator::Now () + expireTime)
-  // , m_timerExpired (false)
-  // , m_counterExpirations (0)
   , m_maxRetxCount (0)
 {
 }
@@ -52,7 +50,6 @@ CcnxPitEntry::SetExpireTime (const Time &expireTime)
   NS_LOG_FUNCTION (expireTime.ToDouble (Time::S));
   m_expireTime = expireTime;
 }
-
 
 void
 CcnxPitEntry::UpdateLifetime (const Time &offsetTime)
@@ -66,10 +63,10 @@ CcnxPitEntry::UpdateLifetime (const Time &offsetTime)
   NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
 }
 
-CcnxPitEntryIncomingFaceContainer::type::iterator
+CcnxPitEntry::in_iterator
 CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
 {
-  std::pair<CcnxPitEntryIncomingFaceContainer::type::iterator,bool> ret = 
+  std::pair<in_iterator,bool> ret = 
     m_incoming.insert (CcnxPitEntryIncomingFace (face));
 
   NS_ASSERT_MSG (ret.second, "Something is wrong");
@@ -84,10 +81,10 @@ CcnxPitEntry::RemoveIncoming (Ptr<CcnxFace> face)
 }
 
 
-CcnxPitEntryOutgoingFaceContainer::type::iterator
+CcnxPitEntry::out_iterator
 CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
 {
-  std::pair<CcnxPitEntryOutgoingFaceContainer::type::iterator,bool> ret =
+  std::pair<out_iterator,bool> ret =
     m_outgoing.insert (CcnxPitEntryOutgoingFace (face));
 
   if (!ret.second)
@@ -102,13 +99,12 @@ CcnxPitEntry::AddOutgoing (Ptr<CcnxFace> face)
 void
 CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
 {
-  CcnxPitEntryIncomingFaceContainer::type::iterator incoming =
-    m_incoming.find (face);
+  in_iterator incoming = m_incoming.find (face);
 
   if (incoming != m_incoming.end ())
     m_incoming.erase (incoming);
 
-  CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+  out_iterator outgoing =
     m_outgoing.find (face);
 
   if (outgoing != m_outgoing.end ())
@@ -116,7 +112,7 @@ CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
 }
 
 void
-CcnxPitEntry::SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterator face)
+CcnxPitEntry::SetWaitingInVain (CcnxPitEntry::out_iterator face)
 {
   NS_LOG_DEBUG (boost::cref (*face->m_face));
 

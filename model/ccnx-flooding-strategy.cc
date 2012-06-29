@@ -83,7 +83,7 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
 
   int propagatedCount = 0;
 
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry->m_faces.get<i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list

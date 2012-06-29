@@ -151,11 +151,6 @@ public:
   
   /**
    * \brief Print out content store entries
-   *
-   * Debug build provides dumping of content store entries in
-   * lexicographical order of corresponding prefixes
-   *
-   * Release build dumps everything in MRU order
    */
   virtual void
   Print () const = 0;

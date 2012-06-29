@@ -124,32 +124,50 @@ public:
   /**
    * \brief Find corresponding PIT entry for the given content name
    * \param prefix Prefix for which to lookup the entry
-   * \returns const reference to Pit entry. If record not found,
-   *          CcnxPitEntryNotFound exception will be thrown
+   * \returns iterator to Pit entry. If record not found,
+   *          return end() iterator
    */
-  CcnxPitEntryContainer::type::iterator
+  iterator
   Lookup (const CcnxContentObjectHeader &header) const;
 
   /**
-   * \brief Find corresponding PIT entry for the given content name
-   * \param prefix Prefix for which to lookup the entry
-   * \returns a tuple:
-   * get<0>: `const CcnxPitEntry&`: a valid PIT entry (if record does not exist, it will be created)
-   * get<1>: `bool`: true if a new entry was created
-   * get<2>: `bool`: true if a PIT entry exists and Nonce that present in header has been already seen
-   * 
+   * \brief Find a PIT entry for the given content interest
+   * \param header parsed interest header
+   * \returns iterator to Pit entry. If record not found,
+   *          return end() iterator
    */
-  boost::tuple<const CcnxPitEntry&, bool, bool>
+  iterator
   Lookup (const CcnxInterestHeader &header);
 
   /**
-   * @brief Get pruning timeout for PIT entries (configuration parameter)
+   * @brief Check if the Interest carries an existent nonce.
+   * If not, nonce will be added to the list of known nonces
+   * @returns true if interest is duplicate (carries an existent nonce), false otherwise
    */
-  Time GetPitEntryPruningTimeout () const
-  {
-    return m_PitEntryPruningTimout;
-  }
+  bool
+  CheckIfDuplicate (iterator entry, const CcnxInterestHeader &header);
   
+  /**
+   * @brief Creates a PIT entry for the given interest
+   * @param header parsed interest header
+   * @returns iterator to Pit entry. If record could not be created (e.g., limit reached),
+   *          return end() iterator
+   *
+   * Note. This call assumes that the entry does not exist (i.e., there was a Lookup call before)
+   */
+  iterator
+  Create (const CcnxInterestHeader &header);
+  
+  /**
+   * @brief Mark PIT entry deleted
+   * @param entry PIT entry
+   *
+   * Effectively, this method removes all incoming/outgoing faces and set
+   * lifetime +m_PitEntryDefaultLifetime from Now ()
+   */
+  void
+  MarkErased (iterator entry);
+    
 protected:
   // inherited from Object class                                                                                                                                                        
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
@@ -194,11 +212,6 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<< (std::ostream& os, const CcnxPit &pit);
-
-/**
- * @brief Class for exception when PIT entry is not found
- */
-class CcnxPitEntryNotFound {};
 
 } // namespace ns3
 

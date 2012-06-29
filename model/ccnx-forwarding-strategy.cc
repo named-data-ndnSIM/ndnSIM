@@ -92,7 +92,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
 
   int propagatedCount = 0;
   
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry.m_faces.get<i_metric> ())
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry->m_faces.get<i_metric> ())
     {
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
           metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)

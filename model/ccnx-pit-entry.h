@@ -52,29 +52,6 @@ class i_retx {};
 
 /**
  * \ingroup ccnx
- * \brief Typedef for indexed face container of CcnxPitEntryIncomingFace
- *
- * Indexes:
- * - by face (may be it will be possible to replace with just the std::map)
- */
-struct CcnxPitEntryIncomingFaceContainer
-{
-  /// @cond include_hidden
-  typedef boost::multi_index::multi_index_container<
-    CcnxPitEntryIncomingFace,
-    boost::multi_index::indexed_by<
-      // For fast access to elements using CcnxFace
-      boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ccnx_private::i_face>,
-        boost::multi_index::member<CcnxPitEntryIncomingFace, Ptr<CcnxFace>, &CcnxPitEntryIncomingFace::m_face>
-      >
-    >
-   > type;
-  /// @endcond
-};
-
-/**
- * \ingroup ccnx
  * \brief Typedef for indexed face container of CcnxPitEntryOutgoingFace
  *
  * Indexes:
@@ -108,13 +85,21 @@ struct CcnxPitEntryOutgoingFaceContainer
 struct CcnxPitEntry
 {
 public:
+  typedef std::set< CcnxPitEntryIncomingFace > in_container; ///< @brief incoming faces container type
+  typedef in_container::iterator in_iterator;                ///< @brief iterator to incoming faces
+
+  typedef CcnxPitEntryOutgoingFaceContainer::type out_container; ///< @brief outgoing faces container type
+  typedef out_container::iterator out_iterator;              ///< @brief iterator to outgoing faces
+
+  typedef std::set< uint32_t > nonce_container;  ///< @brief nonce container type
+  
   /**
    * \brief PIT entry constructor
    * \param prefix Prefix of the PIT entry
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &offsetTime, const CcnxFibEntry &fibEntry);
+  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &offsetTime, CcnxFib::iterator fibEntry);
   
   /**
    * @brief Update lifetime of PIT entry
@@ -177,7 +162,7 @@ public:
    * @param face Face to add to the list of incoming faces
    * @returns iterator to the added entry
    */
-  CcnxPitEntryIncomingFaceContainer::type::iterator
+  in_iterator
   AddIncoming (Ptr<CcnxFace> face);
 
   /**
@@ -199,7 +184,7 @@ public:
    * @param face Face to add to the list of outgoing faces
    * @returns iterator to the added entry
    */
-  CcnxPitEntryOutgoingFaceContainer::type::iterator
+  out_iterator
   AddOutgoing (Ptr<CcnxFace> face);
 
   /**
@@ -222,7 +207,7 @@ public:
    * @brief Flag outgoing face as hopeless
    */
   void
-  SetWaitingInVain (CcnxPitEntryOutgoingFaceContainer::type::iterator face);
+  SetWaitingInVain (out_iterator face);
   
   /**
    * @brief Check if all outgoing faces are NACKed
@@ -250,15 +235,15 @@ private:
   /**
    * \brief Default constructor
    */
-  CcnxPitEntry () : m_fibEntry(*((CcnxFibEntry*)0)) {};
+  CcnxPitEntry () {};
   
 public:
   Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
-  const CcnxFibEntry &m_fibEntry; ///< \brief FIB entry related to this prefix
-  std::set<uint32_t> m_seenNonces; ///< \brief map of nonces that were seen for this prefix
+  CcnxFib::iterator m_fibEntry;     ///< \brief FIB entry related to this prefix
   
-  CcnxPitEntryIncomingFaceContainer::type m_incoming; ///< \brief container for incoming interests
-  CcnxPitEntryOutgoingFaceContainer::type m_outgoing; ///< \brief container for outgoing interests
+  nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix  
+  in_container  m_incoming;      ///< \brief container for incoming interests
+  out_container m_outgoing;      ///< \brief container for outgoing interests
 
   Time m_expireTime;         ///< \brief Time when PIT entry will be removed
 

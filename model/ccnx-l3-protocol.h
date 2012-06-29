@@ -160,20 +160,8 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  // /// \brief Set buckets leak interval
-  // void
-  // SetBucketLeakInterval (Time interval);
-
-  // /// \brief Get buckets leak interval
-  // Time
-  // GetBucketLeakInterval () const;
-  
-  // /// \brief Periodically generate pre-calculated number of tokens (leak buckets)
-  // void
-  // LeakBuckets ();
-
   void
-  GiveUpInterest (const CcnxPitEntry &pitEntry,
+  GiveUpInterest (CcnxPit::iterator pitEntry,
                   Ptr<CcnxInterestHeader> header);
 
   void

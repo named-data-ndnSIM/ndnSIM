@@ -271,6 +271,8 @@ struct CcnxFibEntryContainer
 class CcnxFib : public Object
 {
 public:
+  typedef CcnxFibEntryContainer::type::iterator iterator;
+  
   /**
    * \brief Interface ID
    *
