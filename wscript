@@ -43,6 +43,9 @@ def build(bld):
     if 'topology' in bld.env['NDN_plugins']:
         deps.append ('topology-read')
 
+    if 'mobility' in bld.env['NDN_plugins']:
+        deps.append ('mobility')
+
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
