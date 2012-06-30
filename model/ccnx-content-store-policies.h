@@ -19,8 +19,8 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#ifndef CCNX_CONTENT_STORE_LRU_H
-#define	CCNX_CONTENT_STORE_LRU_H
+#ifndef CCNX_CONTENT_STORE_POLICIES_H
+#define	CCNX_CONTENT_STORE_POLICIES_H
 
 #include "ccnx-content-store-impl.h"
 
@@ -149,4 +149,4 @@ private:
 
 } //namespace ns3
 
-#endif // CCNX_CONTENT_STORE_LRU_H
+#endif // CCNX_CONTENT_STORE_POLICIES_H

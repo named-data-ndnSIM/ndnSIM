@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ccnx-content-store-lru.h"
+#include "ccnx-content-store-policies.h"
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
 
