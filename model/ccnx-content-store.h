@@ -153,7 +153,7 @@ public:
    * \brief Print out content store entries
    */
   virtual void
-  Print () const = 0;
+  Print (std::ostream &os) const = 0;
 
 protected:
   TracedCallback<Ptr<const CcnxInterestHeader>,
@@ -165,7 +165,7 @@ protected:
 inline std::ostream&
 operator<< (std::ostream &os, const CcnxContentStore &cs)
 {
-  cs.Print ();
+  cs.Print (os);
   return os;
 }
 

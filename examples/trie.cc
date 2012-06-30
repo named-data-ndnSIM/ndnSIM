@@ -20,7 +20,7 @@
 
 #include "ns3/core-module.h"
 #include "ns3/ndnSIM-module.h"
-#include "../utils/trie.h"
+#include "../utils/trie-with-policy.h"
 
 using namespace ns3;
 
@@ -46,9 +46,15 @@ operator << (std::ostream &os, const Integer &i)
 int
 main (int argc, char *argv[])
 {
-  typedef indexed_trie<ns3::CcnxNameComponents, Integer, smart_pointer_payload_traits<Integer> > trie;
+  typedef trie_with_policy<ns3::CcnxNameComponents,
+                           Integer,
+                           smart_pointer_payload_traits<Integer>,
+                           lru_policy_traits<CcnxNameComponents,
+                                             Integer,
+                                             smart_pointer_payload_traits<Integer> >
+                           > trie;
   trie x;
-  x.getPolicy ().set_max_size (2);
+  x.getPolicy ().set_max_size (100);
   
   // x.getTrie ().PrintStat (std::cout);
   
@@ -61,22 +67,23 @@ main (int argc, char *argv[])
   ns3::Ptr<Integer> i = ns3::Create<Integer> (1);
   x.insert (n4, ns3::Create<Integer> (4));
 
-
-  
   x.insert (n3, ns3::Create<Integer> (3));
   
   std::pair< trie::iterator, bool > item =
     x.insert (n2, ns3::Create<Integer> (2));
-  x.erase (item.first);
+  // x.erase (item.first);
 
   x.insert (n1, ns3::Create<Integer> (1));
   x.insert (n4, ns3::Create<Integer> (4));
 
-  // std::cout << x.getTrie ();
-  BOOST_FOREACH (const trie::parent_trie &item, x.getPolicy ())
-    {
-      std::cout << *item.payload () << " " << std::endl;
-    }
+  std::cout << "digraph trie {\n";
+  std::cout << x.getTrie ();
+  std::cout << "}\n";
+
+  // BOOST_FOREACH (const trie::parent_trie &item, x.getPolicy ())
+  //   {
+  //     std::cout << *item.payload () << " " << std::endl;
+  //   }
 
   // ns3::CcnxNameComponents n4;
   // n4("a")("c");

@@ -15,36 +15,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #ifndef CCNX_CONTENT_STORE_LRU_H
 #define	CCNX_CONTENT_STORE_LRU_H
 
-#include "ccnx-content-store.h"
+#include "ccnx-content-store-impl.h"
 
 #include "ccnx.h"
 #include "ccnx-name-components-hash-helper.h"
 
 #include "../utils/trie.h"
+#include "../utils/trie-with-policy.h"
+
+#include "../utils/lru-policy.h"
+#include "../utils/random-policy.h"
+#include "../utils/fifo-policy.h"
 
 namespace  ns3
 {
-/**
- * \ingroup ccnx
- * \brief Typedef for content store container implemented as trie with configurable replacement policy
- */
-typedef indexed_trie<CcnxNameComponents,
-                     CcnxContentStoreEntry, smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                     lru_policy_traits<CcnxNameComponents,
-                                       CcnxContentStoreEntry,
-                                       smart_pointer_payload_traits<CcnxContentStoreEntry> > > CcnxContentStoreLruContainer;
 
 /**
  * \ingroup ccnx
- * \brief NDN content store entry
+ * \brief Content Store with LRU replacement policy
  */
-class CcnxContentStoreLru : public CcnxContentStore
+class CcnxContentStoreLru :
+    public CcnxContentStoreImpl<
+      trie_with_policy<CcnxNameComponents,
+                       CcnxContentStoreEntry,
+                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                       lru_policy_traits<CcnxNameComponents,
+                                         CcnxContentStoreEntry,
+                                         smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+      >
 {
 public:
   /**
@@ -60,41 +65,87 @@ public:
   CcnxContentStoreLru ();
   virtual ~CcnxContentStoreLru ();
 
-  /**
-   * \brief Set maximum size of content store
-   *
-   * \param size size in packets
-   */
+private:
   void
   SetMaxSize (uint32_t maxSize);
 
-  /**
-   * \brief Get maximum size of content store
-   *
-   * \returns size in packets
-   */
   uint32_t
   GetMaxSize () const;
-  
-  // from CcnxContentStore
-  virtual boost::tuple<Ptr<Packet>, Ptr<const CcnxContentObjectHeader>, Ptr<const Packet> >
-  Lookup (Ptr<const CcnxInterestHeader> interest);
-            
-  virtual bool
-  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+};
 
-  virtual void
-  Print () const;
-  
-private:
-  size_t m_maxSize; ///< \brief maximum number of entries in cache
+
+/**
+ * \ingroup ccnx
+ * \brief Content Store with RANDOM replacement policy
+ */
+class CcnxContentStoreRandom :
+    public CcnxContentStoreImpl<
+      trie_with_policy<CcnxNameComponents,
+                       CcnxContentStoreEntry,
+                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                       random_policy_traits<CcnxNameComponents,
+                                            CcnxContentStoreEntry,
+                                            smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+      >
+{
+public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
 
   /**
-   * \brief Content store implemented as a Boost.MultiIndex container
-   * \internal
+   * Default constructor
    */
-  CcnxContentStoreLruContainer m_contentStore;
+  CcnxContentStoreRandom ();
+  virtual ~CcnxContentStoreRandom ();
+
+private:
+  void
+  SetMaxSize (uint32_t maxSize);
+
+  uint32_t
+  GetMaxSize () const;
 };
+
+/**
+ * \ingroup ccnx
+ * \brief Content Store with FIFO replacement policy
+ */
+class CcnxContentStoreFifo :
+    public CcnxContentStoreImpl<
+      trie_with_policy<CcnxNameComponents,
+                       CcnxContentStoreEntry,
+                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                       fifo_policy_traits<CcnxNameComponents,
+                                          CcnxContentStoreEntry,
+                                          smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+      >
+{
+public:
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * Default constructor
+   */
+  CcnxContentStoreFifo ();
+  virtual ~CcnxContentStoreFifo ();
+
+private:
+  void
+  SetMaxSize (uint32_t maxSize);
+
+  uint32_t
+  GetMaxSize () const;
+};
+
 
 } //namespace ns3
 

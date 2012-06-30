@@ -18,11 +18,14 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ns3/core-module.h"
-#include "ns3/ndnSIM-module.h"
+#ifndef TRIE_H_
+#define TRIE_H_
+
+#include "ns3/ptr.h"
 
 #include <boost/intrusive/unordered_set.hpp>
 #include <boost/intrusive/list.hpp>
+#include <boost/intrusive/set.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -64,8 +67,8 @@ smart_pointer_payload_traits<Payload>::empty_payload = 0;
 //
 template<typename FullKey,
          typename Payload,
-         typename PayloadTraits = pointer_payload_traits<Payload>,
-         typename PolicyHook = bi::list_member_hook<> >
+         typename PayloadTraits,
+         typename PolicyHook >
 class trie; 
 
 template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
@@ -339,7 +342,7 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
   if (payload_ != PayloadTraits::empty_payload)
     return this;
 
-  typedef trie<FullKey, Payload, PayloadTraits> trie;
+  typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
   BOOST_FOREACH (trie &subnode, children_)
     {
       iterator value = subnode.find ();
@@ -451,274 +454,4 @@ hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node)
   return boost::hash_value (trie_node.key_);
 }
 
-
-
-template<typename FullKey,
-	 typename Payload, typename PayloadTraits
-         >
-struct lru_policy_traits
-{
-  typedef trie< FullKey, Payload, PayloadTraits, bi::list_member_hook<> > parent_trie;
-  typedef typename bi::list< parent_trie,
-                             bi::member_hook< parent_trie,
-                                              bi::list_member_hook<>,
-                                              &parent_trie::policy_hook_ > > policy_container;
-
-  class policy : public policy_container
-  {
-  public:
-    policy ()
-      : max_size_ (100)
-    {
-    }
-
-    inline void
-    update (typename parent_trie::iterator item)
-    {
-      // do relocation
-      policy_container::splice (policy_container::end (),
-                                *this,
-                                policy_container::s_iterator_to (*item));
-    }
-  
-    inline void
-    insert (typename parent_trie::iterator item)
-    {
-      if (policy_container::size () >= max_size_)
-        {
-          typename parent_trie::iterator oldItem = &(*policy_container::begin ());
-          policy_container::pop_front ();
-          oldItem->erase ();
-        }
-      
-      policy_container::push_back (*item);
-    }
-  
-    inline void
-    lookup (typename parent_trie::iterator item)
-    {
-      // do relocation
-      policy_container::splice (policy_container::end (),
-                                *this,
-                                policy_container::s_iterator_to (*item));
-    }
-  
-    inline void
-    erase (typename parent_trie::iterator item)
-    {
-      policy_container::erase (policy_container::s_iterator_to (*item));
-    }
-
-    inline void
-    set_max_size (size_t max_size)
-    {
-      max_size_ = max_size;
-    }
-
-  private:
-    size_t max_size_;
-  };
-};
-
-
-
-template<typename FullKey,
-	 typename Payload, typename PayloadTraits = pointer_payload_traits<Payload>,
-         typename policy_traits = lru_policy_traits<FullKey, Payload, PayloadTraits>
-         >
-class indexed_trie 
-{
-public:
-  typedef trie< FullKey, Payload, PayloadTraits > parent_trie;
-  typedef typename parent_trie::iterator          iterator;
-
-  inline
-  indexed_trie (size_t bucketSize = 10, size_t bucketIncrement = 10)
-    : trie_ ("", bucketSize, bucketIncrement)
-  {
-  }
-
-  inline std::pair< iterator, bool >
-  insert (const FullKey &key, typename PayloadTraits::const_pointer_type payload)
-  {
-    std::pair<iterator, bool> item =
-      trie_.insert (key, payload);
-
-    if (item.second) // real insert
-      {
-        policy_.insert (s_iterator_to (item.first));
-      }
-    else
-      {
-        item.first->set_payload (payload);
-        policy_.update (s_iterator_to (item.first));
-      }
-    
-    return item;
-  }
-
-  inline void
-  erase (iterator node)
-  {
-    if (node == end ()) return;
-
-    policy_.erase (s_iterator_to (node));
-    node->erase (); // will do cleanup here
-  }
-
-  /**
-   * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)
-   */
-  inline iterator
-  longest_prefix_match (const FullKey &key)
-  {
-    boost::tuple< iterator, bool, iterator > item = trie_.find (key);
-    if (item.template get<0> () != trie_.end ())
-      {
-        policy_.lookup (s_iterator_to (item.template get<0> ()));
-      }
-    return item.template get<0> ();
-  }
-
-  /**
-   * @brief Find a node that has prefix at least as the key (cache lookup)
-   */
-  inline iterator
-  deepest_prefix_match (const FullKey &key)
-  {
-    iterator foundItem, lastItem;
-    bool reachLast;
-    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
-
-    // guard in case we don't have anything in the trie
-    if (lastItem == trie_.end ())
-      return trie_.end ();
-    
-    if (reachLast)
-      {
-        if (foundItem == trie_.end ())
-          {
-            foundItem = lastItem->find (); // should be something
-          }
-        policy_.lookup (s_iterator_to (foundItem));
-        return foundItem;
-      }
-    else
-      { // couldn't find a node that has prefix at least as key
-        return trie_.end ();
-      }
-  }
-
-  /**
-   * @brief Find a node that has prefix at least as the key
-   */
-  template<class Predicate>
-  inline iterator
-  deepest_prefix_match (const FullKey &key, Predicate pred)
-  {
-    iterator foundItem, lastItem;
-    bool reachLast;
-    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
-
-    // guard in case we don't have anything in the trie
-    if (lastItem == trie_.end ())
-      return trie_.end ();
-    
-    if (reachLast)
-      {
-        foundItem = lastItem->find_if (pred); // may or may not find something
-        if (foundItem == trie_.end ())
-          {
-            return trie_.end ();
-          }
-        policy_.lookup (s_iterator_to (foundItem));
-        return foundItem;
-      }
-    else
-      { // couldn't find a node that has prefix at least as key
-        return trie_.end ();
-      }
-  }
-  
-  // /**
-  //  * @brief Perform the longest prefix match
-  //  * @param key the key for which to perform the longest prefix match
-  //  *
-  //  * @return ->second is true if prefix in ->first is longer than key
-  //  *         ->third is always last node searched
-  //  */
-  // inline boost::tuple< iterator, bool, iterator >
-  // find (const FullKey &key)
-  // {
-  //   boost::tuple< iterator, bool, iterator > item = trie_.find (key);
-  //   if (item.template get<0> () != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item.template get<0> ()));
-  //     }
-  //   return boost::make_tuple (s_iterator_to (item.template get<0> ()),
-  //                             item.template get<1> (),
-  //                             s_iterator_to (item.template get<2> ()));
-  // }
-
-  // /**
-  //  * @brief Find next payload of the sub-trie
-  //  * @param start Start for the search (root for the sub-trie)
-  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
-  //  */
-  // inline iterator
-  // find (iterator start)
-  // {
-  //   iterator item = start->find ();
-  //   if (item != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item));
-  //     }
-  //   return item;
-  // }
-
-  // /**
-  //  * @brief Find next payload of the sub-trie satisfying the predicate
-  //  * @param start Start for the search (root for the sub-trie)
-  //  * @param pred predicate
-  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
-  //  */
-  // template<class Predicate>
-  // inline iterator
-  // find_if (iterator start, Predicate pred)
-  // {
-  //   iterator item = start->find (pred);
-  //   if (item != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item));
-  //     }
-  //   return item;
-  // }
-
-  iterator end ()
-  {
-    return 0;
-  }
-
-  const parent_trie &
-  getTrie () const { return trie_; }
-
-  const typename policy_traits::policy &
-  getPolicy () const { return policy_; }
-
-  typename policy_traits::policy &
-  getPolicy () { return policy_; }
-
-  static inline iterator
-  s_iterator_to (typename parent_trie::iterator item)
-  {
-    if (item == 0)
-      return 0;
-    else
-      return &(*item);
-  }
-  
-private:
-  parent_trie      trie_;
-  typename policy_traits::policy policy_;
-};
-
+#endif // TRIE_H_

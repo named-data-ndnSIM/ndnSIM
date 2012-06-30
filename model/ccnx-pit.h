@@ -120,7 +120,7 @@ public:
    * \brief Destructor
    */
   virtual ~CcnxPit ();
-  
+
   /**
    * \brief Find corresponding PIT entry for the given content name
    * \param prefix Prefix for which to lookup the entry
@@ -167,15 +167,16 @@ public:
    */
   void
   MarkErased (iterator entry);
-    
+
 protected:
   // inherited from Object class                                                                                                                                                        
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
   virtual void DoDispose (); ///< @brief Do cleanup
-  	
+
 private:
   /** \brief Remove expired records from PIT */
-  void CleanExpired ();
+  void
+  CleanExpired ();
 
   /**
    * \brief Set cleanup timeout
@@ -184,16 +185,19 @@ private:
    *
    * \param timeout cleanup timeout
    */
-  void SetCleanupTimeout (const Time &timeout);
+  void
+  SetCleanupTimeout (const Time &timeout);
 
   /**
    * \brief Get cleanup timeout
    *
    * \returns cleanup timeout
    */
-  Time GetCleanupTimeout () const;
+  Time
+  GetCleanupTimeout () const;
 
-  friend std::ostream& operator<< (std::ostream& os, const CcnxPit &fib);
+  friend std::ostream&
+  operator<< (std::ostream& os, const CcnxPit &fib);
   
 private:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working

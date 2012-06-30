@@ -64,9 +64,6 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
-
-  // Set maximum number of packets that will be cached (default 100)
-  Config::SetDefault ("ns3::CcnxContentStoreLru::Size", StringValue ("1000"));
   
   uint32_t nGrid = 3;
   Time finishTime = Seconds (20.0); 
@@ -84,6 +81,8 @@ main (int argc, char *argv[])
   // Install CCNx stack on all nodes
   NS_LOG_INFO ("Installing CCNx stack on all nodes");
   CcnxStackHelper ccnxHelper;
+  ccnxHelper.SetContentStore ("ns3::CcnxContentStoreRandom",
+                              "Size", "10");
   ccnxHelper.InstallAll ();
 
   CcnxGlobalRoutingHelper ccnxGlobalRoutingHelper;
@@ -118,6 +117,16 @@ main (int argc, char *argv[])
     
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node ++)
+    {
+      std::cout << "Node #" << (*node)->GetId () << std::endl;
+      (*node)->GetObject<CcnxContentStore> ()->Print (std::cout);
+      std::cout << std::endl;
+    }
+  
   Simulator::Destroy ();
   NS_LOG_INFO ("Done!");
     
