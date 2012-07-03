@@ -254,24 +254,6 @@ struct multi_policy_traits
       {
         return this->container2_;
       }
-      // template<>
-      // inline typename policy_container::container1_type &
-      // get<1> ()
-      // {
-      //   return this->container1_;
-      // }
-      // inline void
-      // set_max_size (size_t max_size)
-      // {
-      //   this->container1_.set_max_size (max_size);
-      //   this->container2_.set_max_size (max_size);
-      // }
-
-      // inline size_t
-      // get_max_size () const
-      // {
-      //   return this->container1_.get_max_size ();
-      // }
     };
   };
 };

@@ -92,9 +92,12 @@ template<class Container>
 void 
 CcnxContentStoreImpl<Container>::Print (std::ostream &os) const
 {
-  BOOST_FOREACH (const typename Container::parent_trie &item, this->getPolicy ())
+  for (typename Container::policy_container::const_iterator item = this->getPolicy ().begin ();
+       item != this->getPolicy ().end ();
+       item++)
+  // BOOST_FOREACH (const typename Container::parent_trie &item, this->getPolicy ())
     {
-      os << item.payload ()->GetName () << std::endl;
+      os << item->payload ()->GetName () << std::endl;
     }
 }
 

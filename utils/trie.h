@@ -345,9 +345,12 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
     return this;
 
   typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  BOOST_FOREACH (trie &subnode, children_)
+  for (typename trie::unordered_set::iterator subnode = children_.begin ();
+       subnode != children_.end ();
+       subnode++ )
+  // BOOST_FOREACH (trie &subnode, children_)
     {
-      iterator value = subnode.find ();
+      iterator value = subnode->find ();
       if (value != 0)
 	return value;
     }
@@ -365,11 +368,14 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
     return this;
 
   typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  BOOST_FOREACH (const trie &subnode, children_)
+  for (typename trie::unordered_set::iterator subnode = children_.begin ();
+       subnode != children_.end ();
+       subnode++ )
+  // BOOST_FOREACH (const trie &subnode, children_)
     {
-      iterator value = subnode.find ();
+      iterator value = subnode->find ();
       if (value != 0)
-	return value;
+        return value;
     }
   
   return 0;
@@ -407,13 +413,17 @@ operator << (std::ostream &os, const trie<FullKey, Payload, PayloadTraits, Polic
 {
   os << "# " << trie_node.key_ << ((trie_node.payload_ != 0)?"*":"") << std::endl;
   typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  BOOST_FOREACH (const trie &subnode, trie_node.children_)
+
+  for (typename trie::unordered_set::const_iterator subnode = trie_node.children_.begin ();
+       subnode != trie_node.children_.end ();
+       subnode++ )
+  // BOOST_FOREACH (const trie &subnode, trie_node.children_)
     {
       os << "\"" << &trie_node << "\"" << " [label=\"" << trie_node.key_ << ((trie_node.payload_ != 0)?"*":"") << "\"]\n";
-      os << "\"" << &subnode << "\"" << " [label=\"" << subnode.key_ << ((subnode.payload_ != 0)?"*":"") << "\"]""\n";
+      os << "\"" << &(*subnode) << "\"" << " [label=\"" << subnode->key_ << ((subnode->payload_ != 0)?"*":"") << "\"]""\n";
       
-      os << "\"" << &trie_node << "\"" << " -> " << "\"" << &subnode << "\"" << "\n";
-      os << subnode;
+      os << "\"" << &trie_node << "\"" << " -> " << "\"" << &(*subnode) << "\"" << "\n";
+      os << *subnode;
     }
 
   return os;
@@ -434,9 +444,12 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
   os << "\n";
 
   typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  BOOST_FOREACH (const trie &subnode, children_)
+  for (typename trie::unordered_set::const_iterator subnode = children_.begin ();
+       subnode != children_.end ();
+       subnode++ )
+  // BOOST_FOREACH (const trie &subnode, children_)
     {
-      subnode.PrintStat (os);
+      subnode->PrintStat (os);
     }
 }
 
