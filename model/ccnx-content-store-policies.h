@@ -22,10 +22,9 @@
 #ifndef CCNX_CONTENT_STORE_POLICIES_H
 #define	CCNX_CONTENT_STORE_POLICIES_H
 
-#include "ccnx-content-store-impl.h"
+// #include "ns3/ccnx.h"
 
-#include "ccnx.h"
-#include "ccnx-name-components-hash-helper.h"
+#include "ccnx-content-store-impl.h"
 
 #include "../utils/trie.h"
 #include "../utils/trie-with-policy.h"
@@ -44,11 +43,8 @@ namespace  ns3
 class CcnxContentStoreLru :
     public CcnxContentStoreImpl<
       trie_with_policy<CcnxNameComponents,
-                       CcnxContentStoreEntry,
                        smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       lru_policy_traits<CcnxNameComponents,
-                                         CcnxContentStoreEntry,
-                                         smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+                       lru_policy_traits >
       >
 {
 public:
@@ -81,11 +77,8 @@ private:
 class CcnxContentStoreRandom :
     public CcnxContentStoreImpl<
       trie_with_policy<CcnxNameComponents,
-                       CcnxContentStoreEntry,
                        smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       random_policy_traits<CcnxNameComponents,
-                                            CcnxContentStoreEntry,
-                                            smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+                       random_policy_traits >
       >
 {
 public:
@@ -117,11 +110,8 @@ private:
 class CcnxContentStoreFifo :
     public CcnxContentStoreImpl<
       trie_with_policy<CcnxNameComponents,
-                       CcnxContentStoreEntry,
                        smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       fifo_policy_traits<CcnxNameComponents,
-                                          CcnxContentStoreEntry,
-                                          smart_pointer_payload_traits<CcnxContentStoreEntry> > >
+                       fifo_policy_traits >
       >
 {
 public:

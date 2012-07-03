@@ -22,22 +22,30 @@
 #define TRIE_WITH_POLICY_H_
 
 #include "trie.h"
-#include "lru-policy.h"
 
 template<typename FullKey,
-	 typename Payload,
          typename PayloadTraits,
          typename PolicyTraits
          >
 class trie_with_policy
 {
 public:
-  typedef trie< FullKey, Payload, PayloadTraits, typename PolicyTraits::policy_hook_type > parent_trie;
-  typedef typename parent_trie::iterator          iterator;
+  typedef trie< FullKey,
+                typename PayloadTraits::payload_type,
+                PayloadTraits,
+                typename PolicyTraits::policy_hook_type > parent_trie;
+
+  typedef typename parent_trie::iterator iterator;
+
+  typedef typename PolicyTraits::template policy<
+    trie_with_policy<FullKey, PayloadTraits, PolicyTraits>,
+    parent_trie,
+    typename PolicyTraits::template container_hook<parent_trie>::type >::type policy_container;
 
   inline
   trie_with_policy (size_t bucketSize = 10, size_t bucketIncrement = 10)
     : trie_ ("", bucketSize, bucketIncrement)
+    , policy_ (*this)
   {
   }
 
@@ -49,7 +57,12 @@ public:
 
     if (item.second) // real insert
       {
-        policy_.insert (s_iterator_to (item.first));
+        bool ok = policy_.insert (s_iterator_to (item.first));
+        if (!ok)
+          {
+            item.first->erase (); // cannot insert
+            return std::make_pair (end (), false);
+          }
       }
     else
       {
@@ -142,60 +155,6 @@ public:
         return trie_.end ();
       }
   }
-  
-  // /**
-  //  * @brief Perform the longest prefix match
-  //  * @param key the key for which to perform the longest prefix match
-  //  *
-  //  * @return ->second is true if prefix in ->first is longer than key
-  //  *         ->third is always last node searched
-  //  */
-  // inline boost::tuple< iterator, bool, iterator >
-  // find (const FullKey &key)
-  // {
-  //   boost::tuple< iterator, bool, iterator > item = trie_.find (key);
-  //   if (item.template get<0> () != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item.template get<0> ()));
-  //     }
-  //   return boost::make_tuple (s_iterator_to (item.template get<0> ()),
-  //                             item.template get<1> (),
-  //                             s_iterator_to (item.template get<2> ()));
-  // }
-
-  // /**
-  //  * @brief Find next payload of the sub-trie
-  //  * @param start Start for the search (root for the sub-trie)
-  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
-  //  */
-  // inline iterator
-  // find (iterator start)
-  // {
-  //   iterator item = start->find ();
-  //   if (item != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item));
-  //     }
-  //   return item;
-  // }
-
-  // /**
-  //  * @brief Find next payload of the sub-trie satisfying the predicate
-  //  * @param start Start for the search (root for the sub-trie)
-  //  * @param pred predicate
-  //  * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
-  //  */
-  // template<class Predicate>
-  // inline iterator
-  // find_if (iterator start, Predicate pred)
-  // {
-  //   iterator item = start->find (pred);
-  //   if (item != trie_.end ())
-  //     {
-  //       policy_.lookup (s_iterator_to (item));
-  //     }
-  //   return item;
-  // }
 
   iterator end ()
   {
@@ -205,10 +164,10 @@ public:
   const parent_trie &
   getTrie () const { return trie_; }
 
-  const typename PolicyTraits::policy &
+  const policy_container &
   getPolicy () const { return policy_; }
 
-  typename PolicyTraits::policy &
+  policy_container &
   getPolicy () { return policy_; }
 
   static inline iterator
@@ -222,7 +181,7 @@ public:
   
 private:
   parent_trie      trie_;
-  typename PolicyTraits::policy policy_;
+  policy_container policy_;
 };
 
 

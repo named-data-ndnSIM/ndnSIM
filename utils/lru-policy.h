@@ -21,79 +21,90 @@
 #ifndef LRU_POLICY_H_
 #define LRU_POLICY_H_
 
-template<typename FullKey,
-	 typename Payload,
-         typename PayloadTraits
-         >
 struct lru_policy_traits
 {
   typedef bi::list_member_hook<> policy_hook_type;
-  typedef trie< FullKey, Payload, PayloadTraits, policy_hook_type> parent_trie;
-  typedef typename bi::list< parent_trie,
-                             bi::member_hook< parent_trie,
-                                              policy_hook_type,
-                                              &parent_trie::policy_hook_ > > policy_container;
 
-  
-  class policy : public policy_container
+  template<class Container>
+  struct container_hook
   {
-  public:
-    policy ()
-      : max_size_ (100)
-    {
-    }
+    // could be class/struct implementation
+    typedef bi::member_hook< Container,
+                             policy_hook_type,
+                             &Container::policy_hook_ > type;
+  };
 
-    inline void
-    update (typename parent_trie::iterator item)
+  template<class Base,
+           class Container,
+           class Hook>
+  struct policy 
+  {
+    typedef typename bi::list< Container, Hook > policy_container;
+    
+    // could be just typedef
+    class type : public policy_container
     {
-      // do relocation
-      policy_container::splice (policy_container::end (),
-                                *this,
-                                policy_container::s_iterator_to (*item));
-    }
+    public:
+      typedef Container parent_trie;
+    
+      type (Base &base)
+        : base_ (base)
+        , max_size_ (100)
+      {
+      }
+
+      inline void
+      update (typename parent_trie::iterator item)
+      {
+        // do relocation
+        policy_container::splice (policy_container::end (),
+                                  *this,
+                                  policy_container::s_iterator_to (*item));
+      }
   
-    inline void
-    insert (typename parent_trie::iterator item)
-    {
-      if (policy_container::size () >= max_size_)
-        {
-          typename parent_trie::iterator oldItem = &(*policy_container::begin ());
-          policy_container::pop_front ();
-          oldItem->erase ();
-        }
+      inline bool
+      insert (typename parent_trie::iterator item)
+      {
+        if (policy_container::size () >= max_size_)
+          {
+            base_.erase (&(*policy_container::begin ()));
+          }
       
-      policy_container::push_back (*item);
-    }
+        policy_container::push_back (*item);
+        return true;
+      }
   
-    inline void
-    lookup (typename parent_trie::iterator item)
-    {
-      // do relocation
-      policy_container::splice (policy_container::end (),
-                                *this,
-                                policy_container::s_iterator_to (*item));
-    }
+      inline void
+      lookup (typename parent_trie::iterator item)
+      {
+        // do relocation
+        policy_container::splice (policy_container::end (),
+                                  *this,
+                                  policy_container::s_iterator_to (*item));
+      }
   
-    inline void
-    erase (typename parent_trie::iterator item)
-    {
-      policy_container::erase (policy_container::s_iterator_to (*item));
-    }
+      inline void
+      erase (typename parent_trie::iterator item)
+      {
+        policy_container::erase (policy_container::s_iterator_to (*item));
+      }
 
-    inline void
-    set_max_size (size_t max_size)
-    {
-      max_size_ = max_size;
-    }
+      inline void
+      set_max_size (size_t max_size)
+      {
+        max_size_ = max_size;
+      }
 
-    inline size_t
-    get_max_size () const
-    {
-      return max_size_;
-    }
+      inline size_t
+      get_max_size () const
+      {
+        return max_size_;
+      }
 
-  private:
-    size_t max_size_;
+    private:
+      Base &base_;
+      size_t max_size_;
+    };
   };
 };
 

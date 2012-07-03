@@ -38,6 +38,7 @@ namespace bi = boost::intrusive;
 template<typename Payload>
 struct pointer_payload_traits
 {
+  typedef Payload         payload_type;
   typedef Payload*        pointer_type;
   typedef const Payload*  const_pointer_type;
 
@@ -51,6 +52,7 @@ pointer_payload_traits<Payload>::empty_payload = 0;
 template<typename Payload>
 struct smart_pointer_payload_traits
 {
+  typedef Payload                 payload_type;
   typedef ns3::Ptr<Payload>       pointer_type;
   typedef ns3::Ptr<const Payload> const_pointer_type;
   
