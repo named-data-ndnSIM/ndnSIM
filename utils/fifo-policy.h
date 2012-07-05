@@ -23,7 +23,7 @@
 
 struct fifo_policy_traits
 {
-  typedef bi::list_member_hook<> policy_hook_type;
+  struct policy_hook_type : public bi::list_member_hook<> {};
 
   template<class Container>
   struct container_hook
@@ -94,6 +94,9 @@ struct fifo_policy_traits
       {
         return max_size_;
       }
+
+    private:
+      type () : base_(*((Base*)0)) { };
 
     private:
       Base &base_;

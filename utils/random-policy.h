@@ -30,22 +30,9 @@ struct random_policy_traits
   template<class Container>
   struct container_hook
   {
-    struct type
-    {
-      typedef bi::member_hook< Container,
-                               policy_hook_type,
-                               &Container::policy_hook_ > hook_type;
-
-      static uint32_t& get_order (typename Container::iterator item)
-      {
-        return item->policy_hook_.randomOrder;
-      }
-      
-      static const uint32_t& get_order (typename Container::const_iterator item)
-      {
-        return item->policy_hook_.randomOrder;
-      }
-    };
+    typedef bi::member_hook< Container,
+                             policy_hook_type,
+                             &Container::policy_hook_ > type;
   };
 
   template<class Base,
@@ -53,18 +40,30 @@ struct random_policy_traits
            class Hook>
   struct policy 
   {
+    static uint32_t& get_order (typename Container::iterator item)
+    {
+      return static_cast<typename policy_container::value_traits::hook_type*>
+        (policy_container::value_traits::to_node_ptr(*item))->randomOrder;
+    }
+      
+    static const uint32_t& get_order (typename Container::const_iterator item)
+    {
+      return static_cast<const typename policy_container::value_traits::hook_type*>
+        (policy_container::value_traits::to_node_ptr(*item))->randomOrder;
+    }
+    
     template<class Key>
     struct MemberHookLess
     {
       bool operator () (const Key &a, const Key &b) const
       {
-        return Hook::get_order (&a) < Hook::get_order (&b);
+        return get_order (&a) < get_order (&b);
       }
     };
 
     typedef bi::set< Container,
                      bi::compare< MemberHookLess< Container > >,
-                     typename Hook::hook_type > policy_container;
+                     Hook > policy_container;
     
     // could be just typedef
     class type : public policy_container
@@ -88,7 +87,7 @@ struct random_policy_traits
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        Hook::get_order (item) = u_rand.GetValue ();
+        get_order (item) = u_rand.GetValue ();
 
         if (policy_container::size () >= max_size_)
           {
@@ -133,6 +132,9 @@ struct random_policy_traits
         return max_size_;
       }
 
+    private:
+      type () : base_(*((Base*)0)) { };
+      
     private:
       Base &base_;
       ns3::UniformVariable u_rand;
