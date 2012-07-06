@@ -254,11 +254,7 @@ struct CcnxFibEntryContainer
         boost::multi_index::const_mem_fun<CcnxFibEntry,
                                           const CcnxNameComponents&,
                                           &CcnxFibEntry::GetPrefix>,
-        CcnxPrefixHash>,
-
-      boost::multi_index::random_access<
-        boost::multi_index::tag<__ccnx_private::i_nth>
-        >
+        CcnxPrefixHash>
       >
     > type;
   /// @endcond
@@ -363,18 +359,6 @@ public:
    */
   void
   RemoveFromAll (Ptr<CcnxFace> face);
-
-  /**
-   * \brief Get number of FIB entry (for python bindings)
-   */
-  uint32_t 
-  GetCcnxFibEntryCount () const;
-
-  /**
-   * \brief Get FIB entry by index (for python bindings)
-   */
-  const CcnxFibEntry &
-  GetCcnxFibEntry (uint32_t index);
 
 public:
   CcnxFibEntryContainer::type m_fib; ///< @brief Internal container

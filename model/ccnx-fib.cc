@@ -303,25 +303,6 @@ CcnxFib::RemoveFromAll (Ptr<CcnxFace> face)
                       this, ll::_1, face));
 }
 
-/**
- * \brief Get number of FIB entry (for python bindings)
- */
-uint32_t 
-CcnxFib::GetCcnxFibEntryCount () const
-{
-  return m_fib.size ();
-}
-
-/**
- * \brief Get FIB entry by index (for python bindings)
- */
-const CcnxFibEntry &
-CcnxFib::GetCcnxFibEntry (uint32_t index)
-{
-  NS_ASSERT (0 <= index && index < m_fib.size ());
-  return m_fib.get <i_nth> () [index];
-}
-
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {
