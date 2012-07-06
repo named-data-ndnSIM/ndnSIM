@@ -127,6 +127,12 @@ struct random_policy_traits
       }
 
       inline void
+      clear ()
+      {
+        policy_container::clear ();
+      }
+
+      inline void
       set_max_size (size_t max_size)
       {
         max_size_ = max_size;

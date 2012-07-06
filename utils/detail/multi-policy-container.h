@@ -77,6 +77,13 @@ struct inherit_with_base : Super, Value
     Value::value_.erase (item);
     Super::erase (item);
   }  
+
+  void
+  clear ()
+  {
+    Value::value_.clear ();
+    Super::clear ();
+  }
 };
 
 template< class Base >
@@ -88,6 +95,7 @@ struct empty_policy_wrap
   bool insert (typename Base::iterator item) { return true; }
   void lookup (typename Base::iterator item) {}
   void erase (typename Base::iterator item) {}
+  void clear () {}
 };
 
 template< class Base, class Vector >

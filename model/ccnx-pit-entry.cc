@@ -27,6 +27,7 @@
 
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <boost/foreach.hpp>
 namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");

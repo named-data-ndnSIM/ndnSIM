@@ -26,21 +26,24 @@ namespace ndnSIM
 
 struct empty_policy_traits
 {
-  typedef void policy_hook_type;
+  typedef void* policy_hook_type;
 
-  template<class Container> struct container_hook { typedef void type; }
+  template<class Container> struct container_hook { typedef void* type; };
 
   template<class Base,
            class Container,
            class Hook>
   struct policy 
   {
-    class type
+    struct type
     {
-      inline void update (typename parent_trie::iterator) { }
-      inline bool insert (typename parent_trie::iterator) { return true; }
-      inline void  lookup (typename parent_trie::iterator item) { }
-      inline void erase (typename parent_trie::iterator item) { }
+      inline type (Base &base) {}
+      
+      inline void update (typename Container::iterator) { }
+      inline bool insert (typename Container::iterator) { return true; }
+      inline void lookup (typename Container::iterator item) { }
+      inline void erase (typename Container::iterator item) { }
+      inline void clear () { }
     };
   };
 };

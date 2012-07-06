@@ -30,6 +30,7 @@
 
 #include "ns3/ccnx-app-face.h"
 #include "ns3/ccnx-fib.h"
+#include "../model/ccnx-fib-impl.h"
 
 #include <boost/ref.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -84,12 +85,12 @@ CcnxProducer::StartApplication ()
   CcnxApp::StartApplication ();
 
   Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
-  CcnxFibEntryContainer::type::iterator fibEntry = fib->Add (m_prefix, m_face, 0);
+  CcnxFib::iterator fibEntry = fib->Add (m_prefix, m_face, 0);
 
   // make face green, so it will be used primarily
-  fib->m_fib.modify (fibEntry,
-                     ll::bind (&CcnxFibEntry::UpdateStatus,
-                               ll::_1, m_face, CcnxFibFaceMetric::NDN_FIB_GREEN));
+  StaticCast<CcnxFibImpl> (fib)->modify (fibEntry,
+                                         ll::bind (&CcnxFibEntry::UpdateStatus,
+                                                   ll::_1, m_face, CcnxFibFaceMetric::NDN_FIB_GREEN));
 }
 
 void

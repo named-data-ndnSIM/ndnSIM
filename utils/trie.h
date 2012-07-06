@@ -29,6 +29,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/foreach.hpp>
 
 namespace ndnSIM
 {
@@ -43,11 +44,11 @@ struct pointer_payload_traits
   typedef Payload*        pointer_type;
   typedef const Payload*  const_pointer_type;
 
-  static const Payload* empty_payload;
+  static Payload* empty_payload;
 };
 
 template<typename Payload>
-const Payload*
+Payload*
 pointer_payload_traits<Payload>::empty_payload = 0;
 
 template<typename Payload>
@@ -57,11 +58,11 @@ struct smart_pointer_payload_traits
   typedef ns3::Ptr<Payload>       pointer_type;
   typedef ns3::Ptr<const Payload> const_pointer_type;
   
-  static const ns3::Ptr<const Payload> empty_payload;
+  static ns3::Ptr<Payload> empty_payload;
 };
 
 template<typename Payload>
-const ns3::Ptr<const Payload>
+ns3::Ptr<Payload>
 smart_pointer_payload_traits<Payload>::empty_payload = 0;
 
 
@@ -109,6 +110,12 @@ public:
 
   inline
   ~trie ();
+
+  void
+  clear ()
+  {
+    children_.clear_and_dispose (trie_delete_disposer ());
+  }
   
   // actual entry
   friend bool
@@ -120,7 +127,7 @@ public:
 
   inline std::pair<iterator, bool>
   insert (const FullKey &key,
-          typename PayloadTraits::const_pointer_type payload);
+          typename PayloadTraits::pointer_type payload);
 
   /**
    * @brief Removes payload (if it exists) and if there are no children, prunes parents trie
@@ -133,6 +140,12 @@ public:
    */
   inline void
   prune ();
+
+  inline boost::tuple<const iterator, bool, const iterator>
+  find (const FullKey &key) const
+  {
+    return const_cast<trie*> (this)->find (key);
+  }
 
   /**
    * @brief Perform the longest prefix match
@@ -175,8 +188,14 @@ public:
     return payload_;
   }
 
+  typename PayloadTraits::pointer_type
+  payload ()
+  {
+    return payload_;
+  }
+
   void
-  set_payload (typename PayloadTraits::const_pointer_type payload)
+  set_payload (typename PayloadTraits::pointer_type payload)
   {
     payload_ = payload;
   }
@@ -237,7 +256,7 @@ private:
   buckets_array buckets_;
   unordered_set children_;
   
-  typename PayloadTraits::const_pointer_type payload_;
+  typename PayloadTraits::pointer_type payload_;
   trie *parent_; // to make cleaning effective
 };
 
@@ -267,7 +286,7 @@ template<typename FullKey, typename Payload, typename PayloadTraits, typename Po
 inline
 std::pair<typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator, bool>
 trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::insert (const FullKey &key, typename PayloadTraits::const_pointer_type payload)
+::insert (const FullKey &key, typename PayloadTraits::pointer_type payload)
 {
   trie *trieNode = this;
   

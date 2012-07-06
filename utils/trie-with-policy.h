@@ -53,7 +53,7 @@ public:
   }
 
   inline std::pair< iterator, bool >
-  insert (const FullKey &key, typename PayloadTraits::const_pointer_type payload)
+  insert (const FullKey &key, typename PayloadTraits::pointer_type payload)
   {
     std::pair<iterator, bool> item =
       trie_.insert (key, payload);
@@ -69,11 +69,23 @@ public:
       }
     else
       {
-        item.first->set_payload (payload);
-        policy_.update (s_iterator_to (item.first));
+        return std::make_pair (s_iterator_to (item.first), false);
       }
 
     return item;
+  }
+
+  inline void
+  erase (const FullKey &key)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+    
+    if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
+      return; // nothing to invalidate
+
+    erase (lastItem);
   }
 
   inline void
@@ -85,18 +97,39 @@ public:
     node->erase (); // will do cleanup here
   }
 
+  inline void
+  clear ()
+  {
+    policy_.clear ();
+    trie_.clear ();
+  }
+
+  template<typename Modifier>
+  bool
+  modify (iterator position, Modifier mod)
+  {
+    if (position == end ()) return false;
+    if (position->payload () == PayloadTraits::empty_payload) return false;
+
+    mod (*position->payload ());
+    policy_.update (position);
+    return true;
+  }
+  
   /**
    * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)
    */
   inline iterator
   longest_prefix_match (const FullKey &key)
   {
-    boost::tuple< iterator, bool, iterator > item = trie_.find (key);
-    if (item.template get<0> () != trie_.end ())
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+    if (foundItem != trie_.end ())
       {
-        policy_.lookup (s_iterator_to (item.template get<0> ()));
+        policy_.lookup (s_iterator_to (foundItem));
       }
-    return item.template get<0> ();
+    return foundItem;
   }
 
   /**
@@ -159,7 +192,7 @@ public:
       }
   }
 
-  iterator end ()
+  iterator end () const
   {
     return 0;
   }
@@ -190,4 +223,3 @@ private:
 } // ndnSIM
 
 #endif // TRIE_WITH_POLICY_H_
-

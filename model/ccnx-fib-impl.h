@@ -18,38 +18,48 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _CCNX_FIB_H_
-#define	_CCNX_FIB_H_
+#ifndef _CCNX_FIB_IMPL_H_
+#define	_CCNX_FIB_IMPL_H_
 
-#include "ns3/simple-ref-count.h"
-#include "ns3/node.h"
+#include "ns3/ccnx-fib.h"
+#include "ns3/ccnx-name-components.h"
 
-#include "ns3/ccnx-fib-entry.h"
+#include "../utils/trie-with-policy.h"
+#include "../utils/empty-policy.h"
 
 namespace ns3 {
 
-class CcnxInterestHeader;
+struct CcnxFibEntryContainer
+{
+  typedef ndnSIM::trie_with_policy<
+    CcnxNameComponents,
+    ndnSIM::smart_pointer_payload_traits<CcnxFibEntry>,
+    ndnSIM::empty_policy_traits
+    > type;
+};
 
 /**
  * \ingroup ccnx
  * \brief Class implementing FIB functionality
  */
-class CcnxFib : public Object
+class CcnxFibImpl : public CcnxFib,
+                    private CcnxFibEntryContainer::type
 {
 public:
-  typedef ns3::Ptr<CcnxFibEntry> iterator; // not sure, but let's see what will happen
-  typedef ns3::Ptr<CcnxFibEntry> const_iterator;
+  typedef CcnxFibEntryContainer::type super;
+  
+  /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
 
   /**
-   * @brief Default constructor
+   * \brief Constructor
    */
-  CcnxFib () {}
-  
-  /**
-   * @brief Virtual destructor
-   */
-  virtual ~CcnxFib () { };
-  
+  CcnxFibImpl ();
+
   /**
    * \brief Perform longest prefix match
    *
@@ -58,8 +68,8 @@ public:
    * \param interest Interest packet header
    * \returns If entry found a valid iterator will be returned, otherwise end ()
    */
-  virtual iterator
-  LongestPrefixMatch (const CcnxInterestHeader &interest) const = 0;
+  CcnxFib::iterator
+  LongestPrefixMatch (const CcnxInterestHeader &interest) const;
   
   /**
    * \brief Add or update FIB entry
@@ -72,8 +82,8 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual iterator
-  Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric) = 0;
+  CcnxFib::iterator
+  Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
   /**
    * \brief Add or update FIB entry using smart pointer to prefix
@@ -86,8 +96,8 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual iterator
-  Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric) = 0;
+  CcnxFib::iterator
+  Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric);
 
   /**
    * @brief Remove FIB entry
@@ -97,8 +107,8 @@ public:
    *
    * @param name	Smart pointer to prefix
    */
-  virtual void
-  Remove (const Ptr<const CcnxNameComponents> &prefix) = 0;
+  void
+  Remove (const Ptr<const CcnxNameComponents> &prefix);
 
   /**
    * @brief Invalidate FIB entry ("Safe" version of Remove)
@@ -106,55 +116,51 @@ public:
    * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
    * @param name	Smart pointer to prefix
    */
-  virtual void
-  Invalidate (const Ptr<const CcnxNameComponents> &prefix) = 0;
+  void
+  Invalidate (const Ptr<const CcnxNameComponents> &prefix);
 
   /**
    * @brief Invalidate all FIB entries
    */
-  virtual void
-  InvalidateAll () = 0;
+  void
+  InvalidateAll ();
   
   /**
    * @brief Remove reference to a face from the entry. If entry had only this face, the whole
    * entry will be removed
    */
-  virtual void
-  Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face) = 0;
+  void
+  Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face);
 
   /**
    * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
    * this FIB entry will be removed.
    */
-  virtual void
-  RemoveFromAll (Ptr<CcnxFace> face) = 0;
+  void
+  RemoveFromAll (Ptr<CcnxFace> face);
 
-  /**
-   * @brief Print out entries in FIB
-   */
-  virtual void
-  Print (std::ostream &os) const = 0;
+  void
+  Print (std::ostream &os) const;
   
-  // /**
-  //  * @brief Modify element in container
-  //  */
-  // template<typename Modifier>
-  // virtual bool
-  // modify (iterator position, Modifier mod) = 0;
-  // // {
-  // //   return this->m_fib.modify (position, mod);
-  // // }
+  /**
+   * @brief Modify element in container
+   */
+  template<typename Modifier>
+  bool
+  modify (CcnxFib::iterator position, Modifier mod)
+  {
+    return this->modify (position, mod);
+  }
+  
+protected:
+  // inherited from Object class
+  virtual void NotifyNewAggregate (); ///< @brief Notify when object is aggregated
+  virtual void DoDispose (); ///< @brief Perform cleanup
   
 private:
-  friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
-  CcnxFib(const CcnxFib&) {} ; ///< \brief copy constructor is disabled
+  Ptr<Node> m_node;
 };
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
  
 } // namespace ns3
 
-#endif	/* NDN_FIB_H */
+#endif	/* _CCNX_FIB_IMPL_H_ */

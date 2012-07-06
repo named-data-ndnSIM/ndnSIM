@@ -115,6 +115,12 @@ struct multi_policy_traits
       {
         policy_container::erase (item);
       }
+      
+      inline void
+      clear ()
+      {
+        policy_container::clear ();
+      }
     };
   };
 };
