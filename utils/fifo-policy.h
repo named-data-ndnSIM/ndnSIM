@@ -21,15 +21,21 @@
 #ifndef FIFO_POLICY_H_
 #define FIFO_POLICY_H_
 
+#include <boost/intrusive/options.hpp>
+#include <boost/intrusive/list.hpp>
+
+namespace ndnSIM
+{
+
 struct fifo_policy_traits
 {
-  struct policy_hook_type : public bi::list_member_hook<> {};
+  struct policy_hook_type : public boost::intrusive::list_member_hook<> {};
 
   template<class Container>
   struct container_hook
   {
     // could be class/struct implementation
-    typedef bi::member_hook< Container,
+    typedef boost::intrusive::member_hook< Container,
                              policy_hook_type,
                              &Container::policy_hook_ > type;
   };
@@ -39,7 +45,7 @@ struct fifo_policy_traits
            class Hook>
   struct policy 
   {
-    typedef typename bi::list< Container, Hook > policy_container;
+    typedef typename boost::intrusive::list< Container, Hook > policy_container;
     
     // could be just typedef
     class type : public policy_container
@@ -104,5 +110,7 @@ struct fifo_policy_traits
     };
   };
 };
+
+} // ndnSIM
 
 #endif

@@ -23,16 +23,22 @@
 
 #include "ns3/random-variable.h"
 
+#include <boost/intrusive/options.hpp>
+#include <boost/intrusive/set.hpp>
+
+namespace ndnSIM
+{
+
 struct random_policy_traits
 {
-  struct policy_hook_type : public bi::set_member_hook<> { uint32_t randomOrder; };
+  struct policy_hook_type : public boost::intrusive::set_member_hook<> { uint32_t randomOrder; };
 
   template<class Container>
   struct container_hook
   {
-    typedef bi::member_hook< Container,
-                             policy_hook_type,
-                             &Container::policy_hook_ > type;
+    typedef boost::intrusive::member_hook< Container,
+                                           policy_hook_type,
+                                           &Container::policy_hook_ > type;
   };
 
   template<class Base,
@@ -61,9 +67,9 @@ struct random_policy_traits
       }
     };
 
-    typedef bi::set< Container,
-                     bi::compare< MemberHookLess< Container > >,
-                     Hook > policy_container;
+    typedef boost::intrusive::set< Container,
+                                   boost::intrusive::compare< MemberHookLess< Container > >,
+                                   Hook > policy_container;
     
     // could be just typedef
     class type : public policy_container
@@ -93,7 +99,7 @@ struct random_policy_traits
           {
             if (MemberHookLess<Container>() (*item, *policy_container::begin ()))
               {
-                std::cout << "Cannot add. Signaling fail\n";
+                // std::cout << "Cannot add. Signaling fail\n";
                 // just return false. Indicating that insert "failed"
                 return false;
               }
@@ -142,5 +148,7 @@ struct random_policy_traits
     };
   };
 };
+
+} // ndnSIM
 
 #endif // RANDOM_POLICY_H

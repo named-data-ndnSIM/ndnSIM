@@ -42,9 +42,9 @@ namespace  ns3
  */
 class CcnxContentStoreLru :
     public CcnxContentStoreImpl<
-      trie_with_policy<CcnxNameComponents,
-                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       lru_policy_traits >
+       ndnSIM::trie_with_policy<CcnxNameComponents,
+                                ndnSIM::smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                                ndnSIM::lru_policy_traits >
       >
 {
 public:
@@ -76,9 +76,9 @@ private:
  */
 class CcnxContentStoreRandom :
     public CcnxContentStoreImpl<
-      trie_with_policy<CcnxNameComponents,
-                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       random_policy_traits >
+      ndnSIM::trie_with_policy<CcnxNameComponents,
+                       ndnSIM::smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                       ndnSIM::random_policy_traits >
       >
 {
 public:
@@ -109,9 +109,9 @@ private:
  */
 class CcnxContentStoreFifo :
     public CcnxContentStoreImpl<
-      trie_with_policy<CcnxNameComponents,
-                       smart_pointer_payload_traits<CcnxContentStoreEntry>,
-                       fifo_policy_traits >
+      ndnSIM::trie_with_policy<CcnxNameComponents,
+                       ndnSIM::smart_pointer_payload_traits<CcnxContentStoreEntry>,
+                       ndnSIM::fifo_policy_traits >
       >
 {
 public:

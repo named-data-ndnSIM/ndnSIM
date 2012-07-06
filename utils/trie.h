@@ -30,7 +30,8 @@
 #include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 
-namespace bi = boost::intrusive;
+namespace ndnSIM
+{
 
 /////////////////////////////////////////////////////
 // Allow customization for payload
@@ -211,13 +212,14 @@ public:
   PolicyHook policy_hook_;
 
 private:
-  bi::unordered_set_member_hook<> unordered_set_member_hook_;
+  boost::intrusive::unordered_set_member_hook<> unordered_set_member_hook_;
 
   // necessary typedefs
   typedef trie self_type;
-  typedef bi::member_hook< trie,
-  			   bi::unordered_set_member_hook< >, &trie::unordered_set_member_hook_ > member_hook;
-  typedef bi::unordered_set< trie, member_hook >                                                 unordered_set;
+  typedef boost::intrusive::member_hook< trie,
+                                         boost::intrusive::unordered_set_member_hook< >,
+                                         &trie::unordered_set_member_hook_ > member_hook;
+  typedef boost::intrusive::unordered_set< trie, member_hook > unordered_set;
   typedef typename unordered_set::bucket_type   bucket_type;
   typedef typename unordered_set::bucket_traits bucket_traits;
 
@@ -468,5 +470,7 @@ hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node)
 {
   return boost::hash_value (trie_node.key_);
 }
+
+} // ndnSIM
 
 #endif // TRIE_H_

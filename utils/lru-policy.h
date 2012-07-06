@@ -21,16 +21,22 @@
 #ifndef LRU_POLICY_H_
 #define LRU_POLICY_H_
 
+#include <boost/intrusive/options.hpp>
+#include <boost/intrusive/list.hpp>
+
+namespace ndnSIM
+{
+
 struct lru_policy_traits
 {
-  struct policy_hook_type : public bi::list_member_hook<> {};
+  struct policy_hook_type : public boost::intrusive::list_member_hook<> {};
 
   template<class Container>
   struct container_hook
   {
-    typedef bi::member_hook< Container,
-                             policy_hook_type,
-                             &Container::policy_hook_ > type;
+    typedef boost::intrusive::member_hook< Container,
+                                           policy_hook_type,
+                                           &Container::policy_hook_ > type;
   };
 
   template<class Base,
@@ -38,7 +44,7 @@ struct lru_policy_traits
            class Hook>
   struct policy 
   {
-    typedef typename bi::list< Container, Hook > policy_container;
+    typedef typename boost::intrusive::list< Container, Hook > policy_container;
     
     // could be just typedef
     class type : public policy_container
@@ -109,5 +115,7 @@ struct lru_policy_traits
     };
   };
 };
+
+} // ndnSIM
 
 #endif

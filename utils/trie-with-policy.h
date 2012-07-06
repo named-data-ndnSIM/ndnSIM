@@ -23,6 +23,9 @@
 
 #include "trie.h"
 
+namespace ndnSIM
+{
+
 template<typename FullKey,
          typename PayloadTraits,
          typename PolicyTraits
@@ -184,6 +187,7 @@ private:
   policy_container policy_;
 };
 
+} // ndnSIM
 
 #endif // TRIE_WITH_POLICY_H_
 
