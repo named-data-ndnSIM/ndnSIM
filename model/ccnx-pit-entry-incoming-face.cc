@@ -31,4 +31,21 @@ CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace (Ptr<CcnxFace> face)
 {
 }
 
+CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace ()
+  : m_face (0)
+  , m_arrivalTime (0)
+{
+}
+
+/**
+ * @brie Copy operator
+ */
+CcnxPitEntryIncomingFace &
+CcnxPitEntryIncomingFace::operator = (CcnxPitEntryIncomingFace &other)
+{
+  m_face = other.m_face;
+  m_arrivalTime = other.m_arrivalTime;
+  return *this;
+}
+
 } // namespace ns3

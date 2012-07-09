@@ -42,7 +42,11 @@ using namespace __ccnx_private;
 TypeId 
 CcnxFib::GetTypeId (void)
 {
-  return CcnxFibImpl::GetTypeId ();
+  static TypeId tid = TypeId ("ns3::CcnxFib") // cheating ns3 object system
+    .SetParent<Object> ()
+    .SetGroupName ("Ccnx")
+  ;
+  return tid;
 }
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)

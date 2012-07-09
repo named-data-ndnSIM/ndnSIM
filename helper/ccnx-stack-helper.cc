@@ -63,7 +63,7 @@ CcnxStackHelper::CcnxStackHelper ()
   m_ccnxFactory.        SetTypeId ("ns3::CcnxL3Protocol");
   m_strategyFactory.    SetTypeId ("ns3::CcnxFloodingStrategy");
   m_contentStoreFactory.SetTypeId ("ns3::CcnxContentStoreLru");
-  m_fibFactory.         SetTypeId ("ns3::CcnxFib");
+  m_fibFactory.         SetTypeId ("ns3::CcnxFibImpl");
   m_pitFactory.         SetTypeId ("ns3::CcnxPit");
 }
     

@@ -1328,6 +1328,8 @@ def register_Ns3CcnxPitEntryIncomingFace_methods(root_module, cls):
     cls.add_constructor([param('ns3::CcnxPitEntryIncomingFace const &', 'arg0')])
     ## ccnx-pit-entry-incoming-face.h (module 'ndnSIM'): ns3::CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace(ns3::Ptr<ns3::CcnxFace> face) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+    ## ccnx-pit-entry-incoming-face.h (module 'ndnSIM'): ns3::CcnxPitEntryIncomingFace::CcnxPitEntryIncomingFace() [constructor]
+    cls.add_constructor([])
     ## ccnx-pit-entry-incoming-face.h (module 'ndnSIM'): ns3::CcnxPitEntryIncomingFace::m_arrivalTime [variable]
     cls.add_instance_attribute('m_arrivalTime', 'ns3::Time', is_const=False)
     ## ccnx-pit-entry-incoming-face.h (module 'ndnSIM'): ns3::CcnxPitEntryIncomingFace::m_face [variable]
@@ -3054,6 +3056,11 @@ def register_Ns3Object_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## object.h (module 'core'): ns3::Ptr<ns3::CcnxFib> ns3::Object::GetObject() const [member function]
+    cls.add_method('GetObject', 
+                   'ns3::Ptr< ns3::CcnxFib >', 
+                   [], 
+                   is_const=True, template_parameters=['ns3::CcnxFib'])
     ## object.h (module 'core'): static ns3::TypeId ns3::Object::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -4360,6 +4367,21 @@ def register_Ns3CcnxFib_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxFibEntry >', 
                    [param('ns3::Ptr< ns3::CcnxNameComponents const > const &', 'prefix'), param('ns3::Ptr< ns3::CcnxFace >', 'face'), param('int32_t', 'metric')], 
                    is_pure_virtual=True, is_virtual=True)
+    ## ccnx-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::CcnxFibEntry> ns3::CcnxFib::Begin() [member function]
+    cls.add_method('Begin', 
+                   'ns3::Ptr< ns3::CcnxFibEntry const >', 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## ccnx-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::CcnxFibEntry> ns3::CcnxFib::End() [member function]
+    cls.add_method('End', 
+                   'ns3::Ptr< ns3::CcnxFibEntry const >', 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## ccnx-fib.h (module 'ndnSIM'): static ns3::Ptr<ns3::CcnxFib> ns3::CcnxFib::GetCcnxFib(ns3::Ptr<ns3::Object> node) [member function]
+    cls.add_method('GetCcnxFib', 
+                   'ns3::Ptr< ns3::CcnxFib >', 
+                   [param('ns3::Ptr< ns3::Object >', 'node')], 
+                   is_static=True)
     ## ccnx-fib.h (module 'ndnSIM'): static ns3::TypeId ns3::CcnxFib::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -4375,6 +4397,11 @@ def register_Ns3CcnxFib_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxFibEntry >', 
                    [param('ns3::CcnxInterestHeader const &', 'interest')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ccnx-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::CcnxFibEntry> ns3::CcnxFib::Next(ns3::Ptr<const ns3::CcnxFibEntry> item) [member function]
+    cls.add_method('Next', 
+                   'ns3::Ptr< ns3::CcnxFibEntry const >', 
+                   [param('ns3::Ptr< ns3::CcnxFibEntry const >', 'item')], 
+                   is_pure_virtual=True, is_virtual=True)
     ## ccnx-fib.h (module 'ndnSIM'): void ns3::CcnxFib::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 

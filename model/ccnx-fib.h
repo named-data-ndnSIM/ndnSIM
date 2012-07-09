@@ -38,7 +38,7 @@ class CcnxFib : public Object
 {
 public:
   typedef ns3::Ptr<CcnxFibEntry> iterator; // not sure, but let's see what will happen
-  typedef ns3::Ptr<CcnxFibEntry> const_iterator;
+  typedef ns3::Ptr<const CcnxFibEntry> const_iterator;
 
   /**
    * \brief Interface ID
@@ -133,16 +133,27 @@ public:
    */
   virtual void
   Print (std::ostream &os) const = 0;
-  
-  // /**
-  //  * @brief Modify element in container
-  //  */
-  // template<typename Modifier>
-  // virtual bool
-  // modify (iterator position, Modifier mod) = 0;
-  // // {
-  // //   return this->m_fib.modify (position, mod);
-  // // }
+
+  /**
+   * @brief Return first element of FIB (no order guaranteed)
+   */
+  virtual const_iterator
+  Begin () = 0;
+
+  /**
+   * @brief Return item next after last (no order guaranteed)
+   */
+  virtual const_iterator
+  End () = 0;
+
+  /**
+   * @brief Advance the iterator
+   */
+  virtual const_iterator
+  Next (const_iterator item) = 0;
+
+  static inline Ptr<CcnxFib>
+  GetCcnxFib (Ptr<Object> node);
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
@@ -153,7 +164,13 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
- 
+
+Ptr<CcnxFib>
+CcnxFib::GetCcnxFib (Ptr<Object> node)
+{
+  return node->GetObject<CcnxFib> ();
+}
+
 } // namespace ns3
 
 #endif	/* NDN_FIB_H */

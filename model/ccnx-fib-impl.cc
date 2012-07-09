@@ -43,8 +43,8 @@ NS_OBJECT_ENSURE_REGISTERED (CcnxFibImpl);
 TypeId 
 CcnxFibImpl::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxFib") // cheating ns3 object system
-    .SetParent<Object> ()
+  static TypeId tid = TypeId ("ns3::CcnxFibImpl") // cheating ns3 object system
+    .SetParent<CcnxFib> ()
     .SetGroupName ("Ccnx")
     .AddConstructor<CcnxFibImpl> ()
   ;
@@ -192,5 +192,48 @@ CcnxFibImpl::Print (std::ostream &os) const
       os << item->payload ()->GetPrefix () << "\t" << *item->payload () << "\n";
     }
 }
+
+CcnxFib::const_iterator
+CcnxFibImpl::Begin ()
+{
+  super::parent_trie::const_recursive_iterator item (super::getTrie ());
+  super::parent_trie::const_recursive_iterator end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
+CcnxFib::const_iterator
+CcnxFibImpl::End ()
+{
+  return 0;
+}
+
+CcnxFib::const_iterator
+CcnxFibImpl::Next (CcnxFib::const_iterator from)
+{
+  if (from == 0) return 0;
+  
+  super::parent_trie::const_recursive_iterator item (*StaticCast<const CcnxFibEntryImpl> (from)->to_iterator ());
+  super::parent_trie::const_recursive_iterator end (0);
+  for (item++; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
 
 } // namespace ns3

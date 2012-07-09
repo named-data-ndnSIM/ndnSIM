@@ -47,6 +47,16 @@ public:
   CcnxPitEntryIncomingFace (Ptr<CcnxFace> face);
 
   /**
+   * @brief Default constructor, necessary for Python bindings, but should not be used anywhere else.
+   */
+  CcnxPitEntryIncomingFace ();
+  /**
+   * @brie Copy operator
+   */
+  CcnxPitEntryIncomingFace &
+  operator = (CcnxPitEntryIncomingFace &other);
+
+  /**
    * @brief Compare two CcnxPitEntryIncomingFace
    */
   bool operator== (const CcnxPitEntryIncomingFace &dst) { return *m_face==*(dst.m_face); }

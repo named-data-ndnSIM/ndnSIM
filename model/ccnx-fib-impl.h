@@ -88,80 +88,35 @@ public:
    */
   CcnxFibImpl ();
 
-  /**
-   * \brief Perform longest prefix match
-   *
-   * \todo Implement exclude filters
-   *
-   * \param interest Interest packet header
-   * \returns If entry found a valid iterator will be returned, otherwise end ()
-   */
-  CcnxFib::iterator
+  virtual CcnxFib::iterator
   LongestPrefixMatch (const CcnxInterestHeader &interest) const;
   
-  /**
-   * \brief Add or update FIB entry
-   *
-   * If the entry exists, metric will be updated. Otherwise, new entry will be created
-   *
-   * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
-   *
-   * @param name	Prefix
-   * @param face	Forwarding face
-   * @param metric	Routing metric
-   */
-  CcnxFib::iterator
+  virtual CcnxFib::iterator
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
-  /**
-   * \brief Add or update FIB entry using smart pointer to prefix
-   *
-   * If the entry exists, metric will be updated. Otherwise, new entry will be created
-   *
-   * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
-   *
-   * @param name	Smart pointer to prefix
-   * @param face	Forwarding face
-   * @param metric	Routing metric
-   */
-  CcnxFib::iterator
+  virtual CcnxFib::iterator
   Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric);
 
-  /**
-   * @brief Remove FIB entry
-   *
-   * ! ATTENTION ! Use with caution.  All PIT entries referencing the corresponding FIB entry will become invalid.
-   * So, simulation may crash.
-   *
-   * @param name	Smart pointer to prefix
-   */
-  void
+  virtual void
   Remove (const Ptr<const CcnxNameComponents> &prefix);
 
-  // /**
-  //  * @brief Invalidate FIB entry ("Safe" version of Remove)
-  //  *
-  //  * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
-  //  * @param name	Smart pointer to prefix
-  //  */
-  // void
-  // Invalidate (const Ptr<const CcnxNameComponents> &prefix);
-
-  /**
-   * @brief Invalidate all FIB entries
-   */
-  void
+  virtual void
   InvalidateAll ();
   
-  /**
-   * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
-   * this FIB entry will be removed.
-   */
-  void
+  virtual void
   RemoveFromAll (Ptr<CcnxFace> face);
 
-  void
+  virtual void
   Print (std::ostream &os) const;
+
+  virtual CcnxFib::const_iterator
+  Begin ();
+
+  virtual CcnxFib::const_iterator
+  End ();
+
+  virtual CcnxFib::const_iterator
+  Next (CcnxFib::const_iterator item);
   
   /**
    * @brief Modify element in container
