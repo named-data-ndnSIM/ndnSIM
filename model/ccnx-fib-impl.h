@@ -29,11 +29,39 @@
 
 namespace ns3 {
 
+class CcnxFibEntryImpl : public CcnxFibEntry
+{
+public:
+  typedef ndnSIM::trie_with_policy<
+    CcnxNameComponents,
+    ndnSIM::smart_pointer_payload_traits<CcnxFibEntryImpl>,
+    ndnSIM::empty_policy_traits
+    > trie;
+
+  CcnxFibEntryImpl (const Ptr<const CcnxNameComponents> &prefix)
+    : CcnxFibEntry (prefix)
+    , item_ (0)
+  {
+  }
+
+  void
+  SetTrie (trie::iterator item)
+  {
+    item_ = item;
+  }
+
+  trie::iterator to_iterator () { return item_; }
+  trie::const_iterator to_iterator () const { return item_; }
+  
+private:
+  trie::iterator item_;
+};
+
 struct CcnxFibEntryContainer
 {
   typedef ndnSIM::trie_with_policy<
     CcnxNameComponents,
-    ndnSIM::smart_pointer_payload_traits<CcnxFibEntry>,
+    ndnSIM::smart_pointer_payload_traits<CcnxFibEntryImpl>,
     ndnSIM::empty_policy_traits
     > type;
 };
@@ -140,14 +168,9 @@ public:
    */
   template<typename Modifier>
   bool
-  modify (CcnxFib::iterator position, Modifier mod)
+  modify (CcnxFib::iterator item, Modifier mod)
   {
-    mod (*position);
-
-    return true;
-    // somehow we need to obtain trie iterator from the payload...    
-    // super::getPolicy ().
-    // return super::modify (position, mod);
+    return super::modify (StaticCast<CcnxFibEntryImpl> (item)->to_iterator (), mod);
   }
   
 protected:
@@ -162,7 +185,6 @@ private:
    */
   void
   Remove (super::parent_trie &item, Ptr<CcnxFace> face);
-
   
 private:
   Ptr<Node> m_node;

@@ -39,6 +39,7 @@ public:
                 typename PolicyTraits::policy_hook_type > parent_trie;
 
   typedef typename parent_trie::iterator iterator;
+  typedef typename parent_trie::const_iterator const_iterator;
 
   typedef typename PolicyTraits::template policy<
     trie_with_policy<FullKey, PayloadTraits, PolicyTraits>,
