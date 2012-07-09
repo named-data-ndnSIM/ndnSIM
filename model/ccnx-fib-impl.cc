@@ -91,10 +91,12 @@ CcnxFibImpl::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t 
 CcnxFib::iterator
 CcnxFibImpl::Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric)
 {
-  NS_LOG_FUNCTION(this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
+  NS_LOG_FUNCTION (this);
+  // NS_LOG_FUNCTION(this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
 
   // will add entry if doesn't exists, or just return an iterator to the existing entry
-  std::pair< super::iterator, bool > result = super::insert (*prefix, Create<CcnxFibEntry> (prefix));
+  Ptr<CcnxFibEntry> newEntry = Create<CcnxFibEntry> (prefix);
+  std::pair< super::iterator, bool > result = super::insert (*prefix, newEntry);
   
   NS_ASSERT_MSG (face != NULL, "Trying to modify NULL face");
   
@@ -112,68 +114,83 @@ CcnxFibImpl::Remove (const Ptr<const CcnxNameComponents> &prefix)
   super::erase (*prefix);
 }
 
-void
-CcnxFibImpl::Invalidate (const Ptr<const CcnxNameComponents> &prefix)
-{
-  NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
+// void
+// CcnxFibImpl::Invalidate (const Ptr<const CcnxNameComponents> &prefix)
+// {
+//   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 
-  super::iterator foundItem, lastItem;
-  bool reachLast;
-  boost::tie (foundItem, reachLast, lastItem) = super::getTrie ().find (*prefix);
+//   super::iterator foundItem, lastItem;
+//   bool reachLast;
+//   boost::tie (foundItem, reachLast, lastItem) = super::getTrie ().find (*prefix);
   
-  if (!reachLast || lastItem->payload () == 0)
-    return; // nothing to invalidate
+//   if (!reachLast || lastItem->payload () == 0)
+//     return; // nothing to invalidate
 
-  super::modify (lastItem,
-                 ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
-}
+//   super::modify (lastItem,
+//                  ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
+// }
 
 void
 CcnxFibImpl::InvalidateAll ()
 {
-  // NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId ());
+  NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId ());
 
-  // for (super::iterator entry = m_fib.begin ();
-  //      entry != m_fib.end ();
-  //      entry ++)
-  //   {
-  //     m_fib.modify (entry,
-  //                   ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
-  //   }
+  super::parent_trie::recursive_iterator item (super::getTrie ());
+  super::parent_trie::recursive_iterator end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+
+      super::modify (&(*item),
+                     ll::bind (&CcnxFibEntry::Invalidate, ll::_1));
+    }
 }
 
 void
-CcnxFibImpl::Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face)
+CcnxFibImpl::Remove (super::parent_trie &item, Ptr<CcnxFace> face)
 {
-  // NS_LOG_FUNCTION (this);
+  if (item.payload () == 0) return;
+  NS_LOG_FUNCTION (this);
 
-  // m_fib.modify (m_fib.iterator_to (entry),
-  //               ll::bind (&CcnxFibEntry::RemoveFace, ll::_1, face));
-  // if (entry.m_faces.size () == 0)
-  //   {
-  //     m_fib.erase (m_fib.iterator_to (entry));
-  //   }
+  super::modify (&item,
+                 ll::bind (&CcnxFibEntry::RemoveFace, ll::_1, face));
 }
 
 void
 CcnxFibImpl::RemoveFromAll (Ptr<CcnxFace> face)
 {
-  // NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this);
 
-  // for_each (m_fib.begin (), m_fib.end (), 
-  //           ll::bind (static_cast< void (CcnxFib::*) (const CcnxFibEntry &, Ptr<CcnxFace>) > (&CcnxFib::Remove),
-  //                     this, ll::_1, face));
+  std::for_each (super::parent_trie::recursive_iterator (super::getTrie ()),
+                 super::parent_trie::recursive_iterator (0), 
+                 ll::bind (static_cast< void (CcnxFib::*) (super::parent_trie &, Ptr<CcnxFace>) > (&CcnxFibImpl::Remove),
+                           this, ll::_1, face));
+
+  super::parent_trie::recursive_iterator trieNode (super::getTrie ());
+  super::parent_trie::recursive_iterator end (0);
+  for (; trieNode != end; trieNode++)
+    {
+      if (trieNode->payload () == 0) continue;
+      
+      if (trieNode->payload ()->m_faces.size () == 0)
+        {
+          trieNode = super::parent_trie::recursive_iterator (trieNode->erase ());
+        }
+    }
 }
 
 void
 CcnxFibImpl::Print (std::ostream &os) const
 {
-  // for (super::iterator entry = fib.m_fib.begin ();
-  //      entry != fib.m_fib.end ();
-  //      entry++)
-  //   {
-  //     os << entry->GetPrefix () << "\t" << *entry << "\n";
-  //   }
+  // !!! unordered_set imposes "random" order of item in the same level !!!
+  super::parent_trie::const_recursive_iterator item (super::getTrie ());
+  super::parent_trie::const_recursive_iterator end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+
+      os << item->payload ()->GetPrefix () << "\t" << *item->payload () << "\n";
+    }
 }
 
 } // namespace ns3

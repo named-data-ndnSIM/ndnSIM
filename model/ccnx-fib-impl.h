@@ -110,14 +110,14 @@ public:
   void
   Remove (const Ptr<const CcnxNameComponents> &prefix);
 
-  /**
-   * @brief Invalidate FIB entry ("Safe" version of Remove)
-   *
-   * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
-   * @param name	Smart pointer to prefix
-   */
-  void
-  Invalidate (const Ptr<const CcnxNameComponents> &prefix);
+  // /**
+  //  * @brief Invalidate FIB entry ("Safe" version of Remove)
+  //  *
+  //  * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
+  //  * @param name	Smart pointer to prefix
+  //  */
+  // void
+  // Invalidate (const Ptr<const CcnxNameComponents> &prefix);
 
   /**
    * @brief Invalidate all FIB entries
@@ -125,13 +125,6 @@ public:
   void
   InvalidateAll ();
   
-  /**
-   * @brief Remove reference to a face from the entry. If entry had only this face, the whole
-   * entry will be removed
-   */
-  void
-  Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face);
-
   /**
    * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
    * this FIB entry will be removed.
@@ -149,13 +142,27 @@ public:
   bool
   modify (CcnxFib::iterator position, Modifier mod)
   {
-    return this->modify (position, mod);
+    mod (*position);
+
+    return true;
+    // somehow we need to obtain trie iterator from the payload...    
+    // super::getPolicy ().
+    // return super::modify (position, mod);
   }
   
 protected:
   // inherited from Object class
   virtual void NotifyNewAggregate (); ///< @brief Notify when object is aggregated
   virtual void DoDispose (); ///< @brief Perform cleanup
+
+private:
+  /**
+   * @brief Remove reference to a face from the entry. If entry had only this face, the whole
+   * entry will be removed
+   */
+  void
+  Remove (super::parent_trie &item, Ptr<CcnxFace> face);
+
   
 private:
   Ptr<Node> m_node;

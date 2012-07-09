@@ -213,7 +213,8 @@ CcnxStackHelper::Install (Ptr<Node> node) const
   Ptr<Ccnx> ccnx = m_ccnxFactory.Create<Ccnx> ();
 
   // Create and aggregate FIB
-  ccnx->AggregateObject (m_fibFactory.Create<CcnxFib> ());
+  Ptr<CcnxFib> fib = m_fibFactory.Create<CcnxFib> ();
+  ccnx->AggregateObject (fib);
 
   // Create and aggregate PIT
   ccnx->AggregateObject (m_pitFactory.Create<CcnxPit> ());

@@ -41,6 +41,12 @@ public:
   typedef ns3::Ptr<CcnxFibEntry> const_iterator;
 
   /**
+   * \brief Interface ID
+   *
+   * \return interface ID
+   */
+  static TypeId GetTypeId ();
+  /**
    * @brief Default constructor
    */
   CcnxFib () {}
@@ -100,14 +106,14 @@ public:
   virtual void
   Remove (const Ptr<const CcnxNameComponents> &prefix) = 0;
 
-  /**
-   * @brief Invalidate FIB entry ("Safe" version of Remove)
-   *
-   * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
-   * @param name	Smart pointer to prefix
-   */
-  virtual void
-  Invalidate (const Ptr<const CcnxNameComponents> &prefix) = 0;
+  // /**
+  //  * @brief Invalidate FIB entry ("Safe" version of Remove)
+  //  *
+  //  * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
+  //  * @param name	Smart pointer to prefix
+  //  */
+  // virtual void
+  // Invalidate (const Ptr<const CcnxNameComponents> &prefix) = 0;
 
   /**
    * @brief Invalidate all FIB entries
@@ -115,13 +121,6 @@ public:
   virtual void
   InvalidateAll () = 0;
   
-  /**
-   * @brief Remove reference to a face from the entry. If entry had only this face, the whole
-   * entry will be removed
-   */
-  virtual void
-  Remove (const CcnxFibEntry &entry, Ptr<CcnxFace> face) = 0;
-
   /**
    * @brief Remove all references to a face from FIB.  If for some enty that face was the only element,
    * this FIB entry will be removed.

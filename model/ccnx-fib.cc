@@ -39,6 +39,12 @@ namespace ns3 {
 
 using namespace __ccnx_private;
 
+TypeId 
+CcnxFib::GetTypeId (void)
+{
+  return CcnxFibImpl::GetTypeId ();
+}
+
 std::ostream& operator<< (std::ostream& os, const CcnxFib &fib)
 {
   os << "Node " << Names::FindName (fib.GetObject<Node>()) << "\n";

@@ -30,6 +30,7 @@
 #include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/foreach.hpp>
+#include <boost/mpl/if.hpp>
 
 namespace ndnSIM
 {
@@ -92,7 +93,8 @@ hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node);
 ///////////////////////////////////////////////////
 // actual definition
 //
-
+template<class T>
+class trie_iterator;
 
 template<typename FullKey,
 	 typename Payload, typename PayloadTraits,
@@ -104,17 +106,51 @@ public:
 
   typedef trie*       iterator;
   typedef const trie* const_iterator;
+
+  typedef trie_iterator<trie> recursive_iterator;
+  typedef trie_iterator<const trie> const_recursive_iterator;
   
   inline
-  trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10);
+  trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10)
+    : key_ (key)
+    , initialBucketSize_ (bucketSize)
+    , bucketIncrement_ (bucketIncrement)
+    , bucketSize_ (initialBucketSize_)
+    , buckets_ (new bucket_type [bucketSize_]) //cannot use normal pointer, because lifetime of buckets should be larger than lifetime of the container
+    , children_ (bucket_traits (buckets_.get (), bucketSize_))
+    , payload_ (PayloadTraits::empty_payload)
+    , parent_ (0)
+  {
+  }
 
   inline
-  ~trie ();
+  ~trie ()
+  {
+    payload_ = PayloadTraits::empty_payload; // necessary for smart pointers...
+    children_.clear_and_dispose (trie_delete_disposer ());
+  }
 
   void
   clear ()
   {
     children_.clear_and_dispose (trie_delete_disposer ());
+  }
+
+  template<class Predicate>
+  void
+  clear_if (Predicate cond)
+  {
+    recursive_iterator trieNode (this);
+    recursive_iterator end (0);
+
+    while (trieNode != end)
+      {
+        if (cond (*trieNode))
+          {
+            trieNode = recursive_iterator (trieNode->erase ());
+          }
+        trieNode ++;
+      }
   }
   
   // actual entry
@@ -127,19 +163,73 @@ public:
 
   inline std::pair<iterator, bool>
   insert (const FullKey &key,
-          typename PayloadTraits::pointer_type payload);
+          typename PayloadTraits::pointer_type payload)
+  {
+    trie *trieNode = this;
+  
+    BOOST_FOREACH (const Key &subkey, key)
+      {
+        typename unordered_set::iterator item = trieNode->children_.find (subkey);
+        if (item == trieNode->children_.end ())
+          {
+            trie *newNode = new trie (subkey, initialBucketSize_, bucketIncrement_);
+            // std::cout << "new " << newNode << "\n";
+            newNode->parent_ = trieNode;
+
+            if (trieNode->children_.size () >= trieNode->bucketSize_)
+              {
+                trieNode->bucketSize_ += trieNode->bucketIncrement_;
+                buckets_array newBuckets (new bucket_type [trieNode->bucketSize_]);
+                trieNode->children_.rehash (bucket_traits (newBuckets.get (), trieNode->bucketSize_));
+                trieNode->buckets_.swap (newBuckets);
+              }
+	  
+            std::pair< typename unordered_set::iterator, bool > ret =
+              trieNode->children_.insert (*newNode);
+	  
+            trieNode = &(*ret.first);
+          }
+        else
+          trieNode = &(*item);
+      }
+
+    if (trieNode->payload_ == PayloadTraits::empty_payload)
+      {
+        trieNode->payload_ = payload;
+        return std::make_pair (trieNode, true);
+      }
+    else
+      return std::make_pair (trieNode, false);
+  }
 
   /**
    * @brief Removes payload (if it exists) and if there are no children, prunes parents trie
    */
-  inline void
-  erase ();
+  inline iterator
+  erase ()
+  {
+    payload_ = PayloadTraits::empty_payload;
+    return prune ();
+  }
 
   /**
    * @brief Do exactly as erase, but without erasing the payload
    */
-  inline void
-  prune ();
+  inline iterator
+  prune ()
+  {
+    if (payload_ == PayloadTraits::empty_payload &&
+        children_.size () == 0)
+      {
+        if (parent_ == 0) return this;
+
+        trie *parent = parent_;
+        parent->children_.erase_and_dispose (*this, trie_delete_disposer ()); // delete this; basically, committing a suicide
+
+        return parent->prune ();
+      }
+    return this;
+  }
 
   inline boost::tuple<const iterator, bool, const iterator>
   find (const FullKey &key) const
@@ -154,14 +244,55 @@ public:
    * @return ->second is true if prefix in ->first is longer than key
    */
   inline boost::tuple<iterator, bool, iterator>
-  find (const FullKey &key);
+  find (const FullKey &key)
+  {
+    trie *trieNode = this;
+    iterator foundNode = (payload_ != PayloadTraits::empty_payload) ? this : 0;
+    bool reachLast = true;
+  
+    BOOST_FOREACH (const Key &subkey, key)
+      {
+        typename unordered_set::iterator item = trieNode->children_.find (subkey);
+        if (item == trieNode->children_.end ())
+          {
+            reachLast = false;
+            break;
+          }
+        else
+          {
+            trieNode = &(*item);
+	  
+            if (trieNode->payload_ != PayloadTraits::empty_payload)
+              foundNode = trieNode;
+          }
+      }
+
+    return boost::make_tuple (foundNode, reachLast, trieNode);  
+  }
 
   /**
    * @brief Find next payload of the sub-trie
    * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
    */
   inline iterator
-  find ();
+  find ()
+  {
+    if (payload_ != PayloadTraits::empty_payload)
+      return this;
+
+    typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+    for (typename trie::unordered_set::iterator subnode = children_.begin ();
+         subnode != children_.end ();
+         subnode++ )
+      // BOOST_FOREACH (trie &subnode, children_)
+      {
+        iterator value = subnode->find ();
+        if (value != 0)
+          return value;
+      }
+  
+    return 0;
+  }
 
   /**
    * @brief Find next payload of the sub-trie satisfying the predicate
@@ -170,7 +301,24 @@ public:
    */
   template<class Predicate>
   inline iterator
-  find_if (Predicate pred);
+  find_if (Predicate pred)
+  {
+    if (payload_ != PayloadTraits::empty_payload && pred (payload_))
+      return this;
+
+    typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+    for (typename trie::unordered_set::iterator subnode = children_.begin ();
+         subnode != children_.end ();
+         subnode++ )
+      // BOOST_FOREACH (const trie &subnode, children_)
+      {
+        iterator value = subnode->find ();
+        if (value != 0)
+          return value;
+      }
+  
+    return 0;
+  }
 
   iterator end ()
   {
@@ -209,7 +357,6 @@ private:
   {
     void operator() (trie *delete_this)
     {
-      // std::cout << "Deleting " << delete_this << "\n";
       delete delete_this;
     }
   };
@@ -238,10 +385,14 @@ private:
   typedef boost::intrusive::member_hook< trie,
                                          boost::intrusive::unordered_set_member_hook< >,
                                          &trie::unordered_set_member_hook_ > member_hook;
+
   typedef boost::intrusive::unordered_set< trie, member_hook > unordered_set;
   typedef typename unordered_set::bucket_type   bucket_type;
   typedef typename unordered_set::bucket_traits bucket_traits;
 
+  template<class T>
+  friend class trie_iterator;
+  
   ////////////////////////////////////////////////
   // Actual data
   ////////////////////////////////////////////////
@@ -260,173 +411,8 @@ private:
   trie *parent_; // to make cleaning effective
 };
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::trie (const trie::Key &key, size_t bucketSize, size_t bucketIncrement)
-  : key_ (key)
-  , initialBucketSize_ (bucketSize)
-  , bucketIncrement_ (bucketIncrement)
-  , bucketSize_ (initialBucketSize_)
-  , buckets_ (new bucket_type [bucketSize_]) //cannot use normal pointer, because lifetime of buckets should be larger than lifetime of the container
-  , children_ (bucket_traits (buckets_.get (), bucketSize_))
-  , payload_ (PayloadTraits::empty_payload)
-  , parent_ (0)
-{
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::~trie ()
-{
-  payload_ = PayloadTraits::empty_payload; // necessary for smart pointers...
-  children_.clear_and_dispose (trie_delete_disposer ());
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-inline
-std::pair<typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator, bool>
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::insert (const FullKey &key, typename PayloadTraits::pointer_type payload)
-{
-  trie *trieNode = this;
-  
-  BOOST_FOREACH (const Key &subkey, key)
-    {
-      typename unordered_set::iterator item = trieNode->children_.find (subkey);
-      if (item == trieNode->children_.end ())
-	{
-	  trie *newNode = new trie (subkey, initialBucketSize_, bucketIncrement_);
-	  // std::cout << "new " << newNode << "\n";
-	  newNode->parent_ = trieNode;
-
-	  if (trieNode->children_.size () >= trieNode->bucketSize_)
-	    {
-	      trieNode->bucketSize_ += trieNode->bucketIncrement_;
-              buckets_array newBuckets (new bucket_type [trieNode->bucketSize_]);
-	      trieNode->children_.rehash (bucket_traits (newBuckets.get (), trieNode->bucketSize_));
-	      trieNode->buckets_.swap (newBuckets);
-	    }
-	  
-	  std::pair< typename unordered_set::iterator, bool > ret =
-	    trieNode->children_.insert (*newNode);
-	  
-	  trieNode = &(*ret.first);
-	}
-      else
-	trieNode = &(*item);
-    }
-
-  if (trieNode->payload_ == 0)
-    {
-      trieNode->payload_ = payload;
-      return std::make_pair (trieNode, true);
-    }
-  else
-    return std::make_pair (trieNode, false);
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-inline
-boost::tuple<typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator,
-	     bool,
-	     typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator>
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::find (const FullKey &key)
-{
-  trie *trieNode = this;
-  iterator foundNode = (payload_ != PayloadTraits::empty_payload) ? this : 0;
-  bool reachLast = true;
-  
-  BOOST_FOREACH (const Key &subkey, key)
-    {
-      typename unordered_set::iterator item = trieNode->children_.find (subkey);
-      if (item == trieNode->children_.end ())
-	{
-	  reachLast = false;
-	  break;
-	}
-      else
-	{
-	  trieNode = &(*item);
-	  
-	  if (trieNode->payload_ != PayloadTraits::empty_payload)
-	    foundNode = trieNode;
-	}
-    }
-
-  return boost::make_tuple (foundNode, reachLast, trieNode);  
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-inline typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::find ()
-{
-  if (payload_ != PayloadTraits::empty_payload)
-    return this;
-
-  typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  for (typename trie::unordered_set::iterator subnode = children_.begin ();
-       subnode != children_.end ();
-       subnode++ )
-  // BOOST_FOREACH (trie &subnode, children_)
-    {
-      iterator value = subnode->find ();
-      if (value != 0)
-	return value;
-    }
-  
-  return 0;
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-template<class Predicate>
-inline typename trie<FullKey, Payload, PayloadTraits, PolicyHook>::iterator
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::find_if (Predicate pred)
-{
-  if (payload_ != PayloadTraits::empty_payload && pred (payload_))
-    return this;
-
-  typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
-  for (typename trie::unordered_set::iterator subnode = children_.begin ();
-       subnode != children_.end ();
-       subnode++ )
-  // BOOST_FOREACH (const trie &subnode, children_)
-    {
-      iterator value = subnode->find ();
-      if (value != 0)
-        return value;
-    }
-  
-  return 0;
-}
 
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::erase ()
-{
-  payload_ = PayloadTraits::empty_payload;
-  prune ();
-}
-
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
-inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
-::prune ()
-{
-  if (payload_ == 0 && children_.size () == 0)
-    {
-      if (parent_ == 0) return;
-
-      trie *parent = parent_;
-      parent->children_.erase_and_dispose (*this, trie_delete_disposer ()); // delete this; basically, committing a suicide
-
-      parent->prune ();
-    }
-}
 
 template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
 inline std::ostream&
@@ -489,6 +475,72 @@ hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node)
 {
   return boost::hash_value (trie_node.key_);
 }
+
+
+
+template<class Trie>
+class trie_iterator
+{
+public:
+  trie_iterator () : trie_ (0) {}
+  trie_iterator (typename Trie::iterator item) : trie_ (item) {}
+  trie_iterator (Trie &item) : trie_ (&item) {}
+  
+  Trie & operator* () { return *trie_; }
+  const Trie & operator* () const { return *trie_; }
+  Trie * operator-> () { return trie_; }
+  const Trie * operator-> () const { return trie_; }
+  bool operator== (trie_iterator<const Trie> &other) const { return (trie_ == other.trie_); }
+  bool operator== (trie_iterator<Trie> &other) { return (trie_ == other.trie_); }
+  bool operator!= (trie_iterator<const Trie> &other) const { return !(*this == other); }
+  bool operator!= (trie_iterator<Trie> &other) { return !(*this == other); }
+  
+  trie_iterator<Trie> &
+  operator++ (int)
+  {
+    if (trie_->children_.size () > 0)
+      trie_ = &(*trie_->children_.begin ());
+    else
+      trie_ = goUp ();
+    return *this;
+  }
+
+  trie_iterator<Trie> &
+  operator++ ()
+  {
+    (*this)++;
+    return *this;
+  }  
+
+private:
+  typedef typename boost::mpl::if_< boost::is_same<Trie, const Trie>,
+                                    typename Trie::unordered_set::const_iterator,
+                                    typename Trie::unordered_set::iterator>::type set_iterator;
+  
+  Trie* goUp ()
+  {
+    if (trie_->parent_ != 0)
+      {
+        // typename Trie::unordered_set::iterator item =
+        set_iterator item = trie_->parent_->children_.iterator_to (*trie_);
+        item++;
+        if (item != trie_->parent_->children_.end ())
+          {
+            return &(*item);
+          }
+        else
+          {
+            trie_ = trie_->parent_;
+            return goUp ();
+          }
+      }
+    else
+      return 0;
+  }
+private:
+  Trie *trie_;
+};
+
 
 } // ndnSIM
 

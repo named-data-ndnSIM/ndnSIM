@@ -200,6 +200,9 @@ public:
   const parent_trie &
   getTrie () const { return trie_; }
 
+  parent_trie &
+  getTrie () { return trie_; }
+
   const policy_container &
   getPolicy () const { return policy_; }
 

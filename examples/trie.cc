@@ -26,6 +26,9 @@
 #include "../utils/fifo-policy.h"
 #include "../utils/multi-policy.h"
 
+#include <boost/lexical_cast.hpp>
+
+using namespace std;
 using namespace ns3;
 using namespace ndnSIM;
 using namespace boost;
@@ -55,44 +58,67 @@ main (int argc, char *argv[])
   CommandLine args;
   args.Parse (argc, argv);
 
-  typedef trie_with_policy<
-    ns3::CcnxNameComponents,
-    smart_pointer_payload_traits<Integer>,
-    multi_policy_traits<
-      mpl::vector2<lru_policy_traits,random_policy_traits>
-      > > trie;
+  // typedef trie_with_policy<
+  //   ns3::CcnxNameComponents,
+  //   smart_pointer_payload_traits<Integer>,
+  //   multi_policy_traits<
+  //     mpl::vector2<lru_policy_traits,random_policy_traits>
+  //     > > trie;
   
-  trie x;
-  x.getPolicy ().get<0> ().set_max_size (100);
-  x.getPolicy ().get<1> ().set_max_size (3);
-  // // x.getPolicy ().get<1> ().set_max_size (3);
-  // // // x.getPolicy ().get1 ().set_max_size (10);
-  // // // x.getPolicy ().get2 ().set_max_size (3);
+  // trie x;
+  // x.getPolicy ().get<0> ().set_max_size (100);
+  // x.getPolicy ().get<1> ().set_max_size (3);
+  // // // x.getPolicy ().get<1> ().set_max_size (3);
+  // // // // x.getPolicy ().get1 ().set_max_size (10);
+  // // // // x.getPolicy ().get2 ().set_max_size (3);
   
-  // // // x.getTrie ().PrintStat (std::cout);
+  // // // // x.getTrie ().PrintStat (std::cout);
   
-  ns3::CcnxNameComponents n1,n2,n3,n4;
-  // // // n1("a")("b")("c");
-  // // // n2("a")("b")("d");
-  // // // n3("a")("b")("f");
-  // // // n4("a")("b");
+  // ns3::CcnxNameComponents n1,n2,n3,n4;
+  // // // // n1("a")("b")("c");
+  // // // // n2("a")("b")("d");
+  // // // // n3("a")("b")("f");
+  // // // // n4("a")("b");
 
-  n1("a");
-  n2("b");
-  n3("c");
-  n4("d");
+  // n1("a");
+  // n2("b");
+  // n3("c");
+  // n4("d");
 
-  x.insert (n1, ns3::Create<Integer> (1));
-  x.insert (n2, ns3::Create<Integer> (2));
-  // // // x.longest_prefix_match (n1);
-  x.insert (n3, ns3::Create<Integer> (3));
-  x.insert (n4, ns3::Create<Integer> (4));
-  x.insert (n4, ns3::Create<Integer> (4));
+  // x.insert (n1, ns3::Create<Integer> (1));
+  // x.insert (n2, ns3::Create<Integer> (2));
+  // // // // x.longest_prefix_match (n1);
+  // x.insert (n3, ns3::Create<Integer> (3));
+  // x.insert (n4, ns3::Create<Integer> (4));
+  // x.insert (n4, ns3::Create<Integer> (4));
 
-  std::cout << "digraph trie {\n";
-  std::cout << x.getTrie ();
-  std::cout << "}\n";
+  // std::cout << "digraph trie {\n";
+  // std::cout << x.getTrie ();
+  // std::cout << "}\n";
 
+  Ptr<Node> node = CreateObject<Node> ();
+  Names::Add ("TestNode", node);
+  Ptr<CcnxApp> app = CreateObject<CcnxApp> ();
+  node->AddApplication (app);
+  
+  ObjectFactory factory ("ns3::CcnxFib");
+  
+  Ptr<CcnxFib> fib = factory.Create<CcnxFib> ();
+  node->AggregateObject (fib);
+  Ptr<CcnxFace> face = CreateObject<CcnxAppFace> (app);
+
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla"), face, 1);
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla/1"), face, 1);
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla/2"), face, 1);
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla/3"), face, 1);
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla/1/1"), face, 1);
+  fib->Add (lexical_cast<CcnxNameComponents> ("/bla/1/2"), face, 1);
+  
+  cout << *fib << endl;
+
+  fib->RemoveFromAll (face);
+
+  cout << *fib << endl;
   // BOOST_FOREACH (const trie::parent_trie &item, x.getPolicy ())
   //   {
   //     std::cout << *item.payload () << " " << std::endl;

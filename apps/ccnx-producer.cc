@@ -84,9 +84,12 @@ CcnxProducer::StartApplication ()
 
   CcnxApp::StartApplication ();
 
+  NS_LOG_DEBUG ("NodeID: " << GetNode ()->GetId ());
+  
   Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
+  
   CcnxFib::iterator fibEntry = fib->Add (m_prefix, m_face, 0);
-
+  
   // make face green, so it will be used primarily
   StaticCast<CcnxFibImpl> (fib)->modify (fibEntry,
                                          ll::bind (&CcnxFibEntry::UpdateStatus,
