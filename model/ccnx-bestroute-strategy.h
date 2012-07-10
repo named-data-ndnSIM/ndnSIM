@@ -48,7 +48,7 @@ public:
         
   // inherited from  CcnxForwardingStrategy
   virtual bool
-  PropagateInterest (const CcnxPitEntry  &pitEntry, 
+  PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet);

@@ -98,7 +98,7 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<const CcnxNameComponents> prefix, const Time &offsetTime, Ptr<CcnxFibEntry> fibEntry);
+  CcnxPitEntry (Ptr<const CcnxInterestHeader> header, Ptr<CcnxFibEntry> fibEntry);
   
   /**
    * @brief Update lifetime of PIT entry
@@ -226,8 +226,6 @@ public:
    */
   void
   IncreaseAllowedRetxCount ();
-  
-protected:
   
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);

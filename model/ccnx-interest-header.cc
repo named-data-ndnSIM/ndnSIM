@@ -74,6 +74,12 @@ CcnxInterestHeader::GetName () const
   return *m_name;
 }
 
+Ptr<const CcnxNameComponents>
+CcnxInterestHeader::GetNamePtr () const
+{
+  return m_name;
+}
+
 void
 CcnxInterestHeader::SetMinSuffixComponents (int32_t value)
 {

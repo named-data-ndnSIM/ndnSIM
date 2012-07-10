@@ -79,6 +79,12 @@ CcnxContentObjectHeader::GetName () const
   return *m_name;
 }
 
+Ptr<const CcnxNameComponents>
+CcnxContentObjectHeader::GetNamePtr () const
+{
+  return m_name;
+}
+
 #define CCNB CcnxEncodingHelper // just to simplify writing
 
 void

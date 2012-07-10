@@ -24,6 +24,7 @@
 #include "ccnx-pit.h"
 #include "../utils/trie-with-policy.h"
 #include "../utils/empty-policy.h"
+#include "../utils/persistent-policy.h"
 #include "ns3/ccnx-name-components.h"
 
 namespace ns3 {
@@ -34,11 +35,12 @@ public:
   typedef ndnSIM::trie_with_policy<
     CcnxNameComponents,
     ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl>,
-    ndnSIM::empty_policy_traits
+    ndnSIM::persistent_policy_traits
     > trie;
 
-  CcnxPitEntryImpl (const Ptr<const CcnxNameComponents> &prefix, const Time &offsetTime, Ptr<CcnxFibEntry> fibEntry)
-    : CcnxPitEntry (prefix, offsetTime, fibEntry)
+  CcnxPitEntryImpl (Ptr<const CcnxInterestHeader> header,
+                    Ptr<CcnxFibEntry> fibEntry)
+    : CcnxPitEntry (header, fibEntry)
     , item_ (0)
   {
   }
@@ -88,16 +90,13 @@ public:
 
   // inherited from CcnxPit  
   virtual Ptr<CcnxPitEntry>
-  Lookup (const CcnxContentObjectHeader &header) const;
+  Lookup (const CcnxContentObjectHeader &header);
 
   virtual Ptr<CcnxPitEntry>
   Lookup (const CcnxInterestHeader &header);
 
-  virtual bool
-  CheckIfDuplicate (Ptr<CcnxPitEntry> entry, const CcnxInterestHeader &header);
-  
   virtual Ptr<CcnxPitEntry>
-  Create (const CcnxInterestHeader &header);
+  Create (Ptr<const CcnxInterestHeader> header);
   
   virtual void
   MarkErased (Ptr<CcnxPitEntry> entry);
@@ -105,15 +104,14 @@ public:
   virtual void
   Print (std::ostream &os) const;
 
-  // /**
-  //  * @brief Modify element in container
-  //  */
-  // template<typename Modifier>
-  // bool
-  // modify (Ptr<CcnxPitEntry> item, Modifier mod)
-  // {
-  //   return super::modify (StaticCast<CcnxPitEntryImpl> (item)->to_iterator (), mod);
-  // }
+  virtual Ptr<CcnxPitEntry>
+  Begin ();
+
+  virtual Ptr<CcnxPitEntry>
+  End ();
+
+  virtual Ptr<CcnxPitEntry>
+  Next (Ptr<CcnxPitEntry>);
   
 protected:
   // inherited from CcnxPit

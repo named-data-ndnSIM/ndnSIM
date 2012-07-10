@@ -24,6 +24,9 @@
 namespace ndnSIM
 {
 
+/**
+ * @brief Traits for empty (bogus) replacement policy
+ */
 struct empty_policy_traits
 {
   typedef void* policy_hook_type;

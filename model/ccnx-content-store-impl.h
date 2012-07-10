@@ -58,7 +58,7 @@ CcnxContentStoreImpl<Container>::Lookup (Ptr<const CcnxInterestHeader> interest)
   // NS_LOG_FUNCTION (this << interest->GetName ());
 
   /// @todo Change to search with predicate
-  typename Container::iterator node = this->deepest_prefix_match (interest->GetName ());
+  typename Container::const_iterator node = this->deepest_prefix_match (interest->GetName ());
   
   if (node != this->end ())
     {

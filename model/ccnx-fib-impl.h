@@ -89,7 +89,7 @@ public:
   CcnxFibImpl ();
 
   virtual Ptr<CcnxFibEntry>
-  LongestPrefixMatch (const CcnxInterestHeader &interest) const;
+  LongestPrefixMatch (const CcnxInterestHeader &interest);
   
   virtual Ptr<CcnxFibEntry>
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);

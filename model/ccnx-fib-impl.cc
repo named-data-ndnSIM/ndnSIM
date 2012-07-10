@@ -70,9 +70,9 @@ CcnxFibImpl::DoDispose (void)
 
 
 Ptr<CcnxFibEntry>
-CcnxFibImpl::LongestPrefixMatch (const CcnxInterestHeader &interest) const
+CcnxFibImpl::LongestPrefixMatch (const CcnxInterestHeader &interest)
 {
-  super::iterator item = const_cast<CcnxFibImpl*> (this)->super::longest_prefix_match (interest.GetName ());
+  super::iterator item = super::longest_prefix_match (interest.GetName ());
   // @todo use predicate to search with exclude filters
 
   if (item == super::end ())
@@ -94,16 +94,23 @@ CcnxFibImpl::Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> fac
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
 
   // will add entry if doesn't exists, or just return an iterator to the existing entry
-  Ptr<CcnxFibEntryImpl> newEntry = Create<CcnxFibEntryImpl> (prefix);
-  std::pair< super::iterator, bool > result = super::insert (*prefix, newEntry);
-  newEntry->SetTrie (result.first);
+  std::pair< super::iterator, bool > result = super::insert (*prefix, 0);
+  if (result.first != super::end ())
+    {
+      if (result.second)
+        {
+            Ptr<CcnxFibEntryImpl> newEntry = Create<CcnxFibEntryImpl> (prefix);
+            newEntry->SetTrie (result.first);
+            result.first->set_payload (newEntry);
+        }
   
-  NS_ASSERT_MSG (face != NULL, "Trying to modify NULL face");
-  
-  super::modify (result.first,
-                 ll::bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
+      super::modify (result.first,
+                     ll::bind (&CcnxFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
     
-  return result.first->payload ();
+      return result.first->payload ();
+    }
+  else
+    return 0;
 }
 
 void

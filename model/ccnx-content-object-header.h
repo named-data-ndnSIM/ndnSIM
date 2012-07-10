@@ -243,6 +243,12 @@ public:
   GetName () const;
 
   /**
+   * @brief Get smart pointer to the interest name (to avoid extra memory usage)
+   */
+  Ptr<const CcnxNameComponents>
+  GetNamePtr () const;
+
+  /**
    * @brief Get editable reference to content object's Signature
    */
   inline Signature &

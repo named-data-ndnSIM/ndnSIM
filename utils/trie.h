@@ -71,24 +71,23 @@ smart_pointer_payload_traits<Payload>::empty_payload = 0;
 // forward declarations
 //
 template<typename FullKey,
-         typename Payload,
          typename PayloadTraits,
          typename PolicyHook >
 class trie; 
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline std::ostream&
 operator << (std::ostream &os,
-             const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node);
+             const trie<FullKey, PayloadTraits, PolicyHook> &trie_node);
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 bool
-operator== (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &a,
-            const trie<FullKey, Payload, PayloadTraits, PolicyHook> &b);
+operator== (const trie<FullKey, PayloadTraits, PolicyHook> &a,
+            const trie<FullKey, PayloadTraits, PolicyHook> &b);
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook >
+template<typename FullKey, typename PayloadTraits, typename PolicyHook >
 std::size_t
-hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node);
+hash_value (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node);
 
 ///////////////////////////////////////////////////
 // actual definition
@@ -97,7 +96,7 @@ template<class T>
 class trie_iterator;
 
 template<typename FullKey,
-	 typename Payload, typename PayloadTraits,
+	 typename PayloadTraits,
          typename PolicyHook >
 class trie
 {
@@ -109,6 +108,8 @@ public:
 
   typedef trie_iterator<trie> recursive_iterator;
   typedef trie_iterator<const trie> const_recursive_iterator;
+
+  typedef PayloadTraits payload_traits;
   
   inline
   trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10)
@@ -155,11 +156,11 @@ public:
   
   // actual entry
   friend bool
-  operator== <> (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &a,
-                 const trie<FullKey, Payload, PayloadTraits, PolicyHook> &b);
+  operator== <> (const trie<FullKey, PayloadTraits, PolicyHook> &a,
+                 const trie<FullKey, PayloadTraits, PolicyHook> &b);
 
   friend std::size_t
-  hash_value <> (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node);
+  hash_value <> (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node);
 
   inline std::pair<iterator, bool>
   insert (const FullKey &key,
@@ -231,11 +232,11 @@ public:
     return this;
   }
 
-  inline boost::tuple<const iterator, bool, const iterator>
-  find (const FullKey &key) const
-  {
-    return const_cast<trie*> (this)->find (key);
-  }
+  // inline boost::tuple<const iterator, bool, const iterator>
+  // find (const FullKey &key) const
+  // {
+  //   return const_cast<trie*> (this)->find (key);
+  // }
 
   /**
    * @brief Perform the longest prefix match
@@ -280,7 +281,7 @@ public:
     if (payload_ != PayloadTraits::empty_payload)
       return this;
 
-    typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+    typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
     for (typename trie::unordered_set::iterator subnode = children_.begin ();
          subnode != children_.end ();
          subnode++ )
@@ -300,13 +301,13 @@ public:
    * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
    */
   template<class Predicate>
-  inline iterator
+  inline const iterator
   find_if (Predicate pred)
   {
     if (payload_ != PayloadTraits::empty_payload && pred (payload_))
       return this;
 
-    typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+    typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
     for (typename trie::unordered_set::iterator subnode = children_.begin ();
          subnode != children_.end ();
          subnode++ )
@@ -414,12 +415,12 @@ private:
 
 
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline std::ostream&
-operator << (std::ostream &os, const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node)
+operator << (std::ostream &os, const trie<FullKey, PayloadTraits, PolicyHook> &trie_node)
 {
   os << "# " << trie_node.key_ << ((trie_node.payload_ != 0)?"*":"") << std::endl;
-  typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+  typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
 
   for (typename trie::unordered_set::const_iterator subnode = trie_node.children_.begin ();
        subnode != trie_node.children_.end ();
@@ -436,9 +437,9 @@ operator << (std::ostream &os, const trie<FullKey, Payload, PayloadTraits, Polic
   return os;
 }
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline void
-trie<FullKey, Payload, PayloadTraits, PolicyHook>
+trie<FullKey, PayloadTraits, PolicyHook>
 ::PrintStat (std::ostream &os) const
 {
   os << "# " << key_ << ((payload_ != 0)?"*":"") << ": " << children_.size() << " children" << std::endl;
@@ -450,7 +451,7 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
     }
   os << "\n";
 
-  typedef trie<FullKey, Payload, PayloadTraits, PolicyHook> trie;
+  typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
   for (typename trie::unordered_set::const_iterator subnode = children_.begin ();
        subnode != children_.end ();
        subnode++ )
@@ -461,17 +462,17 @@ trie<FullKey, Payload, PayloadTraits, PolicyHook>
 }
 
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline bool
-operator == (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &a,
-             const trie<FullKey, Payload, PayloadTraits, PolicyHook> &b)
+operator == (const trie<FullKey, PayloadTraits, PolicyHook> &a,
+             const trie<FullKey, PayloadTraits, PolicyHook> &b)
 {
   return a.key_ == b.key_;
 }
 
-template<typename FullKey, typename Payload, typename PayloadTraits, typename PolicyHook>
+template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline std::size_t
-hash_value (const trie<FullKey, Payload, PayloadTraits, PolicyHook> &trie_node)
+hash_value (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node)
 {
   return boost::hash_value (trie_node.key_);
 }

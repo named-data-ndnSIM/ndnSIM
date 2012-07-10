@@ -64,7 +64,7 @@ CcnxFloodingStrategy::CcnxFloodingStrategy ()
 }
 
 bool
-CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry, 
+CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
                                          const Ptr<CcnxFace> &incomingFace,
                                          Ptr<CcnxInterestHeader> &header,
                                          const Ptr<const Packet> &packet)
@@ -83,7 +83,7 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
 
   int propagatedCount = 0;
 
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry.m_fibEntry->m_faces.get<i_metric> ())
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->m_fibEntry->m_faces.get<i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
@@ -95,22 +95,16 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           continue; // same face as incoming, don't forward
         }
 
-      // if (pitEntry.m_incoming.find (metricFace.m_face) != pitEntry.m_incoming.end ()) 
-      //   {
-      //     NS_LOG_DEBUG ("continue (same as previous incoming)");
-      //     continue; // don't forward to face that we received interest from
-      //   }
-
       CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry.m_outgoing.find (metricFace.m_face);
+        pitEntry->m_outgoing.find (metricFace.m_face);
       
-      if (outgoing != pitEntry.m_outgoing.end () &&
-          outgoing->m_retxCount >= pitEntry.m_maxRetxCount)
+      if (outgoing != pitEntry->m_outgoing.end () &&
+          outgoing->m_retxCount >= pitEntry->m_maxRetxCount)
         {
           NS_LOG_DEBUG ("continue (same as previous outgoing)");
           continue; // already forwarded before during this retransmission cycle
         }
-      NS_LOG_DEBUG ("max retx count: " << pitEntry.m_maxRetxCount);
+      NS_LOG_DEBUG ("max retx count: " << pitEntry->m_maxRetxCount);
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...
@@ -118,14 +112,7 @@ CcnxFloodingStrategy::PropagateInterest (const CcnxPitEntry  &pitEntry,
           continue;
         }
 
-      m_pit->modify (pitEntry,
-                     ll::bind(&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
-
-      // if (Simulator::GetContext ()==2)
-      //   {
-      //     NS_LOG_ERROR ("new outgoing entry for " << boost::cref (*metricFace.m_face));
-      //     NS_LOG_ERROR ("size: " << pitEntry.m_outgoing.size ());
-      //   }
+      pitEntry->AddOutgoing (metricFace.m_face);
 
       Ptr<Packet> packetToSend = packet->Copy ();
 

@@ -34,7 +34,6 @@ class trie_with_policy
 {
 public:
   typedef trie< FullKey,
-                typename PayloadTraits::payload_type,
                 PayloadTraits,
                 typename PolicyTraits::policy_hook_type > parent_trie;
 
@@ -133,6 +132,16 @@ public:
     return foundItem;
   }
 
+  // /**
+  //  * @brief Const version of the longest common prefix match
+  //  * (semi-const, because there could be update of the policy anyways)
+  //  */
+  // inline const_iterator
+  // longest_prefix_match (const FullKey &key) const
+  // {
+  //   return static_cast<trie_with_policy*> (this)->longest_prefix_match (key);
+  // }
+
   /**
    * @brief Find a node that has prefix at least as the key (cache lookup)
    */
@@ -221,7 +230,7 @@ public:
   
 private:
   parent_trie      trie_;
-  policy_container policy_;
+  mutable policy_container policy_;
 };
 
 } // ndnSIM

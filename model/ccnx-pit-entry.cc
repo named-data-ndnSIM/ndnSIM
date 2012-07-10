@@ -21,6 +21,7 @@
 #include "ccnx-pit-entry.h"
 #include "ccnx-name-components.h"
 #include "ccnx-fib.h"
+#include "ccnx-interest-header.h"
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
@@ -35,14 +36,14 @@ NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");
 namespace ns3
 {
 
-CcnxPitEntry::CcnxPitEntry (Ptr<const CcnxNameComponents> prefix,
-                            const Time &expireTime,
+CcnxPitEntry::CcnxPitEntry (Ptr<const CcnxInterestHeader> header,
                             Ptr<CcnxFibEntry> fibEntry)
-  : m_prefix (prefix)
+  : m_prefix (header->GetNamePtr ())
+  , m_expireTime (Simulator::Now () + header->GetInterestLifetime ())
   , m_fibEntry (fibEntry)
-  , m_expireTime (Simulator::Now () + expireTime)
   , m_maxRetxCount (0)
 {
+  // note that if interest lifetime is not set, the behavior is undefined
 }
 
 void

@@ -155,6 +155,12 @@ public:
   GetName () const;
 
   /**
+   * @brief Get smart pointer to the interest name (to avoid extra memory usage)
+   */
+  Ptr<const CcnxNameComponents>
+  GetNamePtr () const;
+
+  /**
    * \brief Set interest MinSuffixComponents
    *
    * MinSuffixComponents refer to the number of name components beyond those in the prefix, 

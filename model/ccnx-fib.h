@@ -62,7 +62,7 @@ public:
    * \returns If entry found a valid iterator will be returned, otherwise end ()
    */
   virtual Ptr<CcnxFibEntry>
-  LongestPrefixMatch (const CcnxInterestHeader &interest) const = 0;
+  LongestPrefixMatch (const CcnxInterestHeader &interest) = 0;
   
   /**
    * \brief Add or update FIB entry

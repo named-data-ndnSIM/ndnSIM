@@ -54,12 +54,6 @@ CcnxPit::GetTypeId ()
                    StringValue ("100ms"),
                    MakeTimeAccessor (&CcnxPit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
-    
-    .AddAttribute ("PitEntryDefaultLifetime",
-                   "Default lifetime of PIT entry (aka default Interest lifetime)",
-                   StringValue("4s"),
-                   MakeTimeAccessor (&CcnxPit::m_PitEntryDefaultLifetime),
-                   MakeTimeChecker ())
     ;
 
   return tid;

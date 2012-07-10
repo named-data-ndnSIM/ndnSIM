@@ -67,12 +67,13 @@ CcnxPitImpl::~CcnxPitImpl ()
 uint32_t
 CcnxPitImpl::GetMaxSize () const
 {
-  return 0;
+  return getPolicy ().get_max_size ();
 }
 
 void
 CcnxPitImpl::SetMaxSize (uint32_t maxSize)
 {
+  getPolicy ().set_max_size (maxSize);
 }
 
 void 
@@ -87,7 +88,7 @@ CcnxPitImpl::NotifyNewAggregate ()
 void 
 CcnxPitImpl::DoDispose ()
 {
-  // clear ();
+  clear ();
 }
 
 void
@@ -96,6 +97,7 @@ CcnxPitImpl::DoCleanExpired ()
   // NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
   Time now = Simulator::Now ();
 
+  NS_LOG_ERROR ("Need to be repaired");
   // // uint32_t count = 0;
   // while (!empty ())
   //   {
@@ -111,101 +113,126 @@ CcnxPitImpl::DoCleanExpired ()
 }
 
 Ptr<CcnxPitEntry>
-CcnxPitImpl::Lookup (const CcnxContentObjectHeader &header) const
+CcnxPitImpl::Lookup (const CcnxContentObjectHeader &header)
 {
-  return 0;
-  // iterator entry = end ();
+  /// @todo use predicate to search with exclude filters  
+  super::iterator item = super::longest_prefix_match (header.GetName ());
 
-  // // do the longest prefix match
-  // const CcnxNameComponents &name = header.GetName ();
-  // for (size_t componentsCount = name.GetComponents ().size ()+1;
-  //      componentsCount > 0;
-  //      componentsCount--)
-  //   {
-  //     CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount-1));
-
-  //     entry = get<i_prefix> ().find (subPrefix);
-  //     if (entry != end())
-  //       return entry;
-  //   }
-
-  // return end ();
+  if (item == super::end ())
+    return 0;
+  else
+    return item->payload (); // which could also be 0
 }
 
 Ptr<CcnxPitEntry>
 CcnxPitImpl::Lookup (const CcnxInterestHeader &header)
 {
-  return 0;
-  // NS_LOG_FUNCTION (header.GetName ());
-  // NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
+  NS_LOG_FUNCTION (header.GetName ());
+  NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
 
-  // iterator entry = get<i_prefix> ().find (header.GetName ());
-  // if (entry == end ())
-  //   return end ();
-   
-  // return entry;
-}
+  super::iterator foundItem, lastItem;
+  bool reachLast;
+  boost::tie (foundItem, reachLast, lastItem) = super::getTrie ().find (header.GetName ());
 
-bool
-CcnxPitImpl::CheckIfDuplicate (Ptr<CcnxPitEntry> entry, const CcnxInterestHeader &header)
-{
-  // if (!entry->IsNonceSeen (header.GetNonce ()))
-  //   {
-  //     modify (entry,
-  //             boost::bind(&CcnxPitEntry::AddSeenNonce, ll::_1, header.GetNonce ()));
-  //     return false;
-  //   }
-  // else
-    // return true;
-  return false;
+  if (!reachLast || lastItem == super::end ())
+    return 0;
+  else
+    return lastItem->payload (); // which could also be 0
 }
 
 Ptr<CcnxPitEntry>
-CcnxPitImpl::Create (const CcnxInterestHeader &header)
+CcnxPitImpl::Create (Ptr<const CcnxInterestHeader> header)
 {
-  // NS_ASSERT_MSG (get<i_prefix> ().find (header.GetName ()) == end (),
-  //                "Entry already exists, Create must not be called!!!");
-  
-  // if (m_maxSize > 0 &&
-  //     size () >= m_maxSize)
-  //   {
-  //     // remove old record
-  //     get<i_timestamp> ().erase (get<i_timestamp> ().begin ());
-  //   }
-      
-  // Ptr<CcnxFibEntry> fibEntry = m_fib->LongestPrefixMatch (header);
-  // // NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
-  // //                "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
+  Ptr<CcnxFibEntry> fibEntry = m_fib->LongestPrefixMatch (*header);
+  NS_ASSERT_MSG (fibEntry != 0,
+                 "There should be at least default route set" <<
+                 " Prefix = "<< header->GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
 
-  // return insert (end (),
-  //                CcnxPitEntry (ns3::Create<CcnxNameComponents> (header.GetName ()),
-  //                              header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
-  //                              :                                       header.GetInterestLifetime (),
-  //                              fibEntry));
-  return 0;
+
+  Ptr<CcnxPitEntryImpl> newEntry = ns3::Create<CcnxPitEntryImpl> (header, fibEntry);
+  std::pair< super::iterator, bool > result = super::insert (header->GetName (), newEntry);
+  if (result.first != super::end ())
+    {
+      if (result.second)
+        {
+          newEntry->SetTrie (result.first);
+          return newEntry;
+        }
+      else
+        {
+          // should we do anything?
+          // update payload? add new payload?
+          return result.first->payload ();
+        }
+    }
+  else
+    return 0;
 }
 
 
 void
 CcnxPitImpl::MarkErased (Ptr<CcnxPitEntry> entry)
 {
-  // modify (entry,
-  //         ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-  //                   Simulator::Now () + m_PitEntryPruningTimout));
+  // entry->SetExpireTime (Simulator::Now () + m_PitEntryPruningTimout);
+  super::erase (StaticCast<CcnxPitEntryImpl> (entry)->to_iterator ());
 }
 
 
 void
 CcnxPitImpl::Print (std::ostream& os) const
 {
-  os << "Should be implemented soon\n";
-  // BOOST_FOREACH (const CcnxPitEntry &entry, pit)
-  //   {
-  //     if (entry.m_incoming.size () == 0 && entry.m_outgoing.size () == 0)
-  //       continue; // these are stale to-be-removed records, so there is no need to print them out
-      
-  //     os << entry << std::endl;
-  //   }
+  // !!! unordered_set imposes "random" order of item in the same level !!!
+  super::parent_trie::const_recursive_iterator item (super::getTrie ()), end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+
+      os << item->payload ()->GetPrefix () << "\t" << *item->payload () << "\n";
+    }
 }
+
+Ptr<CcnxPitEntry>
+CcnxPitImpl::Begin ()
+{
+  super::parent_trie::recursive_iterator item (super::getTrie ()), end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
+Ptr<CcnxPitEntry>
+CcnxPitImpl::End ()
+{
+  return 0;
+}
+
+Ptr<CcnxPitEntry>
+CcnxPitImpl::Next (Ptr<CcnxPitEntry> from)
+{
+  if (from == 0) return 0;
+  
+  super::parent_trie::recursive_iterator
+    item (*StaticCast<CcnxPitEntryImpl> (from)->to_iterator ()),
+    end (0);
+  
+  for (item++; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
 
 } // namespace ns3

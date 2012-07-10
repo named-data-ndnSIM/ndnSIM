@@ -27,6 +27,9 @@
 namespace ndnSIM
 {
 
+/**
+ * @brief Traits for Least Recently Used replacement policy
+ */
 struct lru_policy_traits
 {
   struct policy_hook_type : public boost::intrusive::list_member_hook<> {};

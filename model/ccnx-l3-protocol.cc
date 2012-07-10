@@ -175,24 +175,22 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
   face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<CcnxFace>&,const Ptr<const Packet>&> ());
 
   // just to be on a safe side. Do the process in two steps
-  std::list<boost::reference_wrapper<const CcnxPitEntry> > entriesToRemoves;
-  NS_ASSERT_MSG (false, "Need to be repaired");
-  // BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
-  //   {
-  //     m_pit->modify (pitEntry,
-  //                    ll::bind (&CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
-
-  //     // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
-  //     // Thus, we have to remove the whole PIT entry
-  //     if (pitEntry.m_fibEntry->m_faces.size () == 1 &&
-  //         pitEntry.m_fibEntry->m_faces.begin ()->m_face == face)
-  //       {
-  //         entriesToRemoves.push_back (boost::cref (pitEntry));
-  //       }
-  //   }
-  BOOST_FOREACH (const CcnxPitEntry &removedEntry, entriesToRemoves)
+  std::list< Ptr<CcnxPitEntry> > entriesToRemoves;
+  for (Ptr<CcnxPitEntry> pitEntry = m_pit->Begin (); pitEntry != 0; pitEntry = m_pit->Next (pitEntry))
     {
-      m_pit->erase (removedEntry);
+      pitEntry->RemoveAllReferencesToFace (face);
+      
+      // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
+      // Thus, we have to remove the whole PIT entry
+      if (pitEntry->m_fibEntry->m_faces.size () == 1 &&
+          pitEntry->m_fibEntry->m_faces.begin ()->m_face == face)
+        {
+          entriesToRemoves.push_back (pitEntry);
+        }
+    }
+  BOOST_FOREACH (Ptr<CcnxPitEntry> removedEntry, entriesToRemoves)
+    {
+      m_pit->MarkErased (removedEntry);
     }
 
   CcnxFaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
@@ -322,17 +320,15 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   // incomingFace->LeakBucketByOnePacket ();
 
   NS_LOG_ERROR ("Nack on " << boost::cref(*incomingFace));
-
-  m_pit->modify (pitEntry,
-                 ll::bind (&CcnxPitEntry::SetWaitingInVain, ll::_1, outFace));
+  
+  pitEntry->SetWaitingInVain (outFace);
 
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
 
   if (header->GetNack () == CcnxInterestHeader::NACK_GIVEUP_PIT)
     {
-      m_pit->modify (pitEntry,
-                     ll::bind (&CcnxPitEntry::RemoveIncoming, ll::_1, incomingFace));
+      pitEntry->RemoveIncoming (incomingFace);
     }
 
   pitEntry->m_fibEntry->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
@@ -361,7 +357,7 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   nonNackInterest->AddHeader (*header);
   
   bool propagated = m_forwardingStrategy->
-    PropagateInterest (*pitEntry, incomingFace, header, nonNackInterest);
+    PropagateInterest (pitEntry, incomingFace, header, nonNackInterest);
 
   // // ForwardingStrategy will try its best to forward packet to at least one interface.
   // // If no interests was propagated, then there is not other option for forwarding or
@@ -386,7 +382,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
     {
-      pitEntry = m_pit->Create (*header);
+      pitEntry = m_pit->Create (header);
     }
 
   if (pitEntry == 0)
@@ -397,8 +393,13 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
   
   bool isNew = pitEntry->m_incoming.size () == 0 && pitEntry->m_outgoing.size () == 0;
-  bool isDuplicated = m_pit->CheckIfDuplicate (pitEntry, *header);
-  
+  bool isDuplicated = true;
+  if (!pitEntry->IsNonceSeen (header->GetNonce ()))
+    {
+      pitEntry->AddSeenNonce (header->GetNonce ());
+      isDuplicated = false;
+    }
+
   NS_LOG_FUNCTION (header->GetName () << header->GetNonce () << boost::cref (*incomingFace) << isDuplicated);
 
   /////////////////////////////////////////////////////////////////////////////////////////
@@ -426,8 +427,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
   else
     {
-      m_pit->modify (pitEntry,
-                     ll::var(inFace) = ll::bind (&CcnxPitEntry::AddIncoming, ll::_1, incomingFace));
+      inFace = pitEntry->AddIncoming (incomingFace);
     }
   //////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////
@@ -472,9 +472,7 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
     }
 
   // update PIT entry lifetime
-  m_pit->modify (pitEntry,
-                 ll::bind (&CcnxPitEntry::UpdateLifetime, ll::_1,
-                           header->GetInterestLifetime ()));
+  pitEntry->UpdateLifetime (header->GetInterestLifetime ());
   
   if (outFace != pitEntry->m_outgoing.end ())
     {
@@ -506,17 +504,16 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
   /////////////////////////////////////////////////////////////////////
   
   bool propagated = m_forwardingStrategy->
-    PropagateInterest (*pitEntry, incomingFace, header, packet);
+    PropagateInterest (pitEntry, incomingFace, header, packet);
 
   if (!propagated && isRetransmitted) //give another chance if retransmitted
     {
       // increase max number of allowed retransmissions
-      m_pit->modify (pitEntry,
-                     ll::bind (&CcnxPitEntry::IncreaseAllowedRetxCount, ll::_1));
+      pitEntry->IncreaseAllowedRetxCount ();
 
       // try again
       propagated = m_forwardingStrategy->
-        PropagateInterest (*pitEntry, incomingFace, header, packet);
+        PropagateInterest (pitEntry, incomingFace, header, packet);
     }
   
   // ForwardingStrategy will try its best to forward packet to at least one interface.
@@ -552,12 +549,10 @@ CcnxL3Protocol::OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
       if (pitEntry->m_incoming.size () > 0)
         {
           // All incoming interests are satisfied. Remove them
-          m_pit->modify (pitEntry,
-                         ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
+          pitEntry->ClearIncoming ();
 
           // Remove all outgoing faces
-          m_pit->modify (pitEntry,
-                         ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
+          pitEntry->ClearOutgoing ();
           
           // Set pruning timout on PIT entry (instead of deleting the record)
           m_pit->MarkErased (pitEntry);
@@ -628,8 +623,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
       // Add or update entry in the content store
       m_contentStore->Add (header, payload);
 
-      m_pit->modify (pitEntry,
-                     ll::bind (&CcnxPitEntry::RemoveIncoming, ll::_1, incomingFace));
+      pitEntry->RemoveIncoming (incomingFace);
 
       if (pitEntry->m_incoming.size () == 0)
         {
@@ -682,12 +676,10 @@ CcnxL3Protocol::GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
         }
   
       // All incoming interests cannot be satisfied. Remove them
-      m_pit->modify (pitEntry,
-                     ll::bind (&CcnxPitEntry::ClearIncoming, ll::_1));
+      pitEntry->ClearIncoming ();
 
       // Remove also outgoing
-      m_pit->modify (pitEntry,
-                     ll::bind (&CcnxPitEntry::ClearOutgoing, ll::_1));
+      pitEntry->ClearOutgoing ();
   
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->MarkErased (pitEntry);

@@ -27,6 +27,9 @@
 namespace ndnSIM
 {
 
+/**
+ * @brief Traits for First In First Out replacement policy
+ */
 struct fifo_policy_traits
 {
   struct policy_hook_type : public boost::intrusive::list_member_hook<> {};

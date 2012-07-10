@@ -61,7 +61,7 @@ public:
    * @return true if interest was successfully propagated, false if all options have failed
    */
   virtual bool
-  PropagateInterest (const CcnxPitEntry  &pitEntry, 
+  PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet) = 0;
@@ -80,7 +80,7 @@ protected:
    * \see PropagateInterest
    */
   bool
-  PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry, 
+  PropagateInterestViaGreen (Ptr<CcnxPitEntry> pitEntry, 
                              const Ptr<CcnxFace> &incomingFace,
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
