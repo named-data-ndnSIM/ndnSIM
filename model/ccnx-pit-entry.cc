@@ -36,9 +36,11 @@ NS_LOG_COMPONENT_DEFINE ("CcnxPitEntry");
 namespace ns3
 {
 
-CcnxPitEntry::CcnxPitEntry (Ptr<const CcnxInterestHeader> header,
+CcnxPitEntry::CcnxPitEntry (CcnxPit &container,
+                            Ptr<const CcnxInterestHeader> header,
                             Ptr<CcnxFibEntry> fibEntry)
-  : m_prefix (header->GetNamePtr ())
+  : m_container (container)
+  , m_prefix (header->GetNamePtr ())
   , m_expireTime (Simulator::Now () + header->GetInterestLifetime ())
   , m_fibEntry (fibEntry)
   , m_maxRetxCount (0)

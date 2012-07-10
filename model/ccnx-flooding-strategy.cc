@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "ccnx-flooding-strategy.h"
@@ -83,7 +84,7 @@ CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry,
 
   int propagatedCount = 0;
 
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->m_fibEntry->m_faces.get<i_metric> ())
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
@@ -96,15 +97,15 @@ CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry,
         }
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry->m_outgoing.find (metricFace.m_face);
+        pitEntry->GetOutgoing ().find (metricFace.m_face);
       
-      if (outgoing != pitEntry->m_outgoing.end () &&
-          outgoing->m_retxCount >= pitEntry->m_maxRetxCount)
+      if (outgoing != pitEntry->GetOutgoing ().end () &&
+          outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
         {
           NS_LOG_DEBUG ("continue (same as previous outgoing)");
           continue; // already forwarded before during this retransmission cycle
         }
-      NS_LOG_DEBUG ("max retx count: " << pitEntry->m_maxRetxCount);
+      NS_LOG_DEBUG ("max retx count: " << pitEntry->GetMaxRetxCount ());
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...

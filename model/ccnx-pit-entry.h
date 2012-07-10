@@ -41,6 +41,7 @@ namespace ns3 {
 
 class CcnxFace;
 class CcnxNameComponents;
+class CcnxPit;
 
 /// @cond include_hidden
 namespace __ccnx_private
@@ -80,6 +81,8 @@ struct CcnxPitEntryOutgoingFaceContainer
 /**
  * \ingroup ccnx
  * \brief structure for PIT entry
+ *
+ * All set-methods are virtual, in case index rearrangement is necessary in the derived classes
  */
 struct CcnxPitEntry : SimpleRefCount<CcnxPitEntry>
 {
@@ -98,7 +101,12 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<const CcnxInterestHeader> header, Ptr<CcnxFibEntry> fibEntry);
+  CcnxPitEntry (CcnxPit &container, Ptr<const CcnxInterestHeader> header, Ptr<CcnxFibEntry> fibEntry);
+
+  /**
+   * @brief Virtual destructor
+   */
+  virtual ~CcnxPitEntry () {}
   
   /**
    * @brief Update lifetime of PIT entry
@@ -108,7 +116,7 @@ public:
    *
    * @param offsetTime Relative time to the current moment, representing PIT entry lifetime
    */
-  void
+  virtual void
   UpdateLifetime (const Time &offsetTime);
 
   /**
@@ -132,7 +140,7 @@ public:
    *
    * @param expireTime absolute simulation time of when the record should expire
    */
-  void
+  virtual void
   SetExpireTime (const Time &expireTime);
   
   /**
@@ -151,7 +159,7 @@ public:
    *
    * All nonces are stored for the lifetime of the PIT entry
    */
-  void
+  virtual void
   AddSeenNonce (uint32_t nonce)
   { m_seenNonces.insert (nonce); }
 
@@ -161,19 +169,19 @@ public:
    * @param face Face to add to the list of incoming faces
    * @returns iterator to the added entry
    */
-  in_iterator
+  virtual in_iterator
   AddIncoming (Ptr<CcnxFace> face);
 
   /**
    * @brief Remove incoming entry for face `face`
    */
-  void
+  virtual void
   RemoveIncoming (Ptr<CcnxFace> face);
 
   /**
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
    */
-  void
+  virtual void
   ClearIncoming ()
   { m_incoming.clear (); }
 
@@ -183,13 +191,13 @@ public:
    * @param face Face to add to the list of outgoing faces
    * @returns iterator to the added entry
    */
-  out_iterator
+  virtual out_iterator
   AddOutgoing (Ptr<CcnxFace> face);
 
   /**
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
    */
-  void
+  virtual void
   ClearOutgoing ()
   { m_outgoing.clear (); }  
   
@@ -199,13 +207,13 @@ public:
    * This method should be called before face is completely removed from the stack.
    * Face is removed from the lists of incoming and outgoing faces
    */
-  void
+  virtual void
   RemoveAllReferencesToFace (Ptr<CcnxFace> face);
 
   /**
    * @brief Flag outgoing face as hopeless
    */
-  void
+  virtual void
   SetWaitingInVain (out_iterator face);
   
   /**
@@ -224,17 +232,27 @@ public:
   /**
    * @brief Increase maximum limit of allowed retransmission per outgoing face
    */
-  void
+  virtual void
   IncreaseAllowedRetxCount ();
-  
+
+  Ptr<CcnxFibEntry>
+  GetFibEntry () { return m_fibEntry; };
+
+  const in_container &
+  GetIncoming () const { return m_incoming; }
+
+  const out_container &
+  GetOutgoing () const { return m_outgoing; }
+
+  uint32_t
+  GetMaxRetxCount () const { return m_maxRetxCount; }
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const CcnxPitEntry &entry);
-  /**
-   * \brief Default constructor
-   */
-  CcnxPitEntry () {};
   
-public:
+protected:
+  CcnxPit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
+  
   Ptr<const CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
   Ptr<CcnxFibEntry> m_fibEntry;     ///< \brief FIB entry related to this prefix
   

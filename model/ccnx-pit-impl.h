@@ -29,33 +29,46 @@
 
 namespace ns3 {
 
+template<class Pit>
 class CcnxPitEntryImpl : public CcnxPitEntry
 {
 public:
-  typedef ndnSIM::trie_with_policy<
-    CcnxNameComponents,
-    ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl>,
-    ndnSIM::persistent_policy_traits
-    > trie;
-
-  CcnxPitEntryImpl (Ptr<const CcnxInterestHeader> header,
+  CcnxPitEntryImpl (CcnxPit &pit,
+                    Ptr<const CcnxInterestHeader> header,
                     Ptr<CcnxFibEntry> fibEntry)
-    : CcnxPitEntry (header, fibEntry)
-    , item_ (0)
+  : CcnxPitEntry (pit, header, fibEntry)
+  , item_ (0)
   {
+    static_cast<Pit&> (m_container).i_time.insert (*this);    
+  }
+  
+  virtual ~CcnxPitEntryImpl ()
+  {
+    static_cast<Pit&> (m_container).i_time.erase (*this);
   }
 
+  // to make sure policies work
   void
-  SetTrie (trie::iterator item)
-  {
-    item_ = item;
-  }
+  SetTrie (typename Pit::super::iterator item) { item_ = item; }
 
-  trie::iterator to_iterator () { return item_; }
-  trie::const_iterator to_iterator () const { return item_; }
+  typename Pit::super::iterator to_iterator () { return item_; }
+  typename Pit::super::const_iterator to_iterator () const { return item_; }
+
+public:
+  boost::intrusive::set_member_hook<> time_hook_;
   
 private:
-  trie::iterator item_;
+  typename Pit::super::iterator item_;
+};
+
+template<class T>
+struct TimestampIndex
+{
+  bool
+  operator () (const T &a, const T &b) const
+  {
+    return a.GetExpireTime () < b.GetExpireTime ();
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -66,10 +79,19 @@ private:
  * \brief Class implementing Pending Interests Table
  */
 class CcnxPitImpl : public CcnxPit
-                  , protected CcnxPitEntryImpl::trie
+                  , protected ndnSIM::trie_with_policy<CcnxNameComponents,
+                                                       ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl > >,
+                                                       ndnSIM::persistent_policy_traits
+                                                       >
 {
 public:
-  typedef CcnxPitEntryImpl::trie super;
+  typedef ndnSIM::trie_with_policy<CcnxNameComponents,
+                                   ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl > >,
+                                   ndnSIM::persistent_policy_traits
+                                   > super;
+  typedef CcnxPitEntryImpl< CcnxPitImpl > entry;
+
+  // typedef CcnxPitEntryImpl::trie super;
 
   /**
    * \brief Interface ID
@@ -130,6 +152,18 @@ private:
   
 private:
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
+
+  // indexes
+  typedef
+  boost::intrusive::set<entry,
+                        boost::intrusive::compare < TimestampIndex< entry > >,
+                        boost::intrusive::member_hook< entry,
+                                                       boost::intrusive::set_member_hook<>,
+                                                       &entry::time_hook_>
+                        > expireTimeIndexType;
+  expireTimeIndexType i_time; 
+                        
+  friend class CcnxPitEntryImpl< CcnxPitImpl >;
 };
 
 } // namespace ns3

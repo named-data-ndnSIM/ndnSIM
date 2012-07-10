@@ -35,22 +35,22 @@ using namespace boost;
 
 NS_LOG_COMPONENT_DEFINE ("Trie");
 
-class Integer : public ns3::SimpleRefCount<Integer>
-{
-public:
-  Integer (int value) : value_ (value) {}
+// class Integer : public ns3::SimpleRefCount<Integer>
+// {
+// public:
+//   ::Integer (int value) : value_ (value) {}
 
-  operator int () const { return value_; }
-private:
-  int value_;
-};
+//   operator int () const { return value_; }
+// private:
+//   int value_;
+// };
 
-std::ostream &
-operator << (std::ostream &os, const Integer &i)
-{
-  os << (int)i;
-  return os;
-}
+// std::ostream &
+// operator << (std::ostream &os, const ::Integer &i)
+// {
+//   os << (int)i;
+//   return os;
+// }
 
 int
 main (int argc, char *argv[])

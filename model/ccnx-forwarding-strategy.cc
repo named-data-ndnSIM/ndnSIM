@@ -92,22 +92,22 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (Ptr<CcnxPitEntry> pitEntry,
 
   int propagatedCount = 0;
   
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->m_fibEntry->m_faces.get<i_metric> ())
+  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
     {
       if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
           metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
-      if (pitEntry->m_incoming.find (metricFace.m_face) != pitEntry->m_incoming.end ()) 
+      if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
         continue; // don't forward to face that we received interest from
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry->m_outgoing.find (metricFace.m_face);
+        pitEntry->GetOutgoing ().find (metricFace.m_face);
       
-      if (outgoing != pitEntry->m_outgoing.end () &&
-          outgoing->m_retxCount >= pitEntry->m_maxRetxCount)
+      if (outgoing != pitEntry->GetOutgoing ().end () &&
+          outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
         {
-          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry->m_maxRetxCount);
+          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry->GetMaxRetxCount ());
           continue;
         }
       

@@ -39,6 +39,21 @@ namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxPitImpl);
 
+
+// CcnxPitEntryImpl::CcnxPitEntryImpl (CcnxPit &pit,
+//                                     Ptr<const CcnxInterestHeader> header,
+//                                     Ptr<CcnxFibEntry> fibEntry)
+//   : CcnxPitEntry (pit, header, fibEntry)
+//   , item_ (0)
+// {
+//   static_cast<CcnxPitImpl&> (m_container).i_time.insert (*this);
+// }
+
+// CcnxPitEntryImpl::~CcnxPitEntryImpl ()
+// {
+//   static_cast<CcnxPitImpl&> (m_container).i_time.erase (*this);
+// }
+
 TypeId
 CcnxPitImpl::GetTypeId ()
 {
@@ -149,7 +164,7 @@ CcnxPitImpl::Create (Ptr<const CcnxInterestHeader> header)
                  " Prefix = "<< header->GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
 
 
-  Ptr<CcnxPitEntryImpl> newEntry = ns3::Create<CcnxPitEntryImpl> (header, fibEntry);
+  Ptr< entry > newEntry = ns3::Create< entry > (boost::ref (*this), header, fibEntry);
   std::pair< super::iterator, bool > result = super::insert (header->GetName (), newEntry);
   if (result.first != super::end ())
     {
@@ -171,10 +186,10 @@ CcnxPitImpl::Create (Ptr<const CcnxInterestHeader> header)
 
 
 void
-CcnxPitImpl::MarkErased (Ptr<CcnxPitEntry> entry)
+CcnxPitImpl::MarkErased (Ptr<CcnxPitEntry> item)
 {
   // entry->SetExpireTime (Simulator::Now () + m_PitEntryPruningTimout);
-  super::erase (StaticCast<CcnxPitEntryImpl> (entry)->to_iterator ());
+  super::erase (StaticCast< entry > (item)->to_iterator ());
 }
 
 
@@ -219,7 +234,7 @@ CcnxPitImpl::Next (Ptr<CcnxPitEntry> from)
   if (from == 0) return 0;
   
   super::parent_trie::recursive_iterator
-    item (*StaticCast<CcnxPitEntryImpl> (from)->to_iterator ()),
+    item (*StaticCast< entry > (from)->to_iterator ()),
     end (0);
   
   for (item++; item != end; item++)
