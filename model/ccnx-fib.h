@@ -37,9 +37,6 @@ class CcnxInterestHeader;
 class CcnxFib : public Object
 {
 public:
-  typedef ns3::Ptr<CcnxFibEntry> iterator; // not sure, but let's see what will happen
-  typedef ns3::Ptr<const CcnxFibEntry> const_iterator;
-
   /**
    * \brief Interface ID
    *
@@ -64,7 +61,7 @@ public:
    * \param interest Interest packet header
    * \returns If entry found a valid iterator will be returned, otherwise end ()
    */
-  virtual iterator
+  virtual Ptr<CcnxFibEntry>
   LongestPrefixMatch (const CcnxInterestHeader &interest) const = 0;
   
   /**
@@ -78,7 +75,7 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual iterator
+  virtual Ptr<CcnxFibEntry>
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric) = 0;
 
   /**
@@ -92,7 +89,7 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual iterator
+  virtual Ptr<CcnxFibEntry>
   Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric) = 0;
 
   /**
@@ -137,26 +134,36 @@ public:
   /**
    * @brief Return first element of FIB (no order guaranteed)
    */
-  virtual const_iterator
+  virtual Ptr<const CcnxFibEntry>
   Begin () = 0;
 
   /**
    * @brief Return item next after last (no order guaranteed)
    */
-  virtual const_iterator
+  virtual Ptr<const CcnxFibEntry>
   End () = 0;
 
   /**
    * @brief Advance the iterator
    */
-  virtual const_iterator
-  Next (const_iterator item) = 0;
+  virtual Ptr<const CcnxFibEntry>
+  Next (Ptr<const CcnxFibEntry>) = 0;
 
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  
+  /**
+   * @brief Static call to cheat python bindings
+   */
   static inline Ptr<CcnxFib>
   GetCcnxFib (Ptr<Object> node);
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
   
 private:
-  friend std::ostream& operator<< (std::ostream& os, const CcnxFib &fib);
   CcnxFib(const CcnxFib&) {} ; ///< \brief copy constructor is disabled
 };
 
@@ -173,4 +180,4 @@ CcnxFib::GetCcnxFib (Ptr<Object> node)
 
 } // namespace ns3
 
-#endif	/* NDN_FIB_H */
+#endif // _CCNX_FIB_H_

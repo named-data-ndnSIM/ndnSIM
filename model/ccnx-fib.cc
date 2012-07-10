@@ -42,7 +42,7 @@ using namespace __ccnx_private;
 TypeId 
 CcnxFib::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxFib") // cheating ns3 object system
+  static TypeId tid = TypeId ("ns3::private::CcnxFib") // cheating ns3 object system
     .SetParent<Object> ()
     .SetGroupName ("Ccnx")
   ;

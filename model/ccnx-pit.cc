@@ -31,10 +31,6 @@
 
 NS_LOG_COMPONENT_DEFINE ("CcnxPit");
 
-using namespace boost::tuples;
-using namespace boost;
-namespace ll = boost::lambda;
-
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (CcnxPit);
@@ -44,10 +40,9 @@ using namespace __ccnx_private;
 TypeId
 CcnxPit::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::CcnxPit")
+  static TypeId tid = TypeId ("ns3::private::CcnxPit")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
-    .AddConstructor<CcnxPit> ()
     .AddAttribute ("CleanupTimeout",
                    "Timeout defining how frequent RIT should be cleaned up",
                    StringValue ("1s"),
@@ -65,12 +60,6 @@ CcnxPit::GetTypeId ()
                    StringValue("4s"),
                    MakeTimeAccessor (&CcnxPit::m_PitEntryDefaultLifetime),
                    MakeTimeChecker ())
-
-    .AddAttribute ("MaxSize",
-                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
-                   StringValue ("0"),
-                   MakeUintegerAccessor (&CcnxPit::m_maxSize),
-                   MakeUintegerChecker<uint32_t> ())
     ;
 
   return tid;
@@ -84,22 +73,13 @@ CcnxPit::~CcnxPit ()
 {
 }
 
-void 
-CcnxPit::NotifyNewAggregate ()
+void CcnxPit::CleanExpired ()
 {
-  if (m_fib == 0)
-    {
-      m_fib = GetObject<CcnxFib> ();
-    }
-}
-
-void 
-CcnxPit::DoDispose ()
-{
-  if (m_cleanupEvent.IsRunning ())
-    m_cleanupEvent.Cancel ();
-
-  clear ();
+  DoCleanExpired ();
+  
+  // schedule next event  
+  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
+                                        &CcnxPit::CleanExpired, this); 
 }
 
 void
@@ -120,121 +100,5 @@ CcnxPit::GetCleanupTimeout () const
   return m_cleanupTimeout;
 }
 
-void CcnxPit::CleanExpired ()
-{
-  // NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
-  Time now = Simulator::Now ();
-
-  // uint32_t count = 0;
-  while (!empty ())
-    {
-      CcnxPit::index<i_timestamp>::type::iterator entry = get<i_timestamp> ().begin ();
-      if (entry->GetExpireTime () <= now) // is the record stale?
-        {
-          get<i_timestamp> ().erase (entry);
-          // count ++;
-        }
-      else
-        break; // nothing else to do. All later records will not be stale
-    }
-
-  // schedule next event  
-  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
-                                        &CcnxPit::CleanExpired, this); 
-}
-
-CcnxPit::iterator
-CcnxPit::Lookup (const CcnxContentObjectHeader &header) const
-{
-  iterator entry = end ();
-
-  // do the longest prefix match
-  const CcnxNameComponents &name = header.GetName ();
-  for (size_t componentsCount = name.GetComponents ().size ()+1;
-       componentsCount > 0;
-       componentsCount--)
-    {
-      CcnxNameComponents subPrefix (name.GetSubComponents (componentsCount-1));
-
-      entry = get<i_prefix> ().find (subPrefix);
-      if (entry != end())
-        return entry;
-    }
-
-  return end ();
-}
-
-CcnxPit::iterator
-CcnxPit::Lookup (const CcnxInterestHeader &header)
-{
-  NS_LOG_FUNCTION (header.GetName ());
-  NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
-
-  iterator entry = get<i_prefix> ().find (header.GetName ());
-  if (entry == end ())
-    return end ();
-   
-  return entry;
-}
-
-bool
-CcnxPit::CheckIfDuplicate (CcnxPit::iterator entry, const CcnxInterestHeader &header)
-{
-  if (!entry->IsNonceSeen (header.GetNonce ()))
-    {
-      modify (entry,
-              boost::bind(&CcnxPitEntry::AddSeenNonce, ll::_1, header.GetNonce ()));
-      return false;
-    }
-  else
-    return true;
-}
-
-CcnxPit::iterator
-CcnxPit::Create (const CcnxInterestHeader &header)
-{
-  NS_ASSERT_MSG (get<i_prefix> ().find (header.GetName ()) == end (),
-                 "Entry already exists, Create must not be called!!!");
-  
-  if (m_maxSize > 0 &&
-      size () >= m_maxSize)
-    {
-      // remove old record
-      get<i_timestamp> ().erase (get<i_timestamp> ().begin ());
-    }
-      
-  CcnxFib::iterator fibEntry = m_fib->LongestPrefixMatch (header);
-  // NS_ASSERT_MSG (fibEntry != m_fib->m_fib.end (),
-  //                "There should be at least default route set" << " Prefix = "<<header.GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
-
-  return insert (end (),
-                 CcnxPitEntry (ns3::Create<CcnxNameComponents> (header.GetName ()),
-                               header.GetInterestLifetime ().IsZero ()?m_PitEntryDefaultLifetime
-                               :                                       header.GetInterestLifetime (),
-                               fibEntry));
-}
-
-
-void
-CcnxPit::MarkErased (CcnxPit::iterator entry)
-{
-  modify (entry,
-          ll::bind (&CcnxPitEntry::SetExpireTime, ll::_1,
-                    Simulator::Now () + m_PitEntryPruningTimout));
-}
-
-
-std::ostream& operator<< (std::ostream& os, const CcnxPit &pit)
-{
-  BOOST_FOREACH (const CcnxPitEntry &entry, pit)
-    {
-      if (entry.m_incoming.size () == 0 && entry.m_outgoing.size () == 0)
-        continue; // these are stale to-be-removed records, so there is no need to print them out
-      
-      os << entry << std::endl;
-    }
-
-  return os;
-}
 
 } // namespace ns3

@@ -118,7 +118,7 @@ CcnxForwardingStrategy::PropagateInterestViaGreen (const CcnxPitEntry  &pitEntry
           continue;
         }
 
-      m_pit->modify (m_pit->iterator_to (pitEntry),
+      m_pit->modify (pitEntry,
                      ll::bind (&CcnxPitEntry::AddOutgoing, ll::_1, metricFace.m_face));
 
       Ptr<Packet> packetToSend = packet->Copy ();

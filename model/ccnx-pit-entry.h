@@ -22,6 +22,7 @@
 #define _CCNX_PIT_ENTRY_H_
 
 #include "ns3/ptr.h"
+#include "ns3/simple-ref-count.h"
 
 #include "ccnx-pit-entry-incoming-face.h"
 #include "ccnx-pit-entry-outgoing-face.h"
@@ -80,7 +81,7 @@ struct CcnxPitEntryOutgoingFaceContainer
  * \ingroup ccnx
  * \brief structure for PIT entry
  */
-struct CcnxPitEntry
+struct CcnxPitEntry : SimpleRefCount<CcnxPitEntry>
 {
 public:
   typedef std::set< CcnxPitEntryIncomingFace > in_container; ///< @brief incoming faces container type
@@ -97,7 +98,7 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  CcnxPitEntry (Ptr<CcnxNameComponents> prefix, const Time &offsetTime, CcnxFib::iterator fibEntry);
+  CcnxPitEntry (Ptr<const CcnxNameComponents> prefix, const Time &offsetTime, Ptr<CcnxFibEntry> fibEntry);
   
   /**
    * @brief Update lifetime of PIT entry
@@ -236,8 +237,8 @@ private:
   CcnxPitEntry () {};
   
 public:
-  Ptr<CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
-  CcnxFib::iterator m_fibEntry;     ///< \brief FIB entry related to this prefix
+  Ptr<const CcnxNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
+  Ptr<CcnxFibEntry> m_fibEntry;     ///< \brief FIB entry related to this prefix
   
   nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix  
   in_container  m_incoming;      ///< \brief container for incoming interests

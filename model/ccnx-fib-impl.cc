@@ -43,7 +43,7 @@ NS_OBJECT_ENSURE_REGISTERED (CcnxFibImpl);
 TypeId 
 CcnxFibImpl::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxFibImpl") // cheating ns3 object system
+  static TypeId tid = TypeId ("ns3::CcnxFib") // cheating ns3 object system
     .SetParent<CcnxFib> ()
     .SetGroupName ("Ccnx")
     .AddConstructor<CcnxFibImpl> ()
@@ -69,7 +69,7 @@ CcnxFibImpl::DoDispose (void)
 }
 
 
-CcnxFib::iterator
+Ptr<CcnxFibEntry>
 CcnxFibImpl::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 {
   super::iterator item = const_cast<CcnxFibImpl*> (this)->super::longest_prefix_match (interest.GetName ());
@@ -82,13 +82,13 @@ CcnxFibImpl::LongestPrefixMatch (const CcnxInterestHeader &interest) const
 }
 
 
-CcnxFib::iterator
+Ptr<CcnxFibEntry>
 CcnxFibImpl::Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric)
 {
   return Add (Create<CcnxNameComponents> (prefix), face, metric);
 }
   
-CcnxFib::iterator
+Ptr<CcnxFibEntry>
 CcnxFibImpl::Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
@@ -193,7 +193,7 @@ CcnxFibImpl::Print (std::ostream &os) const
     }
 }
 
-CcnxFib::const_iterator
+Ptr<const CcnxFibEntry>
 CcnxFibImpl::Begin ()
 {
   super::parent_trie::const_recursive_iterator item (super::getTrie ());
@@ -210,14 +210,14 @@ CcnxFibImpl::Begin ()
     return item->payload ();
 }
 
-CcnxFib::const_iterator
+Ptr<const CcnxFibEntry>
 CcnxFibImpl::End ()
 {
   return 0;
 }
 
-CcnxFib::const_iterator
-CcnxFibImpl::Next (CcnxFib::const_iterator from)
+Ptr<const CcnxFibEntry>
+CcnxFibImpl::Next (Ptr<const CcnxFibEntry> from)
 {
   if (from == 0) return 0;
   

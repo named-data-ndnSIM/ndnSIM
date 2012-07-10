@@ -176,22 +176,23 @@ CcnxL3Protocol::RemoveFace (Ptr<CcnxFace> face)
 
   // just to be on a safe side. Do the process in two steps
   std::list<boost::reference_wrapper<const CcnxPitEntry> > entriesToRemoves;
-  BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
-    {
-      m_pit->modify (m_pit->iterator_to (pitEntry),
-                     ll::bind (&CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
+  NS_ASSERT_MSG (false, "Need to be repaired");
+  // BOOST_FOREACH (const CcnxPitEntry &pitEntry, *m_pit)
+  //   {
+  //     m_pit->modify (pitEntry,
+  //                    ll::bind (&CcnxPitEntry::RemoveAllReferencesToFace, ll::_1, face));
 
-      // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
-      // Thus, we have to remove the whole PIT entry
-      if (pitEntry.m_fibEntry->m_faces.size () == 1 &&
-          pitEntry.m_fibEntry->m_faces.begin ()->m_face == face)
-        {
-          entriesToRemoves.push_back (boost::cref (pitEntry));
-        }
-    }
+  //     // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
+  //     // Thus, we have to remove the whole PIT entry
+  //     if (pitEntry.m_fibEntry->m_faces.size () == 1 &&
+  //         pitEntry.m_fibEntry->m_faces.begin ()->m_face == face)
+  //       {
+  //         entriesToRemoves.push_back (boost::cref (pitEntry));
+  //       }
+  //   }
   BOOST_FOREACH (const CcnxPitEntry &removedEntry, entriesToRemoves)
     {
-      m_pit->erase (m_pit->iterator_to (removedEntry));
+      m_pit->erase (removedEntry);
     }
 
   CcnxFaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
@@ -294,8 +295,8 @@ CcnxL3Protocol::OnNack (const Ptr<CcnxFace> &incomingFace,
   NS_LOG_FUNCTION (incomingFace << header << packet);
   m_inNacks (header, incomingFace);
 
-  CcnxPit::iterator pitEntry = m_pit->Lookup (*header);
-  if (pitEntry == m_pit->end ())
+  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  if (pitEntry == 0)
     {
       // somebody is doing something bad
       m_dropNacks (header, NON_DUPLICATED, incomingFace);
@@ -381,13 +382,13 @@ void CcnxL3Protocol::OnInterest (const Ptr<CcnxFace> &incomingFace,
 {
   m_inInterests (header, incomingFace);
 
-  CcnxPit::iterator pitEntry = m_pit->Lookup (*header);
-  if (pitEntry == m_pit->end ())
+  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  if (pitEntry == 0)
     {
       pitEntry = m_pit->Create (*header);
     }
 
-  if (pitEntry == m_pit->end ())
+  if (pitEntry == 0)
     {
       // if it is still not created, then give up processing
       m_dropInterests (header, PIT_LIMIT, incomingFace);
@@ -533,8 +534,8 @@ CcnxL3Protocol::OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
                                const Ptr<const Packet> &packet)
 {
   // 1. Lookup PIT entry
-  CcnxPit::iterator pitEntry = m_pit->Lookup (*header);
-  if (pitEntry != m_pit->end ())
+  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  if (pitEntry != 0)
     {
       //satisfy all pending incoming Interests
       BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->m_incoming)
@@ -579,8 +580,8 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
   m_inData (header, payload, incomingFace);
   
   // 1. Lookup PIT entry
-  CcnxPit::iterator pitEntry = m_pit->Lookup (*header);
-  if (pitEntry != m_pit->end ())
+  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  if (pitEntry != 0)
     {
       // Note that with MultiIndex we need to modify entries indirectly
 
@@ -657,7 +658,7 @@ CcnxL3Protocol::OnData (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-CcnxL3Protocol::GiveUpInterest (CcnxPit::iterator pitEntry,
+CcnxL3Protocol::GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
                                 Ptr<CcnxInterestHeader> header)
 {
   NS_LOG_FUNCTION (this);

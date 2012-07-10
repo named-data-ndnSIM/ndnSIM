@@ -89,6 +89,7 @@ def build(bld):
         "model/ccnx-content-store.h",
         "model/ccnx-fib.h",
         "model/ccnx-fib-entry.h",
+        "model/ccnx-forwarding-strategy.h",
         "model/ccnx-face.h",
         "model/ccnx-app-face.h",
         "model/ccnx-net-device-face.h",

@@ -25,20 +25,7 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 
-#include "ccnx-name-components-hash-helper.h"
 #include "ccnx-pit-entry.h"
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/tag.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/composite_key.hpp>
-#include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/mem_fun.hpp>
-#include <map>
-#include <iostream>
-#include <algorithm>
-#include <boost/tuple/tuple.hpp>
 
 namespace ns3 {
 
@@ -47,53 +34,6 @@ class CcnxFace;
 class CcnxContentObjectHeader;
 class CcnxInterestHeader;
 
-/// @cond include_hidden
-/**
- * \ingroup ccnx
- * \private
- * \brief Private namespace for CCNx PIT implementation
- */
-namespace __ccnx_private
-{
-// class i_prefix{}; ///< tag for prefix hash
-class i_timestamp {}; ///< tag for timestamp-ordered records (for cleanup optimization)  
-};
-/// @endcond
-
-/**
- * \ingroup ccnx
- * \brief Typedef for RIT container implemented as a Boost.MultiIndex container
- *
- * - First index (tag<i_prefix>) is a unique hash index based on
- *   prefixes
- * - Second index (tag<i_timestamp>) is a sequenced index based on
- *   arrival order (for clean-up optimizations)
- *
- * \see http://www.boost.org/doc/libs/1_46_1/libs/multi_index/doc/ for more information on Boost.MultiIndex library
- */
-struct CcnxPitEntryContainer
-{
-  /// @cond include_hidden
-  typedef
-  boost::multi_index::multi_index_container<
-    CcnxPitEntry,
-    boost::multi_index::indexed_by<
-      // indexed by hash
-      boost::multi_index::hashed_unique<
-        boost::multi_index::tag<__ccnx_private::i_prefix>,
-        boost::multi_index::const_mem_fun<CcnxPitEntry, const CcnxNameComponents&, &CcnxPitEntry::GetPrefix>,
-        CcnxPrefixHash
-        >,
-      // sequenced to implement MRU
-      boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<__ccnx_private::i_timestamp>,
-        boost::multi_index::member<CcnxPitEntry, Time, &CcnxPitEntry::m_expireTime>
-        >
-      >
-    > type;
-  /// @endcond
-};
-
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +41,7 @@ struct CcnxPitEntryContainer
  * \ingroup ccnx
  * \brief Class implementing Pending Interests Table
  */
-class CcnxPit : public CcnxPitEntryContainer::type, public Object
+class CcnxPit : public Object
 {
 public:
   /**
@@ -127,8 +67,8 @@ public:
    * \returns iterator to Pit entry. If record not found,
    *          return end() iterator
    */
-  iterator
-  Lookup (const CcnxContentObjectHeader &header) const;
+  virtual Ptr<CcnxPitEntry>
+  Lookup (const CcnxContentObjectHeader &header) const = 0;
 
   /**
    * \brief Find a PIT entry for the given content interest
@@ -136,16 +76,16 @@ public:
    * \returns iterator to Pit entry. If record not found,
    *          return end() iterator
    */
-  iterator
-  Lookup (const CcnxInterestHeader &header);
+  virtual Ptr<CcnxPitEntry>
+  Lookup (const CcnxInterestHeader &header) = 0;
 
   /**
    * @brief Check if the Interest carries an existent nonce.
    * If not, nonce will be added to the list of known nonces
    * @returns true if interest is duplicate (carries an existent nonce), false otherwise
    */
-  bool
-  CheckIfDuplicate (iterator entry, const CcnxInterestHeader &header);
+  virtual bool
+  CheckIfDuplicate (Ptr<CcnxPitEntry> entry, const CcnxInterestHeader &header) = 0;
   
   /**
    * @brief Creates a PIT entry for the given interest
@@ -155,8 +95,8 @@ public:
    *
    * Note. This call assumes that the entry does not exist (i.e., there was a Lookup call before)
    */
-  iterator
-  Create (const CcnxInterestHeader &header);
+  virtual Ptr<CcnxPitEntry>
+  Create (const CcnxInterestHeader &header) = 0;
   
   /**
    * @brief Mark PIT entry deleted
@@ -165,19 +105,56 @@ public:
    * Effectively, this method removes all incoming/outgoing faces and set
    * lifetime +m_PitEntryDefaultLifetime from Now ()
    */
+  virtual void
+  MarkErased (Ptr<CcnxPitEntry> entry) = 0;
+
+  /**
+   * @brief Print out PIT contents for debugging purposes
+   *
+   * Note that there is no definite order in which entries are printed out
+   */
+  virtual void
+  Print (std::ostream &os) const = 0;
+
+  template<class A,class M>
   void
-  MarkErased (iterator entry);
+  modify (A, M)
+  {
+    ;
+  }
+
+  template<class A>
+  void
+  erase (A)
+  {
+    ;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  
+  /**
+   * @brief Static call to cheat python bindings
+   */
+  static inline Ptr<CcnxFib>
+  GetCcnxPit (Ptr<Object> node);
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
 protected:
-  // inherited from Object class                                                                                                                                                        
-  virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
-  virtual void DoDispose (); ///< @brief Do cleanup
-
+  virtual void
+  DoCleanExpired () = 0;
+  
 private:
-  /** \brief Remove expired records from PIT */
+  /**
+   * @brief Remove expired records from PIT
+   */
   void
   CleanExpired ();
-
+  
   /**
    * \brief Set cleanup timeout
    *
@@ -195,27 +172,25 @@ private:
    */
   Time
   GetCleanupTimeout () const;
-
-  friend std::ostream&
-  operator<< (std::ostream& os, const CcnxPit &fib);
   
-private:
+protected:
   Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
   EventId m_cleanupEvent;   ///< \brief Cleanup event
 
   // configuration variables. Check implementation of GetTypeId for more details
   Time    m_PitEntryPruningTimout;
   Time    m_PitEntryDefaultLifetime;
-
-  uint32_t m_maxSize;
-
-  Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-std::ostream& operator<< (std::ostream& os, const CcnxPit &pit);
+inline std::ostream&
+operator<< (std::ostream& os, const CcnxPit &pit)
+{
+  pit.Print (os);
+  return os;
+}
 
 } // namespace ns3
 

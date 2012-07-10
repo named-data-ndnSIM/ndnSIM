@@ -161,7 +161,7 @@ private:
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
   void
-  GiveUpInterest (CcnxPit::iterator pitEntry,
+  GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
                   Ptr<CcnxInterestHeader> header);
 
   void

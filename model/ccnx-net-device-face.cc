@@ -30,6 +30,7 @@
 
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/channel.h"
+#include "ns3/ccnx-name-components.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxNetDeviceFace");
 

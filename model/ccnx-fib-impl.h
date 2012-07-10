@@ -88,13 +88,13 @@ public:
    */
   CcnxFibImpl ();
 
-  virtual CcnxFib::iterator
+  virtual Ptr<CcnxFibEntry>
   LongestPrefixMatch (const CcnxInterestHeader &interest) const;
   
-  virtual CcnxFib::iterator
+  virtual Ptr<CcnxFibEntry>
   Add (const CcnxNameComponents &prefix, Ptr<CcnxFace> face, int32_t metric);
 
-  virtual CcnxFib::iterator
+  virtual Ptr<CcnxFibEntry>
   Add (const Ptr<const CcnxNameComponents> &prefix, Ptr<CcnxFace> face, int32_t metric);
 
   virtual void
@@ -109,21 +109,21 @@ public:
   virtual void
   Print (std::ostream &os) const;
 
-  virtual CcnxFib::const_iterator
+  virtual Ptr<const CcnxFibEntry>
   Begin ();
 
-  virtual CcnxFib::const_iterator
+  virtual Ptr<const CcnxFibEntry>
   End ();
 
-  virtual CcnxFib::const_iterator
-  Next (CcnxFib::const_iterator item);
+  virtual Ptr<const CcnxFibEntry>
+  Next (Ptr<const CcnxFibEntry> item);
   
   /**
    * @brief Modify element in container
    */
   template<typename Modifier>
   bool
-  modify (CcnxFib::iterator item, Modifier mod)
+  modify (Ptr<CcnxFibEntry> item, Modifier mod)
   {
     return super::modify (StaticCast<CcnxFibEntryImpl> (item)->to_iterator (), mod);
   }

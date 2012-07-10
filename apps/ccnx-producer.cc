@@ -88,7 +88,7 @@ CcnxProducer::StartApplication ()
   
   Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
   
-  CcnxFib::iterator fibEntry = fib->Add (m_prefix, m_face, 0);
+  Ptr<CcnxFibEntry> fibEntry = fib->Add (m_prefix, m_face, 0);
   
   // make face green, so it will be used primarily
   StaticCast<CcnxFibImpl> (fib)->modify (fibEntry,

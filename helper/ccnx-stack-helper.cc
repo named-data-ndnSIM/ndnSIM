@@ -34,10 +34,12 @@
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-helper.h"
 
-#include "../model/ccnx-forwarding-strategy.h"
 #include "../model/ccnx-net-device-face.h"
 #include "../model/ccnx-l3-protocol.h"
-#include "../model/ccnx-fib.h"
+
+#include "ns3/ccnx-forwarding-strategy.h"
+#include "ns3/ccnx-fib.h"
+#include "ns3/ccnx-name-components.h"
 
 #include "ns3/node-list.h"
 // #include "ns3/loopback-net-device.h"
@@ -63,7 +65,7 @@ CcnxStackHelper::CcnxStackHelper ()
   m_ccnxFactory.        SetTypeId ("ns3::CcnxL3Protocol");
   m_strategyFactory.    SetTypeId ("ns3::CcnxFloodingStrategy");
   m_contentStoreFactory.SetTypeId ("ns3::CcnxContentStoreLru");
-  m_fibFactory.         SetTypeId ("ns3::CcnxFibImpl");
+  m_fibFactory.         SetTypeId ("ns3::CcnxFib");
   m_pitFactory.         SetTypeId ("ns3::CcnxPit");
 }
     
