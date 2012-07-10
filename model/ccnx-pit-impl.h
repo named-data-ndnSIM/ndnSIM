@@ -67,6 +67,8 @@ class CcnxPitImpl : public CcnxPit
                   , protected CcnxPitEntryImpl::trie
 {
 public:
+  typedef CcnxPitEntryImpl::trie super;
+
   /**
    * \brief Interface ID
    *
@@ -102,6 +104,16 @@ public:
 
   virtual void
   Print (std::ostream &os) const;
+
+  // /**
+  //  * @brief Modify element in container
+  //  */
+  // template<typename Modifier>
+  // bool
+  // modify (Ptr<CcnxPitEntry> item, Modifier mod)
+  // {
+  //   return super::modify (StaticCast<CcnxPitEntryImpl> (item)->to_iterator (), mod);
+  // }
   
 protected:
   // inherited from CcnxPit

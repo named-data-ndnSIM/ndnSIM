@@ -89,11 +89,13 @@ CcnxProducer::StartApplication ()
   Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
   
   Ptr<CcnxFibEntry> fibEntry = fib->Add (m_prefix, m_face, 0);
+
+  fibEntry->UpdateStatus (m_face, CcnxFibFaceMetric::NDN_FIB_GREEN);
   
-  // make face green, so it will be used primarily
-  StaticCast<CcnxFibImpl> (fib)->modify (fibEntry,
-                                         ll::bind (&CcnxFibEntry::UpdateStatus,
-                                                   ll::_1, m_face, CcnxFibFaceMetric::NDN_FIB_GREEN));
+  // // make face green, so it will be used primarily
+  // StaticCast<CcnxFibImpl> (fib)->modify (fibEntry,
+  //                                        ll::bind (&CcnxFibEntry::UpdateStatus,
+  //                                                  ll::_1, m_face, CcnxFibFaceMetric::NDN_FIB_GREEN));
 }
 
 void

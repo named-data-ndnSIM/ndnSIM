@@ -118,15 +118,15 @@ public:
   virtual Ptr<const CcnxFibEntry>
   Next (Ptr<const CcnxFibEntry> item);
   
-  /**
-   * @brief Modify element in container
-   */
-  template<typename Modifier>
-  bool
-  modify (Ptr<CcnxFibEntry> item, Modifier mod)
-  {
-    return super::modify (StaticCast<CcnxFibEntryImpl> (item)->to_iterator (), mod);
-  }
+  // /**
+  //  * @brief Modify element in container
+  //  */
+  // template<typename Modifier>
+  // bool
+  // modify (Ptr<CcnxFibEntry> item, Modifier mod)
+  // {
+  //   return super::modify (StaticCast<CcnxFibEntryImpl> (item)->to_iterator (), mod);
+  // }
   
 protected:
   // inherited from Object class
