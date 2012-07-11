@@ -49,7 +49,6 @@ def build(bld):
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
-    tests = bld.create_ns3_module_test_library('ndnSIM')
     headers = bld.new_task_gen(features=['ns3header'])
     headers.module = 'ndnSIM'
 
@@ -69,13 +68,6 @@ def build(bld):
         "helper/ccnx-stack-helper.h",
         "helper/ccnx-app-helper.h",
         "helper/ccnx-header-helper.h",
-        # "helper/ccnx-trace-helper.h",
-        # "helper/tracers/ipv4-app-tracer.h",
-        # "helper/tracers/ipv4-l3-tracer.h",
-        # "helper/tracers/ccnx-app-tracer.h",
-        # "helper/tracers/ccnx-l3-tracer.h",
-        # "helper/tracers/ccnx-consumer-window-tracer.h",
-        # "helper/tracers/ccnx-path-weight-tracer.h",
         "helper/ccnx-face-container.h",
         "helper/ccnx-global-routing-helper.h",
 
@@ -116,6 +108,7 @@ def build(bld):
             ])
         module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
     
+    tests = bld.create_ns3_module_test_library('ndnSIM')
     tests.source = bld.path.ant_glob('test/*.cc');
 
     if bld.env.ENABLE_EXAMPLES:

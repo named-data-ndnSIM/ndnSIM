@@ -116,8 +116,8 @@ def register_types(module):
     module.add_class('TagData', import_from_module='ns.network', outer_class=root_module['ns3::PacketTagList'])
     ## random-variable.h (module 'core'): ns3::RandomVariable [class]
     module.add_class('RandomVariable', import_from_module='ns.core')
-    ## random-variable.h (module 'core'): ns3::SeedManager [class]
-    module.add_class('SeedManager', import_from_module='ns.core')
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager [class]
+    module.add_class('RngSeedManager', import_from_module='ns.core')
     ## random-variable.h (module 'core'): ns3::SequentialVariable [class]
     module.add_class('SequentialVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
@@ -370,12 +370,16 @@ def register_types(module):
     module.add_container('std::list< ns3::TopologyReader::Link >', 'ns3::TopologyReader::Link', container_type='list')
     module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
-    module.add_container('std::set< unsigned int >', 'unsigned int', container_type='set')
     module.add_container('std::set< ns3::CcnxPitEntryIncomingFace >', 'ns3::CcnxPitEntryIncomingFace', container_type='set')
+    module.add_container('std::set< unsigned int >', 'unsigned int', container_type='set')
     typehandlers.add_type_alias('ns3::Vector3DChecker', 'ns3::VectorChecker')
     typehandlers.add_type_alias('ns3::Vector3DChecker*', 'ns3::VectorChecker*')
     typehandlers.add_type_alias('ns3::Vector3DChecker&', 'ns3::VectorChecker&')
     module.add_typedef(root_module['ns3::Vector3DChecker'], 'VectorChecker')
+    typehandlers.add_type_alias('ns3::RngSeedManager', 'ns3::SeedManager')
+    typehandlers.add_type_alias('ns3::RngSeedManager*', 'ns3::SeedManager*')
+    typehandlers.add_type_alias('ns3::RngSeedManager&', 'ns3::SeedManager&')
+    module.add_typedef(root_module['ns3::RngSeedManager'], 'SeedManager')
     typehandlers.add_type_alias('ns3::Vector3D', 'ns3::Vector')
     typehandlers.add_type_alias('ns3::Vector3D*', 'ns3::Vector*')
     typehandlers.add_type_alias('ns3::Vector3D&', 'ns3::Vector&')
@@ -448,7 +452,7 @@ def register_methods(root_module):
     register_Ns3PacketTagList_methods(root_module, root_module['ns3::PacketTagList'])
     register_Ns3PacketTagListTagData_methods(root_module, root_module['ns3::PacketTagList::TagData'])
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
-    register_Ns3SeedManager_methods(root_module, root_module['ns3::SeedManager'])
+    register_Ns3RngSeedManager_methods(root_module, root_module['ns3::RngSeedManager'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
     register_Ns3SpringMobilityHelper_methods(root_module, root_module['ns3::SpringMobilityHelper'])
@@ -2210,32 +2214,32 @@ def register_Ns3RandomVariable_methods(root_module, cls):
                    is_const=True)
     return
 
-def register_Ns3SeedManager_methods(root_module, cls):
-    ## random-variable.h (module 'core'): ns3::SeedManager::SeedManager() [constructor]
+def register_Ns3RngSeedManager_methods(root_module, cls):
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager::RngSeedManager() [constructor]
     cls.add_constructor([])
-    ## random-variable.h (module 'core'): ns3::SeedManager::SeedManager(ns3::SeedManager const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SeedManager const &', 'arg0')])
-    ## random-variable.h (module 'core'): static bool ns3::SeedManager::CheckSeed(uint32_t seed) [member function]
-    cls.add_method('CheckSeed', 
-                   'bool', 
-                   [param('uint32_t', 'seed')], 
-                   is_static=True)
-    ## random-variable.h (module 'core'): static uint32_t ns3::SeedManager::GetRun() [member function]
-    cls.add_method('GetRun', 
-                   'uint32_t', 
+    ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager::RngSeedManager(ns3::RngSeedManager const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::RngSeedManager const &', 'arg0')])
+    ## rng-seed-manager.h (module 'core'): static uint64_t ns3::RngSeedManager::GetNextStreamIndex() [member function]
+    cls.add_method('GetNextStreamIndex', 
+                   'uint64_t', 
                    [], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static uint32_t ns3::SeedManager::GetSeed() [member function]
+    ## rng-seed-manager.h (module 'core'): static uint64_t ns3::RngSeedManager::GetRun() [member function]
+    cls.add_method('GetRun', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
+    ## rng-seed-manager.h (module 'core'): static uint32_t ns3::RngSeedManager::GetSeed() [member function]
     cls.add_method('GetSeed', 
                    'uint32_t', 
                    [], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static void ns3::SeedManager::SetRun(uint32_t run) [member function]
+    ## rng-seed-manager.h (module 'core'): static void ns3::RngSeedManager::SetRun(uint64_t run) [member function]
     cls.add_method('SetRun', 
                    'void', 
-                   [param('uint32_t', 'run')], 
+                   [param('uint64_t', 'run')], 
                    is_static=True)
-    ## random-variable.h (module 'core'): static void ns3::SeedManager::SetSeed(uint32_t seed) [member function]
+    ## rng-seed-manager.h (module 'core'): static void ns3::RngSeedManager::SetSeed(uint32_t seed) [member function]
     cls.add_method('SetSeed', 
                    'void', 
                    [param('uint32_t', 'seed')], 
@@ -2967,6 +2971,7 @@ def register_Ns3Object_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxFib >', 
                    [], 
                    is_const=True, template_parameters=['ns3::CcnxFib'])
+    ## object.h (module 'core'): ns3::Ptr<ns3::CcnxPit> ns3::Object::GetObject() const [member function]
     cls.add_method('GetObject', 
                    'ns3::Ptr< ns3::CcnxPit >', 
                    [], 
@@ -4712,8 +4717,8 @@ def register_Ns3CcnxPit_methods(root_module, cls):
                    'ns3::Ptr< ns3::CcnxPitEntry >', 
                    [], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ccnx-pit.h (module 'ndnSIM'): static ns3::Ptr<ns3::CcnxFib> ns3::CcnxPit::GetCcnxPit(ns3::Ptr<ns3::Object> node) [member function]
-    cls.add_method('GetCcnxPit',
+    ## ccnx-pit.h (module 'ndnSIM'): static ns3::Ptr<ns3::CcnxPit> ns3::CcnxPit::GetCcnxPit(ns3::Ptr<ns3::Object> node) [member function]
+    cls.add_method('GetCcnxPit', 
                    'ns3::Ptr< ns3::CcnxPit >', 
                    [param('ns3::Ptr< ns3::Object >', 'node')], 
                    is_static=True)
@@ -4747,31 +4752,29 @@ def register_Ns3CcnxPit_methods(root_module, cls):
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
-    ## ccnx-pit.h (module 'ndnSIM'): void ns3::CcnxPit::DoCleanExpired() [member function]
-    cls.add_method('DoCleanExpired', 
-                   'void', 
-                   [], 
-                   is_pure_virtual=True, visibility='protected', is_virtual=True)
     return
 
 def register_Ns3CcnxPitEntry_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::CcnxPitEntry(ns3::CcnxPitEntry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::CcnxPitEntry const &', 'arg0')])
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::CcnxPitEntry(ns3::Ptr<const ns3::CcnxInterestHeader> header, ns3::Ptr<ns3::CcnxFibEntry> fibEntry) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::CcnxInterestHeader const >', 'header'), param('ns3::Ptr< ns3::CcnxFibEntry >', 'fibEntry')])
+    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::CcnxPitEntry(ns3::CcnxPit & container, ns3::Ptr<const ns3::CcnxInterestHeader> header, ns3::Ptr<ns3::CcnxFibEntry> fibEntry) [constructor]
+    cls.add_constructor([param('ns3::CcnxPit &', 'container'), param('ns3::Ptr< ns3::CcnxInterestHeader const >', 'header'), param('ns3::Ptr< ns3::CcnxFibEntry >', 'fibEntry')])
     ## ccnx-pit-entry.h (module 'ndnSIM'): std::_Rb_tree_const_iterator<ns3::CcnxPitEntryIncomingFace> ns3::CcnxPitEntry::AddIncoming(ns3::Ptr<ns3::CcnxFace> face) [member function]
     cls.add_method('AddIncoming', 
                    'std::_Rb_tree_const_iterator< ns3::CcnxPitEntryIncomingFace >', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): boost::multi_index::detail::bidir_node_iterator<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntryOutgoingFace, std::allocator<ns3::CcnxPitEntryOutgoingFace> > > > > ns3::CcnxPitEntry::AddOutgoing(ns3::Ptr<ns3::CcnxFace> face) [member function]
     cls.add_method('AddOutgoing', 
                    'boost::multi_index::detail::bidir_node_iterator< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntryOutgoingFace, std::allocator< ns3::CcnxPitEntryOutgoingFace > > > > >', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::AddSeenNonce(uint32_t nonce) [member function]
     cls.add_method('AddSeenNonce', 
                    'void', 
-                   [param('uint32_t', 'nonce')])
+                   [param('uint32_t', 'nonce')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): bool ns3::CcnxPitEntry::AreAllOutgoingInVain() const [member function]
     cls.add_method('AreAllOutgoingInVain', 
                    'bool', 
@@ -4785,14 +4788,35 @@ def register_Ns3CcnxPitEntry_methods(root_module, cls):
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::ClearIncoming() [member function]
     cls.add_method('ClearIncoming', 
                    'void', 
-                   [])
+                   [], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::ClearOutgoing() [member function]
     cls.add_method('ClearOutgoing', 
                    'void', 
-                   [])
+                   [], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::Time const & ns3::CcnxPitEntry::GetExpireTime() const [member function]
     cls.add_method('GetExpireTime', 
                    'ns3::Time const &', 
+                   [], 
+                   is_const=True)
+    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::Ptr<ns3::CcnxFibEntry> ns3::CcnxPitEntry::GetFibEntry() [member function]
+    cls.add_method('GetFibEntry', 
+                   'ns3::Ptr< ns3::CcnxFibEntry >', 
+                   [])
+    ## ccnx-pit-entry.h (module 'ndnSIM'): std::set<ns3::CcnxPitEntryIncomingFace, std::less<ns3::CcnxPitEntryIncomingFace>, std::allocator<ns3::CcnxPitEntryIncomingFace> > const & ns3::CcnxPitEntry::GetIncoming() const [member function]
+    cls.add_method('GetIncoming', 
+                   'std::set< ns3::CcnxPitEntryIncomingFace > const &', 
+                   [], 
+                   is_const=True)
+    ## ccnx-pit-entry.h (module 'ndnSIM'): uint32_t ns3::CcnxPitEntry::GetMaxRetxCount() const [member function]
+    cls.add_method('GetMaxRetxCount', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ccnx-pit-entry.h (module 'ndnSIM'): boost::multi_index::multi_index_container<ns3::CcnxPitEntryOutgoingFace, boost::multi_index::indexed_by<boost::multi_index::ordered_unique<boost::multi_index::tag<ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, boost::multi_index::member<ns3::CcnxPitEntryOutgoingFace, ns3::Ptr<ns3::CcnxFace>, &(ns3::CcnxPitEntryOutgoingFace::m_face)>, mpl_::na>, boost::multi_index::ordered_non_unique<boost::multi_index::tag<ns3::__ccnx_private::i_retx, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, boost::multi_index::member<ns3::CcnxPitEntryOutgoingFace, unsigned int, &(ns3::CcnxPitEntryOutgoingFace::m_retxCount)>, mpl_::na>, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, std::allocator<ns3::CcnxPitEntryOutgoingFace> > const & ns3::CcnxPitEntry::GetOutgoing() const [member function]
+    cls.add_method('GetOutgoing', 
+                   'boost::multi_index::multi_index_container< ns3::CcnxPitEntryOutgoingFace, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryOutgoingFace, ns3::Ptr< ns3::CcnxFace >, & ( ns3::CcnxPitEntryOutgoingFace::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::__ccnx_private::i_retx, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryOutgoingFace, unsigned int, & ( ns3::CcnxPitEntryOutgoingFace::m_retxCount ) >, mpl_::na >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxPitEntryOutgoingFace > > const &', 
                    [], 
                    is_const=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxNameComponents const & ns3::CcnxPitEntry::GetPrefix() const [member function]
@@ -4803,7 +4827,8 @@ def register_Ns3CcnxPitEntry_methods(root_module, cls):
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::IncreaseAllowedRetxCount() [member function]
     cls.add_method('IncreaseAllowedRetxCount', 
                    'void', 
-                   [])
+                   [], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): bool ns3::CcnxPitEntry::IsNonceSeen(uint32_t nonce) const [member function]
     cls.add_method('IsNonceSeen', 
                    'bool', 
@@ -4812,39 +4837,23 @@ def register_Ns3CcnxPitEntry_methods(root_module, cls):
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::RemoveAllReferencesToFace(ns3::Ptr<ns3::CcnxFace> face) [member function]
     cls.add_method('RemoveAllReferencesToFace', 
                    'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')])
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::RemoveIncoming(ns3::Ptr<ns3::CcnxFace> face) [member function]
     cls.add_method('RemoveIncoming', 
                    'void', 
-                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')])
-    ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::SetExpireTime(ns3::Time const & expireTime) [member function]
-    cls.add_method('SetExpireTime', 
-                   'void', 
-                   [param('ns3::Time const &', 'expireTime')])
+                   [param('ns3::Ptr< ns3::CcnxFace >', 'face')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::SetWaitingInVain(boost::multi_index::detail::bidir_node_iterator<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::index_node_base<ns3::CcnxPitEntryOutgoingFace, std::allocator<ns3::CcnxPitEntryOutgoingFace> > > > > face) [member function]
     cls.add_method('SetWaitingInVain', 
                    'void', 
-                   [param('boost::multi_index::detail::bidir_node_iterator< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntryOutgoingFace, std::allocator< ns3::CcnxPitEntryOutgoingFace > > > > >', 'face')])
+                   [param('boost::multi_index::detail::bidir_node_iterator< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::index_node_base< ns3::CcnxPitEntryOutgoingFace, std::allocator< ns3::CcnxPitEntryOutgoingFace > > > > >', 'face')], 
+                   is_virtual=True)
     ## ccnx-pit-entry.h (module 'ndnSIM'): void ns3::CcnxPitEntry::UpdateLifetime(ns3::Time const & offsetTime) [member function]
     cls.add_method('UpdateLifetime', 
                    'void', 
-                   [param('ns3::Time const &', 'offsetTime')])
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_expireTime [variable]
-    cls.add_instance_attribute('m_expireTime', 'ns3::Time', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_fibEntry [variable]
-    cls.add_instance_attribute('m_fibEntry', 'ns3::Ptr< ns3::CcnxFibEntry >', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_incoming [variable]
-    cls.add_instance_attribute('m_incoming', 'std::set< ns3::CcnxPitEntryIncomingFace >', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_lastRetransmission [variable]
-    cls.add_instance_attribute('m_lastRetransmission', 'ns3::Time', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_maxRetxCount [variable]
-    cls.add_instance_attribute('m_maxRetxCount', 'uint32_t', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_outgoing [variable]
-    cls.add_instance_attribute('m_outgoing', 'boost::multi_index::multi_index_container< ns3::CcnxPitEntryOutgoingFace, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::__ccnx_private::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryOutgoingFace, ns3::Ptr< ns3::CcnxFace >, & ( ns3::CcnxPitEntryOutgoingFace::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::__ccnx_private::i_retx, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::CcnxPitEntryOutgoingFace, unsigned int, & ( ns3::CcnxPitEntryOutgoingFace::m_retxCount ) >, mpl_::na >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::CcnxPitEntryOutgoingFace > >', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_prefix [variable]
-    cls.add_instance_attribute('m_prefix', 'ns3::Ptr< ns3::CcnxNameComponents const >', is_const=False)
-    ## ccnx-pit-entry.h (module 'ndnSIM'): ns3::CcnxPitEntry::m_seenNonces [variable]
-    cls.add_instance_attribute('m_seenNonces', 'std::set< unsigned int >', is_const=False)
+                   [param('ns3::Time const &', 'offsetTime')], 
+                   is_virtual=True)
     return
 
 def register_Ns3EmptyAttributeValue_methods(root_module, cls):
