@@ -103,28 +103,39 @@ CcnxPitImpl::NotifyNewAggregate ()
 void 
 CcnxPitImpl::DoDispose ()
 {
-  clear ();
+  super::clear ();
+}
+
+void CcnxPitImpl::RescheduleCleaning ()
+{
+  m_cleanEvent.Cancel ();
+  if (i_time.empty ())
+    return;
+
+  m_cleanEvent = Simulator::Schedule (i_time.begin ()->GetExpireTime (),
+                                      &CcnxPitImpl::CleanExpired, this);
 }
 
 void
-CcnxPitImpl::DoCleanExpired ()
+CcnxPitImpl::CleanExpired ()
 {
-  // NS_LOG_LOGIC ("Cleaning PIT. Total: " << size ());
+  NS_LOG_LOGIC ("Cleaning PIT. Total: " << i_time.size ());
   Time now = Simulator::Now ();
 
-  NS_LOG_ERROR ("Need to be repaired");
-  // // uint32_t count = 0;
-  // while (!empty ())
-  //   {
-  //     CcnxPit::index<i_timestamp>::type::iterator entry = get<i_timestamp> ().begin ();
-  //     if (entry->GetExpireTime () <= now) // is the record stale?
-  //       {
-  //         get<i_timestamp> ().erase (entry);
-  //         // count ++;
-  //       }
-  //     else
-  //       break; // nothing else to do. All later records will not be stale
-  //   }
+  // uint32_t count = 0;
+  while (!i_time.empty ())
+    {
+      time_index::iterator entry = i_time.begin ();
+      if (entry->GetExpireTime () <= now) // is the record stale?
+        {
+          super::erase (entry->to_iterator ());
+      //     // count ++;
+        }
+      else
+        break; // nothing else to do. All later records will not be stale
+    }
+
+  RescheduleCleaning ();
 }
 
 Ptr<CcnxPitEntry>

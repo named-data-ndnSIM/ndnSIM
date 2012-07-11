@@ -136,14 +136,6 @@ public:
   { return m_expireTime; }
 
   /**
-   * @brief Set expiration time on record as `expireTime` (absolute time)
-   *
-   * @param expireTime absolute simulation time of when the record should expire
-   */
-  virtual void
-  SetExpireTime (const Time &expireTime);
-  
-  /**
    * @brief Check if nonce `nonce` for the same prefix has already been seen
    *
    * @param nonce Nonce to check

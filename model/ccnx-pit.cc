@@ -43,11 +43,11 @@ CcnxPit::GetTypeId ()
   static TypeId tid = TypeId ("ns3::private::CcnxPit")
     .SetGroupName ("Ccnx")
     .SetParent<Object> ()
-    .AddAttribute ("CleanupTimeout",
-                   "Timeout defining how frequent RIT should be cleaned up",
-                   StringValue ("1s"),
-                   MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
-                   MakeTimeChecker ())
+    // .AddAttribute ("CleanupTimeout",
+    //                "Timeout defining how frequent RIT should be cleaned up",
+    //                StringValue ("1s"),
+    //                MakeTimeAccessor (&CcnxPit::GetCleanupTimeout, &CcnxPit::SetCleanupTimeout),
+    //                MakeTimeChecker ())
     
     .AddAttribute ("PitEntryPruningTimout",
                    "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
@@ -67,32 +67,32 @@ CcnxPit::~CcnxPit ()
 {
 }
 
-void CcnxPit::CleanExpired ()
-{
-  DoCleanExpired ();
+// void CcnxPit::CleanExpired ()
+// {
+//   DoCleanExpired ();
   
-  // schedule next event  
-  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
-                                        &CcnxPit::CleanExpired, this); 
-}
+//   // schedule next event  
+//   m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
+//                                         &CcnxPit::CleanExpired, this); 
+// }
 
-void
-CcnxPit::SetCleanupTimeout (const Time &timeout)
-{
-  m_cleanupTimeout = timeout;
-  if (m_cleanupEvent.IsRunning ())
-    m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
+// void
+// CcnxPit::SetCleanupTimeout (const Time &timeout)
+// {
+//   m_cleanupTimeout = timeout;
+//   if (m_cleanupEvent.IsRunning ())
+//     m_cleanupEvent.Cancel (); // cancel any scheduled cleanup events
 
-  // schedule even with new timeout
-  m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
-                                        &CcnxPit::CleanExpired, this); 
-}
+//   // schedule even with new timeout
+//   m_cleanupEvent = Simulator::Schedule (m_cleanupTimeout,
+//                                         &CcnxPit::CleanExpired, this); 
+// }
 
-Time
-CcnxPit::GetCleanupTimeout () const
-{
-  return m_cleanupTimeout;
-}
+// Time
+// CcnxPit::GetCleanupTimeout () const
+// {
+//   return m_cleanupTimeout;
+// }
 
 
 } // namespace ns3

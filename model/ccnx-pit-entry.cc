@@ -49,13 +49,6 @@ CcnxPitEntry::CcnxPitEntry (CcnxPit &container,
 }
 
 void
-CcnxPitEntry::SetExpireTime (const Time &expireTime)
-{
-  NS_LOG_FUNCTION (expireTime.ToDouble (Time::S));
-  m_expireTime = expireTime;
-}
-
-void
 CcnxPitEntry::UpdateLifetime (const Time &offsetTime)
 {
   NS_LOG_FUNCTION (offsetTime.ToDouble (Time::S));

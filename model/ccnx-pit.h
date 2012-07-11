@@ -159,39 +159,32 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
-protected:
-  virtual void
-  DoCleanExpired () = 0;
-  
 private:
-  /**
-   * @brief Remove expired records from PIT
-   */
-  void
-  CleanExpired ();
+  // /**
+  //  * @brief Remove expired records from PIT
+  //  */
+  // void
+  // CleanExpired ();
   
-  /**
-   * \brief Set cleanup timeout
-   *
-   * Side effect: current clean up even (if any) will be cancelled and a new event started
-   *
-   * \param timeout cleanup timeout
-   */
-  void
-  SetCleanupTimeout (const Time &timeout);
+  // /**
+  //  * \brief Set cleanup timeout
+  //  *
+  //  * Side effect: current clean up even (if any) will be cancelled and a new event started
+  //  *
+  //  * \param timeout cleanup timeout
+  //  */
+  // void
+  // SetCleanupTimeout (const Time &timeout);
 
-  /**
-   * \brief Get cleanup timeout
-   *
-   * \returns cleanup timeout
-   */
-  Time
-  GetCleanupTimeout () const;
+  // /**
+  //  * \brief Get cleanup timeout
+  //  *
+  //  * \returns cleanup timeout
+  //  */
+  // Time
+  // GetCleanupTimeout () const;
   
 protected:
-  Time    m_cleanupTimeout; ///< \brief Configurable timeout of how often cleanup events are working
-  EventId m_cleanupEvent;   ///< \brief Cleanup event
-
   // configuration variables. Check implementation of GetTypeId for more details
   Time    m_PitEntryPruningTimout;
 };
