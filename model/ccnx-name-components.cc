@@ -43,7 +43,14 @@ CcnxNameComponents::CcnxNameComponents (const std::list<boost::reference_wrapper
       Add (component.get ());
     }
 }
-  
+
+CcnxNameComponents::CcnxNameComponents (const std::string &prefix)
+{
+  istringstream is (prefix);
+  is >> *this;
+}
+
+
 const std::list<std::string> &
 CcnxNameComponents::GetComponents () const
 {

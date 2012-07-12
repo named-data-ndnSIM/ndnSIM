@@ -113,19 +113,11 @@ public:
   virtual void
   Print (std::ostream &os) const = 0;
 
-  // template<class A,class M>
-  // void
-  // modify (A, M)
-  // {
-  //   ;
-  // }
-
-  // template<class A>
-  // void
-  // erase (A)
-  // {
-  //   ;
-  // }
+  /**
+   * @brief Get number of entries in PIT
+   */
+  virtual uint32_t
+  GetSize () const = 0;
 
   /**
    * @brief Return first element of FIB (no order guaranteed)

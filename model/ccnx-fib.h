@@ -132,6 +132,12 @@ public:
   Print (std::ostream &os) const = 0;
 
   /**
+   * @brief Get number of entries in FIB
+   */
+  virtual uint32_t
+  GetSize () const = 0;
+
+  /**
    * @brief Return first element of FIB (no order guaranteed)
    */
   virtual Ptr<const CcnxFibEntry>

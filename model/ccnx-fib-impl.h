@@ -25,7 +25,7 @@
 #include "ns3/ccnx-name-components.h"
 
 #include "../utils/trie-with-policy.h"
-#include "../utils/empty-policy.h"
+#include "../utils/counting-policy.h"
 
 namespace ns3 {
 
@@ -35,7 +35,7 @@ public:
   typedef ndnSIM::trie_with_policy<
     CcnxNameComponents,
     ndnSIM::smart_pointer_payload_traits<CcnxFibEntryImpl>,
-    ndnSIM::empty_policy_traits
+    ndnSIM::counting_policy_traits
     > trie;
 
   CcnxFibEntryImpl (const Ptr<const CcnxNameComponents> &prefix)
@@ -62,7 +62,7 @@ struct CcnxFibEntryContainer
   typedef ndnSIM::trie_with_policy<
     CcnxNameComponents,
     ndnSIM::smart_pointer_payload_traits<CcnxFibEntryImpl>,
-    ndnSIM::empty_policy_traits
+    ndnSIM::counting_policy_traits
     > type;
 };
 
@@ -108,6 +108,9 @@ public:
 
   virtual void
   Print (std::ostream &os) const;
+
+  virtual uint32_t
+  GetSize () const;
 
   virtual Ptr<const CcnxFibEntry>
   Begin ();

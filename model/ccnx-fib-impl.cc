@@ -200,6 +200,12 @@ CcnxFibImpl::Print (std::ostream &os) const
     }
 }
 
+uint32_t
+CcnxFibImpl::GetSize () const
+{
+  return super::getPolicy ().size ();
+}
+
 Ptr<const CcnxFibEntry>
 CcnxFibImpl::Begin ()
 {

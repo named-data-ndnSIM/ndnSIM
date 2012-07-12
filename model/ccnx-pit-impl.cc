@@ -110,9 +110,18 @@ void CcnxPitImpl::RescheduleCleaning ()
 {
   m_cleanEvent.Cancel ();
   if (i_time.empty ())
-    return;
+    {
+      NS_LOG_DEBUG ("No items in PIT");
+      return;
+    }
 
-  m_cleanEvent = Simulator::Schedule (i_time.begin ()->GetExpireTime (),
+  Time nextEvent = i_time.begin ()->GetExpireTime () - Simulator::Now ();
+  if (nextEvent < 0) nextEvent = Seconds (0);
+  
+  NS_LOG_DEBUG ("Schedule next cleaning in " <<
+                nextEvent.ToDouble (Time::S) << "s (at " <<
+                i_time.begin ()->GetExpireTime () << "s abs time");
+  m_cleanEvent = Simulator::Schedule (nextEvent,
                                       &CcnxPitImpl::CleanExpired, this);
 }
 
@@ -215,6 +224,12 @@ CcnxPitImpl::Print (std::ostream& os) const
 
       os << item->payload ()->GetPrefix () << "\t" << *item->payload () << "\n";
     }
+}
+
+uint32_t
+CcnxPitImpl::GetSize () const
+{
+  return super::getPolicy ().size ();
 }
 
 Ptr<CcnxPitEntry>

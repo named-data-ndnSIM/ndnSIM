@@ -63,6 +63,13 @@ public:
   CcnxNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
 
   /**
+   * @brief Constructor
+   * Creates a prefix from the string (string is parsed using operator>>)
+   * @param[in] prefix A string representation of a prefix
+   */
+  CcnxNameComponents (const std::string &prefix);
+  
+  /**
    * \brief Generic Add method
    * Appends object of type T to the list of components 
    * @param[in] value The object to be appended

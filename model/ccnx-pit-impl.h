@@ -82,6 +82,9 @@ public:
   virtual void
   Print (std::ostream &os) const;
 
+  virtual uint32_t
+  GetSize () const;
+
   virtual Ptr<CcnxPitEntry>
   Begin ();
 
