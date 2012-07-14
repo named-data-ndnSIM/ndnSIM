@@ -53,7 +53,7 @@ public:
   }
 
   inline std::pair< iterator, bool >
-  insert (const FullKey &key, typename PayloadTraits::pointer_type payload)
+  insert (const FullKey &key, typename PayloadTraits::insert_type payload)
   {
     std::pair<iterator, bool> item =
       trie_.insert (key, payload);

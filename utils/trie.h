@@ -41,9 +41,12 @@ namespace ndnSIM
 template<typename Payload>
 struct pointer_payload_traits
 {
-  typedef Payload         payload_type;
-  typedef Payload*        pointer_type;
-  typedef const Payload*  const_pointer_type;
+  typedef Payload         payload_type; // general type of the payload
+  typedef Payload*        storage_type; // how the payload is actually stored
+  typedef Payload*        insert_type;  // what parameter is inserted
+
+  typedef Payload*        return_type;  // what is returned on access
+  typedef const Payload*  const_return_type; // what is returned on const access
 
   static Payload* empty_payload;
 };
@@ -56,8 +59,11 @@ template<typename Payload>
 struct smart_pointer_payload_traits
 {
   typedef Payload                 payload_type;
-  typedef ns3::Ptr<Payload>       pointer_type;
-  typedef ns3::Ptr<const Payload> const_pointer_type;
+  typedef ns3::Ptr<Payload>       storage_type;
+  typedef ns3::Ptr<Payload>       insert_type;
+  
+  typedef ns3::Ptr<Payload>       return_type;
+  typedef ns3::Ptr<const Payload> const_return_type;
   
   static ns3::Ptr<Payload> empty_payload;
 };
@@ -65,6 +71,23 @@ struct smart_pointer_payload_traits
 template<typename Payload>
 ns3::Ptr<Payload>
 smart_pointer_payload_traits<Payload>::empty_payload = 0;
+
+template<typename Payload>
+struct non_pointer_traits
+{
+  typedef Payload         payload_type;
+  typedef Payload         storage_type;
+  typedef const Payload & insert_type; // nothing to insert
+
+  typedef Payload&        return_type;
+  typedef const Payload & const_return_type;
+  
+  static Payload empty_payload;
+};
+
+template<typename Payload>
+Payload 
+non_pointer_traits<Payload>::empty_payload = Payload ();
 
 
 ////////////////////////////////////////////////////
@@ -95,6 +118,9 @@ hash_value (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node);
 template<class T>
 class trie_iterator;
 
+template<class T>
+class trie_point_iterator;
+
 template<typename FullKey,
 	 typename PayloadTraits,
          typename PolicyHook >
@@ -108,6 +134,9 @@ public:
 
   typedef trie_iterator<trie> recursive_iterator;
   typedef trie_iterator<const trie> const_recursive_iterator;
+
+  typedef trie_point_iterator<trie> point_iterator;
+  typedef trie_point_iterator<const trie> const_point_iterator;
 
   typedef PayloadTraits payload_traits;
   
@@ -164,7 +193,7 @@ public:
 
   inline std::pair<iterator, bool>
   insert (const FullKey &key,
-          typename PayloadTraits::pointer_type payload)
+          typename PayloadTraits::insert_type payload)
   {
     trie *trieNode = this;
   
@@ -331,20 +360,20 @@ public:
     return 0;
   }
 
-  typename PayloadTraits::const_pointer_type
+  typename PayloadTraits::const_return_type
   payload () const
   {
     return payload_;
   }
 
-  typename PayloadTraits::pointer_type
+  typename PayloadTraits::return_type
   payload ()
   {
     return payload_;
   }
 
   void
-  set_payload (typename PayloadTraits::pointer_type payload)
+  set_payload (typename PayloadTraits::insert_type payload)
   {
     payload_ = payload;
   }
@@ -393,7 +422,10 @@ private:
 
   template<class T>
   friend class trie_iterator;
-  
+
+  template<class T>
+  friend class trie_point_iterator;
+
   ////////////////////////////////////////////////
   // Actual data
   ////////////////////////////////////////////////
@@ -408,7 +440,7 @@ private:
   buckets_array buckets_;
   unordered_set children_;
   
-  typename PayloadTraits::pointer_type payload_;
+  typename PayloadTraits::storage_type payload_;
   trie *parent_; // to make cleaning effective
 };
 
@@ -419,7 +451,7 @@ template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline std::ostream&
 operator << (std::ostream &os, const trie<FullKey, PayloadTraits, PolicyHook> &trie_node)
 {
-  os << "# " << trie_node.key_ << ((trie_node.payload_ != 0)?"*":"") << std::endl;
+  os << "# " << trie_node.key_ << ((trie_node.payload_ != PayloadTraits::empty_payload)?"*":"") << std::endl;
   typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
 
   for (typename trie::unordered_set::const_iterator subnode = trie_node.children_.begin ();
@@ -427,8 +459,8 @@ operator << (std::ostream &os, const trie<FullKey, PayloadTraits, PolicyHook> &t
        subnode++ )
   // BOOST_FOREACH (const trie &subnode, trie_node.children_)
     {
-      os << "\"" << &trie_node << "\"" << " [label=\"" << trie_node.key_ << ((trie_node.payload_ != 0)?"*":"") << "\"]\n";
-      os << "\"" << &(*subnode) << "\"" << " [label=\"" << subnode->key_ << ((subnode->payload_ != 0)?"*":"") << "\"]""\n";
+      os << "\"" << &trie_node << "\"" << " [label=\"" << trie_node.key_ << ((trie_node.payload_ != PayloadTraits::empty_payload)?"*":"") << "\"]\n";
+      os << "\"" << &(*subnode) << "\"" << " [label=\"" << subnode->key_ << ((subnode->payload_ != PayloadTraits::empty_payload)?"*":"") << "\"]""\n";
       
       os << "\"" << &trie_node << "\"" << " -> " << "\"" << &(*subnode) << "\"" << "\n";
       os << *subnode;
@@ -442,7 +474,7 @@ inline void
 trie<FullKey, PayloadTraits, PolicyHook>
 ::PrintStat (std::ostream &os) const
 {
-  os << "# " << key_ << ((payload_ != 0)?"*":"") << ": " << children_.size() << " children" << std::endl;
+  os << "# " << key_ << ((payload_ != PayloadTraits::empty_payload)?"*":"") << ": " << children_.size() << " children" << std::endl;
   for (size_t bucket = 0, maxbucket = children_.bucket_count ();
        bucket < maxbucket;
        bucket++)
@@ -538,6 +570,65 @@ private:
     else
       return 0;
   }
+private:
+  Trie *trie_;
+};
+
+
+template<class Trie>
+class trie_point_iterator
+{
+private:  
+  typedef typename boost::mpl::if_< boost::is_same<Trie, const Trie>,
+                                    typename Trie::unordered_set::const_iterator,
+                                    typename Trie::unordered_set::iterator>::type set_iterator;
+
+public:
+  trie_point_iterator () : trie_ (0) {}
+  trie_point_iterator (typename Trie::iterator item) : trie_ (item) {}
+  trie_point_iterator (Trie &item)
+  {
+    if (item.children_.size () != 0)
+      trie_ = &*item.children_.begin ();
+    else
+      trie_ = 0;
+  }
+  
+  Trie & operator* () { return *trie_; }
+  const Trie & operator* () const { return *trie_; }
+  Trie * operator-> () { return trie_; }
+  const Trie * operator-> () const { return trie_; }
+  bool operator== (trie_point_iterator<const Trie> &other) const { return (trie_ == other.trie_); }
+  bool operator== (trie_point_iterator<Trie> &other) { return (trie_ == other.trie_); }
+  bool operator!= (trie_point_iterator<const Trie> &other) const { return !(*this == other); }
+  bool operator!= (trie_point_iterator<Trie> &other) { return !(*this == other); }
+  
+  trie_point_iterator<Trie> &
+  operator++ (int)
+  {
+    if (trie_->parent_ != 0)
+      {
+        set_iterator item = trie_->parent_->children_.iterator_to (*trie_);
+        item ++;
+        if (item == trie_->parent_->children_.end ())
+          trie_ = 0;
+        else
+          trie_ = &*item;
+      }
+    else
+      {
+        trie_ = 0;
+      }
+    return *this;
+  }
+
+  trie_point_iterator<Trie> &
+  operator++ ()
+  {
+    (*this)++;
+    return *this;
+  }  
+
 private:
   Trie *trie_;
 };

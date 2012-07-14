@@ -208,6 +208,14 @@ public:
    *
    * Internal index is used for comparison.
    */
+  inline bool
+  operator!= (const CcnxFace &face) const;
+  
+  /**
+   * \brief Compare two faces. Only two faces on the same node could be compared.
+   *
+   * Internal index is used for comparison.
+   */
   bool
   operator< (const CcnxFace &face) const;
 
@@ -265,6 +273,13 @@ CcnxFace::GetId () const
 {
   return m_id;
 }
+
+inline bool
+CcnxFace::operator!= (const CcnxFace &face) const
+{
+  return !(*this == face);
+}
+
 
 } // namespace ns3
 
