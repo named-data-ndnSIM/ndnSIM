@@ -377,6 +377,11 @@ public:
   {
     payload_ = payload;
   }
+
+  Key key () const
+  {
+    return key_;
+  }
   
   inline void
   PrintStat (std::ostream &os) const;  

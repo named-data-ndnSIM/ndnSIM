@@ -53,7 +53,7 @@ public:
   GetStats () const;
 
   bool
-  IsEmpty () const;
+  IsZero () const;
   
 private:
   uint32_t counter_;
@@ -61,6 +61,9 @@ private:
   double avg1_;
   double avg5_;
   double avg15_;
+
+  friend std::ostream &
+  operator << (std::ostream &os, const LoadStats &stats);
 };
 
 std::ostream &

@@ -55,8 +55,10 @@ public:
   void
   Timeout (const ns3::CcnxNameComponents &key);
 
+  // const LoadStatsNode &
+  // Get (const ns3::CcnxNameComponents &key) const;
   const LoadStatsNode &
-  Get (const ns3::CcnxNameComponents &key) const;
+  operator [] (const ns3::CcnxNameComponents &key) const;
   
 private:
   const LoadStatsNode &

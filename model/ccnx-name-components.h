@@ -68,6 +68,13 @@ public:
    * @param[in] prefix A string representation of a prefix
    */
   CcnxNameComponents (const std::string &prefix);
+
+  /**
+   * @brief Constructor
+   * Creates a prefix from the string (string is parsed using operator>>)
+   * @param[in] prefix A string representation of a prefix
+   */
+  CcnxNameComponents (const char *prefix);
   
   /**
    * \brief Generic Add method

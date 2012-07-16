@@ -20,8 +20,15 @@
 
 #include "load-stats-node.h"
 #include "ns3/ccnx-face.h"
+#include "ns3/log.h"
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+
+namespace ll = boost::lambda;
 
 using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE ("LoadStatsNode");
 
 namespace ndnSIM
 {
@@ -29,6 +36,8 @@ namespace ndnSIM
 void
 LoadStatsNode::Step ()
 {
+  NS_LOG_FUNCTION (this);
+  
   m_pit.Step ();
   
   for (stats_container::iterator item = m_incoming.begin ();
@@ -107,6 +116,8 @@ LoadStatsNode::Timeout ()
 LoadStatsNode &
 LoadStatsNode::operator += (const LoadStatsNode &stats)
 {
+  NS_LOG_FUNCTION (this << &stats);
+  
   m_pit += stats.m_pit;
   
   // aggregate incoming
@@ -128,10 +139,37 @@ LoadStatsNode::operator += (const LoadStatsNode &stats)
   return *this;
 }
 
+bool
+LoadStatsNode::IsZero () const
+{
+  bool zero = true;
+  std::for_each (m_incoming.begin (), m_incoming.end (),
+                 zero &= ll::bind (&LoadStatsFace::IsZero,
+                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+
+  std::for_each (m_outgoing.begin (), m_outgoing.end (),
+                 zero &= ll::bind (&LoadStatsFace::IsZero,
+                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+  zero &= m_pit.IsZero ();
+  
+  return zero;  
+}
+
+bool
+LoadStatsNode::operator == (const LoadStatsNode &other) const
+{
+  if (other.m_incoming.size () > 0 ||
+      other.m_outgoing.size () > 0 ||
+      !other.m_pit.IsZero ())
+    return false;
+
+  return IsZero ();
+}
+
 std::ostream&
 operator << (std::ostream &os, const LoadStatsNode &node)
 {
-  os << "PIT: " << node.m_pit << std::endl;
+  os << "PIT: " << node.m_pit;// << std::endl;
   return os;
 }
 

@@ -84,7 +84,7 @@ struct CcnxPitEntryOutgoingFaceContainer
  *
  * All set-methods are virtual, in case index rearrangement is necessary in the derived classes
  */
-struct CcnxPitEntry : SimpleRefCount<CcnxPitEntry>
+class CcnxPitEntry : public SimpleRefCount<CcnxPitEntry>
 {
 public:
   typedef std::set< CcnxPitEntryIncomingFace > in_container; ///< @brief incoming faces container type

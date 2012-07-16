@@ -50,6 +50,13 @@ CcnxNameComponents::CcnxNameComponents (const std::string &prefix)
   is >> *this;
 }
 
+CcnxNameComponents::CcnxNameComponents (const char *prefix)
+{
+  NS_ASSERT (prefix != 0);
+  
+  istringstream is (prefix);
+  is >> *this;
+}
 
 const std::list<std::string> &
 CcnxNameComponents::GetComponents () const

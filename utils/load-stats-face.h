@@ -59,6 +59,9 @@ public:
 
   LoadStatsFace &
   operator += (const LoadStatsFace &load);
+
+  bool
+  IsZero () const;
   
 private:
   LoadStats m_count;

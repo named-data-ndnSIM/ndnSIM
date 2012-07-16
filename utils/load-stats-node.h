@@ -89,15 +89,15 @@ public:
   pit () const;
 
   bool
-  operator == (const LoadStatsNode &other) const
-  {
-    return false;
-  }
-
+  IsZero () const;
+  
+  bool
+  operator == (const LoadStatsNode &other) const;
+  
   bool
   operator != (const LoadStatsNode &other) const
   {
-    return true;
+    return !(*this == other);
   }
 
   LoadStatsNode &

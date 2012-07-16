@@ -19,6 +19,7 @@
  */
 
 #include "load-stats.h"
+#include "ns3/log.h"
 
 using namespace ns3;
 
@@ -27,6 +28,8 @@ const double EXP_5  = exp (-5.0/300.0); /* 1/exp(5sec/5min) */
 const double EXP_15 = exp (-5.0/900.0); /* 1/exp(5sec/15min) */
 
 const double EPSILON = 0.000001;
+
+NS_LOG_COMPONENT_DEFINE ("LoadStats");
 
 namespace ndnSIM
 {
@@ -42,6 +45,8 @@ LoadStats::LoadStats ()
 void
 LoadStats::Step ()
 {
+  // NS_LOG_FUNCTION (this);
+
   // do magic
   avg1_  = EXP_1 * avg1_  + (1 - EXP_1)  * counter_;
   avg5_  = EXP_1 * avg5_  + (1 - EXP_5)  * counter_;
@@ -53,25 +58,17 @@ LoadStats::Step ()
 LoadStats &
 LoadStats::operator ++ (int)
 {
+  // NS_LOG_FUNCTION (this);
+
   counter_ ++;
   return *this;
 }
 
-// void
-// LoadStats::Increment (uint32_t amount)
-// {
-//   counter_ += amount;
-// }
-
-// uint32_t
-// LoadStats::GetCounter () const
-// {
-//   return counter_;
-// }
-
 LoadStats &
 LoadStats::operator += (const LoadStats &stats)
 {
+  // NS_LOG_FUNCTION (this << &stats << stats.counter_);
+
   counter_ += stats.counter_;
   return *this;
 }
@@ -83,9 +80,10 @@ LoadStats::GetStats () const
 }
 
 bool
-LoadStats::IsEmpty () const
+LoadStats::IsZero () const
 {
-  return (avg1_ < EPSILON &&
+  return (counter_ == 0 &&
+          avg1_ < EPSILON &&
 	  avg5_ < EPSILON &&
 	  avg15_ < EPSILON);
 }
@@ -93,8 +91,7 @@ LoadStats::IsEmpty () const
 std::ostream &
 operator << (std::ostream &os, const LoadStats &stats)
 {
-  LoadStats::stats_tuple data = stats.GetStats ();
-  os << data.get<0> () << ", " << data.get<1> () << ", " << data.get<2> ();// << std::endl;
+  os << stats.avg1_ << ", " << stats.avg5_ << ", " << stats.avg15_;
   return os;
 }
 

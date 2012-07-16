@@ -37,27 +37,28 @@ StatsTree::StatsTree ()
 void
 StatsTree::Step ()
 {
+  NS_LOG_FUNCTION (this);
+
   // walking the tree, aggregating and stepping on every node, starting the leaves
   // for (trie_type::
 
   WalkLeftRightRoot (&m_tree);
+  m_tree.payload ().Step ();
+  NS_LOG_DEBUG ("[" << m_tree.key () << "] " << m_tree.payload ());  
 }
 
 void
 StatsTree::NewPitEntry (const ns3::CcnxNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
-  NS_ASSERT (item.second == false); // should always return false
 
   item.first->payload ().NewPitEntry ();
-  NS_LOG_DEBUG ("NewPitEntry: " << item.first->payload ());
 }
 
 void
 StatsTree::Incoming (const CcnxNameComponents &key, Ptr<CcnxFace> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
-  NS_ASSERT (item.second == false); // should always return false
 
   item.first->payload ().AddIncoming (face);
 }
@@ -66,7 +67,6 @@ void
 StatsTree::Outgoing (const CcnxNameComponents &key, Ptr<CcnxFace> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
-  NS_ASSERT (item.second == false); // should always return false
 
   item.first->payload ().AddOutgoing (face);
 }
@@ -75,7 +75,6 @@ void
 StatsTree::Satisfy (const CcnxNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
-  NS_ASSERT (item.second == false); // should always return false
 
   item.first->payload ().Satisfy ();
 }
@@ -84,42 +83,49 @@ void
 StatsTree::Timeout (const CcnxNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
-  NS_ASSERT (item.second == false); // should always return false
 
   item.first->payload ().Timeout ();
 }
 
+// const LoadStatsNode &
+// StatsTree::Get (const ns3::CcnxNameComponents &key) const
 const LoadStatsNode &
-StatsTree::Get (const ns3::CcnxNameComponents &key) const
+StatsTree::operator [] (const ns3::CcnxNameComponents &key) const
 {
   tree_type::iterator foundItem, lastItem;
   bool reachLast;
   boost::tie (foundItem, reachLast, lastItem) = const_cast<tree_type&> (m_tree).find (key);
 
-  NS_ASSERT_MSG (foundItem == lastItem, "Found item should always be the same as last item (same address)");
-
-  return foundItem->payload ();
+  return lastItem->payload ();
 }
 
 const LoadStatsNode&
 StatsTree::WalkLeftRightRoot (tree_type *node)
 {
   tree_type::point_iterator item (*node), end;
-  
-  for (; item != end; item++)
+
+  while (item != end)
     {
       node->payload () += WalkLeftRightRoot (&*item);
-      NS_LOG_DEBUG (node << ", " << node->payload ());
-    }
+      item->payload ().Step ();
 
-  node->payload ().Step ();
+      NS_LOG_DEBUG ("[" << item->key () << "] " << item->payload ());
+      // item->prune (); // will do only if necessary
+
+      tree_type::point_iterator prune_iterator = item;
+      item++;
+
+      prune_iterator->prune ();
+    }
+  
   return node->payload ();
 }
 
 std::ostream &
 operator << (std::ostream &os, const StatsTree &tree)
 {
-  os << tree.m_tree.payload ();
+  // os << "[" << tree.m_tree.key () << "]: " << tree.m_tree.payload ();
+  os << tree.m_tree;
   return os;
 }
 

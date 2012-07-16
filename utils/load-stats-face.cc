@@ -58,6 +58,12 @@ LoadStatsFace::operator += (const LoadStatsFace &load)
   return *this;
 }
 
+bool
+LoadStatsFace::IsZero () const
+{
+  return m_count.IsZero () && m_satisfied.IsZero () && m_unsatisfied.IsZero ();
+}
+
 std::ostream &
 operator << (std::ostream &os, const LoadStatsFace &stats)
 {

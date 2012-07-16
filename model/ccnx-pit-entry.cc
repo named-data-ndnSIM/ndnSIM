@@ -41,10 +41,10 @@ CcnxPitEntry::CcnxPitEntry (CcnxPit &container,
                             Ptr<CcnxFibEntry> fibEntry)
   : m_container (container)
   , m_prefix (header->GetNamePtr ())
+  , m_fibEntry (fibEntry)
   , m_expireTime (Simulator::Now () + (!header->GetInterestLifetime ().IsZero ()?
                                        header->GetInterestLifetime ():
                                        Seconds (1.0)))
-  , m_fibEntry (fibEntry)
   , m_maxRetxCount (0)
 {
   // note that if interest lifetime is not set, the behavior is undefined
