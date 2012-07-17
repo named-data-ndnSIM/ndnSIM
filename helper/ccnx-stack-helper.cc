@@ -39,7 +39,9 @@
 
 #include "ns3/ccnx-forwarding-strategy.h"
 #include "ns3/ccnx-fib.h"
+#include "ns3/ccnx-pit.h"
 #include "ns3/ccnx-name-components.h"
+#include "ns3/ccnx-content-store.h"
 
 #include "ns3/node-list.h"
 // #include "ns3/loopback-net-device.h"

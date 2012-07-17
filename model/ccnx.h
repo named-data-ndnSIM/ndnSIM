@@ -131,64 +131,21 @@ public:
   virtual Ptr<CcnxFace>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const = 0;
 
-  /**
-   * \enum DropReason
-   * \brief A reason why the packet has been dropped
-   */
-  enum DropReason
-    {
-      DUPLICATED, // Interests
-      SUPPRESSED, // Interests and Nacks
-      NO_FACES,    // Interests
-      NON_DUPLICATED, // Nacks
-      AFTER_SATISFIED, // Nacks
-      UNSOLICITED,      // data
-      PIT_LIMIT         // PIT limit reached
-    };
-  
-protected:
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  
-  // transmittedInterestTrace is inside ForwardingStrategy
-  
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inInterests; ///< @brief trace of incoming Interests
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 DropReason,
-                 Ptr<const CcnxFace> > m_dropInterests; ///< @brief trace of dropped Interests
-  
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_outNacks; ///< @brief trace of outgoing NACKs
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inNacks; ///< @brief trace of incoming NACKs
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 DropReason,
-                 Ptr<const CcnxFace> > m_dropNacks; ///< @brief trace of dropped NACKs
-
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 bool /*from cache*/,
-                 Ptr<const CcnxFace> > m_outData; ///< @brief trace of outgoing Data
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<const CcnxFace> > m_inData; ///< @brief trace of incoming Data
-
-  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
-                  DropReason,
-                  Ptr<const CcnxFace> > m_dropData;  ///< @brief trace of dropped Data
-};
+  // /**
+  //  * \enum DropReason
+  //  * \brief A reason why the packet has been dropped
+  //  */
+  // enum DropReason
+  //   {
+  //     DUPLICATED, // Interests
+  //     SUPPRESSED, // Interests and Nacks
+  //     NO_FACES,    // Interests
+  //     NON_DUPLICATED, // Nacks
+  //     AFTER_SATISFIED, // Nacks
+  //     UNSOLICITED,      // data
+  //     PIT_LIMIT         // PIT limit reached
+  //   };
+  };
 
 } // namespace ns3 
 

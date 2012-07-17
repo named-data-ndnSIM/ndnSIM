@@ -19,9 +19,10 @@
  */
 
 #include "ccnx-pit-entry.h"
-#include "ccnx-name-components.h"
-#include "ccnx-fib.h"
-#include "ccnx-interest-header.h"
+
+#include "ns3/ccnx-fib.h"
+#include "ns3/ccnx-name-components.h"
+#include "ns3/ccnx-interest-header.h"
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"

@@ -24,9 +24,9 @@
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 
+#include "ns3/ccnx-fib.h"
 #include "ccnx-pit-entry-incoming-face.h"
 #include "ccnx-pit-entry-outgoing-face.h"
-#include "ccnx-fib.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>

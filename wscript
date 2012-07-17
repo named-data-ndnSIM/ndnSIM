@@ -56,13 +56,11 @@ def build(bld):
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
    
-    module.source = bld.path.ant_glob(['model/*.cc', 'apps/*.cc', 
+    module.source = bld.path.ant_glob(['model/**/*.cc',
+                                       'apps/*.cc',
                                        'utils/*.cc',
-                                       'helper/*.cc',
-                                       'helper/tracers/*.cc',
-                                       'helper/ccnb-parser/*.cc',
-                                       'helper/ccnb-parser/visitors/*.cc',
-                                       'helper/ccnb-parser/syntax-tree/*.cc'])
+                                       'helper/**/*.cc',
+                                       ])
 
     headers.source = [
         "helper/ccnx-stack-helper.h",
@@ -74,21 +72,21 @@ def build(bld):
         "apps/ccnx-app.h",
 
         "model/ccnx.h",
-        "model/ccnx-pit.h",
-        "model/ccnx-pit-entry.h",
-        "model/ccnx-pit-entry-incoming-face.h",
-        "model/ccnx-pit-entry-outgoing-face.h",
-        "model/ccnx-content-store.h",
-        "model/ccnx-fib.h",
-        "model/ccnx-fib-entry.h",
-        "model/ccnx-forwarding-strategy.h",
+        "model/pit/ccnx-pit.h",
+        "model/pit/ccnx-pit-entry.h",
+        "model/pit/ccnx-pit-entry-incoming-face.h",
+        "model/pit/ccnx-pit-entry-outgoing-face.h",
+        "model/content-store/ccnx-content-store.h",
+        "model/fib/ccnx-fib.h",
+        "model/fib/ccnx-fib-entry.h",
+        "model/forwarding-strategy/ccnx-forwarding-strategy.h",
         "model/ccnx-face.h",
         "model/ccnx-app-face.h",
         "model/ccnx-net-device-face.h",
         "model/ccnx-interest-header.h",
         "model/ccnx-content-object-header.h",
         "model/ccnx-name-components.h",
-        "model/ccnx-name-components-hash-helper.h",
+        # "model/ccnx-name-components-hash-helper.h",
 
         "utils/batches.h",
         # "utils/weights-path-stretch-tag.h",

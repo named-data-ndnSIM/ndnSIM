@@ -22,9 +22,10 @@
 #define	_CCNX_PIT_IMPL_H_
 
 #include "ccnx-pit.h"
-#include "../utils/trie-with-policy.h"
-#include "../utils/empty-policy.h"
-#include "../utils/persistent-policy.h"
+
+#include "../../utils/trie-with-policy.h"
+#include "../../utils/empty-policy.h"
+#include "../../utils/persistent-policy.h"
 
 #include "ccnx-pit-entry-impl.h"
 

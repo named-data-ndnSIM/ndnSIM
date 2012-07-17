@@ -30,9 +30,12 @@ namespace ns3 {
 
 class CcnxFace;
 class CcnxInterestHeader;
+class CcnxContentObjectHeader;
 class CcnxPit;
 class CcnxPitEntry;
 class CcnxFibFaceMetric;
+class CcnxFib;
+class CcnxContentStore;
 
 /**
  * \ingroup ccnx
@@ -50,6 +53,35 @@ public:
   virtual ~CcnxForwardingStrategy ();
 
   /**
+   * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
+   * 
+   * Processing Interest packets
+   * @param face    incoming face
+   * @param header  deserialized Interest header
+   * @param packet  original packet
+   */
+  virtual void
+  OnInterest (const Ptr<CcnxFace> &face,
+              Ptr<CcnxInterestHeader> &header,
+              const Ptr<const Packet> &p);
+
+  /**
+   * \brief Actual processing of incoming CCNx content objects
+   * 
+   * Processing ContentObject packets
+   * @param face    incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload data packet payload
+   * @param packet  original packet
+   */
+  virtual void
+  OnData (const Ptr<CcnxFace> &face,
+          Ptr<CcnxContentObjectHeader> &header,
+          Ptr<Packet> &payload,
+          const Ptr<const Packet> &packet);
+    
+// protected:
+  /**
    * @brief Base method to propagate the interest according to the forwarding strategy
    *
    * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
@@ -65,7 +97,7 @@ public:
                      const Ptr<CcnxFace> &incomingFace,
                      Ptr<CcnxInterestHeader> &header,
                      const Ptr<const Packet> &packet) = 0;
-    
+
 protected:
   /**
    * @brief Propagate interest via a green interface. Fail, if no green interfaces available
@@ -85,9 +117,15 @@ protected:
                              Ptr<CcnxInterestHeader> &header,
                              const Ptr<const Packet> &packet);
 
-  /// @brief Transmitted interests trace
-  TracedCallback<Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace> > m_transmittedInterestsTrace;
+  virtual void
+  GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
+                  Ptr<CcnxInterestHeader> header);
 
+  virtual void
+  OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
+                 Ptr<const Packet> payload,
+                 const Ptr<const Packet> &packet);
+  
 protected:
   // inherited from Object class                                                                                                                                                        
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
@@ -95,6 +133,50 @@ protected:
   
 protected:  
   Ptr<CcnxPit> m_pit; ///< \brief Reference to PIT to which this forwarding strategy is associated
+  Ptr<CcnxFib> m_fib; ///< \brief FIB  
+  Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
+
+  bool m_nacksEnabled;
+  bool m_cacheUnsolicitedData;
+
+  // transmittedInterestTrace is inside ForwardingStrategy
+  
+  
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_outInterests; ///< @brief Transmitted interests trace
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_inInterests; ///< @brief trace of incoming Interests
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_dropInterests; ///< @brief trace of dropped Interests
+  
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_outNacks; ///< @brief trace of outgoing NACKs
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_inNacks; ///< @brief trace of incoming NACKs
+
+  TracedCallback<Ptr<const CcnxInterestHeader>,
+                 Ptr<const CcnxFace> > m_dropNacks; ///< @brief trace of dropped NACKs
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                 bool /*from cache*/,
+                 Ptr<const CcnxFace> > m_outData; ///< @brief trace of outgoing Data
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<const CcnxFace> > m_inData; ///< @brief trace of incoming Data
+
+  TracedCallback<Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>,
+                  Ptr<const CcnxFace> > m_dropData;  ///< @brief trace of dropped Data
 };
 
 } //namespace ns3

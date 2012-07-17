@@ -19,12 +19,14 @@
  */
 
 #include "ccnx-pit-impl.h"
+
+#include "ns3/ccnx-interest-header.h"
+#include "ns3/ccnx-content-object-header.h"
+
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
-#include "ccnx-interest-header.h"
-#include "ccnx-content-object-header.h"
 
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>

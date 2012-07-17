@@ -24,8 +24,8 @@
 #include "ns3/ccnx-fib.h"
 #include "ns3/ccnx-name-components.h"
 
-#include "../utils/trie-with-policy.h"
-#include "../utils/counting-policy.h"
+#include "../../utils/trie-with-policy.h"
+#include "../../utils/counting-policy.h"
 
 namespace ns3 {
 

@@ -26,12 +26,12 @@
 
 #include "ccnx-content-store-impl.h"
 
-#include "../utils/trie.h"
-#include "../utils/trie-with-policy.h"
+#include "../../utils/trie.h"
+#include "../../utils/trie-with-policy.h"
 
-#include "../utils/lru-policy.h"
-#include "../utils/random-policy.h"
-#include "../utils/fifo-policy.h"
+#include "../../utils/lru-policy.h"
+#include "../../utils/random-policy.h"
+#include "../../utils/fifo-policy.h"
 
 namespace  ns3
 {

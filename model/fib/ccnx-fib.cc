@@ -20,12 +20,12 @@
 
 #include "ccnx-fib.h"
 
-#include "ccnx.h"
-#include "ccnx-face.h"
-#include "ccnx-interest-header.h"
-
-#include "ccnx-name-components.h"
 #include "ccnx-fib-impl.h"
+
+#include "ns3/ccnx.h"
+#include "ns3/ccnx-face.h"
+#include "ns3/ccnx-interest-header.h"
+#include "ns3/ccnx-name-components.h"
 
 #include "ns3/node.h"
 #include "ns3/names.h"

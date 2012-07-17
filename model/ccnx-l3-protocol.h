@@ -28,9 +28,9 @@
 #include "ns3/net-device.h"
 #include "ns3/nstime.h"
 
-#include "ccnx-content-store.h"
-#include "ccnx-pit.h"
-#include "ccnx-fib.h"
+// #include "ccnx-content-store.h"
+// #include "ccnx-pit.h"
+// #include "ccnx-fib.h"
 
 #include "ccnx.h"
 
@@ -106,46 +106,46 @@ private:
   void
   Receive (const Ptr<CcnxFace> &face, const Ptr<const Packet> &p);
 
-  /**
-   * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
-   * 
-   * Processing Interest packets
-   * @param face    incoming face
-   * @param header  deserialized Interest header
-   * @param packet  original packet
-   */
-  void
-  OnInterest (const Ptr<CcnxFace> &face,
-              Ptr<CcnxInterestHeader> &header,
-              const Ptr<const Packet> &p);
+  // /**
+  //  * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
+  //  * 
+  //  * Processing Interest packets
+  //  * @param face    incoming face
+  //  * @param header  deserialized Interest header
+  //  * @param packet  original packet
+  //  */
+  // void
+  // OnInterest (const Ptr<CcnxFace> &face,
+  //             Ptr<CcnxInterestHeader> &header,
+  //             const Ptr<const Packet> &p);
 
-  /**
-   * \brief Processing of incoming CCNx NACKs. Note, these packets, like interests, do not have payload
-   * 
-   * Processing NACK packets
-   * @param face    incoming face
-   * @param header  deserialized Interest header
-   * @param packet  original packet
-   */
-  void
-  OnNack (const Ptr<CcnxFace> &face,
-          Ptr<CcnxInterestHeader> &header,
-          const Ptr<const Packet> &p);
+  // /**
+  //  * \brief Processing of incoming CCNx NACKs. Note, these packets, like interests, do not have payload
+  //  * 
+  //  * Processing NACK packets
+  //  * @param face    incoming face
+  //  * @param header  deserialized Interest header
+  //  * @param packet  original packet
+  //  */
+  // void
+  // OnNack (const Ptr<CcnxFace> &face,
+  //         Ptr<CcnxInterestHeader> &header,
+  //         const Ptr<const Packet> &p);
   
-  /**
-   * \brief Actual processing of incoming CCNx content objects
-   * 
-   * Processing ContentObject packets
-   * @param face    incoming face
-   * @param header  deserialized ContentObject header
-   * @param payload data packet payload
-   * @param packet  original packet
-   */
-  void
-  OnData (const Ptr<CcnxFace> &face,
-          Ptr<CcnxContentObjectHeader> &header,
-          Ptr<Packet> &payload,
-          const Ptr<const Packet> &packet);
+  // /**
+  //  * \brief Actual processing of incoming CCNx content objects
+  //  * 
+  //  * Processing ContentObject packets
+  //  * @param face    incoming face
+  //  * @param header  deserialized ContentObject header
+  //  * @param payload data packet payload
+  //  * @param packet  original packet
+  //  */
+  // void
+  // OnData (const Ptr<CcnxFace> &face,
+  //         Ptr<CcnxContentObjectHeader> &header,
+  //         Ptr<Packet> &payload,
+  //         const Ptr<const Packet> &packet);
 
 protected:
   virtual void DoDispose (void); ///< @brief Do cleanup
@@ -160,14 +160,14 @@ private:
   CcnxL3Protocol(const CcnxL3Protocol &); ///< copy constructor is disabled
   CcnxL3Protocol &operator = (const CcnxL3Protocol &); ///< copy operator is disabled
 
-  void
-  GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
-                  Ptr<CcnxInterestHeader> header);
+  // void
+  // GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
+  //                 Ptr<CcnxInterestHeader> header);
 
-  void
-  OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
-                 Ptr<const Packet> payload,
-                 const Ptr<const Packet> &packet);
+  // void
+  // OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
+  //                Ptr<const Packet> payload,
+  //                const Ptr<const Packet> &packet);
   
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
@@ -177,12 +177,9 @@ private:
   // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ccnx stack is installed
   Ptr<CcnxForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
-  Ptr<CcnxPit> m_pit; ///< \brief PIT (pending interest table)
-  Ptr<CcnxFib> m_fib; ///< \brief FIB  
-  Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
-  bool m_nacksEnabled;
-  bool m_cacheUnsolicitedData;
+  // bool m_nacksEnabled;
+  // bool m_cacheUnsolicitedData;
 };
   
 } // Namespace ns3

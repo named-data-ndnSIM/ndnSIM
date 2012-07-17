@@ -30,7 +30,7 @@
 
 #include "ns3/ccnx-app-face.h"
 #include "ns3/ccnx-fib.h"
-#include "../model/ccnx-fib-impl.h"
+// #include "../model/ccnx-fib-impl.h"
 
 #include <boost/ref.hpp>
 #include <boost/lambda/lambda.hpp>
