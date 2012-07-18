@@ -41,7 +41,8 @@ class CcnxContentStore;
  * \ingroup ccnx
  * \brief Abstract base class for CCNx forwarding strategies
  */
-class CcnxForwardingStrategy : public Object
+class CcnxForwardingStrategy :
+    public Object
 {
 public:
   static TypeId GetTypeId (void);
@@ -80,7 +81,64 @@ public:
           Ptr<Packet> &payload,
           const Ptr<const Packet> &packet);
     
-// protected:
+protected:
+  // events
+  virtual void
+  DidReceiveDuplicateInterest (const Ptr<CcnxFace> &face,
+                               Ptr<CcnxInterestHeader> &header,
+                               const Ptr<const Packet> &packet,
+                               Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
+                               Ptr<CcnxInterestHeader> header,
+                               const Ptr<const Packet> &packet,
+                               Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                          Ptr<CcnxInterestHeader> header,
+                          const Ptr<const Packet> &packet);
+  
+  virtual void
+  DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                     Ptr<CcnxInterestHeader> header,
+                     const Ptr<const Packet> &packet,
+                     Ptr<CcnxPitEntry> pitEntry);
+
+  virtual bool
+  DetectRetransmittedInterest (const Ptr<CcnxFace> &incomingFace,
+                               Ptr<CcnxPitEntry> pitEntry);
+
+  // only for data received from network
+  virtual void
+  WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
+                              Ptr<CcnxPitEntry> pitEntry);
+
+  // for data received both from network and cache
+  virtual void
+  SatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace, // 0 allowed (from cache)
+                          Ptr<const CcnxContentObjectHeader> header,
+                          Ptr<const Packet> payload,
+                          const Ptr<const Packet> &packet,
+                          Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  DidReceiveUnsolicitedData (const Ptr<CcnxFace> &incomingFace,
+                             Ptr<const CcnxContentObjectHeader> header,
+                             Ptr<const Packet> payload);
+  
+  virtual bool
+  ShouldSuppressIncomingInterest (const Ptr<CcnxFace> &incomingFace,
+                                  Ptr<CcnxPitEntry> pitEntry);
+
+
+  virtual void
+  PropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                     Ptr<CcnxInterestHeader> &header,
+                     const Ptr<const Packet> &packet,
+                     Ptr<CcnxPitEntry> pitEntry);
+  
   /**
    * @brief Base method to propagate the interest according to the forwarding strategy
    *
@@ -93,38 +151,16 @@ public:
    * @return true if interest was successfully propagated, false if all options have failed
    */
   virtual bool
-  PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
-                     const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packet) = 0;
+  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                       Ptr<CcnxInterestHeader> &header,
+                       const Ptr<const Packet> &packet,
+                       Ptr<CcnxPitEntry> pitEntry) = 0;
 
-protected:
-  /**
-   * @brief Propagate interest via a green interface. Fail, if no green interfaces available
-   *
-   * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
-   * @param incomingFace  Incoming face
-   * @param header        CcnxInterestHeader
-   * @param packet        Original Interest packet
-   * @param sendCallback  Send callback
-   * @return true if interest was successfully propagated, false if all options have failed
-   *
-   * \see PropagateInterest
-   */
-  bool
-  PropagateInterestViaGreen (Ptr<CcnxPitEntry> pitEntry, 
-                             const Ptr<CcnxFace> &incomingFace,
-                             Ptr<CcnxInterestHeader> &header,
-                             const Ptr<const Packet> &packet);
 
-  virtual void
-  GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
-                  Ptr<CcnxInterestHeader> header);
-
-  virtual void
-  OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
-                 Ptr<const Packet> payload,
-                 const Ptr<const Packet> &packet);
+  // virtual void
+  // OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
+  //                Ptr<const Packet> payload,
+  //                const Ptr<const Packet> &packet);
   
 protected:
   // inherited from Object class                                                                                                                                                        
@@ -136,11 +172,8 @@ protected:
   Ptr<CcnxFib> m_fib; ///< \brief FIB  
   Ptr<CcnxContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
-  bool m_nacksEnabled;
   bool m_cacheUnsolicitedData;
-
-  // transmittedInterestTrace is inside ForwardingStrategy
-  
+  bool m_detectRetransmissions;
   
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<const CcnxFace> > m_outInterests; ///< @brief Transmitted interests trace
@@ -151,19 +184,6 @@ protected:
   TracedCallback<Ptr<const CcnxInterestHeader>,
                  Ptr<const CcnxFace> > m_dropInterests; ///< @brief trace of dropped Interests
   
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_outNacks; ///< @brief trace of outgoing NACKs
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inNacks; ///< @brief trace of incoming NACKs
-
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_dropNacks; ///< @brief trace of dropped NACKs
-
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////

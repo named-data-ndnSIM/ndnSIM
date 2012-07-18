@@ -19,7 +19,7 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ccnx-flooding-strategy.h"
+#include "best-route.h"
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-pit.h"
@@ -27,75 +27,62 @@
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/boolean.h"
 
-#include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("CcnxFloodingStrategy");
+NS_LOG_COMPONENT_DEFINE ("NdnSimBestRoute");
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndnSIM {
 
 using namespace __ccnx_private;
 
-NS_OBJECT_ENSURE_REGISTERED (CcnxFloodingStrategy);
-    
-TypeId CcnxFloodingStrategy::GetTypeId (void)
+NS_OBJECT_ENSURE_REGISTERED (BestRoute);
+  
+TypeId
+BestRoute::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::CcnxFloodingStrategy")
+  static TypeId tid = TypeId ("ns3::ndnSIM::BestRoute")
     .SetGroupName ("Ccnx")
-    .SetParent <CcnxForwardingStrategy> ()
-    .AddConstructor <CcnxFloodingStrategy> ()
-
-    .AddAttribute ("SmartFlooding",
-                   "If true then if a GREEN face exists, Interests will be sent only to such face (!only to one green face!)",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&CcnxFloodingStrategy::m_smartFlooding),
-                   MakeBooleanChecker ())
+    .SetParent <GreenYellowRed> ()
+    .AddConstructor <BestRoute> ()
     ;
   return tid;
 }
     
-CcnxFloodingStrategy::CcnxFloodingStrategy ()
+BestRoute::BestRoute ()
 {
 }
-
+    
 bool
-CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
-                                         const Ptr<CcnxFace> &incomingFace,
-                                         Ptr<CcnxInterestHeader> &header,
-                                         const Ptr<const Packet> &packet)
+BestRoute::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                                Ptr<CcnxInterestHeader> &header,
+                                const Ptr<const Packet> &packet,
+                                Ptr<CcnxPitEntry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
-  if (m_smartFlooding)
-    {
-      // Try to work out with just green faces
-      bool greenOk = PropagateInterestViaGreen (pitEntry, incomingFace, header, packet);
-      if (greenOk)
-        return true;
-      
-      // boo... :(
-    }
+
+  // Try to work out with just green faces
+  bool greenOk = super::DoPropagateInterest (incomingFace, header, packet, pitEntry);
+  if (greenOk)
+    return true;
 
   int propagatedCount = 0;
 
   BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
     {
-      NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
-      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
+      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
       
       if (metricFace.m_face == incomingFace) 
-        {
-          NS_LOG_DEBUG ("continue (same as incoming)");
-          continue; // same face as incoming, don't forward
-        }
+        continue; // same face as incoming, don't forward
+
+      if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
+        continue; // don't forward to face that we received interest from
 
       CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
         pitEntry->GetOutgoing ().find (metricFace.m_face);
@@ -103,10 +90,9 @@ CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry,
       if (outgoing != pitEntry->GetOutgoing ().end () &&
           outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
         {
-          NS_LOG_DEBUG ("continue (same as previous outgoing)");
+          NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount ());
           continue; // already forwarded before during this retransmission cycle
         }
-      NS_LOG_DEBUG ("max retx count: " << pitEntry->GetMaxRetxCount ());
 
       bool faceAvailable = metricFace.m_face->IsBelowLimit ();
       if (!faceAvailable) // huh...
@@ -123,10 +109,12 @@ CcnxFloodingStrategy::PropagateInterest (Ptr<CcnxPitEntry> pitEntry,
       m_outInterests (header, metricFace.m_face);
       
       propagatedCount++;
+      break; // do only once
     }
 
   NS_LOG_INFO ("Propagated to " << propagatedCount << " faces");
   return propagatedCount > 0;
 }
-    
-} //namespace ns3
+
+} // namespace ndnSIM
+} // namespace ns3

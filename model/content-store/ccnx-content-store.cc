@@ -58,7 +58,7 @@ CcnxContentStore::~CcnxContentStore ()
 
 //////////////////////////////////////////////////////////////////////
 
-CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxContentStoreEntry::CcnxContentStoreEntry (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
   : m_header (header)
   , m_packet (packet->Copy ())
 {

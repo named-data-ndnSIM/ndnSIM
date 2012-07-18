@@ -67,26 +67,20 @@ TypeId CcnxForwardingStrategy::GetTypeId (void)
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
-    .AddTraceSource ("OutNacks",  "OutNacks",  MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_outNacks))
-    .AddTraceSource ("InNacks",   "InNacks",   MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_inNacks))
-    .AddTraceSource ("DropNacks", "DropNacks", MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_dropNacks))
-    
-    ////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////
-
     .AddTraceSource ("OutData",  "OutData",  MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_outData))
     .AddTraceSource ("InData",   "InData",   MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_inData))
     .AddTraceSource ("DropData", "DropData", MakeTraceSourceAccessor (&CcnxForwardingStrategy::m_dropData))
 
-    .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&CcnxForwardingStrategy::m_nacksEnabled),
-                   MakeBooleanChecker ())
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
                    BooleanValue (false),
                    MakeBooleanAccessor (&CcnxForwardingStrategy::m_cacheUnsolicitedData),
                    MakeBooleanChecker ())
 
+    .AddAttribute ("DetectRetransmissions", "If non-duplicate interest is received on the same face more than once, "
+                                            "it is considered a retransmission",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&CcnxForwardingStrategy::m_detectRetransmissions),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -139,16 +133,17 @@ CcnxForwardingStrategy::OnInterest (const Ptr<CcnxFace> &incomingFace,
   if (pitEntry == 0)
     {
       pitEntry = m_pit->Create (header);
+      if (pitEntry != 0)
+        {
+          DidCreatePitEntry (incomingFace, header, packet, pitEntry);
+        }
+      else
+        {
+          FailedToCreatePitEntry (incomingFace, header, packet);
+          return;
+        }
     }
 
-  if (pitEntry == 0)
-    {
-      // if it is still not created, then give up processing
-      m_dropInterests (header, incomingFace);
-      return;
-    }
-  
-  bool isNew = pitEntry->GetIncoming ().size () == 0 && pitEntry->GetOutgoing ().size () == 0;
   bool isDuplicated = true;
   if (!pitEntry->IsNonceSeen (header->GetNonce ()))
     {
@@ -156,61 +151,9 @@ CcnxForwardingStrategy::OnInterest (const Ptr<CcnxFace> &incomingFace,
       isDuplicated = false;
     }
 
-  NS_LOG_FUNCTION (header->GetName () << header->GetNonce () << boost::cref (*incomingFace) << isDuplicated);
-
-  /////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////
-  //                                                                                     //
-  // !!!! IMPORTANT CHANGE !!!! Duplicate interests will create incoming face entry !!!! //
-  //                                                                                     //
-  /////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////
-  
-  // Data is not in cache
-  CcnxPitEntry::in_iterator inFace   = pitEntry->GetIncoming ().find (incomingFace);
-  CcnxPitEntry::out_iterator outFace = pitEntry->GetOutgoing ().find (incomingFace);
-
-  bool isRetransmitted = false;
-  
-  if (inFace != pitEntry->GetIncoming ().end ())
-    {
-      // CcnxPitEntryIncomingFace.m_arrivalTime keeps track arrival time of the first packet... why?
-
-      isRetransmitted = true;
-      // this is almost definitely a retransmission. But should we trust the user on that?
-    }
-  else
-    {
-      inFace = pitEntry->AddIncoming (incomingFace);
-    }
-  //////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////
-  
   if (isDuplicated) 
     {
-      NS_LOG_DEBUG ("Received duplicatie interest on " << *incomingFace);
-      m_dropInterests (header, incomingFace);
-
-      /**
-       * This condition will handle "routing" loops and also recently satisfied interests.
-       * Every time interest is satisfied, PIT entry (with empty incoming and outgoing faces)
-       * is kept for another small chunk of time.
-       */
-
-      if (m_nacksEnabled)
-        {
-          NS_LOG_DEBUG ("Sending NACK_LOOP");
-          header->SetNack (CcnxInterestHeader::NACK_LOOP);
-          Ptr<Packet> nack = Create<Packet> ();
-          nack->AddHeader (*header);
-
-          incomingFace->Send (nack);
-          m_outNacks (header, incomingFace);
-        }
-      
+      DidReceiveDuplicateInterest (incomingFace, header, packet, pitEntry);
       return;
     }
 
@@ -221,64 +164,25 @@ CcnxForwardingStrategy::OnInterest (const Ptr<CcnxFace> &incomingFace,
   if (contentObject != 0)
     {
       NS_ASSERT (contentObjectHeader != 0);      
-      NS_LOG_LOGIC("Found in cache");
 
-      OnDataDelayed (contentObjectHeader, payload, contentObject);
+      pitEntry->AddIncoming (incomingFace/*, Seconds (1.0)*/);
+      SatisfyPendingInterest (0, contentObjectHeader, payload, contentObject, pitEntry);
       return;
     }
 
-  // update PIT entry lifetime
-  pitEntry->UpdateLifetime (header->GetInterestLifetime ());
-  
-  if (outFace != pitEntry->GetOutgoing ().end ())
+  if (ShouldSuppressIncomingInterest (incomingFace, pitEntry))
     {
-      NS_LOG_DEBUG ("Non duplicate interests from the face we have sent interest to. Don't suppress");
-      // got a non-duplicate interest from the face we have sent interest to
-      // Probably, there is no point in waiting data from that face... Not sure yet
+      pitEntry->AddIncoming (incomingFace/*, header->GetInterestLifetime ()*/);
+      // update PIT entry lifetime
+      pitEntry->UpdateLifetime (header->GetInterestLifetime ());
 
-      // If we're expecting data from the interface we got the interest from ("producer" asks us for "his own" data)
-      // Mark interface YELLOW, but keep a small hope that data will come eventually.
-
-      // ?? not sure if we need to do that ?? ...
-      
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
-      // StaticCast<CcnxFibImpl> (m_fib)->modify(pitEntry->GetFibEntry (),
-      //                                          ll::bind (&CcnxFibEntry::UpdateStatus,
-      //                                                    ll::_1, incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW));
-    }
-  else
-    if (!isNew && !isRetransmitted)
-      {
-        // Suppress this interest if we're still expecting data from some other face
-        NS_LOG_DEBUG ("Suppress interests");
-        m_dropInterests (header, incomingFace);
-        return;
-      }
-  
-  /////////////////////////////////////////////////////////////////////
-  // Propagate
-  /////////////////////////////////////////////////////////////////////
-  
-  bool propagated = PropagateInterest (pitEntry, incomingFace, header, packet);
-
-  if (!propagated && isRetransmitted) //give another chance if retransmitted
-    {
-      // increase max number of allowed retransmissions
-      pitEntry->IncreaseAllowedRetxCount ();
-
-      // try again
-      propagated = PropagateInterest (pitEntry, incomingFace, header, packet);
-    }
-  
-  // ForwardingStrategy will try its best to forward packet to at least one interface.
-  // If no interests was propagated, then there is not other option for forwarding or
-  // ForwardingStrategy failed to find it. 
-  if (!propagated)
-    {
-      NS_LOG_DEBUG ("Not propagated");
+      // Suppress this interest if we're still expecting data from some other face
+      NS_LOG_DEBUG ("Suppress interests");
       m_dropInterests (header, incomingFace);
-      GiveUpInterest (pitEntry, header);
+      return;
     }
+
+  PropagateInterest (incomingFace, header, packet, pitEntry);
 }
 
 void
@@ -290,205 +194,220 @@ CcnxForwardingStrategy::OnData (const Ptr<CcnxFace> &incomingFace,
   NS_LOG_FUNCTION (incomingFace << header->GetName () << payload << packet);
   m_inData (header, payload, incomingFace);
   
-  // 1. Lookup PIT entry
+  // Lookup PIT entry
   Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
-  if (pitEntry != 0)
+  if (pitEntry == 0)
     {
-      // Note that with MultiIndex we need to modify entries indirectly
-
-      CcnxPitEntry::out_iterator out = pitEntry->GetOutgoing ().find (incomingFace);
-  
-      // If we have sent interest for this data via this face, then update stats.
-      if (out != pitEntry->GetOutgoing ().end ())
-        {
-          pitEntry->GetFibEntry ()->UpdateFaceRtt (incomingFace, Simulator::Now () - out->m_sendTime);
-          // StaticCast<CcnxFibImpl> (m_fib)->modify (pitEntry->GetFibEntry (),
-          //                                          ll::bind (&CcnxFibEntry::UpdateFaceRtt,
-          //                                                    ll::_1,
-          //                                                    incomingFace,
-          //                                                    Simulator::Now () - out->m_sendTime));
-        }
-      else
-        {
-          // Unsolicited data, but we're interested in it... should we get it?
-          // Potential hole for attacks
-
-          if (m_cacheUnsolicitedData)
-            {
-              // Optimistically add or update entry in the content store
-              m_contentStore->Add (header, payload);
-            }
-          else
-            {
-              NS_LOG_ERROR ("PIT entry for "<< header->GetName ()<<" is valid, "
-                            "but outgoing entry for interface "<< boost::cref(*incomingFace) <<" doesn't exist\n");
-            }
-          // ignore unsolicited data
-          return;
-        }
-
-      // Update metric status for the incoming interface in the corresponding FIB entry
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN);
-      // StaticCast<CcnxFibImpl>(m_fib)->modify (pitEntry->GetFibEntry (),
-      //                                          ll::bind (&CcnxFibEntry::UpdateStatus, ll::_1,
-      //                                                    incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN));
-  
+      DidReceiveUnsolicitedData (incomingFace, header, payload);
+      return;
+    }
+  else
+    {
       // Add or update entry in the content store
       m_contentStore->Add (header, payload);
-
-      pitEntry->RemoveIncoming (incomingFace);
-
-      if (pitEntry->GetIncoming ().size () == 0)
-        {
-          // Set pruning timout on PIT entry (instead of deleting the record)
-          m_pit->MarkErased (pitEntry);
-        }
-      else
-        {
-          OnDataDelayed (header, payload, packet);
-        }
     }
-  else
+
+  while (pitEntry != 0)
     {
-      NS_LOG_DEBUG ("Pit entry not found");
-      if (m_cacheUnsolicitedData)
-        {
-          // Optimistically add or update entry in the content store
-          m_contentStore->Add (header, payload);
-        }
-      else
-        {
-          // Drop data packet if PIT entry is not found
-          // (unsolicited data packets should not "poison" content store)
-      
-          //drop dulicated or not requested data packet
-          m_dropData (header, payload, incomingFace);
-        }
-      return; // do not process unsoliced data packets
+      // Do data plane performance measurements
+      WillSatisfyPendingInterest (incomingFace, pitEntry);
+
+      // Actually satisfy pending interest
+      SatisfyPendingInterest (incomingFace, header, payload, packet, pitEntry);
+
+      // Lookup another PIT entry
+      pitEntry = m_pit->Lookup (*header);
     }
 }
 
+
+void
+CcnxForwardingStrategy::DidReceiveDuplicateInterest (const Ptr<CcnxFace> &incomingFace,
+                                                     Ptr<CcnxInterestHeader> &header,
+                                                     const Ptr<const Packet> &packet,
+                                                     Ptr<CcnxPitEntry> pitEntry)
+{
+  NS_LOG_FUNCTION (this << *incomingFace);
+  /////////////////////////////////////////////////////////////////////////////////////////
+  //                                                                                     //
+  // !!!! IMPORTANT CHANGE !!!! Duplicate interests will create incoming face entry !!!! //
+  //                                                                                     //
+  /////////////////////////////////////////////////////////////////////////////////////////
+  pitEntry->AddIncoming (incomingFace);
+  m_dropInterests (header, incomingFace);
+}
+
+void
+CcnxForwardingStrategy::DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
+                                                     Ptr<CcnxInterestHeader> header,
+                                                     const Ptr<const Packet> &packet,
+                                                     Ptr<CcnxPitEntry> pitEntry)
+{
+  NS_LOG_FUNCTION (this << *incomingFace);
+  m_dropInterests (header, incomingFace);
+}
+
+void
+CcnxForwardingStrategy::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                                                Ptr<CcnxInterestHeader> header,
+                                                const Ptr<const Packet> &packet)
+{
+  NS_LOG_FUNCTION (this);
+  m_dropInterests (header, incomingFace);
+}
+  
+void
+CcnxForwardingStrategy::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                                           Ptr<CcnxInterestHeader> header,
+                                           const Ptr<const Packet> &packet,
+                                           Ptr<CcnxPitEntry> pitEntrypitEntry)
+{
+}
 
 bool
-CcnxForwardingStrategy::PropagateInterestViaGreen (Ptr<CcnxPitEntry> pitEntry, 
-                                                   const Ptr<CcnxFace> &incomingFace,
-                                                   Ptr<CcnxInterestHeader> &header,
-                                                   const Ptr<const Packet> &packet)
+CcnxForwardingStrategy::DetectRetransmittedInterest (const Ptr<CcnxFace> &incomingFace,
+                                                     Ptr<CcnxPitEntry> pitEntry)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT_MSG (m_pit != 0, "PIT should be aggregated with forwarding strategy");
+  CcnxPitEntry::in_iterator inFace = pitEntry->GetIncoming ().find (incomingFace);
 
-  int propagatedCount = 0;
+  bool isRetransmitted = false;
   
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
+  if (inFace != pitEntry->GetIncoming ().end ())
     {
-      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
-          metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)
-        break; //propagate only to green faces
-
-      if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
-        continue; // don't forward to face that we received interest from
-
-      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry->GetOutgoing ().find (metricFace.m_face);
-      
-      if (outgoing != pitEntry->GetOutgoing ().end () &&
-          outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
-        {
-          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry->GetMaxRetxCount ());
-          continue;
-        }
-      
-      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
-      if (!faceAvailable) // huh...
-        {
-          // let's try different green face
-          continue;
-        }
-
-      pitEntry->AddOutgoing (metricFace.m_face);
-
-      Ptr<Packet> packetToSend = packet->Copy ();
-
-      //transmission
-      metricFace.m_face->Send (packetToSend);
-      m_outInterests (header, metricFace.m_face);
-      
-      propagatedCount++;
-      break; // propagate only one interest
+      // this is almost definitely a retransmission. But should we trust the user on that?
+      isRetransmitted = true;
     }
 
-  return propagatedCount > 0;
+  return isRetransmitted;
 }
 
 void
-CcnxForwardingStrategy::OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
-                                       Ptr<const Packet> payload,
-                                       const Ptr<const Packet> &packet)
+CcnxForwardingStrategy::SatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
+                                                Ptr<const CcnxContentObjectHeader> header,
+                                                Ptr<const Packet> payload,
+                                                const Ptr<const Packet> &packet,
+                                                Ptr<CcnxPitEntry> pitEntry)
 {
-  // 1. Lookup PIT entry
-  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
-  if (pitEntry != 0)
+  if (incomingFace != 0)
+    pitEntry->RemoveIncoming (incomingFace);
+
+  //satisfy all pending incoming Interests
+  BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
     {
-      //satisfy all pending incoming Interests
-      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
-        {
-          incoming.m_face->Send (packet->Copy ());
-          m_outData (header, payload, false, incoming.m_face);
-          NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+      incoming.m_face->Send (packet->Copy ());
+      m_outData (header, payload, false, incoming.m_face);
+      NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
           
-          // successfull forwarded data trace
-        }
+      // successfull forwarded data trace
+    }
 
-      if (pitEntry->GetIncoming ().size () > 0)
-        {
-          // All incoming interests are satisfied. Remove them
-          pitEntry->ClearIncoming ();
+  // All incoming interests are satisfied. Remove them
+  pitEntry->ClearIncoming ();
 
-          // Remove all outgoing faces
-          pitEntry->ClearOutgoing ();
+  // Remove all outgoing faces
+  pitEntry->ClearOutgoing ();
           
-          // Set pruning timout on PIT entry (instead of deleting the record)
-          m_pit->MarkErased (pitEntry);
-        }
+  // Set pruning timout on PIT entry (instead of deleting the record)
+  m_pit->MarkErased (pitEntry);
+}
+
+void
+CcnxForwardingStrategy::DidReceiveUnsolicitedData (const Ptr<CcnxFace> &incomingFace,
+                                                   Ptr<const CcnxContentObjectHeader> header,
+                                                   Ptr<const Packet> payload)
+{
+  if (m_cacheUnsolicitedData)
+    {
+      // Optimistically add or update entry in the content store
+      m_contentStore->Add (header, payload);
     }
   else
     {
-      NS_LOG_DEBUG ("Pit entry not found (was satisfied and removed before)");
-      return; // do not process unsoliced data packets
+      // Drop data packet if PIT entry is not found
+      // (unsolicited data packets should not "poison" content store)
+      
+      //drop dulicated or not requested data packet
+      m_dropData (header, payload, incomingFace);
     }
 }
 
 void
-CcnxForwardingStrategy::GiveUpInterest (Ptr<CcnxPitEntry> pitEntry,
-                                        Ptr<CcnxInterestHeader> header)
+CcnxForwardingStrategy::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
+                                                    Ptr<CcnxPitEntry> pitEntry)
 {
-  NS_LOG_FUNCTION (this);
-
-  if (m_nacksEnabled)
+  CcnxPitEntry::out_iterator out = pitEntry->GetOutgoing ().find (incomingFace);
+  
+  // If we have sent interest for this data via this face, then update stats.
+  if (out != pitEntry->GetOutgoing ().end ())
     {
-      Ptr<Packet> packet = Create<Packet> ();
-      header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
-      packet->AddHeader (*header);
-
-      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
-        {
-          NS_LOG_DEBUG ("Send NACK for " << boost::cref (header->GetName ()) << " to " << boost::cref (*incoming.m_face));
-          incoming.m_face->Send (packet->Copy ());
-
-          m_outNacks (header, incoming.m_face);
-        }
-  
-      // All incoming interests cannot be satisfied. Remove them
-      pitEntry->ClearIncoming ();
-
-      // Remove also outgoing
-      pitEntry->ClearOutgoing ();
-  
-      // Set pruning timout on PIT entry (instead of deleting the record)
-      m_pit->MarkErased (pitEntry);
-    }
+      pitEntry->GetFibEntry ()->UpdateFaceRtt (incomingFace, Simulator::Now () - out->m_sendTime);
+    } 
 }
 
+bool
+CcnxForwardingStrategy::ShouldSuppressIncomingInterest (const Ptr<CcnxFace> &incomingFace,
+                                                        Ptr<CcnxPitEntry> pitEntry)
+{
+  bool isNew = pitEntry->GetIncoming ().size () == 0 && pitEntry->GetOutgoing ().size () == 0;
+
+  if (isNew) return false; // never suppress new interests
+  
+  bool isRetransmitted = m_detectRetransmissions && // a small guard
+                         DetectRetransmittedInterest (incomingFace, pitEntry);  
+
+  if (pitEntry->GetOutgoing ().find (incomingFace) != pitEntry->GetOutgoing ().end ())
+    {
+      NS_LOG_DEBUG ("Non duplicate interests from the face we have sent interest to. Don't suppress");
+      // got a non-duplicate interest from the face we have sent interest to
+      // Probably, there is no point in waiting data from that face... Not sure yet
+
+      // If we're expecting data from the interface we got the interest from ("producer" asks us for "his own" data)
+      // Mark interface YELLOW, but keep a small hope that data will come eventually.
+
+      // ?? not sure if we need to do that ?? ...
+      
+      // pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
+    }
+  else
+    if (!isNew && !isRetransmitted)
+      {
+        return true;
+      }
+
+  return false;
+}
+
+void
+CcnxForwardingStrategy::PropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                                           Ptr<CcnxInterestHeader> &header,
+                                           const Ptr<const Packet> &packet,
+                                           Ptr<CcnxPitEntry> pitEntry)
+{
+  bool isRetransmitted = m_detectRetransmissions && // a small guard
+                         DetectRetransmittedInterest (incomingFace, pitEntry);  
+  
+  pitEntry->AddIncoming (incomingFace/*, header->GetInterestLifetime ()*/);
+  /// @todo Make lifetime per incoming interface
+  pitEntry->UpdateLifetime (header->GetInterestLifetime ());
+  
+  bool propagated = DoPropagateInterest (incomingFace, header, packet, pitEntry);
+
+  if (!propagated && isRetransmitted) //give another chance if retransmitted
+    {
+      // increase max number of allowed retransmissions
+      pitEntry->IncreaseAllowedRetxCount ();
+
+      // try again
+      propagated = DoPropagateInterest (incomingFace, header, packet, pitEntry);
+    }
+
+  // ForwardingStrategy will try its best to forward packet to at least one interface.
+  // If no interests was propagated, then there is not other option for forwarding or
+  // ForwardingStrategy failed to find it. 
+  if (!propagated && pitEntry->GetOutgoing ().size () == 0)
+    {
+      DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
+    }
+}
 
 } //namespace ns3

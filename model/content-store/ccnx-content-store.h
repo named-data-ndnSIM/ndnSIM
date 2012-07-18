@@ -59,7 +59,7 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  CcnxContentStoreEntry (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+  CcnxContentStoreEntry (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet);
 
   /**
    * \brief Get prefix of the stored entry
@@ -90,7 +90,7 @@ public:
   GetFullyFormedCcnxPacket () const;
 
 private:
-  Ptr<CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
+  Ptr<const CcnxContentObjectHeader> m_header; ///< \brief non-modifiable CcnxContentObjectHeader
   Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
 };
 
@@ -138,7 +138,7 @@ public:
    * @returns true if an existing entry was updated, false otherwise
    */
   virtual bool
-  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet) = 0;
+  Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet) = 0;
 
   // /**
   //  * \brief Add a new content to the content store.

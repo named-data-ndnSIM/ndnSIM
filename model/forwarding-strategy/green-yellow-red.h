@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -15,47 +15,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
-
-#ifndef CCNX_FLOODING_STRATEGY_H
-#define CCNX_FLOODING_STRATEGY_H
+#ifndef NDNSIM_GREEN_YELLOW_RED_H
+#define NDNSIM_GREEN_YELLOW_RED_H
 
 #include "ccnx-forwarding-strategy.h"
 
-namespace ns3 
-{
-    
-class CcnxFace;
-class CcnxInterestHeader;
-    
+namespace ns3 {
+namespace ndnSIM {
+
 /**
  * \ingroup ccnx
- * \brief Flooding strategy
- *
- * \todo Describe
  */
-class CcnxFloodingStrategy : public CcnxForwardingStrategy
+class GreenYellowRed :
+    public CcnxForwardingStrategy
 {
 public:
   static TypeId GetTypeId (void);
 
-  /**
-   * @brief Default constructor
-   */
-  CcnxFloodingStrategy ();
+protected:
+  virtual void
+  WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
+                              Ptr<CcnxPitEntry> pitEntry);
 
-  // inherited from  CcnxForwardingStrategy
   virtual bool
-  PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
-                     const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packet);
+  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                       Ptr<CcnxInterestHeader> &header,
+                       const Ptr<const Packet> &packet,
+                       Ptr<CcnxPitEntry> pitEntry);
 
 private:
-  bool m_smartFlooding;
+  typedef CcnxForwardingStrategy super;
 };
-    
-} //namespace ns3
 
-#endif /* CCNX_FLOODING_STRATEGY_H */
+} // namespace ndnSIM
+} // namespace ns3
+
+#endif // NDNSIM_GREEN_YELLOW_RED

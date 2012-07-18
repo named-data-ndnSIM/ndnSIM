@@ -15,28 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
+#ifndef NDNSIM_SMART_FLOODING_H
+#define NDNSIM_SMART_FLOODING_H
 
-#ifndef CCNX_BESTROUTE_STRATEGY_H
-#define CCNX_BESTROUTE_STRATEGY_H
+#include "green-yellow-red.h"
 
-#include "ccnx-forwarding-strategy.h"
+namespace ns3 {
+namespace ndnSIM {
 
-namespace ns3 
-{
-    
-class CcnxFace;
-class CcnxInterestHeader;
-    
 /**
  * \ingroup ccnx
- * \brief Best route strategy
- *
- * \todo Describe
  */
-class CcnxBestRouteStrategy : public CcnxForwardingStrategy
+class SmartFlooding :
+    public GreenYellowRed
 {
 public:
   static TypeId GetTypeId (void);
@@ -44,16 +38,20 @@ public:
   /**
    * @brief Default constructor
    */
-  CcnxBestRouteStrategy ();
-        
-  // inherited from  CcnxForwardingStrategy
+  SmartFlooding ();
+
+  // inherited
   virtual bool
-  PropagateInterest (Ptr<CcnxPitEntry> pitEntry, 
-                     const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> &header,
-                     const Ptr<const Packet> &packet);
+  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
+                       Ptr<CcnxInterestHeader> &header,
+                       const Ptr<const Packet> &packet,
+                       Ptr<CcnxPitEntry> pitEntry);
+
+private:
+  typedef GreenYellowRed super;
 };
 
-} //namespace ns3
+} // namespace ndnSIM
+} // namespace ns3
 
-#endif /* CCNX_BESTROUTE_STRATEGY_H */
+#endif // NDNSIM_SMART_FLOODING_H

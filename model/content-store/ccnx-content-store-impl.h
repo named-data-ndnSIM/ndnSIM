@@ -41,7 +41,7 @@ public:
   Lookup (Ptr<const CcnxInterestHeader> interest);
             
   virtual inline bool
-  Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet);
+  Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet);
 
   // virtual bool
   // Remove (Ptr<CcnxInterestHeader> header);
@@ -79,7 +79,7 @@ CcnxContentStoreImpl<Container>::Lookup (Ptr<const CcnxInterestHeader> interest)
     
 template<class Container>
 bool 
-CcnxContentStoreImpl<Container>::Add (Ptr<CcnxContentObjectHeader> header, Ptr<const Packet> packet)
+CcnxContentStoreImpl<Container>::Add (Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> packet)
 {
   // NS_LOG_FUNCTION (this << header->GetName ());
 
