@@ -70,10 +70,10 @@ protected:
           Ptr<CcnxInterestHeader> &header,
           const Ptr<const Packet> &p);
 
-  // virtual void
-  // OnDataDelayed (Ptr<const CcnxContentObjectHeader> header,
-  //                Ptr<const Packet> payload,
-  //                const Ptr<const Packet> &packet);
+  virtual void
+  DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+                       uint32_t nackCode,
+                       Ptr<CcnxPitEntry> pitEntry);
   
 protected:  
   bool m_nacksEnabled;

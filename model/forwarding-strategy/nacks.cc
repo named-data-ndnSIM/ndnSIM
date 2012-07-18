@@ -83,11 +83,50 @@ Nacks::OnInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-Nacks::OnNack (const Ptr<CcnxFace> &face,
+Nacks::OnNack (const Ptr<CcnxFace> &incomingFace,
                Ptr<CcnxInterestHeader> &header,
-               const Ptr<const Packet> &p)
+               const Ptr<const Packet> &packet)
 {
-  NS_ASSERT (false);
+  NS_ASSERT (m_nacksEnabled);
+
+  // NS_LOG_FUNCTION (incomingFace << header << packet);
+  m_inNacks (header, incomingFace);
+
+  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  if (pitEntry == 0)
+    {
+      // somebody is doing something bad
+      m_dropNacks (header, incomingFace);
+      return;
+    }
+  
+  // This was done in error. Never, never do anything, except normal leakage. This way we ensure that we will not have losses,
+  // at least when there is only one client
+  //
+  // incomingFace->LeakBucketByOnePacket ();
+
+  pitEntry->SetWaitingInVain (incomingFace);
+
+  DidReceiveValidNack (incomingFace, header->GetNack (), pitEntry);
+  
+  if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
+    {
+      NS_LOG_DEBUG ("Not all outgoing are in vain");
+      // suppress
+      // Don't do anything, we are still expecting data from some other face
+      m_dropNacks (header, incomingFace);
+      return;
+    }
+  
+  Ptr<Packet> nonNackInterest = Create<Packet> ();
+  header->SetNack (CcnxInterestHeader::NORMAL_INTEREST);
+  nonNackInterest->AddHeader (*header);
+  
+  bool propagated = DoPropagateInterest (incomingFace, header, nonNackInterest, pitEntry);
+  if (!propagated)
+    {
+      DidExhaustForwardingOptions (incomingFace, header, nonNackInterest, pitEntry);
+    }  
 }
 
 void
@@ -143,6 +182,20 @@ Nacks::DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
     }  
 }
 
+void
+Nacks::DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+                            uint32_t nackCode,
+                            Ptr<CcnxPitEntry> pitEntry)
+{
+  // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
+  // So, if we had an incoming entry to this neighbor, then we can remove it now
+  if (nackCode == CcnxInterestHeader::NACK_GIVEUP_PIT)
+    {
+      pitEntry->RemoveIncoming (incomingFace);
+    }
+
+  pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
+}
 
 } // namespace ndnSIM
 } // namespace ns3

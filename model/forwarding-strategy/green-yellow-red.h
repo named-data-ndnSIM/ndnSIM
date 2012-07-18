@@ -21,7 +21,7 @@
 #ifndef NDNSIM_GREEN_YELLOW_RED_H
 #define NDNSIM_GREEN_YELLOW_RED_H
 
-#include "ccnx-forwarding-strategy.h"
+#include "nacks.h"
 
 namespace ns3 {
 namespace ndnSIM {
@@ -30,7 +30,7 @@ namespace ndnSIM {
  * \ingroup ccnx
  */
 class GreenYellowRed :
-    public CcnxForwardingStrategy
+    public Nacks
 {
 public:
   static TypeId GetTypeId (void);
@@ -45,9 +45,13 @@ protected:
                        Ptr<CcnxInterestHeader> &header,
                        const Ptr<const Packet> &packet,
                        Ptr<CcnxPitEntry> pitEntry);
+  virtual void
+  DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+                       uint32_t nackCode,
+                       Ptr<CcnxPitEntry> pitEntry);
 
 private:
-  typedef CcnxForwardingStrategy super;
+  typedef Nacks super;
 };
 
 } // namespace ndnSIM

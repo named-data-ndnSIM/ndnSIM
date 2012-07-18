@@ -205,8 +205,10 @@ public:
   /**
    * @brief Flag outgoing face as hopeless
    */
+  // virtual void
+  // SetWaitingInVain (out_iterator face);
   virtual void
-  SetWaitingInVain (out_iterator face);
+  SetWaitingInVain (Ptr<CcnxFace> face);
   
   /**
    * @brief Check if all outgoing faces are NACKed

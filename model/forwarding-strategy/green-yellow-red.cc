@@ -58,7 +58,7 @@ GreenYellowRed::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndnSIM::GreenYellowRed")
     .SetGroupName ("Ccnx")
-    .SetParent<CcnxForwardingStrategy> ()
+    .SetParent<Nacks> ()
 
     ;
   return tid;
@@ -125,6 +125,20 @@ GreenYellowRed::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
 
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
 }
+
+void
+GreenYellowRed::DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+                                     uint32_t nackCode,
+                                     Ptr<CcnxPitEntry> pitEntry)
+{
+  super::DidReceiveValidNack (incomingFace, nackCode, pitEntry);
+
+  if (nackCode != CcnxInterestHeader::NACK_LOOP)
+    {
+      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
+    }
+}
+
 
 } // namespace ndnSIM
 } // namespace ns3

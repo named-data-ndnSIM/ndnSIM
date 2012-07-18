@@ -111,14 +111,28 @@ CcnxPitEntry::RemoveAllReferencesToFace (Ptr<CcnxFace> face)
     m_outgoing.erase (outgoing);
 }
 
-void
-CcnxPitEntry::SetWaitingInVain (CcnxPitEntry::out_iterator face)
-{
-  NS_LOG_DEBUG (boost::cref (*face->m_face));
+// void
+// CcnxPitEntry::SetWaitingInVain (CcnxPitEntry::out_iterator face)
+// {
+//   NS_LOG_DEBUG (boost::cref (*face->m_face));
 
-  m_outgoing.modify (face,
+//   m_outgoing.modify (face,
+//                      (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain = true);
+// }
+
+void
+CcnxPitEntry::SetWaitingInVain (Ptr<CcnxFace> face)
+{
+  // NS_LOG_DEBUG (boost::cref (*face->m_face));
+
+  out_iterator item = m_outgoing.find (face);
+  if (item == m_outgoing.end ())
+    return;
+  
+  m_outgoing.modify (item,
                      (&ll::_1)->*&CcnxPitEntryOutgoingFace::m_waitingInVain = true);
 }
+
 
 bool
 CcnxPitEntry::AreAllOutgoingInVain () const
