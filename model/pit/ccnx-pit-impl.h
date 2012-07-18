@@ -113,6 +113,7 @@ private:
 private:
   EventId m_cleanEvent;
   Ptr<CcnxFib> m_fib; ///< \brief Link to FIB table
+  Ptr<CcnxForwardingStrategy> m_forwardingStrategy;
 
   // indexes
   typedef

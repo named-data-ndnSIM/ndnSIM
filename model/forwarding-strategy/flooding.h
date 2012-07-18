@@ -48,7 +48,7 @@ protected:
   // inherited from  Nacks/CcnxForwardingStrategy
   virtual bool
   DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                       Ptr<CcnxInterestHeader> &header,
+                       Ptr<CcnxInterestHeader> header,
                        const Ptr<const Packet> &packet,
                        Ptr<CcnxPitEntry> pitEntry);
 

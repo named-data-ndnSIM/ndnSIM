@@ -80,7 +80,10 @@ public:
           Ptr<CcnxContentObjectHeader> &header,
           Ptr<Packet> &payload,
           const Ptr<const Packet> &packet);
-    
+
+  virtual void
+  WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);
+  
 protected:
   // events
   virtual void
@@ -110,7 +113,8 @@ protected:
   DetectRetransmittedInterest (const Ptr<CcnxFace> &incomingFace,
                                Ptr<CcnxPitEntry> pitEntry);
 
-  // only for data received from network
+  // makes sense only for data received from network
+  // When Interest is satisfied from the cache, incoming face is 0
   virtual void
   WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
                               Ptr<CcnxPitEntry> pitEntry);
@@ -132,10 +136,28 @@ protected:
   ShouldSuppressIncomingInterest (const Ptr<CcnxFace> &incomingFace,
                                   Ptr<CcnxPitEntry> pitEntry);
 
+  /**
+   * @brief Event fired before actually sending out an interest
+   *
+   * If event returns false, then there is some kind of a problem (e.g., per-face limit reached)
+   */
+  virtual bool
+  WillSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
+                       Ptr<CcnxInterestHeader> header,
+                       Ptr<CcnxPitEntry> pitEntry);
+
+  /**
+   * @brief Event fired just after sending out an interest
+   */
+  virtual void
+  DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
+                       Ptr<CcnxInterestHeader> header,
+                       Ptr<CcnxPitEntry> pitEntry);
+  
 
   virtual void
   PropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> &header,
+                     Ptr<CcnxInterestHeader> header,
                      const Ptr<const Packet> &packet,
                      Ptr<CcnxPitEntry> pitEntry);
   
@@ -152,7 +174,7 @@ protected:
    */
   virtual bool
   DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                       Ptr<CcnxInterestHeader> &header,
+                       Ptr<CcnxInterestHeader> header,
                        const Ptr<const Packet> &packet,
                        Ptr<CcnxPitEntry> pitEntry) = 0;
 

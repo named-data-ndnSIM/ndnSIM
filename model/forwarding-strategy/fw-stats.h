@@ -16,14 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 
-#ifndef NDNSIM_BEST_ROUTE_H
-#define NDNSIM_BEST_ROUTE_H
+#ifndef NDNSIM_FW_STATS_H
+#define NDNSIM_FW_STATS_H
 
-#include "green-yellow-red.h"
+#include "best-route.h"
+#include "../../utils/stats-tree.h"
 
 namespace ns3 {
 namespace ndnSIM {
@@ -32,8 +32,8 @@ namespace ndnSIM {
  * \ingroup ccnx
  * \brief Best route strategy
  */
-class BestRoute :
-    public GreenYellowRed
+class FwStats :
+    public BestRoute
 {
 public:
   static TypeId
@@ -42,20 +42,34 @@ public:
   /**
    * @brief Default constructor
    */
-  BestRoute ();
-        
-  // inherited from  CcnxForwardingStrategy
-  virtual bool
-  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                       Ptr<CcnxInterestHeader> header,
-                       const Ptr<const Packet> &packet,
-                       Ptr<CcnxPitEntry> pitEntry);
+  FwStats ();
 
+protected:
+  virtual void
+  DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                     Ptr<CcnxInterestHeader> header,
+                     const Ptr<const Packet> &packet,
+                     Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
+                              Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
+                      Ptr<CcnxInterestHeader> header,
+                      Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);
+    
 private:
-  typedef GreenYellowRed super;
+  ::ndnSIM::StatsTree m_stats;
+  
+  typedef BestRoute super;
 };
 
 } // namespace ndnSIM
 } // namespace ns3
 
-#endif // NDNSIM_BEST_ROUTE_H
+#endif // NDNSIM_FW_STATS_H

@@ -66,7 +66,7 @@ GreenYellowRed::GetTypeId (void)
 
 bool
 GreenYellowRed::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                                     Ptr<CcnxInterestHeader> &header,
+                                     Ptr<CcnxInterestHeader> header,
                                      const Ptr<const Packet> &packet,
                                      Ptr<CcnxPitEntry> pitEntry)
 {
@@ -84,30 +84,16 @@ GreenYellowRed::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
       if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
         continue; // don't forward to face that we received interest from
 
-      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry->GetOutgoing ().find (metricFace.m_face);
-      
-      if (outgoing != pitEntry->GetOutgoing ().end () &&
-          outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
+      if (!WillSendOutInterest (metricFace.m_face, header, pitEntry))
         {
-          NS_LOG_DEBUG ("retxCount: " << outgoing->m_retxCount << ", maxRetxCount: " << pitEntry->GetMaxRetxCount ());
           continue;
         }
-      
-      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
-      if (!faceAvailable) // huh...
-        {
-          // let's try different green face
-          continue;
-        }
-
-      pitEntry->AddOutgoing (metricFace.m_face);
-
-      Ptr<Packet> packetToSend = packet->Copy ();
 
       //transmission
+      Ptr<Packet> packetToSend = packet->Copy ();
       metricFace.m_face->Send (packetToSend);
-      m_outInterests (header, metricFace.m_face);
+
+      DidSendOutInterest (metricFace.m_face, header, pitEntry);
       
       propagatedCount++;
       break; // propagate only one interest

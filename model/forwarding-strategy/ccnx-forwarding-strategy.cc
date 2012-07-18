@@ -28,6 +28,7 @@
 #include "ns3/ccnx-pit.h"
 #include "ns3/ccnx-fib.h"
 #include "ns3/ccnx-content-store.h"
+#include "ns3/ccnx-face.h"
 
 #include "ns3/assert.h"
 #include "ns3/ptr.h"
@@ -166,6 +167,11 @@ CcnxForwardingStrategy::OnInterest (const Ptr<CcnxFace> &incomingFace,
       NS_ASSERT (contentObjectHeader != 0);      
 
       pitEntry->AddIncoming (incomingFace/*, Seconds (1.0)*/);
+
+      // Do data plane performance measurements
+      WillSatisfyPendingInterest (0, pitEntry);
+
+      // Actually satisfy pending interest
       SatisfyPendingInterest (0, contentObjectHeader, payload, contentObject, pitEntry);
       return;
     }
@@ -379,7 +385,7 @@ CcnxForwardingStrategy::ShouldSuppressIncomingInterest (const Ptr<CcnxFace> &inc
 
 void
 CcnxForwardingStrategy::PropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                                           Ptr<CcnxInterestHeader> &header,
+                                           Ptr<CcnxInterestHeader> header,
                                            const Ptr<const Packet> &packet,
                                            Ptr<CcnxPitEntry> pitEntry)
 {
@@ -408,6 +414,44 @@ CcnxForwardingStrategy::PropagateInterest (const Ptr<CcnxFace> &incomingFace,
     {
       DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
     }
+}
+
+bool
+CcnxForwardingStrategy::WillSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
+                                             Ptr<CcnxInterestHeader> header,
+                                             Ptr<CcnxPitEntry> pitEntry)
+{
+  CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
+    pitEntry->GetOutgoing ().find (outgoingFace);
+      
+  if (outgoing != pitEntry->GetOutgoing ().end () &&
+      outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
+    {
+      NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount ());
+      return false; // already forwarded before during this retransmission cycle
+    }
+
+  
+  bool ok = outgoingFace->IsBelowLimit ();
+  if (!ok)
+    return false;
+
+  pitEntry->AddOutgoing (outgoingFace);
+  return true;
+}
+
+void
+CcnxForwardingStrategy::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
+                                            Ptr<CcnxInterestHeader> header,
+                                            Ptr<CcnxPitEntry> pitEntry)
+{
+  m_outInterests (header, outgoingFace);
+}
+
+void
+CcnxForwardingStrategy::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)
+{
+  // do nothing for now. may be need to do some logging
 }
 
 } //namespace ns3

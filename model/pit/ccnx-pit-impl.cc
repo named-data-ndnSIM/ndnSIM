@@ -22,6 +22,7 @@
 
 #include "ns3/ccnx-interest-header.h"
 #include "ns3/ccnx-content-object-header.h"
+#include "ns3/ccnx-forwarding-strategy.h"
 
 #include "ns3/log.h"
 #include "ns3/string.h"
@@ -100,12 +101,23 @@ CcnxPitImpl::NotifyNewAggregate ()
     {
       m_fib = GetObject<CcnxFib> ();
     }
+  if (m_forwardingStrategy == 0)
+    {
+      m_forwardingStrategy = GetObject<CcnxForwardingStrategy> ();
+    }
+
+  CcnxPit::NotifyNewAggregate ();
 }
 
 void 
 CcnxPitImpl::DoDispose ()
 {
   super::clear ();
+
+  m_forwardingStrategy = 0;
+  m_fib = 0;
+
+  CcnxPit::DoDispose ();
 }
 
 void CcnxPitImpl::RescheduleCleaning ()
@@ -139,6 +151,7 @@ CcnxPitImpl::CleanExpired ()
       time_index::iterator entry = i_time.begin ();
       if (entry->GetExpireTime () <= now) // is the record stale?
         {
+          m_forwardingStrategy->WillErasePendingInterest (entry->to_iterator ()->payload ());
           super::erase (entry->to_iterator ());
       //     // count ++;
         }
@@ -166,6 +179,7 @@ CcnxPitImpl::Lookup (const CcnxInterestHeader &header)
 {
   NS_LOG_FUNCTION (header.GetName ());
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
+  NS_ASSERT_MSG (m_forwardingStrategy != 0, "Forwarding strategy  should be set");
 
   super::iterator foundItem, lastItem;
   bool reachLast;

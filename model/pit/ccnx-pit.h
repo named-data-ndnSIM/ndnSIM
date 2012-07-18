@@ -147,35 +147,6 @@ public:
   static inline Ptr<CcnxPit>
   GetCcnxPit (Ptr<Object> node);
 
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-private:
-  // /**
-  //  * @brief Remove expired records from PIT
-  //  */
-  // void
-  // CleanExpired ();
-  
-  // /**
-  //  * \brief Set cleanup timeout
-  //  *
-  //  * Side effect: current clean up even (if any) will be cancelled and a new event started
-  //  *
-  //  * \param timeout cleanup timeout
-  //  */
-  // void
-  // SetCleanupTimeout (const Time &timeout);
-
-  // /**
-  //  * \brief Get cleanup timeout
-  //  *
-  //  * \returns cleanup timeout
-  //  */
-  // Time
-  // GetCleanupTimeout () const;
-  
 protected:
   // configuration variables. Check implementation of GetTypeId for more details
   Time    m_PitEntryPruningTimout;

@@ -61,7 +61,7 @@ Flooding::Flooding ()
 
 bool
 Flooding::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                               Ptr<CcnxInterestHeader> &header,
+                               Ptr<CcnxInterestHeader> header,
                                const Ptr<const Packet> &packet,
                                Ptr<CcnxPitEntry> pitEntry)
 {
@@ -81,30 +81,16 @@ Flooding::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
           continue; // same face as incoming, don't forward
         }
 
-      CcnxPitEntryOutgoingFaceContainer::type::iterator outgoing =
-        pitEntry->GetOutgoing ().find (metricFace.m_face);
-      
-      if (outgoing != pitEntry->GetOutgoing ().end () &&
-          outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
-        {
-          NS_LOG_DEBUG ("continue (same as previous outgoing)");
-          continue; // already forwarded before during this retransmission cycle
-        }
-      NS_LOG_DEBUG ("max retx count: " << pitEntry->GetMaxRetxCount ());
-
-      bool faceAvailable = metricFace.m_face->IsBelowLimit ();
-      if (!faceAvailable) // huh...
+      if (!WillSendOutInterest (metricFace.m_face, header, pitEntry))
         {
           continue;
         }
 
-      pitEntry->AddOutgoing (metricFace.m_face);
-
-      Ptr<Packet> packetToSend = packet->Copy ();
-
       //transmission
+      Ptr<Packet> packetToSend = packet->Copy ();
       metricFace.m_face->Send (packetToSend);
-      m_outInterests (header, metricFace.m_face);
+
+      DidSendOutInterest (metricFace.m_face, header, pitEntry);
       
       propagatedCount++;
     }

@@ -117,7 +117,7 @@ CcnxL3Protocol::NotifyNewAggregate ()
   //     m_contentStore = GetObject<CcnxContentStore> ();
   //   }
 
-  Object::NotifyNewAggregate ();
+  Ccnx::NotifyNewAggregate ();
 }
 
 void 
@@ -135,7 +135,7 @@ CcnxL3Protocol::DoDispose (void)
   // Force delete on objects
   m_forwardingStrategy = 0; // there is a reference to PIT stored in here
 
-  Object::DoDispose ();
+  Ccnx::DoDispose ();
 }
 
 uint32_t 
