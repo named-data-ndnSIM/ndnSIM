@@ -22,6 +22,8 @@
 #ifndef NDNSIM_FW_STATS_H
 #define NDNSIM_FW_STATS_H
 
+#include "ns3/event-id.h"
+
 #include "best-route.h"
 #include "../../utils/stats-tree.h"
 
@@ -30,7 +32,7 @@ namespace ndnSIM {
 
 /**
  * \ingroup ccnx
- * \brief Best route strategy
+ * \brief Strategy based on best route and adding statistics gathering capabilities
  */
 class FwStats :
     public BestRoute
@@ -62,9 +64,21 @@ protected:
 
   virtual void
   WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);
-    
+
+  // from Object
+  void
+  DoDispose ();
+  
+private:
+  void
+  RefreshStats ();
+
+  void
+  ScheduleRefreshingIfNecessary ();
+  
 private:
   ::ndnSIM::StatsTree m_stats;
+  EventId m_statsRefreshEvent;
   
   typedef BestRoute super;
 };

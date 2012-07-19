@@ -28,6 +28,8 @@
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
+#include "ns3/simulator.h"
+
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -57,6 +59,13 @@ FwStats::FwStats ()
 }
 
 void
+FwStats::DoDispose ()
+{
+  BestRoute::DoDispose ();
+  m_statsRefreshEvent.Cancel ();
+}
+
+void
 FwStats::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
                             Ptr<CcnxInterestHeader> header,
                             const Ptr<const Packet> &packet,
@@ -66,6 +75,8 @@ FwStats::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
   
   m_stats.NewPitEntry (header->GetName ());
   m_stats.Incoming (header->GetName (), incomingFace);
+  
+  ScheduleRefreshingIfNecessary ();
 }
 
 void
@@ -74,7 +85,9 @@ FwStats::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
 {
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
   
-  m_stats.Satisfy (pitEntry->GetPrefix ());  
+  m_stats.Satisfy (pitEntry->GetPrefix ());
+  
+  ScheduleRefreshingIfNecessary ();
 }
 
 void
@@ -85,6 +98,8 @@ FwStats::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
   super::DidSendOutInterest (outgoingFace, header, pitEntry);
 
   m_stats.Outgoing (header->GetName (), outgoingFace);
+  
+  ScheduleRefreshingIfNecessary ();
 }
 
 void
@@ -93,7 +108,30 @@ FwStats::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)
   super::WillErasePendingInterest (pitEntry);
 
   m_stats.Timeout (pitEntry->GetPrefix ());
+  
+  ScheduleRefreshingIfNecessary ();
 }
+
+void
+FwStats::ScheduleRefreshingIfNecessary ()
+{
+  if (m_statsRefreshEvent.IsRunning ()) return;
+  m_statsRefreshEvent = Simulator::Schedule (Seconds (1.0), &FwStats::RefreshStats, this);
+}
+
+void
+FwStats::RefreshStats ()
+{
+  m_stats.Step ();
+  
+  NS_LOG_DEBUG (m_stats["/"]);
+
+  if (!m_stats["/"].IsZero ())
+    {
+      m_statsRefreshEvent = Simulator::Schedule (Seconds (1.0), &FwStats::RefreshStats, this);
+    }
+}
+
 
 
 } // namespace ndnSIM

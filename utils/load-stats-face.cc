@@ -20,8 +20,21 @@
 
 #include "load-stats-face.h"
 
+#include "ns3/log.h"
+
+#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/range_c.hpp>
+
+using namespace boost::mpl;
+using namespace boost::tuples;
+
+NS_LOG_COMPONENT_DEFINE ("LoadStatsFace");
+
 namespace ndnSIM
 {
+
+std::ostream &
+operator << (std::ostream &os, const LoadStats::stats_tuple &tuple);
 
 void
 LoadStatsFace::Step ()
@@ -30,22 +43,47 @@ LoadStatsFace::Step ()
   m_satisfied.Step ();
   m_unsatisfied.Step ();
 }
-  
-//
+
+struct update_retval
+{
+  update_retval (const LoadStats &count, const LoadStats &other, LoadStats::stats_tuple &tuple)
+    : count_ (count)
+    , other_ (other)
+    , tuple_ (tuple) {}
+  const LoadStats &count_;
+  const LoadStats &other_;
+  LoadStats::stats_tuple &tuple_;
+    
+  template< typename U >
+  void operator () (U)
+  {
+    if (count_.GetStats ().get<U::value> () < LoadStats::PRECISION)
+      tuple_.get<U::value> () = -1;
+    else
+      tuple_.get<U::value> () = other_.GetStats ().get<U::value> () / count_.GetStats ().get<U::value> ();
+  }
+};
+
 LoadStats::stats_tuple
 LoadStatsFace::GetSatisfiedRatio () const
 {
-  return LoadStats::stats_tuple (m_satisfied.GetStats ().get<0> () / std::max (0.01, m_count.GetStats ().get<0> ()),
-				 m_satisfied.GetStats ().get<1> () / std::max (0.01, m_count.GetStats ().get<1> ()),
-				 m_satisfied.GetStats ().get<2> () / std::max (0.01, m_count.GetStats ().get<2> ()));
+  LoadStats::stats_tuple retval;
+  for_each< range_c<int, 0, length<LoadStats::stats_tuple>::value> >
+    (update_retval (m_count, m_satisfied, retval));
+
+  NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
+  return retval;
 }
 
 LoadStats::stats_tuple
 LoadStatsFace::GetUnsatisfiedRatio () const
 {
-  return LoadStats::stats_tuple (m_unsatisfied.GetStats ().get<0> () / std::max (0.01, m_count.GetStats ().get<0> ()),
-				 m_unsatisfied.GetStats ().get<1> () / std::max (0.01, m_count.GetStats ().get<1> ()),
-				 m_unsatisfied.GetStats ().get<2> () / std::max (0.01, m_count.GetStats ().get<2> ()));
+  LoadStats::stats_tuple retval;
+  for_each< range_c<int, 0, length<LoadStats::stats_tuple>::value> >
+    (update_retval (m_count, m_unsatisfied, retval));
+
+  NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
+  return retval;
 }
   
 LoadStatsFace &
@@ -64,10 +102,42 @@ LoadStatsFace::IsZero () const
   return m_count.IsZero () && m_satisfied.IsZero () && m_unsatisfied.IsZero ();
 }
 
+struct print_tuple
+{
+  print_tuple (const LoadStats::stats_tuple &tuple, std::ostream &os)
+    : tuple_ (tuple)
+    , os_ (os)
+  {
+  }
+  
+  const LoadStats::stats_tuple &tuple_;
+  std::ostream &os_;
+    
+  template< typename U >
+  void operator () (U)
+  {
+    os_ << tuple_.get< U::value > () << " ";
+  }
+};
+
+
+std::ostream &
+operator << (std::ostream &os, const LoadStats::stats_tuple &tuple)
+{
+  for_each< range_c<int, 0, length<LoadStats::stats_tuple>::value> >
+    (print_tuple (tuple, os));
+  
+  return os;
+}
+
 std::ostream &
 operator << (std::ostream &os, const LoadStatsFace &stats)
 {
-  os << stats.m_count << "/" << stats.m_satisfied << "/" << stats.m_unsatisfied;
+  LoadStats::stats_tuple
+    satisfied   = stats.GetSatisfiedRatio (),
+    unsatisfied = stats.GetUnsatisfiedRatio ();
+
+  os << "ration satisfied: " << satisfied << "/ unsatisfied: " << unsatisfied;
   return os;
 }
 

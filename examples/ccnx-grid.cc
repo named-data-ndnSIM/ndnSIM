@@ -81,8 +81,11 @@ main (int argc, char *argv[])
   // Install CCNx stack on all nodes
   NS_LOG_INFO ("Installing CCNx stack on all nodes");
   CcnxStackHelper ccnxHelper;
-  ccnxHelper.SetContentStore ("ns3::CcnxContentStoreRandom",
+  ccnxHelper.SetContentStore ("ns3::CcnxContentStoreLru",
                               "Size", "10");
+  // ccnxHelper.SetContentStore ("ns3::CcnxContentStoreRandom",
+  //                             "Size", "10");
+  // ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::BestRoute");
   ccnxHelper.InstallAll ();
 
   CcnxGlobalRoutingHelper ccnxGlobalRoutingHelper;
@@ -99,7 +102,7 @@ main (int argc, char *argv[])
   
   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
   consumerHelper.SetPrefix (prefix);
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 10 interests a second
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
   CcnxAppHelper producerHelper ("ns3::CcnxProducer");

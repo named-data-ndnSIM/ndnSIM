@@ -104,15 +104,15 @@ StatsTreeTest::DoRun ()
   // NS_LOG_DEBUG ("In, face1, satisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.667, 0.01, "Satisfied ratio should be ~ 2/3");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.667, 0.01, "Satisfied ratio should be ~ 2/3");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.667, 0.01, "Satisfied ratio should be ~ 2/3");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<1> (), 0,           "Satisfied ratio should be less 0 (invalid)");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "Satisfied ratio should be less 0 (invalid)");
   
   tuple = node.incoming ().find (face1)->second.GetUnsatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, unsatisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.333, 0.01, "Satisfied ratio should be ~ 1/3");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.333, 0.01, "Satisfied ratio should be ~ 1/3");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.333, 0.01, "Satisfied ratio should be ~ 1/3");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<1> (), 0,           "Satisfied ratio should be less 0 (invalid)");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "Satisfied ratio should be less 0 (invalid)");
 
   node.AddIncoming (face1);
   node.Timeout ();
@@ -123,18 +123,18 @@ StatsTreeTest::DoRun ()
   tuple = node.incoming ().find (face1)->second.GetSatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, satisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.489, 0.01, "");
+  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.473776, 0.01, "");
   NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.489, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.489, 0.01, "");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");
   
   tuple = node.incoming ().find (face1)->second.GetUnsatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, unsatisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.51, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.51, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.51, 0.01, "");  
+  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.526, 0.01, "");
+  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.504, 0.01, "");
+  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");  
 
-  for (uint32_t i = 0; i < 50; i++ )
+  for (uint32_t i = 0; i < 10; i++ )
     node.Step ();
 
   // NS_LOG_DEBUG ("After more decaying");
@@ -142,16 +142,16 @@ StatsTreeTest::DoRun ()
   tuple = node.incoming ().find (face1)->second.GetSatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, satisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.228, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.047, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.015, 0.01, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<0> (), 0, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
   
   tuple = node.incoming ().find (face1)->second.GetUnsatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, unsatisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.238, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.049, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<2> (), 0.016, 0.01, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<0> (), 0, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
+  NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
 
   /////////////////////////////////////////////////////
   //              Actual tree testing                //
@@ -174,16 +174,19 @@ StatsTreeTest::DoRun ()
   tree.Step ();
 
   NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (tree ["/"]),
-                         "PIT: 0.479734, 0.0991713, 0.0332409/0.159911, 0.0330571, 0.0110803/0.0799556, 0.0165285, 0.00554015",
+                         // "PIT: 0.479734, 0.0991713, 0.0332409/0.159911, 0.0330571, 0.0110803/0.0799556, 0.0165285, 0.00554015",
+                         "PIT: ration satisfied: 0.333333 0.333333 -1 / unsatisfied: 0.166667 0.166667 -1 ",
                          "Something wrong with stats tree");
 
   NS_TEST_ASSERT_MSG_NE (&tree ["/bla/bla/bla"],
                          &tree ["/"],
                          "The stats tree should not be empty");
-  for (uint32_t i = 0; i < 150; i++)
+  for (uint32_t i = 0; i < 50; i++)
     {
       tree.Step ();
     }
+  NS_LOG_DEBUG (tree ["/bla/bla/bla"]);
+  NS_LOG_DEBUG (tree ["/"]);
   NS_TEST_ASSERT_MSG_EQ (&tree ["/bla/bla/bla"],
                          &tree ["/"],
                          "The stats tree should be empty (only root node)");

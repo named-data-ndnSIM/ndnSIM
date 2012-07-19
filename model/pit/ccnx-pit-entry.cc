@@ -69,7 +69,7 @@ CcnxPitEntry::AddIncoming (Ptr<CcnxFace> face)
   std::pair<in_iterator,bool> ret = 
     m_incoming.insert (CcnxPitEntryIncomingFace (face));
 
-  NS_ASSERT_MSG (ret.second, "Something is wrong");
+  // NS_ASSERT_MSG (ret.second, "Something is wrong");
 
   return ret.first;
 }

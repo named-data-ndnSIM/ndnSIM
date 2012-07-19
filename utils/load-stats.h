@@ -32,6 +32,8 @@ class LoadStats
 public:
   typedef boost::tuple<double, double, double> stats_tuple;
 
+  static const double PRECISION;
+
   LoadStats ();
   
   void
@@ -59,8 +61,8 @@ private:
   uint32_t counter_;
 
   double avg1_;
-  double avg5_;
-  double avg15_;
+  double avg2_;
+  double avg3_;
 
   friend std::ostream &
   operator << (std::ostream &os, const LoadStats &stats);
