@@ -37,6 +37,12 @@ public:
     
 private:
   virtual void DoRun ();
+
+  void
+  BasicTests ();
+
+  void
+  SimpleScenario ();
 };
   
 }

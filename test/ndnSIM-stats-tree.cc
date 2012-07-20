@@ -20,6 +20,7 @@
 
 #include "ndnSIM-stats-tree.h"
 #include "ns3/core-module.h"
+#include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
 #include "../utils/stats-tree.h"
 #include "../apps/ccnx-producer.h"
@@ -35,6 +36,14 @@ namespace ns3
 
 void
 StatsTreeTest::DoRun ()
+{
+  BasicTests ();
+  SimpleScenario ();
+}
+
+
+void
+StatsTreeTest::BasicTests ()
 {
   CcnxStackHelper ccnx;
 
@@ -181,7 +190,7 @@ StatsTreeTest::DoRun ()
   NS_TEST_ASSERT_MSG_NE (&tree ["/bla/bla/bla"],
                          &tree ["/"],
                          "The stats tree should not be empty");
-  for (uint32_t i = 0; i < 50; i++)
+  for (uint32_t i = 0; i < 9; i++)
     {
       tree.Step ();
     }
@@ -190,6 +199,20 @@ StatsTreeTest::DoRun ()
   NS_TEST_ASSERT_MSG_EQ (&tree ["/bla/bla/bla"],
                          &tree ["/"],
                          "The stats tree should be empty (only root node)");
+}
+
+
+
+void
+StatsTreeTest::SimpleScenario ()
+{
+  NodeContainer nodes;
+  nodes.Create (2);
+  PointToPointHelper p2pHelper;
+  p2pHelper.Install (nodes);
+
+
+  
 }
 
 }

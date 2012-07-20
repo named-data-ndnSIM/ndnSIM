@@ -71,7 +71,7 @@ LoadStatsFace::GetSatisfiedRatio () const
   for_each< range_c<int, 0, length<LoadStats::stats_tuple>::value> >
     (update_retval (m_count, m_satisfied, retval));
 
-  NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
+  // NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
   return retval;
 }
 
@@ -82,7 +82,7 @@ LoadStatsFace::GetUnsatisfiedRatio () const
   for_each< range_c<int, 0, length<LoadStats::stats_tuple>::value> >
     (update_retval (m_count, m_unsatisfied, retval));
 
-  NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
+  // NS_LOG_DEBUG (retval.get<0> () << ", " << retval.get<1> () << ", " << retval.get<2> ());
   return retval;
 }
   
