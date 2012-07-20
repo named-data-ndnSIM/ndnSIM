@@ -106,8 +106,11 @@ void
 GreenYellowRed::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
                                             Ptr<CcnxPitEntry> pitEntry)
 {
-  // Update metric status for the incoming interface in the corresponding FIB entry
-  pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN);
+  if (incomingFace != 0)
+    {
+      // Update metric status for the incoming interface in the corresponding FIB entry
+      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN);
+    }
 
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
 }
@@ -119,7 +122,8 @@ GreenYellowRed::DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
 {
   super::DidReceiveValidNack (incomingFace, nackCode, pitEntry);
 
-  if (nackCode != CcnxInterestHeader::NACK_LOOP)
+  if (incomingFace != 0 &&
+      nackCode != CcnxInterestHeader::NACK_LOOP)
     {
       pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
     }
