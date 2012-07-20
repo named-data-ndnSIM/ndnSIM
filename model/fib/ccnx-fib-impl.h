@@ -142,7 +142,7 @@ private:
    * entry will be removed
    */
   void
-  Remove (super::parent_trie &item, Ptr<CcnxFace> face);
+  RemoveFace (super::parent_trie &item, Ptr<CcnxFace> face);
   
 private:
   Ptr<Node> m_node;

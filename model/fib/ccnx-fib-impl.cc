@@ -154,7 +154,7 @@ CcnxFibImpl::InvalidateAll ()
 }
 
 void
-CcnxFibImpl::Remove (super::parent_trie &item, Ptr<CcnxFace> face)
+CcnxFibImpl::RemoveFace (super::parent_trie &item, Ptr<CcnxFace> face)
 {
   if (item.payload () == 0) return;
   NS_LOG_FUNCTION (this);
@@ -170,7 +170,7 @@ CcnxFibImpl::RemoveFromAll (Ptr<CcnxFace> face)
 
   std::for_each (super::parent_trie::recursive_iterator (super::getTrie ()),
                  super::parent_trie::recursive_iterator (0), 
-                 ll::bind (static_cast< void (CcnxFib::*) (super::parent_trie &, Ptr<CcnxFace>) > (&CcnxFibImpl::Remove),
+                 ll::bind (&CcnxFibImpl::RemoveFace,
                            this, ll::_1, face));
 
   super::parent_trie::recursive_iterator trieNode (super::getTrie ());
