@@ -303,6 +303,18 @@ CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<CcnxFace> fac
 }
 
 void
+CcnxStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
+{
+  Ptr<Ccnx>     ccnx = node->GetObject<Ccnx> ();
+  NS_ASSERT_MSG (ccnx != 0, "Ccnx stack should be installed on the node");
+
+  Ptr<CcnxFace> face = ccnx->GetFace (faceId);
+  NS_ASSERT_MSG (face != 0, "Face with ID [" << faceId << "] does not exist on node [" << node->GetId () << "]");
+
+  AddRoute (node, prefix, face, metric);
+}
+
+void
 CcnxStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);

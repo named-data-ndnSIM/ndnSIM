@@ -202,6 +202,17 @@ public:
   /**
    * \brief Add forwarding entry in FIB
    *
+   * \param nodeName Node
+   * \param prefix Routing prefix
+   * \param faceId Face index
+   * \param metric Routing metric
+   */
+  static void
+  AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric);
+
+  /**
+   * \brief Add forwarding entry in FIB
+   *
    * \param node   Node
    * \param prefix Routing prefix
    * \param face   Face
