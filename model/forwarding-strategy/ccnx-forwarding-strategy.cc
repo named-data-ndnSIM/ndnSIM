@@ -233,7 +233,7 @@ CcnxForwardingStrategy::DidReceiveDuplicateInterest (const Ptr<CcnxFace> &incomi
                                                      const Ptr<const Packet> &packet,
                                                      Ptr<CcnxPitEntry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << *incomingFace);
+  NS_LOG_FUNCTION (this << boost::cref (*incomingFace));
   /////////////////////////////////////////////////////////////////////////////////////////
   //                                                                                     //
   // !!!! IMPORTANT CHANGE !!!! Duplicate interests will create incoming face entry !!!! //
@@ -249,7 +249,7 @@ CcnxForwardingStrategy::DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomi
                                                      const Ptr<const Packet> &packet,
                                                      Ptr<CcnxPitEntry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << *incomingFace);
+  NS_LOG_FUNCTION (this << boost::cref (*incomingFace));
   m_dropInterests (header, incomingFace);
 }
 
