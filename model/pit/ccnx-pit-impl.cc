@@ -195,10 +195,12 @@ Ptr<CcnxPitEntry>
 CcnxPitImpl::Create (Ptr<const CcnxInterestHeader> header)
 {
   Ptr<CcnxFibEntry> fibEntry = m_fib->LongestPrefixMatch (*header);
-  NS_ASSERT_MSG (fibEntry != 0,
-                 "There should be at least default route set" <<
-                 " Prefix = "<< header->GetName() << "NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
-
+  if (fibEntry == 0)
+    return 0;
+  
+  // NS_ASSERT_MSG (fibEntry != 0,
+  //                "There should be at least default route set" <<
+  //                " Prefix = "<< header->GetName() << ", NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
 
   Ptr< entry > newEntry = ns3::Create< entry > (boost::ref (*this), header, fibEntry);
   std::pair< super::iterator, bool > result = super::insert (header->GetName (), newEntry);
