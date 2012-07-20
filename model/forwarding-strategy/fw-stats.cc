@@ -50,6 +50,9 @@ FwStats::GetTypeId (void)
     .SetGroupName ("Ccnx")
     .SetParent <BestRoute> ()
     .AddConstructor <FwStats> ()
+
+    .AddTraceSource ("Stats", "Fired every time stats tree is updated",
+                     MakeTraceSourceAccessor (&FwStats::m_statsTrace))
     ;
   return tid;
 }
@@ -63,6 +66,18 @@ FwStats::DoDispose ()
 {
   BestRoute::DoDispose ();
   m_statsRefreshEvent.Cancel ();
+}
+
+void
+FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                                 Ptr<CcnxInterestHeader> header,
+                                 const Ptr<const Packet> &packet)
+{
+  super::FailedToCreatePitEntry (incomingFace, header, packet);
+
+  // Kind of cheating... But at least this way we will have some statistics
+  m_stats.NewPitEntry (header->GetName ());
+  m_stats.Timeout (header->GetName ());
 }
 
 void
@@ -123,6 +138,7 @@ void
 FwStats::RefreshStats ()
 {
   m_stats.Step ();
+  m_statsTrace (this, m_stats);
   
   NS_LOG_DEBUG (m_stats["/"]);
 

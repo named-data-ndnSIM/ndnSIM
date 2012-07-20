@@ -54,6 +54,11 @@ protected:
                      Ptr<CcnxPitEntry> pitEntry);
 
   virtual void
+  FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
+                          Ptr<CcnxInterestHeader> header,
+                          const Ptr<const Packet> &packet);
+
+  virtual void
   WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
                               Ptr<CcnxPitEntry> pitEntry);
 
@@ -79,6 +84,9 @@ private:
 private:
   ::ndnSIM::StatsTree m_stats;
   EventId m_statsRefreshEvent;
+
+  TracedCallback< Ptr<CcnxForwardingStrategy>,
+                  const ::ndnSIM::StatsTree & > m_statsTrace;
   
   typedef BestRoute super;
 };
