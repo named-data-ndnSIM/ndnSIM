@@ -51,6 +51,9 @@ public:
   LoadStats &
   operator += (const LoadStats &stats);
 
+  LoadStats &
+  operator += (uint32_t amount);
+
   stats_tuple
   GetStats () const;
 

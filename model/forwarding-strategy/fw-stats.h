@@ -46,6 +46,17 @@ public:
    */
   FwStats ();
 
+  virtual void
+  OnInterest (const Ptr<CcnxFace> &face,
+              Ptr<CcnxInterestHeader> &header,
+              const Ptr<const Packet> &p);
+
+  virtual void
+  OnData (const Ptr<CcnxFace> &face,
+          Ptr<CcnxContentObjectHeader> &header,
+          Ptr<Packet> &payload,
+          const Ptr<const Packet> &packet);
+  
 protected:
   virtual void
   DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
@@ -65,7 +76,14 @@ protected:
   virtual void
   DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
                       Ptr<CcnxInterestHeader> header,
+                      const Ptr<const Packet> &packet,
                       Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  DidSendOutData (const Ptr<CcnxFace> &face,
+                  Ptr<const CcnxContentObjectHeader> header,
+                  Ptr<const Packet> payload,
+                  const Ptr<const Packet> &packet);
 
   virtual void
   WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);

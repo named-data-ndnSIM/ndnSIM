@@ -128,6 +128,12 @@ protected:
                           Ptr<CcnxPitEntry> pitEntry);
 
   virtual void
+  DidSendOutData (const Ptr<CcnxFace> &face,
+                  Ptr<const CcnxContentObjectHeader> header,
+                  Ptr<const Packet> payload,
+                  const Ptr<const Packet> &packet);
+  
+  virtual void
   DidReceiveUnsolicitedData (const Ptr<CcnxFace> &incomingFace,
                              Ptr<const CcnxContentObjectHeader> header,
                              Ptr<const Packet> payload);
@@ -151,9 +157,9 @@ protected:
    */
   virtual void
   DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
-                       Ptr<CcnxInterestHeader> header,
-                       Ptr<CcnxPitEntry> pitEntry);
-  
+                      Ptr<CcnxInterestHeader> header,
+                      const Ptr<const Packet> &packet,
+                      Ptr<CcnxPitEntry> pitEntry);
 
   virtual void
   PropagateInterest (const Ptr<CcnxFace> &incomingFace,

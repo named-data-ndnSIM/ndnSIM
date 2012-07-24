@@ -225,7 +225,7 @@ protected:
    *
    * \param p smart pointer to a packet to send
    */
-  virtual void
+  virtual bool
   SendImpl (Ptr<Packet> p) = 0;  
 
 private:

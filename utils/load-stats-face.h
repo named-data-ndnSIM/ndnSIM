@@ -49,6 +49,18 @@ public:
 
   inline const LoadStats&
   unsatisfied () const;
+
+  inline LoadStats&
+  tx ();
+
+  inline const LoadStats&
+  tx () const;
+
+  inline LoadStats&
+  rx ();
+
+  inline const LoadStats&
+  rx () const;
   
   //
   LoadStats::stats_tuple
@@ -67,6 +79,8 @@ private:
   LoadStats m_count;
   LoadStats m_satisfied;
   LoadStats m_unsatisfied;
+  LoadStats m_rx;
+  LoadStats m_tx;
 
   friend std::ostream &
   operator << (std::ostream &os, const LoadStatsFace &stats);
@@ -95,6 +109,23 @@ LoadStatsFace::unsatisfied ()
 inline const LoadStats&
 LoadStatsFace::unsatisfied () const
 { return m_unsatisfied; }
+
+inline LoadStats&
+LoadStatsFace::tx ()
+{ return m_tx; }
+
+inline const LoadStats&
+LoadStatsFace::tx () const
+{ return m_tx; }
+
+inline LoadStats&
+LoadStatsFace::rx ()
+{ return m_rx; }
+
+inline const LoadStats&
+LoadStatsFace::rx () const
+{ return m_rx; }
+
 
 std::ostream &
 operator << (std::ostream &os, const LoadStatsFace &stats);

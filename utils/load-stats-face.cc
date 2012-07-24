@@ -42,6 +42,8 @@ LoadStatsFace::Step ()
   m_count.Step ();
   m_satisfied.Step ();
   m_unsatisfied.Step ();
+  m_tx.Step ();
+  m_rx.Step ();
 }
 
 struct update_retval
@@ -92,6 +94,8 @@ LoadStatsFace::operator += (const LoadStatsFace &load)
   m_count       += load.m_count;
   m_satisfied   += load.m_satisfied;
   m_unsatisfied += load.m_unsatisfied;
+  m_tx          += load.m_tx;
+  m_rx          += load.m_rx;
 
   return *this;
 }
@@ -99,7 +103,7 @@ LoadStatsFace::operator += (const LoadStatsFace &load)
 bool
 LoadStatsFace::IsZero () const
 {
-  return m_count.IsZero () && m_satisfied.IsZero () && m_unsatisfied.IsZero ();
+  return m_count.IsZero () && m_satisfied.IsZero () && m_unsatisfied.IsZero () && m_tx.IsZero () && m_rx.IsZero ();
 }
 
 struct print_tuple

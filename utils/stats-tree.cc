@@ -87,6 +87,22 @@ StatsTree::Timeout (const CcnxNameComponents &key)
   item.first->payload ().Timeout ();
 }
 
+void
+StatsTree::Rx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+{
+  std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
+
+  item.first->payload ().Rx (face, amount);
+}
+
+void
+StatsTree::Tx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+{
+  std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
+
+  item.first->payload ().Tx (face, amount);
+}
+
 // const LoadStatsNode &
 // StatsTree::Get (const ns3::CcnxNameComponents &key) const
 const LoadStatsNode &

@@ -113,6 +113,21 @@ LoadStatsNode::Timeout ()
     }
 }
 
+void
+LoadStatsNode::Rx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+{
+  m_pit.rx () += amount;
+  m_incoming [face].rx () += amount;
+}
+
+void
+LoadStatsNode::Tx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+{
+  m_pit.tx () += amount;
+  m_outgoing [face].tx () += amount;
+}
+
+
 LoadStatsNode &
 LoadStatsNode::operator += (const LoadStatsNode &stats)
 {

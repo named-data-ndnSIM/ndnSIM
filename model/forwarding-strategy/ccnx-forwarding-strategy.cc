@@ -300,9 +300,19 @@ CcnxForwardingStrategy::SatisfyPendingInterest (const Ptr<CcnxFace> &incomingFac
   //satisfy all pending incoming Interests
   BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
     {
-      incoming.m_face->Send (packet->Copy ());
-      m_outData (header, payload, false, incoming.m_face);
-      NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+      bool ok = incoming.m_face->Send (packet->Copy ());
+      if (ok)
+        {
+          m_outData (header, payload, incomingFace == 0, incoming.m_face);
+          DidSendOutData (incoming.m_face, header, payload, packet);
+          
+          NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+        }
+      else
+        {
+          m_dropData (header, payload, incoming.m_face);
+          NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
+        }
           
       // successfull forwarded data trace
     }
@@ -443,9 +453,18 @@ CcnxForwardingStrategy::WillSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
 void
 CcnxForwardingStrategy::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
                                             Ptr<CcnxInterestHeader> header,
+                                            const Ptr<const Packet> &packet,
                                             Ptr<CcnxPitEntry> pitEntry)
 {
   m_outInterests (header, outgoingFace);
+}
+
+void
+CcnxForwardingStrategy::DidSendOutData (const Ptr<CcnxFace> &face,
+                                        Ptr<const CcnxContentObjectHeader> header,
+                                        Ptr<const Packet> payload,
+                                        const Ptr<const Packet> &packet)
+{
 }
 
 void

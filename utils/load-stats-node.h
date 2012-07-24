@@ -76,6 +76,18 @@ public:
   void
   Timeout ();
 
+  /**
+   * Increment counter for Tx amount
+   */
+  void
+  Rx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+
+  /**
+   * Increment counter for Tx amount
+   */
+  void
+  Tx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+
   LoadStatsNode &
   operator += (const LoadStatsNode &stats);
 

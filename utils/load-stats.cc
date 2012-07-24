@@ -62,9 +62,14 @@ LoadStats::Step ()
 LoadStats &
 LoadStats::operator ++ (int)
 {
-  // NS_LOG_FUNCTION (this);
-
   counter_ ++;
+  return *this;
+}
+
+LoadStats &
+LoadStats::operator += (uint32_t amount)
+{
+  counter_ += amount;
   return *this;
 }
 

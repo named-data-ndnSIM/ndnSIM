@@ -185,9 +185,17 @@ CcnxFace::Send (Ptr<Packet> packet)
   //     packet->AddPacketTag (tag);
   //   }
 
-  m_ccnxTxTrace (packet);
-  SendImpl (packet);
-  return true;
+  bool ok = SendImpl (packet);
+  if (ok)
+    {
+      m_ccnxTxTrace (packet);
+      return true;
+    }
+  else
+    {
+      m_ccnxDropTrace (packet);
+      return false;
+    }
 }
 
 bool

@@ -96,7 +96,7 @@ SmartFlooding::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
       Ptr<Packet> packetToSend = packet->Copy ();
       metricFace.m_face->Send (packetToSend);
 
-      DidSendOutInterest (metricFace.m_face, header, pitEntry);
+      DidSendOutInterest (metricFace.m_face, header, packet, pitEntry);
       
       propagatedCount++;
     }

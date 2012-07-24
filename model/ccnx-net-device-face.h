@@ -40,7 +40,7 @@ class Address;
  * object and this object cannot be changed for the lifetime of the
  * face
  *
- * \see CcnxLocalFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
+ * \see CcnxAppFace, CcnxNetDeviceFace, CcnxIpv4Face, CcnxUdpFace
  */
 class CcnxNetDeviceFace  : public CcnxFace
 {
@@ -51,7 +51,8 @@ public:
   /**
    * \brief Constructor
    *
-   * \param netDevice a smart pointer to NetDevice object to which
+   * @param node Node associated with the face
+   * @param netDevice a smart pointer to NetDevice object to which
    * this face will be associate
    */
   CcnxNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
@@ -61,10 +62,10 @@ public:
   // methods overloaded from CcnxFace
   virtual void
   RegisterProtocolHandler (ProtocolHandler handler);
-
+  
 protected:
   // also from CcnxFace
-  virtual void
+  virtual bool
   SendImpl (Ptr<Packet> p);
 
 public:

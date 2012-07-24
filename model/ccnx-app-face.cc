@@ -91,7 +91,7 @@ CcnxAppFace::RegisterProtocolHandler (ProtocolHandler handler)
   m_app->RegisterProtocolHandler (MakeCallback (&CcnxFace::Receive, this));
 }
 
-void
+bool
 CcnxAppFace::SendImpl (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
@@ -124,10 +124,13 @@ CcnxAppFace::SendImpl (Ptr<Packet> p)
             break;
           }
         }
+      
+      return true;
     }
   catch (CcnxUnknownHeaderException)
     {
       NS_LOG_ERROR ("Unknown header type");
+      return false;
     }
 }
 

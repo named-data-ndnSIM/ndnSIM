@@ -69,6 +69,32 @@ FwStats::DoDispose ()
 }
 
 void
+FwStats::OnInterest (const Ptr<CcnxFace> &face,
+                     Ptr<CcnxInterestHeader> &header,
+                     const Ptr<const Packet> &packet)
+{
+  super::OnInterest (face, header, packet);
+  
+  m_stats.Rx (header->GetName (), face, packet->GetSize ());
+
+  ScheduleRefreshingIfNecessary ();
+}
+
+void
+FwStats::OnData (const Ptr<CcnxFace> &face,
+                 Ptr<CcnxContentObjectHeader> &header,
+                 Ptr<Packet> &payload,
+                 const Ptr<const Packet> &packet)
+{
+  super::OnData (face, header, payload, packet);
+  
+  m_stats.Rx (header->GetName (), face, packet->GetSize ());
+
+  ScheduleRefreshingIfNecessary ();
+}
+
+
+void
 FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
                                  Ptr<CcnxInterestHeader> header,
                                  const Ptr<const Packet> &packet)
@@ -77,7 +103,10 @@ FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
 
   // Kind of cheating... But at least this way we will have some statistics
   m_stats.NewPitEntry (header->GetName ());
+  m_stats.Incoming (header->GetName (), incomingFace);
   m_stats.Timeout (header->GetName ());
+
+  ScheduleRefreshingIfNecessary ();
 }
 
 void
@@ -108,14 +137,30 @@ FwStats::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
 void
 FwStats::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
                              Ptr<CcnxInterestHeader> header,
+                             const Ptr<const Packet> &packet,
                              Ptr<CcnxPitEntry> pitEntry)
 {
-  super::DidSendOutInterest (outgoingFace, header, pitEntry);
+  super::DidSendOutInterest (outgoingFace, header, packet, pitEntry);
 
   m_stats.Outgoing (header->GetName (), outgoingFace);
+  m_stats.Tx (header->GetName (), outgoingFace, packet->GetSize ());
   
   ScheduleRefreshingIfNecessary ();
 }
+
+void
+FwStats::DidSendOutData (const Ptr<CcnxFace> &face,
+                         Ptr<const CcnxContentObjectHeader> header,
+                         Ptr<const Packet> payload,
+                         const Ptr<const Packet> &packet)
+{
+  super::DidSendOutData (face, header, payload, packet);
+
+  m_stats.Tx (header->GetName (), face, packet->GetSize ());
+  
+  ScheduleRefreshingIfNecessary ();
+}
+
 
 void
 FwStats::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)

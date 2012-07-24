@@ -61,7 +61,7 @@ public:
   RegisterProtocolHandler (ProtocolHandler handler);
 
 protected:
-  virtual void
+  virtual bool
   SendImpl (Ptr<Packet> p);
 
 public:

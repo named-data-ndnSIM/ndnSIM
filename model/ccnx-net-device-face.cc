@@ -88,7 +88,7 @@ CcnxNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
                                    CcnxL3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
 }
 
-void
+bool
 CcnxNetDeviceFace::SendImpl (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
@@ -98,8 +98,9 @@ CcnxNetDeviceFace::SendImpl (Ptr<Packet> packet)
                  << m_netDevice->GetMtu ()
                  << " for Ccnx; fragmentation not supported");
 
-  m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
-                     CcnxL3Protocol::ETHERNET_FRAME_TYPE);
+  bool ok = m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
+                               CcnxL3Protocol::ETHERNET_FRAME_TYPE);
+  return ok;
 }
 
 // callback

@@ -55,6 +55,12 @@ public:
   void
   Timeout (const ns3::CcnxNameComponents &key);
 
+  void
+  Rx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+
+  void
+  Tx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+
   // const LoadStatsNode &
   // Get (const ns3::CcnxNameComponents &key) const;
   const LoadStatsNode &
