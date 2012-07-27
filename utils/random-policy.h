@@ -98,7 +98,7 @@ struct random_policy_traits
       {
         get_order (item) = u_rand.GetValue ();
 
-        if (policy_container::size () >= max_size_)
+        if (max_size_ != 0 && policy_container::size () >= max_size_)
           {
             if (MemberHookLess<Container>() (*item, *policy_container::begin ()))
               {

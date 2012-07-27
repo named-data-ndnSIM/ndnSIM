@@ -71,7 +71,7 @@ struct fifo_policy_traits
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        if (policy_container::size () >= max_size_)
+        if (max_size_ != 0 && policy_container::size () >= max_size_)
           {
             base_.erase (&(*policy_container::begin ()));
           }

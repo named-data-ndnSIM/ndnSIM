@@ -24,8 +24,6 @@
 #include "ccnx-pit.h"
 
 #include "../../utils/trie-with-policy.h"
-#include "../../utils/empty-policy.h"
-#include "../../utils/persistent-policy.h"
 
 #include "ccnx-pit-entry-impl.h"
 
@@ -37,18 +35,21 @@ namespace ns3 {
  * \ingroup ccnx
  * \brief Class implementing Pending Interests Table
  */
+template<class Policy>
 class CcnxPitImpl : public CcnxPit
                   , protected ndnSIM::trie_with_policy<CcnxNameComponents,
-                                                       ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl > >,
-                                                       ndnSIM::persistent_policy_traits
+                                                       ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl< Policy > > >,
+                                                       // ndnSIM::persistent_policy_traits
+                                                       Policy
                                                        >
 {
 public:
   typedef ndnSIM::trie_with_policy<CcnxNameComponents,
-                                   ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl > >,
-                                   ndnSIM::persistent_policy_traits
+                                   ndnSIM::smart_pointer_payload_traits<CcnxPitEntryImpl< CcnxPitImpl< Policy > > >,
+                                   // ndnSIM::persistent_policy_traits
+                                   Policy
                                    > super;
-  typedef CcnxPitEntryImpl< CcnxPitImpl > entry;
+  typedef CcnxPitEntryImpl< CcnxPitImpl< Policy > > entry;
 
   /**
    * \brief Interface ID
