@@ -112,6 +112,12 @@ public:
    */
   std::list<boost::reference_wrapper<const std::string> >
   GetSubComponents (size_t num) const;
+
+  /**
+   * @brief Get prefix of the name, containing less  minusComponents right components
+   */
+  CcnxNameComponents
+  cut (size_t minusComponents) const;
   
   /**
    * \brief Print name

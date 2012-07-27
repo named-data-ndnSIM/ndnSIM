@@ -90,6 +90,19 @@ CcnxNameComponents::GetSubComponents (size_t num) const
   return subComponents;
 }
 
+CcnxNameComponents
+CcnxNameComponents::cut (size_t minusComponents) const
+{
+  CcnxNameComponents retval;
+  std::list<std::string>::const_iterator component = m_prefix.begin (); 
+  for (uint32_t i = 0; i < m_prefix.size () - minusComponents; i++, component++)
+    {
+      retval.Add (*component);
+    }
+
+  return retval;
+}
+
 void
 CcnxNameComponents::Print (std::ostream &os) const
 {
