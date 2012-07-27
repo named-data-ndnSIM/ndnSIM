@@ -24,6 +24,10 @@
 #include "ns3/names.h"
 #include "ns3/ccnx-app.h"
 
+#ifdef NS3_MPI
+#include "ns3/mpi-interface.h"
+#endif
+
 NS_LOG_COMPONENT_DEFINE ("CcnxAppHelper");
 
 namespace ns3 
@@ -49,14 +53,19 @@ CcnxAppHelper::SetAttribute (std::string name, const AttributeValue &value)
 ApplicationContainer
 CcnxAppHelper::Install (Ptr<Node> node)
 {
-  return ApplicationContainer (InstallPriv (node));
+  ApplicationContainer apps;
+  Ptr<Application> app = InstallPriv (node);
+  if (app != 0)
+    apps.Add (app);
+  
+  return apps;
 }
     
 ApplicationContainer
 CcnxAppHelper::Install (std::string nodeName)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
-  return ApplicationContainer (InstallPriv (node));
+  return Install (node);
 }
     
 ApplicationContainer
@@ -65,7 +74,9 @@ CcnxAppHelper::Install (NodeContainer c)
   ApplicationContainer apps;
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
-      apps.Add (InstallPriv (*i));
+      Ptr<Application> app = InstallPriv (*i);
+      if (app != 0)
+        apps.Add (app);
     }
     
   return apps;
@@ -74,6 +85,15 @@ CcnxAppHelper::Install (NodeContainer c)
 Ptr<Application>
 CcnxAppHelper::InstallPriv (Ptr<Node> node)
 {
+#ifdef NS3_MPI
+  if (MpiInterface::IsEnabled () &&
+      node->GetSystemId () != MpiInterface::GetSystemId ())
+    {
+      // don't create an app if MPI is enabled and node is not in the correct partition
+      return 0;
+    }
+#endif
+  
   Ptr<CcnxApp> app = m_factory.Create<CcnxApp> ();        
   node->AddApplication (app);
         
