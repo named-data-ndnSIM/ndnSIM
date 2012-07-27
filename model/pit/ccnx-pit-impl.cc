@@ -71,7 +71,7 @@ CcnxPitImpl<persistent_policy_traits>::GetTypeId ()
                    MakeUintegerChecker<uint32_t> ())
     ;
 
-  return TypeId ();
+  return tid;
 }
 
 template<>
@@ -90,7 +90,7 @@ CcnxPitImpl<random_policy_traits>::GetTypeId ()
                    MakeUintegerChecker<uint32_t> ())
     ;
 
-  return TypeId ();
+  return tid;
 }
 
 template<>
@@ -109,9 +109,17 @@ CcnxPitImpl<lru_policy_traits>::GetTypeId ()
                    MakeUintegerChecker<uint32_t> ())
     ;
 
-  return TypeId ();
+  return tid;
 }
 
+// template<class Policy>
+// TypeId
+// CcnxPitImpl<Policy>::GetTypeId ()
+// {
+//   static TypeId tid = TypeId ("ns3::UnknownPitPolicy");
+
+//   return tid;
+// }
 
 // CcnxPitEntryImpl::CcnxPitEntryImpl (CcnxPit &pit,
 //                                     Ptr<const CcnxInterestHeader> header,
