@@ -75,7 +75,7 @@ FwStats::OnInterest (const Ptr<CcnxFace> &face,
 {
   super::OnInterest (face, header, packet);
   
-  m_stats.Rx (header->GetName (), face, packet->GetSize ());
+  m_stats.Rx (header->GetName ().cut (1), face, packet->GetSize ());
 
   ScheduleRefreshingIfNecessary ();
 }
@@ -88,7 +88,7 @@ FwStats::OnData (const Ptr<CcnxFace> &face,
 {
   super::OnData (face, header, payload, packet);
   
-  m_stats.Rx (header->GetName (), face, packet->GetSize ());
+  m_stats.Rx (header->GetName ().cut (1), face, packet->GetSize ());
 
   ScheduleRefreshingIfNecessary ();
 }
@@ -102,9 +102,9 @@ FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
   super::FailedToCreatePitEntry (incomingFace, header, packet);
 
   // Kind of cheating... But at least this way we will have some statistics
-  m_stats.NewPitEntry (header->GetName ());
-  m_stats.Incoming (header->GetName (), incomingFace);
-  m_stats.Timeout (header->GetName ());
+  m_stats.NewPitEntry (header->GetName ().cut (1));
+  m_stats.Incoming (header->GetName ().cut (1), incomingFace);
+  m_stats.Timeout (header->GetName ().cut (1));
 
   ScheduleRefreshingIfNecessary ();
 }
@@ -117,8 +117,8 @@ FwStats::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
 {
   super::DidCreatePitEntry (incomingFace, header, packet, pitEntry);
   
-  m_stats.NewPitEntry (header->GetName ());
-  m_stats.Incoming (header->GetName (), incomingFace);
+  m_stats.NewPitEntry (header->GetName ().cut (1));
+  m_stats.Incoming (header->GetName ().cut (1), incomingFace);
   
   ScheduleRefreshingIfNecessary ();
 }
@@ -129,7 +129,7 @@ FwStats::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
 {
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
   
-  m_stats.Satisfy (pitEntry->GetPrefix ());
+  m_stats.Satisfy (pitEntry->GetPrefix ().cut (1));
   
   ScheduleRefreshingIfNecessary ();
 }
@@ -142,8 +142,8 @@ FwStats::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
 {
   super::DidSendOutInterest (outgoingFace, header, packet, pitEntry);
 
-  m_stats.Outgoing (header->GetName (), outgoingFace);
-  m_stats.Tx (header->GetName (), outgoingFace, packet->GetSize ());
+  m_stats.Outgoing (header->GetName ().cut (1), outgoingFace);
+  m_stats.Tx (header->GetName ().cut (1), outgoingFace, packet->GetSize ());
   
   ScheduleRefreshingIfNecessary ();
 }
@@ -156,7 +156,7 @@ FwStats::DidSendOutData (const Ptr<CcnxFace> &face,
 {
   super::DidSendOutData (face, header, payload, packet);
 
-  m_stats.Tx (header->GetName (), face, packet->GetSize ());
+  m_stats.Tx (header->GetName ().cut (1), face, packet->GetSize ());
   
   ScheduleRefreshingIfNecessary ();
 }
@@ -167,7 +167,7 @@ FwStats::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)
 {
   super::WillErasePendingInterest (pitEntry);
 
-  m_stats.Timeout (pitEntry->GetPrefix ());
+  m_stats.Timeout (pitEntry->GetPrefix ().cut (1));
   
   ScheduleRefreshingIfNecessary ();
 }
