@@ -137,6 +137,16 @@ StatsTree::WalkLeftRightRoot (tree_type *node)
   return node->payload ();
 }
 
+void
+StatsTree::RemoveFace (ns3::Ptr<ns3::CcnxFace> face)
+{
+  tree_type::recursive_iterator item (&m_tree), end;
+  for (; item != end; item ++)
+    {
+      item->payload ().RemoveFace (face);
+    }
+}
+
 std::ostream &
 operator << (std::ostream &os, const StatsTree &tree)
 {

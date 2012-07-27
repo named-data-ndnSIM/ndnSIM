@@ -170,6 +170,15 @@ LoadStatsNode::IsZero () const
   return zero;  
 }
 
+
+void
+LoadStatsNode::RemoveFace (ns3::Ptr<ns3::CcnxFace> face)
+{
+  NS_LOG_FUNCTION (this);
+  m_incoming.erase (face);
+  m_outgoing.erase (face);
+}
+
 bool
 LoadStatsNode::operator == (const LoadStatsNode &other) const
 {

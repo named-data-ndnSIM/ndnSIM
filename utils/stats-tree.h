@@ -65,10 +65,14 @@ public:
   // Get (const ns3::CcnxNameComponents &key) const;
   const LoadStatsNode &
   operator [] (const ns3::CcnxNameComponents &key) const;
+
+  void
+  RemoveFace (ns3::Ptr<ns3::CcnxFace> face);
   
 private:
   const LoadStatsNode &
   WalkLeftRightRoot (tree_type *node);
+
   
 private:
   tree_type m_tree;

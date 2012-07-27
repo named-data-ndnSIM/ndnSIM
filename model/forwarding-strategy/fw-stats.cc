@@ -193,6 +193,13 @@ FwStats::RefreshStats ()
     }
 }
 
+void
+FwStats::RemoveFace (Ptr<CcnxFace> face)
+{
+  m_stats.RemoveFace (face);
+
+  super::RemoveFace (face);
+}
 
 
 } // namespace ndnSIM

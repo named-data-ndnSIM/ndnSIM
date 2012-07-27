@@ -118,6 +118,9 @@ public:
     // don't do any copying at all
     return *this;
   }
+
+  void
+  RemoveFace (ns3::Ptr<ns3::CcnxFace> face);
   
 private:
   LoadStatsFace   m_pit;

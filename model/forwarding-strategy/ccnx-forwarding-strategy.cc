@@ -473,4 +473,11 @@ CcnxForwardingStrategy::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)
   // do nothing for now. may be need to do some logging
 }
 
+
+void
+CcnxForwardingStrategy::RemoveFace (Ptr<CcnxFace> face)
+{
+  // do nothing here
+}
+
 } //namespace ns3

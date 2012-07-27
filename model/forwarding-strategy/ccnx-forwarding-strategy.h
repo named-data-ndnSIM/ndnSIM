@@ -83,6 +83,9 @@ public:
 
   virtual void
   WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);
+
+  virtual void
+  RemoveFace (Ptr<CcnxFace> face);
   
 protected:
   // events

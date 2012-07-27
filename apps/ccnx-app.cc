@@ -28,6 +28,7 @@
 #include "ns3/ccnx.h"
 #include "ns3/ccnx-fib.h"
 #include "ns3/ccnx-app-face.h"
+#include "ns3/ccnx-forwarding-strategy.h"
 
 NS_LOG_COMPONENT_DEFINE ("CcnxApp");
 
@@ -151,6 +152,7 @@ CcnxApp::StopApplication () // Called at time specified by Stop
   // step 2. Remove face from CCNx stack
   GetNode ()->GetObject<Ccnx> ()->RemoveFace (m_face);
   GetNode ()->GetObject<CcnxFib> ()->RemoveFromAll (m_face);
+  GetNode ()->GetObject<CcnxForwardingStrategy> ()->RemoveFace (m_face); // notify that face is removed
 
   // step 3. Destroy face
   NS_ASSERT_MSG (m_face->GetReferenceCount ()==1,

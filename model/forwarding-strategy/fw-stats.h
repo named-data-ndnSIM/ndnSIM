@@ -56,7 +56,10 @@ public:
           Ptr<CcnxContentObjectHeader> &header,
           Ptr<Packet> &payload,
           const Ptr<const Packet> &packet);
-  
+
+  virtual void
+  RemoveFace (Ptr<CcnxFace> face);
+
 protected:
   virtual void
   DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
