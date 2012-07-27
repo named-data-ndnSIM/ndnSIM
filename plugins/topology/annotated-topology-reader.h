@@ -110,10 +110,10 @@ public:
 
 protected:
   Ptr<Node>
-  CreateNode (const std::string name);
+  CreateNode (const std::string name, uint32_t systemId);
 
   Ptr<Node>
-  CreateNode (const std::string name, double posX, double posY);
+  CreateNode (const std::string name, double posX, double posY, uint32_t systemId);
   
 protected:
   /**

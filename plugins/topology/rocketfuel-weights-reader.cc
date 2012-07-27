@@ -122,13 +122,13 @@ RocketfuelWeightsReader::Read ()
       Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
       if (fromNode == 0)
         {
-          fromNode = CreateNode (from);
+          fromNode = CreateNode (from, 0);
         }
 
       Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
       if (toNode == 0)
         {
-          toNode = CreateNode (to);
+          toNode = CreateNode (to, 0);
         }
 
       Link *link;

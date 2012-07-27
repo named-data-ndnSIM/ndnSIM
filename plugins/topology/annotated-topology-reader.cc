@@ -87,16 +87,16 @@ AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 }
 
 Ptr<Node>
-AnnotatedTopologyReader::CreateNode (const std::string name)
+AnnotatedTopologyReader::CreateNode (const std::string name, uint32_t systemId)
 {
-  return CreateNode (name, m_randX.GetValue (), m_randY.GetValue ());
+  return CreateNode (name, m_randX.GetValue (), m_randY.GetValue (), systemId);
 }
 
 Ptr<Node>
-AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double posY)
+AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double posY, uint32_t systemId)
 {
   NS_LOG_FUNCTION (this << name << posX << posY);
-  Ptr<Node> node = CreateObject<Node> ();
+  Ptr<Node> node = CreateObject<Node> (systemId);
   Ptr<MobilityModel> loc = DynamicCast<MobilityModel> (m_mobilityFactory.Create ());
   node->AggregateObject (loc);
 
@@ -150,11 +150,12 @@ AnnotatedTopologyReader::Read (void)
       istringstream lineBuffer (line);
       string name, city;
       double latitude, longitude;
+      uint32_t systemId = 0;
 
-      lineBuffer >> name >> city >> latitude >> longitude;
+      lineBuffer >> name >> city >> latitude >> longitude >> systemId;
       if (name.empty ()) continue;
 
-      Ptr<Node> node = CreateNode (name, m_scale*longitude, -m_scale*latitude);
+      Ptr<Node> node = CreateNode (name, m_scale*longitude, -m_scale*latitude, systemId);
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
