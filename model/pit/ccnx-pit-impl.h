@@ -118,7 +118,7 @@ private:
 
   // indexes
   typedef
-  boost::intrusive::set<entry,
+  boost::intrusive::multiset<entry,
                         boost::intrusive::compare < TimestampIndex< entry > >,
                         boost::intrusive::member_hook< entry,
                                                        boost::intrusive::set_member_hook<>,

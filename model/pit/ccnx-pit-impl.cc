@@ -243,7 +243,7 @@ CcnxPitImpl<Policy>::RescheduleCleaning ()
   //               i_time.begin ()->GetExpireTime () << "s abs time");
   
   m_cleanEvent = Simulator::Schedule (nextEvent,
-                                      &CcnxPitImpl::CleanExpired, this);
+                                      &CcnxPitImpl<Policy>::CleanExpired, this);
 }
 
 template<class Policy>
@@ -270,6 +270,7 @@ CcnxPitImpl<Policy>::CleanExpired ()
   if (super::getPolicy ().size ())
     {
       NS_LOG_DEBUG ("Size: " << super::getPolicy ().size ());
+      NS_LOG_DEBUG ("i_time size: " << i_time.size ());
     }
   RescheduleCleaning ();
 }
