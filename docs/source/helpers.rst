@@ -23,20 +23,20 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
   Currently, there are 2 implemented forwarding strategies that can be used in simulations:
 
-  - :ndnsim:`CcnxFloodingStrategy` (default)
+  - :ndnsim:`Flooding` (default)
 
       Interests will be forwarded to all available faces available for a route (FIB entry).
       If there are no available GREEN or YELLOW faces, interests is dropped.
 
       .. code-block:: c++
 
-         ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
+         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::Flooding");
 	 ...
 	 ccnxHelper.Install (nodes);
 	 
       
 
-  - :ndnsim:`CcnxFloodingStrategy` with smart forwarding
+  - :ndnsim:`SmartFlooding`
 
       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face. 
       If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
@@ -44,12 +44,11 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
       .. code-block:: c++
 
-         Config::SetDefault ("ns3::CcnxFloodingStrategy::SmartFlooding", BooleanValue (true));
-         ccnxHelper.SetForwardingStrategy ("ns3::CcnxFloodingStrategy");
+         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::SmartFlooding");
 	 ...
 	 ccnxHelper.Install (nodes);
 
-  - :ndnsim:`CcnxBestRouteStrategy`
+  - :ndnsim:`BestRoute`
 
       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
       If not, Interest will be forwarded to the highest-ranked YELLOW face.
@@ -57,7 +56,7 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
       .. code-block:: c++
 
-         ccnxHelper.SetForwardingStrategy ("ns3::CcnxBestRouteStrategy");
+         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::BestRoute");
 	 ...
 	 ccnxHelper.Install (nodes);
 
