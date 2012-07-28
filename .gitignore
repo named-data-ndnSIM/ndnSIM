@@ -8,3 +8,4 @@ waf
 *.txt
 *.pdf
 *.dot
+doxygen.warnings.log

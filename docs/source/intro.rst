@@ -74,9 +74,9 @@ ndnSIM has been successfully compiled and used under Ubuntu Linux 11.04 (stock g
 Requirements
 -------------
 
-1. ndnSIM requires the latest version of NS-3 simulator (as of May 31st, 2012, development branch of NS-3).
+1. ndnSIM requires the customized version of NS-3 simulator (a number of patches required to make ndnSIM work with the latest development branch of NS-3).
 
-2. ndnSIM requires boost libraries:
+2. Boost libraries should be installed on the system:
 
    * For Ubuntu::
 
@@ -86,7 +86,7 @@ Requirements
 
        sudo port instal boost
 
-3. Other NS-3 modules have additional dependencies.  For example, in
+3. If you are planning to use other modules, like visualizer, a number of additional dependencies should be installed.  For example, in
 order to run `visualizer`_ module, the following should be installed:
 
    * For Ubuntu::
@@ -97,48 +97,29 @@ order to run `visualizer`_ module, the following should be installed:
 
    * For MacOS (macports)::
 
-       sudo port install  py27-pygraphviz py27-kiwi py27-goocanvas
+       sudo port install  py27-pygraphviz py27-goocanvas
+
+.. py27-kiwi 
 
 .. _visualizer: http://www.nsnam.org/wiki/index.php/PyViz
 
 Downloading ndnSIM source
 -------------------------
 
-(Recommended) Custom/unsupported branch of NS-3
-+++++++++++++++++++++++++++++++++++++++++++++++
-
-Alternatively, it is possible to download a custom (unsupported) branch of NS-3 that contains all necessary patches and more::
+Download a custom branch of NS-3 that contains all necessary patches and more::
 
 	mkdir ndnSIM
 	cd ndnSIM
 	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
 	git clone git://github.com/cawka/pybindgen.git pybindgen
+
+The first command is to create a directory, which will contain everything NS-3 related.  The bare minimum is just base NS-3 (the first clone above). The second clone gets a module necessary to build python bindings, which are necessary for the visualizer module.  
+
+Finally, clone actual ndnSIM code and place it in src/ folder::
+
 	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
 
-The first command is to create a directory, which will contain everything NS-3 related.  The bare minimum is just base NS-3 (the first clone above). The second clone gets a module necessary to build python bindings, which are necessary for the visualizer module.  The third clone gets actual ndnSIM code and places it in src/ directory.
-
 There are quite a few modification to the base NS-3 code that are necessary to run ndnSIM, and the code is periodically synchronized with the official developer branch.  Eventually, all the changes will be merged to the official branch, but for the time being, it is necessary to use the customized branch.
-
-
-Only ndnSIM
-+++++++++++
-
-Download NS-3 simulator. For example::
-
-	hg clone http://code.nsnam.org/ns-3-allinone/ ns-3-all
-	cd ns-3-all
-	./download.py
-
-ndnSIM source code should be placed in ``src/ndnSIM`` folder under NS-3 simulator source tree.  For example::
-
-	cd ns-3-dev
-	git clone gitolite@git.irl.cs.ucla.edu:ndn/ndnSIM.git ns-3/src/ndnSIM
-
-.. git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
-
-After cloning, a number of patches need to be applied to the base NS-3 to make sure ndnSIM compiles and works::
-
-	find src/ndnSIM/patches/ -type f -print 0 | xargs -0 patch -p1
 
 Compiling and running ndnSIM
 ----------------------------
@@ -160,6 +141,13 @@ or::
 .. note::
    Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
 
+Additional compiling options
+++++++++++++++++++++++++++++
+
+ndnSIM contains a number of NS-3 extensions that are not technically part of the ndnSIM.  Right now there are two optional plugins---topology and mobility---which can be enabled using the following configuration option::
+
+	./waf configure --enable-ndn-plugins=topology,mobility
+
 
 Documentation
 =============
@@ -171,6 +159,15 @@ Overall structure of ndnSIM is described in our `technical report <http://lasr.c
 .. It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/html/``), provided that ``doxygen`` and ``graphviz`` modules are installed on system::
 
 ..     ./waf doxygen
+
+Support
+=======
+
+The code of ndnSIM is in active development.  Bug reports (issues) as well as new feature implementation are always welcome. 
+
+To file a bug report, please use `GitHub Issues <https://github.com/NDN-Routing/ndnSIM/issues>`_.
+
+To create new feature, please fork the code and submit Pull Request on GitHub.
 
 
 A very short guide to the code
@@ -199,7 +196,8 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 +-----------------+---------------------------------------------------------------------+
 | ``examples/``   | contain :doc:`several example scenarios <examples>`                 |
 +-----------------+---------------------------------------------------------------------+
-| ``utils/``      | helper classes                                                      |
+| ``utils/``      | helper classes, including implementation of generalized data        |
+|                 | structures                                                          |
 +-----------------+---------------------------------------------------------------------+
 | ``plugins/``    | a number of plugins that may be helpful to run simulation scenarios |
 +-----------------+---------------------------------------------------------------------+

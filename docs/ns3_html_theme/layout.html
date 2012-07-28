@@ -1,0 +1,63 @@
+{#
+    ns-3/layout.html
+    ~~~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for ns-3.
+
+    :copyright: Copyright 2012 by ns-3, see AUTHORS.
+    :license: GPL, see LICENSE for details.
+#}
+{% extends "basic/layout.html" %}
+
+{% set reldelim1 = '<span class="navelem">&nbsp;</span>' %}
+{# set reldelim1 = ' @' #}
+  
+{%- block extrahead %}
+  {%- if theme_customstylesheet %}
+  <link rel="stylesheet" type="text/css"
+    href="{{ pathto('_static/'+theme_customstylesheet, 1) }}" />
+  {%- endif %}
+    
+  {%- if theme_favicon %}
+    <link rel="icon" type="image/ico" 
+      href="{{ pathto('_static/'+theme_favicon, 1) }}" />
+  {%- endif %}
+{% endblock %}
+      
+{% block header %}
+  <div id="titlearea">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tbody>
+	<tr style="height: 56px;">
+	  <td id="projectlogo">
+	    <a href="{{ theme_homepage }}">
+	      <img alt="ndnSIM Logo"
+		   src="{{ pathto('_static/' + theme_logo, 1)}}"/>
+	    </a>
+	    <a href="{{ theme_homepage2 }}">
+	      <img alt="irl Logo"
+		   src="{{ pathto('_static/' + theme_logo2, 1)}}"/>
+	    </a>
+	  </td>
+	  <td id="projecttext">
+	    <div id="projectbrief">{{ theme_projectbrief }} </div>
+	      <span id="projectnumber">{{ theme_projectnumber }}</span>
+	  </td>
+	  <td id="projectsection">
+	    <span style="margin-right:10px">{{ docstitle }}</span>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+      
+{% endblock %}
+
+{% block rootrellink %}
+    <li class="navelem"><a href="{{ theme_homepage }}">{{ theme_projectname }}</a><span class="navelem">&nbsp;</span></li>
+    {{ super() }}
+{% endblock %}
+      
+{% if theme_collapsiblesidebar|tobool %}
+  {% set script_files = script_files + ['_static/sidebar.js'] %}
+{% endif %}
