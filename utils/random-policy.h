@@ -70,7 +70,7 @@ struct random_policy_traits
       }
     };
 
-    typedef boost::intrusive::set< Container,
+    typedef boost::intrusive::multiset< Container,
                                    boost::intrusive::compare< MemberHookLess< Container > >,
                                    Hook > policy_container;
     

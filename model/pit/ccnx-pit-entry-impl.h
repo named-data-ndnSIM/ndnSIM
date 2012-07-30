@@ -46,7 +46,7 @@ public:
   
   virtual ~CcnxPitEntryImpl ()
   {
-    CONTAINER.i_time.erase (*this);
+    CONTAINER.i_time.erase (Pit::time_index::s_iterator_to (*this));
     
     CONTAINER.RescheduleCleaning ();
   }
@@ -54,7 +54,7 @@ public:
   virtual void
   UpdateLifetime (const Time &offsetTime)
   {
-    CONTAINER.i_time.erase (*this);
+    CONTAINER.i_time.erase (Pit::time_index::s_iterator_to (*this));
     super::UpdateLifetime (offsetTime);
     CONTAINER.i_time.insert (*this);
 
