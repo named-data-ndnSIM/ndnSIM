@@ -136,6 +136,8 @@ private:
 
   ObjectFactory m_mobilityFactory;
   double m_scale;
+
+  uint32_t m_requiredPartitions;
 };
 
 }

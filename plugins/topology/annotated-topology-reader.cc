@@ -47,6 +47,10 @@
 
 #include <set>
 
+#ifdef NS3_MPI
+#include <ns3/mpi-interface.h>
+#endif
+
 using namespace std;
 
 namespace ns3 
@@ -59,6 +63,7 @@ AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path, doubl
   , m_randX (0, 100.0)
   , m_randY (0, 100.0)
   , m_scale (scale)
+  , m_requiredPartitions (1)
 {
   NS_LOG_FUNCTION (this);
 
@@ -96,6 +101,8 @@ Ptr<Node>
 AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double posY, uint32_t systemId)
 {
   NS_LOG_FUNCTION (this << name << posX << posY);
+  m_requiredPartitions = std::max (m_requiredPartitions, systemId + 1);
+  
   Ptr<Node> node = CreateObject<Node> (systemId);
   Ptr<MobilityModel> loc = DynamicCast<MobilityModel> (m_mobilityFactory.Create ());
   node->AggregateObject (loc);
@@ -277,6 +284,15 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
 void
 AnnotatedTopologyReader::ApplySettings ()
 {
+#ifdef NS3_MPI
+  if (MpiInterface::GetSize () != m_requiredPartitions)
+    {
+      std::cerr << "MPI interface is enabled, but number of partitions (" << MpiInterface::GetSize ()
+                << ") is not equal to number of partitions in the topology (" << m_requiredPartitions << ")";
+      exit (-1);
+    }
+#endif
+  
   PointToPointHelper p2p;
 
   BOOST_FOREACH (Link &link, m_linksList)
