@@ -29,6 +29,7 @@
 #include "ns3/double.h"
 #include "ns3/boolean.h"
 #include "ns3/simulator.h"
+#include "ns3/random-variable.h"
 
 // #include "ns3/weights-path-stretch-tag.h"
 
@@ -60,6 +61,11 @@ CcnxFace::GetTypeId ()
                    DoubleValue (0.0),
                    MakeDoubleAccessor (&CcnxFace::m_bucketLeak),
                    MakeDoubleChecker<double> ())
+
+    .AddAttribute ("RandomizeLimitChecking", "Whether or not to randomize the limit checking procedure. false (persistent) by default",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&CcnxFace::m_randomizeLimitChecking),
+                   MakeBooleanChecker ())
                    
     // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
     //                BooleanValue (false),
@@ -148,10 +154,30 @@ CcnxFace::IsBelowLimit ()
           //NS_LOG_DEBUG ("Returning false");
           return false;
         }
-      
-      m_bucket += 1.0;
-    }
 
+      if (m_randomizeLimitChecking)
+        {
+          static NormalVariable acceptanceProbability (m_bucketMax, m_bucketMax/6.0, m_bucketMax/2.0);
+          // static UniformVariable acceptanceProbability (0, m_bucketMax);
+          double value = acceptanceProbability.GetValue ();
+          if (value > m_bucketMax)
+            value -= m_bucketMax;
+      
+          if (m_bucket < value)
+            {
+              m_bucket += 1.0;
+              return true;
+            }
+          else
+            return false;
+        }
+      else
+        {
+          m_bucket += 1.0;
+          return true;
+        }
+    }
+  
   return true;
 }
 

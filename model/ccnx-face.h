@@ -246,6 +246,7 @@ private:
   uint32_t m_id; ///< \brief id of the interface in CCNx stack (per-node uniqueness)
   Time m_lastLeakTime;
   uint32_t m_metric; ///< \brief metric of the face
+  bool m_randomizeLimitChecking;
 
   // bool m_enableMetricTagging;
 
