@@ -4,17 +4,17 @@ ndnSIM helpers
 Helpers are very important components of ndnSIM, especially for writing simulation scenarios.
 The following summarizes helpers and their basic usage.
 
-CcnxStackHelper
+NdnStackHelper
 ---------------
 
-:ndnsim:`CcnxStackHelper` is used to install ndnSIM network stack on requested nodes, as well to provide a simple way configure several important parameters of NDN simulation.
+:ndnsim:`NdnStackHelper` is used to install ndnSIM network stack on requested nodes, as well to provide a simple way configure several important parameters of NDN simulation.
 
 Example::
 
-   CcnxStackHelper ccnxHelper;
+   NdnStackHelper ndnHelper;
    NodeContainer nodes;
    ...
-   ccnxHelper.Install (nodes);
+   ndnHelper.Install (nodes);
 
 Forwarding strategy
 +++++++++++++++++++
@@ -30,9 +30,9 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
       .. code-block:: c++
 
-         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::Flooding");
+         ndnHelper.SetForwardingStrategy ("ns3::ndnSIM::Flooding");
 	 ...
-	 ccnxHelper.Install (nodes);
+	 ndnHelper.Install (nodes);
 	 
       
 
@@ -44,9 +44,9 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
       .. code-block:: c++
 
-         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::SmartFlooding");
+         ndnHelper.SetForwardingStrategy ("ns3::ndnSIM::SmartFlooding");
 	 ...
-	 ccnxHelper.Install (nodes);
+	 ndnHelper.Install (nodes);
 
   - :ndnsim:`BestRoute`
 
@@ -56,9 +56,9 @@ Forwarding strategy parameter **must** be set before installing stack on a node.
 
       .. code-block:: c++
 
-         ccnxHelper.SetForwardingStrategy ("ns3::ndnSIM::BestRoute");
+         ndnHelper.SetForwardingStrategy ("ns3::ndnSIM::BestRoute");
 	 ...
-	 ccnxHelper.Install (nodes);
+	 ndnHelper.Install (nodes);
 
 Default routes
 ++++++++++++++
@@ -68,34 +68,34 @@ Default routes
 
 In simple topologies, like in :doc:`examples <examples>`, or when
 simulating broadcast environment, it is possible to set up *default*
-FIB entries using :ndnsim:`CcnxStackHelper::SetDefaultRoutes` call.
+FIB entries using :ndnsim:`NdnStackHelper::SetDefaultRoutes` call.
 More specifically, every installed NDN stack will have a FIB entry to ``/`` prefix, containing all available faces.
 
 The following should be done before installing stack on a node:
 
   .. code-block:: c++
 
-     ccnxHelper.SetDefaultRoutes (true);
+     ndnHelper.SetDefaultRoutes (true);
      ...
-     ccnxHelper.Install (nodes);
+     ndnHelper.Install (nodes);
 
 
 Manually routes
 +++++++++++++++
 
-Routes can be configured manually using :ndnsim:`CcnxStackHelper::AddRoute` static methods of :ndnsim:`CcnxStackHelper`.
+Routes can be configured manually using :ndnsim:`NdnStackHelper::AddRoute` static methods of :ndnsim:`NdnStackHelper`.
 
 These routes **should** be created **after** installing NDN stack on a node:
 
   .. code-block:: c++
 
-     ccnxHelper.Install (nodes);
+     ndnHelper.Install (nodes);
      ...
      Ptr<Node> node = ...     // FIB entry will be added to FIB on this node
      std::string prefix = ... // some prefix
-     Ptr<CcnxFace> face = ... // NDN face that belongs to the node and through which prefix is accessible
+     Ptr<NdnFace> face = ... // NDN face that belongs to the node and through which prefix is accessible
      int32_t metric = ...     // some routing metric
-     CcnxStackHelper::AddRoute (node, prefix, face, metric);
+     NdnStackHelper::AddRoute (node, prefix, face, metric);
 
 
 .. Enable optional interest limiting
@@ -103,60 +103,60 @@ These routes **should** be created **after** installing NDN stack on a node:
 
 .. EnableLimits
 
-CcnxGlobalRoutingHelper
+NdnGlobalRoutingHelper
 -----------------------
 
-To simplify FIB management in large topologies, ndnSIM contains a global routing controller (:ndnsim:`helper <CcnxGlobalRoutingHelper>` and :ndnsim:`special interface <CcnxGlobalRouter>`), similar in spirit to ``Ipv4GlobalRoutingHelper``.
+To simplify FIB management in large topologies, ndnSIM contains a global routing controller (:ndnsim:`helper <NdnGlobalRoutingHelper>` and :ndnsim:`special interface <NdnGlobalRouter>`), similar in spirit to ``Ipv4GlobalRoutingHelper``.
 
 There are several necessary steps, in order to take advantage of the global routing controller:
 
-* install :ndnsim:`special interfaces <CcnxGlobalRouter>` on nodes
+* install :ndnsim:`special interfaces <NdnGlobalRouter>` on nodes
 
    .. code-block:: c++
    
      NodeContainer nodes;
      ...
-     CcnxGlobalRoutingHelper ccnxGlobalRoutingHelper;
-     ccnxGlobalRoutingHelper.Install (nodes);
+     NdnGlobalRoutingHelper ndnGlobalRoutingHelper;
+     ndnGlobalRoutingHelper.Install (nodes);
    
-* specify which node exports which prefix using :ndnsim:`CcnxGlobalRoutingHelper::AddOrigins`
+* specify which node exports which prefix using :ndnsim:`NdnGlobalRoutingHelper::AddOrigins`
 
    .. code-block:: c++
    
      Ptr<Node> producer; // producer node that exports prefix
      std::string prefix; // exported prefix
      ...
-     ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+     ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
    
-* calculate and install FIBs on every node using :ndnsim:`CcnxGlobalRoutingHelper::CalculateRoutes`
+* calculate and install FIBs on every node using :ndnsim:`NdnGlobalRoutingHelper::CalculateRoutes`
 
    .. code-block:: c++
    
-     ccnxGlobalRoutingHelper.CalculateRoutes ();
+     cdnGlobalRoutingHelper.CalculateRoutes ();
    
 
-CcnxAppHelper
+NdnAppHelper
 ---------------
 
-:ndnsim:`CcnxAppHelper` simplifies task of creating, configuring, and installing ndnSIM applications.
+:ndnsim:`NdnAppHelper` simplifies task of creating, configuring, and installing ndnSIM applications.
 
 
-The basic usage of the :ndnsim:`CcnxAppHelper`:
+The basic usage of the :ndnsim:`NdnAppHelper`:
 
 * Create helper for specific applications class:
 
    .. code-block:: c++
 
       // Create helper for the consumer generating Interests with constant rate
-      CcnxAppHelper consumerHelper ("ns3::CcnxConsumerCbr");
+      NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
 
-* Assign prefix on which application operates (either generating Interests using this name or satisfying Interests for this name) using :ndnsim:`CcnxAppHelper::SetPrefix`:
+* Assign prefix on which application operates (either generating Interests using this name or satisfying Interests for this name) using :ndnsim:`NdnAppHelper::SetPrefix`:
 
    .. code-block:: c++
 
       consumerHelper.SetPrefix (prefix);
 
-* Assign application-specific attributes using :ndnsim:`CcnxAppHelper::SetAttribute`:
+* Assign application-specific attributes using :ndnsim:`NdnAppHelper::SetAttribute`:
 
    .. code-block:: c++
 

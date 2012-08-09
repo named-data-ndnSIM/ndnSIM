@@ -114,66 +114,6 @@ NdnPitImpl<lru_policy_traits>::GetTypeId ()
   return tid;
 }
 
-// template<class Policy>
-// TypeId
-// NdnPitImpl<Policy>::GetTypeId ()
-// {
-//   static TypeId tid = TypeId ("ns3::UnknownPitPolicy");
-
-//   return tid;
-// }
-
-// NdnPitEntryImpl::NdnPitEntryImpl (NdnPit &pit,
-//                                     Ptr<const NdnInterestHeader> header,
-//                                     Ptr<NdnFibEntry> fibEntry)
-//   : NdnPitEntry (pit, header, fibEntry)
-//   , item_ (0)
-// {
-//   static_cast<NdnPitImpl&> (m_container).i_time.insert (*this);
-// }
-
-// NdnPitEntryImpl::~NdnPitEntryImpl ()
-// {
-//   static_cast<NdnPitImpl&> (m_container).i_time.erase (*this);
-// }
-
-// TypeId
-// NdnPitImpl::GetTypeId ()
-// {
-//   static TypeId tid = TypeId ("ns3::NdnPit")
-//     .SetGroupName ("Ndn")
-//     .SetParent<NdnPit> ()
-//     .AddConstructor<NdnPitImpl> ()
-//     .AddAttribute ("MaxSize",
-//                    "Set maximum number of entries in PIT. If 0, limit is not enforced",
-//                    StringValue ("0"),
-//                    MakeUintegerAccessor (&NdnPitImpl::GetMaxSize, &NdnPitImpl::SetMaxSize),
-//                    MakeUintegerChecker<uint32_t> ())
-//     ;
-
-//   return tid;
-// }
-
-
-// template<class AcceptanceAndReplacementPolicy>
-// TypeId
-// NdnPitImpl::GetTypeId ()
-// {
-//   #error "Not specialized version is not supported"
-//   // static TypeId tid = TypeId ("ns3::NdnPit")
-//   //   .SetGroupName ("Ndn")
-//   //   .SetParent<NdnPit> ()
-//   //   .AddConstructor<NdnPitImpl> ()
-//   //   .AddAttribute ("MaxSize",
-//   //                  "Set maximum number of entries in PIT. If 0, limit is not enforced",
-//   //                  StringValue ("0"),
-//   //                  MakeUintegerAccessor (&NdnPitImpl::GetMaxSize, &NdnPitImpl::SetMaxSize),
-//   //                  MakeUintegerChecker<uint32_t> ())
-//   //   ;
-
-//   return Typeid ();
-// }
-
 template<class Policy>
 NdnPitImpl<Policy>::NdnPitImpl ()
 {

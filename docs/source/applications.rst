@@ -6,15 +6,15 @@ ndnSIM includes a few reference applications that can be used as a base for NDN 
 Reference applications
 ++++++++++++++++++++++
 
-CcnxConsumerCbr
+NdnConsumerCbr
 ^^^^^^^^^^^^^^^
 
-:ndnsim:`CcnxConsumerCbr` an application that generates Interest traffic with predefined pattern (constant frequency, constant average rate with inter-Interest gap distributed uniformly at random, exponentially at random, etc.).
+:ndnsim:`NdnConsumerCbr` an application that generates Interest traffic with predefined pattern (constant frequency, constant average rate with inter-Interest gap distributed uniformly at random, exponentially at random, etc.).
 
 .. code-block:: c++
 
    // Create application using the app helper
-   CcnxAppHelper helper ("ns3::CcnxConsumerCbr");
+   NdnAppHelper helper ("ns3::NdnConsumerCbr");
 
 This applications has the following attributes:
 
@@ -48,15 +48,15 @@ This applications has the following attributes:
      // Set attribute using the app helper
      helper.SetAttribute ("Randomize", StringValue ("uniform"));
 
-CcnxConsumerBatches
+NdnConsumerBatches
 ^^^^^^^^^^^^^^^^^^^
 
-:ndnsim:`CcnxConsumerBatches` is an on-off-style application gen- erating a specified number of Interests at specified points of simulation.
+:ndnsim:`NdnConsumerBatches` is an on-off-style application gen- erating a specified number of Interests at specified points of simulation.
 
 .. code-block:: c++
 
    // Create application using the app helper
-   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerBatches");
+   NdnAppHelper consumerHelper ("ns3::NdnConsumerBatches");
 
 This applications has the following attributes:
 
@@ -74,15 +74,15 @@ This applications has the following attributes:
      helper.SetAttribute ("Batches", StringValue ("1s 1 2s 5 10s 2"));
 
 
-CcnxConsumerWindow
+NdnConsumerWindow
 ^^^^^^^^^^^^^^^^^^
 
-:ndnsim:`CcnxConsumerWindow` is an application generating a variable rate Interest traffic. It relies on an optional NACK-Interest feature and implements a simple sliding-window-based Interest generation mecha- nism.
+:ndnsim:`NdnConsumerWindow` is an application generating a variable rate Interest traffic. It relies on an optional NACK-Interest feature and implements a simple sliding-window-based Interest generation mechanism.
 
 .. code-block:: c++
 
    // Create application using the app helper
-   CcnxAppHelper consumerHelper ("ns3::CcnxConsumerWindow");
+   NdnAppHelper consumerHelper ("ns3::NdnConsumerWindow");
 
 
 This applications has the following attributes:
@@ -110,24 +110,24 @@ This applications has the following attributes:
 
   If ``Size`` is set to -1, Interests will be requested till the end of the simulation.
 
-CcnxProducer
+NdnProducer
 ^^^^^^^^^^^^
 
-:ndnsim:`CcnxProducer` a simple Interest-sink application, which replying every incoming Interest with Data packet with a specified size and name same as in Interest.
+:ndnsim:`NdnProducer` a simple Interest-sink application, which replying every incoming Interest with Data packet with a specified size and name same as in Interest.
 
 .. code-block:: c++
 
    // Create application using the app helper
-   CcnxAppHelper consumerHelper ("ns3::CcnxProducer");
+   NdnAppHelper consumerHelper ("ns3::NdnProducer");
 
 
 Custom applications
 +++++++++++++++++++
 
-Applications interact with the core of the system using :ndnsim:`CcnxAppFace` realization of Face abstraction. 
-To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`CcnxApp` class that takes care of creating :ndnsim:`CcnxAppFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
+Applications interact with the core of the system using :ndnsim:`NdnAppFace` realization of Face abstraction. 
+To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`NdnApp` class that takes care of creating :ndnsim:`NdnAppFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
 
-.. Base CcnxApp class
+.. Base NdnApp class
 .. ^^^^^^^^^^^^^^^^^^
 
 
@@ -139,20 +139,20 @@ The following code shows how a simple ndnSIM application can be created.  For de
 
 .. code-block:: c++
 
-    class CustomApp : public CcnxApp
+    class CustomApp : public NdnApp
     {
     public:
-      // overridden from CcnxApp
+      // overridden from NdnApp
 
       // Processing upon start of the application
       virtual void
       StartApplication ()
       {
-        // initialize CcnxApp
-        CcnxApp::StartApplication ();
+        // initialize NdnApp
+        NdnApp::StartApplication ();
         
         // Create a name components object for name ``/prefix/sub``
-	Ptr<CcnxNameComponents> prefix = Create<CcnxNameComponents> (); // now prefix contains ``/``
+	Ptr<NdnNameComponents> prefix = Create<NdnNameComponents> (); // now prefix contains ``/``
 	prefix->Add ("prefix"); // now prefix contains ``/prefix``
 	prefix->Add ("sub"); // now prefix contains ``/prefix/sub``
 
@@ -161,24 +161,24 @@ The following code shows how a simple ndnSIM application can be created.  For de
         /////////////////////////////////////////////////////////////////////////////
 
         // Get FIB object        
-        Ptr<CcnxFib> fib = GetNode ()->GetObject<CcnxFib> ();
+        Ptr<NdnFib> fib = GetNode ()->GetObject<NdnFib> ();
 
         // Add entry to FIB
-        // Note that ``m_face`` is cretaed by CcnxApp
-        CcnxFibEntryContainer::type::iterator fibEntry = fib->Add (*prefix, m_face, 0);
+        // Note that ``m_face`` is cretaed by NdnApp
+        NdnFibEntryContainer::type::iterator fibEntry = fib->Add (*prefix, m_face, 0);
       
         /////////////////////////////////////
 	// Sending one Interest packet out //
         /////////////////////////////////////
 
-        // Create and configure CcnxInterestHeader
-        CcnxInterestHeader interestHeader;
+        // Create and configure NdnInterestHeader
+        NdnInterestHeader interestHeader;
         UniformVariable rand (0,std::numeric_limits<uint32_t>::max ());
         interestHeader.SetNonce            (rand.GetValue ());
         interestHeader.SetName             (prefix);
         interestHeader.SetInterestLifetime (Seconds (1.0));
       
-        // Create packet and add CcnxInterestHeader
+        // Create packet and add NdnInterestHeader
         Ptr<Packet> packet = Create<Packet> ();
         packet->AddHeader (interestHeader);
 
@@ -193,21 +193,21 @@ The following code shows how a simple ndnSIM application can be created.  For de
       virtual void
       StopApplication ()
       {
-        // cleanup CcnxApp
-        CcnxApp::StopApplication ();
+        // cleanup NdnApp
+        NdnApp::StopApplication ();
       }
     
       // Callback that will be called when Interest arrives
       virtual void
-      OnInterest (const Ptr<const CcnxInterestHeader> &interest, Ptr<Packet> packet)
+      OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet)
       {
-        // Create and configure CcnxContentObjectHeader and CcnxContentObjectTail
+        // Create and configure NdnContentObjectHeader and NdnContentObjectTail
         // (header is added in front of the packet, tail is added at the end of the packet)
         
-        CcnxContentObjectHeader data;
-        data.SetName (Create<CcnxNameComponents> (interest->GetName ())); // data will have the same name as Interests
+        NdnContentObjectHeader data;
+        data.SetName (Create<NdnNameComponents> (interest->GetName ())); // data will have the same name as Interests
       
-        CcnxContentObjectTail trailer; // doesn't require any configuration
+        NdnContentObjectTail trailer; // doesn't require any configuration
 
         // Create packet and add header and trailer
         Ptr<Packet> packet = Create<Packet> (1024);
@@ -224,7 +224,7 @@ The following code shows how a simple ndnSIM application can be created.  For de
      
       // Callback that will be called when Data arrives
       virtual void
-      OnContentObject (const Ptr<const CcnxContentObjectHeader> &contentObject,
+      OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
                        Ptr<Packet> payload)
       {
         std::cout << "DATA received for name " << contentObject->GetName () << std::endl; 

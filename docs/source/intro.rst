@@ -17,7 +17,7 @@ Following the NDN architecture, ndnSIM is implemented as a new network-layer pro
 
 .. This flexibility allows ndnSIM to simulate scenarios of various homogeneous and heterogeneous networks (e.g., NDN-only, NDN-over-IP, etc.).
 
-The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <CcnxPit>`, :ndnsim:`forwarding information base (FIB) <CcnxFib>`, :ndnsim:`content store <CcnxContentStore>`, :ndnsim:`network <CcnxNetDeviceFace>` and :ndnsim:`application <CcnxAppFace>` interfaces, :ndnsim:`Interest forwarding strategies <CcnxForwardingStrategy>`, etc.
+The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <NdnPit>`, :ndnsim:`forwarding information base (FIB) <NdnFib>`, :ndnsim:`content store <NdnContentStore>`, :ndnsim:`network <NdnNetDeviceFace>` and :ndnsim:`application <NdnAppFace>` interfaces, :ndnsim:`Interest forwarding strategies <NdnForwardingStrategy>`, etc.
 This modular structure allows any component to be easily modified or replaced with no or minimal impact on other components.
 In addition, the simulator provides an extensive collection of interfaces and helpers to perform detailed tracing behavior of every component, as well as NDN traffic flow.
 
@@ -33,8 +33,8 @@ In addition, the simulator provides an extensive collection of interfaces and he
     .................|......................................|......................
     .		     v			     	            v			  .
     .		+------------------+	     +----------------------+		  .
-    .           |    "CcnxFace"    |	     |      "CcnxFace"      |		  .
-    .           |  "(CcnxAppFace)" |	     | "(CcnxNetDeviceFace)"|		  .
+    .           |    "NdnFace"     |	     |      "NdnFace"       |		  .
+    .           |  "(NdnAppFace)"  |	     | "(NdnNetDeviceFace)" |		  .
     .		+------------------+         +----------------------+		  .
     .		               ^                   ^				  .
     .			       |                   |				  .
@@ -42,7 +42,7 @@ In addition, the simulator provides an extensive collection of interfaces and he
     .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
     .			    XX                         XX			  .
     .			    XX    Core NDN protocol    XX  			  .
-    .                       XX    "(CcnxL3Protocol)"   XX
+    .                       XX    "(NdnL3Protocol)"    XX
     .			    XX                         XX			  .
     .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
     .			      ^       ^       ^       ^				  .
@@ -51,7 +51,7 @@ In addition, the simulator provides an extensive collection of interfaces and he
     .	  | 		    	  |		  |    		   |		  .
     .	  v			  v		  v		   v		  .
     . +-------------------+      +-------+      +-------+        +-------------+  .
-    . | "CcnxContentStore"|      |  PIT  |      |  FIB  |        | "Pluggable" |  .
+    . | "NdnContentStore" |      |  PIT  |      |  FIB  |        | "Pluggable" |  .
     . +-------------------+      +-------+      +-------+        | "Forwarding"|  .
     .							         | "Strategy"  |  .
     .							         +-------------+  .
@@ -178,18 +178,18 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 +-----------------+---------------------------------------------------------------------+
 | Folder          | Description                                                         |
 +=================+=====================================================================+
-| ``model/``      | implementation of NDN base: :ndnsim:`CcnxL3Protocol`, faces         |
-|                 | (:ndnsim:`CcnxFace`, :ndnsim:`CcnxNetDeviceFace`, forwarding        |
-|                 | :ndnsim:`CcnxAppFace`),                                             |
-|                 | strategies (:ndnsim:`CcnxForwardingStrategy`,                       |
-|                 | :ndnsim:`CcnxFloodingStrategy`, :ndnsim:`CcnxBestRouteStrategy`),   |
+| ``model/``      | implementation of NDN base: :ndnsim:`NdnL3Protocol`, faces          |
+|                 | (:ndnsim:`NdnFace`, :ndnsim:`NdnNetDeviceFace`, forwarding          |
+|                 | :ndnsim:`NdnAppFace`),                                              |
+|                 | strategies (:ndnsim:`NdnForwardingStrategy`,                        |
+|                 | :ndnsim:`Flooding`, :ndnsim:`SmartFlooding`, :ndnsim:`BestRoute`),  |
 |                 | etc.                                                                |
 +-----------------+---------------------------------------------------------------------+
 | ``apps/``       | applications (in NS-3 sense) that can be installed on the nodes.    |
-|                 | Right now we have one producer (:ndnsim:`CcnxProducer`) and a       |
-|                 | collection  of consumer (:ndnsim:`CcnxConsumerCbr`,                 |
-|                 | :ndnsim:`CcnxConsumerWindow`,                                       |
-|                 | :ndnsim:`CcnxConsumerBatches`).  See doxygen documentation or       |
+|                 | Right now we have one producer (:ndnsim:`NdnProducer`) and a        |
+|                 | collection  of consumer (:ndnsim:`NdnConsumerCbr`,                  |
+|                 | :ndnsim:`NdnConsumerWindow`,                                        |
+|                 | :ndnsim:`NdnConsumerBatches`).  See doxygen documentation or        |
 |                 | source  code for details                                            |
 +-----------------+---------------------------------------------------------------------+
 | ``helper/``     | a number of :doc:`useful helpers <helpers>`                         |
@@ -205,9 +205,9 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 Logging
 -----------------
 
-Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` will show everything what happens on :ndnsim:`CcnxFace` and :ndnsim:`CcnxConsumer` classes::
+Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`NdnFace` and :ndnsim:`NdnConsumer` will show everything what happens on :ndnsim:`NdnFace` and :ndnsim:`NdnConsumer` classes::
 
-    NS_LOG=CcnxFace:CcnxConsumer ./waf --run=ccnx-simple
+    NS_LOG=NdnFace:NdnConsumer ./waf --run=ndn-simple
 
 Refer to the source code and NS-3 documentation to see what logging interfaces are available and about details how enable one or more logging interfaces.
 
