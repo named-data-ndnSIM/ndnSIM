@@ -35,13 +35,12 @@
 #include <list>
 #include <map>
 
-namespace boost
-{
+namespace boost {
 
 class NdnGlobalRouterGraph
 {
 public:
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > Vertice;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > Vertice;
   typedef uint16_t edge_property_type;
   typedef uint32_t vertex_property_type;
   
@@ -49,14 +48,14 @@ public:
   {
     for (ns3::NodeList::Iterator node = ns3::NodeList::Begin (); node != ns3::NodeList::End (); node++)
       {
-        ns3::Ptr<ns3::NdnGlobalRouter> gr = (*node)->GetObject<ns3::NdnGlobalRouter> ();
+        ns3::Ptr<ns3::ndn::GlobalRouter> gr = (*node)->GetObject<ns3::ndn::GlobalRouter> ();
 	if (gr != 0)
 	  m_vertices.push_back (gr);
       }
 
     for (ns3::ChannelList::Iterator channel = ns3::ChannelList::Begin (); channel != ns3::ChannelList::End (); channel++)
       {
-        ns3::Ptr<ns3::NdnGlobalRouter> gr = (*channel)->GetObject<ns3::NdnGlobalRouter> ();
+        ns3::Ptr<ns3::ndn::GlobalRouter> gr = (*channel)->GetObject<ns3::ndn::GlobalRouter> ();
 	if (gr != 0)
 	  m_vertices.push_back (gr);
       }
@@ -85,7 +84,7 @@ struct graph_traits< NdnGlobalRouterGraph >
 {
   // Graph concept
   typedef NdnGlobalRouterGraph::Vertice vertex_descriptor;
-  typedef ns3::NdnGlobalRouter::Incidency edge_descriptor;
+  typedef ns3::ndn::GlobalRouter::Incidency edge_descriptor;
   typedef directed_tag directed_category;
   typedef disallow_parallel_edge_tag edge_parallel_category;
   typedef ndn_global_router_graph_category traversal_category;
@@ -95,7 +94,7 @@ struct graph_traits< NdnGlobalRouterGraph >
   typedef size_t vertices_size_type;
 
   // AdjacencyGraph concept
-  typedef ns3::NdnGlobalRouter::IncidencyList::iterator out_edge_iterator;
+  typedef ns3::ndn::GlobalRouter::IncidencyList::iterator out_edge_iterator;
   typedef size_t degree_size_type;
 
   // typedef size_t edges_size_type;
@@ -206,9 +205,9 @@ template<>
 struct property_traits< EdgeWeights >
 {
   // Metric property map
-  typedef tuple< ns3::Ptr<ns3::NdnFace>, uint16_t > value_type;
-  typedef tuple< ns3::Ptr<ns3::NdnFace>, uint16_t > reference;
-  typedef ns3::NdnGlobalRouter::Incidency key_type;
+  typedef tuple< ns3::Ptr<ns3::ndn::Face>, uint16_t > value_type;
+  typedef tuple< ns3::Ptr<ns3::ndn::Face>, uint16_t > reference;
+  typedef ns3::ndn::GlobalRouter::Incidency key_type;
   typedef readable_property_map_tag category;
 };
 
@@ -254,8 +253,8 @@ struct WeightCombine :
     return a + b.get<1> ();
   }
 
-  tuple< ns3::Ptr<ns3::NdnFace>, uint32_t >
-  operator () (tuple< ns3::Ptr<ns3::NdnFace>, uint32_t > a,
+  tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t >
+  operator () (tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t > a,
                property_traits< EdgeWeights >::reference b) const
   {
     if (a.get<0> () == 0)
@@ -271,7 +270,7 @@ struct property_traits< VertexIds >
   // Metric property map
   typedef uint32_t value_type;
   typedef uint32_t reference;
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > key_type;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > key_type;
   typedef readable_property_map_tag category;
 };
 
@@ -300,16 +299,16 @@ put (reference_wrapper< M > mapp,
 }
 
 // void
-// put (cref< std::map< ns3::Ptr<ns3::NdnGlobalRouter>, ns3::Ptr<ns3::NdnGlobalRouter> > > map,
+// put (cref< std::map< ns3::Ptr<ns3::ndn::GlobalRouter>, ns3::Ptr<ns3::ndn::GlobalRouter> > > map,
 
 uint32_t
-get (const boost::VertexIds&, ns3::Ptr<ns3::NdnGlobalRouter> &gr)
+get (const boost::VertexIds&, ns3::Ptr<ns3::ndn::GlobalRouter> &gr)
 {
   return gr->GetId ();
 }
 
 inline property_traits< EdgeWeights >::reference
-get(const boost::EdgeWeights&, ns3::NdnGlobalRouter::Incidency &edge)
+get(const boost::EdgeWeights&, ns3::ndn::GlobalRouter::Incidency &edge)
 {
   if (edge.get<1> () == 0)
     return property_traits< EdgeWeights >::reference (0, 0);
@@ -318,7 +317,7 @@ get(const boost::EdgeWeights&, ns3::NdnGlobalRouter::Incidency &edge)
 }
 
 struct PredecessorsMap :
-  public std::map< ns3::Ptr< ns3::NdnGlobalRouter >, ns3::Ptr< ns3::NdnGlobalRouter > >
+    public std::map< ns3::Ptr< ns3::ndn::GlobalRouter >, ns3::Ptr< ns3::ndn::GlobalRouter > >
 {
 };
 
@@ -326,15 +325,15 @@ template<>
 struct property_traits< reference_wrapper<PredecessorsMap> >
 {
   // Metric property map
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > value_type;
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > reference;
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > key_type;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > value_type;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > reference;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > key_type;
   typedef read_write_property_map_tag category;
 };
 
 
 struct DistancesMap :
-  public std::map< ns3::Ptr< ns3::NdnGlobalRouter >, tuple< ns3::Ptr<ns3::NdnFace>, uint32_t > >
+    public std::map< ns3::Ptr< ns3::ndn::GlobalRouter >, tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t > >
 {
 };
 
@@ -342,18 +341,18 @@ template<>
 struct property_traits< reference_wrapper<DistancesMap> >
 {
   // Metric property map
-  typedef tuple< ns3::Ptr<ns3::NdnFace>, uint32_t > value_type;
-  typedef tuple< ns3::Ptr<ns3::NdnFace>, uint32_t > reference;
-  typedef ns3::Ptr< ns3::NdnGlobalRouter > key_type;
+  typedef tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t > value_type;
+  typedef tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t > reference;
+  typedef ns3::Ptr< ns3::ndn::GlobalRouter > key_type;
   typedef read_write_property_map_tag category;
 };
 
-inline tuple< ns3::Ptr<ns3::NdnFace>, uint32_t >
-get (DistancesMap &map, ns3::Ptr<ns3::NdnGlobalRouter> key)
+inline tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t >
+get (DistancesMap &map, ns3::Ptr<ns3::ndn::GlobalRouter> key)
 {
   boost::DistancesMap::iterator i = map.find (key);
   if (i == map.end ())
-    return tuple< ns3::Ptr<ns3::NdnFace>, uint32_t > (0, std::numeric_limits<uint32_t>::max ());
+    return tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t > (0, std::numeric_limits<uint32_t>::max ());
   else
     return i->second;
 }

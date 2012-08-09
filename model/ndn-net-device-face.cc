@@ -28,19 +28,21 @@
 #include "ns3/node.h"
 #include "ns3/pointer.h"
 
+// #include "ns3/address.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/channel.h"
 #include "ns3/ndn-name-components.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnNetDeviceFace");
+NS_LOG_COMPONENT_DEFINE ("ndn.NetDeviceFace");
 
 namespace ns3 {
+namespace ndn {
 
 TypeId
-NdnNetDeviceFace::GetTypeId ()
+NetDeviceFace::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnNetDeviceFace")
-    .SetParent<NdnFace> ()
+  static TypeId tid = TypeId ("ns3::ndn::NetDeviceFace")
+    .SetParent<Face> ()
     .SetGroupName ("Ndn")
     ;
   return tid;
@@ -50,46 +52,46 @@ NdnNetDeviceFace::GetTypeId ()
  * By default, Ndn face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face
  */
-NdnNetDeviceFace::NdnNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice)
-  : NdnFace (node)
+NetDeviceFace::NetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice)
+  : Face (node)
   , m_netDevice (netDevice)
 {
   NS_LOG_FUNCTION (this << netDevice);
 
   SetMetric (1); // default metric
 
-  NS_ASSERT_MSG (m_netDevice != 0, "NdnNetDeviceFace needs to be assigned a valid NetDevice");
+  NS_ASSERT_MSG (m_netDevice != 0, "NetDeviceFace needs to be assigned a valid NetDevice");
 }
 
-NdnNetDeviceFace::~NdnNetDeviceFace ()
+NetDeviceFace::~NetDeviceFace ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-NdnNetDeviceFace& NdnNetDeviceFace::operator= (const NdnNetDeviceFace &)
+NetDeviceFace& NetDeviceFace::operator= (const NetDeviceFace &)
 {
   return *this;
 }
 
 Ptr<NetDevice>
-NdnNetDeviceFace::GetNetDevice () const
+NetDeviceFace::GetNetDevice () const
 {
   return m_netDevice;
 }
 
 void
-NdnNetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
+NetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
   NS_LOG_FUNCTION (this);
 
-  NdnFace::RegisterProtocolHandler (handler);
+  Face::RegisterProtocolHandler (handler);
   
-  m_node->RegisterProtocolHandler (MakeCallback (&NdnNetDeviceFace::ReceiveFromNetDevice, this),
-                                   NdnL3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
+  m_node->RegisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this),
+                                   L3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
 }
 
 bool
-NdnNetDeviceFace::SendImpl (Ptr<Packet> packet)
+NetDeviceFace::SendImpl (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
   
@@ -99,18 +101,18 @@ NdnNetDeviceFace::SendImpl (Ptr<Packet> packet)
                  << " for Ndn; fragmentation not supported");
 
   bool ok = m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
-                               NdnL3Protocol::ETHERNET_FRAME_TYPE);
+                               L3Protocol::ETHERNET_FRAME_TYPE);
   return ok;
 }
 
 // callback
 void
-NdnNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
-                                         Ptr<const Packet> p,
-                                         uint16_t protocol,
-                                         const Address &from,
-                                         const Address &to,
-                                         NetDevice::PacketType packetType)
+NetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
+                                     Ptr<const Packet> p,
+                                     uint16_t protocol,
+                                     const Address &from,
+                                     const Address &to,
+                                     NetDevice::PacketType packetType)
 {
   NS_LOG_FUNCTION (device << p << protocol << from << to << packetType);
   Receive (p);
@@ -118,15 +120,20 @@ NdnNetDeviceFace::ReceiveFromNetDevice (Ptr<NetDevice> device,
 
 
 std::ostream&
-NdnNetDeviceFace::Print (std::ostream& os) const
+NetDeviceFace::Print (std::ostream& os) const
 {
+#ifdef NS3_LOG_ENABLE
   os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId () << ",";
   os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (0)->GetNode ()->GetId ();
   os << "-";
   os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (1)->GetNode ()->GetId ();
   os << ")";
+#else
+  os << "dev=net(" << GetId () << ")";
+#endif  
   return os;
 }
 
-}; // namespace ns3
+} // namespace ndnsim
+} // namespace ns3
 

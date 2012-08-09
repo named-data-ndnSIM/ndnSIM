@@ -24,10 +24,9 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 /**
  * @brief Traits for Least Recently Used replacement policy
@@ -128,6 +127,7 @@ struct lru_policy_traits
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif

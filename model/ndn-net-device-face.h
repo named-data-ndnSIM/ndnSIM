@@ -25,8 +25,7 @@
 #include "ns3/net-device.h"
 
 namespace ns3 {
-
-class Address;
+namespace ndn {
   
 /**
  * \ingroup ndn-face
@@ -42,7 +41,7 @@ class Address;
  *
  * \see NdnAppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
  */
-class NdnNetDeviceFace  : public NdnFace
+class NetDeviceFace  : public Face
 {
 public:
   static TypeId
@@ -55,8 +54,8 @@ public:
    * @param netDevice a smart pointer to NetDevice object to which
    * this face will be associate
    */
-  NdnNetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
-  virtual ~NdnNetDeviceFace();
+  NetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
+  virtual ~NetDeviceFace();
 
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from NdnFace
@@ -84,8 +83,8 @@ public:
   Ptr<NetDevice> GetNetDevice () const;
 
 private:
-  NdnNetDeviceFace (const NdnNetDeviceFace &); ///< \brief Disabled copy constructor
-  NdnNetDeviceFace& operator= (const NdnNetDeviceFace &); ///< \brief Disabled copy operator
+  NetDeviceFace (const NetDeviceFace &); ///< \brief Disabled copy constructor
+  NetDeviceFace& operator= (const NetDeviceFace &); ///< \brief Disabled copy operator
 
   /// \brief callback from lower layers
   void ReceiveFromNetDevice (Ptr<NetDevice> device,
@@ -99,6 +98,7 @@ private:
   Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif //NDN_NET_DEVICE_FACE_H

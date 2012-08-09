@@ -22,19 +22,20 @@
 
 #include "ns3/ndn-interest-header.h"
 
-#include "ccnb-parser/visitors/ccnb-parser-interest-visitor.h"
+#include "ccnb-parser/visitors/interest-visitor.h"
 
-#include "ccnb-parser/syntax-tree/ccnb-parser-block.h"
-#include "ccnb-parser/syntax-tree/ccnb-parser-dtag.h"
+#include "ccnb-parser/syntax-tree/block.h"
+#include "ccnb-parser/syntax-tree/dtag.h"
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnDecodingHelper");
+NS_LOG_COMPONENT_DEFINE ("ndn.DecodingHelper");
 
 namespace ns3 {
+namespace ndn {
 
 size_t
-NdnDecodingHelper::Deserialize (Buffer::Iterator start, NdnInterestHeader &interest)
+DecodingHelper::Deserialize (Buffer::Iterator start, InterestHeader &interest)
 {
   static CcnbParser::InterestVisitor interestVisitor;
 
@@ -57,4 +58,5 @@ NdnDecodingHelper::Deserialize (Buffer::Iterator start, NdnInterestHeader &inter
 //   return i.GetDistanceFrom (start);
 // }
 
+} // namespace ndn
 } // namespace ns3

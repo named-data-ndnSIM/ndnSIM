@@ -22,29 +22,30 @@
 #define	_NDN_PIT_ENTRY_IMPL_H_
 
 namespace ns3 {
+namespace ndn {
 
-class NdnPit;
-class NdnInterestHeader;
-class NdnFibEntry;
+class Pit;
+
+namespace pit {
 
 template<class Pit>
-class NdnPitEntryImpl : public NdnPitEntry
+class EntryImpl : public Entry
 {
-  typedef NdnPitEntry super;
+  typedef Entry super;
   #define CONTAINER static_cast<Pit&> (m_container)
   
 public:
-  NdnPitEntryImpl (NdnPit &pit,
-                    Ptr<const NdnInterestHeader> header,
-                    Ptr<NdnFibEntry> fibEntry)
-  : NdnPitEntry (pit, header, fibEntry)
+  EntryImpl (Pit &pit,
+                Ptr<const InterestHeader> header,
+                Ptr<fib::Entry> fibEntry)
+  : Entry (pit, header, fibEntry)
   , item_ (0)
   {
     CONTAINER.i_time.insert (*this);
     CONTAINER.RescheduleCleaning ();
   }
   
-  virtual ~NdnPitEntryImpl ()
+  virtual ~EntryImpl ()
   {
     CONTAINER.i_time.erase (Pit::time_index::s_iterator_to (*this));
     
@@ -86,6 +87,8 @@ struct TimestampIndex
   }
 };
 
-} // ns3
+} // namespace pit
+} // namespace ndn
+} // namespace ns3
 
 #endif 

@@ -32,14 +32,15 @@
 #include <boost/foreach.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("NdnPitEntry");
+NS_LOG_COMPONENT_DEFINE ("ndn.pit.Entry");
 
-namespace ns3
-{
+namespace ns3 {
+namespace ndn {
+namespace pit {
 
-NdnPitEntry::NdnPitEntry (NdnPit &container,
-                            Ptr<const NdnInterestHeader> header,
-                            Ptr<NdnFibEntry> fibEntry)
+Entry::Entry (Pit &container,
+              Ptr<const InterestHeader> header,
+              Ptr<fib::Entry> fibEntry)
   : m_container (container)
   , m_prefix (header->GetNamePtr ())
   , m_fibEntry (fibEntry)
@@ -52,7 +53,7 @@ NdnPitEntry::NdnPitEntry (NdnPit &container,
 }
 
 void
-NdnPitEntry::UpdateLifetime (const Time &offsetTime)
+Entry::UpdateLifetime (const Time &offsetTime)
 {
   NS_LOG_FUNCTION (offsetTime.ToDouble (Time::S));
   
@@ -63,11 +64,11 @@ NdnPitEntry::UpdateLifetime (const Time &offsetTime)
   NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
 }
 
-NdnPitEntry::in_iterator
-NdnPitEntry::AddIncoming (Ptr<NdnFace> face)
+Entry::in_iterator
+Entry::AddIncoming (Ptr<Face> face)
 {
   std::pair<in_iterator,bool> ret = 
-    m_incoming.insert (NdnPitEntryIncomingFace (face));
+    m_incoming.insert (IncomingFace (face));
 
   // NS_ASSERT_MSG (ret.second, "Something is wrong");
 
@@ -75,29 +76,29 @@ NdnPitEntry::AddIncoming (Ptr<NdnFace> face)
 }
 
 void
-NdnPitEntry::RemoveIncoming (Ptr<NdnFace> face)
+Entry::RemoveIncoming (Ptr<Face> face)
 {
   m_incoming.erase (face);
 }
 
 
-NdnPitEntry::out_iterator
-NdnPitEntry::AddOutgoing (Ptr<NdnFace> face)
+Entry::out_iterator
+Entry::AddOutgoing (Ptr<Face> face)
 {
   std::pair<out_iterator,bool> ret =
-    m_outgoing.insert (NdnPitEntryOutgoingFace (face));
+    m_outgoing.insert (OutgoingFace (face));
 
   if (!ret.second)
     { // outgoing face already exists
       m_outgoing.modify (ret.first,
-                         ll::bind (&NdnPitEntryOutgoingFace::UpdateOnRetransmit, ll::_1));
+                         ll::bind (&OutgoingFace::UpdateOnRetransmit, ll::_1));
     }
 
   return ret.first;
 }
 
 void
-NdnPitEntry::RemoveAllReferencesToFace (Ptr<NdnFace> face)
+Entry::RemoveAllReferencesToFace (Ptr<Face> face)
 {
   in_iterator incoming = m_incoming.find (face);
 
@@ -112,16 +113,16 @@ NdnPitEntry::RemoveAllReferencesToFace (Ptr<NdnFace> face)
 }
 
 // void
-// NdnPitEntry::SetWaitingInVain (NdnPitEntry::out_iterator face)
+// Entry::SetWaitingInVain (Entry::out_iterator face)
 // {
 //   NS_LOG_DEBUG (boost::cref (*face->m_face));
 
 //   m_outgoing.modify (face,
-//                      (&ll::_1)->*&NdnPitEntryOutgoingFace::m_waitingInVain = true);
+//                      (&ll::_1)->*&EntryOutgoingFace::m_waitingInVain = true);
 // }
 
 void
-NdnPitEntry::SetWaitingInVain (Ptr<NdnFace> face)
+Entry::SetWaitingInVain (Ptr<Face> face)
 {
   // NS_LOG_DEBUG (boost::cref (*face->m_face));
 
@@ -130,37 +131,37 @@ NdnPitEntry::SetWaitingInVain (Ptr<NdnFace> face)
     return;
   
   m_outgoing.modify (item,
-                     (&ll::_1)->*&NdnPitEntryOutgoingFace::m_waitingInVain = true);
+                     (&ll::_1)->*&OutgoingFace::m_waitingInVain = true);
 }
 
 
 bool
-NdnPitEntry::AreAllOutgoingInVain () const
+Entry::AreAllOutgoingInVain () const
 {
   NS_LOG_DEBUG (m_outgoing.size ());
 
   bool inVain = true;
   std::for_each (m_outgoing.begin (), m_outgoing.end (),
-                 ll::var(inVain) &= (&ll::_1)->*&NdnPitEntryOutgoingFace::m_waitingInVain);
+                 ll::var(inVain) &= (&ll::_1)->*&OutgoingFace::m_waitingInVain);
 
   NS_LOG_DEBUG ("inVain " << inVain);
   return inVain;
 }
 
 bool
-NdnPitEntry::AreTherePromisingOutgoingFacesExcept (Ptr<NdnFace> face) const
+Entry::AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const
 {
   bool inVain = true;
   std::for_each (m_outgoing.begin (), m_outgoing.end (),
                  ll::var(inVain) &=
-                 ((&ll::_1)->*&NdnPitEntryOutgoingFace::m_face == face ||
-                  (&ll::_1)->*&NdnPitEntryOutgoingFace::m_waitingInVain));
+                 ((&ll::_1)->*&OutgoingFace::m_face == face ||
+                  (&ll::_1)->*&OutgoingFace::m_waitingInVain));
 
   return !inVain;
 }
 
 void
-NdnPitEntry::IncreaseAllowedRetxCount ()
+Entry::IncreaseAllowedRetxCount ()
 {
   NS_LOG_ERROR (this);
   if (Simulator::Now () - m_lastRetransmission >= MilliSeconds (100))
@@ -172,12 +173,12 @@ NdnPitEntry::IncreaseAllowedRetxCount ()
     }
 }
 
-std::ostream& operator<< (std::ostream& os, const NdnPitEntry &entry)
+std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {
   os << "Prefix: " << *entry.m_prefix << "\n";
   os << "In: ";
   bool first = true;
-  BOOST_FOREACH (const NdnPitEntryIncomingFace &face, entry.m_incoming)
+  BOOST_FOREACH (const IncomingFace &face, entry.m_incoming)
     {
       if (!first)
         os << ",";
@@ -189,7 +190,7 @@ std::ostream& operator<< (std::ostream& os, const NdnPitEntry &entry)
 
   os << "\nOut: ";
   first = true;
-  BOOST_FOREACH (const NdnPitEntryOutgoingFace &face, entry.m_outgoing)
+  BOOST_FOREACH (const OutgoingFace &face, entry.m_outgoing)
     {
       if (!first)
         os << ",";
@@ -214,4 +215,6 @@ std::ostream& operator<< (std::ostream& os, const NdnPitEntry &entry)
 }
 
 
-}
+} // namespace pit
+} // namespace ndn
+} // namespace ns3

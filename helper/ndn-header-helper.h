@@ -23,17 +23,12 @@
 
 #include "ns3/ptr.h"
 
-#define INTEREST_BYTE0 0x01
-#define INTEREST_BYTE1 0xD2
-
-#define CONTENT_OBJECT_BYTE0 0x04
-#define CONTENT_OBJECT_BYTE1 0x82
-
-namespace ns3
-{
+namespace ns3 {
 
 class Header;
 class Packet;
+
+namespace ndn {
 
 /**
  * \ingroup ndn-helpers
@@ -43,11 +38,11 @@ class Packet;
  *
  * Ndn doesn't really have a header, so we need this class to
  * determine type of Ndn packet and return corresponent header class,
- * NdnInterestHeader or NdnContentObjectHeader
+ * InterestHeader or ContentObjectHeader
  *
- * Throws NdnUnknownHeaderException if header type couldn't be determined
+ * Throws UnknownHeaderException if header type couldn't be determined
  */
-class NdnHeaderHelper
+class HeaderHelper
 {
 public:
   /**
@@ -89,8 +84,9 @@ public:
    * \brief Exception thrown if Ndn stack receives unrecognized
    * message type
    */
-class NdnUnknownHeaderException {};
+class UnknownHeaderException {};
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_HEADER_HELPER_H_

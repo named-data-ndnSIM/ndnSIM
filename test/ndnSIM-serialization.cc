@@ -29,7 +29,7 @@ using namespace std;
 namespace ns3
 {
 
-NS_LOG_COMPONENT_DEFINE ("NdnSimSerialization");
+NS_LOG_COMPONENT_DEFINE ("ndn.Serialization");
 
 void
 InterestSerializationTest::DoRun ()

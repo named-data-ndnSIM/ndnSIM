@@ -25,18 +25,19 @@
 #include "ns3/ndn-face.h"
 
 namespace ns3 {
+namespace ndn {
 
-NdnFaceContainer::NdnFaceContainer ()
+FaceContainer::FaceContainer ()
 {
 }
 
-NdnFaceContainer::NdnFaceContainer (const NdnFaceContainer &other)
+FaceContainer::FaceContainer (const FaceContainer &other)
 {
   AddAll (other);
 }
 
-NdnFaceContainer&
-NdnFaceContainer::operator= (const NdnFaceContainer &other)
+FaceContainer&
+FaceContainer::operator= (const FaceContainer &other)
 {
   m_faces.clear ();
   AddAll (other);
@@ -46,38 +47,38 @@ NdnFaceContainer::operator= (const NdnFaceContainer &other)
 
   
 void
-NdnFaceContainer::AddAll (Ptr<NdnFaceContainer> other)
+FaceContainer::AddAll (Ptr<FaceContainer> other)
 {
   AddAll (*other);
 }
 
 void
-NdnFaceContainer::AddAll (const NdnFaceContainer &other)
+FaceContainer::AddAll (const FaceContainer &other)
 {
   m_faces.insert (m_faces.end (),
                   other.m_faces.begin (), other.m_faces.end ());
 }
 
-NdnFaceContainer::Iterator
-NdnFaceContainer::Begin (void) const
+FaceContainer::Iterator
+FaceContainer::Begin (void) const
 {
   return m_faces.begin ();
 }
 
-NdnFaceContainer::Iterator
-NdnFaceContainer::End (void) const
+FaceContainer::Iterator
+FaceContainer::End (void) const
 {
   return m_faces.end ();
 }
 
 uint32_t
-NdnFaceContainer::GetN (void) const
+FaceContainer::GetN (void) const
 {
   return m_faces.size ();
 }
 
 // void 
-// NdnFaceContainer::SetMetricToAll (uint16_t metric)
+// FaceContainer::SetMetricToAll (uint16_t metric)
 // {
 //   for (FaceContainer::iterator it=m_faces.begin ();
 //        it != m_faces.end ();
@@ -88,16 +89,16 @@ NdnFaceContainer::GetN (void) const
 // }
 
 void 
-NdnFaceContainer::Add (const Ptr<NdnFace> &face)
+FaceContainer::Add (const Ptr<Face> &face)
 {
   m_faces.push_back (face);
 }
 
-Ptr<NdnFace>
-NdnFaceContainer::Get (NdnFaceContainer::Iterator i) const
+Ptr<Face>
+FaceContainer::Get (FaceContainer::Iterator i) const
 {
   return *i;
 }
 
-
+} // namespace ndn
 } // namespace ns3

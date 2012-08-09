@@ -23,8 +23,10 @@
 #include "ns3/simulator.h"
 
 namespace ns3 {
+namespace ndn {
+namespace pit {
 
-NdnPitEntryOutgoingFace::NdnPitEntryOutgoingFace (Ptr<NdnFace> face)
+OutgoingFace::OutgoingFace (Ptr<Face> face)
   : m_face (face)
   , m_sendTime (Simulator::Now ())
   , m_retxCount (0)
@@ -33,11 +35,13 @@ NdnPitEntryOutgoingFace::NdnPitEntryOutgoingFace (Ptr<NdnFace> face)
 }
 
 void
-NdnPitEntryOutgoingFace::UpdateOnRetransmit ()
+OutgoingFace::UpdateOnRetransmit ()
 {
   m_sendTime = Simulator::Now ();
   m_retxCount++;
   m_waitingInVain = false;
 }
 
+} // namespace pit
+} // namespace ndn
 } // namespace ns3

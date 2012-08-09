@@ -25,17 +25,18 @@
 #include "ns3/ptr.h"
 
 #include "ns3/ndn-face.h"
-// #include <iostream>
 
 namespace ns3 {
+namespace ndn {
+namespace pit {
 
 /**
  * \ingroup ndn
  * \brief PIT state component for each incoming interest (not including duplicates)
  */
-struct NdnPitEntryIncomingFace
+struct IncomingFace
 {
-  Ptr<NdnFace> m_face; ///< \brief face of the incoming Interest
+  Ptr< Face > m_face; ///< \brief face of the incoming Interest
   Time m_arrivalTime;   ///< \brief arrival time of the incoming Interest
 
 public:
@@ -44,36 +45,37 @@ public:
    * \param face face of the incoming interest
    * \param lifetime lifetime of the incoming interest
    */
-  NdnPitEntryIncomingFace (Ptr<NdnFace> face);
+  IncomingFace (Ptr<Face> face);
 
   /**
    * @brief Default constructor, necessary for Python bindings, but should not be used anywhere else.
    */
-  NdnPitEntryIncomingFace ();
+  IncomingFace ();
   /**
    * @brie Copy operator
    */
-  NdnPitEntryIncomingFace &
-  operator = (NdnPitEntryIncomingFace &other);
+  IncomingFace &
+  operator = (IncomingFace &other);
 
   /**
-   * @brief Compare two NdnPitEntryIncomingFace
+   * @brief Compare two PitEntryIncomingFace
    */
-  bool operator== (const NdnPitEntryIncomingFace &dst) { return *m_face==*(dst.m_face); }
+  bool operator== (const IncomingFace &dst) { return *m_face==*(dst.m_face); }
 
   /**
-   * @brief Compare NdnPitEntryIncomingFace with NdnFace
+   * @brief Compare PitEntryIncomingFace with Face
    */
-  bool operator== (Ptr<NdnFace> face) { return *m_face==*face; }
+  bool operator== (Ptr<Face> face) { return *m_face==*face; }
 
   /**
    * \brief Comparison operator used by boost::multi_index::identity<>
    */
   bool
-  operator< (const NdnPitEntryIncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+  operator< (const IncomingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
 };
 
-
+} // namespace pit
+} // namespace ndn
 } // namespace ns3
 
 #endif	/* NDN_PIT_ENTRY_INCOMING_FACE_H */

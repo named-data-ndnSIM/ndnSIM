@@ -44,63 +44,63 @@
 
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("NdnConsumer");
+NS_LOG_COMPONENT_DEFINE ("ndn.Consumer");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
     
-NS_OBJECT_ENSURE_REGISTERED (NdnConsumer);
+NS_OBJECT_ENSURE_REGISTERED (Consumer);
     
 TypeId
-NdnConsumer::GetTypeId (void)
+Consumer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnConsumer")
+  static TypeId tid = TypeId ("ns3::ndn::Consumer")
     .SetGroupName ("Ndn")
-    .SetParent<NdnApp> ()
+    .SetParent<App> ()
     .AddAttribute ("StartSeq", "Initial sequence number",
                    IntegerValue (0),
-                   MakeIntegerAccessor(&NdnConsumer::m_seq),
+                   MakeIntegerAccessor(&Consumer::m_seq),
                    MakeIntegerChecker<int32_t>())
 
-    .AddAttribute ("Prefix","NdnName of the Interest",
+    .AddAttribute ("Prefix","Name of the Interest",
                    StringValue ("/"),
-                   MakeNdnNameComponentsAccessor (&NdnConsumer::m_interestName),
-                   MakeNdnNameComponentsChecker ())
+                   MakeNameComponentsAccessor (&Consumer::m_interestName),
+                   MakeNameComponentsChecker ())
     .AddAttribute ("LifeTime", "LifeTime for interest packet",
                    StringValue ("2s"),
-                   MakeTimeAccessor (&NdnConsumer::m_interestLifeTime),
+                   MakeTimeAccessor (&Consumer::m_interestLifeTime),
                    MakeTimeChecker ())
     .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",
                    IntegerValue(-1),
-                   MakeIntegerAccessor(&NdnConsumer::m_minSuffixComponents),
+                   MakeIntegerAccessor(&Consumer::m_minSuffixComponents),
                    MakeIntegerChecker<int32_t>())
     .AddAttribute ("MaxSuffixComponents", "MaxSuffixComponents",
                    IntegerValue(-1),
-                   MakeIntegerAccessor(&NdnConsumer::m_maxSuffixComponents),
+                   MakeIntegerAccessor(&Consumer::m_maxSuffixComponents),
                    MakeIntegerChecker<int32_t>())
     .AddAttribute ("ChildSelector", "ChildSelector",
                    BooleanValue(false),
-                   MakeBooleanAccessor(&NdnConsumer::m_childSelector),
+                   MakeBooleanAccessor(&Consumer::m_childSelector),
                    MakeBooleanChecker())
-    .AddAttribute ("Exclude", "only simple name matching is supported (use NdnNameComponents)",
-                   NdnNameComponentsValue (),
-                   MakeNdnNameComponentsAccessor (&NdnConsumer::m_exclude),
-                   MakeNdnNameComponentsChecker ())
+    .AddAttribute ("Exclude", "only simple name matching is supported (use NameComponents)",
+                   NameComponentsValue (),
+                   MakeNameComponentsAccessor (&Consumer::m_exclude),
+                   MakeNameComponentsChecker ())
 
     .AddAttribute ("RetxTimer",
                    "Timeout defining how frequent retransmission timeouts should be checked",
                    StringValue ("50ms"),
-                   MakeTimeAccessor (&NdnConsumer::GetRetxTimer, &NdnConsumer::SetRetxTimer),
+                   MakeTimeAccessor (&Consumer::GetRetxTimer, &Consumer::SetRetxTimer),
                    MakeTimeChecker ())
 
     .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
-                    MakeTraceSourceAccessor (&NdnConsumer::m_pathWeightsTrace))
+                    MakeTraceSourceAccessor (&Consumer::m_pathWeightsTrace))
     ;
 
   return tid;
 }
     
-NdnConsumer::NdnConsumer ()
+Consumer::Consumer ()
   : m_rand (0, std::numeric_limits<uint32_t>::max ())
   , m_seq (0)
   , m_seqMax (0) // don't request anything
@@ -111,7 +111,7 @@ NdnConsumer::NdnConsumer ()
 }
 
 void
-NdnConsumer::SetRetxTimer (Time retxTimer)
+Consumer::SetRetxTimer (Time retxTimer)
 {
   m_retxTimer = retxTimer;
   if (m_retxEvent.IsRunning ())
@@ -119,17 +119,17 @@ NdnConsumer::SetRetxTimer (Time retxTimer)
 
   // schedule even with new timeout
   m_retxEvent = Simulator::Schedule (m_retxTimer,
-                                     &NdnConsumer::CheckRetxTimeout, this); 
+                                     &Consumer::CheckRetxTimeout, this); 
 }
 
 Time
-NdnConsumer::GetRetxTimer () const
+Consumer::GetRetxTimer () const
 {
   return m_retxTimer;
 }
 
 void
-NdnConsumer::CheckRetxTimeout ()
+Consumer::CheckRetxTimeout ()
 {
   Time now = Simulator::Now ();
 
@@ -150,23 +150,23 @@ NdnConsumer::CheckRetxTimeout ()
     }
 
   m_retxEvent = Simulator::Schedule (m_retxTimer,
-                                     &NdnConsumer::CheckRetxTimeout, this); 
+                                     &Consumer::CheckRetxTimeout, this); 
 }
 
 // Application Methods
 void 
-NdnConsumer::StartApplication () // Called at time specified by Start
+Consumer::StartApplication () // Called at time specified by Start
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   // do base stuff
-  NdnApp::StartApplication ();
+  App::StartApplication ();
 
   ScheduleNextPacket ();
 }
     
 void 
-NdnConsumer::StopApplication () // Called at time specified by Stop
+Consumer::StopApplication () // Called at time specified by Stop
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -174,11 +174,11 @@ NdnConsumer::StopApplication () // Called at time specified by Stop
   Simulator::Cancel (m_sendEvent);
 
   // cleanup base stuff
-  NdnApp::StopApplication ();
+  App::StopApplication ();
 }
     
 void
-NdnConsumer::SendPacket ()
+Consumer::SendPacket ()
 {
   if (!m_active) return;
 
@@ -220,18 +220,18 @@ NdnConsumer::SendPacket ()
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
   
   //
-  Ptr<NdnNameComponents> nameWithSequence = Create<NdnNameComponents> (m_interestName);
+  Ptr<NameComponents> nameWithSequence = Create<NameComponents> (m_interestName);
   (*nameWithSequence) (seq);
   //
 
-  NdnInterestHeader interestHeader;
+  InterestHeader interestHeader;
   interestHeader.SetNonce               (m_rand.GetValue ());
   interestHeader.SetName                (nameWithSequence);
   interestHeader.SetInterestLifetime    (m_interestLifeTime);
   interestHeader.SetChildSelector       (m_childSelector);
   if (m_exclude.size ()>0)
     {
-      interestHeader.SetExclude (Create<NdnNameComponents> (m_exclude));
+      interestHeader.SetExclude (Create<NameComponents> (m_exclude));
     }
   interestHeader.SetMaxSuffixComponents (m_maxSuffixComponents);
   interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
@@ -261,12 +261,12 @@ NdnConsumer::SendPacket ()
 
 
 void
-NdnConsumer::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                                Ptr<Packet> payload)
 {
   if (!m_active) return;
 
-  NdnApp::OnContentObject (contentObject, payload); // tracing inside
+  App::OnContentObject (contentObject, payload); // tracing inside
   
   NS_LOG_FUNCTION (this << contentObject << payload);
 
@@ -300,11 +300,11 @@ NdnConsumer::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentOb
 }
 
 void
-NdnConsumer::OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> origPacket)
+Consumer::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPacket)
 {
   if (!m_active) return;
   
-  NdnApp::OnNack (interest, origPacket); // tracing inside
+  App::OnNack (interest, origPacket); // tracing inside
   
   NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
 
@@ -325,7 +325,7 @@ NdnConsumer::OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> o
 }
 
 void
-NdnConsumer::OnTimeout (uint32_t sequenceNumber)
+Consumer::OnTimeout (uint32_t sequenceNumber)
 {
   // std::cout << Simulator::Now () << ", TO: " << sequenceNumber << ", current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
 
@@ -335,4 +335,5 @@ NdnConsumer::OnTimeout (uint32_t sequenceNumber)
   ScheduleNextPacket (); 
 }
 
+} // namespace ndn
 } // namespace ns3

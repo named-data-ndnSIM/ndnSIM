@@ -24,10 +24,9 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 /**
  * @brief Traits for First In First Out replacement policy
@@ -123,6 +122,7 @@ struct fifo_policy_traits
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif

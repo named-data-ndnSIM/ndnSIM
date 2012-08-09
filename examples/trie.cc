@@ -33,7 +33,7 @@ using namespace ns3;
 using namespace ndnSIM;
 using namespace boost;
 
-NS_LOG_COMPONENT_DEFINE ("Trie");
+NS_LOG_COMPONENT_DEFINE ("ndn.Trie");
 
 // class Integer : public ns3::SimpleRefCount<Integer>
 // {
@@ -98,21 +98,21 @@ main (int argc, char *argv[])
 
   Ptr<Node> node = CreateObject<Node> ();
   Names::Add ("TestNode", node);
-  Ptr<NdnApp> app = CreateObject<NdnApp> ();
+  Ptr<ndn::App> app = CreateObject<ndn::App> ();
   node->AddApplication (app);
   
-  ObjectFactory factory ("ns3::NdnFib");
+  ObjectFactory factory ("ns3::ndn::fib::Default");
   
-  Ptr<NdnFib> fib = factory.Create<NdnFib> ();
+  Ptr<ndn::Fib> fib = factory.Create<ndn::Fib> ();
   node->AggregateObject (fib);
-  Ptr<NdnFace> face = CreateObject<NdnAppFace> (app);
+  Ptr<ndn::Face> face = CreateObject<ndn::AppFace> (app);
 
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla"), face, 1);
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla/1"), face, 1);
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla/2"), face, 1);
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla/3"), face, 1);
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla/1/1"), face, 1);
-  fib->Add (lexical_cast<NdnNameComponents> ("/bla/1/2"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/2"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/3"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/1"), face, 1);
+  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/2"), face, 1);
   
   cout << *fib << endl;
 

@@ -30,20 +30,23 @@
 namespace ns3 {
 
 class Channel;
-class Ndn;
-class NdnFace;
-class NdnNameComponents;
+
+namespace ndn {
+
+class L3Protocol;
+class Face;
+class NameComponents;
 
 /**
  * @brief Class representing global router interface for ndnSIM
  */
-class NdnGlobalRouter : public Object
+class GlobalRouter : public Object
 {
 public:
   /**
    * @brief Graph edge
    */
-  typedef boost::tuple< Ptr< NdnGlobalRouter >, Ptr< NdnFace >, Ptr< NdnGlobalRouter > > Incidency;
+  typedef boost::tuple< Ptr< GlobalRouter >, Ptr< Face >, Ptr< GlobalRouter > > Incidency;
   /**
    * @brief List of graph edges
    */
@@ -51,7 +54,7 @@ public:
   /**
    * @brief List of locally exported prefixes
    */
-  typedef std::list< Ptr<NdnNameComponents> > LocalPrefixList;
+  typedef std::list< Ptr<NameComponents> > LocalPrefixList;
   
   /**
    * \brief Interface ID
@@ -64,7 +67,7 @@ public:
   /**
    * @brief Default constructor
    */
-  NdnGlobalRouter ();
+  GlobalRouter ();
 
   /**
    * @brief Get numeric ID of the node (internally assigned)
@@ -73,25 +76,25 @@ public:
   GetId () const;
 
   /**
-   * @brief Helper function to get smart pointer to Ndn object (basically, self)
+   * @brief Helper function to get smart pointer to ndn::L3Protocol object (basically, self)
    */
-  Ptr<Ndn>
-  GetNdn () const;
+  Ptr<L3Protocol>
+  GetL3Protocol () const;
 
   /**
    * @brief Add new locally exported prefix
    * @param prefix Prefix
    */
   void
-  AddLocalPrefix (Ptr< NdnNameComponents > prefix);
+  AddLocalPrefix (Ptr< NameComponents > prefix);
 
   /**
    * @brief Add edge to the node
    * @param face Face of the edge
-   * @param ndn NdnGlobalRouter of another node
+   * @param ndn GlobalRouter of another node
    */
   void
-  AddIncidency (Ptr< NdnFace > face, Ptr< NdnGlobalRouter > ndn);
+  AddIncidency (Ptr< Face > face, Ptr< GlobalRouter > ndn);
 
   /**
    * @brief Get list of edges that are connected to this node
@@ -113,7 +116,7 @@ protected:
 private:
   uint32_t m_id;
   
-  Ptr<Ndn> m_ndn;
+  Ptr<L3Protocol> m_ndn;
   LocalPrefixList m_localPrefixes;
   IncidencyList m_incidencies;
 
@@ -121,8 +124,8 @@ private:
 };
 
 inline bool
-operator == (const NdnGlobalRouter::Incidency &a,
-             const NdnGlobalRouter::Incidency &b)
+operator == (const GlobalRouter::Incidency &a,
+             const GlobalRouter::Incidency &b)
 {
   return a.get<0> () == b.get<0> () &&
     a.get<1> () == b.get<1> () &&
@@ -130,12 +133,13 @@ operator == (const NdnGlobalRouter::Incidency &a,
 }
 
 inline bool
-operator != (const NdnGlobalRouter::Incidency &a,
-             const NdnGlobalRouter::Incidency &b)
+operator != (const GlobalRouter::Incidency &a,
+             const GlobalRouter::Incidency &b)
 {
   return ! (a == b);
 }
 
-}
+} // namespace ndn
+} // namespace ns3
 
 #endif // NDN_GLOBAL_ROUTER_H

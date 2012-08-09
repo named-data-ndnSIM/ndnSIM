@@ -30,26 +30,31 @@
 #include "ns3/ndn-name-components.h"
 
 namespace ns3 {
+namespace ndn {
+
+class ForwardingStrategy;
+
+namespace pit {
 
 /**
  * \ingroup ndn
  * \brief Class implementing Pending Interests Table
  */
 template<class Policy>
-class NdnPitImpl : public NdnPit
-                  , protected ndnSIM::trie_with_policy<NdnNameComponents,
-                                                       ndnSIM::smart_pointer_payload_traits<NdnPitEntryImpl< NdnPitImpl< Policy > > >,
-                                                       // ndnSIM::persistent_policy_traits
-                                                       Policy
-                                                       >
+class PitImpl : public Pit
+              , protected ndnSIM::trie_with_policy<NameComponents,
+                                                   ndnSIM::smart_pointer_payload_traits< EntryImpl< PitImpl< Policy > > >,
+                                                   // ndnSIM::persistent_policy_traits
+                                                   Policy
+                                                   >
 {
 public:
-  typedef ndnSIM::trie_with_policy<NdnNameComponents,
-                                   ndnSIM::smart_pointer_payload_traits<NdnPitEntryImpl< NdnPitImpl< Policy > > >,
+  typedef ndnSIM::trie_with_policy<NameComponents,
+                                   ndnSIM::smart_pointer_payload_traits< EntryImpl< PitImpl< Policy > > >,
                                    // ndnSIM::persistent_policy_traits
                                    Policy
                                    > super;
-  typedef NdnPitEntryImpl< NdnPitImpl< Policy > > entry;
+  typedef EntryImpl< PitImpl< Policy > > entry;
 
   /**
    * \brief Interface ID
@@ -61,25 +66,25 @@ public:
   /**
    * \brief PIT constructor
    */
-  NdnPitImpl ();
+  PitImpl ();
 
   /**
    * \brief Destructor
    */
-  virtual ~NdnPitImpl ();
+  virtual ~PitImpl ();
 
-  // inherited from NdnPit  
-  virtual Ptr<NdnPitEntry>
-  Lookup (const NdnContentObjectHeader &header);
+  // inherited from Pit  
+  virtual Ptr<Entry>
+  Lookup (const ContentObjectHeader &header);
 
-  virtual Ptr<NdnPitEntry>
-  Lookup (const NdnInterestHeader &header);
+  virtual Ptr<Entry>
+  Lookup (const InterestHeader &header);
 
-  virtual Ptr<NdnPitEntry>
-  Create (Ptr<const NdnInterestHeader> header);
+  virtual Ptr<Entry>
+  Create (Ptr<const InterestHeader> header);
   
   virtual void
-  MarkErased (Ptr<NdnPitEntry> entry);
+  MarkErased (Ptr<Entry> entry);
 
   virtual void
   Print (std::ostream &os) const;
@@ -87,14 +92,14 @@ public:
   virtual uint32_t
   GetSize () const;
 
-  virtual Ptr<NdnPitEntry>
+  virtual Ptr<Entry>
   Begin ();
 
-  virtual Ptr<NdnPitEntry>
+  virtual Ptr<Entry>
   End ();
 
-  virtual Ptr<NdnPitEntry>
-  Next (Ptr<NdnPitEntry>);
+  virtual Ptr<Entry>
+  Next (Ptr<Entry>);
   
 protected:
   void RescheduleCleaning ();
@@ -113,8 +118,8 @@ private:
   
 private:
   EventId m_cleanEvent;
-  Ptr<NdnFib> m_fib; ///< \brief Link to FIB table
-  Ptr<NdnForwardingStrategy> m_forwardingStrategy;
+  Ptr<Fib> m_fib; ///< \brief Link to FIB table
+  Ptr<ForwardingStrategy> m_forwardingStrategy;
 
   // indexes
   typedef
@@ -126,9 +131,11 @@ private:
                         > time_index;
   time_index i_time; 
                         
-  friend class NdnPitEntryImpl< NdnPitImpl >;
+  friend class EntryImpl< PitImpl >;
 };
 
+} // namespace pit
+} // namespace ndn
 } // namespace ns3
 
 #endif	/* NDN_PIT_IMPL_H */

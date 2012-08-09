@@ -37,89 +37,89 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("NdnProducer");
+NS_LOG_COMPONENT_DEFINE ("ndn.Producer");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (NdnProducer);
+NS_OBJECT_ENSURE_REGISTERED (Producer);
     
 TypeId
-NdnProducer::GetTypeId (void)
+Producer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnProducer")
+  static TypeId tid = TypeId ("ns3::ndn::Producer")
     .SetGroupName ("Ndn")
-    .SetParent<NdnApp> ()
-    .AddConstructor<NdnProducer> ()
+    .SetParent<App> ()
+    .AddConstructor<Producer> ()
     .AddAttribute ("Prefix","Prefix, for which producer has the data",
                    StringValue ("/"),
-                   MakeNdnNameComponentsAccessor (&NdnProducer::m_prefix),
-                   MakeNdnNameComponentsChecker ())
+                   MakeNameComponentsAccessor (&Producer::m_prefix),
+                   MakeNameComponentsChecker ())
     .AddAttribute ("PayloadSize", "Virtual payload size for Content packets",
                    UintegerValue (1024),
-                   MakeUintegerAccessor(&NdnProducer::m_virtualPayloadSize),
+                   MakeUintegerAccessor(&Producer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
 
     // optional attributes
     .AddAttribute ("SignatureBits", "SignatureBits field",
                    UintegerValue (0),
-                   MakeUintegerAccessor(&NdnProducer::m_signatureBits),
+                   MakeUintegerAccessor(&Producer::m_signatureBits),
                    MakeUintegerChecker<uint32_t> ())
     ;
         
   return tid;
 }
     
-NdnProducer::NdnProducer ()
+Producer::Producer ()
 {
   // NS_LOG_FUNCTION_NOARGS ();
 }
 
 // inherited from Application base class.
 void
-NdnProducer::StartApplication ()
+Producer::StartApplication ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_ASSERT (GetNode ()->GetObject<NdnFib> () != 0);
+  NS_ASSERT (GetNode ()->GetObject<Fib> () != 0);
 
-  NdnApp::StartApplication ();
+  App::StartApplication ();
 
   NS_LOG_DEBUG ("NodeID: " << GetNode ()->GetId ());
   
-  Ptr<NdnFib> fib = GetNode ()->GetObject<NdnFib> ();
+  Ptr<Fib> fib = GetNode ()->GetObject<Fib> ();
   
-  Ptr<NdnFibEntry> fibEntry = fib->Add (m_prefix, m_face, 0);
+  Ptr<fib::Entry> fibEntry = fib->Add (m_prefix, m_face, 0);
 
-  fibEntry->UpdateStatus (m_face, NdnFibFaceMetric::NDN_FIB_GREEN);
+  fibEntry->UpdateStatus (m_face, fib::FaceMetric::NDN_FIB_GREEN);
   
   // // make face green, so it will be used primarily
-  // StaticCast<NdnFibImpl> (fib)->modify (fibEntry,
-  //                                        ll::bind (&NdnFibEntry::UpdateStatus,
-  //                                                  ll::_1, m_face, NdnFibFaceMetric::NDN_FIB_GREEN));
+  // StaticCast<fib::FibImpl> (fib)->modify (fibEntry,
+  //                                        ll::bind (&fib::Entry::UpdateStatus,
+  //                                                  ll::_1, m_face, fib::FaceMetric::NDN_FIB_GREEN));
 }
 
 void
-NdnProducer::StopApplication ()
+Producer::StopApplication ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_ASSERT (GetNode ()->GetObject<NdnFib> () != 0);
+  NS_ASSERT (GetNode ()->GetObject<Fib> () != 0);
 
-  NdnApp::StopApplication ();
+  App::StopApplication ();
 }
 
 
 void
-NdnProducer::OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> origPacket)
+Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPacket)
 {
-  NdnApp::OnInterest (interest, origPacket); // tracing inside
+  App::OnInterest (interest, origPacket); // tracing inside
 
   NS_LOG_FUNCTION (this << interest);
 
   if (!m_active) return;
     
-  static NdnContentObjectTail tail;
-  Ptr<NdnContentObjectHeader> header = Create<NdnContentObjectHeader> ();
-  header->SetName (Create<NdnNameComponents> (interest->GetName ()));
+  static ContentObjectTail tail;
+  Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+  header->SetName (Create<NameComponents> (interest->GetName ()));
   header->GetSignedInfo ().SetTimestamp (Simulator::Now ());
   header->GetSignature ().SetSignatureBits (m_signatureBits);
 
@@ -147,4 +147,5 @@ NdnProducer::OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packe
   m_transmittedContentObjects (header, packet, this, m_face);
 }
 
+} // namespace ndn
 } // namespace ns3

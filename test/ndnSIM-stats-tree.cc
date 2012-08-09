@@ -27,7 +27,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnStatsTreeTest");
+NS_LOG_COMPONENT_DEFINE ("ndn.StatsTreeTest");
 
 namespace ns3
 {

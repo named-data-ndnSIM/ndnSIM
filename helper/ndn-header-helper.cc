@@ -29,32 +29,39 @@
 #include "ns3/ndn-content-object-header.h"
 #include <iomanip>
 
-NS_LOG_COMPONENT_DEFINE ("NdnHeaderHelper");
+NS_LOG_COMPONENT_DEFINE ("ndn.HeaderHelper");
+
+#define INTEREST_BYTE0 0x01
+#define INTEREST_BYTE1 0xD2
+
+#define CONTENT_OBJECT_BYTE0 0x04
+#define CONTENT_OBJECT_BYTE1 0x82
 
 
-namespace ns3
-{
+namespace ns3 {
+namespace ndn {
 
-NdnHeaderHelper::Type
-NdnHeaderHelper::GetNdnHeaderType (Ptr<const Packet> packet)
+HeaderHelper::Type
+HeaderHelper::GetNdnHeaderType (Ptr<const Packet> packet)
 {
   uint8_t type[2];
   uint32_t read=packet->CopyData (type,2);
 
-  if (read!=2) throw NdnUnknownHeaderException();
+  if (read!=2) throw UnknownHeaderException();
 
   NS_LOG_DEBUG (*packet);
   if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
     {
-      return NdnHeaderHelper::INTEREST;
+      return HeaderHelper::INTEREST;
     }
   else if (type[0] == CONTENT_OBJECT_BYTE0 && type[1] == CONTENT_OBJECT_BYTE1)
     {
-      return NdnHeaderHelper::CONTENT_OBJECT;
+      return HeaderHelper::CONTENT_OBJECT;
     }
 
   NS_LOG_DEBUG (*packet);
-  throw NdnUnknownHeaderException();
+  throw UnknownHeaderException();
 }
 
+} // namespace ndn
 } // namespace ns3

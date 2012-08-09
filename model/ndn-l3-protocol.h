@@ -28,42 +28,43 @@
 #include "ns3/net-device.h"
 #include "ns3/nstime.h"
 
-// #include "ndn-content-store.h"
-// #include "ndn-pit.h"
-// #include "ndn-fib.h"
-
-#include "ndn.h"
-
 namespace ns3 {
 
 class Packet;
 class NetDevice;
 class Node;
-class NdnFace;
-class NdnRoute;
-class NdnForwardingStrategy;
 class Header;
-class NdnInterestHeader;
-class NdnContentObjectHeader;
 
-    
+namespace ndn {
+
+class Face;
+class ForwardingStrategy;
+class InterestHeader;
+class ContentObjectHeader;
+
+/**
+ * \defgroup ndn ndnSIM: NDN simulation module
+ *
+ * This is a simplified modular implementation of NDN protocol
+ */
 /**
  * \ingroup ndn
- * \brief Actual implementation of the Ndn network layer
- * 
- * \todo This description is incorrect. Should be changed accordingly
+ * \brief Implementation network-layer of NDN stack
  *
- * This class contains two distinct groups of trace sources.  The
- * trace sources 'Rx' and 'Tx' are called, respectively, immediately
- * after receiving from the NetDevice and immediately before sending
- * to a NetDevice for transmitting a packet.  These are low level
- * trace sources that include the NdnHeader already serialized into
- * the packet.  In contrast, the Drop, SendOutgoing, UnicastForward,
- * and LocalDeliver trace sources are slightly higher-level and pass
- * around the NdnHeader as an explicit parameter and not as part of
- * the packet.
+ * This class defines the API to manipulate the following aspects of
+ * the NDN stack implementation:
+ * -# register a face (Face-derived object) for use by the NDN
+ *    layer
+ * 
+ * Each Face-derived object has conceptually a single NDN
+ * interface associated with it.
+ *
+ * In addition, this class defines NDN packet coding constants
+ *
+ * \see Face, ForwardingStrategy
  */
-class NdnL3Protocol : public Ndn
+class L3Protocol :
+    public Object
 {
 public:
   /**
@@ -80,72 +81,52 @@ public:
   /**
    * \brief Default constructor. Creates an empty stack without forwarding strategy set
    */
-  NdnL3Protocol();
-  virtual ~NdnL3Protocol ();
+  L3Protocol();
+  virtual ~L3Protocol ();
 
-  ////////////////////////////////////////////////////////////////////
-  // functions defined in base class Ndn
-
+  /**
+   * \brief Add face to Ndn stack
+   *
+   * \param face smart pointer to NdnFace-derived object
+   * (NdnLocalFace, NdnNetDeviceFace, NdnUdpFace) \returns the
+   * index of the Ndn interface added.
+   * 
+   * \see NdnLocalFace, NdnNetDeviceFace, NdnUdpFace
+   */
   virtual uint32_t
-  AddFace (const Ptr<NdnFace> &face);
+  AddFace (const Ptr<Face> &face);
   
+  /**
+   * \brief Get current number of faces added to Ndn stack
+   *
+   * \returns the number of faces
+   */
   virtual uint32_t
   GetNFaces () const;
   
-  virtual Ptr<NdnFace>
+  /**
+   * \brief Get face by face index
+   * \param face The face number of an Ndn interface.
+   * \returns The NdnFace associated with the Ndn face number.
+   */
+  virtual Ptr<Face>
   GetFace (uint32_t face) const;
 
+  /**
+   * \brief Remove face from ndn stack (remove callbacks)
+   */
   virtual void
-  RemoveFace (Ptr<NdnFace> face);
+  RemoveFace (Ptr<Face> face);
 
-  virtual Ptr<NdnFace>
+  /**
+   * \brief Get face for NetDevice
+   */
+  virtual Ptr<Face>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
-  
-  // void ScheduleLeakage();
+
 private:
   void
-  Receive (const Ptr<NdnFace> &face, const Ptr<const Packet> &p);
-
-  // /**
-  //  * \brief Actual processing of incoming Ndn interests. Note, interests do not have payload
-  //  * 
-  //  * Processing Interest packets
-  //  * @param face    incoming face
-  //  * @param header  deserialized Interest header
-  //  * @param packet  original packet
-  //  */
-  // void
-  // OnInterest (const Ptr<NdnFace> &face,
-  //             Ptr<NdnInterestHeader> &header,
-  //             const Ptr<const Packet> &p);
-
-  // /**
-  //  * \brief Processing of incoming Ndn NACKs. Note, these packets, like interests, do not have payload
-  //  * 
-  //  * Processing NACK packets
-  //  * @param face    incoming face
-  //  * @param header  deserialized Interest header
-  //  * @param packet  original packet
-  //  */
-  // void
-  // OnNack (const Ptr<NdnFace> &face,
-  //         Ptr<NdnInterestHeader> &header,
-  //         const Ptr<const Packet> &p);
-  
-  // /**
-  //  * \brief Actual processing of incoming Ndn content objects
-  //  * 
-  //  * Processing ContentObject packets
-  //  * @param face    incoming face
-  //  * @param header  deserialized ContentObject header
-  //  * @param payload data packet payload
-  //  * @param packet  original packet
-  //  */
-  // void
-  // OnData (const Ptr<NdnFace> &face,
-  //         Ptr<NdnContentObjectHeader> &header,
-  //         Ptr<Packet> &payload,
-  //         const Ptr<const Packet> &packet);
+  Receive (const Ptr<Face> &face, const Ptr<const Packet> &p);
 
 protected:
   virtual void DoDispose (void); ///< @brief Do cleanup
@@ -157,31 +138,20 @@ protected:
   virtual void NotifyNewAggregate ();
 
 private:
-  NdnL3Protocol(const NdnL3Protocol &); ///< copy constructor is disabled
-  NdnL3Protocol &operator = (const NdnL3Protocol &); ///< copy operator is disabled
-
-  // void
-  // GiveUpInterest (Ptr<NdnPitEntry> pitEntry,
-  //                 Ptr<NdnInterestHeader> header);
-
-  // void
-  // OnDataDelayed (Ptr<const NdnContentObjectHeader> header,
-  //                Ptr<const Packet> payload,
-  //                const Ptr<const Packet> &packet);
+  L3Protocol(const L3Protocol &); ///< copy constructor is disabled
+  L3Protocol &operator = (const L3Protocol &); ///< copy operator is disabled
   
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
-  typedef std::vector<Ptr<NdnFace> > NdnFaceList;
-  NdnFaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
+  typedef std::vector<Ptr<Face> > FaceList;
+  FaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
 
   // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
-  Ptr<NdnForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
-
-  // bool m_nacksEnabled;
-  // bool m_cacheUnsolicitedData;
+  Ptr<ForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 };
-  
-} // Namespace ns3
+
+} // namespace ndn
+} // namespace ns3
 
 #endif /* NDN_L3_PROTOCOL_H */

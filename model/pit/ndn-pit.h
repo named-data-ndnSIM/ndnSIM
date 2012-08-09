@@ -28,11 +28,12 @@
 #include "ndn-pit-entry.h"
 
 namespace ns3 {
+namespace ndn {
 
-class Ndn;
-class NdnFace;
-class NdnContentObjectHeader;
-class NdnInterestHeader;
+class L3Protocol;
+class Face;
+class ContentObjectHeader;
+class InterestHeader;
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -41,7 +42,7 @@ class NdnInterestHeader;
  * \ingroup ndn
  * \brief Class implementing Pending Interests Table
  */
-class NdnPit : public Object
+class Pit : public Object
 {
 public:
   /**
@@ -54,12 +55,12 @@ public:
   /**
    * \brief PIT constructor
    */
-  NdnPit ();
+  Pit ();
 
   /**
    * \brief Destructor
    */
-  virtual ~NdnPit ();
+  virtual ~Pit ();
 
   /**
    * \brief Find corresponding PIT entry for the given content name
@@ -72,8 +73,8 @@ public:
    * \returns smart pointer to PIT entry. If record not found,
    *          returns 0
    */
-  virtual Ptr<NdnPitEntry>
-  Lookup (const NdnContentObjectHeader &header) = 0;
+  virtual Ptr<pit::Entry>
+  Lookup (const ContentObjectHeader &header) = 0;
 
   /**
    * \brief Find a PIT entry for the given content interest
@@ -81,8 +82,8 @@ public:
    * \returns iterator to Pit entry. If record not found,
    *          return end() iterator
    */
-  virtual Ptr<NdnPitEntry>
-  Lookup (const NdnInterestHeader &header) = 0;
+  virtual Ptr<pit::Entry>
+  Lookup (const InterestHeader &header) = 0;
 
   /**
    * @brief Creates a PIT entry for the given interest
@@ -92,8 +93,8 @@ public:
    *
    * Note. This call assumes that the entry does not exist (i.e., there was a Lookup call before)
    */
-  virtual Ptr<NdnPitEntry>
-  Create (Ptr<const NdnInterestHeader> header) = 0;
+  virtual Ptr<pit::Entry>
+  Create (Ptr<const InterestHeader> header) = 0;
   
   /**
    * @brief Mark PIT entry deleted
@@ -103,7 +104,7 @@ public:
    * lifetime +m_PitEntryDefaultLifetime from Now ()
    */
   virtual void
-  MarkErased (Ptr<NdnPitEntry> entry) = 0;
+  MarkErased (Ptr<pit::Entry> entry) = 0;
 
   /**
    * @brief Print out PIT contents for debugging purposes
@@ -122,20 +123,20 @@ public:
   /**
    * @brief Return first element of FIB (no order guaranteed)
    */
-  virtual Ptr<NdnPitEntry>
+  virtual Ptr<pit::Entry>
   Begin () = 0;
 
   /**
    * @brief Return item next after last (no order guaranteed)
    */
-  virtual Ptr<NdnPitEntry>
+  virtual Ptr<pit::Entry>
   End () = 0;
 
   /**
    * @brief Advance the iterator
    */
-  virtual Ptr<NdnPitEntry>
-  Next (Ptr<NdnPitEntry>) = 0;
+  virtual Ptr<pit::Entry>
+  Next (Ptr<pit::Entry>) = 0;
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -144,8 +145,8 @@ public:
   /**
    * @brief Static call to cheat python bindings
    */
-  static inline Ptr<NdnPit>
-  GetNdnPit (Ptr<Object> node);
+  static inline Ptr<Pit>
+  GetPit (Ptr<Object> node);
 
 protected:
   // configuration variables. Check implementation of GetTypeId for more details
@@ -156,19 +157,19 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////
 
 inline std::ostream&
-operator<< (std::ostream& os, const NdnPit &pit)
+operator<< (std::ostream& os, const Pit &pit)
 {
   pit.Print (os);
   return os;
 }
 
-inline Ptr<NdnPit>
-NdnPit::GetNdnPit (Ptr<Object> node)
+inline Ptr<Pit>
+Pit::GetPit (Ptr<Object> node)
 {
-  return node->GetObject<NdnPit> ();
+  return node->GetObject<Pit> ();
 }
 
-
+} // namespace ndn
 } // namespace ns3
 
 #endif	/* NDN_PIT_H */

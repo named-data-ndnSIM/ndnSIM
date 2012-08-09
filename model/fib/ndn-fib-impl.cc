@@ -34,43 +34,45 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("NdnFibImpl");
+NS_LOG_COMPONENT_DEFINE ("ndn.fib.FibImpl");
 
 namespace ns3 {
+namespace ndn {
+namespace fib {
 
-NS_OBJECT_ENSURE_REGISTERED (NdnFibImpl);
+NS_OBJECT_ENSURE_REGISTERED (FibImpl);
 
 TypeId 
-NdnFibImpl::GetTypeId (void)
+FibImpl::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnFib") // cheating ns3 object system
-    .SetParent<NdnFib> ()
+  static TypeId tid = TypeId ("ns3::ndn::fib::Default") // cheating ns3 object system
+    .SetParent<Fib> ()
     .SetGroupName ("Ndn")
-    .AddConstructor<NdnFibImpl> ()
+    .AddConstructor<FibImpl> ()
   ;
   return tid;
 }
 
-NdnFibImpl::NdnFibImpl ()
+FibImpl::FibImpl ()
 {
 }
 
 void
-NdnFibImpl::NotifyNewAggregate ()
+FibImpl::NotifyNewAggregate ()
 {
   Object::NotifyNewAggregate ();
 }
 
 void 
-NdnFibImpl::DoDispose (void)
+FibImpl::DoDispose (void)
 {
   clear ();
   Object::DoDispose ();
 }
 
 
-Ptr<NdnFibEntry>
-NdnFibImpl::LongestPrefixMatch (const NdnInterestHeader &interest)
+Ptr<Entry>
+FibImpl::LongestPrefixMatch (const InterestHeader &interest)
 {
   super::iterator item = super::longest_prefix_match (interest.GetName ());
   // @todo use predicate to search with exclude filters
@@ -82,14 +84,14 @@ NdnFibImpl::LongestPrefixMatch (const NdnInterestHeader &interest)
 }
 
 
-Ptr<NdnFibEntry>
-NdnFibImpl::Add (const NdnNameComponents &prefix, Ptr<NdnFace> face, int32_t metric)
+Ptr<Entry>
+FibImpl::Add (const NameComponents &prefix, Ptr<Face> face, int32_t metric)
 {
-  return Add (Create<NdnNameComponents> (prefix), face, metric);
+  return Add (Create<NameComponents> (prefix), face, metric);
 }
   
-Ptr<NdnFibEntry>
-NdnFibImpl::Add (const Ptr<const NdnNameComponents> &prefix, Ptr<NdnFace> face, int32_t metric)
+Ptr<Entry>
+FibImpl::Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t metric)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
 
@@ -99,13 +101,13 @@ NdnFibImpl::Add (const Ptr<const NdnNameComponents> &prefix, Ptr<NdnFace> face, 
     {
       if (result.second)
         {
-            Ptr<NdnFibEntryImpl> newEntry = Create<NdnFibEntryImpl> (prefix);
+            Ptr<EntryImpl> newEntry = Create<EntryImpl> (prefix);
             newEntry->SetTrie (result.first);
             result.first->set_payload (newEntry);
         }
   
       super::modify (result.first,
-                     ll::bind (&NdnFibEntry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
+                     ll::bind (&Entry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
     
       return result.first->payload ();
     }
@@ -114,7 +116,7 @@ NdnFibImpl::Add (const Ptr<const NdnNameComponents> &prefix, Ptr<NdnFace> face, 
 }
 
 void
-NdnFibImpl::Remove (const Ptr<const NdnNameComponents> &prefix)
+FibImpl::Remove (const Ptr<const NameComponents> &prefix)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 
@@ -122,7 +124,7 @@ NdnFibImpl::Remove (const Ptr<const NdnNameComponents> &prefix)
 }
 
 // void
-// NdnFibImpl::Invalidate (const Ptr<const NdnNameComponents> &prefix)
+// FibImpl::Invalidate (const Ptr<const NameComponents> &prefix)
 // {
 //   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 
@@ -134,11 +136,11 @@ NdnFibImpl::Remove (const Ptr<const NdnNameComponents> &prefix)
 //     return; // nothing to invalidate
 
 //   super::modify (lastItem,
-//                  ll::bind (&NdnFibEntry::Invalidate, ll::_1));
+//                  ll::bind (&Entry::Invalidate, ll::_1));
 // }
 
 void
-NdnFibImpl::InvalidateAll ()
+FibImpl::InvalidateAll ()
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId ());
 
@@ -149,28 +151,28 @@ NdnFibImpl::InvalidateAll ()
       if (item->payload () == 0) continue;
 
       super::modify (&(*item),
-                     ll::bind (&NdnFibEntry::Invalidate, ll::_1));
+                     ll::bind (&Entry::Invalidate, ll::_1));
     }
 }
 
 void
-NdnFibImpl::RemoveFace (super::parent_trie &item, Ptr<NdnFace> face)
+FibImpl::RemoveFace (super::parent_trie &item, Ptr<Face> face)
 {
   if (item.payload () == 0) return;
   NS_LOG_FUNCTION (this);
 
   super::modify (&item,
-                 ll::bind (&NdnFibEntry::RemoveFace, ll::_1, face));
+                 ll::bind (&Entry::RemoveFace, ll::_1, face));
 }
 
 void
-NdnFibImpl::RemoveFromAll (Ptr<NdnFace> face)
+FibImpl::RemoveFromAll (Ptr<Face> face)
 {
   NS_LOG_FUNCTION (this);
 
   std::for_each (super::parent_trie::recursive_iterator (super::getTrie ()),
                  super::parent_trie::recursive_iterator (0), 
-                 ll::bind (&NdnFibImpl::RemoveFace,
+                 ll::bind (&FibImpl::RemoveFace,
                            this, ll::_1, face));
 
   super::parent_trie::recursive_iterator trieNode (super::getTrie ());
@@ -187,7 +189,7 @@ NdnFibImpl::RemoveFromAll (Ptr<NdnFace> face)
 }
 
 void
-NdnFibImpl::Print (std::ostream &os) const
+FibImpl::Print (std::ostream &os) const
 {
   // !!! unordered_set imposes "random" order of item in the same level !!!
   super::parent_trie::const_recursive_iterator item (super::getTrie ());
@@ -201,13 +203,13 @@ NdnFibImpl::Print (std::ostream &os) const
 }
 
 uint32_t
-NdnFibImpl::GetSize () const
+FibImpl::GetSize () const
 {
   return super::getPolicy ().size ();
 }
 
-Ptr<const NdnFibEntry>
-NdnFibImpl::Begin ()
+Ptr<const Entry>
+FibImpl::Begin ()
 {
   super::parent_trie::const_recursive_iterator item (super::getTrie ());
   super::parent_trie::const_recursive_iterator end (0);
@@ -223,18 +225,18 @@ NdnFibImpl::Begin ()
     return item->payload ();
 }
 
-Ptr<const NdnFibEntry>
-NdnFibImpl::End ()
+Ptr<const Entry>
+FibImpl::End ()
 {
   return 0;
 }
 
-Ptr<const NdnFibEntry>
-NdnFibImpl::Next (Ptr<const NdnFibEntry> from)
+Ptr<const Entry>
+FibImpl::Next (Ptr<const Entry> from)
 {
   if (from == 0) return 0;
   
-  super::parent_trie::const_recursive_iterator item (*StaticCast<const NdnFibEntryImpl> (from)->to_iterator ());
+  super::parent_trie::const_recursive_iterator item (*StaticCast<const EntryImpl> (from)->to_iterator ());
   super::parent_trie::const_recursive_iterator end (0);
   for (item++; item != end; item++)
     {
@@ -248,5 +250,6 @@ NdnFibImpl::Next (Ptr<const NdnFibEntry> from)
     return item->payload ();
 }
 
-
+} // namespace fib
+} // namespace ndn
 } // namespace ns3

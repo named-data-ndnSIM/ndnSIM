@@ -71,22 +71,27 @@ def build(bld):
 
         "apps/ndn-app.h",
 
-        "model/ndn.h",
-        "model/pit/ndn-pit.h",
-        "model/pit/ndn-pit-entry.h",
-        "model/pit/ndn-pit-entry-incoming-face.h",
-        "model/pit/ndn-pit-entry-outgoing-face.h",
-        "model/content-store/ndn-content-store.h",
-        "model/fib/ndn-fib.h",
-        "model/fib/ndn-fib-entry.h",
-        "model/forwarding-strategy/ndn-forwarding-strategy.h",
+        "model/ndn-l3-protocol.h",
         "model/ndn-face.h",
         "model/ndn-app-face.h",
         "model/ndn-net-device-face.h",
         "model/ndn-interest-header.h",
         "model/ndn-content-object-header.h",
         "model/ndn-name-components.h",
-        # "model/ndn-name-components-hash-helper.h",
+
+        "model/cs/ndn-content-store.h",
+
+        "model/fib/ndn-fib.h",
+        "model/fib/ndn-fib-entry.h",
+        
+        "model/pit/ndn-pit.h",
+        "model/pit/ndn-pit-entry.h",
+        "model/pit/ndn-pit-entry-incoming-face.h",
+        "model/pit/ndn-pit-entry-outgoing-face.h",
+        
+        
+        
+        "model/fw/ndn-forwarding-strategy.h",
 
         "utils/batches.h",
         # "utils/weights-path-stretch-tag.h",

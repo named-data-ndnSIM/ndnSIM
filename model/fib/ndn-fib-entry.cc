@@ -32,30 +32,25 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("NdnFibEntry");
+NS_LOG_COMPONENT_DEFINE ("ndn.fib.Entry");
 
-namespace ns3
-{
+namespace ns3 {
+namespace ndn {
+namespace fib {
 
 //////////////////////////////////////////////////////////////////////
 // Helpers
 //////////////////////////////////////////////////////////////////////
-namespace __ndn_private {
 
-struct NdnFibFaceMetricByFace
+struct FaceMetricByFace
 {
-  typedef NdnFibFaceMetricContainer::type::index<i_face>::type
+  typedef FaceMetricContainer::type::index<i_face>::type
   type;
 };
 
-}
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-
-using namespace __ndn_private;
 
 void
-NdnFibFaceMetric::UpdateRtt (const Time &rttSample)
+FaceMetric::UpdateRtt (const Time &rttSample)
 {
   // const Time & this->m_rttSample
   
@@ -78,56 +73,56 @@ NdnFibFaceMetric::UpdateRtt (const Time &rttSample)
 /////////////////////////////////////////////////////////////////////
 
 void
-NdnFibEntry::UpdateFaceRtt (Ptr<NdnFace> face, const Time &sample)
+Entry::UpdateFaceRtt (Ptr<Face> face, const Time &sample)
 {
-  NdnFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  FaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
-                  ll::bind (&NdnFibFaceMetric::UpdateRtt, ll::_1, sample));
+                  ll::bind (&FaceMetric::UpdateRtt, ll::_1, sample));
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
 }
 
 void
-NdnFibEntry::UpdateStatus (Ptr<NdnFace> face, NdnFibFaceMetric::Status status)
+Entry::UpdateStatus (Ptr<Face> face, FaceMetric::Status status)
 {
   NS_LOG_FUNCTION (this << boost::cref(*face) << status);
 
-  NdnFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  FaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   NS_ASSERT_MSG (record != m_faces.get<i_face> ().end (),
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
-                  (&ll::_1)->*&NdnFibFaceMetric::m_status = status);
+                  (&ll::_1)->*&FaceMetric::m_status = status);
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
 }
 
 void
-NdnFibEntry::AddOrUpdateRoutingMetric (Ptr<NdnFace> face, int32_t metric)
+Entry::AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT_MSG (face != NULL, "Trying to Add or Update NULL face");
 
-  NdnFibFaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  FaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
   if (record == m_faces.get<i_face> ().end ())
     {
-      m_faces.insert (NdnFibFaceMetric (face, metric));
+      m_faces.insert (FaceMetric (face, metric));
     }
   else
   {
     // don't update metric to higher value
-    if (record->m_routingCost > metric || record->m_status == NdnFibFaceMetric::NDN_FIB_RED)
+    if (record->m_routingCost > metric || record->m_status == FaceMetric::NDN_FIB_RED)
       {
         m_faces.modify (record,
-                        (&ll::_1)->*&NdnFibFaceMetric::m_routingCost = metric);
+                        (&ll::_1)->*&FaceMetric::m_routingCost = metric);
 
         m_faces.modify (record,
-                        (&ll::_1)->*&NdnFibFaceMetric::m_status = NdnFibFaceMetric::NDN_FIB_YELLOW);
+                        (&ll::_1)->*&FaceMetric::m_status = FaceMetric::NDN_FIB_YELLOW);
       }
   }
   
@@ -136,31 +131,31 @@ NdnFibEntry::AddOrUpdateRoutingMetric (Ptr<NdnFace> face, int32_t metric)
 }
 
 void
-NdnFibEntry::Invalidate ()
+Entry::Invalidate ()
 {
-  for (NdnFibFaceMetricByFace::type::iterator face = m_faces.begin ();
+  for (FaceMetricByFace::type::iterator face = m_faces.begin ();
        face != m_faces.end ();
        face++)
     {
       m_faces.modify (face,
-                      (&ll::_1)->*&NdnFibFaceMetric::m_routingCost = std::numeric_limits<uint16_t>::max ());
+                      (&ll::_1)->*&FaceMetric::m_routingCost = std::numeric_limits<uint16_t>::max ());
 
       m_faces.modify (face,
-                      (&ll::_1)->*&NdnFibFaceMetric::m_status = NdnFibFaceMetric::NDN_FIB_RED);
+                      (&ll::_1)->*&FaceMetric::m_status = FaceMetric::NDN_FIB_RED);
     }
 }
 
-const NdnFibFaceMetric &
-NdnFibEntry::FindBestCandidate (uint32_t skip/* = 0*/) const
+const FaceMetric &
+Entry::FindBestCandidate (uint32_t skip/* = 0*/) const
 {
-  if (m_faces.size () == 0) throw NdnFibEntry::NoFaces ();
+  if (m_faces.size () == 0) throw Entry::NoFaces ();
   skip = skip % m_faces.size();
   return m_faces.get<i_nth> () [skip];
 }
 
-std::ostream& operator<< (std::ostream& os, const NdnFibEntry &entry)
+std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {
-  for (NdnFibFaceMetricContainer::type::index<i_nth>::type::iterator metric =
+  for (FaceMetricContainer::type::index<i_nth>::type::iterator metric =
          entry.m_faces.get<i_nth> ().begin ();
        metric != entry.m_faces.get<i_nth> ().end ();
        metric++)
@@ -173,7 +168,7 @@ std::ostream& operator<< (std::ostream& os, const NdnFibEntry &entry)
   return os;
 }
 
-std::ostream& operator<< (std::ostream& os, const NdnFibFaceMetric &metric)
+std::ostream& operator<< (std::ostream& os, const FaceMetric &metric)
 {
   static const std::string statusString[] = {"","g","y","r"};
 
@@ -181,5 +176,6 @@ std::ostream& operator<< (std::ostream& os, const NdnFibFaceMetric &metric)
   return os;
 }
 
-
-} // ns3
+} // namespace fib
+} // namespace ndn
+} // namespace ns3

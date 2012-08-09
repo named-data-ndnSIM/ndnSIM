@@ -25,14 +25,14 @@
 #include "ns3/traced-value.h"
 #include "ns3/batches.h"
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * @ingroup ndn
  * \brief Ndn application for sending out Interest packets in batches
  */
-class NdnConsumerBatches: public NdnConsumer
+class ConsumerBatches: public Consumer
 {
 public: 
   static TypeId GetTypeId ();
@@ -40,17 +40,17 @@ public:
   /**
    * \brief Default constructor 
    */
-  NdnConsumerBatches ();
+  ConsumerBatches ();
 
-  // From NdnApp
+  // From App
   // virtual void
-  // OnInterest (const Ptr<const NdnInterestHeader> &interest);
-
-  // virtual void
-  // OnNack (const Ptr<const NdnInterestHeader> &interest);
+  // OnInterest (const Ptr<const InterestHeader> &interest);
 
   // virtual void
-  // OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+  // OnNack (const Ptr<const InterestHeader> &interest);
+
+  // virtual void
+  // OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
   // virtual void
@@ -67,12 +67,13 @@ private:
   AddBatch (uint32_t amount);
 protected:
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying Ndn protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket ();
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif

@@ -37,14 +37,14 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * @ingroup ndn
- * \brief Ndn application for sending out Interest packets
+ * \brief NDN application for sending out Interest packets
  */
-class NdnConsumer: public NdnApp
+class Consumer: public App
 {
 public: 
   static TypeId GetTypeId ();
@@ -53,18 +53,18 @@ public:
    * \brief Default constructor 
    * Sets up randomizer function and packet sequence number
    */
-  NdnConsumer ();
-  virtual ~NdnConsumer () {};
+  Consumer ();
+  virtual ~Consumer () {};
 
-  // From NdnApp
+  // From App
   // virtual void
-  // OnInterest (const Ptr<const NdnInterestHeader> &interest);
+  // OnInterest (const Ptr<const InterestHeader> &interest);
 
   virtual void
-  OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet);
+  OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
 
   virtual void
-  OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                    Ptr<Packet> payload);
 
   /**
@@ -81,7 +81,7 @@ public:
   SendPacket ();
   
 protected:
-  // from NdnApp
+  // from App
   virtual void
   StartApplication ();
 
@@ -89,7 +89,7 @@ protected:
   StopApplication ();
   
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying Ndn protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket () = 0;
@@ -126,12 +126,12 @@ protected:
   Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
   
   Time               m_offTime;             ///< \brief Time interval between packets
-  NdnNameComponents m_interestName;        ///< \brief NdnName of the Interest (use NdnNameComponents)
+  NameComponents     m_interestName;        ///< \brief NDN Name of the Interest (use NameComponents)
   Time               m_interestLifeTime;    ///< \brief LifeTime for interest packet
-  int32_t            m_minSuffixComponents; ///< \brief MinSuffixComponents. See NdnInterestHeader for more information
-  int32_t            m_maxSuffixComponents; ///< \brief MaxSuffixComponents. See NdnInterestHeader for more information
-  bool               m_childSelector;       ///< \brief ChildSelector. See NdnInterestHeader for more information
-  NdnNameComponents m_exclude;             ///< \brief Exclude. See NdnInterestHeader for more information
+  int32_t            m_minSuffixComponents; ///< \brief MinSuffixComponents. See InterestHeader for more information
+  int32_t            m_maxSuffixComponents; ///< \brief MaxSuffixComponents. See InterestHeader for more information
+  bool               m_childSelector;       ///< \brief ChildSelector. See InterestHeader for more information
+  NameComponents     m_exclude;             ///< \brief Exclude. See InterestHeader for more information
 
 /// @cond include_hidden  
   /**
@@ -185,6 +185,7 @@ protected:
 /// @endcond
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif

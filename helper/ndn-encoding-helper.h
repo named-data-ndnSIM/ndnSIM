@@ -23,22 +23,23 @@
 
 #include <sys/types.h>
 
-#include "ccnb-parser/ccnb-parser-common.h"
+#include "ccnb-parser/common.h"
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/buffer.h"
 
 namespace ns3 {
+namespace ndn {
 
-class NdnNameComponents;
+class NameComponents;
 
-class NdnInterestHeader;
-class NdnContentObjectHeader;
+class InterestHeader;
+class ContentObjectHeader;
   
 /**
  * \brief Helper to encode/decode ccnb formatted Ndn message
  */
-class NdnEncodingHelper
+class EncodingHelper
 {
 public:
   /**
@@ -48,7 +49,7 @@ public:
    * @return length of serialized NdnInterestHeader
    */
   static size_t
-  Serialize (Buffer::Iterator start, const NdnInterestHeader &interest);
+  Serialize (Buffer::Iterator start, const InterestHeader &interest);
 
   /**
    * \brief Compute the size of serialized NdnInterestHeader
@@ -56,7 +57,7 @@ public:
    * @return length 
    */
   static size_t
-  GetSerializedSize (const NdnInterestHeader &interest);
+  GetSerializedSize (const InterestHeader &interest);
   
 public:
   /**
@@ -98,7 +99,7 @@ public:
 
   /**
    * @brief Append CCNB closer tag (estimated size is 1)
-   * @param start Buffer to store serialized NdnInterestHeader
+   * @param start Buffer to store serialized InterestHeader
    *
    * @returns written length
    */
@@ -106,22 +107,22 @@ public:
   AppendCloser (Buffer::Iterator &start);
 
   /**
-   * @brief Append NdnNameComponents in CCNB encoding
-   * @param start Buffer to store serialized NdnInterestHeader
-   * @param name constant reference to NdnNameComponents object
+   * @brief Append NameComponents in CCNB encoding
+   * @param start Buffer to store serialized InterestHeader
+   * @param name constant reference to NameComponents object
    *
    * @returns written length
    */
   static size_t
-  AppendNameComponents (Buffer::Iterator &start, const NdnNameComponents &name);
+  AppendNameComponents (Buffer::Iterator &start, const NameComponents &name);
 
   /**
-   * @brief Estimate size of NdnNameComponents in CCNB encoding
-   * @param name constant reference to NdnNameComponents object
+   * @brief Estimate size of NameComponents in CCNB encoding
+   * @param name constant reference to NameComponents object
    * @returns estimated length
    */
   static size_t
-  EstimateNameComponents (const NdnNameComponents &name);
+  EstimateNameComponents (const NameComponents &name);
 
   /**
    * Append a binary timestamp as a BLOB using the ccn binary
@@ -213,11 +214,12 @@ public:
 
 template<class T>
 size_t
-NdnEncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag, const T &data)
+EncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag, const T &data)
 {
   return AppendTaggedBlob (start, dtag, reinterpret_cast<const uint8_t*> (&data), sizeof (data));
 }
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_ENCODING_HELPER_H_

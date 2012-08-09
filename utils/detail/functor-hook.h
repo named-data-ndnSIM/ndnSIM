@@ -23,12 +23,10 @@
 
 #include <boost/intrusive/parent_from_member.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
-namespace detail
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
+namespace detail {
 
 template<class BaseHook, class ValueType, int N>
 struct FunctorHook
@@ -66,6 +64,7 @@ struct FunctorHook
 
 } // detail
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // FUNCTOR_HOOK_H_

@@ -27,14 +27,15 @@
 #include "ns3/ndn-fib-entry.h"
 
 namespace ns3 {
+namespace ndn {
 
-class NdnInterestHeader;
+class InterestHeader;
 
 /**
  * \ingroup ndn
  * \brief Class implementing FIB functionality
  */
-class NdnFib : public Object
+class Fib : public Object
 {
 public:
   /**
@@ -46,12 +47,12 @@ public:
   /**
    * @brief Default constructor
    */
-  NdnFib () {}
+  Fib () {}
   
   /**
    * @brief Virtual destructor
    */
-  virtual ~NdnFib () { };
+  virtual ~Fib () { };
   
   /**
    * \brief Perform longest prefix match
@@ -61,8 +62,8 @@ public:
    * \param interest Interest packet header
    * \returns If entry found a valid iterator will be returned, otherwise end ()
    */
-  virtual Ptr<NdnFibEntry>
-  LongestPrefixMatch (const NdnInterestHeader &interest) = 0;
+  virtual Ptr<fib::Entry>
+  LongestPrefixMatch (const InterestHeader &interest) = 0;
   
   /**
    * \brief Add or update FIB entry
@@ -75,8 +76,8 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual Ptr<NdnFibEntry>
-  Add (const NdnNameComponents &prefix, Ptr<NdnFace> face, int32_t metric) = 0;
+  virtual Ptr<fib::Entry>
+  Add (const NameComponents &prefix, Ptr<Face> face, int32_t metric) = 0;
 
   /**
    * \brief Add or update FIB entry using smart pointer to prefix
@@ -89,8 +90,8 @@ public:
    * @param face	Forwarding face
    * @param metric	Routing metric
    */
-  virtual Ptr<NdnFibEntry>
-  Add (const Ptr<const NdnNameComponents> &prefix, Ptr<NdnFace> face, int32_t metric) = 0;
+  virtual Ptr<fib::Entry>
+  Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t metric) = 0;
 
   /**
    * @brief Remove FIB entry
@@ -101,7 +102,7 @@ public:
    * @param name	Smart pointer to prefix
    */
   virtual void
-  Remove (const Ptr<const NdnNameComponents> &prefix) = 0;
+  Remove (const Ptr<const NameComponents> &prefix) = 0;
 
   // /**
   //  * @brief Invalidate FIB entry ("Safe" version of Remove)
@@ -110,7 +111,7 @@ public:
   //  * @param name	Smart pointer to prefix
   //  */
   // virtual void
-  // Invalidate (const Ptr<const NdnNameComponents> &prefix) = 0;
+  // Invalidate (const Ptr<const NameComponents> &prefix) = 0;
 
   /**
    * @brief Invalidate all FIB entries
@@ -123,7 +124,7 @@ public:
    * this FIB entry will be removed.
    */
   virtual void
-  RemoveFromAll (Ptr<NdnFace> face) = 0;
+  RemoveFromAll (Ptr<Face> face) = 0;
 
   /**
    * @brief Print out entries in FIB
@@ -140,20 +141,20 @@ public:
   /**
    * @brief Return first element of FIB (no order guaranteed)
    */
-  virtual Ptr<const NdnFibEntry>
+  virtual Ptr<const fib::Entry>
   Begin () = 0;
 
   /**
    * @brief Return item next after last (no order guaranteed)
    */
-  virtual Ptr<const NdnFibEntry>
+  virtual Ptr<const fib::Entry>
   End () = 0;
 
   /**
    * @brief Advance the iterator
    */
-  virtual Ptr<const NdnFibEntry>
-  Next (Ptr<const NdnFibEntry>) = 0;
+  virtual Ptr<const fib::Entry>
+  Next (Ptr<const fib::Entry>) = 0;
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -162,28 +163,29 @@ public:
   /**
    * @brief Static call to cheat python bindings
    */
-  static inline Ptr<NdnFib>
-  GetNdnFib (Ptr<Object> node);
+  static inline Ptr<Fib>
+  GetFib (Ptr<Object> node);
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   
 private:
-  NdnFib(const NdnFib&) {} ; ///< \brief copy constructor is disabled
+  Fib (const Fib&) {} ; ///< \brief copy constructor is disabled
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-std::ostream& operator<< (std::ostream& os, const NdnFib &fib);
+std::ostream& operator<< (std::ostream& os, const Fib &fib);
 
-Ptr<NdnFib>
-NdnFib::GetNdnFib (Ptr<Object> node)
+Ptr<Fib>
+Fib::GetFib (Ptr<Object> node)
 {
-  return node->GetObject<NdnFib> ();
+  return node->GetObject<Fib> ();
 }
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_FIB_H_

@@ -28,78 +28,78 @@
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnConsumerWindow");
+NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerWindow");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
     
-NS_OBJECT_ENSURE_REGISTERED (NdnConsumerWindow);
+NS_OBJECT_ENSURE_REGISTERED (ConsumerWindow);
     
 TypeId
-NdnConsumerWindow::GetTypeId (void)
+ConsumerWindow::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnConsumerWindow")
+  static TypeId tid = TypeId ("ns3::ndn::ConsumerWindow")
     .SetGroupName ("Ndn")
-    .SetParent<NdnConsumer> ()
-    .AddConstructor<NdnConsumerWindow> ()
+    .SetParent<Consumer> ()
+    .AddConstructor<ConsumerWindow> ()
 
     .AddAttribute ("Window", "Initial size of the window",
                    StringValue ("1"),
-                   MakeUintegerAccessor (&NdnConsumerWindow::GetWindow, &NdnConsumerWindow::SetWindow),
+                   MakeUintegerAccessor (&ConsumerWindow::GetWindow, &ConsumerWindow::SetWindow),
                    MakeUintegerChecker<uint32_t> ())
 
     .AddAttribute ("PayloadSize", "Average size of content object size (to calculate interest generation rate)",
                    UintegerValue (1040),
-                   MakeUintegerAccessor (&NdnConsumerWindow::GetPayloadSize, &NdnConsumerWindow::SetPayloadSize),
+                   MakeUintegerAccessor (&ConsumerWindow::GetPayloadSize, &ConsumerWindow::SetPayloadSize),
                    MakeUintegerChecker<uint32_t>())
     .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
                    DoubleValue (-1), // don't impose limit by default
-                   MakeDoubleAccessor (&NdnConsumerWindow::GetMaxSize, &NdnConsumerWindow::SetMaxSize),
+                   MakeDoubleAccessor (&ConsumerWindow::GetMaxSize, &ConsumerWindow::SetMaxSize),
                    MakeDoubleChecker<double> ())
 
     .AddTraceSource ("WindowTrace",
                      "Window that controls how many outstanding interests are allowed",
-                     MakeTraceSourceAccessor (&NdnConsumerWindow::m_window))
+                     MakeTraceSourceAccessor (&ConsumerWindow::m_window))
     .AddTraceSource ("InFlight",
                      "Current number of outstanding interests",
-                     MakeTraceSourceAccessor (&NdnConsumerWindow::m_window))
+                     MakeTraceSourceAccessor (&ConsumerWindow::m_window))
     ;
 
   return tid;
 }
 
-NdnConsumerWindow::NdnConsumerWindow ()
+ConsumerWindow::ConsumerWindow ()
   : m_payloadSize (1040)
   , m_inFlight (0)
 {
 }
 
 void
-NdnConsumerWindow::SetWindow (uint32_t window)
+ConsumerWindow::SetWindow (uint32_t window)
 {
   m_window = window;
 }
 
 uint32_t
-NdnConsumerWindow::GetWindow () const
+ConsumerWindow::GetWindow () const
 {
   return m_window;
 }
 
 uint32_t
-NdnConsumerWindow::GetPayloadSize () const
+ConsumerWindow::GetPayloadSize () const
 {
   return m_payloadSize;
 }
 
 void
-NdnConsumerWindow::SetPayloadSize (uint32_t payload)
+ConsumerWindow::SetPayloadSize (uint32_t payload)
 {
   m_payloadSize = payload;
 }
 
 double
-NdnConsumerWindow::GetMaxSize () const
+ConsumerWindow::GetMaxSize () const
 {
   if (m_seqMax == 0)
     return -1.0;
@@ -108,7 +108,7 @@ NdnConsumerWindow::GetMaxSize () const
 }
 
 void
-NdnConsumerWindow::SetMaxSize (double size)
+ConsumerWindow::SetMaxSize (double size)
 {
   m_maxSize = size;
   if (m_maxSize < 0)
@@ -124,12 +124,12 @@ NdnConsumerWindow::SetMaxSize (double size)
 
 
 void
-NdnConsumerWindow::ScheduleNextPacket ()
+ConsumerWindow::ScheduleNextPacket ()
 {
   if (m_window == static_cast<uint32_t> (0) || m_inFlight >= m_window)
     {
       if (!m_sendEvent.IsRunning ())
-        m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &NdnConsumer::SendPacket, this);
+        m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &Consumer::SendPacket, this);
       return;
     }
   
@@ -137,7 +137,7 @@ NdnConsumerWindow::ScheduleNextPacket ()
   if (!m_sendEvent.IsRunning ())
     {
       m_inFlight++;
-      m_sendEvent = Simulator::ScheduleNow (&NdnConsumer::SendPacket, this);
+      m_sendEvent = Simulator::ScheduleNow (&Consumer::SendPacket, this);
     }
 }
 
@@ -146,10 +146,10 @@ NdnConsumerWindow::ScheduleNextPacket ()
 ///////////////////////////////////////////////////
 
 void
-NdnConsumerWindow::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+ConsumerWindow::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                                      Ptr<Packet> payload)
 {
-  NdnConsumer::OnContentObject (contentObject, payload);
+  Consumer::OnContentObject (contentObject, payload);
 
   m_window = m_window + 1;
 
@@ -158,9 +158,9 @@ NdnConsumerWindow::OnContentObject (const Ptr<const NdnContentObjectHeader> &con
 }
 
 void
-NdnConsumerWindow::OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> payload)
+ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> payload)
 {
-  NdnConsumer::OnNack (interest, payload);
+  Consumer::OnNack (interest, payload);
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 
   if (m_window > static_cast<uint32_t> (0))
@@ -171,10 +171,11 @@ NdnConsumerWindow::OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Pac
 }
 
 void
-NdnConsumerWindow::OnTimeout (uint32_t sequenceNumber)
+ConsumerWindow::OnTimeout (uint32_t sequenceNumber)
 {
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
-  NdnConsumer::OnTimeout (sequenceNumber);
+  Consumer::OnTimeout (sequenceNumber);
 }
 
+} // namespace ndn
 } // namespace ns3

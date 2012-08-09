@@ -56,30 +56,31 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnStackHelper");
+NS_LOG_COMPONENT_DEFINE ("ndn.StackHelper");
 
 namespace ns3 {
+namespace ndn {
     
-NdnStackHelper::NdnStackHelper ()
+StackHelper::StackHelper ()
   : m_limitsEnabled (false)
   , m_needSetDefaultRoutes (false)
 {
-  m_ndnFactory.        SetTypeId ("ns3::NdnL3Protocol");
-  m_strategyFactory.    SetTypeId ("ns3::ndnSIM::Flooding");
-  m_contentStoreFactory.SetTypeId ("ns3::NdnContentStoreLru");
-  m_fibFactory.         SetTypeId ("ns3::NdnFib");
-  m_pitFactory.         SetTypeId ("ns3::NdnPit");
+  m_ndnFactory.         SetTypeId ("ns3::ndn::L3Protocol");
+  m_strategyFactory.    SetTypeId ("ns3::ndn::fw::Flooding");
+  m_contentStoreFactory.SetTypeId ("ns3::ndn::cs::Lru");
+  m_fibFactory.         SetTypeId ("ns3::ndn::fib::Default");
+  m_pitFactory.         SetTypeId ("ns3::ndn::pit::Persistent");
 }
     
-NdnStackHelper::~NdnStackHelper ()
+StackHelper::~StackHelper ()
 {
 }
 
 void
-NdnStackHelper::SetNdnAttributes (const std::string &attr1, const std::string &value1,
-                                    const std::string &attr2, const std::string &value2,
-                                    const std::string &attr3, const std::string &value3,
-                                    const std::string &attr4, const std::string &value4)
+StackHelper::SetStackAttributes (const std::string &attr1, const std::string &value1,
+                                 const std::string &attr2, const std::string &value2,
+                                 const std::string &attr3, const std::string &value3,
+                                 const std::string &attr4, const std::string &value4)
 {
   if (attr1 != "")
       m_ndnFactory.Set (attr1, StringValue (value1));
@@ -92,7 +93,7 @@ NdnStackHelper::SetNdnAttributes (const std::string &attr1, const std::string &v
 }
 
 void 
-NdnStackHelper::SetForwardingStrategy (const std::string &strategy,
+StackHelper::SetForwardingStrategy (const std::string &strategy,
                                         const std::string &attr1, const std::string &value1,
                                         const std::string &attr2, const std::string &value2,
                                         const std::string &attr3, const std::string &value3,
@@ -110,7 +111,7 @@ NdnStackHelper::SetForwardingStrategy (const std::string &strategy,
 }
 
 void
-NdnStackHelper::SetContentStore (const std::string &contentStore,
+StackHelper::SetContentStore (const std::string &contentStore,
                                   const std::string &attr1, const std::string &value1,
                                   const std::string &attr2, const std::string &value2,
                                   const std::string &attr3, const std::string &value3,
@@ -128,7 +129,7 @@ NdnStackHelper::SetContentStore (const std::string &contentStore,
 }
 
 void
-NdnStackHelper::SetPit (const std::string &pitClass,
+StackHelper::SetPit (const std::string &pitClass,
                          const std::string &attr1, const std::string &value1,
                          const std::string &attr2, const std::string &value2,
                          const std::string &attr3, const std::string &value3,
@@ -146,7 +147,7 @@ NdnStackHelper::SetPit (const std::string &pitClass,
 }
 
 void
-NdnStackHelper::SetFib (const std::string &fibClass,
+StackHelper::SetFib (const std::string &fibClass,
                          const std::string &attr1, const std::string &value1,
                          const std::string &attr2, const std::string &value2,
                          const std::string &attr3, const std::string &value3,
@@ -164,14 +165,14 @@ NdnStackHelper::SetFib (const std::string &fibClass,
 }
 
 void
-NdnStackHelper::SetDefaultRoutes (bool needSet)
+StackHelper::SetDefaultRoutes (bool needSet)
 {
   NS_LOG_FUNCTION (this << needSet);
   m_needSetDefaultRoutes = needSet;
 }
 
 void
-NdnStackHelper::EnableLimits (bool enable/* = true*/,
+StackHelper::EnableLimits (bool enable/* = true*/,
                                Time avgRtt/*=Seconds(0.1)*/,
                                uint32_t avgContentObject/*=1100*/,
                                uint32_t avgInterest/*=40*/)
@@ -183,10 +184,10 @@ NdnStackHelper::EnableLimits (bool enable/* = true*/,
   m_avgInterestSize = avgInterest;
 }
 
-Ptr<NdnFaceContainer>
-NdnStackHelper::Install (NodeContainer c) const
+Ptr<FaceContainer>
+StackHelper::Install (NodeContainer c) const
 {
-  Ptr<NdnFaceContainer> faces = Create<NdnFaceContainer> ();
+  Ptr<FaceContainer> faces = Create<FaceContainer> ();
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
     {
       faces->AddAll (Install (*i));
@@ -194,42 +195,42 @@ NdnStackHelper::Install (NodeContainer c) const
   return faces;
 }
 
-Ptr<NdnFaceContainer>
-NdnStackHelper::InstallAll (void) const
+Ptr<FaceContainer>
+StackHelper::InstallAll (void) const
 {
   return Install (NodeContainer::GetGlobal ());
 }
 
-Ptr<NdnFaceContainer>
-NdnStackHelper::Install (Ptr<Node> node) const
+Ptr<FaceContainer>
+StackHelper::Install (Ptr<Node> node) const
 {
   // NS_ASSERT_MSG (m_forwarding, "SetForwardingHelper() should be set prior calling Install() method");
-  Ptr<NdnFaceContainer> faces = Create<NdnFaceContainer> ();
+  Ptr<FaceContainer> faces = Create<FaceContainer> ();
   
-  if (node->GetObject<Ndn> () != 0)
+  if (node->GetObject<L3Protocol> () != 0)
     {
-      NS_FATAL_ERROR ("NdnStackHelper::Install (): Installing " 
+      NS_FATAL_ERROR ("StackHelper::Install (): Installing " 
                       "a NdnStack to a node with an existing Ndn object");
       return 0;
     }
 
-  // Create NdnL3Protocol
-  Ptr<Ndn> ndn = m_ndnFactory.Create<Ndn> ();
+  // Create L3Protocol
+  Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol> ();
 
   // Create and aggregate FIB
-  Ptr<NdnFib> fib = m_fibFactory.Create<NdnFib> ();
+  Ptr<Fib> fib = m_fibFactory.Create<Fib> ();
   ndn->AggregateObject (fib);
 
   // Create and aggregate PIT
-  ndn->AggregateObject (m_pitFactory.Create<NdnPit> ());
+  ndn->AggregateObject (m_pitFactory.Create<Pit> ());
   
   // Create and aggregate forwarding strategy
-  ndn->AggregateObject (m_strategyFactory.Create<NdnForwardingStrategy> ());
+  ndn->AggregateObject (m_strategyFactory.Create<ForwardingStrategy> ());
 
   // Create and aggregate content store
-  ndn->AggregateObject (m_contentStoreFactory.Create<NdnContentStore> ());
+  ndn->AggregateObject (m_contentStoreFactory.Create<ContentStore> ());
 
-  // Aggregate NdnL3Protocol on node
+  // Aggregate L3Protocol on node
   node->AggregateObject (ndn);
   
   for (uint32_t index=0; index < node->GetNDevices (); index++)
@@ -240,10 +241,10 @@ NdnStackHelper::Install (Ptr<Node> node) const
       // if (DynamicCast<LoopbackNetDevice> (device) != 0)
       //   continue; // don't create face for a LoopbackNetDevice
 
-      Ptr<NdnNetDeviceFace> face = CreateObject<NdnNetDeviceFace> (node, device);
+      Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace> (node, device);
 
       ndn->AddFace (face);
-      NS_LOG_LOGIC ("Node " << node->GetId () << ": added NdnNetDeviceFace as face #" << *face);
+      NS_LOG_LOGIC ("Node " << node->GetId () << ": added NetDeviceFace as face #" << *face);
 
       if (m_needSetDefaultRoutes)
         {
@@ -282,8 +283,8 @@ NdnStackHelper::Install (Ptr<Node> node) const
   return faces;
 }
 
-Ptr<NdnFaceContainer>
-NdnStackHelper::Install (std::string nodeName) const
+Ptr<FaceContainer>
+StackHelper::Install (std::string nodeName) const
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   return Install (node);
@@ -291,43 +292,43 @@ NdnStackHelper::Install (std::string nodeName) const
 
 
 void
-NdnStackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<NdnFace> face, int32_t metric)
+StackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<Face> face, int32_t metric)
 {
   NS_LOG_LOGIC ("[" << node->GetId () << "]$ route add " << prefix << " via " << *face << " metric " << metric);
 
-  Ptr<NdnFib>  fib  = node->GetObject<NdnFib> ();
+  Ptr<Fib>  fib  = node->GetObject<Fib> ();
 
-  NdnNameComponentsValue prefixValue;
-  prefixValue.DeserializeFromString (prefix, MakeNdnNameComponentsChecker ());
+  NameComponentsValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeNameComponentsChecker ());
   fib->Add (prefixValue.Get (), face, metric);
 }
 
 void
-NdnStackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
+StackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
 {
-  Ptr<Ndn>     ndn = node->GetObject<Ndn> ();
+  Ptr<L3Protocol>     ndn = node->GetObject<L3Protocol> ();
   NS_ASSERT_MSG (ndn != 0, "Ndn stack should be installed on the node");
 
-  Ptr<NdnFace> face = ndn->GetFace (faceId);
+  Ptr<Face> face = ndn->GetFace (faceId);
   NS_ASSERT_MSG (face != 0, "Face with ID [" << faceId << "] does not exist on node [" << node->GetId () << "]");
 
   AddRoute (node, prefix, face, metric);
 }
 
 void
-NdnStackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
+StackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
   
-  Ptr<Ndn>     ndn = node->GetObject<Ndn> ();
+  Ptr<L3Protocol>     ndn = node->GetObject<L3Protocol> ();
   NS_ASSERT_MSG (ndn != 0, "Ndn stack should be installed on the node");
 
-  Ptr<NdnFace> face = ndn->GetFace (faceId);
+  Ptr<Face> face = ndn->GetFace (faceId);
   NS_ASSERT_MSG (face != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName << "]");
 
   AddRoute (node, prefix, face, metric);
 }
 
-
+} // namespace ndn
 } // namespace ns3

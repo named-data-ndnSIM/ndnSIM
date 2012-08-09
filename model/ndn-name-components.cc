@@ -27,17 +27,18 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("NdnNameComponents");
+NS_LOG_COMPONENT_DEFINE ("ndn.NameComponents");
 
 namespace ns3 {
+namespace ndn {
 
-ATTRIBUTE_HELPER_CPP (NdnNameComponents);
+ATTRIBUTE_HELPER_CPP (NameComponents);
 
-NdnNameComponents::NdnNameComponents (/* root */)
+NameComponents::NameComponents (/* root */)
 {
 }
 
-NdnNameComponents::NdnNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
+NameComponents::NameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
 {
   BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)
     {
@@ -45,13 +46,13 @@ NdnNameComponents::NdnNameComponents (const std::list<boost::reference_wrapper<c
     }
 }
 
-NdnNameComponents::NdnNameComponents (const std::string &prefix)
+NameComponents::NameComponents (const std::string &prefix)
 {
   istringstream is (prefix);
   is >> *this;
 }
 
-NdnNameComponents::NdnNameComponents (const char *prefix)
+NameComponents::NameComponents (const char *prefix)
 {
   NS_ASSERT (prefix != 0);
   
@@ -60,13 +61,13 @@ NdnNameComponents::NdnNameComponents (const char *prefix)
 }
 
 const std::list<std::string> &
-NdnNameComponents::GetComponents () const
+NameComponents::GetComponents () const
 {
   return m_prefix;
 }
 
 std::string
-NdnNameComponents::GetLastComponent () const
+NameComponents::GetLastComponent () const
 {
   if (m_prefix.size () == 0)
     {
@@ -77,7 +78,7 @@ NdnNameComponents::GetLastComponent () const
 }
 
 std::list<boost::reference_wrapper<const std::string> >
-NdnNameComponents::GetSubComponents (size_t num) const
+NameComponents::GetSubComponents (size_t num) const
 {
   NS_ASSERT_MSG (0<=num && num<=m_prefix.size (), "Invalid number of subcomponents requested");
   
@@ -91,10 +92,10 @@ NdnNameComponents::GetSubComponents (size_t num) const
   return subComponents;
 }
 
-NdnNameComponents
-NdnNameComponents::cut (size_t minusComponents) const
+NameComponents
+NameComponents::cut (size_t minusComponents) const
 {
-  NdnNameComponents retval;
+  NameComponents retval;
   std::list<std::string>::const_iterator component = m_prefix.begin (); 
   for (uint32_t i = 0; i < m_prefix.size () - minusComponents; i++, component++)
     {
@@ -105,7 +106,7 @@ NdnNameComponents::cut (size_t minusComponents) const
 }
 
 void
-NdnNameComponents::Print (std::ostream &os) const
+NameComponents::Print (std::ostream &os) const
 {
   for (const_iterator i=m_prefix.begin(); i!=m_prefix.end(); i++)
     {
@@ -115,14 +116,14 @@ NdnNameComponents::Print (std::ostream &os) const
 }
   
 std::ostream &
-operator << (std::ostream &os, const NdnNameComponents &components)
+operator << (std::ostream &os, const NameComponents &components)
 {
   components.Print (os);
   return os;
 }
 
 std::istream &
-operator >> (std::istream &is, NdnNameComponents &components)
+operator >> (std::istream &is, NameComponents &components)
 {
   istream_iterator<char> eos; // end of stream
   
@@ -148,5 +149,5 @@ operator >> (std::istream &is, NdnNameComponents &components)
   return is;
 }
 
-}
-
+} // ndn
+} // ns3

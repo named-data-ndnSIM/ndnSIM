@@ -47,7 +47,7 @@ using namespace ns3;
  *     NS_LOG=NdnSimple:NdnConsumer ./waf --run=ndn-simple
  */
 
-NS_LOG_COMPONENT_DEFINE ("NdnSimple");
+NS_LOG_COMPONENT_DEFINE ("ndn.Simple");
 
 int 
 main (int argc, char *argv[])

@@ -25,8 +25,9 @@
 #include "ns3/simple-ref-count.h"
 
 #include "ns3/ndn-fib.h"
-#include "ndn-pit-entry-incoming-face.h"
-#include "ndn-pit-entry-outgoing-face.h"
+
+#include "ns3/ndn-pit-entry-incoming-face.h"
+#include "ns3/ndn-pit-entry-outgoing-face.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -38,39 +39,38 @@
 #include <set>
 
 namespace ns3 {
+namespace ndn {
 
-class NdnFace;
-class NdnNameComponents;
-class NdnPit;
+class Pit;
+
+namespace pit {
 
 /// @cond include_hidden
-namespace __ndn_private
-{
+class i_face {};
 class i_retx {};
-}
 /// @endcond
 
 /**
  * \ingroup ndn
- * \brief Typedef for indexed face container of NdnPitEntryOutgoingFace
+ * \brief Typedef for indexed face container of PitEntryOutgoingFace
  *
  * Indexes:
  * - by face (may be it will be possible to replace with just the std::map)
  */
-struct NdnPitEntryOutgoingFaceContainer
+struct OutgoingFaceContainer
 {
   /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
-    NdnPitEntryOutgoingFace,
+    OutgoingFace,
     boost::multi_index::indexed_by<
       // For fast access to elements using NdnFace
       boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ndn_private::i_face>,
-        boost::multi_index::member<NdnPitEntryOutgoingFace, Ptr<NdnFace>, &NdnPitEntryOutgoingFace::m_face>
+        boost::multi_index::tag<i_face>,
+        boost::multi_index::member<OutgoingFace, Ptr<Face>, &OutgoingFace::m_face>
       >,
       boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<__ndn_private::i_retx>,
-        boost::multi_index::member<NdnPitEntryOutgoingFace, uint32_t, &NdnPitEntryOutgoingFace::m_retxCount>
+        boost::multi_index::tag<i_retx>,
+        boost::multi_index::member<OutgoingFace, uint32_t, &OutgoingFace::m_retxCount>
       >    
     >
    > type;
@@ -84,13 +84,13 @@ struct NdnPitEntryOutgoingFaceContainer
  *
  * All set-methods are virtual, in case index rearrangement is necessary in the derived classes
  */
-class NdnPitEntry : public SimpleRefCount<NdnPitEntry>
+class Entry : public SimpleRefCount<Entry>
 {
 public:
-  typedef std::set< NdnPitEntryIncomingFace > in_container; ///< @brief incoming faces container type
+  typedef std::set< IncomingFace > in_container; ///< @brief incoming faces container type
   typedef in_container::iterator in_iterator;                ///< @brief iterator to incoming faces
 
-  typedef NdnPitEntryOutgoingFaceContainer::type out_container; ///< @brief outgoing faces container type
+  typedef OutgoingFaceContainer::type out_container; ///< @brief outgoing faces container type
   typedef out_container::iterator out_iterator;              ///< @brief iterator to outgoing faces
 
   typedef std::set< uint32_t > nonce_container;  ///< @brief nonce container type
@@ -101,12 +101,12 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  NdnPitEntry (NdnPit &container, Ptr<const NdnInterestHeader> header, Ptr<NdnFibEntry> fibEntry);
+  Entry (Pit &container, Ptr<const InterestHeader> header, Ptr<fib::Entry> fibEntry);
 
   /**
    * @brief Virtual destructor
    */
-  virtual ~NdnPitEntry () {}
+  virtual ~Entry () {}
   
   /**
    * @brief Update lifetime of PIT entry
@@ -122,7 +122,7 @@ public:
   /**
    * @brief Get prefix of the PIT entry
    */
-  const NdnNameComponents &
+  const NameComponents &
   GetPrefix () const
   { return *m_prefix; }
 
@@ -162,13 +162,13 @@ public:
    * @returns iterator to the added entry
    */
   virtual in_iterator
-  AddIncoming (Ptr<NdnFace> face);
+  AddIncoming (Ptr<Face> face);
 
   /**
    * @brief Remove incoming entry for face `face`
    */
   virtual void
-  RemoveIncoming (Ptr<NdnFace> face);
+  RemoveIncoming (Ptr<Face> face);
 
   /**
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
@@ -184,7 +184,7 @@ public:
    * @returns iterator to the added entry
    */
   virtual out_iterator
-  AddOutgoing (Ptr<NdnFace> face);
+  AddOutgoing (Ptr<Face> face);
 
   /**
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
@@ -200,7 +200,7 @@ public:
    * Face is removed from the lists of incoming and outgoing faces
    */
   virtual void
-  RemoveAllReferencesToFace (Ptr<NdnFace> face);
+  RemoveAllReferencesToFace (Ptr<Face> face);
 
   /**
    * @brief Flag outgoing face as hopeless
@@ -208,7 +208,7 @@ public:
   // virtual void
   // SetWaitingInVain (out_iterator face);
   virtual void
-  SetWaitingInVain (Ptr<NdnFace> face);
+  SetWaitingInVain (Ptr<Face> face);
   
   /**
    * @brief Check if all outgoing faces are NACKed
@@ -221,7 +221,7 @@ public:
    * \see AreAllOutgoingInVain
    **/
   bool
-  AreTherePromisingOutgoingFacesExcept (Ptr<NdnFace> face) const;
+  AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const;
 
   /**
    * @brief Increase maximum limit of allowed retransmission per outgoing face
@@ -229,7 +229,7 @@ public:
   virtual void
   IncreaseAllowedRetxCount ();
 
-  Ptr<NdnFibEntry>
+  Ptr<fib::Entry>
   GetFibEntry () { return m_fibEntry; };
 
   const in_container &
@@ -242,13 +242,13 @@ public:
   GetMaxRetxCount () const { return m_maxRetxCount; }
 
 private:
-  friend std::ostream& operator<< (std::ostream& os, const NdnPitEntry &entry);
+  friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
   
 protected:
-  NdnPit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
+  Pit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
   
-  Ptr<const NdnNameComponents> m_prefix; ///< \brief Prefix of the PIT entry
-  Ptr<NdnFibEntry> m_fibEntry;     ///< \brief FIB entry related to this prefix
+  Ptr<const NameComponents> m_prefix; ///< \brief Prefix of the PIT entry
+  Ptr<fib::Entry> m_fibEntry;     ///< \brief FIB entry related to this prefix
   
   nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix  
   in_container  m_incoming;      ///< \brief container for incoming interests
@@ -260,8 +260,10 @@ protected:
   uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
 };
 
-std::ostream& operator<< (std::ostream& os, const NdnPitEntry &entry);
+std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
+} // namespace pit
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_PIT_ENTRY_H_

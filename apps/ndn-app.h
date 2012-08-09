@@ -26,25 +26,27 @@
 #include "ns3/callback.h"
 #include "ns3/traced-callback.h"
 
-namespace ns3 
-{
+namespace ns3 {
 
 class Packet;
-class NdnInterestHeader;
-class NdnContentObjectHeader;
-class NdnFace;
+
+namespace ndn {
+
+class InterestHeader;
+class ContentObjectHeader;
+class Face;
 
 /**
  * @ingroup ndn
- * @brief Base class that all Ndn applications should be derived from.
+ * @brief Base class that all NDN applications should be derived from.
  * 
  * The class implements virtual calls onInterest, onNack, and onContentObject
  */
-class NdnApp: public Application
+class App: public Application
 {
 public:
   /**
-   * @brief A callback to pass packets to underlying Ndn protocol
+   * @brief A callback to pass packets to underlying NDN protocol
    */
   typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
   
@@ -53,8 +55,8 @@ public:
   /**
    * @brief Default constructor
    */
-  NdnApp ();
-  virtual ~NdnApp ();
+  App ();
+  virtual ~App ();
 
   /**
    * @brief Register lower layer callback (to send interests from the application)
@@ -69,14 +71,14 @@ public:
    *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet);
+  OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
 
   /**
    * @brief Method that will be called every time new NACK arrives
    * @param interest Interest header
    */
   virtual void
-  OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet);
+  OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
   
   /**
    * @brief Method that will be called every time new ContentObject arrives
@@ -84,7 +86,7 @@ public:
    * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
    */
   virtual void
-  OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                    Ptr<Packet> payload);
         
 protected:
@@ -102,27 +104,28 @@ protected:
   StopApplication ();     ///< @brief Called at time specified by Stop
 
 protected:
-  ProtocolHandler m_protocolHandler; ///< @brief A callback to pass packets to underlying Ndn protocol
+  ProtocolHandler m_protocolHandler; ///< @brief A callback to pass packets to underlying NDN protocol
   bool m_active;  ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
-  Ptr<NdnFace> m_face;   ///< @brief automatically created application face through which application communicates
+  Ptr<Face> m_face;   ///< @brief automatically created application face through which application communicates
 
-  TracedCallback<Ptr<const NdnInterestHeader>,
-                 Ptr<NdnApp>, Ptr<NdnFace> > m_receivedInterests; ///< @brief App-level trace of received Interests
+  TracedCallback<Ptr<const InterestHeader>,
+                 Ptr<App>, Ptr<Face> > m_receivedInterests; ///< @brief App-level trace of received Interests
 
-  TracedCallback<Ptr<const NdnInterestHeader>,
-                 Ptr<NdnApp>, Ptr<NdnFace> > m_receivedNacks; ///< @brief App-level trace of received NACKs
+  TracedCallback<Ptr<const InterestHeader>,
+                 Ptr<App>, Ptr<Face> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
-  TracedCallback<Ptr<const NdnContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<NdnApp>, Ptr<NdnFace> > m_receivedContentObjects; ///< @brief App-level trace of received Data
+  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<App>, Ptr<Face> > m_receivedContentObjects; ///< @brief App-level trace of received Data
 
 
-  TracedCallback<Ptr<const NdnInterestHeader>,
-                 Ptr<NdnApp>, Ptr<NdnFace> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
+  TracedCallback<Ptr<const InterestHeader>,
+                 Ptr<App>, Ptr<Face> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const NdnContentObjectHeader>, Ptr<const Packet>,
-                 Ptr<NdnApp>, Ptr<NdnFace> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
+  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+                 Ptr<App>, Ptr<Face> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // NDN_APP_H

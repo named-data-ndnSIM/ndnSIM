@@ -29,12 +29,11 @@ const double EXP_1 = exp (-1.0/5.0);  /* 1/exp(1sec/5sec) */
 const double EXP_2 = exp (-1.0/30.0); /* 1/exp(1sec/30sec) */
 const double EXP_3 = exp (-1.0/60.0); /* 1/exp(1sec/60sec) */
 
-NS_LOG_COMPONENT_DEFINE ("LoadStats");
+NS_LOG_COMPONENT_DEFINE ("ndn.LoadStats");
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 const double LoadStats::PRECISION = 0.1;
 
@@ -104,5 +103,6 @@ operator << (std::ostream &os, const LoadStats &stats)
   return os;
 }
 
-} // ndnSIM
-} // ns3
+} // namespace ndnSIM
+} // namespace ndn
+} // namespace ns3

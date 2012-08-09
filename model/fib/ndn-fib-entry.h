@@ -23,8 +23,8 @@
 
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
-#include "ns3/ndn.h"
 #include "ns3/ndn-face.h"
+#include "ns3/ndn-name-components.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -35,16 +35,18 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
-namespace ns3
-{
+namespace ns3 {
+namespace ndn {
 
-class NdnNameComponents;
+class NameComponents;
+
+namespace fib {
 
 /**
  * \ingroup ndn
  * \brief Structure holding various parameters associated with a (FibEntry, Face) tuple
  */
-class NdnFibFaceMetric
+class FaceMetric
 {
 public:
   /**
@@ -60,7 +62,7 @@ public:
    * \param face Face for which metric
    * \param cost Initial value for routing cost
    */
-  NdnFibFaceMetric (Ptr<NdnFace> face, int32_t cost)
+  FaceMetric (Ptr<Face> face, int32_t cost)
     : m_face (face)
     , m_status (NDN_FIB_YELLOW)
     , m_routingCost (cost)
@@ -72,18 +74,18 @@ public:
    * \brief Comparison operator used by boost::multi_index::identity<>
    */
   bool
-  operator< (const NdnFibFaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
+  operator< (const FaceMetric &fm) const { return *m_face < *fm.m_face; } // return identity of the face
 
   /**
-   * @brief Comparison between NdnFibFaceMetric and NdnFace
+   * @brief Comparison between FaceMetric and Face
    */
   bool
-  operator< (const Ptr<NdnFace> &face) const { return *m_face < *face; } 
+  operator< (const Ptr<Face> &face) const { return *m_face < *face; } 
 
   /**
-   * @brief Return NdnFace associated with NdnFibFaceMetric
+   * @brief Return Face associated with FaceMetric
    */
-  Ptr<NdnFace>
+  Ptr<Face>
   GetFace () const { return m_face; }
 
   /**
@@ -94,9 +96,9 @@ public:
   UpdateRtt (const Time &rttSample);
   
 private:
-  friend std::ostream& operator<< (std::ostream& os, const NdnFibFaceMetric &metric);
+  friend std::ostream& operator<< (std::ostream& os, const FaceMetric &metric);
 public:
-  Ptr<NdnFace> m_face; ///< Face
+  Ptr<Face> m_face; ///< Face
   
   Status m_status;		///< \brief Status of the next hop: 
 				///<		- NDN_FIB_GREEN
@@ -109,9 +111,16 @@ public:
   Time m_rttVar;       ///< \brief round-trip time variation
 };
 
+/// @cond include_hidden
+class i_face {};
+class i_metric {};
+class i_nth {};
+/// @endcond
+
+
 /**
  * \ingroup ndn
- * \brief Typedef for indexed face container of NdnFibEntry
+ * \brief Typedef for indexed face container of Entry
  *
  * Currently, there are 2 indexes:
  * - by face (used to find record and update metric)
@@ -119,31 +128,31 @@ public:
  * - random access index (for fast lookup on nth face). Order is
  *   maintained manually to be equal to the 'by metric' order
  */
-struct NdnFibFaceMetricContainer
+struct FaceMetricContainer
 {
   /// @cond include_hidden
   typedef boost::multi_index::multi_index_container<
-    NdnFibFaceMetric,
+    FaceMetric,
     boost::multi_index::indexed_by<
-      // For fast access to elements using NdnFace
+      // For fast access to elements using Face
       boost::multi_index::ordered_unique<
-        boost::multi_index::tag<__ndn_private::i_face>,
-        boost::multi_index::member<NdnFibFaceMetric,Ptr<NdnFace>,&NdnFibFaceMetric::m_face>
+        boost::multi_index::tag<i_face>,
+        boost::multi_index::member<FaceMetric,Ptr<Face>,&FaceMetric::m_face>
       >,
 
       // List of available faces ordered by (status, m_routingCost)
       boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<__ndn_private::i_metric>,
+        boost::multi_index::tag<i_metric>,
         boost::multi_index::composite_key<
-          NdnFibFaceMetric,
-          boost::multi_index::member<NdnFibFaceMetric,NdnFibFaceMetric::Status,&NdnFibFaceMetric::m_status>,
-          boost::multi_index::member<NdnFibFaceMetric,int32_t,&NdnFibFaceMetric::m_routingCost>
+          FaceMetric,
+          boost::multi_index::member<FaceMetric,FaceMetric::Status,&FaceMetric::m_status>,
+          boost::multi_index::member<FaceMetric,int32_t,&FaceMetric::m_routingCost>
         >
       >,
 
       // To optimize nth candidate selection (sacrifice a little bit space to gain speed)
       boost::multi_index::random_access<
-        boost::multi_index::tag<__ndn_private::i_nth>
+        boost::multi_index::tag<i_nth>
       >
     >
    > type;
@@ -155,7 +164,7 @@ struct NdnFibFaceMetricContainer
  * \brief Structure for FIB table entry, holding indexed list of
  *        available faces and their respective metrics
  */
-class NdnFibEntry : public SimpleRefCount<NdnFibEntry>
+class Entry : public SimpleRefCount<Entry>
 {
 public:
   class NoFaces {}; ///< @brief Exception class for the case when FIB entry is not found
@@ -164,7 +173,7 @@ public:
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
    */
-  NdnFibEntry (const Ptr<const NdnNameComponents> &prefix)
+  Entry (const Ptr<const NameComponents> &prefix)
   : m_prefix (prefix)
   , m_needsProbing (false)
   { }
@@ -173,14 +182,14 @@ public:
    * \brief Update status of FIB next hop
    * \param status Status to set on the FIB entry
    */
-  void UpdateStatus (Ptr<NdnFace> face, NdnFibFaceMetric::Status status);
+  void UpdateStatus (Ptr<Face> face, FaceMetric::Status status);
 
   /**
    * \brief Add or update routing metric of FIB next hop
    *
    * Initial status of the next hop is set to YELLOW
    */
-  void AddOrUpdateRoutingMetric (Ptr<NdnFace> face, int32_t metric);
+  void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
 
   /**
    * @brief Invalidate face
@@ -194,44 +203,46 @@ public:
    * @brief Update RTT averages for the face
    */
   void
-  UpdateFaceRtt (Ptr<NdnFace> face, const Time &sample);
+  UpdateFaceRtt (Ptr<Face> face, const Time &sample);
   
   /**
    * \brief Get prefix for the FIB entry
    */
-  const NdnNameComponents&
+  const NameComponents&
   GetPrefix () const { return *m_prefix; }
 
   /**
    * \brief Find "best route" candidate, skipping `skip' first candidates (modulo # of faces)
    *
-   * throws NdnFibEntry::NoFaces if m_faces.size()==0
+   * throws Entry::NoFaces if m_faces.size()==0
    */
-  const NdnFibFaceMetric &
+  const FaceMetric &
   FindBestCandidate (uint32_t skip = 0) const;
 
   /**
    * @brief Remove record associated with `face`
    */
   void
-  RemoveFace (const Ptr<NdnFace> &face)
+  RemoveFace (const Ptr<Face> &face)
   {
     m_faces.erase (face);
   }
 	
 private:
-  friend std::ostream& operator<< (std::ostream& os, const NdnFibEntry &entry);
+  friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
 public:
-  Ptr<const NdnNameComponents> m_prefix; ///< \brief Prefix of the FIB entry
-  NdnFibFaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
+  Ptr<const NameComponents> m_prefix; ///< \brief Prefix of the FIB entry
+  FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
   bool m_needsProbing;      ///< \brief flag indicating that probing should be performed 
 };
 
-std::ostream& operator<< (std::ostream& os, const NdnFibEntry &entry);
-std::ostream& operator<< (std::ostream& os, const NdnFibFaceMetric &metric);
+std::ostream& operator<< (std::ostream& os, const Entry &entry);
+std::ostream& operator<< (std::ostream& os, const FaceMetric &metric);
 
-} // ns3
+} // namespace fib
+} // namespace ndn
+} // namespace ns3
 
 #endif // _NDN_FIB_ENTRY_H_

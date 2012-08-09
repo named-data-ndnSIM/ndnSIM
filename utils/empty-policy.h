@@ -21,10 +21,9 @@
 #ifndef EMPTY_POLICY_H_
 #define EMPTY_POLICY_H_
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 /**
  * @brief Traits for empty (bogus) replacement policy
@@ -54,6 +53,7 @@ struct empty_policy_traits
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // EMPTY_POLICY_H_

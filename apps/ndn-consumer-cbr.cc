@@ -34,35 +34,35 @@
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnConsumerCbr");
+NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerCbr");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
     
-NS_OBJECT_ENSURE_REGISTERED (NdnConsumerCbr);
+NS_OBJECT_ENSURE_REGISTERED (ConsumerCbr);
     
 TypeId
-NdnConsumerCbr::GetTypeId (void)
+ConsumerCbr::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnConsumerCbr")
+  static TypeId tid = TypeId ("ns3::ndn::ConsumerCbr")
     .SetGroupName ("Ndn")
-    .SetParent<NdnConsumer> ()
-    .AddConstructor<NdnConsumerCbr> ()
+    .SetParent<Consumer> ()
+    .AddConstructor<ConsumerCbr> ()
 
     .AddAttribute ("Frequency", "Frequency of interest packets",
                    StringValue ("1.0"),
-                   MakeDoubleAccessor (&NdnConsumerCbr::m_frequency),
+                   MakeDoubleAccessor (&ConsumerCbr::m_frequency),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("Randomize", "Type of send time randomization: none (default), uniform, exponential",
                    StringValue ("none"),
-                   MakeStringAccessor (&NdnConsumerCbr::SetRandomize, &NdnConsumerCbr::GetRandomize),
+                   MakeStringAccessor (&ConsumerCbr::SetRandomize, &ConsumerCbr::GetRandomize),
                    MakeStringChecker ())
     ;
 
   return tid;
 }
     
-NdnConsumerCbr::NdnConsumerCbr ()
+ConsumerCbr::ConsumerCbr ()
   : m_frequency (1.0)
   , m_firstTime (true)
   , m_random (0)
@@ -71,14 +71,14 @@ NdnConsumerCbr::NdnConsumerCbr ()
   m_seqMax = std::numeric_limits<uint32_t>::max ();
 }
 
-NdnConsumerCbr::~NdnConsumerCbr ()
+ConsumerCbr::~ConsumerCbr ()
 {
   if (m_random)
     delete m_random;
 }
 
 void
-NdnConsumerCbr::ScheduleNextPacket ()
+ConsumerCbr::ScheduleNextPacket ()
 {
   // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
   // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
@@ -86,7 +86,7 @@ NdnConsumerCbr::ScheduleNextPacket ()
   if (m_firstTime)
     {
       m_sendEvent = Simulator::Schedule (Seconds (0.0),
-                                         &NdnConsumer::SendPacket, this);
+                                         &Consumer::SendPacket, this);
       m_firstTime = false;
     }
   else if (!m_sendEvent.IsRunning ())
@@ -95,11 +95,11 @@ NdnConsumerCbr::ScheduleNextPacket ()
                                          Seconds(1.0 / m_frequency)
                                        :
                                          Seconds(m_random->GetValue ()),
-                                       &NdnConsumer::SendPacket, this);
+                                       &Consumer::SendPacket, this);
 }
 
 void
-NdnConsumerCbr::SetRandomize (const std::string &value)
+ConsumerCbr::SetRandomize (const std::string &value)
 {
   if (m_random)
     delete m_random;
@@ -119,7 +119,7 @@ NdnConsumerCbr::SetRandomize (const std::string &value)
 }
 
 std::string
-NdnConsumerCbr::GetRandomize () const
+ConsumerCbr::GetRandomize () const
 {
   return m_randomType;
 }
@@ -130,16 +130,17 @@ NdnConsumerCbr::GetRandomize () const
 ///////////////////////////////////////////////////
 
 // void
-// NdnConsumer::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+// Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
 //                                const Ptr<const Packet> &payload)
 // {
-//   NdnConsumer::OnContentObject (contentObject, payload); // tracing inside
+//   Consumer::OnContentObject (contentObject, payload); // tracing inside
 // }
 
 // void
-// NdnConsumer::OnNack (const Ptr<const NdnInterestHeader> &interest)
+// Consumer::OnNack (const Ptr<const InterestHeader> &interest)
 // {
-//   NdnConsumer::OnNack (interest); // tracing inside
+//   Consumer::OnNack (interest); // tracing inside
 // }
 
+} // namespace ndn
 } // namespace ns3

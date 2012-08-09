@@ -23,15 +23,17 @@
 #include "ns3/simulator.h"
 
 namespace ns3 {
+namespace ndn {
+namespace pit {
 
-NdnPitEntryIncomingFace::NdnPitEntryIncomingFace (Ptr<NdnFace> face)
+IncomingFace::IncomingFace (Ptr<Face> face)
   : m_face (face)
   , m_arrivalTime (Simulator::Now ())
   // , m_nonce (nonce)
 {
 }
 
-NdnPitEntryIncomingFace::NdnPitEntryIncomingFace ()
+IncomingFace::IncomingFace ()
   : m_face (0)
   , m_arrivalTime (0)
 {
@@ -40,12 +42,14 @@ NdnPitEntryIncomingFace::NdnPitEntryIncomingFace ()
 /**
  * @brie Copy operator
  */
-NdnPitEntryIncomingFace &
-NdnPitEntryIncomingFace::operator = (NdnPitEntryIncomingFace &other)
+IncomingFace &
+IncomingFace::operator = (IncomingFace &other)
 {
   m_face = other.m_face;
   m_arrivalTime = other.m_arrivalTime;
   return *this;
 }
 
+} // namespace pit
+} // namespace ndn
 } // namespace ns3

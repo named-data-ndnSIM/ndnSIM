@@ -20,7 +20,7 @@
 
 #include "ndn-global-router.h"
 
-#include "ns3/ndn.h"
+#include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-name-components.h"
 
@@ -29,78 +29,79 @@
 using namespace boost;
 
 namespace ns3 {
+namespace ndn {
 
-uint32_t NdnGlobalRouter::m_idCounter = 0;
+uint32_t GlobalRouter::m_idCounter = 0;
 
-NS_OBJECT_ENSURE_REGISTERED (NdnGlobalRouter);
+NS_OBJECT_ENSURE_REGISTERED (GlobalRouter);
 
 TypeId 
-NdnGlobalRouter::GetTypeId ()
+GlobalRouter::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnGlobalRouter")
+  static TypeId tid = TypeId ("ns3::ndn::GlobalRouter")
     .SetGroupName ("Ndn")
     .SetParent<Object> ()
   ;
   return tid;
 }
 
-NdnGlobalRouter::NdnGlobalRouter ()
+GlobalRouter::GlobalRouter ()
 {
   m_id = m_idCounter;
   m_idCounter ++;
 }
 
 void
-NdnGlobalRouter::NotifyNewAggregate ()
+GlobalRouter::NotifyNewAggregate ()
 {
   if (m_ndn == 0)
     {
-      m_ndn = GetObject<Ndn> ();
+      m_ndn = GetObject<L3Protocol> ();
     }
   Object::NotifyNewAggregate ();
 }
 
 uint32_t
-NdnGlobalRouter::GetId () const
+GlobalRouter::GetId () const
 {
   return m_id;
 }
 
-Ptr<Ndn>
-NdnGlobalRouter::GetNdn () const
+Ptr<L3Protocol>
+GlobalRouter::GetL3Protocol () const
 {
   return m_ndn;
 }
 
 void
-NdnGlobalRouter::AddLocalPrefix (Ptr< NdnNameComponents > prefix)
+GlobalRouter::AddLocalPrefix (Ptr< NameComponents > prefix)
 {
   m_localPrefixes.push_back (prefix);
 }
 
 void
-NdnGlobalRouter::AddIncidency (Ptr< NdnFace > face, Ptr< NdnGlobalRouter > gr)
+GlobalRouter::AddIncidency (Ptr< Face > face, Ptr< GlobalRouter > gr)
 {
   m_incidencies.push_back (make_tuple (this, face, gr));
 }
 
-NdnGlobalRouter::IncidencyList &
-NdnGlobalRouter::GetIncidencies ()
+GlobalRouter::IncidencyList &
+GlobalRouter::GetIncidencies ()
 {
   return m_incidencies;
 }
 
-const NdnGlobalRouter::LocalPrefixList &
-NdnGlobalRouter::GetLocalPrefixes () const
+const GlobalRouter::LocalPrefixList &
+GlobalRouter::GetLocalPrefixes () const
 {
   return m_localPrefixes;
 }
 
 // void
-// NdnGlobalRouter::AddIncidencyChannel (Ptr< NdnFace > face, Ptr< Channel > channel)
+// GlobalRouter::AddIncidencyChannel (Ptr< NdnFace > face, Ptr< Channel > channel)
 // {
 //   m_incidenciesChannel.push_back (make_tuple (face, channel));
 // }
 
-}
-
+} // namespace ndn
+} // namespace ns3

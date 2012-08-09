@@ -34,25 +34,25 @@
 #include "ndn-interest-header.h"
 #include "ndn-content-object-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnAppFace");
+NS_LOG_COMPONENT_DEFINE ("ndn.AppFace");
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (NdnAppFace);
+NS_OBJECT_ENSURE_REGISTERED (AppFace);
 
 TypeId
-NdnAppFace::GetTypeId ()
+AppFace::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnAppFace")
-    .SetParent<NdnFace> ()
+  static TypeId tid = TypeId ("ns3::ndn::AppFace")
+    .SetParent<Face> ()
     .SetGroupName ("Ndn")
     ;
   return tid;
 }
 
-NdnAppFace::NdnAppFace (Ptr<NdnApp> app)
-  : NdnFace (app->GetNode ())
+AppFace::AppFace (Ptr<App> app)
+  : Face (app->GetNode ())
   , m_app (app)
 {
   NS_LOG_FUNCTION (this << app);
@@ -60,50 +60,50 @@ NdnAppFace::NdnAppFace (Ptr<NdnApp> app)
   NS_ASSERT (m_app != 0);
 }
 
-NdnAppFace::~NdnAppFace ()
+AppFace::~AppFace ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-NdnAppFace::NdnAppFace ()
-  : NdnFace (0)
+AppFace::AppFace ()
+  : Face (0)
 {
 }
 
-NdnAppFace::NdnAppFace (const NdnAppFace &)
-  : NdnFace (0)
+AppFace::AppFace (const AppFace &)
+  : Face (0)
 {
 }
 
-NdnAppFace& NdnAppFace::operator= (const NdnAppFace &)
+AppFace& AppFace::operator= (const AppFace &)
 {
-  return *((NdnAppFace*)0);
+  return *((AppFace*)0);
 }
 
 
 void
-NdnAppFace::RegisterProtocolHandler (ProtocolHandler handler)
+AppFace::RegisterProtocolHandler (ProtocolHandler handler)
 {
   NS_LOG_FUNCTION (this);
 
-  NdnFace::RegisterProtocolHandler (handler);
+  Face::RegisterProtocolHandler (handler);
 
-  m_app->RegisterProtocolHandler (MakeCallback (&NdnFace::Receive, this));
+  m_app->RegisterProtocolHandler (MakeCallback (&Face::Receive, this));
 }
 
 bool
-NdnAppFace::SendImpl (Ptr<Packet> p)
+AppFace::SendImpl (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
 
   try
     {
-      NdnHeaderHelper::Type type = NdnHeaderHelper::GetNdnHeaderType (p);
+      HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
       switch (type)
         {
-        case NdnHeaderHelper::INTEREST:
+        case HeaderHelper::INTEREST:
           {
-            Ptr<NdnInterestHeader> header = Create<NdnInterestHeader> ();
+            Ptr<InterestHeader> header = Create<InterestHeader> ();
             p->RemoveHeader (*header);
 
             if (header->GetNack () > 0)
@@ -113,10 +113,10 @@ NdnAppFace::SendImpl (Ptr<Packet> p)
           
             break;
           }
-        case NdnHeaderHelper::CONTENT_OBJECT:
+        case HeaderHelper::CONTENT_OBJECT:
           {
-            static NdnContentObjectTail tail;
-            Ptr<NdnContentObjectHeader> header = Create<NdnContentObjectHeader> ();
+            static ContentObjectTail tail;
+            Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
             p->RemoveHeader (*header);
             p->RemoveTrailer (tail);
             m_app->OnContentObject (header, p/*payload*/);
@@ -127,7 +127,7 @@ NdnAppFace::SendImpl (Ptr<Packet> p)
       
       return true;
     }
-  catch (NdnUnknownHeaderException)
+  catch (UnknownHeaderException)
     {
       NS_LOG_ERROR ("Unknown header type");
       return false;
@@ -135,11 +135,12 @@ NdnAppFace::SendImpl (Ptr<Packet> p)
 }
 
 std::ostream&
-NdnAppFace::Print (std::ostream& os) const
+AppFace::Print (std::ostream& os) const
 {
   os << "dev=local(" << GetId() << ")";
   return os;
 }
 
-}; // namespace ns3
+} // namespace ndn
+} // namespace ns3
 

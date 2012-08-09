@@ -25,57 +25,57 @@
 
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"
-#include "ns3/ndn.h"
+#include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-forwarding-strategy.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnApp");
+NS_LOG_COMPONENT_DEFINE ("ndn.App");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
     
-NS_OBJECT_ENSURE_REGISTERED (NdnApp);
+NS_OBJECT_ENSURE_REGISTERED (App);
     
 TypeId
-NdnApp::GetTypeId (void)
+App::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnApp")
+  static TypeId tid = TypeId ("ns3::ndn::App")
     .SetGroupName ("Ndn")
     .SetParent<Application> ()
-    .AddConstructor<NdnApp> ()
+    .AddConstructor<App> ()
 
     .AddTraceSource ("ReceivedInterests", "ReceivedInterests",
-                    MakeTraceSourceAccessor (&NdnApp::m_receivedInterests))
+                    MakeTraceSourceAccessor (&App::m_receivedInterests))
     
     .AddTraceSource ("ReceivedNacks", "ReceivedNacks",
-                    MakeTraceSourceAccessor (&NdnApp::m_receivedNacks))
+                    MakeTraceSourceAccessor (&App::m_receivedNacks))
     
     .AddTraceSource ("ReceivedContentObjects", "ReceivedContentObjects",
-                    MakeTraceSourceAccessor (&NdnApp::m_receivedContentObjects))
+                    MakeTraceSourceAccessor (&App::m_receivedContentObjects))
 
     .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
-                    MakeTraceSourceAccessor (&NdnApp::m_transmittedInterests))
+                    MakeTraceSourceAccessor (&App::m_transmittedInterests))
 
     .AddTraceSource ("TransmittedContentObjects", "TransmittedContentObjects",
-                    MakeTraceSourceAccessor (&NdnApp::m_transmittedContentObjects))
+                    MakeTraceSourceAccessor (&App::m_transmittedContentObjects))
     ;
   return tid;
 }
     
-NdnApp::NdnApp ()
+App::App ()
   : m_protocolHandler (0)
   , m_active (false)
   , m_face (0)
 {
 }
     
-NdnApp::~NdnApp ()
+App::~App ()
 {
 }
 
 void
-NdnApp::DoDispose (void)
+App::DoDispose (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -86,27 +86,27 @@ NdnApp::DoDispose (void)
 }
 
 void
-NdnApp::RegisterProtocolHandler (ProtocolHandler handler)
+App::RegisterProtocolHandler (ProtocolHandler handler)
 {
   m_protocolHandler = handler;
 }
     
 void
-NdnApp::OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet)
+App::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedInterests (interest, this, m_face);
 }
 
 void
-NdnApp::OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet)
+App::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedNacks (interest, this, m_face);
 }
 
 void
-NdnApp::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+App::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                           Ptr<Packet> payload)
 {
   NS_LOG_FUNCTION (this << contentObject << payload);
@@ -115,34 +115,34 @@ NdnApp::OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
 
 // Application Methods
 void 
-NdnApp::StartApplication () // Called at time specified by Start
+App::StartApplication () // Called at time specified by Start
 {
   NS_LOG_FUNCTION_NOARGS ();
   
   NS_ASSERT (m_active != true);
   m_active = true;
 
-  NS_ASSERT_MSG (GetNode ()->GetObject<Ndn> () != 0,
+  NS_ASSERT_MSG (GetNode ()->GetObject<L3Protocol> () != 0,
                  "Ndn stack should be installed on the node " << GetNode ());
 
   // step 1. Create a face
-  m_face = CreateObject<NdnAppFace> (/*Ptr<NdnApp> (this)*/this);
+  m_face = CreateObject<AppFace> (/*Ptr<App> (this)*/this);
     
   // step 2. Add face to the Ndn stack
-  GetNode ()->GetObject<Ndn> ()->AddFace (m_face);
+  GetNode ()->GetObject<L3Protocol> ()->AddFace (m_face);
 
   // step 3. Enable face
   m_face->SetUp (true);
 }
     
 void 
-NdnApp::StopApplication () // Called at time specified by Stop
+App::StopApplication () // Called at time specified by Stop
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   if (!m_active) return; //don't assert here, just return
  
-  NS_ASSERT (GetNode ()->GetObject<Ndn> () != 0);
+  NS_ASSERT (GetNode ()->GetObject<L3Protocol> () != 0);
 
   m_active = false;
 
@@ -150,9 +150,9 @@ NdnApp::StopApplication () // Called at time specified by Stop
   m_face->SetUp (false);
 
   // step 2. Remove face from Ndn stack
-  GetNode ()->GetObject<Ndn> ()->RemoveFace (m_face);
-  GetNode ()->GetObject<NdnFib> ()->RemoveFromAll (m_face);
-  GetNode ()->GetObject<NdnForwardingStrategy> ()->RemoveFace (m_face); // notify that face is removed
+  GetNode ()->GetObject<L3Protocol> ()->RemoveFace (m_face);
+  GetNode ()->GetObject<Fib> ()->RemoveFromAll (m_face);
+  GetNode ()->GetObject<ForwardingStrategy> ()->RemoveFace (m_face); // notify that face is removed
 
   // step 3. Destroy face
   NS_ASSERT_MSG (m_face->GetReferenceCount ()==1,
@@ -161,4 +161,5 @@ NdnApp::StopApplication () // Called at time specified by Stop
   m_face = 0;
 }
 
-}
+} // namespace ndn
+} // namespace ns3

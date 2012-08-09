@@ -69,7 +69,7 @@ Getting Started
 Portability
 ------------
 
-ndnSIM has been successfully compiled and used under Ubuntu Linux 11.04 (stock gcc), Mac OS 10.6/10.7 (gcc-4.2 apple/llvm, macports gcc 4.6), FreeBSD 8.2 (requires gcc from ports - the stock gcc will not work!).
+ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (stock gcc, boost 1.48), Mac OS 10.6/10.7/10.8 (gcc-4.2 apple/llvm, macports gcc 4.6, boost 1.49 or 1.50).
 
 Requirements
 -------------
@@ -127,8 +127,10 @@ Compiling and running ndnSIM
 ndnSIM uses standard NS-3 compilation procedure.  For example::
 
 	cd <ns-3-folder>
-	./waf configure --enable-examples
+	./waf configure --enable-examples --enable-ndn-plugins=topology,mobility
 	./waf
+
+
 
 To run :doc:`sample ndnSIM simulations <examples>`::
 

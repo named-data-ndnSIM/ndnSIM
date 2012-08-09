@@ -27,14 +27,14 @@
 #include "ns3/application-container.h"
 #include "ns3/ptr.h"
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * \brief A helper to make it easier to instantiate an ns3::NdnConsumer Application
  * on a set of nodes.
  */
-class NdnAppHelper
+class AppHelper
 {        
 public:
 
@@ -43,7 +43,7 @@ public:
    *
    * \param app Class of the application
    */
-  NdnAppHelper (const std::string &prefix);
+  AppHelper (const std::string &prefix);
 
   /**
    * @brief Set the prefix consumer will be requesting
@@ -100,6 +100,7 @@ private:
   ObjectFactory m_factory;
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // NDN_APP_HELPER_H

@@ -25,8 +25,8 @@
 #include "ndn-consumer.h"
 #include "ns3/traced-value.h"
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * @ingroup ndn
@@ -35,7 +35,7 @@ namespace ns3
  * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the simulator.
  * Behavior may be unpredictable if used incorrectly.
  */
-class NdnConsumerWindow: public NdnConsumer
+class ConsumerWindow: public Consumer
 {
 public: 
   static TypeId GetTypeId ();
@@ -43,17 +43,17 @@ public:
   /**
    * \brief Default constructor 
    */
-  NdnConsumerWindow ();
+  ConsumerWindow ();
 
-  // From NdnApp
+  // From App
   // virtual void
-  // OnInterest (const Ptr<const NdnInterestHeader> &interest);
+  // OnInterest (const Ptr<const InterestHeader> &interest);
 
   virtual void
-  OnNack (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> payload);
+  OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> payload);
 
   virtual void
-  OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                    Ptr<Packet> payload);
 
   virtual void
@@ -61,7 +61,7 @@ public:
  
 protected:
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying Ndn protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket ();
@@ -93,6 +93,7 @@ private:
   TracedValue<uint32_t> m_inFlight;
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif

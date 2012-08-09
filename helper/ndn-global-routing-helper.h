@@ -29,36 +29,38 @@ class Node;
 class NodeContainer;
 class Channel;
 
+namespace ndn {
+
 /**
  * @ingroup ndn
- * @brief Helper for NdnGlobalRouter interface
+ * @brief Helper for GlobalRouter interface
  */
-class NdnGlobalRoutingHelper
+class GlobalRoutingHelper
 {
 public:
   /**
-   * @brief Install NdnGlobalRouter interface on a node
+   * @brief Install GlobalRouter interface on a node
    *
-   * Note that NdnGlobalRouter will also be installed on all connected nodes and channels
+   * Note that GlobalRouter will also be installed on all connected nodes and channels
    *
-   * @param node Node to install NdnGlobalRouter interface
+   * @param node Node to install GlobalRouter interface
    */
   void
   Install (Ptr<Node> node);
 
   
   /**
-   * @brief Install NdnGlobalRouter interface on nodes
+   * @brief Install GlobalRouter interface on nodes
    *
-   * Note that NdnGlobalRouter will also be installed on all connected nodes and channels
+   * Note that GlobalRouter will also be installed on all connected nodes and channels
    *
-   * @param nodes NodeContainer to install NdnGlobalRouter interface
+   * @param nodes NodeContainer to install GlobalRouter interface
    */
   void
   Install (const NodeContainer &nodes);
 
   /**
-   * @brief Install NdnGlobalRouter interface on all nodes
+   * @brief Install GlobalRouter interface on all nodes
    */
   void
   InstallAll ();
@@ -98,6 +100,7 @@ private:
   Install (Ptr<Channel> channel);
 };
 
-}
+} // namespace ndn
+} // namespace ns3
 
 #endif // NDN_GLOBAL_ROUTING_HELPER_H

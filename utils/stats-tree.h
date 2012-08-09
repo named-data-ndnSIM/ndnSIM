@@ -26,15 +26,14 @@
 #include "ns3/ndn-name-components.h"
 #include "ns3/ptr.h"
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 class StatsTree
 {
 public:
-  typedef trie< ns3::NdnNameComponents,
+  typedef trie< NameComponents,
                 non_pointer_traits< LoadStatsNode >, void* > tree_type;
   
   StatsTree ();
@@ -43,33 +42,33 @@ public:
   Step ();
   
   void
-  NewPitEntry (const ns3::NdnNameComponents &key);
+  NewPitEntry (const NameComponents &key);
 
   void
-  Incoming (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face);
+  Incoming (const NameComponents &key, Ptr<Face> face);
 
   void
-  Outgoing (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face);
+  Outgoing (const NameComponents &key, Ptr<Face> face);
 
   void
-  Satisfy (const ns3::NdnNameComponents &key);
+  Satisfy (const NameComponents &key);
 
   void
-  Timeout (const ns3::NdnNameComponents &key);
+  Timeout (const NameComponents &key);
 
   void
-  Rx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
+  Rx (const NameComponents &key, Ptr<Face> face, uint32_t amount);
 
   void
-  Tx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
+  Tx (const NameComponents &key, Ptr<Face> face, uint32_t amount);
 
   // const LoadStatsNode &
-  // Get (const ns3::NdnNameComponents &key) const;
+  // Get (const NameComponents &key) const;
   const LoadStatsNode &
-  operator [] (const ns3::NdnNameComponents &key) const;
+  operator [] (const NameComponents &key) const;
 
   void
-  RemoveFace (ns3::Ptr<ns3::NdnFace> face);
+  RemoveFace (Ptr<Face> face);
   
 private:
   const LoadStatsNode &
@@ -86,7 +85,8 @@ private:
 std::ostream &
 operator << (std::ostream &os, const StatsTree &tree);
 
-} // ndnSIM
-} // ns3
+} // namespace ndnSIM
+} // namespace ndn
+} // namespace ns3
 
 #endif // STATS_TREE_H

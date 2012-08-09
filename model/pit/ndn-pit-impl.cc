@@ -37,7 +37,7 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnPitImpl");
+NS_LOG_COMPONENT_DEFINE ("ndn.pit.PitImpl");
 
 using namespace boost::tuples;
 using namespace boost;
@@ -53,23 +53,24 @@ namespace ll = boost::lambda;
   } x_ ## type ## templ ## RegistrationVariable
 
 namespace ns3 {
+namespace ndn {
+namespace pit {
 
 using namespace ndnSIM;
 
-
 template<>
 TypeId
-NdnPitImpl<persistent_policy_traits>::GetTypeId ()
+PitImpl<persistent_policy_traits>::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnPit")
+  static TypeId tid = TypeId ("ns3::ndn::pit::Persistent")
     .SetGroupName ("Ndn")
-    .SetParent<NdnPit> ()
-    .AddConstructor< NdnPitImpl< persistent_policy_traits > > ()
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< persistent_policy_traits > > ()
     .AddAttribute ("MaxSize",
                    "Set maximum number of entries in PIT. If 0, limit is not enforced",
                    StringValue ("0"),
-                   MakeUintegerAccessor (&NdnPitImpl< persistent_policy_traits >::GetMaxSize,
-                                         &NdnPitImpl< persistent_policy_traits >::SetMaxSize),
+                   MakeUintegerAccessor (&PitImpl< persistent_policy_traits >::GetMaxSize,
+                                         &PitImpl< persistent_policy_traits >::SetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
     ;
 
@@ -78,17 +79,17 @@ NdnPitImpl<persistent_policy_traits>::GetTypeId ()
 
 template<>
 TypeId
-NdnPitImpl<random_policy_traits>::GetTypeId ()
+PitImpl<random_policy_traits>::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnPitRandom")
+  static TypeId tid = TypeId ("ns3::ndn::pit::Random")
     .SetGroupName ("Ndn")
-    .SetParent<NdnPit> ()
-    .AddConstructor< NdnPitImpl< random_policy_traits > > ()
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< random_policy_traits > > ()
     .AddAttribute ("MaxSize",
                    "Set maximum number of entries in PIT. If 0, limit is not enforced",
                    StringValue ("0"),
-                   MakeUintegerAccessor (&NdnPitImpl< random_policy_traits >::GetMaxSize,
-                                         &NdnPitImpl< random_policy_traits >::SetMaxSize),
+                   MakeUintegerAccessor (&PitImpl< random_policy_traits >::GetMaxSize,
+                                         &PitImpl< random_policy_traits >::SetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
     ;
 
@@ -97,17 +98,17 @@ NdnPitImpl<random_policy_traits>::GetTypeId ()
 
 template<>
 TypeId
-NdnPitImpl<lru_policy_traits>::GetTypeId ()
+PitImpl<lru_policy_traits>::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnPitLru")
+  static TypeId tid = TypeId ("ns3::ndn::pit::Lru")
     .SetGroupName ("Ndn")
-    .SetParent<NdnPit> ()
-    .AddConstructor< NdnPitImpl< lru_policy_traits > > ()
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< lru_policy_traits > > ()
     .AddAttribute ("MaxSize",
                    "Set maximum number of entries in PIT. If 0, limit is not enforced",
                    StringValue ("0"),
-                   MakeUintegerAccessor (&NdnPitImpl< lru_policy_traits >::GetMaxSize,
-                                         &NdnPitImpl< lru_policy_traits >::SetMaxSize),
+                   MakeUintegerAccessor (&PitImpl< lru_policy_traits >::GetMaxSize,
+                                         &PitImpl< lru_policy_traits >::SetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
     ;
 
@@ -115,60 +116,60 @@ NdnPitImpl<lru_policy_traits>::GetTypeId ()
 }
 
 template<class Policy>
-NdnPitImpl<Policy>::NdnPitImpl ()
+PitImpl<Policy>::PitImpl ()
 {
 }
 
 template<class Policy>
-NdnPitImpl<Policy>::~NdnPitImpl ()
+PitImpl<Policy>::~PitImpl ()
 {
 }
 
 template<class Policy>
 uint32_t
-NdnPitImpl<Policy>::GetMaxSize () const
+PitImpl<Policy>::GetMaxSize () const
 {
   return super::getPolicy ().get_max_size ();
 }
 
 template<class Policy>
 void
-NdnPitImpl<Policy>::SetMaxSize (uint32_t maxSize)
+PitImpl<Policy>::SetMaxSize (uint32_t maxSize)
 {
   super::getPolicy ().set_max_size (maxSize);
 }
 
 template<class Policy>
 void 
-NdnPitImpl<Policy>::NotifyNewAggregate ()
+PitImpl<Policy>::NotifyNewAggregate ()
 {
   if (m_fib == 0)
     {
-      m_fib = GetObject<NdnFib> ();
+      m_fib = GetObject<Fib> ();
     }
   if (m_forwardingStrategy == 0)
     {
-      m_forwardingStrategy = GetObject<NdnForwardingStrategy> ();
+      m_forwardingStrategy = GetObject<ForwardingStrategy> ();
     }
 
-  NdnPit::NotifyNewAggregate ();
+  Pit::NotifyNewAggregate ();
 }
 
 template<class Policy>
 void 
-NdnPitImpl<Policy>::DoDispose ()
+PitImpl<Policy>::DoDispose ()
 {
   super::clear ();
 
   m_forwardingStrategy = 0;
   m_fib = 0;
 
-  NdnPit::DoDispose ();
+  Pit::DoDispose ();
 }
 
 template<class Policy>
 void
-NdnPitImpl<Policy>::RescheduleCleaning ()
+PitImpl<Policy>::RescheduleCleaning ()
 {
   m_cleanEvent.Cancel ();
   if (i_time.empty ())
@@ -185,12 +186,12 @@ NdnPitImpl<Policy>::RescheduleCleaning ()
   //               i_time.begin ()->GetExpireTime () << "s abs time");
   
   m_cleanEvent = Simulator::Schedule (nextEvent,
-                                      &NdnPitImpl<Policy>::CleanExpired, this);
+                                      &PitImpl<Policy>::CleanExpired, this);
 }
 
 template<class Policy>
 void
-NdnPitImpl<Policy>::CleanExpired ()
+PitImpl<Policy>::CleanExpired ()
 {
   NS_LOG_LOGIC ("Cleaning PIT. Total: " << i_time.size ());
   Time now = Simulator::Now ();
@@ -218,8 +219,8 @@ NdnPitImpl<Policy>::CleanExpired ()
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::Lookup (const NdnContentObjectHeader &header)
+Ptr<Entry>
+PitImpl<Policy>::Lookup (const ContentObjectHeader &header)
 {
   /// @todo use predicate to search with exclude filters  
   typename super::iterator item = super::longest_prefix_match (header.GetName ());
@@ -231,8 +232,8 @@ NdnPitImpl<Policy>::Lookup (const NdnContentObjectHeader &header)
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::Lookup (const NdnInterestHeader &header)
+Ptr<Entry>
+PitImpl<Policy>::Lookup (const InterestHeader &header)
 {
   // NS_LOG_FUNCTION (header.GetName ());
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
@@ -249,10 +250,10 @@ NdnPitImpl<Policy>::Lookup (const NdnInterestHeader &header)
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::Create (Ptr<const NdnInterestHeader> header)
+Ptr<Entry>
+PitImpl<Policy>::Create (Ptr<const InterestHeader> header)
 {
-  Ptr<NdnFibEntry> fibEntry = m_fib->LongestPrefixMatch (*header);
+  Ptr<fib::Entry> fibEntry = m_fib->LongestPrefixMatch (*header);
   if (fibEntry == 0)
     return 0;
   
@@ -283,7 +284,7 @@ NdnPitImpl<Policy>::Create (Ptr<const NdnInterestHeader> header)
 
 template<class Policy>
 void
-NdnPitImpl<Policy>::MarkErased (Ptr<NdnPitEntry> item)
+PitImpl<Policy>::MarkErased (Ptr<Entry> item)
 {
   // entry->SetExpireTime (Simulator::Now () + m_PitEntryPruningTimout);
   super::erase (StaticCast< entry > (item)->to_iterator ());
@@ -292,7 +293,7 @@ NdnPitImpl<Policy>::MarkErased (Ptr<NdnPitEntry> item)
 
 template<class Policy>
 void
-NdnPitImpl<Policy>::Print (std::ostream& os) const
+PitImpl<Policy>::Print (std::ostream& os) const
 {
   // !!! unordered_set imposes "random" order of item in the same level !!!
   typename super::parent_trie::const_recursive_iterator item (super::getTrie ()), end (0);
@@ -306,14 +307,14 @@ NdnPitImpl<Policy>::Print (std::ostream& os) const
 
 template<class Policy>
 uint32_t
-NdnPitImpl<Policy>::GetSize () const
+PitImpl<Policy>::GetSize () const
 {
   return super::getPolicy ().size ();
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::Begin ()
+Ptr<Entry>
+PitImpl<Policy>::Begin ()
 {
   typename super::parent_trie::recursive_iterator item (super::getTrie ()), end (0);
   for (; item != end; item++)
@@ -329,15 +330,15 @@ NdnPitImpl<Policy>::Begin ()
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::End ()
+Ptr<Entry>
+PitImpl<Policy>::End ()
 {
   return 0;
 }
 
 template<class Policy>
-Ptr<NdnPitEntry>
-NdnPitImpl<Policy>::Next (Ptr<NdnPitEntry> from)
+Ptr<Entry>
+PitImpl<Policy>::Next (Ptr<Entry> from)
 {
   if (from == 0) return 0;
   
@@ -359,13 +360,14 @@ NdnPitImpl<Policy>::Next (Ptr<NdnPitEntry> from)
 
 
 // explicit instantiation and registering
-template class NdnPitImpl<persistent_policy_traits>;
-template class NdnPitImpl<random_policy_traits>;
-template class NdnPitImpl<lru_policy_traits>;
+template class PitImpl<persistent_policy_traits>;
+template class PitImpl<random_policy_traits>;
+template class PitImpl<lru_policy_traits>;
 
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(NdnPitImpl, persistent_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(NdnPitImpl, random_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(NdnPitImpl, lru_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, persistent_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, random_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, lru_policy_traits);
 
-
+} // namespace pit
+} // namespace ndn
 } // namespace ns3

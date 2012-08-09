@@ -25,14 +25,15 @@
 #include "ns3/buffer.h"
 
 namespace ns3 {
+namespace ndn {
 
-class NdnInterestHeader;
-class NdnContentObjectHeader;
+class InterestHeader;
+class ContentObjectHeader;
 
 /**
  * \brief Helper class to decode ccnb formatted Ndn message
  */
-class NdnDecodingHelper
+class DecodingHelper
 {
 public:
   /**
@@ -42,7 +43,7 @@ public:
    * @return Number of bytes used for deserialization
    */
   static size_t
-  Deserialize (Buffer::Iterator start, NdnInterestHeader &interest);
+  Deserialize (Buffer::Iterator start, InterestHeader &interest);
 
   /**
    * \brief Deserialize Buffer::Iterator to NdnContentObjectHeader
@@ -50,9 +51,11 @@ public:
    * @param contentObject Pointer to the NdnContentObjectHeader to hold deserialized value
    * @return Number of bytes used for deserialization
    */
-  static size_t
-  Deserialize (Buffer::Iterator start, NdnContentObjectHeader &contentObject);
+  // static size_t
+  // Deserialize (Buffer::Iterator start, ContentObjectHeader &contentObject);
 };
+
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_DECODING_HELPER_H_

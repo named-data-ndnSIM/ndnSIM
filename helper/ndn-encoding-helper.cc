@@ -28,9 +28,10 @@
 #include <boost/foreach.hpp>
 
 namespace ns3 {
+namespace ndn {
 
 size_t
-NdnEncodingHelper::Serialize (Buffer::Iterator start, const NdnInterestHeader &interest)
+EncodingHelper::Serialize (Buffer::Iterator start, const InterestHeader &interest)
 {
   size_t written = 0;
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
@@ -99,7 +100,7 @@ NdnEncodingHelper::Serialize (Buffer::Iterator start, const NdnInterestHeader &i
 }
 
 size_t
-NdnEncodingHelper::GetSerializedSize (const NdnInterestHeader &interest)
+EncodingHelper::GetSerializedSize (const InterestHeader &interest)
 {
   size_t written = 0;
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>
@@ -176,7 +177,7 @@ NdnEncodingHelper::GetSerializedSize (const NdnInterestHeader &interest)
 #define CCN_TT_HBIT ((unsigned char)(1 << 7))
 
 size_t
-NdnEncodingHelper::AppendBlockHeader (Buffer::Iterator &start, size_t val, CcnbParser::ccn_tt tt)
+EncodingHelper::AppendBlockHeader (Buffer::Iterator &start, size_t val, CcnbParser::ccn_tt tt)
 {
   unsigned char buf[1+8*((sizeof(val)+6)/7)];
   unsigned char *p = &(buf[sizeof(buf)-1]);
@@ -195,7 +196,7 @@ NdnEncodingHelper::AppendBlockHeader (Buffer::Iterator &start, size_t val, CcnbP
 }
 
 size_t
-NdnEncodingHelper::EstimateBlockHeader (size_t value)
+EncodingHelper::EstimateBlockHeader (size_t value)
 {
   value >>= (7-CCN_TT_BITS);
   size_t n = 1;
@@ -208,7 +209,7 @@ NdnEncodingHelper::EstimateBlockHeader (size_t value)
 }
 
 size_t
-NdnEncodingHelper::AppendNumber (Buffer::Iterator &start, uint32_t number)
+EncodingHelper::AppendNumber (Buffer::Iterator &start, uint32_t number)
 {
   std::ostringstream os;
   os << number;
@@ -222,7 +223,7 @@ NdnEncodingHelper::AppendNumber (Buffer::Iterator &start, uint32_t number)
 }
 
 size_t
-NdnEncodingHelper::EstimateNumber (uint32_t number)
+EncodingHelper::EstimateNumber (uint32_t number)
 {
   std::ostringstream os;
   os << number;
@@ -230,14 +231,14 @@ NdnEncodingHelper::EstimateNumber (uint32_t number)
 }
   
 size_t
-NdnEncodingHelper::AppendCloser (Buffer::Iterator &start)
+EncodingHelper::AppendCloser (Buffer::Iterator &start)
 {
   start.WriteU8 (CcnbParser::CCN_CLOSE);
   return 1;
 }
 
 size_t
-NdnEncodingHelper::AppendNameComponents (Buffer::Iterator &start, const NdnNameComponents &name)
+EncodingHelper::AppendNameComponents (Buffer::Iterator &start, const NameComponents &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())
@@ -249,7 +250,7 @@ NdnEncodingHelper::AppendNameComponents (Buffer::Iterator &start, const NdnNameC
 }
 
 size_t
-NdnEncodingHelper::EstimateNameComponents (const NdnNameComponents &name)
+EncodingHelper::EstimateNameComponents (const NameComponents &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())
@@ -260,7 +261,7 @@ NdnEncodingHelper::EstimateNameComponents (const NdnNameComponents &name)
 }
 
 size_t
-NdnEncodingHelper::AppendTimestampBlob (Buffer::Iterator &start, const Time &time)
+EncodingHelper::AppendTimestampBlob (Buffer::Iterator &start, const Time &time)
 {
   // the original function implements Markers... thought not sure what are these markers for...
 
@@ -287,7 +288,7 @@ NdnEncodingHelper::AppendTimestampBlob (Buffer::Iterator &start, const Time &tim
 }
 
 size_t
-NdnEncodingHelper::EstimateTimestampBlob (const Time &time)
+EncodingHelper::EstimateTimestampBlob (const Time &time)
 {
   int required_bytes = 2; // 12 bits for fractions of a second, 4 bits left for seconds. Sometimes it is enough
   intmax_t ts = time.ToInteger (Time::S) >> 4;
@@ -298,7 +299,7 @@ NdnEncodingHelper::EstimateTimestampBlob (const Time &time)
 }
 
 size_t
-NdnEncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
+EncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
                   const uint8_t *data, size_t size)
 {
   size_t written = AppendBlockHeader (start, dtag, CcnbParser::CCN_DTAG);
@@ -317,7 +318,7 @@ NdnEncodingHelper::AppendTaggedBlob (Buffer::Iterator &start, CcnbParser::ccn_dt
 }
 
 size_t
-NdnEncodingHelper::EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size)
+EncodingHelper::EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size)
 {
   if (size>0)
     return EstimateBlockHeader (dtag) + EstimateBlockHeader (size) + size + 1;
@@ -326,7 +327,7 @@ NdnEncodingHelper::EstimateTaggedBlob (CcnbParser::ccn_dtag dtag, size_t size)
 }
 
 size_t
-NdnEncodingHelper::AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
+EncodingHelper::AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag dtag,
                                   const std::string &string)
 {
   size_t written = AppendBlockHeader (start, dtag, CcnbParser::CCN_DTAG);
@@ -341,10 +342,11 @@ NdnEncodingHelper::AppendString (Buffer::Iterator &start, CcnbParser::ccn_dtag d
 }
 
 size_t
-NdnEncodingHelper::EstimateString (CcnbParser::ccn_dtag dtag, const std::string &string)
+EncodingHelper::EstimateString (CcnbParser::ccn_dtag dtag, const std::string &string)
 {
   return EstimateBlockHeader (dtag) + EstimateBlockHeader (string.size ()) + string.size () + 1;
 }
 
 
+} // namespace ndn
 } // namespace ns3

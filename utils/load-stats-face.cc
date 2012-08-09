@@ -28,12 +28,11 @@
 using namespace boost::mpl;
 using namespace boost::tuples;
 
-NS_LOG_COMPONENT_DEFINE ("LoadStatsFace");
+NS_LOG_COMPONENT_DEFINE ("ndn.LoadStatsFace");
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 std::ostream &
 operator << (std::ostream &os, const LoadStats::stats_tuple &tuple);
@@ -147,6 +146,7 @@ operator << (std::ostream &os, const LoadStatsFace &stats)
   return os;
 }
 
-} // ndnSIM
-} // ns3
+} // namespace ndnSIM
+} // namespace ndn
+} // namespace ns3
 

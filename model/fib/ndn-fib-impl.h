@@ -28,18 +28,20 @@
 #include "../../utils/counting-policy.h"
 
 namespace ns3 {
+namespace ndn {
+namespace fib {
 
-class NdnFibEntryImpl : public NdnFibEntry
+class EntryImpl : public Entry
 {
 public:
   typedef ndnSIM::trie_with_policy<
-    NdnNameComponents,
-    ndnSIM::smart_pointer_payload_traits<NdnFibEntryImpl>,
+    NameComponents,
+    ndnSIM::smart_pointer_payload_traits<EntryImpl>,
     ndnSIM::counting_policy_traits
     > trie;
 
-  NdnFibEntryImpl (const Ptr<const NdnNameComponents> &prefix)
-    : NdnFibEntry (prefix)
+  EntryImpl (const Ptr<const NameComponents> &prefix)
+    : Entry (prefix)
     , item_ (0)
   {
   }
@@ -57,24 +59,19 @@ private:
   trie::iterator item_;
 };
 
-struct NdnFibEntryContainer
-{
-  typedef ndnSIM::trie_with_policy<
-    NdnNameComponents,
-    ndnSIM::smart_pointer_payload_traits<NdnFibEntryImpl>,
-    ndnSIM::counting_policy_traits
-    > type;
-};
-
 /**
  * \ingroup ndn
  * \brief Class implementing FIB functionality
  */
-class NdnFibImpl : public NdnFib,
-                    private NdnFibEntryContainer::type
+class FibImpl : public Fib,
+                protected ndnSIM::trie_with_policy< NameComponents,
+                                                    ndnSIM::smart_pointer_payload_traits< EntryImpl >,
+                                                    ndnSIM::counting_policy_traits >
 {
 public:
-  typedef NdnFibEntryContainer::type super;
+  typedef ndnSIM::trie_with_policy< NameComponents,
+                                    ndnSIM::smart_pointer_payload_traits<EntryImpl>,
+                                    ndnSIM::counting_policy_traits > super;
   
   /**
    * \brief Interface ID
@@ -86,25 +83,25 @@ public:
   /**
    * \brief Constructor
    */
-  NdnFibImpl ();
+  FibImpl ();
 
-  virtual Ptr<NdnFibEntry>
-  LongestPrefixMatch (const NdnInterestHeader &interest);
+  virtual Ptr<Entry>
+  LongestPrefixMatch (const InterestHeader &interest);
   
-  virtual Ptr<NdnFibEntry>
-  Add (const NdnNameComponents &prefix, Ptr<NdnFace> face, int32_t metric);
+  virtual Ptr<Entry>
+  Add (const NameComponents &prefix, Ptr<Face> face, int32_t metric);
 
-  virtual Ptr<NdnFibEntry>
-  Add (const Ptr<const NdnNameComponents> &prefix, Ptr<NdnFace> face, int32_t metric);
+  virtual Ptr<Entry>
+  Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t metric);
 
   virtual void
-  Remove (const Ptr<const NdnNameComponents> &prefix);
+  Remove (const Ptr<const NameComponents> &prefix);
 
   virtual void
   InvalidateAll ();
   
   virtual void
-  RemoveFromAll (Ptr<NdnFace> face);
+  RemoveFromAll (Ptr<Face> face);
 
   virtual void
   Print (std::ostream &os) const;
@@ -112,24 +109,14 @@ public:
   virtual uint32_t
   GetSize () const;
 
-  virtual Ptr<const NdnFibEntry>
+  virtual Ptr<const Entry>
   Begin ();
 
-  virtual Ptr<const NdnFibEntry>
+  virtual Ptr<const Entry>
   End ();
 
-  virtual Ptr<const NdnFibEntry>
-  Next (Ptr<const NdnFibEntry> item);
-  
-  // /**
-  //  * @brief Modify element in container
-  //  */
-  // template<typename Modifier>
-  // bool
-  // modify (Ptr<NdnFibEntry> item, Modifier mod)
-  // {
-  //   return super::modify (StaticCast<NdnFibEntryImpl> (item)->to_iterator (), mod);
-  // }
+  virtual Ptr<const Entry>
+  Next (Ptr<const Entry> item);
   
 protected:
   // inherited from Object class
@@ -142,12 +129,14 @@ private:
    * entry will be removed
    */
   void
-  RemoveFace (super::parent_trie &item, Ptr<NdnFace> face);
+  RemoveFace (super::parent_trie &item, Ptr<Face> face);
   
 private:
   Ptr<Node> m_node;
 };
- 
+
+} // namespace fib
+} // namespace ndn
 } // namespace ns3
 
 #endif	/* _NDN_FIB_IMPL_H_ */

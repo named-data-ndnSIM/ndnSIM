@@ -25,12 +25,10 @@
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/at.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
-namespace detail
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
+namespace detail {
 
 template <class T>
 struct wrap
@@ -82,6 +80,7 @@ struct multi_type_container
   
 } // detail
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // MULTI_TYPE_CONTAINER_H_

@@ -28,30 +28,30 @@
 #include "ns3/mpi-interface.h"
 #endif
 
-NS_LOG_COMPONENT_DEFINE ("NdnAppHelper");
+NS_LOG_COMPONENT_DEFINE ("ndn.AppHelper");
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
-NdnAppHelper::NdnAppHelper (const std::string &app)
+AppHelper::AppHelper (const std::string &app)
 {
   m_factory.SetTypeId (app);
 }
 
 void
-NdnAppHelper::SetPrefix (const std::string &prefix)
+AppHelper::SetPrefix (const std::string &prefix)
 {
   m_factory.Set ("Prefix", StringValue(prefix));
 }
 
 void 
-NdnAppHelper::SetAttribute (std::string name, const AttributeValue &value)
+AppHelper::SetAttribute (std::string name, const AttributeValue &value)
 {
   m_factory.Set (name, value);
 }
     
 ApplicationContainer
-NdnAppHelper::Install (Ptr<Node> node)
+AppHelper::Install (Ptr<Node> node)
 {
   ApplicationContainer apps;
   Ptr<Application> app = InstallPriv (node);
@@ -62,14 +62,14 @@ NdnAppHelper::Install (Ptr<Node> node)
 }
     
 ApplicationContainer
-NdnAppHelper::Install (std::string nodeName)
+AppHelper::Install (std::string nodeName)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   return Install (node);
 }
     
 ApplicationContainer
-NdnAppHelper::Install (NodeContainer c)
+AppHelper::Install (NodeContainer c)
 {
   ApplicationContainer apps;
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -83,7 +83,7 @@ NdnAppHelper::Install (NodeContainer c)
 }
     
 Ptr<Application>
-NdnAppHelper::InstallPriv (Ptr<Node> node)
+AppHelper::InstallPriv (Ptr<Node> node)
 {
 #ifdef NS3_MPI
   if (MpiInterface::IsEnabled () &&
@@ -94,10 +94,11 @@ NdnAppHelper::InstallPriv (Ptr<Node> node)
     }
 #endif
   
-  Ptr<NdnApp> app = m_factory.Create<NdnApp> ();        
+  Ptr<App> app = m_factory.Create<App> ();        
   node->AddApplication (app);
         
   return app;
 }
 
-}
+} // namespace ndn
+} // namespace ns3

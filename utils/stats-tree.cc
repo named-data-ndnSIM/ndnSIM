@@ -22,14 +22,11 @@
 #include "ns3/ndn-face.h"
 #include "ns3/log.h"
 
-using namespace ns3;
+NS_LOG_COMPONENT_DEFINE ("ndn.StatsTree");
 
-NS_LOG_COMPONENT_DEFINE ("StatsTree");
-
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 StatsTree::StatsTree ()
   : m_tree ("")
@@ -50,7 +47,7 @@ StatsTree::Step ()
 }
 
 void
-StatsTree::NewPitEntry (const ns3::NdnNameComponents &key)
+StatsTree::NewPitEntry (const NameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -58,7 +55,7 @@ StatsTree::NewPitEntry (const ns3::NdnNameComponents &key)
 }
 
 void
-StatsTree::Incoming (const NdnNameComponents &key, Ptr<NdnFace> face)
+StatsTree::Incoming (const NameComponents &key, Ptr<Face> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -66,7 +63,7 @@ StatsTree::Incoming (const NdnNameComponents &key, Ptr<NdnFace> face)
 }
 
 void
-StatsTree::Outgoing (const NdnNameComponents &key, Ptr<NdnFace> face)
+StatsTree::Outgoing (const NameComponents &key, Ptr<Face> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -74,7 +71,7 @@ StatsTree::Outgoing (const NdnNameComponents &key, Ptr<NdnFace> face)
 }
 
 void
-StatsTree::Satisfy (const NdnNameComponents &key)
+StatsTree::Satisfy (const NameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -82,7 +79,7 @@ StatsTree::Satisfy (const NdnNameComponents &key)
 }
 
 void
-StatsTree::Timeout (const NdnNameComponents &key)
+StatsTree::Timeout (const NameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -90,7 +87,7 @@ StatsTree::Timeout (const NdnNameComponents &key)
 }
 
 void
-StatsTree::Rx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
+StatsTree::Rx (const NameComponents &key, Ptr<Face> face, uint32_t amount)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -98,7 +95,7 @@ StatsTree::Rx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, u
 }
 
 void
-StatsTree::Tx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
+StatsTree::Tx (const NameComponents &key, Ptr<Face> face, uint32_t amount)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -106,9 +103,9 @@ StatsTree::Tx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, u
 }
 
 // const LoadStatsNode &
-// StatsTree::Get (const ns3::NdnNameComponents &key) const
+// StatsTree::Get (const NameComponents &key) const
 const LoadStatsNode &
-StatsTree::operator [] (const ns3::NdnNameComponents &key) const
+StatsTree::operator [] (const NameComponents &key) const
 {
   tree_type::iterator foundItem, lastItem;
   bool reachLast;
@@ -140,7 +137,7 @@ StatsTree::WalkLeftRightRoot (tree_type *node)
 }
 
 void
-StatsTree::RemoveFace (ns3::Ptr<ns3::NdnFace> face)
+StatsTree::RemoveFace (Ptr<Face> face)
 {
   tree_type::recursive_iterator item (&m_tree), end;
   for (; item != end; item ++)
@@ -158,6 +155,7 @@ operator << (std::ostream &os, const StatsTree &tree)
 }
 
 
-} // ndnSIM
-} // ns3
+} // namespace ndnSIM
+} // namespace ndn
+} // namespace ns3
 

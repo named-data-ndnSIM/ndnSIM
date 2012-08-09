@@ -23,10 +23,9 @@
 
 #include "trie.h"
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 template<typename FullKey,
          typename PayloadTraits,
@@ -236,6 +235,7 @@ private:
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // TRIE_WITH_POLICY_H_

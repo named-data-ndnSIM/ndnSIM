@@ -20,36 +20,24 @@
 
 #include "ndn-fib.h"
 
-#include "ndn-fib-impl.h"
-
-#include "ns3/ndn.h"
-#include "ns3/ndn-face.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-name-components.h"
-
 #include "ns3/node.h"
 #include "ns3/names.h"
 
-#include <boost/ref.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-namespace ll = boost::lambda;
-
 namespace ns3 {
-
-using namespace __ndn_private;
+namespace ndn {
 
 TypeId 
-NdnFib::GetTypeId (void)
+Fib::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::private::NdnFib") // cheating ns3 object system
+  static TypeId tid = TypeId ("ns3::ndn::Fib") // cheating ns3 object system
     .SetParent<Object> ()
     .SetGroupName ("Ndn")
   ;
   return tid;
 }
 
-std::ostream& operator<< (std::ostream& os, const NdnFib &fib)
+std::ostream&
+operator<< (std::ostream& os, const Fib &fib)
 {
   os << "Node " << Names::FindName (fib.GetObject<Node>()) << "\n";
   os << "  Dest prefix      Interfaces(Costs)                  \n";
@@ -59,4 +47,5 @@ std::ostream& operator<< (std::ostream& os, const NdnFib &fib)
   return os;
 }
 
+} // namespace ndn
 } // namespace ns3

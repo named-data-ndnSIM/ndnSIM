@@ -20,7 +20,7 @@
 
 #include "ndn-global-routing-helper.h"
 
-#include "ns3/ndn.h"
+#include "ns3/ndn-l3-protocol.h"
 #include "../model/ndn-net-device-face.h"
 #include "../model/ndn-global-router.h"
 #include "ns3/ndn-name-components.h"
@@ -45,34 +45,35 @@
 
 #include "boost-graph-ndn-global-routing-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnGlobalRoutingHelper");
+NS_LOG_COMPONENT_DEFINE ("ndn.GlobalRoutingHelper");
 
 using namespace std;
 using namespace boost;
 
 namespace ns3 {
+namespace ndn {
 
 void
-NdnGlobalRoutingHelper::Install (Ptr<Node> node)
+GlobalRoutingHelper::Install (Ptr<Node> node)
 {
   NS_LOG_LOGIC ("Node: " << node->GetId ());
   
-  Ptr<Ndn> ndn = node->GetObject<Ndn> ();
-  NS_ASSERT_MSG (ndn != 0, "Cannot install NdnGlobalRoutingHelper before Ndn is installed on a node");
+  Ptr<L3Protocol> ndn = node->GetObject<L3Protocol> ();
+  NS_ASSERT_MSG (ndn != 0, "Cannot install GlobalRoutingHelper before Ndn is installed on a node");
 
-  Ptr<NdnGlobalRouter> gr = node->GetObject<NdnGlobalRouter> ();
+  Ptr<GlobalRouter> gr = node->GetObject<GlobalRouter> ();
   if (gr != 0)
     {
-      NS_LOG_DEBUG ("NdnGlobalRouter is already installed: " << gr);
+      NS_LOG_DEBUG ("GlobalRouter is already installed: " << gr);
       return; // already installed
     }
   
-  gr = CreateObject<NdnGlobalRouter> ();
+  gr = CreateObject<GlobalRouter> ();
   node->AggregateObject (gr);
   
   for (uint32_t faceId = 0; faceId < ndn->GetNFaces (); faceId++)
     {
-      Ptr<NdnNetDeviceFace> face = DynamicCast<NdnNetDeviceFace> (ndn->GetFace (faceId));
+      Ptr<NetDeviceFace> face = DynamicCast<NetDeviceFace> (ndn->GetFace (faceId));
       if (face == 0)
 	{
 	  NS_LOG_DEBUG ("Skipping non-netdevice face");
@@ -82,7 +83,7 @@ NdnGlobalRoutingHelper::Install (Ptr<Node> node)
       Ptr<NetDevice> nd = face->GetNetDevice ();
       if (nd == 0)
 	{
-	  NS_LOG_DEBUG ("Not a NetDevice associated with NdnNetDeviceFace");
+	  NS_LOG_DEBUG ("Not a NetDevice associated with NetDeviceFace");
 	  continue;
 	}
       
@@ -104,24 +105,24 @@ NdnGlobalRoutingHelper::Install (Ptr<Node> node)
 	      Ptr<Node> otherNode = otherSide->GetNode ();
 	      NS_ASSERT (otherNode != 0);
 	      
-	      Ptr<NdnGlobalRouter> otherGr = otherNode->GetObject<NdnGlobalRouter> ();
+	      Ptr<GlobalRouter> otherGr = otherNode->GetObject<GlobalRouter> ();
 	      if (otherGr == 0)
 		{
 		  Install (otherNode);
 		}
-	      otherGr = otherNode->GetObject<NdnGlobalRouter> ();
+	      otherGr = otherNode->GetObject<GlobalRouter> ();
 	      NS_ASSERT (otherGr != 0);
 	      gr->AddIncidency (face, otherGr);
 	    }
 	}
       else
 	{
-	  Ptr<NdnGlobalRouter> grChannel = ch->GetObject<NdnGlobalRouter> ();
+	  Ptr<GlobalRouter> grChannel = ch->GetObject<GlobalRouter> ();
 	  if (grChannel == 0)
 	    {
 	      Install (ch);
 	    }
-	  grChannel = ch->GetObject<NdnGlobalRouter> ();
+	  grChannel = ch->GetObject<GlobalRouter> ();
 	  
 	  gr->AddIncidency (0, grChannel);
 	}
@@ -129,15 +130,15 @@ NdnGlobalRoutingHelper::Install (Ptr<Node> node)
 }
 
 void
-NdnGlobalRoutingHelper::Install (Ptr<Channel> channel)
+GlobalRoutingHelper::Install (Ptr<Channel> channel)
 {
   NS_LOG_LOGIC ("Channel: " << channel->GetId ());
 
-  Ptr<NdnGlobalRouter> gr = channel->GetObject<NdnGlobalRouter> ();
+  Ptr<GlobalRouter> gr = channel->GetObject<GlobalRouter> ();
   if (gr != 0)
     return;
 
-  gr = CreateObject<NdnGlobalRouter> ();
+  gr = CreateObject<GlobalRouter> ();
   channel->AggregateObject (gr);
   
   for (uint32_t deviceId = 0; deviceId < channel->GetNDevices (); deviceId ++)
@@ -147,12 +148,12 @@ NdnGlobalRoutingHelper::Install (Ptr<Channel> channel)
       Ptr<Node> node = dev->GetNode ();
       NS_ASSERT (node != 0);
 
-      Ptr<NdnGlobalRouter> grOther = node->GetObject<NdnGlobalRouter> ();
+      Ptr<GlobalRouter> grOther = node->GetObject<GlobalRouter> ();
       if (grOther == 0)
 	{
 	  Install (node);
 	}
-      grOther = node->GetObject<NdnGlobalRouter> ();
+      grOther = node->GetObject<GlobalRouter> ();
       NS_ASSERT (grOther != 0);
 
       gr->AddIncidency (0, grOther);
@@ -160,7 +161,7 @@ NdnGlobalRoutingHelper::Install (Ptr<Channel> channel)
 }
 
 void
-NdnGlobalRoutingHelper::Install (const NodeContainer &nodes)
+GlobalRoutingHelper::Install (const NodeContainer &nodes)
 {
   for (NodeContainer::Iterator node = nodes.Begin ();
        node != nodes.End ();
@@ -171,25 +172,25 @@ NdnGlobalRoutingHelper::Install (const NodeContainer &nodes)
 }
 
 void
-NdnGlobalRoutingHelper::InstallAll ()
+GlobalRoutingHelper::InstallAll ()
 {
   Install (NodeContainer::GetGlobal ());
 }
 
 
 void
-NdnGlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
+GlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
 {
-  Ptr<NdnGlobalRouter> gr = node->GetObject<NdnGlobalRouter> ();
+  Ptr<GlobalRouter> gr = node->GetObject<GlobalRouter> ();
   NS_ASSERT_MSG (gr != 0,
-		 "NdnGlobalRouter is not installed on the node");
+		 "GlobalRouter is not installed on the node");
 
-  Ptr<NdnNameComponents> name = Create<NdnNameComponents> (boost::lexical_cast<NdnNameComponents> (prefix));
+  Ptr<NameComponents> name = Create<NameComponents> (boost::lexical_cast<NameComponents> (prefix));
   gr->AddLocalPrefix (name);  
 }
 
 void
-NdnGlobalRoutingHelper::AddOrigins (const std::string &prefix, const NodeContainer &nodes)
+GlobalRoutingHelper::AddOrigins (const std::string &prefix, const NodeContainer &nodes)
 {
   for (NodeContainer::Iterator node = nodes.Begin ();
        node != nodes.End ();
@@ -200,7 +201,7 @@ NdnGlobalRoutingHelper::AddOrigins (const std::string &prefix, const NodeContain
 }
 
 void
-NdnGlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string &nodeName)
+GlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string &nodeName)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, nodeName << "is not a Node");
@@ -209,7 +210,7 @@ NdnGlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string 
 }
 
 void
-NdnGlobalRoutingHelper::CalculateRoutes ()
+GlobalRoutingHelper::CalculateRoutes ()
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
@@ -227,10 +228,10 @@ NdnGlobalRoutingHelper::CalculateRoutes ()
   // is not obviously how implement in an efficient manner
   for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node++)
     {
-      Ptr<NdnGlobalRouter> source = (*node)->GetObject<NdnGlobalRouter> ();
+      Ptr<GlobalRouter> source = (*node)->GetObject<GlobalRouter> ();
       if (source == 0)
 	{
-	  NS_LOG_DEBUG ("Node " << (*node)->GetId () << " does not export NdnGlobalRouter interface");
+	  NS_LOG_DEBUG ("Node " << (*node)->GetId () << " does not export GlobalRouter interface");
 	  continue;
 	}
   
@@ -252,7 +253,7 @@ NdnGlobalRoutingHelper::CalculateRoutes ()
 
       // NS_LOG_DEBUG (predecessors.size () << ", " << distances.size ());
 
-      Ptr<NdnFib>  fib  = source->GetObject<NdnFib> ();
+      Ptr<Fib>  fib  = source->GetObject<Fib> ();
       fib->InvalidateAll ();
       NS_ASSERT (fib != 0);
       
@@ -275,7 +276,7 @@ NdnGlobalRoutingHelper::CalculateRoutes ()
 		// cout << " reachable via face " << *i->second.get<0> ()
 		//      << " with distance " << i->second.get<1> () << endl;
 
-		BOOST_FOREACH (const Ptr<const NdnNameComponents> &prefix, i->first->GetLocalPrefixes ())
+		BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
 		  {
 		    fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
 		  }
@@ -286,4 +287,5 @@ NdnGlobalRoutingHelper::CalculateRoutes ()
 }
 
 
-}
+} // namespace ndn
+} // namespace ns3

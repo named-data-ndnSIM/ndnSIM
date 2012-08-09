@@ -29,47 +29,47 @@
 #include "ns3/double.h"
 #include "ns3/batches.h"
 
-NS_LOG_COMPONENT_DEFINE ("NdnConsumerBatches");
+NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerBatches");
 
-namespace ns3
-{    
+namespace ns3 {
+namespace ndn {
     
-NS_OBJECT_ENSURE_REGISTERED (NdnConsumerBatches);
+NS_OBJECT_ENSURE_REGISTERED (ConsumerBatches);
     
 TypeId
-NdnConsumerBatches::GetTypeId (void)
+ConsumerBatches::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnConsumerBatches")
+  static TypeId tid = TypeId ("ns3::ndn::ConsumerBatches")
     .SetGroupName ("Ndn")
-    .SetParent<NdnConsumer> ()
-    .AddConstructor<NdnConsumerBatches> ()
+    .SetParent<Consumer> ()
+    .AddConstructor<ConsumerBatches> ()
 
     .AddAttribute ("Batches", "Batches to schedule. Should be vector, containing pairs of time and amount",
                    // TypeId::ATTR_SET, 
                    StringValue (""),
-                   MakeBatchesAccessor (&NdnConsumerBatches::GetBatch, &NdnConsumerBatches::SetBatch),
+                   MakeBatchesAccessor (&ConsumerBatches::GetBatch, &ConsumerBatches::SetBatch),
                    MakeBatchesChecker ())
     ;
 
   return tid;
 }
 
-NdnConsumerBatches::NdnConsumerBatches ()
+ConsumerBatches::ConsumerBatches ()
 {
 }
 
 void
-NdnConsumerBatches::SetBatch (const Batches &batches)
+ConsumerBatches::SetBatch (const Batches &batches)
 {
   // std::cout << "Batches: " << batches << "\n";
   for (Batches::const_iterator i = batches.begin (); i != batches.end (); i++)
     {
-      Simulator::Schedule (i->get<0> (), &NdnConsumerBatches::AddBatch, this, i->get<1> ());
+      Simulator::Schedule (i->get<0> (), &ConsumerBatches::AddBatch, this, i->get<1> ());
     }
 }
 
 void
-NdnConsumerBatches::AddBatch (uint32_t amount)
+ConsumerBatches::AddBatch (uint32_t amount)
 {
   // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
   m_seqMax += amount;
@@ -78,14 +78,15 @@ NdnConsumerBatches::AddBatch (uint32_t amount)
 }
 
 void
-NdnConsumerBatches::ScheduleNextPacket ()
+ConsumerBatches::ScheduleNextPacket ()
 {
   if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &NdnConsumer::SendPacket, this);
+    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &Consumer::SendPacket, this);
 }
 
 ///////////////////////////////////////////////////
 //          Process incoming packets             //
 ///////////////////////////////////////////////////
 
+} // namespace ndn
 } // namespace ns3

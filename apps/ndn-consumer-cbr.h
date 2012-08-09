@@ -24,14 +24,14 @@
 
 #include "ndn-consumer.h"
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * @ingroup ndn
  * \brief Ndn application for sending out Interest packets at a "constant" rate (Poisson process)
  */
-class NdnConsumerCbr: public NdnConsumer
+class ConsumerCbr: public Consumer
 {
 public: 
   static TypeId GetTypeId ();
@@ -40,23 +40,23 @@ public:
    * \brief Default constructor 
    * Sets up randomizer function and packet sequence number
    */
-  NdnConsumerCbr ();
-  virtual ~NdnConsumerCbr ();
+  ConsumerCbr ();
+  virtual ~ConsumerCbr ();
 
   // From NdnApp
   // virtual void
-  // OnInterest (const Ptr<const NdnInterestHeader> &interest);
+  // OnInterest (const Ptr<const InterestHeader> &interest);
 
   // virtual void
-  // OnNack (const Ptr<const NdnInterestHeader> &interest);
+  // OnNack (const Ptr<const InterestHeader> &interest);
 
   // virtual void
-  // OnContentObject (const Ptr<const NdnContentObjectHeader> &contentObject,
+  // OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
 protected:
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying Ndn protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket ();
@@ -95,6 +95,7 @@ private:
   std::string         m_randomType;
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif

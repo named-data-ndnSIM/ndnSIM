@@ -33,8 +33,8 @@
 
 #include "ndn-name-components.h"
 
-namespace ns3
-{
+namespace ns3 {
+namespace ndn {
   
 /**
  * Ndn XML definition of Interest
@@ -126,7 +126,7 @@ namespace ns3
   * - InterestLifetime: ?
   * - Nonce: 32 bit random integer.  If value is 0, will not be serialized
   **/
-class NdnInterestHeader : public SimpleRefCount<NdnInterestHeader,Header>
+class InterestHeader : public SimpleRefCount<InterestHeader, Header>
 {
 public:
   /**
@@ -134,7 +134,7 @@ public:
    *
    * Creates a null header
    **/
-  NdnInterestHeader ();
+  InterestHeader ();
 
   /**
    * \brief Set interest name
@@ -143,7 +143,7 @@ public:
    * @param[in] name const pointer to ndnNameComponents object that contains an interest name
    **/
   void
-  SetName (const Ptr<NdnNameComponents> &name);
+  SetName (const Ptr<NameComponents> &name);
 
 
   /**
@@ -151,13 +151,13 @@ public:
    *
    * Gets name of the interest.
    **/
-  const NdnNameComponents&
+  const NameComponents&
   GetName () const;
 
   /**
    * @brief Get smart pointer to the interest name (to avoid extra memory usage)
    */
-  Ptr<const NdnNameComponents>
+  Ptr<const NameComponents>
   GetNamePtr () const;
 
   /**
@@ -210,7 +210,7 @@ public:
    * @param[in] exclude const pointer to ndnNameComponents to be excluded 
    **/
   void
-  SetExclude (const Ptr<NdnNameComponents> &exclude);
+  SetExclude (const Ptr<NameComponents> &exclude);
 
   /**
    * \brief Check if interest conatins exclude filter
@@ -222,7 +222,7 @@ public:
   /**
    * \brief Get exclude filter 
    */
-  const NdnNameComponents&
+  const NameComponents&
   GetExclude () const;
 
   /**
@@ -381,23 +381,25 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  Ptr<NdnNameComponents> m_name;     ///< Interest name
-  int32_t m_minSuffixComponents;      ///< Minimum suffix components. not used if negative
-  int32_t m_maxSuffixComponents;      ///< Maximum suffix components. not used if negative
-  Ptr<NdnNameComponents> m_exclude;  ///< Exclude filter
-  bool m_childSelector;               ///< Default value for ChildSelector is false
-  bool m_answerOriginKind;            ///< Default value for AnswerOriginKind is false
-  int8_t m_scope;                     ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
-  Time  m_interestLifetime;           ///< InterestLifetime
-  uint32_t m_nonce;                   ///< Nonce. not used if zero
-  uint32_t m_nackType;                ///< Negative Acknowledgement type
+  Ptr<NameComponents> m_name;    ///< Interest name
+  int32_t m_minSuffixComponents; ///< Minimum suffix components. not used if negative
+  int32_t m_maxSuffixComponents; ///< Maximum suffix components. not used if negative
+  Ptr<NameComponents> m_exclude; ///< Exclude filter
+  bool m_childSelector;          ///< Default value for ChildSelector is false
+  bool m_answerOriginKind;       ///< Default value for AnswerOriginKind is false
+  int8_t m_scope;                ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood
+  Time  m_interestLifetime;      ///< InterestLifetime
+  uint32_t m_nonce;              ///< Nonce. not used if zero
+  uint32_t m_nackType;           ///< Negative Acknowledgement type
 };
 
 /**
+ * @ingroup ndn-exceptions
  * @brief Class for Interest parsing exception 
  */
-class NdnInterestHeaderException {};
+class InterestHeaderException {};
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_INTEREST_HEADER_H_

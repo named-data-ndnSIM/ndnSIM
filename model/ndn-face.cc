@@ -35,49 +35,50 @@
 
 #include <boost/ref.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnFace");
+NS_LOG_COMPONENT_DEFINE ("ndn.Face");
 
 namespace ns3 {
+namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (NdnFace);
+NS_OBJECT_ENSURE_REGISTERED (Face);
 
 TypeId
-NdnFace::GetTypeId ()
+Face::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::NdnFace")
+  static TypeId tid = TypeId ("ns3::ndn::Face")
     .SetParent<Object> ()
     .SetGroupName ("Ndn")
     .AddAttribute ("Id", "Face id (unique integer for the Ndn stack on this node)",
                    TypeId::ATTR_GET, // allow only getting it.
                    UintegerValue (0),
-                   MakeUintegerAccessor (&NdnFace::m_id),
+                   MakeUintegerAccessor (&Face::m_id),
                    MakeUintegerChecker<uint32_t> ())
 
     .AddAttribute ("BucketMax", "Maximum size of leaky bucket",
                    DoubleValue (-1.0),
-                   MakeDoubleAccessor (&NdnFace::m_bucketMax),
+                   MakeDoubleAccessor (&Face::m_bucketMax),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("BucketLeak", "Normalized bucket leak size",
                    DoubleValue (0.0),
-                   MakeDoubleAccessor (&NdnFace::m_bucketLeak),
+                   MakeDoubleAccessor (&Face::m_bucketLeak),
                    MakeDoubleChecker<double> ())
 
     .AddAttribute ("RandomizeLimitChecking", "Whether or not to randomize the limit checking procedure. false (persistent) by default",
                    BooleanValue (false),
-                   MakeBooleanAccessor (&NdnFace::m_randomizeLimitChecking),
+                   MakeBooleanAccessor (&Face::m_randomizeLimitChecking),
                    MakeBooleanChecker ())
                    
     // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
     //                BooleanValue (false),
-    //                MakeBooleanAccessor (&NdnFace::m_enableMetricTagging),
+    //                MakeBooleanAccessor (&Face::m_enableMetricTagging),
     //                MakeBooleanChecker ())
 
     .AddTraceSource ("NdnTx", "Transmitted packet trace",
-                     MakeTraceSourceAccessor (&NdnFace::m_ndnTxTrace))
+                     MakeTraceSourceAccessor (&Face::m_txTrace))
     .AddTraceSource ("NdnRx", "Received packet trace",
-                     MakeTraceSourceAccessor (&NdnFace::m_ndnRxTrace))
+                     MakeTraceSourceAccessor (&Face::m_rxTrace))
     .AddTraceSource ("NdnDrop", "Dropped packet trace",
-                     MakeTraceSourceAccessor (&NdnFace::m_ndnDropTrace))
+                     MakeTraceSourceAccessor (&Face::m_dropTrace))
     ;
   return tid;
 }
@@ -87,12 +88,12 @@ NdnFace::GetTypeId ()
  *  with no IP addresses.  Before becoming useable, the user must 
  * invoke SetUp on them once an Ndn address and mask have been set.
  */
-NdnFace::NdnFace (Ptr<Node> node) 
+Face::Face (Ptr<Node> node) 
   : m_node (node)
   , m_bucket (0.0)
   , m_bucketMax (-1.0)
   , m_bucketLeak (0.0)
-  , m_protocolHandler (MakeNullCallback<void,const Ptr<NdnFace>&,const Ptr<const Packet>&> ())
+  , m_protocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_lastLeakTime (0)
@@ -104,28 +105,28 @@ NdnFace::NdnFace (Ptr<Node> node)
   NS_ASSERT_MSG (node != 0, "node cannot be NULL. Check the code");
 }
 
-NdnFace::~NdnFace ()
+Face::~Face ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-NdnFace::NdnFace (const NdnFace &)
+Face::Face (const Face &)
 {
 }
 
-NdnFace& NdnFace::operator= (const NdnFace &)
+Face& Face::operator= (const Face &)
 {
   return *this;
 }
 
 Ptr<Node>
-NdnFace::GetNode () const
+Face::GetNode () const
 {
   return m_node;
 }
 
 void
-NdnFace::RegisterProtocolHandler (ProtocolHandler handler)
+Face::RegisterProtocolHandler (ProtocolHandler handler)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -133,14 +134,14 @@ NdnFace::RegisterProtocolHandler (ProtocolHandler handler)
 }
 
 bool
-NdnFace::IsBelowLimit ()
+Face::IsBelowLimit ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 
   /// \todo Implement tracing, if requested
   
   if (!IsUp ()){
-    NS_LOG_INFO("NdnFace is not up.");
+    NS_LOG_INFO("Face is not up.");
     return false;
   }
 
@@ -182,14 +183,14 @@ NdnFace::IsBelowLimit ()
 }
 
 bool
-NdnFace::Send (Ptr<Packet> packet)
+Face::Send (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
   NS_LOG_DEBUG (*packet);
 
   if (!IsUp ())
     {
-      m_ndnDropTrace (packet);
+      m_dropTrace (packet);
       return false;
     }
 
@@ -214,18 +215,18 @@ NdnFace::Send (Ptr<Packet> packet)
   bool ok = SendImpl (packet);
   if (ok)
     {
-      m_ndnTxTrace (packet);
+      m_txTrace (packet);
       return true;
     }
   else
     {
-      m_ndnDropTrace (packet);
+      m_dropTrace (packet);
       return false;
     }
 }
 
 bool
-NdnFace::Receive (const Ptr<const Packet> &packet)
+Face::Receive (const Ptr<const Packet> &packet)
 {
   NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
 
@@ -235,14 +236,14 @@ NdnFace::Receive (const Ptr<const Packet> &packet)
       return false;
     }
 
-  m_ndnRxTrace (packet);
+  m_rxTrace (packet);
   m_protocolHandler (this, packet);
   
   return true;
 }
 
 void
-NdnFace::LeakBucket ()
+Face::LeakBucket ()
 {
   if (m_lastLeakTime.IsZero ())
     {
@@ -262,28 +263,28 @@ NdnFace::LeakBucket ()
 }
 
 void
-NdnFace::SetBucketMax (double bucket)
+Face::SetBucketMax (double bucket)
 {
   NS_LOG_FUNCTION (this << bucket);
   m_bucketMax = bucket;
 }
 
 void
-NdnFace::SetBucketLeak (double leak)
+Face::SetBucketLeak (double leak)
 {
   NS_LOG_FUNCTION (this << leak);
   m_bucketLeak = leak;
 }
 
 void
-NdnFace::SetMetric (uint16_t metric)
+Face::SetMetric (uint16_t metric)
 {
   NS_LOG_FUNCTION (metric);
   m_metric = metric;
 }
 
 uint16_t
-NdnFace::GetMetric (void) const
+Face::GetMetric (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_metric;
@@ -296,21 +297,21 @@ NdnFace::GetMetric (void) const
  */
 
 bool 
-NdnFace::IsUp (void) const
+Face::IsUp (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_ifup;
 }
 
 void 
-NdnFace::SetUp (bool up/* = true*/)
+Face::SetUp (bool up/* = true*/)
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_ifup = up;
 }
 
 bool
-NdnFace::operator== (const NdnFace &face) const
+Face::operator== (const Face &face) const
 {
   NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
                  "Faces of different nodes should not be compared to each other");
@@ -319,7 +320,7 @@ NdnFace::operator== (const NdnFace &face) const
 }
 
 bool
-NdnFace::operator< (const NdnFace &face) const
+Face::operator< (const Face &face) const
 {
   NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
                  "Faces of different nodes should not be compared to each other");
@@ -328,18 +329,19 @@ NdnFace::operator< (const NdnFace &face) const
 }
 
 std::ostream&
-NdnFace::Print (std::ostream &os) const
+Face::Print (std::ostream &os) const
 {
   os << "id=" << GetId ();
   return os;
 }
 
 std::ostream&
-operator<< (std::ostream& os, const NdnFace &face)
+operator<< (std::ostream& os, const Face &face)
 {
   face.Print (os);
   return os;
 }
 
-}; // namespace ns3
+} // namespace ndn
+} // namespace ns3
 

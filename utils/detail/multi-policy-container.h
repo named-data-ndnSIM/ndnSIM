@@ -24,12 +24,10 @@
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/at.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
-namespace detail
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
+namespace detail {
 
 template< class Base, class Value >
 struct policy_wrap
@@ -160,6 +158,7 @@ struct multi_policy_container
 
 } // detail
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // MULTI_POLICY_CONTAINER_H_

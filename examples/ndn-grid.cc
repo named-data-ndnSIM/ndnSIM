@@ -27,7 +27,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("NdnGrid");
+NS_LOG_COMPONENT_DEFINE ("ndn.Grid");
 
 /**
  * This scenario simulates a grid topology (using PointToPointGrid module)

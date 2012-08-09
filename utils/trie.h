@@ -32,10 +32,9 @@
 #include <boost/foreach.hpp>
 #include <boost/mpl/if.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 /////////////////////////////////////////////////////
 // Allow customization for payload
@@ -642,6 +641,7 @@ private:
 
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // TRIE_H_

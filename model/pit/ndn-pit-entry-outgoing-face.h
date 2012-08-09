@@ -27,14 +27,16 @@
 #include "ns3/ndn-face.h"
 
 namespace ns3 {
+namespace ndn {
+namespace pit {
 
 /**
  * \ingroup ndn
  * \brief PIT state component for each outgoing interest
  */
-struct NdnPitEntryOutgoingFace
+struct OutgoingFace
 {
-  Ptr<NdnFace> m_face;     ///< \brief face of the outgoing Interest
+  Ptr<Face> m_face;     ///< \brief face of the outgoing Interest
   Time m_sendTime;          ///< \brief time when the first outgoing interest is sent (for RTT measurements)
                             ///< \todo handle problem of retransmitted interests... Probably, we should include something similar
                             ///<       to TimeStamp TCP option for retransmitted (i.e., only lost interests will suffer)
@@ -43,10 +45,10 @@ struct NdnPitEntryOutgoingFace
 	
 public:
   /**
-   * @brief Constructor to create NdnPitEntryOutgoingFace
+   * @brief Constructor to create PitEntryOutgoingFace
    * \param face face of the outgoing interest
    */
-  NdnPitEntryOutgoingFace (Ptr<NdnFace> face);
+  OutgoingFace (Ptr<Face> face);
 
   /**
    * @brief Update outgoing entry upon retransmission
@@ -55,23 +57,24 @@ public:
   UpdateOnRetransmit ();
 
   /**
-   * @brief Compare to NdnPitEntryOutgoingFace
+   * @brief Compare to PitEntryOutgoingFace
    */
-  bool operator== (const NdnPitEntryOutgoingFace &dst) { return *m_face==*dst.m_face; }
+  bool operator== (const OutgoingFace &dst) { return *m_face==*dst.m_face; }
 
   /**
-   * @brief Compare NdnPitEntryOutgoingFace with NdnFace
+   * @brief Compare PitEntryOutgoingFace with Face
    */
-  bool operator== (Ptr<NdnFace> face) { return *m_face==*face; }
+  bool operator== (Ptr<Face> face) { return *m_face==*face; }
 
   /**
    * \brief Comparison operator used by boost::multi_index::identity<>
    */
   bool
-  operator< (const NdnPitEntryOutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
+  operator< (const OutgoingFace &m) const { return *m_face < *(m.m_face); } // return identity of the face
 };
 
-
+} // namespace pit
+} // namespace ndn
 } // namespace ns3
 
 #endif	/* NDN_PIT_ENTRY_OUTGOING_FACE_H */

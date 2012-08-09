@@ -31,37 +31,37 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnPit");
+NS_LOG_COMPONENT_DEFINE ("ndn.Pit");
 
 namespace ns3 {
+namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (NdnPit);
-
-using namespace __ndn_private;
+NS_OBJECT_ENSURE_REGISTERED (Pit);
 
 TypeId
-NdnPit::GetTypeId ()
+Pit::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::private::NdnPit")
+  static TypeId tid = TypeId ("ns3::ndn::Pit")
     .SetGroupName ("Ndn")
     .SetParent<Object> ()
     
     .AddAttribute ("PitEntryPruningTimout",
                    "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
                    StringValue ("100ms"),
-                   MakeTimeAccessor (&NdnPit::m_PitEntryPruningTimout),
+                   MakeTimeAccessor (&Pit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
     ;
 
   return tid;
 }
 
-NdnPit::NdnPit ()
+Pit::Pit ()
 {
 }
 
-NdnPit::~NdnPit ()
+Pit::~Pit ()
 {
 }
 
+} // namespace ndn
 } // namespace ns3

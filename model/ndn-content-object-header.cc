@@ -25,76 +25,76 @@
 #include "../helper/ndn-encoding-helper.h"
 #include "../helper/ndn-decoding-helper.h"
 
-#include "../helper/ccnb-parser/ccnb-parser-common.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-void-depth-first-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-name-components-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-non-negative-integer-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-timestamp-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-string-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-uint32t-blob-visitor.h"
-#include "../helper/ccnb-parser/visitors/ccnb-parser-content-type-visitor.h"
+#include "../helper/ccnb-parser/common.h"
+#include "../helper/ccnb-parser/visitors/void-depth-first-visitor.h"
+#include "../helper/ccnb-parser/visitors/name-components-visitor.h"
+#include "../helper/ccnb-parser/visitors/non-negative-integer-visitor.h"
+#include "../helper/ccnb-parser/visitors/timestamp-visitor.h"
+#include "../helper/ccnb-parser/visitors/string-visitor.h"
+#include "../helper/ccnb-parser/visitors/uint32t-blob-visitor.h"
+#include "../helper/ccnb-parser/visitors/content-type-visitor.h"
 
-#include "../helper/ccnb-parser/syntax-tree/ccnb-parser-block.h"
-#include "../helper/ccnb-parser/syntax-tree/ccnb-parser-dtag.h"
+#include "../helper/ccnb-parser/syntax-tree/block.h"
+#include "../helper/ccnb-parser/syntax-tree/dtag.h"
 
 #include <boost/foreach.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnContentObjectHeader");
+NS_LOG_COMPONENT_DEFINE ("ndn.ContentObjectHeader");
 
-using namespace ns3::CcnbParser;
+namespace ns3 {
+namespace ndn {
 
-namespace ns3
-{
+using namespace CcnbParser;
 
-const std::string NdnContentObjectHeader::Signature::DefaultDigestAlgorithm = "2.16.840.1.101.3.4.2.1";
+const std::string ContentObjectHeader::Signature::DefaultDigestAlgorithm = "2.16.840.1.101.3.4.2.1";
 
-NS_OBJECT_ENSURE_REGISTERED (NdnContentObjectHeader);
-NS_OBJECT_ENSURE_REGISTERED (NdnContentObjectTail);
+NS_OBJECT_ENSURE_REGISTERED (ContentObjectHeader);
+NS_OBJECT_ENSURE_REGISTERED (ContentObjectTail);
 
 TypeId
-NdnContentObjectHeader::GetTypeId (void)
+ContentObjectHeader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnContentObjectHeader")
-    .SetGroupName ("ndn")
+  static TypeId tid = TypeId ("ns3::ndn::ContentObjectHeader")
+    .SetGroupName ("Ndn")
     .SetParent<Header> ()
-    .AddConstructor<NdnContentObjectHeader> ()
+    .AddConstructor<ContentObjectHeader> ()
     ;
   return tid;
 }
 
-NdnContentObjectHeader::NdnContentObjectHeader ()
+ContentObjectHeader::ContentObjectHeader ()
 {
 }
 
 void
-NdnContentObjectHeader::SetName (const Ptr<NdnNameComponents> &name)
+ContentObjectHeader::SetName (const Ptr<NameComponents> &name)
 {
   m_name = name;
 }
 
-const NdnNameComponents&
-NdnContentObjectHeader::GetName () const
+const NameComponents&
+ContentObjectHeader::GetName () const
 {
-  if (m_name==0) throw NdnContentObjectHeaderException();
+  if (m_name==0) throw ContentObjectHeaderException();
   return *m_name;
 }
 
-Ptr<const NdnNameComponents>
-NdnContentObjectHeader::GetNamePtr () const
+Ptr<const NameComponents>
+ContentObjectHeader::GetNamePtr () const
 {
   return m_name;
 }
 
-#define CCNB NdnEncodingHelper // just to simplify writing
+#define CCNB EncodingHelper // just to simplify writing
 
 void
-NdnContentObjectHeader::Serialize (Buffer::Iterator start) const
+ContentObjectHeader::Serialize (Buffer::Iterator start) const
 {
   size_t written = 0;
-  written += CCNB::AppendBlockHeader (start, CCN_DTAG_ContentObject, CcnbParser::CCN_DTAG); // <ContentObject>
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_ContentObject, CCN_DTAG); // <ContentObject>
 
   // fake signature
-  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Signature, CcnbParser::CCN_DTAG); // <Signature>
+  written += CCNB::AppendBlockHeader (start, CCN_DTAG_Signature, CCN_DTAG); // <Signature>
   // Signature ::= √DigestAlgorithm? 
   //               Witness?         
   //               √SignatureBits
@@ -159,11 +159,11 @@ NdnContentObjectHeader::Serialize (Buffer::Iterator start) const
   written += CCNB::AppendBlockHeader (start, CCN_DTAG_Content, CCN_DTAG); // <Content>
 
   // there are no closing tags !!!
-  // The closing tag is handled by NdnContentObjectTail
+  // The closing tag is handled by ContentObjectTail
 }
 
 uint32_t
-NdnContentObjectHeader::GetSerializedSize () const
+ContentObjectHeader::GetSerializedSize () const
 {
   size_t written = 0;
   written += CCNB::EstimateBlockHeader (CCN_DTAG_ContentObject); // <ContentObject>
@@ -232,7 +232,7 @@ NdnContentObjectHeader::GetSerializedSize () const
   written += CCNB::EstimateBlockHeader (CCN_DTAG_Content); // <Content>
 
   // there are no closing tags !!!
-  // The closing tag is handled by NdnContentObjectTail
+  // The closing tag is handled by ContentObjectTail
   return written;
 }
 #undef CCNB
@@ -240,7 +240,7 @@ NdnContentObjectHeader::GetSerializedSize () const
 class ContentObjectVisitor : public VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be NdnContentObjectHeader* */)
+  virtual void visit (Dtag &n, boost::any param/*should be ContentObjectHeader* */)
   {
     // uint32_t n.m_dtag;
     // std::list<Ptr<Block> > n.m_nestedBlocks;
@@ -251,7 +251,7 @@ public:
     static Uint32tBlobVisitor uint32tBlobVisitor;
     static ContentTypeVisitor contentTypeVisitor;
   
-    NdnContentObjectHeader &contentObject = *(boost::any_cast<NdnContentObjectHeader*> (param));
+    ContentObjectHeader &contentObject = *(boost::any_cast<ContentObjectHeader*> (param));
   
     switch (n.m_dtag)
       {
@@ -265,7 +265,7 @@ public:
       case CCN_DTAG_Name:
         {
           // process name components
-          Ptr<NdnNameComponents> name = Create<NdnNameComponents> ();
+          Ptr<NameComponents> name = Create<NameComponents> ();
         
           BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
             {
@@ -337,7 +337,7 @@ public:
           throw CcnbDecodingException ();
 
         contentObject.GetSignedInfo ().SetContentType
-          (static_cast<NdnContentObjectHeader::ContentType>
+          (static_cast<ContentObjectHeader::ContentType>
            (boost::any_cast<uint32_t> ((*n.m_nestedTags.begin())->accept
                                        (contentTypeVisitor))));
         break;
@@ -372,7 +372,7 @@ public:
             throw CcnbDecodingException ();
 
           // process name components
-          Ptr<NdnNameComponents> name = Create<NdnNameComponents> ();
+          Ptr<NameComponents> name = Create<NameComponents> ();
         
           BOOST_FOREACH (Ptr<Block> block, nameTag->m_nestedTags)
             {
@@ -394,25 +394,25 @@ public:
 };
 
 uint32_t
-NdnContentObjectHeader::Deserialize (Buffer::Iterator start)
+ContentObjectHeader::Deserialize (Buffer::Iterator start)
 {
   static ContentObjectVisitor contentObjectVisitor;
 
   Buffer::Iterator i = start;
-  Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
+  Ptr<Block> root = Block::ParseBlock (i);
   root->accept (contentObjectVisitor, this);
 
   return i.GetDistanceFrom (start);
 }
   
 TypeId
-NdnContentObjectHeader::GetInstanceTypeId (void) const
+ContentObjectHeader::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
   
 void
-NdnContentObjectHeader::Print (std::ostream &os) const
+ContentObjectHeader::Print (std::ostream &os) const
 {
   os << "D: " << GetName ();
   // os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
@@ -420,40 +420,40 @@ NdnContentObjectHeader::Print (std::ostream &os) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NdnContentObjectTail::NdnContentObjectTail ()
+ContentObjectTail::ContentObjectTail ()
 {
 }
 
 TypeId
-NdnContentObjectTail::GetTypeId (void)
+ContentObjectTail::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::NdnContentObjectTail")
+  static TypeId tid = TypeId ("ns3::ndn::ContentObjectTail")
     .SetParent<Trailer> ()
-    .AddConstructor<NdnContentObjectTail> ()
+    .AddConstructor<ContentObjectTail> ()
     ;
   return tid;
 }
 
 TypeId
-NdnContentObjectTail::GetInstanceTypeId (void) const
+ContentObjectTail::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-NdnContentObjectTail::Print (std::ostream &os) const
+ContentObjectTail::Print (std::ostream &os) const
 {
   os << "</Content></ContentObject>";
 }
 
 uint32_t
-NdnContentObjectTail::GetSerializedSize (void) const
+ContentObjectTail::GetSerializedSize (void) const
 {
   return 2;
 }
 
 void
-NdnContentObjectTail::Serialize (Buffer::Iterator start) const
+ContentObjectTail::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
   i.Prev (2); // Trailer interface requires us to go backwards
@@ -463,7 +463,7 @@ NdnContentObjectTail::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-NdnContentObjectTail::Deserialize (Buffer::Iterator start)
+ContentObjectTail::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   i.Prev (2); // Trailer interface requires us to go backwards
@@ -481,7 +481,7 @@ NdnContentObjectTail::Deserialize (Buffer::Iterator start)
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
-NdnContentObjectHeader::SignedInfo::SignedInfo ()
+ContentObjectHeader::SignedInfo::SignedInfo ()
   : m_publisherPublicKeyDigest (0)
   // ,  m_timestamp
   , m_type (DATA)
@@ -492,63 +492,64 @@ NdnContentObjectHeader::SignedInfo::SignedInfo ()
 }
 
 void
-NdnContentObjectHeader::SignedInfo::SetPublisherPublicKeyDigest (uint32_t digest)
+ContentObjectHeader::SignedInfo::SetPublisherPublicKeyDigest (uint32_t digest)
 {
   m_publisherPublicKeyDigest = digest;
 }
 
 uint32_t
-NdnContentObjectHeader::SignedInfo::GetPublisherPublicKeyDigest () const
+ContentObjectHeader::SignedInfo::GetPublisherPublicKeyDigest () const
 {
   return m_publisherPublicKeyDigest;
 }
 
 void
-NdnContentObjectHeader::SignedInfo::SetTimestamp (const Time &timestamp)
+ContentObjectHeader::SignedInfo::SetTimestamp (const Time &timestamp)
 {
   m_timestamp = timestamp;
 }
 
 Time
-NdnContentObjectHeader::SignedInfo::GetTimestamp () const
+ContentObjectHeader::SignedInfo::GetTimestamp () const
 {
   return m_timestamp;
 }
 
 void
-NdnContentObjectHeader::SignedInfo::SetContentType (NdnContentObjectHeader::ContentType type)
+ContentObjectHeader::SignedInfo::SetContentType (ContentObjectHeader::ContentType type)
 {
   m_type = type;
 }
 
-NdnContentObjectHeader::ContentType
-NdnContentObjectHeader::SignedInfo::GetContentType () const
+ContentObjectHeader::ContentType
+ContentObjectHeader::SignedInfo::GetContentType () const
 {
   return m_type;
 }
 
 void
-NdnContentObjectHeader::SignedInfo::SetFreshness (const Time &freshness)
+ContentObjectHeader::SignedInfo::SetFreshness (const Time &freshness)
 {
   m_freshness = freshness;
 }
 
 Time
-NdnContentObjectHeader::SignedInfo::GetFreshness () const
+ContentObjectHeader::SignedInfo::GetFreshness () const
 {
   return m_freshness;
 }
 
 void
-NdnContentObjectHeader::SignedInfo::SetKeyLocator (Ptr<const NdnNameComponents> keyLocator)
+ContentObjectHeader::SignedInfo::SetKeyLocator (Ptr<const NameComponents> keyLocator)
 {
   m_keyLocator = keyLocator;
 }
 
-Ptr<const NdnNameComponents>
-NdnContentObjectHeader::SignedInfo::GetKeyLocator () const
+Ptr<const NameComponents>
+ContentObjectHeader::SignedInfo::GetKeyLocator () const
 {
   return m_keyLocator;
 }
 
+} // namespace ndn
 } // namespace ns3

@@ -28,8 +28,8 @@
 #include "ns3/ndn-name-components.h"
 #include "ns3/ndn-content-object-header.h"
 
-namespace ns3 
-{
+namespace ns3 {
+namespace ndn {
 
 /**
  * @brief A simple Interest-sink applia simple Interest-sink application
@@ -39,16 +39,16 @@ namespace ns3
  * size and name same as in Interest.cation, which replying every incoming Interest
  * with Data packet with a specified size and name same as in Interest.
  */
-class NdnProducer : public NdnApp
+class Producer : public App
 {
 public: 
   static TypeId
   GetTypeId (void);
         
-  NdnProducer ();
+  Producer ();
 
   // inherited from NdnApp
-  void OnInterest (const Ptr<const NdnInterestHeader> &interest, Ptr<Packet> packet);
+  void OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
 
 protected:
   // inherited from Application base class.
@@ -59,13 +59,14 @@ protected:
   StopApplication ();     // Called at time specified by Stop
 
 private:
-  NdnNameComponents m_prefix;
+  NameComponents m_prefix;
   uint32_t m_virtualPayloadSize;
   
   uint32_t m_signatureBits;
-  // NdnContentObjectHeader::SignedInfo m_signedInfo;
+  // ContentObjectHeader::SignedInfo m_signedInfo;
 };
 
-}
+} // namespace ndn
+} // namespace ns3
 
 #endif // NDN_PRODUCER_H

@@ -34,6 +34,7 @@
 #include <boost/ref.hpp>
 
 namespace ns3 {
+namespace ndn {
 
 /**
  * \ingroup ndn
@@ -44,7 +45,7 @@ namespace ns3 {
  * There are no restrictions on what byte sequences may be used.
  * The Name element in an Interest is often referred to with the term name prefix or simply prefix.
  */ 
-class NdnNameComponents : public SimpleRefCount<NdnNameComponents>
+class NameComponents : public SimpleRefCount<NameComponents>
 {
 public:
   typedef std::list<std::string>::iterator       iterator;            
@@ -54,28 +55,28 @@ public:
    * \brief Constructor 
    * Creates a prefix with zero components (can be looked as root "/")
    */
-  NdnNameComponents ();
+  NameComponents ();
   
   /**
    * \brief Constructor
    * Creates a prefix from a list of strings where every string represents a prefix component
    * @param[in] components A list of strings
    */
-  NdnNameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
+  NameComponents (const std::list<boost::reference_wrapper<const std::string> > &components);
 
   /**
    * @brief Constructor
    * Creates a prefix from the string (string is parsed using operator>>)
    * @param[in] prefix A string representation of a prefix
    */
-  NdnNameComponents (const std::string &prefix);
+  NameComponents (const std::string &prefix);
 
   /**
    * @brief Constructor
    * Creates a prefix from the string (string is parsed using operator>>)
    * @param[in] prefix A string representation of a prefix
    */
-  NdnNameComponents (const char *prefix);
+  NameComponents (const char *prefix);
   
   /**
    * \brief Generic Add method
@@ -91,7 +92,7 @@ public:
    * The object of type T will be appended to the list of components
    */
   template<class T>
-  inline NdnNameComponents&
+  inline NameComponents&
   operator () (const T &value);
 
   /**
@@ -117,7 +118,7 @@ public:
   /**
    * @brief Get prefix of the name, containing less  minusComponents right components
    */
-  NdnNameComponents
+  NameComponents
   cut (size_t minusComponents) const;
   
   /**
@@ -127,7 +128,7 @@ public:
   void Print (std::ostream &os) const;
 
   /**
-   * \brief Returns the size of NdnNameComponents
+   * \brief Returns the size of NameComponents
    */
   inline size_t
   size () const;
@@ -157,16 +158,16 @@ public:
   end () const;
 
   /**
-   * \brief Equality operator for NdnNameComponents
+   * \brief Equality operator for NameComponents
    */
   inline bool
-  operator== (const NdnNameComponents &prefix) const;
+  operator== (const NameComponents &prefix) const;
 
   /**
-   * \brief Less than operator for NdnNameComponents
+   * \brief Less than operator for NameComponents
    */
   inline bool
-  operator< (const NdnNameComponents &prefix) const;
+  operator< (const NameComponents &prefix) const;
 
   typedef std::string partial_type;
   
@@ -178,26 +179,26 @@ private:
  * \brief Print out name components separated by slashes, e.g., /first/second/third
  */
 std::ostream &
-operator << (std::ostream &os, const NdnNameComponents &components);
+operator << (std::ostream &os, const NameComponents &components);
 
 /**
  * \brief Read components from input and add them to components. Will read input stream till eof
  * Substrings separated by slashes will become separate components
  */
 std::istream &
-operator >> (std::istream &is, NdnNameComponents &components);
+operator >> (std::istream &is, NameComponents &components);
 
 /**
- * \brief Returns the size of NdnNameComponents object
+ * \brief Returns the size of NameComponents object
  */  
 size_t
-NdnNameComponents::size () const
+NameComponents::size () const
 {
   return m_prefix.size ();
 }
 
-NdnNameComponents::iterator
-NdnNameComponents::begin ()
+NameComponents::iterator
+NameComponents::begin ()
 {
   return m_prefix.begin ();
 }
@@ -205,8 +206,8 @@ NdnNameComponents::begin ()
 /**
  * @brief Get read-only begin() iterator
  */
-NdnNameComponents::const_iterator
-NdnNameComponents::begin () const
+NameComponents::const_iterator
+NameComponents::begin () const
 {
   return m_prefix.begin ();
 }  
@@ -214,8 +215,8 @@ NdnNameComponents::begin () const
 /**
  * @brief Get read-write end() iterator
  */
-NdnNameComponents::iterator
-NdnNameComponents::end ()
+NameComponents::iterator
+NameComponents::end ()
 {
   return m_prefix.end ();
 }
@@ -223,8 +224,8 @@ NdnNameComponents::end ()
 /**
  * @brief Get read-only end() iterator
  */
-NdnNameComponents::const_iterator
-NdnNameComponents::end () const
+NameComponents::const_iterator
+NameComponents::end () const
 {
   return m_prefix.end ();
 }
@@ -235,8 +236,8 @@ NdnNameComponents::end () const
  * The object of type T will be appended to the list of components
  */
 template<class T>
-NdnNameComponents&
-NdnNameComponents::operator () (const T &value)
+NameComponents&
+NameComponents::operator () (const T &value)
 {
   Add (value);
   return *this;
@@ -249,7 +250,7 @@ NdnNameComponents::operator () (const T &value)
  */
 template<class T>
 void
-NdnNameComponents::Add (const T &value)
+NameComponents::Add (const T &value)
 {
   std::ostringstream os;
   os << value;
@@ -257,10 +258,10 @@ NdnNameComponents::Add (const T &value)
 }
 
 /**
- * \brief Equality operator for NdnNameComponents
+ * \brief Equality operator for NameComponents
  */
 bool
-NdnNameComponents::operator== (const NdnNameComponents &prefix) const
+NameComponents::operator== (const NameComponents &prefix) const
 {
   if (m_prefix.size () != prefix.m_prefix.size ())
     return false;
@@ -269,17 +270,19 @@ NdnNameComponents::operator== (const NdnNameComponents &prefix) const
 }
 
 /**
- * \brief Less than operator for NdnNameComponents
+ * \brief Less than operator for NameComponents
  */
 bool
-NdnNameComponents::operator< (const NdnNameComponents &prefix) const
+NameComponents::operator< (const NameComponents &prefix) const
 {
   return std::lexicographical_compare (m_prefix.begin (), m_prefix.end (),
                                        prefix.m_prefix.begin (), prefix.m_prefix.end ());
 }
 
     
-ATTRIBUTE_HELPER_HEADER (NdnNameComponents);
+ATTRIBUTE_HELPER_HEADER (NameComponents);
+
+} // namespace ndn
 } // namespace ns3
 
 #endif // _NDN_NAME_COMPONENTS_H_

@@ -25,13 +25,15 @@
 #include "ndn-face.h"
 #include "ns3/traced-callback.h"
 
-namespace ns3 
-{
+namespace ns3 {
 
-class NdnInterestHeader;
-class NdnContentObjectHeader;
 class Packet;
-class NdnApp;
+
+namespace ndn {
+
+class InterestHeader;
+class ContentObjectHeader;
+class App;
 
 /**
  * \ingroup ndn-face
@@ -41,9 +43,9 @@ class NdnApp;
  * component responsible for actual delivery of data packet to and
  * from Ndn stack
  *
- * \see NdnAppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
+ * \see AppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
  */
-class NdnAppFace  : public NdnFace
+class AppFace  : public Face
 {
 public:
   static TypeId
@@ -52,11 +54,11 @@ public:
   /**
    * \brief Default constructor
    */
-  NdnAppFace (Ptr<NdnApp> app);
-  virtual ~NdnAppFace();
+  AppFace (Ptr<App> app);
+  virtual ~AppFace();
   
   ////////////////////////////////////////////////////////////////////
-  // methods overloaded from NdnFace
+  // methods overloaded from Face
   virtual void
   RegisterProtocolHandler (ProtocolHandler handler);
 
@@ -70,14 +72,15 @@ public:
   ////////////////////////////////////////////////////////////////////
  
 private:
-  NdnAppFace ();
-  NdnAppFace (const NdnAppFace &); ///< \brief Disabled copy constructor
-  NdnAppFace& operator= (const NdnAppFace &); ///< \brief Disabled copy operator
+  AppFace ();
+  AppFace (const AppFace &); ///< \brief Disabled copy constructor
+  AppFace& operator= (const AppFace &); ///< \brief Disabled copy operator
 
 private:
-  Ptr<NdnApp> m_app;
+  Ptr<App> m_app;
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif // NDN_APP_FACE_H

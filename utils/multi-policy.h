@@ -34,10 +34,9 @@
 
 #include <boost/intrusive/options.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 template<typename Policies> // e.g., mpl::vector1< lru_policy_traits >
 struct multi_policy_traits
@@ -128,6 +127,7 @@ struct multi_policy_traits
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // MULTI_POLICY_H_

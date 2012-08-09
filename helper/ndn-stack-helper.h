@@ -30,8 +30,11 @@
 namespace ns3 {
 
 class Node;
-class NdnFaceContainer;
-class NdnFace;
+
+namespace ndn {
+
+class FaceContainer;
+class Face;
 
 /**
  * \ingroup ndn
@@ -54,27 +57,27 @@ class NdnFace;
  * attribute or a set of functionality that may be of interest to many other
  * classes.
  */
-class NdnStackHelper 
+class StackHelper 
 {
 public:
   /**
    * \brief Create a new NdnStackHelper with a default NDN_FLOODING forwarding stategy
    */
-  NdnStackHelper();
+  StackHelper();
   
   /**
    * \brief Destroy the NdnStackHelper
    */
-  virtual ~NdnStackHelper ();
+  virtual ~StackHelper ();
 
   /**
    * @brief Set parameters of NdnL3Protocol
    */
   void
-  SetNdnAttributes (const std::string &attr1 = "", const std::string &value1 = "",
-                     const std::string &attr2 = "", const std::string &value2 = "",
-                     const std::string &attr3 = "", const std::string &value3 = "",
-                     const std::string &attr4 = "", const std::string &value4 = "");
+  SetStackAttributes (const std::string &attr1 = "", const std::string &value1 = "",
+                      const std::string &attr2 = "", const std::string &value2 = "",
+                      const std::string &attr3 = "", const std::string &value3 = "",
+                      const std::string &attr4 = "", const std::string &value4 = "");
   
   
   /**
@@ -147,7 +150,7 @@ public:
    * \returns list of installed faces in the form of a smart pointer
    * to NdnFaceContainer object
    */
-  Ptr<NdnFaceContainer>
+  Ptr<FaceContainer>
   Install (std::string nodeName) const;
 
   /**
@@ -159,9 +162,9 @@ public:
    * \param node The node on which to install the stack.
    *
    * \returns list of installed faces in the form of a smart pointer
-   * to NdnFaceContainer object
+   * to FaceContainer object
    */
-  Ptr<NdnFaceContainer>
+  Ptr<FaceContainer>
   Install (Ptr<Node> node) const;
 
   /**
@@ -174,18 +177,18 @@ public:
    * new stacks.
    *
    * \returns list of installed faces in the form of a smart pointer
-   * to NdnFaceContainer object
+   * to FaceContainer object
    */
-  Ptr<NdnFaceContainer>
+  Ptr<FaceContainer>
   Install (NodeContainer c) const;
 
   /**
    * \brief Install Ndn stack on all nodes in the simulation
    *
    * \returns list of installed faces in the form of a smart pointer
-   * to NdnFaceContainer object
+   * to FaceContainer object
    */
-  Ptr<NdnFaceContainer>
+  Ptr<FaceContainer>
   InstallAll () const;
 
   /**
@@ -219,7 +222,7 @@ public:
    * \param metric Routing metric
    */
   static void
-  AddRoute (Ptr<Node> node, std::string prefix, Ptr<NdnFace> face, int32_t metric);
+  AddRoute (Ptr<Node> node, std::string prefix, Ptr<Face> face, int32_t metric);
 
   /**
    * \brief Set flag indicating necessity to install default routes in FIB
@@ -228,8 +231,8 @@ public:
   SetDefaultRoutes (bool needSet);
 
 private:
-  NdnStackHelper (const NdnStackHelper &);
-  NdnStackHelper &operator = (const NdnStackHelper &o);
+  StackHelper (const StackHelper &);
+  StackHelper &operator = (const StackHelper &o);
   
 private:
   ObjectFactory m_ndnFactory;
@@ -245,6 +248,7 @@ private:
   bool m_needSetDefaultRoutes;  
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif /* NDN_STACK_HELPER_H */

@@ -26,10 +26,9 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/set.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 /**
  * @brief Traits for random replacement policy
@@ -161,6 +160,7 @@ struct random_policy_traits
 };
 
 } // ndnSIM
+} // ndn
 } // ns3
 
 #endif // RANDOM_POLICY_H

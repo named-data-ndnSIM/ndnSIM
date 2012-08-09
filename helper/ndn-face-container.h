@@ -29,6 +29,7 @@
 #include "ns3/ndn-face.h"
 
 namespace ns3 {
+namespace ndn {
 
 /**
  * \ingroup ndn-helpers
@@ -39,47 +40,47 @@ namespace ns3 {
  *
  * \see NdnStackHelper
  */
-class NdnFaceContainer : public SimpleRefCount<NdnFaceContainer>
+class FaceContainer : public SimpleRefCount<FaceContainer>
 {
 private:
-  typedef std::vector<Ptr<NdnFace> > FaceContainer;
+  typedef std::vector< Ptr<Face> > Container;
 public:
-  typedef FaceContainer::const_iterator Iterator; ///< \brief Iterator over NdnFaceContainer
+  typedef Container::const_iterator Iterator; ///< \brief Iterator over FaceContainer
 
   /**
-   * \brief Create an empty NdnFaceContainer.
+   * \brief Create an empty FaceContainer.
    */
-  NdnFaceContainer ();
+  FaceContainer ();
 
   /**
-   * \brief Copy constructor for NdnFaceContainer. Calls AddAll method
+   * \brief Copy constructor for FaceContainer. Calls AddAll method
    *
-   * \see NdnFaceContainer::AddAll
+   * \see FaceContainer::AddAll
    */
-  NdnFaceContainer (const NdnFaceContainer &other);
+  FaceContainer (const FaceContainer &other);
 
   /**
-   * \brief Copy operator for NdnFaceContainer. Empties vector and calls AddAll method
+   * \brief Copy operator for FaceContainer. Empties vector and calls AddAll method
    *
    * All previously obtained iterators (Begin() and End()) will be invalidated
    *
-   * \see NdnFaceContainer::AddAll
+   * \see FaceContainer::AddAll
    */
-  NdnFaceContainer& operator= (const NdnFaceContainer &other);
+  FaceContainer& operator= (const FaceContainer &other);
   
   /**
    * \brief Add all entries from other container
    *
    * \param other smart pointer to a container
    */
-  void AddAll (Ptr<NdnFaceContainer> other);
+  void AddAll (Ptr<FaceContainer> other);
 
   /**
    * \brief Add all entries from other container
    *
    * \param other container
    */
-  void AddAll (const NdnFaceContainer &other);
+  void AddAll (const FaceContainer &other);
 
   /**
    * \brief Get an iterator which refers to the first pair in the
@@ -114,27 +115,28 @@ public:
   /**
    * Add an entry to the container
    *
-   * \param face a smart pointer to a NdnFace-derived object
+   * \param face a smart pointer to a Face-derived object
    *
-   * @see NdnFace
+   * @see Face
    */
-  void Add (const Ptr<NdnFace> &face);
+  void Add (const Ptr<Face> &face);
 
   /**
-   * Get a smart pointer to NdnFace-derived object stored in the container
+   * Get a smart pointer to Face-derived object stored in the container
    *
    * \param i the iterator corresponding to the requested object
    *
    * This method is redundant and simple dereferencing of the iterator should be used instead
    *
-   * @see NdnFace
+   * @see Face
    */
-  Ptr<NdnFace> Get (Iterator i) const;
+  Ptr<Face> Get (Iterator i) const;
 
 private:
-  FaceContainer m_faces;
+  Container m_faces;
 };
 
+} // namespace ndn
 } // namespace ns3
 
 #endif /* NDN_FACE_CONTAINER_H */

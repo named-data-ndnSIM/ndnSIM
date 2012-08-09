@@ -33,22 +33,24 @@ namespace ns3 {
 
 class Packet;
 class Node;
-  
+
+namespace ndn {
+
 /**
  * \ingroup ndn
  * \defgroup ndn-face Faces
  */
 /**
  * \ingroup ndn-face
- * \brief Virtual class defining Ndn face
+ * \brief Virtual class defining NDN face
  *
- * This class defines basic functionality of Ndn face. Face is core
+ * This class defines basic functionality of NDN face. Face is core
  * component responsible for actual delivery of data packet to and
- * from Ndn stack
+ * from NDN stack
  *
- * \see NdnLocalFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
+ * \see ndn::LocalFace, ndn::NetDeviceFace, ndn::Ipv4Face, ndn::UdpFace
  */
-class NdnFace  : public Object
+class Face  : public Object
 {
 public:
   static TypeId
@@ -60,13 +62,13 @@ public:
    * \param face Face from which packet has been received
    * \param packet Original packet
    */
-  typedef Callback<void,const Ptr<NdnFace>&,const Ptr<const Packet>& > ProtocolHandler;
+  typedef Callback<void,const Ptr<Face>&,const Ptr<const Packet>& > ProtocolHandler;
 
   /**
    * \brief Default constructor
    */
-  NdnFace (Ptr<Node> node);
-  virtual ~NdnFace();
+  Face (Ptr<Node> node);
+  virtual ~Face();
 
   /**
    * @brief Get node to which this face is associated
@@ -201,7 +203,7 @@ public:
    * Internal index is used for comparison.
    */
   bool
-  operator== (const NdnFace &face) const;
+  operator== (const Face &face) const;
 
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -209,7 +211,7 @@ public:
    * Internal index is used for comparison.
    */
   inline bool
-  operator!= (const NdnFace &face) const;
+  operator!= (const Face &face) const;
   
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -217,7 +219,7 @@ public:
    * Internal index is used for comparison.
    */
   bool
-  operator< (const NdnFace &face) const;
+  operator< (const Face &face) const;
 
 protected:
   /**
@@ -229,8 +231,8 @@ protected:
   SendImpl (Ptr<Packet> p) = 0;  
 
 private:
-  NdnFace (const NdnFace &); ///< \brief Disabled copy constructor
-  NdnFace& operator= (const NdnFace &); ///< \brief Disabled copy operator
+  Face (const Face &); ///< \brief Disabled copy constructor
+  Face& operator= (const Face &); ///< \brief Disabled copy operator
   
 protected:
   // uint16_t m_metric; ///< \brief Routing/forwarding metric
@@ -250,38 +252,38 @@ private:
 
   // bool m_enableMetricTagging;
 
-  TracedCallback<Ptr<const Packet> > m_ndnTxTrace;
-  TracedCallback<Ptr<const Packet> > m_ndnRxTrace;
-  TracedCallback<Ptr<const Packet> > m_ndnDropTrace;
+  TracedCallback<Ptr<const Packet> > m_txTrace;
+  TracedCallback<Ptr<const Packet> > m_rxTrace;
+  TracedCallback<Ptr<const Packet> > m_dropTrace;
 };
 
-std::ostream& operator<< (std::ostream& os, const NdnFace &face);
+std::ostream& operator<< (std::ostream& os, const Face &face);
 
 inline bool
-operator < (const Ptr<NdnFace> &lhs, const Ptr<NdnFace> &rhs)
+operator < (const Ptr<Face> &lhs, const Ptr<Face> &rhs)
 {
   return *lhs < *rhs;
 }
 
 void
-NdnFace::SetId (uint32_t id)
+Face::SetId (uint32_t id)
 {
   m_id = id;
 }
 
 uint32_t
-NdnFace::GetId () const
+Face::GetId () const
 {
   return m_id;
 }
 
 inline bool
-NdnFace::operator!= (const NdnFace &face) const
+Face::operator!= (const Face &face) const
 {
   return !(*this == face);
 }
 
-
+} // namespace ndn
 } // namespace ns3
 
-#endif //NDN_FACE_H
+#endif // NDN_FACE_H

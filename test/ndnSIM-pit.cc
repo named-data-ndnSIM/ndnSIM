@@ -24,7 +24,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("NdnPitTest");
+NS_LOG_COMPONENT_DEFINE ("ndn.PitTest");
 
 namespace ns3
 {

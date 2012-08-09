@@ -24,10 +24,9 @@
 #include "ns3/nstime.h"
 #include <boost/tuple/tuple.hpp>
 
-namespace ns3
-{
-namespace ndnSIM
-{
+namespace ns3 {
+namespace ndn {
+namespace ndnSIM {
 
 class LoadStats
 {
@@ -76,7 +75,8 @@ private:
 std::ostream &
 operator << (std::ostream &os, const LoadStats &stats);
 
-} // ndnSIM
-} // ns3
+} // namespace ndnSIM
+} // namespace ndn
+} // namespace ns3
 
 #endif // LOAD_STATS_H
