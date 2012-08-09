@@ -46,6 +46,10 @@ public:
    */
   FwStats ();
 
+  inline
+  const ::ndnSIM::StatsTree &
+  GetStatsTree () const;  
+
   virtual void
   OnInterest (const Ptr<CcnxFace> &face,
               Ptr<CcnxInterestHeader> &header,
@@ -111,6 +115,12 @@ private:
   
   typedef BestRoute super;
 };
+
+const ::ndnSIM::StatsTree &
+FwStats::GetStatsTree () const
+{
+  return m_stats;
+}
 
 } // namespace ndnSIM
 } // namespace ns3

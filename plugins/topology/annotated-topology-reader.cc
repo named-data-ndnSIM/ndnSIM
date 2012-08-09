@@ -285,7 +285,8 @@ void
 AnnotatedTopologyReader::ApplySettings ()
 {
 #ifdef NS3_MPI
-  if (MpiInterface::GetSize () != m_requiredPartitions)
+  if (MpiInterface::IsEnabled () &&
+      MpiInterface::GetSize () != m_requiredPartitions)
     {
       std::cerr << "MPI interface is enabled, but number of partitions (" << MpiInterface::GetSize ()
                 << ") is not equal to number of partitions in the topology (" << m_requiredPartitions << ")";
