@@ -158,13 +158,28 @@ bool
 LoadStatsNode::IsZero () const
 {
   bool zero = true;
-  std::for_each (m_incoming.begin (), m_incoming.end (),
-                 zero &= ll::bind (&LoadStatsFace::IsZero,
-                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+  for (stats_container::const_iterator item = m_incoming.begin ();
+       item != m_incoming.end ();
+       item ++)
+    {
+      zero &= item->second.IsZero ();
+    }
 
-  std::for_each (m_outgoing.begin (), m_outgoing.end (),
-                 zero &= ll::bind (&LoadStatsFace::IsZero,
-                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+  for (stats_container::const_iterator item = m_outgoing.begin ();
+       item != m_outgoing.end ();
+       item ++)
+    {
+      zero &= item->second.IsZero ();
+    }
+
+//  std::for_each (m_incoming.begin (), m_incoming.end (),
+//                 zero &= ll::bind (&LoadStatsFace::IsZero,
+//                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+//
+//  std::for_each (m_outgoing.begin (), m_outgoing.end (),
+//                 zero &= ll::bind (&LoadStatsFace::IsZero,
+//                                   ll::bind (&stats_container::value_type::second, ll::_1)));
+  
   zero &= m_pit.IsZero ();
   
   return zero;  

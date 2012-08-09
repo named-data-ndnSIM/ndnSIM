@@ -115,7 +115,7 @@ hash_value (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node);
 ///////////////////////////////////////////////////
 // actual definition
 //
-template<class T>
+template<class T, class NonConstT>
 class trie_iterator;
 
 template<class T>
@@ -132,8 +132,8 @@ public:
   typedef trie*       iterator;
   typedef const trie* const_iterator;
 
-  typedef trie_iterator<trie> recursive_iterator;
-  typedef trie_iterator<const trie> const_recursive_iterator;
+  typedef trie_iterator<trie, trie> recursive_iterator;
+  typedef trie_iterator<const trie, trie> const_recursive_iterator;
 
   typedef trie_point_iterator<trie> point_iterator;
   typedef trie_point_iterator<const trie> const_point_iterator;
@@ -425,7 +425,7 @@ private:
   typedef typename unordered_set::bucket_type   bucket_type;
   typedef typename unordered_set::bucket_traits bucket_traits;
 
-  template<class T>
+  template<class T, class NonConstT>
   friend class trie_iterator;
 
   template<class T>
@@ -516,7 +516,7 @@ hash_value (const trie<FullKey, PayloadTraits, PolicyHook> &trie_node)
 
 
 
-template<class Trie>
+template<class Trie, class NonConstTrie> // hack for boost < 1.47
 class trie_iterator
 {
 public:
@@ -528,12 +528,12 @@ public:
   const Trie & operator* () const { return *trie_; }
   Trie * operator-> () { return trie_; }
   const Trie * operator-> () const { return trie_; }
-  bool operator== (trie_iterator<const Trie> &other) const { return (trie_ == other.trie_); }
-  bool operator== (trie_iterator<Trie> &other) { return (trie_ == other.trie_); }
-  bool operator!= (trie_iterator<const Trie> &other) const { return !(*this == other); }
-  bool operator!= (trie_iterator<Trie> &other) { return !(*this == other); }
+  bool operator== (trie_iterator<const Trie, NonConstTrie> &other) const { return (trie_ == other.trie_); }
+  bool operator== (trie_iterator<Trie, NonConstTrie> &other) { return (trie_ == other.trie_); }
+  bool operator!= (trie_iterator<const Trie, NonConstTrie> &other) const { return !(*this == other); }
+  bool operator!= (trie_iterator<Trie, NonConstTrie> &other) { return !(*this == other); }
   
-  trie_iterator<Trie> &
+  trie_iterator<Trie,NonConstTrie> &
   operator++ (int)
   {
     if (trie_->children_.size () > 0)
@@ -543,7 +543,7 @@ public:
     return *this;
   }
 
-  trie_iterator<Trie> &
+  trie_iterator<Trie,NonConstTrie> &
   operator++ ()
   {
     (*this)++;
@@ -551,16 +551,16 @@ public:
   }  
 
 private:
-  typedef typename boost::mpl::if_< boost::is_same<Trie, const Trie>,
-                                    typename Trie::unordered_set::const_iterator,
-                                    typename Trie::unordered_set::iterator>::type set_iterator;
+  typedef typename boost::mpl::if_< boost::is_same<Trie, NonConstTrie>,
+                                    typename Trie::unordered_set::iterator,
+                                    typename Trie::unordered_set::const_iterator>::type set_iterator;
   
   Trie* goUp ()
   {
     if (trie_->parent_ != 0)
       {
         // typename Trie::unordered_set::iterator item =
-        set_iterator item = trie_->parent_->children_.iterator_to (*trie_);
+        set_iterator item = const_cast<NonConstTrie*>(trie_)->parent_->children_.iterator_to (const_cast<NonConstTrie&> (*trie_));
         item++;
         if (item != trie_->parent_->children_.end ())
           {
