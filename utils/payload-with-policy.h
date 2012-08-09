@@ -21,6 +21,8 @@
 #ifndef PAYLOAD_WITH_INDEX_H_
 #define PAYLOAD_WITH_INDEX_H_
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -100,5 +102,6 @@ private:
 };
 
 } // ndnSIM
+} // ns3
 
 #endif // PAYLOAD_WITH_POLICY_H_

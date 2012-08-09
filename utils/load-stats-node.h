@@ -28,7 +28,6 @@
 namespace ns3
 {
 class NdnFace;
-}
 
 namespace ndnSIM
 {
@@ -152,6 +151,7 @@ LoadStatsNode::pit () const
 std::ostream&
 operator << (std::ostream &os, const LoadStatsNode &node);
 
-}
+} // ndnSIM
+} // ns3
 
 #endif

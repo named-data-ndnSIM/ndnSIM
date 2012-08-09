@@ -26,6 +26,8 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("StatsTree");
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -156,4 +158,6 @@ operator << (std::ostream &os, const StatsTree &tree)
 }
 
 
-}
+} // ndnSIM
+} // ns3
+

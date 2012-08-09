@@ -24,6 +24,8 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -103,5 +105,6 @@ struct counting_policy_traits
 };
 
 } // ndnSIM
+} // ns3
 
 #endif // COUNTING_POLICY_H_

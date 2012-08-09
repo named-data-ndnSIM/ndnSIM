@@ -29,10 +29,10 @@
 
 NS_LOG_COMPONENT_DEFINE ("NdnStatsTreeTest");
 
-using namespace ndnSIM;
-
 namespace ns3
 {
+
+using namespace ndnSIM;
 
 void
 StatsTreeTest::DoRun ()

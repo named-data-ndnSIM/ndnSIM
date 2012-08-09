@@ -21,6 +21,8 @@
 #ifndef EMPTY_POLICY_H_
 #define EMPTY_POLICY_H_
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -51,6 +53,7 @@ struct empty_policy_traits
   };
 };
 
-}
+} // ndnSIM
+} // ns3
 
 #endif // EMPTY_POLICY_H_

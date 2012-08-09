@@ -34,6 +34,8 @@
 
 #include <boost/intrusive/options.hpp>
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -126,5 +128,6 @@ struct multi_policy_traits
 };
 
 } // ndnSIM
+} // ns3
 
 #endif // MULTI_POLICY_H_

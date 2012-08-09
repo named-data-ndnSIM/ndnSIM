@@ -23,6 +23,8 @@
 
 #include "trie.h"
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -234,5 +236,6 @@ private:
 };
 
 } // ndnSIM
+} // ns3
 
 #endif // TRIE_WITH_POLICY_H_

@@ -42,7 +42,6 @@ NS_LOG_COMPONENT_DEFINE ("NdnPitImpl");
 using namespace boost::tuples;
 using namespace boost;
 namespace ll = boost::lambda;
-using namespace ndnSIM;
 
 #define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
   static struct X ## type ## templ ## RegistrationClass \
@@ -54,6 +53,9 @@ using namespace ndnSIM;
   } x_ ## type ## templ ## RegistrationVariable
 
 namespace ns3 {
+
+using namespace ndnSIM;
+
 
 template<>
 TypeId

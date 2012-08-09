@@ -26,6 +26,8 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/set.hpp>
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -159,5 +161,6 @@ struct random_policy_traits
 };
 
 } // ndnSIM
+} // ns3
 
 #endif // RANDOM_POLICY_H

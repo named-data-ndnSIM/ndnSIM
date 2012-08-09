@@ -26,6 +26,8 @@
 #include "ns3/ndn-name-components.h"
 #include "ns3/ptr.h"
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -85,5 +87,6 @@ std::ostream &
 operator << (std::ostream &os, const StatsTree &tree);
 
 } // ndnSIM
+} // ns3
 
 #endif // STATS_TREE_H

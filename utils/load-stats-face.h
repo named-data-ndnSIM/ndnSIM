@@ -23,6 +23,8 @@
 
 #include "load-stats.h"
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -130,6 +132,7 @@ LoadStatsFace::rx () const
 std::ostream &
 operator << (std::ostream &os, const LoadStatsFace &stats);
 
-}
+} // ndnSIM
+} // ns3
 
 #endif // LOAD_STATS_FACE_H

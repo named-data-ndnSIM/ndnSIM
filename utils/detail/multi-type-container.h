@@ -25,6 +25,8 @@
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/at.hpp>
 
+namespace ns3
+{
 namespace ndnSIM
 {
 namespace detail
@@ -80,5 +82,6 @@ struct multi_type_container
   
 } // detail
 } // ndnSIM
+} // ns3
 
 #endif // MULTI_TYPE_CONTAINER_H_

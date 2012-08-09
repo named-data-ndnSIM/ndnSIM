@@ -26,10 +26,10 @@
 
 namespace ll = boost::lambda;
 
-using namespace ns3;
-
 NS_LOG_COMPONENT_DEFINE ("LoadStatsNode");
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -213,4 +213,5 @@ operator << (std::ostream &os, const LoadStatsNode &node)
 }
 
 
-}
+} // ndnSIM
+} // ns3

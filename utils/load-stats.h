@@ -24,6 +24,8 @@
 #include "ns3/nstime.h"
 #include <boost/tuple/tuple.hpp>
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -75,5 +77,6 @@ std::ostream &
 operator << (std::ostream &os, const LoadStats &stats);
 
 } // ndnSIM
+} // ns3
 
 #endif // LOAD_STATS_H

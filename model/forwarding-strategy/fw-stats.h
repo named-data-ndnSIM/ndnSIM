@@ -47,7 +47,7 @@ public:
   FwStats ();
 
   inline
-  const ::ndnSIM::StatsTree &
+  const StatsTree &
   GetStatsTree () const;  
 
   virtual void
@@ -107,16 +107,16 @@ private:
   ScheduleRefreshingIfNecessary ();
   
 private:
-  ::ndnSIM::StatsTree m_stats;
+  StatsTree m_stats;
   EventId m_statsRefreshEvent;
 
   TracedCallback< Ptr<NdnForwardingStrategy>,
-                  const ::ndnSIM::StatsTree & > m_statsTrace;
+                  const StatsTree & > m_statsTrace;
   
   typedef BestRoute super;
 };
 
-const ::ndnSIM::StatsTree &
+const StatsTree &
 FwStats::GetStatsTree () const
 {
   return m_stats;

@@ -21,8 +21,6 @@
 #include "load-stats.h"
 #include "ns3/log.h"
 
-using namespace ns3;
-
 // const double EXP_1  = (1-2.0/6.0);//exp (-1.0/5.0);  /* 1/exp(1sec/5sec) */
 // const double EXP_2  = (1-2.0/31.0);//exp (-1.0/30.0); /* 1/exp(1sec/30sec) */
 // const double EXP_3 = (1-2.0/61.0);//exp (-1.0/60.0); /* 1/exp(1sec/60sec) */
@@ -33,6 +31,8 @@ const double EXP_3 = exp (-1.0/60.0); /* 1/exp(1sec/60sec) */
 
 NS_LOG_COMPONENT_DEFINE ("LoadStats");
 
+namespace ns3
+{
 namespace ndnSIM
 {
 
@@ -105,3 +105,4 @@ operator << (std::ostream &os, const LoadStats &stats)
 }
 
 } // ndnSIM
+} // ns3
