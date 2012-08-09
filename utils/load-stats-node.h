@@ -27,7 +27,7 @@
 
 namespace ns3
 {
-class CcnxFace;
+class NdnFace;
 }
 
 namespace ndnSIM
@@ -38,7 +38,7 @@ namespace ndnSIM
 class LoadStatsNode
 {
 public:
-  typedef std::map< ns3::Ptr<ns3::CcnxFace>, LoadStatsFace > stats_container;
+  typedef std::map< ns3::Ptr<ns3::NdnFace>, LoadStatsFace > stats_container;
 
   LoadStatsNode () {}
   LoadStatsNode (const LoadStatsNode &) {}
@@ -56,13 +56,13 @@ public:
    * Increment counter to incoming list
    */
   void
-  AddIncoming (ns3::Ptr<ns3::CcnxFace> face);
+  AddIncoming (ns3::Ptr<ns3::NdnFace> face);
 
   /**
    * Increment counter to outgoing list
    */
   void
-  AddOutgoing (ns3::Ptr<ns3::CcnxFace> face);
+  AddOutgoing (ns3::Ptr<ns3::NdnFace> face);
 
   /**
    * Increment counter to both incoming and outgoing lists, for all faces
@@ -80,13 +80,13 @@ public:
    * Increment counter for Tx amount
    */
   void
-  Rx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+  Rx (ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
 
   /**
    * Increment counter for Tx amount
    */
   void
-  Tx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+  Tx (ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
 
   LoadStatsNode &
   operator += (const LoadStatsNode &stats);
@@ -120,7 +120,7 @@ public:
   }
 
   void
-  RemoveFace (ns3::Ptr<ns3::CcnxFace> face);
+  RemoveFace (ns3::Ptr<ns3::NdnFace> face);
   
 private:
   LoadStatsFace   m_pit;

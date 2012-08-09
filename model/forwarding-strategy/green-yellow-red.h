@@ -27,7 +27,7 @@ namespace ns3 {
 namespace ndnSIM {
 
 /**
- * \ingroup ccnx
+ * \ingroup ndn
  */
 class GreenYellowRed :
     public Nacks
@@ -37,18 +37,18 @@ public:
 
 protected:
   virtual void
-  WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
-                              Ptr<CcnxPitEntry> pitEntry);
+  WillSatisfyPendingInterest (const Ptr<NdnFace> &incomingFace,
+                              Ptr<NdnPitEntry> pitEntry);
 
   virtual bool
-  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                       Ptr<CcnxInterestHeader> header,
+  DoPropagateInterest (const Ptr<NdnFace> &incomingFace,
+                       Ptr<NdnInterestHeader> header,
                        const Ptr<const Packet> &packet,
-                       Ptr<CcnxPitEntry> pitEntry);
+                       Ptr<NdnPitEntry> pitEntry);
   virtual void
-  DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+  DidReceiveValidNack (const Ptr<NdnFace> &incomingFace,
                        uint32_t nackCode,
-                       Ptr<CcnxPitEntry> pitEntry);
+                       Ptr<NdnPitEntry> pitEntry);
 
 private:
   typedef Nacks super;

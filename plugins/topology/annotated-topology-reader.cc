@@ -37,8 +37,8 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/ccnx.h"
-#include "ns3/ccnx-face.h"
+#include "ns3/ndn.h"
+#include "ns3/ndn-face.h"
 
 #include "ns3/constant-position-mobility-model.h"
 
@@ -249,10 +249,10 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
             ipv4->SetMetric (interfaceId,metric);
           }
 
-        Ptr<Ccnx> ccnx = link.GetFromNode ()->GetObject<Ccnx> ();
-        if (ccnx != 0)
+        Ptr<Ndn> ndn = link.GetFromNode ()->GetObject<Ndn> ();
+        if (ndn != 0)
           {
-            Ptr<CcnxFace> face = ccnx->GetFaceByNetDevice (link.GetFromNetDevice ());
+            Ptr<NdnFace> face = ndn->GetFaceByNetDevice (link.GetFromNetDevice ());
             NS_ASSERT (face != 0);
             
             face->SetMetric (metric);
@@ -269,10 +269,10 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
             ipv4->SetMetric (interfaceId,metric);
           }
         
-        Ptr<Ccnx> ccnx = link.GetToNode ()->GetObject<Ccnx> ();
-        if (ccnx != 0)
+        Ptr<Ndn> ndn = link.GetToNode ()->GetObject<Ndn> ();
+        if (ndn != 0)
           {
-            Ptr<CcnxFace> face = ccnx->GetFaceByNetDevice (link.GetToNetDevice ());
+            Ptr<NdnFace> face = ndn->GetFaceByNetDevice (link.GetToNetDevice ());
             NS_ASSERT (face != 0);
             
             face->SetMetric (metric);

@@ -21,9 +21,9 @@
 
 #include "flooding.h"
 
-#include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-pit-entry.h"
+#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-pit-entry.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -41,14 +41,14 @@ NS_LOG_COMPONENT_DEFINE ("NdnSimFlooding");
 namespace ns3 {
 namespace ndnSIM {
 
-using namespace __ccnx_private;
+using namespace __ndn_private;
 
 NS_OBJECT_ENSURE_REGISTERED (Flooding);
     
 TypeId Flooding::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndnSIM::Flooding")
-    .SetGroupName ("Ccnx")
+    .SetGroupName ("Ndn")
     .SetParent <Nacks> ()
     .AddConstructor <Flooding> ()
     ;
@@ -60,19 +60,19 @@ Flooding::Flooding ()
 }
 
 bool
-Flooding::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                               Ptr<CcnxInterestHeader> header,
+Flooding::DoPropagateInterest (const Ptr<NdnFace> &incomingFace,
+                               Ptr<NdnInterestHeader> header,
                                const Ptr<const Packet> &packet,
-                               Ptr<CcnxPitEntry> pitEntry)
+                               Ptr<NdnPitEntry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
   int propagatedCount = 0;
 
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
+  BOOST_FOREACH (const NdnFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
-      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
+      if (metricFace.m_status == NdnFibFaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
       
       if (metricFace.m_face == incomingFace) 

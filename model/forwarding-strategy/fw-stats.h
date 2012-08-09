@@ -31,7 +31,7 @@ namespace ns3 {
 namespace ndnSIM {
 
 /**
- * \ingroup ccnx
+ * \ingroup ndn
  * \brief Strategy based on best route and adding statistics gathering capabilities
  */
 class FwStats :
@@ -51,49 +51,49 @@ public:
   GetStatsTree () const;  
 
   virtual void
-  OnInterest (const Ptr<CcnxFace> &face,
-              Ptr<CcnxInterestHeader> &header,
+  OnInterest (const Ptr<NdnFace> &face,
+              Ptr<NdnInterestHeader> &header,
               const Ptr<const Packet> &p);
 
   virtual void
-  OnData (const Ptr<CcnxFace> &face,
-          Ptr<CcnxContentObjectHeader> &header,
+  OnData (const Ptr<NdnFace> &face,
+          Ptr<NdnContentObjectHeader> &header,
           Ptr<Packet> &payload,
           const Ptr<const Packet> &packet);
 
   virtual void
-  RemoveFace (Ptr<CcnxFace> face);
+  RemoveFace (Ptr<NdnFace> face);
 
 protected:
   virtual void
-  DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
-                     Ptr<CcnxInterestHeader> header,
+  DidCreatePitEntry (const Ptr<NdnFace> &incomingFace,
+                     Ptr<NdnInterestHeader> header,
                      const Ptr<const Packet> &packet,
-                     Ptr<CcnxPitEntry> pitEntry);
+                     Ptr<NdnPitEntry> pitEntry);
 
   virtual void
-  FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
-                          Ptr<CcnxInterestHeader> header,
+  FailedToCreatePitEntry (const Ptr<NdnFace> &incomingFace,
+                          Ptr<NdnInterestHeader> header,
                           const Ptr<const Packet> &packet);
 
   virtual void
-  WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
-                              Ptr<CcnxPitEntry> pitEntry);
+  WillSatisfyPendingInterest (const Ptr<NdnFace> &incomingFace,
+                              Ptr<NdnPitEntry> pitEntry);
 
   virtual void
-  DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
-                      Ptr<CcnxInterestHeader> header,
+  DidSendOutInterest (const Ptr<NdnFace> &outgoingFace,
+                      Ptr<NdnInterestHeader> header,
                       const Ptr<const Packet> &packet,
-                      Ptr<CcnxPitEntry> pitEntry);
+                      Ptr<NdnPitEntry> pitEntry);
 
   virtual void
-  DidSendOutData (const Ptr<CcnxFace> &face,
-                  Ptr<const CcnxContentObjectHeader> header,
+  DidSendOutData (const Ptr<NdnFace> &face,
+                  Ptr<const NdnContentObjectHeader> header,
                   Ptr<const Packet> payload,
                   const Ptr<const Packet> &packet);
 
   virtual void
-  WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry);
+  WillErasePendingInterest (Ptr<NdnPitEntry> pitEntry);
 
   // from Object
   void
@@ -110,7 +110,7 @@ private:
   ::ndnSIM::StatsTree m_stats;
   EventId m_statsRefreshEvent;
 
-  TracedCallback< Ptr<CcnxForwardingStrategy>,
+  TracedCallback< Ptr<NdnForwardingStrategy>,
                   const ::ndnSIM::StatsTree & > m_statsTrace;
   
   typedef BestRoute super;

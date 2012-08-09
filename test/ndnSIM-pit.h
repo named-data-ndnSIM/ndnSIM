@@ -27,8 +27,8 @@
 namespace ns3
 {
 
-class CcnxFib;
-class CcnxPit;
+class NdnFib;
+class NdnPit;
   
 class PitTest : public TestCase
 {
@@ -41,11 +41,11 @@ public:
 private:
   virtual void DoRun ();
 
-  void Test (Ptr<CcnxFib> fib);
-  void Check0 (Ptr<CcnxPit> pit);
-  void Check1 (Ptr<CcnxPit> pit);
-  void Check2 (Ptr<CcnxPit> pit);
-  void Check3 (Ptr<CcnxPit> pit);
+  void Test (Ptr<NdnFib> fib);
+  void Check0 (Ptr<NdnPit> pit);
+  void Check1 (Ptr<NdnPit> pit);
+  void Check2 (Ptr<NdnPit> pit);
+  void Check3 (Ptr<NdnPit> pit);
 };
   
 }

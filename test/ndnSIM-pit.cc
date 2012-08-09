@@ -24,22 +24,22 @@
 
 #include <boost/lexical_cast.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("CcnxPitTest");
+NS_LOG_COMPONENT_DEFINE ("NdnPitTest");
 
 namespace ns3
 {
 
-class Client : public CcnxApp
+class Client : public NdnApp
 {
 protected:
   void
   StartApplication ()
   {
-    CcnxApp::StartApplication ();
+    NdnApp::StartApplication ();
 
     // add default route
-    Ptr<CcnxFibEntry> fibEntry = GetNode ()->GetObject<CcnxFib> ()->Add (CcnxNameComponents ("/"), m_face, 0);
-    fibEntry->UpdateStatus (m_face, CcnxFibFaceMetric::NDN_FIB_GREEN);
+    Ptr<NdnFibEntry> fibEntry = GetNode ()->GetObject<NdnFib> ()->Add (NdnNameComponents ("/"), m_face, 0);
+    fibEntry->UpdateStatus (m_face, NdnFibFaceMetric::NDN_FIB_GREEN);
     
     Simulator::Schedule (Seconds (0.1), &Client::SendPacket, this, std::string("/1"), 1);
     Simulator::Schedule (Seconds (0.2), &Client::SendPacket, this, std::string("/2"), 1);
@@ -50,7 +50,7 @@ protected:
   void
   StopApplication ()
   {
-    CcnxApp::StopApplication ();
+    NdnApp::StopApplication ();
   }
 
 private:
@@ -58,8 +58,8 @@ private:
   SendPacket (const std::string &prefix, uint32_t nonce)
   {
     Ptr<Packet> pkt = Create<Packet> (0);
-    CcnxInterestHeader i;
-    i.SetName (Create<CcnxNameComponents> (prefix));
+    NdnInterestHeader i;
+    i.SetName (Create<NdnNameComponents> (prefix));
     i.SetNonce (nonce);
     i.SetInterestLifetime (Seconds (0.5));
 
@@ -69,38 +69,38 @@ private:
 };
 
 void
-PitTest::Test (Ptr<CcnxFib> fib)
+PitTest::Test (Ptr<NdnFib> fib)
 {
   NS_TEST_ASSERT_MSG_EQ (fib->GetSize (), 1, "There should be only one entry");
 
-  Ptr<const CcnxFibEntry> fibEntry = fib->Begin ();
-  NS_TEST_ASSERT_MSG_EQ (fibEntry->GetPrefix (), CcnxNameComponents ("/"), "prefix should be /");
+  Ptr<const NdnFibEntry> fibEntry = fib->Begin ();
+  NS_TEST_ASSERT_MSG_EQ (fibEntry->GetPrefix (), NdnNameComponents ("/"), "prefix should be /");
 }
 
 void
-PitTest::Check0 (Ptr<CcnxPit> pit)
+PitTest::Check0 (Ptr<NdnPit> pit)
 {
-  // NS_LOG_DEBUG (*GetNode ()->GetObject<CcnxPit> ());
+  // NS_LOG_DEBUG (*GetNode ()->GetObject<NdnPit> ());
   NS_TEST_ASSERT_MSG_EQ (pit->GetSize (), 0, "There should 0 entries in PIT");
 }
 
 void
-PitTest::Check1 (Ptr<CcnxPit> pit)
+PitTest::Check1 (Ptr<NdnPit> pit)
 {
   NS_TEST_ASSERT_MSG_EQ (pit->GetSize (), 1, "There should 1 entry in PIT");
 }
 
 void
-PitTest::Check2 (Ptr<CcnxPit> pit)
+PitTest::Check2 (Ptr<NdnPit> pit)
 {
-  // NS_LOG_DEBUG (*GetNode ()->GetObject<CcnxPit> ());
+  // NS_LOG_DEBUG (*GetNode ()->GetObject<NdnPit> ());
   NS_TEST_ASSERT_MSG_EQ (pit->GetSize (), 2, "There should 2 entries in PIT");
 }
 
 void
-PitTest::Check3 (Ptr<CcnxPit> pit)
+PitTest::Check3 (Ptr<NdnPit> pit)
 {
-  // NS_LOG_DEBUG (*GetNode ()->GetObject<CcnxPit> ());
+  // NS_LOG_DEBUG (*GetNode ()->GetObject<NdnPit> ());
   NS_TEST_ASSERT_MSG_EQ (pit->GetSize (), 3, "There should 3 entries in PIT");
 }
 
@@ -109,25 +109,25 @@ void
 PitTest::DoRun ()
 {
   Ptr<Node> node = CreateObject<Node> ();
-  CcnxStackHelper ccnx;
-  ccnx.Install (node);
+  NdnStackHelper ndn;
+  ndn.Install (node);
 
   Ptr<Client> app1 = CreateObject<Client> ();
   node->AddApplication (app1);
 
-  Simulator::Schedule (Seconds (0.0001), &PitTest::Test, this, node->GetObject<CcnxFib> ());
+  Simulator::Schedule (Seconds (0.0001), &PitTest::Test, this, node->GetObject<NdnFib> ());
     
-  Simulator::Schedule (Seconds (0.01), &PitTest::Check0, this, node->GetObject<CcnxPit> ());
+  Simulator::Schedule (Seconds (0.01), &PitTest::Check0, this, node->GetObject<NdnPit> ());
 
-  Simulator::Schedule (Seconds (0.11), &PitTest::Check1, this, node->GetObject<CcnxPit> ());
-  Simulator::Schedule (Seconds (0.21), &PitTest::Check2, this, node->GetObject<CcnxPit> ());
-  Simulator::Schedule (Seconds (0.31), &PitTest::Check3, this, node->GetObject<CcnxPit> ());
+  Simulator::Schedule (Seconds (0.11), &PitTest::Check1, this, node->GetObject<NdnPit> ());
+  Simulator::Schedule (Seconds (0.21), &PitTest::Check2, this, node->GetObject<NdnPit> ());
+  Simulator::Schedule (Seconds (0.31), &PitTest::Check3, this, node->GetObject<NdnPit> ());
   
-  Simulator::Schedule (Seconds (0.61), &PitTest::Check3, this, node->GetObject<CcnxPit> ());
-  Simulator::Schedule (Seconds (0.71), &PitTest::Check2, this, node->GetObject<CcnxPit> ());
-  Simulator::Schedule (Seconds (0.81), &PitTest::Check1, this, node->GetObject<CcnxPit> ());
+  Simulator::Schedule (Seconds (0.61), &PitTest::Check3, this, node->GetObject<NdnPit> ());
+  Simulator::Schedule (Seconds (0.71), &PitTest::Check2, this, node->GetObject<NdnPit> ());
+  Simulator::Schedule (Seconds (0.81), &PitTest::Check1, this, node->GetObject<NdnPit> ());
 
-  Simulator::Schedule (Seconds (0.91), &PitTest::Check0, this, node->GetObject<CcnxPit> ());
+  Simulator::Schedule (Seconds (0.91), &PitTest::Check0, this, node->GetObject<NdnPit> ());
 
   Simulator::Stop (Seconds (1.0));
   Simulator::Run ();

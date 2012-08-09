@@ -27,7 +27,7 @@ namespace ns3 {
 namespace CcnbParser {
 
 /**
- * \ingroup ccnx-ccnb
+ * \ingroup ndn-ccnb
  * \brief Visitor interface that takes no arguments and returns nothing
  *
  * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html

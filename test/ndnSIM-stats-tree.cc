@@ -23,11 +23,11 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
 #include "../utils/stats-tree.h"
-#include "../apps/ccnx-producer.h"
+#include "../apps/ndn-producer.h"
 
 #include <boost/lexical_cast.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("CcnxStatsTreeTest");
+NS_LOG_COMPONENT_DEFINE ("NdnStatsTreeTest");
 
 using namespace ndnSIM;
 
@@ -45,20 +45,20 @@ StatsTreeTest::DoRun ()
 void
 StatsTreeTest::BasicTests ()
 {
-  CcnxStackHelper ccnx;
+  NdnStackHelper ndn;
 
   Ptr<Node> node1   = CreateObject<Node> ();
-  Ptr<CcnxApp> app1 = CreateObject<CcnxProducer> ();
+  Ptr<NdnApp> app1 = CreateObject<NdnProducer> ();
   node1->AddApplication (app1);
-  ccnx.Install (node1);
+  ndn.Install (node1);
 
-  Ptr<CcnxFace> face1 = CreateObject<CcnxAppFace> (app1);
-  Ptr<CcnxFace> face2 = CreateObject<CcnxAppFace> (app1);
-  Ptr<CcnxFace> face3 = CreateObject<CcnxAppFace> (app1);
+  Ptr<NdnFace> face1 = CreateObject<NdnAppFace> (app1);
+  Ptr<NdnFace> face2 = CreateObject<NdnAppFace> (app1);
+  Ptr<NdnFace> face3 = CreateObject<NdnAppFace> (app1);
 
-  node1->GetObject<Ccnx> ()->AddFace (face1);
-  node1->GetObject<Ccnx> ()->AddFace (face2);
-  node1->GetObject<Ccnx> ()->AddFace (face3);
+  node1->GetObject<Ndn> ()->AddFace (face1);
+  node1->GetObject<Ndn> ()->AddFace (face2);
+  node1->GetObject<Ndn> ()->AddFace (face3);
 
   // NS_LOG_DEBUG (*face1 << ", " << *face2 << ", " << *face3);
   

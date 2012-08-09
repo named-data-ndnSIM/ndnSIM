@@ -20,13 +20,13 @@
 
 #include "nacks.h"
 
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-pit-entry.h"
-#include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-content-object-header.h"
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-fib.h"
-#include "ns3/ccnx-content-store.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-pit-entry.h"
+#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-fib.h"
+#include "ns3/ndn-content-store.h"
 
 #include "ns3/assert.h"
 #include "ns3/ptr.h"
@@ -53,8 +53,8 @@ TypeId
 Nacks::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndnSIM::Nacks")
-    .SetGroupName ("Ccnx")
-    .SetParent<CcnxForwardingStrategy> ()
+    .SetGroupName ("Ndn")
+    .SetParent<NdnForwardingStrategy> ()
     
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
@@ -72,8 +72,8 @@ Nacks::GetTypeId (void)
 }
 
 void
-Nacks::OnInterest (const Ptr<CcnxFace> &incomingFace,
-                   Ptr<CcnxInterestHeader> &header,
+Nacks::OnInterest (const Ptr<NdnFace> &incomingFace,
+                   Ptr<NdnInterestHeader> &header,
                    const Ptr<const Packet> &packet)
 {
   if (header->GetNack () > 0)
@@ -83,8 +83,8 @@ Nacks::OnInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-Nacks::OnNack (const Ptr<CcnxFace> &incomingFace,
-               Ptr<CcnxInterestHeader> &header,
+Nacks::OnNack (const Ptr<NdnFace> &incomingFace,
+               Ptr<NdnInterestHeader> &header,
                const Ptr<const Packet> &packet)
 {
   NS_ASSERT (m_nacksEnabled);
@@ -92,7 +92,7 @@ Nacks::OnNack (const Ptr<CcnxFace> &incomingFace,
   // NS_LOG_FUNCTION (incomingFace << header << packet);
   m_inNacks (header, incomingFace);
 
-  Ptr<CcnxPitEntry> pitEntry = m_pit->Lookup (*header);
+  Ptr<NdnPitEntry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
     {
       // somebody is doing something bad
@@ -119,7 +119,7 @@ Nacks::OnNack (const Ptr<CcnxFace> &incomingFace,
     }
   
   Ptr<Packet> nonNackInterest = Create<Packet> ();
-  header->SetNack (CcnxInterestHeader::NORMAL_INTEREST);
+  header->SetNack (NdnInterestHeader::NORMAL_INTEREST);
   nonNackInterest->AddHeader (*header);
   
   bool propagated = DoPropagateInterest (incomingFace, header, nonNackInterest, pitEntry);
@@ -130,17 +130,17 @@ Nacks::OnNack (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-Nacks::DidReceiveDuplicateInterest (const Ptr<CcnxFace> &incomingFace,
-                                    Ptr<CcnxInterestHeader> &header,
+Nacks::DidReceiveDuplicateInterest (const Ptr<NdnFace> &incomingFace,
+                                    Ptr<NdnInterestHeader> &header,
                                     const Ptr<const Packet> &packet,
-                                    Ptr<CcnxPitEntry> pitEntry)
+                                    Ptr<NdnPitEntry> pitEntry)
 {
   super::DidReceiveDuplicateInterest (incomingFace, header, packet, pitEntry);
 
   if (m_nacksEnabled)
     {
       NS_LOG_DEBUG ("Sending NACK_LOOP");
-      header->SetNack (CcnxInterestHeader::NACK_LOOP);
+      header->SetNack (NdnInterestHeader::NACK_LOOP);
       Ptr<Packet> nack = Create<Packet> ();
       nack->AddHeader (*header);
 
@@ -150,20 +150,20 @@ Nacks::DidReceiveDuplicateInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-Nacks::DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
-                                    Ptr<CcnxInterestHeader> header,
+Nacks::DidExhaustForwardingOptions (const Ptr<NdnFace> &incomingFace,
+                                    Ptr<NdnInterestHeader> header,
                                     const Ptr<const Packet> &packet,
-                                    Ptr<CcnxPitEntry> pitEntry)
+                                    Ptr<NdnPitEntry> pitEntry)
 {
   super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
 
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
-      header->SetNack (CcnxInterestHeader::NACK_GIVEUP_PIT);
+      header->SetNack (NdnInterestHeader::NACK_GIVEUP_PIT);
       packet->AddHeader (*header);
 
-      BOOST_FOREACH (const CcnxPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
+      BOOST_FOREACH (const NdnPitEntryIncomingFace &incoming, pitEntry->GetIncoming ())
         {
           NS_LOG_DEBUG ("Send NACK for " << boost::cref (header->GetName ()) << " to " << boost::cref (*incoming.m_face));
           incoming.m_face->Send (packet->Copy ());
@@ -183,18 +183,18 @@ Nacks::DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-Nacks::DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+Nacks::DidReceiveValidNack (const Ptr<NdnFace> &incomingFace,
                             uint32_t nackCode,
-                            Ptr<CcnxPitEntry> pitEntry)
+                            Ptr<NdnPitEntry> pitEntry)
 {
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
-  if (nackCode == CcnxInterestHeader::NACK_GIVEUP_PIT)
+  if (nackCode == NdnInterestHeader::NACK_GIVEUP_PIT)
     {
       pitEntry->RemoveIncoming (incomingFace);
     }
 
-  pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
+  pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, NdnFibFaceMetric::NDN_FIB_YELLOW);
 }
 
 } // namespace ndnSIM

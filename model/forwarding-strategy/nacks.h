@@ -20,25 +20,25 @@
 #ifndef NDNSIM_NACKS_H
 #define NDNSIM_NACKS_H
 
-#include "ns3/ccnx-forwarding-strategy.h"
+#include "ns3/ndn-forwarding-strategy.h"
 
 namespace ns3 {
 
 namespace ndnSIM {
 
 /**
- * \ingroup ccnx
- * \brief Abstract base class for CCNx forwarding strategies
+ * \ingroup ndn
+ * \brief Abstract base class for Ndn forwarding strategies
  */
 class Nacks :
-    public CcnxForwardingStrategy
+    public NdnForwardingStrategy
 {
 public:
   static TypeId
   GetTypeId (void);
 
   /**
-   * \brief Actual processing of incoming CCNx interests. Note, interests do not have payload
+   * \brief Actual processing of incoming Ndn interests. Note, interests do not have payload
    * 
    * Processing Interest packets
    * @param face    incoming face
@@ -46,49 +46,49 @@ public:
    * @param packet  original packet
    */
   virtual void
-  OnInterest (const Ptr<CcnxFace> &face,
-              Ptr<CcnxInterestHeader> &header,
+  OnInterest (const Ptr<NdnFace> &face,
+              Ptr<NdnInterestHeader> &header,
               const Ptr<const Packet> &p);
 
 protected:
-  // using CcnxForwardingStrategy::PropagateInterest; // some strange c++ cheating
+  // using NdnForwardingStrategy::PropagateInterest; // some strange c++ cheating
 
   virtual void
-  DidReceiveDuplicateInterest (const Ptr<CcnxFace> &face,
-                               Ptr<CcnxInterestHeader> &header,
+  DidReceiveDuplicateInterest (const Ptr<NdnFace> &face,
+                               Ptr<NdnInterestHeader> &header,
                                const Ptr<const Packet> &packet,
-                               Ptr<CcnxPitEntry> pitEntry);
+                               Ptr<NdnPitEntry> pitEntry);
   
   virtual void
-  DidExhaustForwardingOptions (const Ptr<CcnxFace> &incomingFace,
-                               Ptr<CcnxInterestHeader> header,
+  DidExhaustForwardingOptions (const Ptr<NdnFace> &incomingFace,
+                               Ptr<NdnInterestHeader> header,
                                const Ptr<const Packet> &packet,
-                               Ptr<CcnxPitEntry> pitEntry);
+                               Ptr<NdnPitEntry> pitEntry);
 
   virtual void
-  OnNack (const Ptr<CcnxFace> &face,
-          Ptr<CcnxInterestHeader> &header,
+  OnNack (const Ptr<NdnFace> &face,
+          Ptr<NdnInterestHeader> &header,
           const Ptr<const Packet> &p);
 
   virtual void
-  DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+  DidReceiveValidNack (const Ptr<NdnFace> &incomingFace,
                        uint32_t nackCode,
-                       Ptr<CcnxPitEntry> pitEntry);
+                       Ptr<NdnPitEntry> pitEntry);
   
 protected:  
   bool m_nacksEnabled;
 
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_outNacks; ///< @brief trace of outgoing NACKs
+  TracedCallback<Ptr<const NdnInterestHeader>,
+                 Ptr<const NdnFace> > m_outNacks; ///< @brief trace of outgoing NACKs
 
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_inNacks; ///< @brief trace of incoming NACKs
+  TracedCallback<Ptr<const NdnInterestHeader>,
+                 Ptr<const NdnFace> > m_inNacks; ///< @brief trace of incoming NACKs
 
-  TracedCallback<Ptr<const CcnxInterestHeader>,
-                 Ptr<const CcnxFace> > m_dropNacks; ///< @brief trace of dropped NACKs
+  TracedCallback<Ptr<const NdnInterestHeader>,
+                 Ptr<const NdnFace> > m_dropNacks; ///< @brief trace of dropped NACKs
 
 private:
-  typedef CcnxForwardingStrategy super;
+  typedef NdnForwardingStrategy super;
 };
 
 } // namespace ndnSIM

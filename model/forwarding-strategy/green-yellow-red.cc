@@ -21,13 +21,13 @@
 
 #include "green-yellow-red.h"
 
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-pit-entry.h"
-#include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-content-object-header.h"
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-fib.h"
-#include "ns3/ccnx-content-store.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-pit-entry.h"
+#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-fib.h"
+#include "ns3/ndn-content-store.h"
 
 #include "ns3/assert.h"
 #include "ns3/ptr.h"
@@ -47,7 +47,7 @@ NS_LOG_COMPONENT_DEFINE ("NdnSimGreenYellowRed");
 
 namespace ns3 {
 
-using namespace __ccnx_private;
+using namespace __ndn_private;
 
 namespace ndnSIM {
 
@@ -57,7 +57,7 @@ TypeId
 GreenYellowRed::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndnSIM::GreenYellowRed")
-    .SetGroupName ("Ccnx")
+    .SetGroupName ("Ndn")
     .SetParent<Nacks> ()
 
     ;
@@ -65,20 +65,20 @@ GreenYellowRed::GetTypeId (void)
 }
 
 bool
-GreenYellowRed::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                                     Ptr<CcnxInterestHeader> header,
+GreenYellowRed::DoPropagateInterest (const Ptr<NdnFace> &incomingFace,
+                                     Ptr<NdnInterestHeader> header,
                                      const Ptr<const Packet> &packet,
-                                     Ptr<CcnxPitEntry> pitEntry)
+                                     Ptr<NdnPitEntry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT_MSG (m_pit != 0, "PIT should be aggregated with forwarding strategy");
 
   int propagatedCount = 0;
   
-  BOOST_FOREACH (const CcnxFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
+  BOOST_FOREACH (const NdnFibFaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<i_metric> ())
     {
-      if (metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_RED ||
-          metricFace.m_status == CcnxFibFaceMetric::NDN_FIB_YELLOW)
+      if (metricFace.m_status == NdnFibFaceMetric::NDN_FIB_RED ||
+          metricFace.m_status == NdnFibFaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
       if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
@@ -103,29 +103,29 @@ GreenYellowRed::DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-GreenYellowRed::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
-                                            Ptr<CcnxPitEntry> pitEntry)
+GreenYellowRed::WillSatisfyPendingInterest (const Ptr<NdnFace> &incomingFace,
+                                            Ptr<NdnPitEntry> pitEntry)
 {
   if (incomingFace != 0)
     {
       // Update metric status for the incoming interface in the corresponding FIB entry
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_GREEN);
+      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, NdnFibFaceMetric::NDN_FIB_GREEN);
     }
 
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
 }
 
 void
-GreenYellowRed::DidReceiveValidNack (const Ptr<CcnxFace> &incomingFace,
+GreenYellowRed::DidReceiveValidNack (const Ptr<NdnFace> &incomingFace,
                                      uint32_t nackCode,
-                                     Ptr<CcnxPitEntry> pitEntry)
+                                     Ptr<NdnPitEntry> pitEntry)
 {
   super::DidReceiveValidNack (incomingFace, nackCode, pitEntry);
 
   if (incomingFace != 0 &&
-      nackCode != CcnxInterestHeader::NACK_LOOP)
+      nackCode != NdnInterestHeader::NACK_LOOP)
     {
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, CcnxFibFaceMetric::NDN_FIB_YELLOW);
+      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, NdnFibFaceMetric::NDN_FIB_YELLOW);
     }
 }
 

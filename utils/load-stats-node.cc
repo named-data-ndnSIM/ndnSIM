@@ -19,7 +19,7 @@
  */
 
 #include "load-stats-node.h"
-#include "ns3/ccnx-face.h"
+#include "ns3/ndn-face.h"
 #include "ns3/log.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -62,13 +62,13 @@ LoadStatsNode::NewPitEntry ()
 }
 
 void
-LoadStatsNode::AddIncoming (ns3::Ptr<ns3::CcnxFace> face)
+LoadStatsNode::AddIncoming (ns3::Ptr<ns3::NdnFace> face)
 {
   m_incoming [face].count ()++;
 }
 
 void
-LoadStatsNode::AddOutgoing (ns3::Ptr<ns3::CcnxFace> face)
+LoadStatsNode::AddOutgoing (ns3::Ptr<ns3::NdnFace> face)
 {
   m_outgoing [face].count ()++;
 }
@@ -114,14 +114,14 @@ LoadStatsNode::Timeout ()
 }
 
 void
-LoadStatsNode::Rx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+LoadStatsNode::Rx (ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
 {
   m_pit.rx () += amount;
   m_incoming [face].rx () += amount;
 }
 
 void
-LoadStatsNode::Tx (ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+LoadStatsNode::Tx (ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
 {
   m_pit.tx () += amount;
   m_outgoing [face].tx () += amount;
@@ -187,7 +187,7 @@ LoadStatsNode::IsZero () const
 
 
 void
-LoadStatsNode::RemoveFace (ns3::Ptr<ns3::CcnxFace> face)
+LoadStatsNode::RemoveFace (ns3::Ptr<ns3::NdnFace> face)
 {
   NS_LOG_FUNCTION (this);
   m_incoming.erase (face);

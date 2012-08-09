@@ -19,7 +19,7 @@
  */
 
 #include "stats-tree.h"
-#include "ns3/ccnx-face.h"
+#include "ns3/ndn-face.h"
 #include "ns3/log.h"
 
 using namespace ns3;
@@ -48,7 +48,7 @@ StatsTree::Step ()
 }
 
 void
-StatsTree::NewPitEntry (const ns3::CcnxNameComponents &key)
+StatsTree::NewPitEntry (const ns3::NdnNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -56,7 +56,7 @@ StatsTree::NewPitEntry (const ns3::CcnxNameComponents &key)
 }
 
 void
-StatsTree::Incoming (const CcnxNameComponents &key, Ptr<CcnxFace> face)
+StatsTree::Incoming (const NdnNameComponents &key, Ptr<NdnFace> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -64,7 +64,7 @@ StatsTree::Incoming (const CcnxNameComponents &key, Ptr<CcnxFace> face)
 }
 
 void
-StatsTree::Outgoing (const CcnxNameComponents &key, Ptr<CcnxFace> face)
+StatsTree::Outgoing (const NdnNameComponents &key, Ptr<NdnFace> face)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -72,7 +72,7 @@ StatsTree::Outgoing (const CcnxNameComponents &key, Ptr<CcnxFace> face)
 }
 
 void
-StatsTree::Satisfy (const CcnxNameComponents &key)
+StatsTree::Satisfy (const NdnNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -80,7 +80,7 @@ StatsTree::Satisfy (const CcnxNameComponents &key)
 }
 
 void
-StatsTree::Timeout (const CcnxNameComponents &key)
+StatsTree::Timeout (const NdnNameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -88,7 +88,7 @@ StatsTree::Timeout (const CcnxNameComponents &key)
 }
 
 void
-StatsTree::Rx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+StatsTree::Rx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -96,7 +96,7 @@ StatsTree::Rx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face,
 }
 
 void
-StatsTree::Tx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount)
+StatsTree::Tx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
 
@@ -104,9 +104,9 @@ StatsTree::Tx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face,
 }
 
 // const LoadStatsNode &
-// StatsTree::Get (const ns3::CcnxNameComponents &key) const
+// StatsTree::Get (const ns3::NdnNameComponents &key) const
 const LoadStatsNode &
-StatsTree::operator [] (const ns3::CcnxNameComponents &key) const
+StatsTree::operator [] (const ns3::NdnNameComponents &key) const
 {
   tree_type::iterator foundItem, lastItem;
   bool reachLast;
@@ -138,7 +138,7 @@ StatsTree::WalkLeftRightRoot (tree_type *node)
 }
 
 void
-StatsTree::RemoveFace (ns3::Ptr<ns3::CcnxFace> face)
+StatsTree::RemoveFace (ns3::Ptr<ns3::NdnFace> face)
 {
   tree_type::recursive_iterator item (&m_tree), end;
   for (; item != end; item ++)

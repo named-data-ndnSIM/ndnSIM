@@ -23,7 +23,7 @@
 
 #include "trie.h"
 #include "load-stats-node.h"
-#include "ns3/ccnx-name-components.h"
+#include "ns3/ndn-name-components.h"
 #include "ns3/ptr.h"
 
 namespace ndnSIM
@@ -32,7 +32,7 @@ namespace ndnSIM
 class StatsTree
 {
 public:
-  typedef trie< ns3::CcnxNameComponents,
+  typedef trie< ns3::NdnNameComponents,
                 non_pointer_traits< LoadStatsNode >, void* > tree_type;
   
   StatsTree ();
@@ -41,33 +41,33 @@ public:
   Step ();
   
   void
-  NewPitEntry (const ns3::CcnxNameComponents &key);
+  NewPitEntry (const ns3::NdnNameComponents &key);
 
   void
-  Incoming (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face);
+  Incoming (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face);
 
   void
-  Outgoing (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face);
+  Outgoing (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face);
 
   void
-  Satisfy (const ns3::CcnxNameComponents &key);
+  Satisfy (const ns3::NdnNameComponents &key);
 
   void
-  Timeout (const ns3::CcnxNameComponents &key);
+  Timeout (const ns3::NdnNameComponents &key);
 
   void
-  Rx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+  Rx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
 
   void
-  Tx (const ns3::CcnxNameComponents &key, ns3::Ptr<ns3::CcnxFace> face, uint32_t amount);
+  Tx (const ns3::NdnNameComponents &key, ns3::Ptr<ns3::NdnFace> face, uint32_t amount);
 
   // const LoadStatsNode &
-  // Get (const ns3::CcnxNameComponents &key) const;
+  // Get (const ns3::NdnNameComponents &key) const;
   const LoadStatsNode &
-  operator [] (const ns3::CcnxNameComponents &key) const;
+  operator [] (const ns3::NdnNameComponents &key) const;
 
   void
-  RemoveFace (ns3::Ptr<ns3::CcnxFace> face);
+  RemoveFace (ns3::Ptr<ns3::NdnFace> face);
   
 private:
   const LoadStatsNode &

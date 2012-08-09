@@ -29,7 +29,7 @@ namespace ns3 {
 namespace ndnSIM {
 
 /**
- * \ingroup ccnx
+ * \ingroup ndn
  * \brief Best route strategy
  */
 class BestRoute :
@@ -44,12 +44,12 @@ public:
    */
   BestRoute ();
         
-  // inherited from  CcnxForwardingStrategy
+  // inherited from  NdnForwardingStrategy
   virtual bool
-  DoPropagateInterest (const Ptr<CcnxFace> &incomingFace,
-                       Ptr<CcnxInterestHeader> header,
+  DoPropagateInterest (const Ptr<NdnFace> &incomingFace,
+                       Ptr<NdnInterestHeader> header,
                        const Ptr<const Packet> &packet,
-                       Ptr<CcnxPitEntry> pitEntry);
+                       Ptr<NdnPitEntry> pitEntry);
 
 private:
   typedef GreenYellowRed super;

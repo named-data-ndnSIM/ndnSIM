@@ -34,9 +34,9 @@ NS_LOG_COMPONENT_DEFINE ("NdnSimSerialization");
 void
 InterestSerializationTest::DoRun ()
 {
-  CcnxInterestHeader source;
-  source.SetName                (Create<CcnxNameComponents> (boost::lexical_cast<CcnxNameComponents> ("/test/test2")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<CcnxNameComponents> ("/test/test2"), "set/get name failed");
+  NdnInterestHeader source;
+  source.SetName                (Create<NdnNameComponents> (boost::lexical_cast<NdnNameComponents> ("/test/test2")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NdnNameComponents> ("/test/test2"), "set/get name failed");
   
   source.SetMinSuffixComponents (20);
   NS_TEST_ASSERT_MSG_EQ (source.GetMinSuffixComponents (), 20, "set/get minSuffixComponents failed");
@@ -44,8 +44,8 @@ InterestSerializationTest::DoRun ()
   source.SetMaxSuffixComponents (40);
   NS_TEST_ASSERT_MSG_EQ (source.GetMaxSuffixComponents (), 40, "set/get maxSuffixComponents failed");
 
-  source.SetExclude (Create<CcnxNameComponents> (boost::lexical_cast<CcnxNameComponents> ("/exclude/exclude2")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetExclude (), boost::lexical_cast<CcnxNameComponents> ("/exclude/exclude2"), "set/get exclude failed");
+  source.SetExclude (Create<NdnNameComponents> (boost::lexical_cast<NdnNameComponents> ("/exclude/exclude2")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetExclude (), boost::lexical_cast<NdnNameComponents> ("/exclude/exclude2"), "set/get exclude failed");
 
   source.SetChildSelector       (false);
   NS_TEST_ASSERT_MSG_EQ (source.IsEnabledChildSelector (), false, "set/get child selector failed");
@@ -74,7 +74,7 @@ InterestSerializationTest::DoRun ()
   packet.AddHeader (source);
 	
   //deserialization
-  CcnxInterestHeader target;
+  NdnInterestHeader target;
   packet.RemoveHeader (target);
   
   NS_TEST_ASSERT_MSG_EQ (source.GetName ()                  , target.GetName ()                 , "source/target name failed");

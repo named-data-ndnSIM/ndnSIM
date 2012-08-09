@@ -23,12 +23,12 @@
 #include "../syntax-tree/ccnb-parser-block.h"
 #include "../syntax-tree/ccnb-parser-dtag.h"
 
-#include "ns3/ccnx-name-components.h"
+#include "ns3/ndn-name-components.h"
 
 #include "ns3/assert.h"
 #include "ns3/nstime.h"
 
-#include "ns3/ccnx-interest-header.h"
+#include "ns3/ndn-interest-header.h"
 #include "ccnb-parser-name-components-visitor.h"
 #include "ccnb-parser-non-negative-integer-visitor.h"
 #include "ccnb-parser-timestamp-visitor.h"
@@ -45,7 +45,7 @@ namespace CcnbParser {
 
 // We don't care about any other fields
 void
-InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader* */)
+InterestVisitor::visit (Dtag &n, boost::any param/*should be NdnInterestHeader* */)
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
@@ -55,7 +55,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
   static TimestampVisitor          timestampVisitor;
   static Uint32tBlobVisitor        nonceVisitor;
   
-  CcnxInterestHeader &interest = *(boost::any_cast<CcnxInterestHeader*> (param));
+  NdnInterestHeader &interest = *(boost::any_cast<NdnInterestHeader*> (param));
 
   switch (n.m_dtag)
     {
@@ -73,7 +73,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
         NS_LOG_DEBUG ("Name");
 
         // process name components
-        Ptr<CcnxNameComponents> name = Create<CcnxNameComponents> ();
+        Ptr<NdnNameComponents> name = Create<NdnNameComponents> ();
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {
@@ -106,7 +106,7 @@ InterestVisitor::visit (Dtag &n, boost::any param/*should be CcnxInterestHeader*
       {
         NS_LOG_DEBUG ("Exclude");
         // process exclude components
-        Ptr<CcnxNameComponents> exclude = Create<CcnxNameComponents> ();
+        Ptr<NdnNameComponents> exclude = Create<NdnNameComponents> ();
         
         BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
           {

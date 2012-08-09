@@ -21,10 +21,10 @@
 
 #include "fw-stats.h"
 
-#include "ns3/ccnx-interest-header.h"
-#include "ns3/ccnx-content-object-header.h"
-#include "ns3/ccnx-pit.h"
-#include "ns3/ccnx-pit-entry.h"
+#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-pit-entry.h"
 
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -47,7 +47,7 @@ TypeId
 FwStats::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndnSIM::FwStats")
-    .SetGroupName ("Ccnx")
+    .SetGroupName ("Ndn")
     .SetParent <BestRoute> ()
     .AddConstructor <FwStats> ()
 
@@ -69,8 +69,8 @@ FwStats::DoDispose ()
 }
 
 void
-FwStats::OnInterest (const Ptr<CcnxFace> &face,
-                     Ptr<CcnxInterestHeader> &header,
+FwStats::OnInterest (const Ptr<NdnFace> &face,
+                     Ptr<NdnInterestHeader> &header,
                      const Ptr<const Packet> &packet)
 {
   super::OnInterest (face, header, packet);
@@ -81,8 +81,8 @@ FwStats::OnInterest (const Ptr<CcnxFace> &face,
 }
 
 void
-FwStats::OnData (const Ptr<CcnxFace> &face,
-                 Ptr<CcnxContentObjectHeader> &header,
+FwStats::OnData (const Ptr<NdnFace> &face,
+                 Ptr<NdnContentObjectHeader> &header,
                  Ptr<Packet> &payload,
                  const Ptr<const Packet> &packet)
 {
@@ -95,8 +95,8 @@ FwStats::OnData (const Ptr<CcnxFace> &face,
 
 
 void
-FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
-                                 Ptr<CcnxInterestHeader> header,
+FwStats::FailedToCreatePitEntry (const Ptr<NdnFace> &incomingFace,
+                                 Ptr<NdnInterestHeader> header,
                                  const Ptr<const Packet> &packet)
 {
   super::FailedToCreatePitEntry (incomingFace, header, packet);
@@ -110,10 +110,10 @@ FwStats::FailedToCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-FwStats::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
-                            Ptr<CcnxInterestHeader> header,
+FwStats::DidCreatePitEntry (const Ptr<NdnFace> &incomingFace,
+                            Ptr<NdnInterestHeader> header,
                             const Ptr<const Packet> &packet,
-                            Ptr<CcnxPitEntry> pitEntry)
+                            Ptr<NdnPitEntry> pitEntry)
 {
   super::DidCreatePitEntry (incomingFace, header, packet, pitEntry);
   
@@ -124,8 +124,8 @@ FwStats::DidCreatePitEntry (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-FwStats::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
-                                     Ptr<CcnxPitEntry> pitEntry)
+FwStats::WillSatisfyPendingInterest (const Ptr<NdnFace> &incomingFace,
+                                     Ptr<NdnPitEntry> pitEntry)
 {
   super::WillSatisfyPendingInterest (incomingFace, pitEntry);
   
@@ -135,10 +135,10 @@ FwStats::WillSatisfyPendingInterest (const Ptr<CcnxFace> &incomingFace,
 }
 
 void
-FwStats::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
-                             Ptr<CcnxInterestHeader> header,
+FwStats::DidSendOutInterest (const Ptr<NdnFace> &outgoingFace,
+                             Ptr<NdnInterestHeader> header,
                              const Ptr<const Packet> &packet,
-                             Ptr<CcnxPitEntry> pitEntry)
+                             Ptr<NdnPitEntry> pitEntry)
 {
   super::DidSendOutInterest (outgoingFace, header, packet, pitEntry);
 
@@ -149,8 +149,8 @@ FwStats::DidSendOutInterest (const Ptr<CcnxFace> &outgoingFace,
 }
 
 void
-FwStats::DidSendOutData (const Ptr<CcnxFace> &face,
-                         Ptr<const CcnxContentObjectHeader> header,
+FwStats::DidSendOutData (const Ptr<NdnFace> &face,
+                         Ptr<const NdnContentObjectHeader> header,
                          Ptr<const Packet> payload,
                          const Ptr<const Packet> &packet)
 {
@@ -163,7 +163,7 @@ FwStats::DidSendOutData (const Ptr<CcnxFace> &face,
 
 
 void
-FwStats::WillErasePendingInterest (Ptr<CcnxPitEntry> pitEntry)
+FwStats::WillErasePendingInterest (Ptr<NdnPitEntry> pitEntry)
 {
   super::WillErasePendingInterest (pitEntry);
 
@@ -194,7 +194,7 @@ FwStats::RefreshStats ()
 }
 
 void
-FwStats::RemoveFace (Ptr<CcnxFace> face)
+FwStats::RemoveFace (Ptr<NdnFace> face)
 {
   m_stats.RemoveFace (face);
 
