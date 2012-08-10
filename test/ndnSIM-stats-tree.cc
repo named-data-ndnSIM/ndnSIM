@@ -29,10 +29,10 @@
 
 NS_LOG_COMPONENT_DEFINE ("ndn.StatsTreeTest");
 
-namespace ns3
-{
+namespace ns3 {
 
-using namespace ndnSIM;
+using namespace ndn;
+using namespace ndn::ndnSIM;
 
 void
 StatsTreeTest::DoRun ()
@@ -45,20 +45,20 @@ StatsTreeTest::DoRun ()
 void
 StatsTreeTest::BasicTests ()
 {
-  NdnStackHelper ndn;
+  StackHelper ndn;
 
   Ptr<Node> node1   = CreateObject<Node> ();
-  Ptr<NdnApp> app1 = CreateObject<NdnProducer> ();
+  Ptr<App> app1 = CreateObject<Producer> ();
   node1->AddApplication (app1);
   ndn.Install (node1);
 
-  Ptr<NdnFace> face1 = CreateObject<NdnAppFace> (app1);
-  Ptr<NdnFace> face2 = CreateObject<NdnAppFace> (app1);
-  Ptr<NdnFace> face3 = CreateObject<NdnAppFace> (app1);
+  Ptr<Face> face1 = CreateObject<AppFace> (app1);
+  Ptr<Face> face2 = CreateObject<AppFace> (app1);
+  Ptr<Face> face3 = CreateObject<AppFace> (app1);
 
-  node1->GetObject<Ndn> ()->AddFace (face1);
-  node1->GetObject<Ndn> ()->AddFace (face2);
-  node1->GetObject<Ndn> ()->AddFace (face3);
+  node1->GetObject<L3Protocol> ()->AddFace (face1);
+  node1->GetObject<L3Protocol> ()->AddFace (face2);
+  node1->GetObject<L3Protocol> ()->AddFace (face3);
 
   // NS_LOG_DEBUG (*face1 << ", " << *face2 << ", " << *face3);
   

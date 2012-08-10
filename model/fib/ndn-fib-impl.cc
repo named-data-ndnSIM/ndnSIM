@@ -20,7 +20,6 @@
 
 #include "ndn-fib-impl.h"
 
-#include "ns3/ndn.h"
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-interest-header.h"
 

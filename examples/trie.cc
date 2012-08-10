@@ -30,7 +30,7 @@
 
 using namespace std;
 using namespace ns3;
-using namespace ndnSIM;
+using namespace ndn::ndnSIM;
 using namespace boost;
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Trie");

@@ -44,7 +44,7 @@ using namespace ns3;
  *
  * To run scenario and see what is happening, use the following command:
  *
- *     NS_LOG=NdnSimple:NdnConsumer ./waf --run=ndn-simple
+ *     NS_LOG=ndn.Simple:ndn.Consumer ./waf --run=ndn-simple
  */
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Simple");
@@ -73,12 +73,12 @@ main (int argc, char *argv[])
 
   // Install Ndn stack on all nodes
   NS_LOG_INFO ("Installing Ndn stack");
-  NdnStackHelper ndnHelper;
+  ndn::StackHelper ndnHelper;
   ndnHelper.SetDefaultRoutes (true);
   ndnHelper.InstallAll ();
 
   NS_LOG_INFO ("Installing Ndn applications");
-  NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   // Consumer will request /prefix/0, /prefix/1, ...
   consumerHelper.SetPrefix ("/prefix/0");
   consumerHelper.SetAttribute ("Frequency", StringValue ("1")); // 10 interests a second
@@ -90,7 +90,7 @@ main (int argc, char *argv[])
   consumers.Start (Seconds (1));
   consumers.Stop  (Seconds (1.3));
   
-  NdnAppHelper producerHelper ("ns3::NdnProducer");
+  ndn::AppHelper producerHelper ("ns3::ndn::Producer");
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix ("/prefix");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));

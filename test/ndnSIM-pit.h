@@ -24,11 +24,12 @@
 #include "ns3/test.h"
 #include "ns3/ptr.h"
 
-namespace ns3
-{
+namespace ns3 {
 
-class NdnFib;
-class NdnPit;
+namespace ndn {
+class Fib;
+class Pit;
+}
   
 class PitTest : public TestCase
 {
@@ -41,11 +42,11 @@ public:
 private:
   virtual void DoRun ();
 
-  void Test (Ptr<NdnFib> fib);
-  void Check0 (Ptr<NdnPit> pit);
-  void Check1 (Ptr<NdnPit> pit);
-  void Check2 (Ptr<NdnPit> pit);
-  void Check3 (Ptr<NdnPit> pit);
+  void Test (Ptr<ndn::Fib> fib);
+  void Check0 (Ptr<ndn::Pit> pit);
+  void Check1 (Ptr<ndn::Pit> pit);
+  void Check2 (Ptr<ndn::Pit> pit);
+  void Check3 (Ptr<ndn::Pit> pit);
 };
   
 }

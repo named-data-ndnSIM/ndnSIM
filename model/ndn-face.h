@@ -25,9 +25,10 @@
 #include <algorithm>
 
 #include "ns3/ptr.h"
-#include "ns3/ndn.h"
+#include "ns3/object.h"
 #include "ns3/nstime.h"
 #include "ns3/type-id.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -50,7 +51,8 @@ namespace ndn {
  *
  * \see ndn::LocalFace, ndn::NetDeviceFace, ndn::Ipv4Face, ndn::UdpFace
  */
-class Face  : public Object
+class Face :
+    public Object
 {
 public:
   static TypeId

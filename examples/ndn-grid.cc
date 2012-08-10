@@ -78,17 +78,13 @@ main (int argc, char *argv[])
   PointToPointGridHelper grid (nGrid, nGrid, p2p);
   grid.BoundingBox(100,100,200,200);
 
-  // Install Ndn stack on all nodes
+  // Install NDN stack on all nodes
   NS_LOG_INFO ("Installing Ndn stack on all nodes");
-  NdnStackHelper ndnHelper;
-  ndnHelper.SetContentStore ("ns3::NdnContentStoreLru",
-                              "Size", "10");
-  // ndnHelper.SetContentStore ("ns3::NdnContentStoreRandom",
-  //                             "Size", "10");
-  // ndnHelper.SetForwardingStrategy ("ns3::ndnSIM::BestRoute");
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "Size", "10");
   ndnHelper.InstallAll ();
 
-  NdnGlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
   ndnGlobalRoutingHelper.InstallAll ();
   
   // Getting containers for the consumer/producer
@@ -100,17 +96,17 @@ main (int argc, char *argv[])
   NS_LOG_INFO ("Installing Applications");
   std::string prefix = "/prefix";
   
-  NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetPrefix (prefix);
   consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 10 interests a second
   ApplicationContainer consumers = consumerHelper.Install (consumerNodes);
   
-  NdnAppHelper producerHelper ("ns3::NdnProducer");
+  ndn::AppHelper producerHelper ("ns3::ndn::Producer");
   producerHelper.SetPrefix (prefix);
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   ApplicationContainer producers = producerHelper.Install (producer);
 
-  // Add /prefix origins to NdnGlobalRouter
+  // Add /prefix origins to ndn::GlobalRouter
   ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
 
   // Calculate and install FIBs
@@ -126,7 +122,7 @@ main (int argc, char *argv[])
        node ++)
     {
       std::cout << "Node #" << (*node)->GetId () << std::endl;
-      (*node)->GetObject<NdnContentStore> ()->Print (std::cout);
+      (*node)->GetObject<ndn::ContentStore> ()->Print (std::cout);
       std::cout << std::endl;
     }
   

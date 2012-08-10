@@ -37,7 +37,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
 
-  Config::SetDefault ("ns3::NdnProducer::SignatureBits", StringValue ("1"));
+  Config::SetDefault ("ns3::ndn::Producer::SignatureBits", StringValue ("1"));
   
   // Creating nodes
   NodeContainer nodes;
@@ -48,29 +48,29 @@ main (int argc, char *argv[])
   p2p.Install (nodes.Get (0), nodes.Get (1));
   p2p.Install (nodes.Get (1), nodes.Get (2));
 
-  // Install Ndn stack on all nodes
-  NdnStackHelper ndnHelper;
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
   ndnHelper.SetDefaultRoutes (true);
   ndnHelper.InstallAll ();
 
   // Installing applications
 
   // Consumer
-  NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
+  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   // Consumer will request /prefix/0, /prefix/1, ...
   consumerHelper.SetPrefix ("/prefix");
   consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
   consumerHelper.Install (nodes.Get (0)); // first node
 
   // Producer
-  NdnAppHelper producerHelper ("ns3::NdnProducer");
+  ndn::AppHelper producerHelper ("ns3::ndn::Producer");
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix ("/prefix");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
   producerHelper.Install (nodes.Get (2)); // last node
 
   PcapWriter trace ("ndn-simple-trace.pcap");
-  Config::ConnectWithoutContext ("/NodeList/*/$ns3::NdnL3Protocol/FaceList/*/NdnTx",
+  Config::ConnectWithoutContext ("/NodeList/*/$ns3::ndn::L3Protocol/FaceList/*/NdnTx",
 				 MakeCallback (&PcapWriter::TracePacket, &trace));
   
   Simulator::Stop (Seconds (20.0));

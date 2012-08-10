@@ -37,7 +37,7 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/ndn.h"
+#include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-face.h"
 
 #include "ns3/constant-position-mobility-model.h"
@@ -53,8 +53,7 @@
 
 using namespace std;
 
-namespace ns3 
-{    
+namespace ns3 {    
 
 NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyReader");
     
@@ -249,10 +248,10 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
             ipv4->SetMetric (interfaceId,metric);
           }
 
-        Ptr<Ndn> ndn = link.GetFromNode ()->GetObject<Ndn> ();
+        Ptr<ndn::L3Protocol> ndn = link.GetFromNode ()->GetObject<ndn::L3Protocol> ();
         if (ndn != 0)
           {
-            Ptr<NdnFace> face = ndn->GetFaceByNetDevice (link.GetFromNetDevice ());
+            Ptr<ndn::Face> face = ndn->GetFaceByNetDevice (link.GetFromNetDevice ());
             NS_ASSERT (face != 0);
             
             face->SetMetric (metric);
@@ -269,10 +268,10 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
             ipv4->SetMetric (interfaceId,metric);
           }
         
-        Ptr<Ndn> ndn = link.GetToNode ()->GetObject<Ndn> ();
+        Ptr<ndn::L3Protocol> ndn = link.GetToNode ()->GetObject<ndn::L3Protocol> ();
         if (ndn != 0)
           {
-            Ptr<NdnFace> face = ndn->GetFaceByNetDevice (link.GetToNetDevice ());
+            Ptr<ndn::Face> face = ndn->GetFaceByNetDevice (link.GetToNetDevice ());
             NS_ASSERT (face != 0);
             
             face->SetMetric (metric);

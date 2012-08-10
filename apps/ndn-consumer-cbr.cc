@@ -29,7 +29,6 @@
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
-#include "ns3/ndn.h"
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"

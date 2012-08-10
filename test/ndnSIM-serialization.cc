@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "ns3/core-module.h"
@@ -26,17 +27,18 @@
 
 using namespace std;
 
-namespace ns3
-{
+namespace ns3 {
+
+using namespace ndn;
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Serialization");
 
 void
 InterestSerializationTest::DoRun ()
 {
-  NdnInterestHeader source;
-  source.SetName                (Create<NdnNameComponents> (boost::lexical_cast<NdnNameComponents> ("/test/test2")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NdnNameComponents> ("/test/test2"), "set/get name failed");
+  InterestHeader source;
+  source.SetName                (Create<NameComponents> (boost::lexical_cast<NameComponents> ("/test/test2")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NameComponents> ("/test/test2"), "set/get name failed");
   
   source.SetMinSuffixComponents (20);
   NS_TEST_ASSERT_MSG_EQ (source.GetMinSuffixComponents (), 20, "set/get minSuffixComponents failed");
@@ -44,8 +46,8 @@ InterestSerializationTest::DoRun ()
   source.SetMaxSuffixComponents (40);
   NS_TEST_ASSERT_MSG_EQ (source.GetMaxSuffixComponents (), 40, "set/get maxSuffixComponents failed");
 
-  source.SetExclude (Create<NdnNameComponents> (boost::lexical_cast<NdnNameComponents> ("/exclude/exclude2")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetExclude (), boost::lexical_cast<NdnNameComponents> ("/exclude/exclude2"), "set/get exclude failed");
+  source.SetExclude (Create<NameComponents> (boost::lexical_cast<NameComponents> ("/exclude/exclude2")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetExclude (), boost::lexical_cast<NameComponents> ("/exclude/exclude2"), "set/get exclude failed");
 
   source.SetChildSelector       (false);
   NS_TEST_ASSERT_MSG_EQ (source.IsEnabledChildSelector (), false, "set/get child selector failed");
@@ -74,7 +76,7 @@ InterestSerializationTest::DoRun ()
   packet.AddHeader (source);
 	
   //deserialization
-  NdnInterestHeader target;
+  InterestHeader target;
   packet.RemoveHeader (target);
   
   NS_TEST_ASSERT_MSG_EQ (source.GetName ()                  , target.GetName ()                 , "source/target name failed");
