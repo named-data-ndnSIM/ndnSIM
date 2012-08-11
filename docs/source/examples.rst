@@ -18,10 +18,10 @@ NDN consumer, and one NDN producer:
       |          |         10ms   |        |         10ms   |          |
       +----------+                +--------+                +----------+
 
-Consumer is simulated using :ndnsim:`NdnConsumerCbr` reference application and generates Interests towards the producer
+Consumer is simulated using :ndnsim:`ConsumerCbr` reference application and generates Interests towards the producer
 with frequency of 10 Interests per second (see :doc:`applications`).
 
-Producer is simulated using :ndnsim:`NdnProducer` class, which is used to satisfy all incoming Interests with virtual payload data (1024 bytes).
+Producer is simulated using :ndnsim:`Producer` class, which is used to satisfy all incoming Interests with virtual payload data (1024 bytes).
 
 FIB on every node is populated using default routes (see :doc:`helpers`).
 
@@ -55,21 +55,21 @@ simple scenario
       p2p.Install (nodes.Get (1), nodes.Get (2));
 
       // Install CCNx stack on all nodes
-      NdnStackHelper ccnxHelper;
+      ndn::StackHelper ccnxHelper;
       ccnxHelper.SetDefaultRoutes (true);
       ccnxHelper.InstallAll ();
 
       // Installing applications
 
       // Consumer
-      NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
+      ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
       // Consumer will request /prefix/0, /prefix/1, ...
       consumerHelper.SetPrefix ("/prefix");
       consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
       consumerHelper.Install (nodes.Get (0)); // first node
 
       // Producer
-      NdnAppHelper producerHelper ("ns3::NdnProducer");
+      ndn::AppHelper producerHelper ("ns3::ndn::Producer");
       // Producer will reply to all requests starting with /prefix
       producerHelper.SetPrefix ("/prefix");
       producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
@@ -86,7 +86,7 @@ simple scenario
 If this code is placed into ``scratch/ndn-simple.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
 simulation using the following command (in optimized mode nothing will be printed out)::
 
-     NS_LOG=NdnConsumer:NdnProducer ./waf --run=ndn-simple
+     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple
 
 
 9-node grid example
@@ -115,12 +115,12 @@ This scenario (``ndn-grid.cc``) simulates using a grid topology build with Point
        \-/          \-/      \--------/
 
 
-FIB is populated using :ndnsim:`NdnGlobalRoutingHelper` (see :doc:`helpers`).
+FIB is populated using :ndnsim:`GlobalRoutingHelper` (see :doc:`helpers`).
 
-Consumer is simulated using :ndnsim:`NdnConsumerCbr` reference application and generates Interests towards the producer
+Consumer is simulated using :ndnsim:`ConsumerCbr` reference application and generates Interests towards the producer
 with frequency of 10 Interests per second (see :doc:`applications`).
 
-Producer is simulated using :ndnsim:`NdnProducer` class, which is used to satisfy all incoming Interests with virtual payload data (1024 bytes).
+Producer is simulated using :ndnsim:`Producer` class, which is used to satisfy all incoming Interests with virtual payload data (1024 bytes).
 
 
 The following code represents all that is necessary to run such a
@@ -150,11 +150,11 @@ simple scenario
       grid.BoundingBox(100,100,200,200);
     
       // Install CCNx stack on all nodes
-      NdnStackHelper ccnxHelper;
+      ndn::StackHelper ccnxHelper;
       ccnxHelper.InstallAll ();
     
       // Installing global routing interface on all nodes
-      NdnGlobalRoutingHelper ccnxGlobalRoutingHelper;
+      ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
       ccnxGlobalRoutingHelper.InstallAll ();
       
       // Getting containers for the consumer/producer
@@ -165,17 +165,17 @@ simple scenario
       // Install CCNx applications
       std::string prefix = "/prefix";
       
-      NdnAppHelper consumerHelper ("ns3::NdnConsumerCbr");
+      ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
       consumerHelper.SetPrefix (prefix);
       consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
       consumerHelper.Install (consumerNodes);
       
-      NdnAppHelper producerHelper ("ns3::NdnProducer");
+      ndn::AppHelper producerHelper ("ns3::ndn::Producer");
       producerHelper.SetPrefix (prefix);
       producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
       producerHelper.Install (producer);
     
-      // Add /prefix origins to NdnGlobalRouter
+      // Add /prefix origins to ndn::GlobalRouter
       ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
     
       // Calculate and install FIBs
@@ -193,5 +193,5 @@ simple scenario
 If this code is placed into ``scratch/ndn-grid.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
 simulation using the following command (in optimized mode nothing will be printed out)::
 
-    NS_LOG=NdnConsumer:NdnProducer ./waf --run=ndn-grid
+    NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid
 

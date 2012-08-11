@@ -81,7 +81,8 @@ main (int argc, char *argv[])
   // Install NDN stack on all nodes
   NS_LOG_INFO ("Installing Ndn stack on all nodes");
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "Size", "10");
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "10");
+  // ndnHelper.SetContentStore ("ns3::ndn::cs::Random", "MaxSize", "10");
   ndnHelper.InstallAll ();
 
   ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;

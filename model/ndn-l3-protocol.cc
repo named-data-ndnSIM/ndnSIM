@@ -59,6 +59,7 @@ L3Protocol::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::L3Protocol")
     .SetGroupName ("ndn")
+    .SetParent<Object> ()
     .AddConstructor<L3Protocol> ()
     .AddAttribute ("FaceList", "List of faces associated with ndn stack",
                    ObjectVectorValue (),
