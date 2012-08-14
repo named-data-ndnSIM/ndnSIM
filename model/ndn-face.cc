@@ -90,13 +90,9 @@ Face::GetTypeId ()
  */
 Face::Face (Ptr<Node> node) 
   : m_node (node)
-  , m_bucket (0.0)
-  , m_bucketMax (-1.0)
-  , m_bucketLeak (0.0)
   , m_protocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
-  , m_lastLeakTime (0)
   , m_metric (0)
   // , m_enableMetricTagging (false)
 {
@@ -131,55 +127,6 @@ Face::RegisterProtocolHandler (ProtocolHandler handler)
   NS_LOG_FUNCTION_NOARGS ();
 
   m_protocolHandler = handler;
-}
-
-bool
-Face::IsBelowLimit ()
-{
-  NS_LOG_FUNCTION_NOARGS ();
-
-  /// \todo Implement tracing, if requested
-  
-  if (!IsUp ()){
-    NS_LOG_INFO("Face is not up.");
-    return false;
-  }
-
-  LeakBucket ();
-  
-  if (m_bucketMax > 0)
-    {
-      NS_LOG_DEBUG ("Limits enabled: " << m_bucketMax << ", current: " << m_bucket);
-      if (m_bucket+1.0 > m_bucketMax)
-        {
-          //NS_LOG_DEBUG ("Returning false");
-          return false;
-        }
-
-      if (m_randomizeLimitChecking)
-        {
-          static NormalVariable acceptanceProbability (m_bucketMax, m_bucketMax/6.0, m_bucketMax/2.0);
-          // static UniformVariable acceptanceProbability (0, m_bucketMax);
-          double value = acceptanceProbability.GetValue ();
-          if (value > m_bucketMax)
-            value -= m_bucketMax;
-      
-          if (m_bucket < value)
-            {
-              m_bucket += 1.0;
-              return true;
-            }
-          else
-            return false;
-        }
-      else
-        {
-          m_bucket += 1.0;
-          return true;
-        }
-    }
-  
-  return true;
 }
 
 bool
@@ -240,40 +187,6 @@ Face::Receive (const Ptr<const Packet> &packet)
   m_protocolHandler (this, packet);
   
   return true;
-}
-
-void
-Face::LeakBucket ()
-{
-  if (m_lastLeakTime.IsZero ())
-    {
-      m_lastLeakTime = Simulator::Now ();
-      return;
-    }
-
-  Time interval = Simulator::Now () - m_lastLeakTime;
-  const double leak = m_bucketLeak * interval.ToDouble (Time::S);
-  if (leak >= 1.0)
-    {
-      m_bucket = std::max (0.0, m_bucket - leak);
-      m_lastLeakTime = Simulator::Now ();
-    }
-
-  // NS_LOG_DEBUG ("max: " << m_bucketMax << ", Current bucket: " << m_bucket << ", leak size: " << leak << ", interval: " << interval << ", " << m_bucketLeak);
-}
-
-void
-Face::SetBucketMax (double bucket)
-{
-  NS_LOG_FUNCTION (this << bucket);
-  m_bucketMax = bucket;
-}
-
-void
-Face::SetBucketLeak (double leak)
-{
-  NS_LOG_FUNCTION (this << leak);
-  m_bucketLeak = leak;
 }
 
 void

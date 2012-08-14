@@ -89,14 +89,7 @@ public:
   RegisterProtocolHandler (ProtocolHandler handler);
 
   /**
-   * @brief Check if Interest limit is reached
-   *
-   * Side effect: if limit is not yet reached, the number of outstanding packets will be increased
-   *
-   * @returns true if Interest limit is not yet reached
    */
-  bool
-  IsBelowLimit ();
   
   /**
    * \brief Send packet on a face
@@ -179,27 +172,6 @@ public:
   GetId () const;
 
   /**
-   * @brief Set maximum value for Interest allowance
-   *
-   * @param bucket maximum value for Interest allowance. If < 0, then limit will be disabled
-   */
-  void
-  SetBucketMax (double bucket);
-
-  /**
-   * @brief Set a normalized value (one second) for Interest allowance bucket leak
-   */
-   void
-  SetBucketLeak (double leak);
-  
-  /**
-   * @brief Leak the Interest allowance bucket by (1/interval) * m_bucketMax amount,
-   * where interval is time between two consecutive calls of LeakBucket
-   */
-  void
-  LeakBucket ();
-
-  /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
    *
    * Internal index is used for comparison.
@@ -237,20 +209,13 @@ private:
   Face& operator= (const Face &); ///< \brief Disabled copy operator
   
 protected:
-  // uint16_t m_metric; ///< \brief Routing/forwarding metric
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
-
-  double m_bucket; ///< \brief Value representing current size of the Interest allowance for this face
-  double m_bucketMax;  ///< \brief Maximum Interest allowance for this face
-  double m_bucketLeak; ///< \brief Normalized amount that should be leaked every second
   
 private:
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to Ndn stack
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
   uint32_t m_id; ///< \brief id of the interface in Ndn stack (per-node uniqueness)
-  Time m_lastLeakTime;
   uint32_t m_metric; ///< \brief metric of the face
-  bool m_randomizeLimitChecking;
 
   // bool m_enableMetricTagging;
 

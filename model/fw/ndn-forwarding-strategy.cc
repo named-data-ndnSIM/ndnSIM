@@ -440,11 +440,6 @@ ForwardingStrategy::WillSendOutInterest (const Ptr<Face> &outgoingFace,
       return false; // already forwarded before during this retransmission cycle
     }
 
-  
-  bool ok = outgoingFace->IsBelowLimit ();
-  if (!ok)
-    return false;
-
   pitEntry->AddOutgoing (outgoingFace);
   return true;
 }
