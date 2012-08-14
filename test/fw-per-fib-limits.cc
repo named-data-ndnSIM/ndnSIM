@@ -105,8 +105,14 @@ FwPerFibLimits::DoRun ()
 
   ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceConnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
   NS_TEST_ASSERT_MSG_EQ (ok, true, "");
+  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceDisconnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
+
   ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceConnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
   NS_TEST_ASSERT_MSG_EQ (ok, true, "");
+  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceDisconnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
+
+  Config::Connect ("/NodeList/0/$ns3::ndn::L3Protocol/FaceList/*/Limits/CurMaxLimit", MakeCallback (PrintTracedValue<double>));
+  Config::Connect ("/NodeList/0/$ns3::ndn::L3Protocol/FaceList/*/Limits/Outstanding", MakeCallback (PrintTracedValue<uint32_t>));
 
   nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->SetMaxLimit (100);
   
@@ -137,16 +143,20 @@ FwPerFibLimits::DoRun ()
   Simulator::Schedule (Seconds (102.5), &FwPerFibLimits::CheckOutstanding, this, entry, 0);
   Simulator::Schedule (Seconds (102.5), &FwPerFibLimits::CheckCurMaxLimit, this, entry, 41.75);
 
-  // Config::Connect ("/NodeList/*/$ns3::ndn::L3Protocol/FaceList/*/Limits/CurMaxLimit", MakeCallback (PrintTracedValue<double>));
-  // Config::Connect ("/NodeList/*/$ns3::ndn::L3Protocol/FaceList/*/Limits/Outstanding", MakeCallback (PrintTracedValue<uint32_t>));
-
   AppHelper consumer ("ns3::ndn::ConsumerBatches");
   consumer.SetPrefix ("/bla");
   consumer.SetAttribute ("Batches", StringValue ("105 1"));
   consumer.SetAttribute ("LifeTime", StringValue ("1s"));
-  consumer.Install (nodes.Get (0));
+  consumer.Install (nodes.Get (0))
+    .Stop (Seconds (110.0));
+
+  Simulator::Schedule (Seconds (105.1), &FwPerFibLimits::CheckOutstanding, this, entry, 1);
+  Simulator::Schedule (Seconds (106.7), &FwPerFibLimits::CheckOutstanding, this, entry, 0);
+
+  Simulator::Schedule (Seconds (109.0), &FwPerFibLimits::CheckCurMaxLimit, this, entry, 14.27);
+  Simulator::Schedule (Seconds (119.9), &FwPerFibLimits::CheckCurMaxLimit, this, entry, 16.32);
   
-  Simulator::Stop (Seconds (110.0));
+  Simulator::Stop (Seconds (120.0));
   Simulator::Run ();
  
   Simulator::Destroy ();

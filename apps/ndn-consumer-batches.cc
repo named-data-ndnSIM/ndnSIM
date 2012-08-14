@@ -55,6 +55,7 @@ ConsumerBatches::GetTypeId (void)
 }
 
 ConsumerBatches::ConsumerBatches ()
+  : m_initial (true)
 {
 }
 
@@ -74,6 +75,7 @@ ConsumerBatches::AddBatch (uint32_t amount)
   // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
   m_seqMax += amount;
   m_rtt->ClearSent (); // this is important, otherwise RTT estimation for the new batch will be affected by previous batch history
+  m_initial = true;
   ScheduleNextPacket ();
 }
 
@@ -81,7 +83,13 @@ void
 ConsumerBatches::ScheduleNextPacket ()
 {
   if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S)), &Consumer::SendPacket, this);
+    {
+      Time delay = Seconds (0);
+      if (!m_initial) delay = m_rtt->RetransmitTimeout ();
+      
+      m_initial = false;
+      m_sendEvent = Simulator::Schedule (delay, &Consumer::SendPacket, this);
+    }
 }
 
 ///////////////////////////////////////////////////
