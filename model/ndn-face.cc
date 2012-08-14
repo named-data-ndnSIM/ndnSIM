@@ -30,6 +30,7 @@
 #include "ns3/boolean.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
+#include "ns3/pointer.h"
 
 // #include "ns3/weights-path-stretch-tag.h"
 
@@ -54,20 +55,11 @@ Face::GetTypeId ()
                    MakeUintegerAccessor (&Face::m_id),
                    MakeUintegerChecker<uint32_t> ())
 
-    .AddAttribute ("BucketMax", "Maximum size of leaky bucket",
-                   DoubleValue (-1.0),
-                   MakeDoubleAccessor (&Face::m_bucketMax),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("BucketLeak", "Normalized bucket leak size",
-                   DoubleValue (0.0),
-                   MakeDoubleAccessor (&Face::m_bucketLeak),
-                   MakeDoubleChecker<double> ())
+    .AddAttribute ("Limits", "Limits object",
+                   PointerValue (CreateObject<Limits> ()),
+                   MakePointerAccessor (&Face::m_limits),
+                   MakePointerChecker<Limits> ())
 
-    .AddAttribute ("RandomizeLimitChecking", "Whether or not to randomize the limit checking procedure. false (persistent) by default",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&Face::m_randomizeLimitChecking),
-                   MakeBooleanChecker ())
-                   
     // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
     //                BooleanValue (false),
     //                MakeBooleanAccessor (&Face::m_enableMetricTagging),

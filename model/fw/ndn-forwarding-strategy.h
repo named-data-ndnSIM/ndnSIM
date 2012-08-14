@@ -82,9 +82,19 @@ public:
           Ptr<Packet> &payload,
           const Ptr<const Packet> &packet);
 
+  /**
+   * @brief Event fired just before PIT entry is removed by timeout
+   * @param pitEntry PIT entry to be removed
+   */
   virtual void
-  WillErasePendingInterest (Ptr<pit::Entry> pitEntry);
+  WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Event fired every time face is removed from NDN stack
+   * @param face face to be removed
+   *
+   * For example, when an application terminates, AppFace is removed and this method called by NDN stack.
+   */
   virtual void
   RemoveFace (Ptr<Face> face);
   

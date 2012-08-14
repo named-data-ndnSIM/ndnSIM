@@ -25,6 +25,7 @@
 #include "ns3/nstime.h"
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-name-components.h"
+#include "ns3/ndn-limits.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -176,7 +177,9 @@ public:
   Entry (const Ptr<const NameComponents> &prefix)
   : m_prefix (prefix)
   , m_needsProbing (false)
-  { }
+  {
+    m_limits = CreateObject<Limits> ();
+  }
   
   /**
    * \brief Update status of FIB next hop
@@ -227,7 +230,16 @@ public:
   {
     m_faces.erase (face);
   }
-	
+
+  /**
+   * @brief Get reference to limits object
+   */
+  Limits &
+  GetLimits ()
+  {
+    return *m_limits;
+  }
+    
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
@@ -235,7 +247,9 @@ public:
   Ptr<const NameComponents> m_prefix; ///< \brief Prefix of the FIB entry
   FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
-  bool m_needsProbing;      ///< \brief flag indicating that probing should be performed 
+  bool m_needsProbing;      ///< \brief flag indicating that probing should be performed
+
+  Ptr<Limits> m_limits;
 };
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);

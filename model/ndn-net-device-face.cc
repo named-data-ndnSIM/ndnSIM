@@ -38,6 +38,8 @@ NS_LOG_COMPONENT_DEFINE ("ndn.NetDeviceFace");
 namespace ns3 {
 namespace ndn {
 
+NS_OBJECT_ENSURE_REGISTERED (NetDeviceFace);
+
 TypeId
 NetDeviceFace::GetTypeId ()
 {

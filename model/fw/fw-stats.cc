@@ -167,9 +167,9 @@ FwStats::DidSendOutData (const Ptr<Face> &face,
 
 
 void
-FwStats::WillErasePendingInterest (Ptr<pit::Entry> pitEntry)
+FwStats::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
-  super::WillErasePendingInterest (pitEntry);
+  super::WillEraseTimedOutPendingInterest (pitEntry);
 
   m_stats.Timeout (pitEntry->GetPrefix ().cut (1));
   

@@ -51,8 +51,6 @@ public:
               const Ptr<const Packet> &p);
 
 protected:
-  // using NdnForwardingStrategy::PropagateInterest; // some strange c++ cheating
-
   virtual void
   DidReceiveDuplicateInterest (const Ptr<Face> &face,
                                Ptr<InterestHeader> &header,

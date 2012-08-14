@@ -94,7 +94,7 @@ protected:
                   const Ptr<const Packet> &packet);
 
   virtual void
-  WillErasePendingInterest (Ptr<pit::Entry> pitEntry);
+  WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
   // from Object
   void

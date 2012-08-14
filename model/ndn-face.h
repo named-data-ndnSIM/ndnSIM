@@ -29,6 +29,7 @@
 #include "ns3/nstime.h"
 #include "ns3/type-id.h"
 #include "ns3/traced-callback.h"
+#include "ns3/ndn-limits.h"
 
 namespace ns3 {
 
@@ -89,7 +90,10 @@ public:
   RegisterProtocolHandler (ProtocolHandler handler);
 
   /**
+   * @brief Get reference to Limits object
    */
+  inline Ptr<Limits>
+  GetLimits ();    
   
   /**
    * \brief Send packet on a face
@@ -217,6 +221,7 @@ private:
   uint32_t m_id; ///< \brief id of the interface in Ndn stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
 
+  Ptr<Limits> m_limits;
   // bool m_enableMetricTagging;
 
   TracedCallback<Ptr<const Packet> > m_txTrace;
@@ -249,6 +254,13 @@ Face::operator!= (const Face &face) const
 {
   return !(*this == face);
 }
+
+inline Ptr<Limits>
+Face::GetLimits ()
+{
+  return m_limits;
+}
+
 
 } // namespace ndn
 } // namespace ns3

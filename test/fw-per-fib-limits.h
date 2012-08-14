@@ -1,4 +1,4 @@
-/* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
+/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2011 University of California, Los Angeles
  *
@@ -18,38 +18,35 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-pit-entry-incoming-face.h"
+#ifndef NDNSIM_TEST_FW_PER_FIB_LIMITS_H
+#define NDNSIM_TEST_FW_PER_FIB_LIMITS_H
 
-#include "ns3/simulator.h"
+#include "ns3/test.h"
+#include "ns3/ptr.h"
 
 namespace ns3 {
 namespace ndn {
-namespace pit {
 
-IncomingFace::IncomingFace (Ptr<Face> face)
-  : m_face (face)
-  , m_arrivalTime (Simulator::Now ())
-  // , m_nonce (nonce)
+class Fib;
+namespace fib { class Entry; }
+  
+class FwPerFibLimits : public TestCase
 {
-}
+public:
+  FwPerFibLimits ()
+    : TestCase ("Test for ndn::fw::PerFibLimits")
+  {
+  }
+    
+private:
+  virtual void DoRun ();
 
-IncomingFace::IncomingFace ()
-  : m_face (0)
-  , m_arrivalTime (0)
-{
-}
-
-/**
- * @brie Copy operator
- */
-IncomingFace &
-IncomingFace::operator = (const IncomingFace &other)
-{
-  m_face = other.m_face;
-  m_arrivalTime = other.m_arrivalTime;
-  return *this;
-}
-
-} // namespace pit
+  void CheckCurMaxLimit (Ptr<fib::Entry> entry, double amount);
+  void CheckOutstanding (Ptr<fib::Entry> entry, uint32_t amount);
+  // void Check2 (Ptr<fib::Entry> entry);
+};
+  
 } // namespace ndn
 } // namespace ns3
+
+#endif // NDNSIM_TEST_FW_PER_FIB_LIMITS_H

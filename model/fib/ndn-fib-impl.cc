@@ -208,7 +208,7 @@ FibImpl::GetSize () const
 }
 
 Ptr<const Entry>
-FibImpl::Begin ()
+FibImpl::Begin () const
 {
   super::parent_trie::const_recursive_iterator item (super::getTrie ());
   super::parent_trie::const_recursive_iterator end (0);
@@ -225,13 +225,13 @@ FibImpl::Begin ()
 }
 
 Ptr<const Entry>
-FibImpl::End ()
+FibImpl::End () const
 {
   return 0;
 }
 
 Ptr<const Entry>
-FibImpl::Next (Ptr<const Entry> from)
+FibImpl::Next (Ptr<const Entry> from) const
 {
   if (from == 0) return 0;
   
@@ -248,6 +248,49 @@ FibImpl::Next (Ptr<const Entry> from)
   else
     return item->payload ();
 }
+
+Ptr<Entry>
+FibImpl::Begin ()
+{
+  super::parent_trie::recursive_iterator item (super::getTrie ());
+  super::parent_trie::recursive_iterator end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
+Ptr<Entry>
+FibImpl::End ()
+{
+  return 0;
+}
+
+Ptr<Entry>
+FibImpl::Next (Ptr<Entry> from)
+{
+  if (from == 0) return 0;
+  
+  super::parent_trie::recursive_iterator item (*StaticCast<EntryImpl> (from)->to_iterator ());
+  super::parent_trie::recursive_iterator end (0);
+  for (item++; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
 
 } // namespace fib
 } // namespace ndn

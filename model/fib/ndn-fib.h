@@ -142,19 +142,37 @@ public:
    * @brief Return first element of FIB (no order guaranteed)
    */
   virtual Ptr<const fib::Entry>
-  Begin () = 0;
+  Begin () const = 0;
+
+  /**
+   * @brief Return first element of FIB (no order guaranteed)
+   */
+  virtual Ptr<fib::Entry>
+  Begin () = 0;  
 
   /**
    * @brief Return item next after last (no order guaranteed)
    */
   virtual Ptr<const fib::Entry>
+  End () const = 0;
+
+  /**
+   * @brief Return item next after last (no order guaranteed)
+   */
+  virtual Ptr<fib::Entry>
   End () = 0;
 
   /**
    * @brief Advance the iterator
    */
   virtual Ptr<const fib::Entry>
-  Next (Ptr<const fib::Entry>) = 0;
+  Next (Ptr<const fib::Entry>) const = 0;
+
+  /**
+   * @brief Advance the iterator
+   */
+  virtual Ptr<fib::Entry>
+  Next (Ptr<fib::Entry>) = 0;
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////

@@ -55,7 +55,7 @@ public:
    * @brie Copy operator
    */
   IncomingFace &
-  operator = (IncomingFace &other);
+  operator = (const IncomingFace &other);
 
   /**
    * @brief Compare two PitEntryIncomingFace

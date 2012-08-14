@@ -89,11 +89,10 @@ def build(bld):
         "model/pit/ndn-pit-entry-incoming-face.h",
         "model/pit/ndn-pit-entry-outgoing-face.h",
         
-        
-        
         "model/fw/ndn-forwarding-strategy.h",
 
         "utils/batches.h",
+        "utils/ndn-limits.h",
         # "utils/weights-path-stretch-tag.h",
         ]
 

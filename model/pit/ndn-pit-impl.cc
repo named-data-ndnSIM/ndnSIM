@@ -182,9 +182,9 @@ PitImpl<Policy>::RescheduleCleaning ()
   Time nextEvent = i_time.begin ()->GetExpireTime () - Simulator::Now ();
   if (nextEvent <= 0) nextEvent = Seconds (0);
   
-  // NS_LOG_DEBUG ("Schedule next cleaning in " <<
-  //               nextEvent.ToDouble (Time::S) << "s (at " <<
-  //               i_time.begin ()->GetExpireTime () << "s abs time");
+  NS_LOG_DEBUG ("Schedule next cleaning in " <<
+                nextEvent.ToDouble (Time::S) << "s (at " <<
+                i_time.begin ()->GetExpireTime () << "s abs time");
   
   m_cleanEvent = Simulator::Schedule (nextEvent,
                                       &PitImpl<Policy>::CleanExpired, this);
@@ -203,7 +203,7 @@ PitImpl<Policy>::CleanExpired ()
       typename time_index::iterator entry = i_time.begin ();
       if (entry->GetExpireTime () <= now) // is the record stale?
         {
-          m_forwardingStrategy->WillErasePendingInterest (entry->to_iterator ()->payload ());
+          m_forwardingStrategy->WillEraseTimedOutPendingInterest (entry->to_iterator ()->payload ());
           super::erase (entry->to_iterator ());
           // count ++;
         }

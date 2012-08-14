@@ -427,8 +427,8 @@ ForwardingStrategy::PropagateInterest (const Ptr<Face> &incomingFace,
 
 bool
 ForwardingStrategy::WillSendOutInterest (const Ptr<Face> &outgoingFace,
-                                             Ptr<InterestHeader> header,
-                                             Ptr<pit::Entry> pitEntry)
+                                         Ptr<InterestHeader> header,
+                                         Ptr<pit::Entry> pitEntry)
 {
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outgoingFace);
@@ -462,7 +462,7 @@ ForwardingStrategy::DidSendOutData (const Ptr<Face> &face,
 }
 
 void
-ForwardingStrategy::WillErasePendingInterest (Ptr<pit::Entry> pitEntry)
+ForwardingStrategy::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   // do nothing for now. may be need to do some logging
 }

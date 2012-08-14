@@ -270,6 +270,8 @@ StackHelper::Install (Ptr<Node> node) const
               NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
               NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
 
+              // Set max to BDP
+              face->GetLimits ()->SetMaxLimit (m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
             }
         }
         

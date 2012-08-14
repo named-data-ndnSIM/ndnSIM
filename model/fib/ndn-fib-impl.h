@@ -110,13 +110,22 @@ public:
   GetSize () const;
 
   virtual Ptr<const Entry>
+  Begin () const;
+
+  virtual Ptr<Entry>
   Begin ();
 
   virtual Ptr<const Entry>
+  End () const;
+
+  virtual Ptr<Entry>
   End ();
 
   virtual Ptr<const Entry>
-  Next (Ptr<const Entry> item);
+  Next (Ptr<const Entry> item) const;
+  
+  virtual Ptr<Entry>
+  Next (Ptr<Entry> item);
   
 protected:
   // inherited from Object class

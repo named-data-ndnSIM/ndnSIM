@@ -24,6 +24,7 @@
 #include "ndnSIM-serialization.h"
 #include "ndnSIM-pit.h"
 #include "ndnSIM-stats-tree.h"
+#include "fw-per-fib-limits.h"
 
 namespace ns3
 {
@@ -36,10 +37,11 @@ public:
   {
     SetDataDir (NS_TEST_SOURCEDIR);
     
-    AddTestCase (new InterestSerializationTest ());
-    AddTestCase (new ContentObjectSerializationTest ());
-    AddTestCase (new PitTest ());
-    AddTestCase (new StatsTreeTest ());
+    // AddTestCase (new InterestSerializationTest ());
+    // AddTestCase (new ContentObjectSerializationTest ());
+    // AddTestCase (new PitTest ());
+    // AddTestCase (new StatsTreeTest ());
+    AddTestCase (new ndn::FwPerFibLimits ());
   }
 };
 
