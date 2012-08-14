@@ -319,16 +319,17 @@ Consumer::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPac
   m_retxSeqs.insert (seq);
   NS_LOG_INFO ("After: " << m_retxSeqs.size ());
 
-  // m_rtt->IncreaseMultiplier ();             // Double the next RTO ??
+  m_rtt->IncreaseMultiplier ();             // Double the next RTO ??
   ScheduleNextPacket ();
 }
 
 void
 Consumer::OnTimeout (uint32_t sequenceNumber)
 {
+  NS_LOG_FUNCTION (sequenceNumber);
   // std::cout << Simulator::Now () << ", TO: " << sequenceNumber << ", current RTO: " << m_rtt->RetransmitTimeout ().ToDouble (Time::S) << "s\n";
 
-  // m_rtt->IncreaseMultiplier ();             // Double the next RTO
+  m_rtt->IncreaseMultiplier ();             // Double the next RTO
   m_rtt->SentSeq (SequenceNumber32 (sequenceNumber), 1); // make sure to disable RTT calculation for this sample
   m_retxSeqs.insert (sequenceNumber);
   ScheduleNextPacket (); 

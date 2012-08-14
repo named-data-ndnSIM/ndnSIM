@@ -81,7 +81,7 @@ void
 ConsumerBatches::ScheduleNextPacket ()
 {
   if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &Consumer::SendPacket, this);
+    m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S)), &Consumer::SendPacket, this);
 }
 
 ///////////////////////////////////////////////////
