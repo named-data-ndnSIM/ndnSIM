@@ -29,6 +29,7 @@
 #include "ns3/assert.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/random-variable.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -83,13 +84,14 @@ PerFibLimits::WillSendOutInterest (const Ptr<Face> &outgoingFace,
 
   if (pitEntry->GetFibEntry ()->GetLimits ().IsBelowLimit ())
     {
-      if (outgoingFace->GetLimits ()->IsBelowLimit ())
+      if (outgoingFace->GetLimits ().IsBelowLimit ())
         {
           pitEntry->AddOutgoing (outgoingFace);
           return true;
         }
       else
         {
+          NS_LOG_DEBUG ("Face limit. Reverting back per-prefix allowance");
           pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
         }
     }
@@ -106,7 +108,7 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetLimits ()->RemoveOutstanding ();
+      face->m_face->GetLimits ().RemoveOutstanding ();
       // face->m_face->GetLimits ()->DecreaseLimit (); !!! do not decrease per-face limit. it doesn't make sense !!!
     }
   
@@ -114,7 +116,10 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   pitEntry->GetFibEntry ()->GetLimits ().DecreaseLimit (); // multiplicative decrease
 
   if (!m_decayLimitsEvent.IsRunning ())
-    m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0), &PerFibLimits::DecayLimits, this);
+    {
+      UniformVariable rand (0,5);
+      m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0) + Seconds (0.001 * rand.GetValue ()), &PerFibLimits::DecayLimits, this);
+    }
 }
 
 
@@ -130,7 +135,7 @@ PerFibLimits::WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetLimits ()->RemoveOutstanding ();
+      face->m_face->GetLimits ().RemoveOutstanding ();
       // face->m_face->GetLimits ()->IncreaseLimit (); !!! do not increase (as do not decrease) per-face limit. again, it doesn't make sense
     }
   

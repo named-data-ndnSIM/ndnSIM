@@ -103,18 +103,18 @@ FwPerFibLimits::DoRun ()
   ok = entry->GetLimits ().TraceConnect ("Outstanding", "fibEntry.out", MakeCallback (PrintTracedValue<uint32_t>));
   NS_TEST_ASSERT_MSG_EQ (ok, true, "");
 
-  ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceConnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
+  ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ().TraceConnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
   NS_TEST_ASSERT_MSG_EQ (ok, true, "");
-  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceDisconnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
+  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ().TraceDisconnect ("CurMaxLimit", "face.curMax", MakeCallback (PrintTracedValue<double>));
 
-  ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceConnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
+  ok = nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ().TraceConnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
   NS_TEST_ASSERT_MSG_EQ (ok, true, "");
-  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->TraceDisconnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
+  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ().TraceDisconnect ("Outstanding", "face.out",    MakeCallback (PrintTracedValue<uint32_t>));
 
   Config::Connect ("/NodeList/0/$ns3::ndn::L3Protocol/FaceList/*/Limits/CurMaxLimit", MakeCallback (PrintTracedValue<double>));
   Config::Connect ("/NodeList/0/$ns3::ndn::L3Protocol/FaceList/*/Limits/Outstanding", MakeCallback (PrintTracedValue<uint32_t>));
 
-  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ()->SetMaxLimit (100);
+  nodes.Get (0)->GetObject<L3Protocol> ()->GetFace (0)->GetLimits ().SetMaxLimit (100);
   
   entry->GetLimits ().SetMaxLimit (100);
   NS_TEST_ASSERT_MSG_EQ_TOL ((double)entry->GetLimits ().m_curMaxLimit, 100, 0.1, "");

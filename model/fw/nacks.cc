@@ -156,8 +156,6 @@ Nacks::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
                                     const Ptr<const Packet> &packet,
                                     Ptr<pit::Entry> pitEntry)
 {
-  super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
-
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
@@ -171,16 +169,9 @@ Nacks::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
 
           m_outNacks (header, incoming.m_face);
         }
+    }
   
-      // All incoming interests cannot be satisfied. Remove them
-      pitEntry->ClearIncoming ();
-
-      // Remove also outgoing
-      pitEntry->ClearOutgoing ();
-  
-      // Set pruning timout on PIT entry (instead of deleting the record)
-      m_pit->MarkErased (pitEntry);
-    }  
+  super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
 }
 
 void

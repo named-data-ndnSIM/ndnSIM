@@ -22,6 +22,7 @@
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"
+#include "ns3/random-variable.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Limits");
 
@@ -38,6 +39,30 @@ Limits::GetTypeId ()
     .SetParent <Object> ()
     .AddConstructor <Limits> ()
 
+    .AddAttribute ("ExpDecayTau", "Parameter 'tau' for the exponential delay of the current maximum limit variable",
+                   TimeValue (Seconds (100.0)),
+                   MakeTimeAccessor (&Limits::m_exponentialDecayTau),
+                   MakeTimeChecker ()
+                   )
+
+    .AddAttribute ("NonDecreasePeriod", "Only one decrease is allowed per one NonDecreasePeriod",
+                   TimeValue (Seconds (0.1)),
+                   MakeTimeAccessor (&Limits::m_nonDecreasePeriod),
+                   MakeTimeChecker ()
+                   )
+
+    .AddAttribute ("AdditiveIncrease", "Parameter for additive increase",
+                   DoubleValue (1.0),
+                   MakeDoubleAccessor (&Limits::m_additiveIncrease),
+                   MakeDoubleChecker<double> ()
+                   )
+
+    .AddAttribute ("MultiplicativeDecrease", "Parameter for multiplicative decrease",
+                   DoubleValue (0.5),
+                   MakeDoubleAccessor (&Limits::m_multiplicativeDecrease),
+                   MakeDoubleChecker<double> ()
+                   )
+    
     .AddTraceSource ("CurMaxLimit",
                      "Current maximum limit",
                      MakeTraceSourceAccessor (&Limits::m_curMaxLimit))
@@ -56,21 +81,25 @@ Limits::SetMaxLimit (uint32_t max)
   m_curMaxLimit = max;
 }
 
+uint32_t
+Limits::GetMaxLimit () const
+{
+  return m_maxLimit;
+}
 
 void
 Limits::DecayCurrentLimit ()
 {
-  if (m_maxLimit == 0) return;
+  if (!IsEnabled ()) return;
   
   if (!m_lastDecay.IsZero ())
     {
-      const double tau = 100.0; // seconds
       double timeDiff = (Simulator::Now () - m_lastDecay).ToDouble (Time::S);
 
       NS_LOG_DEBUG ("m_maxLimit - (m_maxLimit - m_curMaxLimit) * exp (-timeDiff / tau)");
-      NS_LOG_DEBUG (m_maxLimit << " - " << " ( " << m_maxLimit << " - " << (double)m_curMaxLimit << " ) " << " * " << " exp (- " << timeDiff << " / " << tau << " ) ");
+      NS_LOG_DEBUG (m_maxLimit << " - " << " ( " << m_maxLimit << " - " << (double)m_curMaxLimit << " ) " << " * " << " exp (- " << timeDiff << " / " << m_exponentialDecayTau.ToDouble (Time::S) << " ) ");
       
-      m_curMaxLimit = m_maxLimit - (m_maxLimit - m_curMaxLimit) * exp (-timeDiff / tau);
+      m_curMaxLimit = m_maxLimit - (m_maxLimit - m_curMaxLimit) * exp (-timeDiff / m_exponentialDecayTau.ToDouble (Time::S));
     }
 
   m_lastDecay = Simulator::Now ();
@@ -79,39 +108,54 @@ Limits::DecayCurrentLimit ()
 void
 Limits::IncreaseLimit ()
 {
-  if (m_maxLimit == 0) return;
+  if (!IsEnabled ()) return;
   
   // Additive increase
   m_curMaxLimit = std::min (1.0 * m_maxLimit,
-                            (double)m_curMaxLimit + 1.0 / (double)m_curMaxLimit);
+                            (double)m_curMaxLimit + m_additiveIncrease / (double)m_curMaxLimit);
 }
 
 void
 Limits::DecreaseLimit ()
 {
-  if (m_maxLimit == 0) return;
+  if (!IsEnabled ()) return;
+
+//   m_curMaxLimit = std::max (0.0,
+//                             (double)m_curMaxLimit - m_multiplicativeDecrease / (double)m_curMaxLimit);
+// }
   
-  const double maxDecreaseFrequency = 10.0;
-
-  if (!m_lastDecrease.IsZero () && Simulator::Now () - m_lastDecrease < Seconds (1 / maxDecreaseFrequency))
-    return;
-
-  // Multiplicative decrease... almost
-  m_curMaxLimit = 0.5 * m_curMaxLimit;
+  if (m_lastDecrease.IsZero () ||
+      (!m_lastDecrease.IsZero () && Simulator::Now () - m_lastDecrease > m_nonDecreasePeriod)) // allow
+    {
+      // Multiplicative decrease... almost
+      m_curMaxLimit = m_multiplicativeDecrease * m_curMaxLimit;
     
-  m_lastDecrease = Simulator::Now ();
+      m_lastDecrease = Simulator::Now ();
+    }
 }
 
 
 bool
 Limits::IsBelowLimit ()
 {
-  if (m_maxLimit == 0) return true;
+  if (!IsEnabled ()) return true;
 
   if (m_curMaxLimit - m_outstanding > 1.0)
     {
-      m_outstanding += 1;
-      return true;
+      // static UniformVariable acceptanceProbability (0, m_curMaxLimit);
+      // double value = acceptanceProbability.GetValue ();
+      double value = m_outstanding+ 1;
+      
+      if (m_outstanding < value)
+        {
+          m_outstanding += 1.0;
+          return true;
+        }
+      else
+        return false;
+      
+      // m_outstanding += 1;
+      // return true;
     }
   else
     return false;
@@ -120,7 +164,7 @@ Limits::IsBelowLimit ()
 void
 Limits::RemoveOutstanding ()
 {
-  if (m_maxLimit == 0) return; //limits are disabled
+  if (!IsEnabled ()) return; //limits are disabled
   
   NS_LOG_DEBUG (m_outstanding);
   NS_ASSERT_MSG (m_outstanding >= 1, "Should not be possible, unless we decreasing this number twice somewhere");

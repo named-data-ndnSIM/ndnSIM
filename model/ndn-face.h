@@ -92,7 +92,7 @@ public:
   /**
    * @brief Get reference to Limits object
    */
-  inline Ptr<Limits>
+  inline Limits&
   GetLimits ();    
   
   /**
@@ -255,10 +255,10 @@ Face::operator!= (const Face &face) const
   return !(*this == face);
 }
 
-inline Ptr<Limits>
+inline Limits&
 Face::GetLimits ()
 {
-  return m_limits;
+  return *m_limits;
 }
 
 

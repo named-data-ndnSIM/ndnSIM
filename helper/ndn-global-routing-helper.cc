@@ -278,7 +278,11 @@ GlobalRoutingHelper::CalculateRoutes ()
 
 		BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
 		  {
-		    fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
+		    Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
+                    if (i->second.get<0> ()->GetLimits ().IsEnabled ())
+                      {
+                        entry->GetLimits ().SetMaxLimit (i->second.get<0> ()->GetLimits ().GetMaxLimit ());
+                      }
 		  }
 		}
 	    }

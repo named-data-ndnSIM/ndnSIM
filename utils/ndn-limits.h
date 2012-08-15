@@ -51,25 +51,40 @@ public:
   { }
  
   /**
-   * Set per-prefix limit
+   * @brief Set limit for the number of outstanding interests
    */
   void
   SetMaxLimit (uint32_t max);
 
   /**
-   * Decay current limit (exponential decaying)
+   * @brief Get limit for the number of outstanding interests
+   */
+  uint32_t
+  GetMaxLimit () const;
+
+  /**
+   * @brief Check whether limits are enabled or not
+   */
+  inline bool
+  IsEnabled () const;
+
+  /**
+   * @brief Decay current limit (exponential decaying)
+   *
+   * If needed, this method should be called externally periodically (doesn't matter how often, decaying amount will remain the same).
+   * Decaying is most likely needed for per-prefix limits, but definitely not needed for per-face limits.
    */
   void
   DecayCurrentLimit ();
 
   /**
-   * Increase current limit (additive increase)
+   * @brief Increase current limit (additive increase)
    */
   void
   IncreaseLimit ();
 
   /**
-   * Decrease current limit (multiplicative decrease)
+   * @brief Decrease current limit (multiplicative decrease)
    */
   void
   DecreaseLimit ();
@@ -79,13 +94,13 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   
   /**
-   * Check if new interest can be send out, if yes, number of outstanding will be increased
+   * @brief Check if new interest can be send out, if yes, number of outstanding will be increased
    */
   bool
   IsBelowLimit ();
 
   /**
-   * Remove outstanding interests
+   * @brief Remove outstanding interests
    */
   void
   RemoveOutstanding ();
@@ -96,9 +111,21 @@ public:
   TracedValue< double >   m_curMaxLimit;
   TracedValue< uint32_t > m_outstanding;
 
+  Time     m_exponentialDecayTau;
+  Time     m_nonDecreasePeriod;
+  double   m_additiveIncrease;
+  double   m_multiplicativeDecrease;
+
   Time     m_lastDecrease;
   Time     m_lastDecay;
 };
+
+inline bool
+Limits::IsEnabled () const
+{
+  return m_maxLimit != 0;
+}
+  
 
 } // namespace ndn
 } // namespace ns3

@@ -244,12 +244,24 @@ ForwardingStrategy::DidReceiveDuplicateInterest (const Ptr<Face> &incomingFace,
 
 void
 ForwardingStrategy::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                                                     Ptr<InterestHeader> header,
-                                                     const Ptr<const Packet> &packet,
-                                                     Ptr<pit::Entry> pitEntry)
+                                                 Ptr<InterestHeader> header,
+                                                 const Ptr<const Packet> &packet,
+                                                 Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << boost::cref (*incomingFace));
-  m_dropInterests (header, incomingFace);
+  if (pitEntry->GetOutgoing ().size () == 0)
+    {
+      m_dropInterests (header, incomingFace);
+
+      // All incoming interests cannot be satisfied. Remove them
+      pitEntry->ClearIncoming ();
+
+      // Remove also outgoing
+      pitEntry->ClearOutgoing ();
+  
+      // Set pruning timout on PIT entry (instead of deleting the record)
+      m_pit->MarkErased (pitEntry);
+    }
 }
 
 void
