@@ -96,6 +96,12 @@ protected:
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
+                               Ptr<InterestHeader> header,
+                               const Ptr<const Packet> &packet,
+                               Ptr<pit::Entry> pitEntry);
+  
   // from Object
   void
   DoDispose ();

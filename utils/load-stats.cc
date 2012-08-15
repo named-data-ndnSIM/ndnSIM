@@ -20,6 +20,7 @@
 
 #include "load-stats.h"
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 
 // const double EXP_1  = (1-2.0/6.0);//exp (-1.0/5.0);  /* 1/exp(1sec/5sec) */
 // const double EXP_2  = (1-2.0/31.0);//exp (-1.0/30.0); /* 1/exp(1sec/30sec) */
@@ -40,7 +41,13 @@ const double LoadStats::PRECISION = 0.1;
 LoadStats::LoadStats ()
   : counter_ (0)
   , avg1_ (0)
+  , avg1Counter_ (0)
+  , avg1CounterOld_ (0)
+
   , avg2_ (0)
+  , avg2Counter_ (0)
+  , avg2CounterOld_ (0)
+
   , avg3_ (0)
 {
 }
@@ -51,9 +58,26 @@ LoadStats::Step ()
   // NS_LOG_FUNCTION (this);
 
   // do magic
-  avg1_ = EXP_1 * avg1_ + (1 - EXP_1) * counter_;
-  avg2_ = EXP_2 * avg2_ + (1 - EXP_2) * counter_;
-  avg3_ = EXP_3 * avg3_ + (1 - EXP_3) * counter_;
+  // avg1_ = EXP_1 * avg1_ + (1 - EXP_1) * counter_;
+  
+  // highly experimental
+  // avg1Counter_ += counter_;
+  // avg1_ = 1.0 * (avg1Counter_ - avg1CounterOld_) / 1.0/*Seconds(1.0).ToDouble (Time::S)*/;
+  // avg1CounterOld_ = avg1Counter_;
+  // avg1LastUpdate_ = Simulator::Now ();
+  avg1_ = counter_;
+  
+  // avg2_ = EXP_2 * avg2_ + (1 - EXP_2) * counter_;
+
+  avg2Counter_ += counter_;
+  if (Simulator::Now () - avg2LastUpdate_ >= Seconds (5.0))
+    {
+      avg2_ = 1.0 * (avg2Counter_ - avg2CounterOld_) / (Simulator::Now () - avg2LastUpdate_).ToDouble (Time::S);
+      avg2CounterOld_ = avg2Counter_;
+      avg2LastUpdate_ = Simulator::Now ();
+    }
+
+  // avg3_ = EXP_3 * avg3_ + (1 - EXP_3) * counter_;
 
   counter_ = 0;
 }

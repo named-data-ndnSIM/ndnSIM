@@ -177,6 +177,22 @@ FwStats::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 }
 
 void
+FwStats::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
+                                      Ptr<InterestHeader> header,
+                                      const Ptr<const Packet> &packet,
+                                      Ptr<pit::Entry> pitEntry)
+{
+  super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
+  
+  if (pitEntry->GetOutgoing ().size () == 0)
+    {
+      m_stats.Timeout (pitEntry->GetPrefix ().cut (1));
+  
+      ScheduleRefreshingIfNecessary ();
+    }
+}
+
+void
 FwStats::ScheduleRefreshingIfNecessary ()
 {
   if (m_statsRefreshEvent.IsRunning ()) return;

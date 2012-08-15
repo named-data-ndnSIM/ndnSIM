@@ -264,6 +264,22 @@ public:
     return this;
   }
 
+  /**
+   * @brief Perform prune of the node, but without attempting to parent of the node
+   */
+  inline void
+  prune_node ()
+  {
+    if (payload_ == PayloadTraits::empty_payload &&
+        children_.size () == 0)
+      {
+        if (parent_ == 0) return;
+
+        trie *parent = parent_;
+        parent->children_.erase_and_dispose (*this, trie_delete_disposer ()); // delete this; basically, committing a suicide
+      }
+  }
+
   // inline boost::tuple<const iterator, bool, const iterator>
   // find (const FullKey &key) const
   // {

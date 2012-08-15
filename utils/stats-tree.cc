@@ -130,7 +130,7 @@ StatsTree::WalkLeftRightRoot (tree_type *node)
       tree_type::point_iterator prune_iterator = item;
       item++;
 
-      prune_iterator->prune ();
+      prune_iterator->prune_node ();
     }
   
   return node->payload ();
