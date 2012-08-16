@@ -30,6 +30,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
+#include "ns3/double.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -51,6 +52,16 @@ PerFibLimits::GetTypeId (void)
     .SetGroupName ("Ndn")
     .SetParent <FwStats> ()
     .AddConstructor <PerFibLimits> ()
+
+    .AddAttribute ("Threshold", "Minimum number of incoming interests to enable dropping decision",
+                   DoubleValue (0.25),
+                   MakeDoubleAccessor (&PerFibLimits::m_threshold),
+                   MakeDoubleChecker<double> ())
+    
+    .AddAttribute ("GraceAcceptProbability", "Probability to accept Interest even though stats telling that satisfaction ratio is 0",
+                   DoubleValue (0.01),
+                   MakeDoubleAccessor (&PerFibLimits::m_graceAcceptProbability),
+                   MakeDoubleChecker<double> ())
     ;
   return tid;
 }
@@ -87,13 +98,13 @@ PerFibLimits::WillSendOutInterest (const Ptr<Face> &outgoingFace,
   // const ndnSIM::LoadStatsFace &stats = GetStatsTree ()[header->GetName ()].incoming ().find (inFace)->second;
   const ndnSIM::LoadStatsFace &stats = GetStatsTree ()["/"].incoming ().find (inFace)->second;
 
-  if (stats.count ().GetStats ().get<0> () >= 0.5 * pitEntry->GetFibEntry ()->GetLimits ().GetMaxLimit ())
+  if (stats.count ().GetStats ().get<0> () >= m_threshold * pitEntry->GetFibEntry ()->GetLimits ().GetMaxLimit ())
   {
     double ratio = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
     // NS_ASSERT_MSG (ratio > 0, "If count is a reasonable value, ratio cannot be negative");
     UniformVariable randAccept (0, 1);
     double dice = randAccept.GetValue ();
-    if (ratio < 0 || dice < ratio + 0.1)
+    if (ratio < 0 || dice < ratio + m_graceAcceptProbability)
       {
         // ok, accepting the interests
       }

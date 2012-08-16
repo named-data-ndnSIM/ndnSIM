@@ -70,6 +70,9 @@ private:
 private:
   EventId m_decayLimitsEvent;
 
+  double m_threshold;
+  double m_graceAcceptProbability;
+
   typedef FwStats super;
 };
 
