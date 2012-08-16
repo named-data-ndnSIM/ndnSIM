@@ -62,18 +62,10 @@ public:
   IsZero () const;
   
 private:
-  uint64_t counter_;
+  uint32_t counter_;
 
   double avg1_;
-  uint64_t avg1Counter_;
-  uint64_t avg1CounterOld_;
-  Time   avg1LastUpdate_;
-  
   double avg2_;
-  uint64_t avg2Counter_;
-  uint64_t avg2CounterOld_;
-  Time   avg2LastUpdate_;
-
   double avg3_;
 
   friend std::ostream &
