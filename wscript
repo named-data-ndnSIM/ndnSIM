@@ -58,7 +58,7 @@ def build(bld):
    
     module.source = bld.path.ant_glob(['model/**/*.cc',
                                        'apps/*.cc',
-                                       'utils/*.cc',
+                                       'utils/**/*.cc',
                                        'helper/**/*.cc',
                                        ])
 

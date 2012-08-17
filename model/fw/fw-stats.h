@@ -25,7 +25,7 @@
 #include "ns3/event-id.h"
 
 #include "best-route.h"
-#include "../../utils/stats-tree.h"
+#include "../../utils/stats/stats-tree.h"
 
 namespace ns3 {
 namespace ndn {

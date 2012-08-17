@@ -23,9 +23,9 @@
 #include "ns3/uinteger.h"
 #include "ns3/string.h"
 
-#include "../../utils/random-policy.h"
-#include "../../utils/lru-policy.h"
-#include "../../utils/fifo-policy.h"
+#include "../../utils/trie/random-policy.h"
+#include "../../utils/trie/lru-policy.h"
+#include "../../utils/trie/fifo-policy.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.cs.ContentStoreImpl");
 

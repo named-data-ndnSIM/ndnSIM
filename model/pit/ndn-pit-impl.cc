@@ -24,10 +24,10 @@
 #include "ns3/ndn-content-object-header.h"
 #include "ns3/ndn-forwarding-strategy.h"
 
-#include "../../utils/empty-policy.h"
-#include "../../utils/persistent-policy.h"
-#include "../../utils/random-policy.h"
-#include "../../utils/lru-policy.h"
+#include "../../utils/trie/empty-policy.h"
+#include "../../utils/trie/persistent-policy.h"
+#include "../../utils/trie/random-policy.h"
+#include "../../utils/trie/lru-policy.h"
 
 #include "ns3/log.h"
 #include "ns3/string.h"

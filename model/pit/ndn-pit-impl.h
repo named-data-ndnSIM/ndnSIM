@@ -23,7 +23,7 @@
 
 #include "ndn-pit.h"
 
-#include "../../utils/trie-with-policy.h"
+#include "../../utils/trie/trie-with-policy.h"
 
 #include "ndn-pit-entry-impl.h"
 

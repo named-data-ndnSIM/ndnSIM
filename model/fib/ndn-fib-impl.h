@@ -24,8 +24,8 @@
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-name-components.h"
 
-#include "../../utils/trie-with-policy.h"
-#include "../../utils/counting-policy.h"
+#include "../../utils/trie/trie-with-policy.h"
+#include "../../utils/trie/counting-policy.h"
 
 namespace ns3 {
 namespace ndn {

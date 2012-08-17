@@ -21,7 +21,7 @@
 #ifndef STATS_TREE_H
 #define STATS_TREE_H
 
-#include "trie.h"
+#include "../trie/trie.h"
 #include "load-stats-node.h"
 #include "ns3/ndn-name-components.h"
 #include "ns3/ptr.h"

@@ -27,7 +27,7 @@
 #include "ns3/ndn-content-object-header.h"
 #include <boost/foreach.hpp>
 
-#include "../../utils/trie-with-policy.h"
+#include "../../utils/trie/trie-with-policy.h"
 
 namespace ns3 {
 namespace ndn {

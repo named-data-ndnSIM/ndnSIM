@@ -22,7 +22,7 @@
 #include "ns3/core-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
-#include "../utils/stats-tree.h"
+#include "../utils/stats/stats-tree.h"
 #include "../apps/ndn-producer.h"
 
 #include <boost/lexical_cast.hpp>

@@ -20,11 +20,11 @@
 
 #include "ns3/core-module.h"
 #include "ns3/ndnSIM-module.h"
-#include "../utils/trie-with-policy.h"
-#include "../utils/lru-policy.h"
-#include "../utils/random-policy.h"
-#include "../utils/fifo-policy.h"
-#include "../utils/multi-policy.h"
+#include "../utils/trie/trie-with-policy.h"
+#include "../utils/trie/lru-policy.h"
+#include "../utils/trie/random-policy.h"
+#include "../utils/trie/fifo-policy.h"
+#include "../utils/trie/multi-policy.h"
 
 #include <boost/lexical_cast.hpp>
 
