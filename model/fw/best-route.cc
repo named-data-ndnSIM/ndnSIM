@@ -46,7 +46,7 @@ BestRoute::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::fw::BestRoute")
     .SetGroupName ("Ndn")
-    .SetParent <GreenYellowRed> ()
+    .SetParent <super> ()
     .AddConstructor <BestRoute> ()
     ;
   return tid;
@@ -57,16 +57,16 @@ BestRoute::BestRoute ()
 }
     
 bool
-BestRoute::DoPropagateInterest (const Ptr<Face> &incomingFace,
-                                Ptr<InterestHeader> header,
-                                const Ptr<const Packet> &packet,
+BestRoute::DoPropagateInterest (Ptr<Face> incomingFace,
+                                Ptr<const InterestHeader> header,
+                                Ptr<const Packet> origPacket,
                                 Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
 
   // Try to work out with just green faces
-  bool greenOk = super::DoPropagateInterest (incomingFace, header, packet, pitEntry);
+  bool greenOk = super::DoPropagateInterest (incomingFace, header, origPacket, pitEntry);
   if (greenOk)
     return true;
 
@@ -88,10 +88,10 @@ BestRoute::DoPropagateInterest (const Ptr<Face> &incomingFace,
         }
 
       //transmission
-      Ptr<Packet> packetToSend = packet->Copy ();
+      Ptr<Packet> packetToSend = origPacket->Copy ();
       metricFace.m_face->Send (packetToSend);
 
-      DidSendOutInterest (metricFace.m_face, header, packet, pitEntry);
+      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
 
       propagatedCount++;
       break; // do only once

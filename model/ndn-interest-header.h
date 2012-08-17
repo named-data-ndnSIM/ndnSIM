@@ -137,6 +137,11 @@ public:
   InterestHeader ();
 
   /**
+   * @brief Copy constructor
+   */
+  InterestHeader (const InterestHeader &interest);
+
+  /**
    * \brief Set interest name
    *
    * Sets name of the interest. For example, SetName( ndnNameComponents("prefix")("postfix") );

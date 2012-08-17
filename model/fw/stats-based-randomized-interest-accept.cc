@@ -16,10 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "per-fib-limits.h"
+#include "stats-based-randomized-interest-accept.h"
 
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"
@@ -37,50 +36,49 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.PerFibLimits");
+NS_LOG_COMPONENT_DEFINE ("ndn.fw.StatsBasedRandomizedInterestAccept");
 
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
-NS_OBJECT_ENSURE_REGISTERED (PerFibLimits);
+NS_OBJECT_ENSURE_REGISTERED (StatsBasedRandomizedInterestAccept);
   
 TypeId
-PerFibLimits::GetTypeId (void)
+StatsBasedRandomizedInterestAccept::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::fw::PerFibLimits")
+  static TypeId tid = TypeId ("ns3::ndn::fw::StatsBasedRandomizedInterestAccept")
     .SetGroupName ("Ndn")
     .SetParent <super> ()
-    .AddConstructor <PerFibLimits> ()
+    .AddConstructor <StatsBasedRandomizedInterestAccept> ()
 
     .AddAttribute ("Threshold", "Minimum number of incoming interests to enable dropping decision",
                    DoubleValue (0.25),
-                   MakeDoubleAccessor (&PerFibLimits::m_threshold),
+                   MakeDoubleAccessor (&StatsBasedRandomizedInterestAccept::m_threshold),
                    MakeDoubleChecker<double> ())
     
     .AddAttribute ("GraceAcceptProbability", "Probability to accept Interest even though stats telling that satisfaction ratio is 0",
                    DoubleValue (0.01),
-                   MakeDoubleAccessor (&PerFibLimits::m_graceAcceptProbability),
+                   MakeDoubleAccessor (&StatsBasedRandomizedInterestAccept::m_graceAcceptProbability),
                    MakeDoubleChecker<double> ())
     ;
   return tid;
 }
     
-PerFibLimits::PerFibLimits ()
+StatsBasedRandomizedInterestAccept::StatsBasedRandomizedInterestAccept ()
 {
 }
 
 void
-PerFibLimits::DoDispose ()
+StatsBasedRandomizedInterestAccept::DoDispose ()
 {
   super::DoDispose ();
-  m_decayLimitsEvent.Cancel ();
 }
 
 bool
-PerFibLimits::WillSendOutInterest (Ptr<Face> outFace,
-                                   Ptr<const InterestHeader> header,
-                                   Ptr<pit::Entry> pitEntry)
+StatsBasedRandomizedInterestAccept::WillSendOutInterest (Ptr<Face> outFace,
+                                                         Ptr<const InterestHeader> header,
+                                                         Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   // override all (if any) parent processing
@@ -133,7 +131,7 @@ PerFibLimits::WillSendOutInterest (Ptr<Face> outFace,
 }
 
 void
-PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+StatsBasedRandomizedInterestAccept::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -142,23 +140,15 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
        face ++)
     {
       face->m_face->GetLimits ().RemoveOutstanding ();
-      // face->m_face->GetLimits ()->DecreaseLimit (); !!! do not decrease per-face limit. it doesn't make sense !!!
     }
   
   pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-  // pitEntry->GetFibEntry ()->GetLimits ().DecreaseLimit (); // multiplicative decrease
-
-  if (!m_decayLimitsEvent.IsRunning ())
-    {
-      UniformVariable rand (0,5);
-      m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0) + Seconds (0.001 * rand.GetValue ()), &PerFibLimits::DecayLimits, this);
-    }
 }
 
 
 void
-PerFibLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                          Ptr<pit::Entry> pitEntry)
+StatsBasedRandomizedInterestAccept::WillSatisfyPendingInterest (Ptr<Face> inFace,
+                                                                Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -169,35 +159,9 @@ PerFibLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
        face ++)
     {
       face->m_face->GetLimits ().RemoveOutstanding ();
-      // face->m_face->GetLimits ()->IncreaseLimit (); !!! do not increase (as do not decrease) per-face limit. again, it doesn't make sense
     }
   
   pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-  // pitEntry->GetFibEntry ()->GetLimits ().IncreaseLimit (); // additive increase
-}
-
-
-// void
-// PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
-//                                    uint32_t nackCode,
-//                                    Ptr<pit::Entry> pitEntry)
-// {
-//   // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
-
-//   // ??
-// }
-
-void
-PerFibLimits::DecayLimits ()
-{
-  for (Ptr<fib::Entry> entry = m_fib->Begin ();
-       entry != m_fib->End ();
-       entry = m_fib->Next (entry))
-    {
-      entry->GetLimits ().DecayCurrentLimit ();
-    }
-
-  m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0), &PerFibLimits::DecayLimits, this);
 }
 
 

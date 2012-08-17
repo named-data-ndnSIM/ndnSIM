@@ -73,109 +73,112 @@ Nacks::GetTypeId (void)
 }
 
 void
-Nacks::OnInterest (const Ptr<Face> &incomingFace,
-                   Ptr<InterestHeader> &header,
-                   const Ptr<const Packet> &packet)
+Nacks::OnInterest (Ptr<Face> inFace,
+                   Ptr<const InterestHeader> header,
+                   Ptr<const Packet> origPacket)
 {
   if (header->GetNack () > 0)
-    OnNack (incomingFace, header, packet/*original packet*/);
+    OnNack (inFace, header, origPacket/*original packet*/);
   else
-    super::OnInterest (incomingFace, header, packet/*original packet*/);  
+    super::OnInterest (inFace, header, origPacket/*original packet*/);  
 }
 
 void
-Nacks::OnNack (const Ptr<Face> &incomingFace,
-               Ptr<InterestHeader> &header,
-               const Ptr<const Packet> &packet)
+Nacks::OnNack (Ptr<Face> inFace,
+               Ptr<const InterestHeader> header,
+               Ptr<const Packet> origPacket)
 {
   NS_ASSERT (m_nacksEnabled);
 
-  // NS_LOG_FUNCTION (incomingFace << header << packet);
-  m_inNacks (header, incomingFace);
+  // NS_LOG_FUNCTION (inFace << header << origPacket);
+  m_inNacks (header, inFace);
 
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
     {
       // somebody is doing something bad
-      m_dropNacks (header, incomingFace);
+      m_dropNacks (header, inFace);
       return;
     }
   
   // This was done in error. Never, never do anything, except normal leakage. This way we ensure that we will not have losses,
   // at least when there is only one client
   //
-  // incomingFace->LeakBucketByOnePacket ();
+  // inFace->LeakBucketByOnePacket ();
 
-  pitEntry->SetWaitingInVain (incomingFace);
+  pitEntry->SetWaitingInVain (inFace);
 
-  DidReceiveValidNack (incomingFace, header->GetNack (), pitEntry);
+  DidReceiveValidNack (inFace, header->GetNack (), pitEntry);
   
   if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
     {
       NS_LOG_DEBUG ("Not all outgoing are in vain");
       // suppress
       // Don't do anything, we are still expecting data from some other face
-      m_dropNacks (header, incomingFace);
+      m_dropNacks (header, inFace);
       return;
     }
   
   Ptr<Packet> nonNackInterest = Create<Packet> ();
-  header->SetNack (InterestHeader::NORMAL_INTEREST);
-  nonNackInterest->AddHeader (*header);
+  Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
+  nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
+  nonNackInterest->AddHeader (*nonNackHeader);
   
-  bool propagated = DoPropagateInterest (incomingFace, header, nonNackInterest, pitEntry);
+  bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
   if (!propagated)
     {
-      DidExhaustForwardingOptions (incomingFace, header, nonNackInterest, pitEntry);
+      DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
     }  
 }
 
 void
-Nacks::DidReceiveDuplicateInterest (const Ptr<Face> &incomingFace,
-                                    Ptr<InterestHeader> &header,
-                                    const Ptr<const Packet> &packet,
+Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
+                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
-  super::DidReceiveDuplicateInterest (incomingFace, header, packet, pitEntry);
+  super::DidReceiveDuplicateInterest (inFace, header, origPacket, pitEntry);
 
   if (m_nacksEnabled)
     {
       NS_LOG_DEBUG ("Sending NACK_LOOP");
-      header->SetNack (InterestHeader::NACK_LOOP);
+      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*header);
+      nackHeader->SetNack (InterestHeader::NACK_LOOP);
       Ptr<Packet> nack = Create<Packet> ();
-      nack->AddHeader (*header);
+      nack->AddHeader (*nackHeader);
 
-      incomingFace->Send (nack);
-      m_outNacks (header, incomingFace);
+      inFace->Send (nack);
+      m_outNacks (nackHeader, inFace);
     }
 }
 
 void
-Nacks::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                                    Ptr<InterestHeader> header,
-                                    const Ptr<const Packet> &packet,
+Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
+                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
-      header->SetNack (InterestHeader::NACK_GIVEUP_PIT);
-      packet->AddHeader (*header);
+      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*header);
+      nackHeader->SetNack (InterestHeader::NACK_GIVEUP_PIT);
+      packet->AddHeader (*nackHeader);
 
       BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
         {
-          NS_LOG_DEBUG ("Send NACK for " << boost::cref (header->GetName ()) << " to " << boost::cref (*incoming.m_face));
+          NS_LOG_DEBUG ("Send NACK for " << boost::cref (nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
           incoming.m_face->Send (packet->Copy ());
 
-          m_outNacks (header, incoming.m_face);
+          m_outNacks (nackHeader, incoming.m_face);
         }
     }
   
-  super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
+  super::DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
 }
 
 void
-Nacks::DidReceiveValidNack (const Ptr<Face> &incomingFace,
+Nacks::DidReceiveValidNack (Ptr<Face> inFace,
                             uint32_t nackCode,
                             Ptr<pit::Entry> pitEntry)
 {
@@ -183,10 +186,10 @@ Nacks::DidReceiveValidNack (const Ptr<Face> &incomingFace,
   // So, if we had an incoming entry to this neighbor, then we can remove it now
   if (nackCode == InterestHeader::NACK_GIVEUP_PIT)
     {
-      pitEntry->RemoveIncoming (incomingFace);
+      pitEntry->RemoveIncoming (inFace);
     }
 
-  pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, fib::FaceMetric::NDN_FIB_YELLOW);
+  pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
 }
 
 } // namespace fw

@@ -28,48 +28,46 @@ namespace fw {
 
 /**
  * \ingroup ndn
- * \brief Abstract base class for Ndn forwarding strategies
+ * \brief Implementation of experimental NACK messages (enables with EnableNACKs option)
  */
 class Nacks :
     public ForwardingStrategy
 {
+private:
+  typedef ForwardingStrategy super;
+
 public:
   static TypeId
   GetTypeId ();
 
-  /**
-   * \brief Actual processing of incoming Ndn interests. Note, interests do not have payload
-   * 
-   * Processing Interest packets
-   * @param face    incoming face
-   * @param header  deserialized Interest header
-   * @param packet  original packet
-   */
+  // from super
   virtual void
-  OnInterest (const Ptr<Face> &face,
-              Ptr<InterestHeader> &header,
-              const Ptr<const Packet> &p);
+  OnInterest (Ptr<Face> face,
+              Ptr<const InterestHeader> header,
+              Ptr<const Packet> origPacket);
 
 protected:
+  // from super
   virtual void
-  DidReceiveDuplicateInterest (const Ptr<Face> &face,
-                               Ptr<InterestHeader> &header,
-                               const Ptr<const Packet> &packet,
+  DidReceiveDuplicateInterest (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> packet,
                                Ptr<pit::Entry> pitEntry);
-  
+
+  // from super
   virtual void
-  DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                               Ptr<InterestHeader> header,
-                               const Ptr<const Packet> &packet,
+  DidExhaustForwardingOptions (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> packet,
                                Ptr<pit::Entry> pitEntry);
 
   virtual void
-  OnNack (const Ptr<Face> &face,
-          Ptr<InterestHeader> &header,
-          const Ptr<const Packet> &p);
+  OnNack (Ptr<Face> inFace,
+          Ptr<const InterestHeader> header,
+          Ptr<const Packet> origPacket);
 
   virtual void
-  DidReceiveValidNack (const Ptr<Face> &incomingFace,
+  DidReceiveValidNack (Ptr<Face> inFace,
                        uint32_t nackCode,
                        Ptr<pit::Entry> pitEntry);
   
@@ -84,9 +82,6 @@ protected:
 
   TracedCallback<Ptr<const InterestHeader>,
                  Ptr<const Face> > m_dropNacks; ///< @brief trace of dropped NACKs
-
-private:
-  typedef ForwardingStrategy super;
 };
 
 } // namespace fw

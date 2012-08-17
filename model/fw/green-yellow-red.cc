@@ -63,9 +63,9 @@ GreenYellowRed::GetTypeId (void)
 }
 
 bool
-GreenYellowRed::DoPropagateInterest (const Ptr<Face> &incomingFace,
-                                     Ptr<InterestHeader> header,
-                                     const Ptr<const Packet> &packet,
+GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
+                                     Ptr<const InterestHeader> header,
+                                     Ptr<const Packet> origPacket,
                                      Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
@@ -88,10 +88,10 @@ GreenYellowRed::DoPropagateInterest (const Ptr<Face> &incomingFace,
         }
 
       //transmission
-      Ptr<Packet> packetToSend = packet->Copy ();
+      Ptr<Packet> packetToSend = origPacket->Copy ();
       metricFace.m_face->Send (packetToSend);
 
-      DidSendOutInterest (metricFace.m_face, header, packet, pitEntry);
+      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
       
       propagatedCount++;
       break; // propagate only one interest
@@ -101,29 +101,29 @@ GreenYellowRed::DoPropagateInterest (const Ptr<Face> &incomingFace,
 }
 
 void
-GreenYellowRed::WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
+GreenYellowRed::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                             Ptr<pit::Entry> pitEntry)
 {
-  if (incomingFace != 0)
+  if (inFace != 0)
     {
       // Update metric status for the incoming interface in the corresponding FIB entry
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, fib::FaceMetric::NDN_FIB_GREEN);
+      pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_GREEN);
     }
 
-  super::WillSatisfyPendingInterest (incomingFace, pitEntry);
+  super::WillSatisfyPendingInterest (inFace, pitEntry);
 }
 
 void
-GreenYellowRed::DidReceiveValidNack (const Ptr<Face> &incomingFace,
+GreenYellowRed::DidReceiveValidNack (Ptr<Face> inFace,
                                      uint32_t nackCode,
                                      Ptr<pit::Entry> pitEntry)
 {
-  super::DidReceiveValidNack (incomingFace, nackCode, pitEntry);
+  super::DidReceiveValidNack (inFace, nackCode, pitEntry);
 
-  if (incomingFace != 0 &&
+  if (inFace != 0 &&
       nackCode != InterestHeader::NACK_LOOP)
     {
-      pitEntry->GetFibEntry ()->UpdateStatus (incomingFace, fib::FaceMetric::NDN_FIB_YELLOW);
+      pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
     }
 }
 

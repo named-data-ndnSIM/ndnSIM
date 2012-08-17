@@ -42,14 +42,20 @@ Entry::Entry (Pit &container,
               Ptr<const InterestHeader> header,
               Ptr<fib::Entry> fibEntry)
   : m_container (container)
-  , m_prefix (header->GetNamePtr ())
+  , m_interest (header)
   , m_fibEntry (fibEntry)
   , m_expireTime (Simulator::Now () + (!header->GetInterestLifetime ().IsZero ()?
                                        header->GetInterestLifetime ():
                                        Seconds (1.0)))
   , m_maxRetxCount (0)
 {
+  NS_LOG_FUNCTION (GetPrefix () << m_expireTime);
   // note that if interest lifetime is not set, the behavior is undefined
+}
+
+Entry::~Entry ()
+{
+  NS_LOG_FUNCTION (GetPrefix ());
 }
 
 void
@@ -63,6 +69,31 @@ Entry::UpdateLifetime (const Time &offsetTime)
   
   NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
 }
+
+const NameComponents &
+Entry::GetPrefix () const
+{
+  return m_interest->GetName ();
+}
+
+const Time &
+Entry::GetExpireTime () const
+{
+  return m_expireTime;
+}
+
+bool
+Entry::IsNonceSeen (uint32_t nonce) const
+{
+  return m_seenNonces.find (nonce) != m_seenNonces.end ();
+}
+
+void
+Entry::AddSeenNonce (uint32_t nonce)
+{
+  m_seenNonces.insert (nonce);
+}
+
 
 Entry::in_iterator
 Entry::AddIncoming (Ptr<Face> face)
@@ -81,6 +112,11 @@ Entry::RemoveIncoming (Ptr<Face> face)
   m_incoming.erase (face);
 }
 
+void
+Entry::ClearIncoming ()
+{
+  m_incoming.clear ();
+}
 
 Entry::out_iterator
 Entry::AddOutgoing (Ptr<Face> face)
@@ -96,6 +132,12 @@ Entry::AddOutgoing (Ptr<Face> face)
     }
 
   return ret.first;
+}
+
+void
+Entry::ClearOutgoing ()
+{
+  m_outgoing.clear ();
 }
 
 void
@@ -175,9 +217,34 @@ Entry::IncreaseAllowedRetxCount ()
     }
 }
 
+Ptr<fib::Entry>
+Entry::GetFibEntry ()
+{
+  return m_fibEntry;
+};
+
+const Entry::in_container &
+Entry::GetIncoming () const
+{
+  return m_incoming;
+}
+
+const Entry::out_container &
+Entry::GetOutgoing () const
+{
+  return m_outgoing;
+}
+
+uint32_t
+Entry::GetMaxRetxCount () const
+{
+  return m_maxRetxCount;
+}
+
+
 std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {
-  os << "Prefix: " << *entry.m_prefix << "\n";
+  os << "Prefix: " << entry.GetPrefix () << "\n";
   os << "In: ";
   bool first = true;
   BOOST_FOREACH (const IncomingFace &face, entry.m_incoming)

@@ -59,15 +59,15 @@ SmartFlooding::SmartFlooding ()
 }
 
 bool
-SmartFlooding::DoPropagateInterest (const Ptr<Face> &incomingFace,
-                                    Ptr<InterestHeader> header,
-                                    const Ptr<const Packet> &packet,
+SmartFlooding::DoPropagateInterest (Ptr<Face> inFace,
+                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
   // Try to work out with just green faces
-  bool greenOk = super::DoPropagateInterest (incomingFace, header, packet, pitEntry);
+  bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
   if (greenOk)
     return true;
 
@@ -79,7 +79,7 @@ SmartFlooding::DoPropagateInterest (const Ptr<Face> &incomingFace,
       if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
       
-      if (metricFace.m_face == incomingFace) 
+      if (metricFace.m_face == inFace) 
         {
           NS_LOG_DEBUG ("continue (same as incoming)");
           continue; // same face as incoming, don't forward
@@ -91,10 +91,10 @@ SmartFlooding::DoPropagateInterest (const Ptr<Face> &incomingFace,
         }
 
       //transmission
-      Ptr<Packet> packetToSend = packet->Copy ();
+      Ptr<Packet> packetToSend = origPacket->Copy ();
       metricFace.m_face->Send (packetToSend);
 
-      DidSendOutInterest (metricFace.m_face, header, packet, pitEntry);
+      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
       
       propagatedCount++;
     }

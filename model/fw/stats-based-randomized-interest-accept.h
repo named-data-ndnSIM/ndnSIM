@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NDNSIM_PER_FIB_LIMITS_H
-#define NDNSIM_PER_FIB_LIMITS_H
+#ifndef NDNSIM_STATS_BASED_RANDOMIZED_INTEREST_ACCEPT_H
+#define NDNSIM_STATS_BASED_RANDOMIZED_INTEREST_ACCEPT_H
 
 #include "ns3/event-id.h"
 
@@ -32,14 +32,19 @@ namespace fw {
 
 /**
  * \ingroup ndn
- * \brief Strategy implementing per-FIB entry limits
+ * \brief Strategy implementing stats-based randomized accept for interests
+ *
+ * (prerequisite) Window-based limits should be enabled
+ *
+ * This strategy has several limitation to accept interest for further processing:
+ * - if per-fib-entry limit or per-face limit is exhausted, Interest will not be accepted
+ * - if the number of interests received from the incoming face is less than threshold, then no special handling
+ * - if this number is greater than threshold, an Interest will be accepted with probability equal to satisfaction ratio for this incoming face (overall per-face).
+ * (probability is shifted to allow small rate of acceptance (1% by default) of Interests from faces with 0 satisfaction ratio.
  */
-class PerFibLimits :
+class StatsBasedRandomizedInterestAccept :
     public FwStats
 {
-private:
-  typedef FwStats super;
-
 public:
   static TypeId
   GetTypeId ();
@@ -47,7 +52,7 @@ public:
   /**
    * @brief Default constructor
    */
-  PerFibLimits ();
+  StatsBasedRandomizedInterestAccept ();
 
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
@@ -67,14 +72,10 @@ protected:
   DoDispose ();
   
 private:
-  void
-  DecayLimits ();
-  
-private:
-  EventId m_decayLimitsEvent;
-
   double m_threshold;
   double m_graceAcceptProbability;
+
+  typedef FwStats super;
 };
 
 
@@ -82,4 +83,4 @@ private:
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDNSIM_PER_FIB_LIMITS_H
+#endif // NDNSIM_STATS_BASED_RANDOMIZED_INTEREST_ACCEPT_H

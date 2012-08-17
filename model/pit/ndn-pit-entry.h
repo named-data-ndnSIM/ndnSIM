@@ -108,7 +108,7 @@ public:
   /**
    * @brief Virtual destructor
    */
-  virtual ~Entry () {}
+  virtual ~Entry ();
   
   /**
    * @brief Update lifetime of PIT entry
@@ -125,27 +125,24 @@ public:
    * @brief Get prefix of the PIT entry
    */
   const NameComponents &
-  GetPrefix () const
-  { return *m_prefix; }
-
+  GetPrefix () const;
+  
   /**
    * @brief Get current expiration time of the record
    *
    * @returns current expiration time of the record
    */
   const Time &
-  GetExpireTime () const
-  { return m_expireTime; }
-
+  GetExpireTime () const;
+  
   /**
    * @brief Check if nonce `nonce` for the same prefix has already been seen
    *
    * @param nonce Nonce to check
    */
   bool
-  IsNonceSeen (uint32_t nonce) const
-  { return m_seenNonces.find (nonce) != m_seenNonces.end (); }
-
+  IsNonceSeen (uint32_t nonce) const;
+  
   /**
    * @brief Add `nonce` to the list of seen nonces
    *
@@ -154,9 +151,8 @@ public:
    * All nonces are stored for the lifetime of the PIT entry
    */
   virtual void
-  AddSeenNonce (uint32_t nonce)
-  { m_seenNonces.insert (nonce); }
-
+  AddSeenNonce (uint32_t nonce);
+  
   /**
    * @brief Add `face` to the list of incoming faces
    *
@@ -176,8 +172,7 @@ public:
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
    */
   virtual void
-  ClearIncoming ()
-  { m_incoming.clear (); }
+  ClearIncoming ();
 
   /**
    * @brief Add `face` to the list of outgoing faces
@@ -192,8 +187,7 @@ public:
    * @brief Clear all incoming faces either after all of them were satisfied or NACKed
    */
   virtual void
-  ClearOutgoing ()
-  { m_outgoing.clear (); }  
+  ClearOutgoing ();
   
   /**
    * @brief Remove all references to face.
@@ -231,25 +225,37 @@ public:
   virtual void
   IncreaseAllowedRetxCount ();
 
-  Ptr<fib::Entry>
-  GetFibEntry () { return m_fibEntry; };
-
-  const in_container &
-  GetIncoming () const { return m_incoming; }
-
-  const out_container &
-  GetOutgoing () const { return m_outgoing; }
-
+  /**
+   * @brief Get maximum allowed number of retransmissions via outgoing faces
+   */
   uint32_t
-  GetMaxRetxCount () const { return m_maxRetxCount; }
+  GetMaxRetxCount () const;
+
+  /**
+   * @brief Get associated FIB entry
+   */
+  Ptr<fib::Entry>
+  GetFibEntry ();
+
+  /**
+   * @brief Get associated list (const reference) of incoming faces
+   */
+  const in_container &
+  GetIncoming () const;
+
+  /**
+   * @brief Get associated list (const reference) of outgoing faces
+   */
+  const out_container &
+  GetOutgoing () const;
 
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
   
 protected:
   Pit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
-  
-  Ptr<const NameComponents> m_prefix; ///< \brief Prefix of the PIT entry
+
+  Ptr<const InterestHeader> m_interest; ///< \brief Interest of the PIT entry (if several interests are received, then nonce is from the first Interest)
   Ptr<fib::Entry> m_fibEntry;     ///< \brief FIB entry related to this prefix
   
   nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix  

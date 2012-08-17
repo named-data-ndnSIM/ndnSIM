@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
+
 #ifndef NDN_FORWARDING_STRATEGY_H
 #define NDN_FORWARDING_STRATEGY_H
 
@@ -60,12 +60,12 @@ public:
    * Processing Interest packets
    * @param face    incoming face
    * @param header  deserialized Interest header
-   * @param packet  original packet
+   * @param origPacket  original packet
    */
   virtual void
-  OnInterest (const Ptr<Face> &face,
-              Ptr<InterestHeader> &header,
-              const Ptr<const Packet> &p);
+  OnInterest (Ptr<Face> face,
+              Ptr<const InterestHeader> header,
+              Ptr<const Packet> origPacket);
 
   /**
    * \brief Actual processing of incoming Ndn content objects
@@ -74,13 +74,13 @@ public:
    * @param face    incoming face
    * @param header  deserialized ContentObject header
    * @param payload data packet payload
-   * @param packet  original packet
+   * @param origPacket  original packet
    */
   virtual void
-  OnData (const Ptr<Face> &face,
-          Ptr<ContentObjectHeader> &header,
-          Ptr<Packet> &payload,
-          const Ptr<const Packet> &packet);
+  OnData (Ptr<Face> face,
+          Ptr<const ContentObjectHeader> header,
+          Ptr<Packet> payload,
+          Ptr<const Packet> origPacket);
 
   /**
    * @brief Event fired just before PIT entry is removed by timeout
@@ -101,59 +101,64 @@ public:
 protected:
   // events
   virtual void
-  DidReceiveDuplicateInterest (const Ptr<Face> &face,
-                               Ptr<InterestHeader> &header,
-                               const Ptr<const Packet> &packet,
+  DidReceiveDuplicateInterest (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
   virtual void
-  DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                               Ptr<InterestHeader> header,
-                               const Ptr<const Packet> &packet,
+  DidExhaustForwardingOptions (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
   virtual void
-  FailedToCreatePitEntry (const Ptr<Face> &incomingFace,
-                          Ptr<InterestHeader> header,
-                          const Ptr<const Packet> &packet);
+  FailedToCreatePitEntry (Ptr<Face> inFace,
+                          Ptr<const InterestHeader> header,
+                          Ptr<const Packet> origPacket);
   
   virtual void
-  DidCreatePitEntry (const Ptr<Face> &incomingFace,
-                     Ptr<InterestHeader> header,
-                     const Ptr<const Packet> &packet,
+  DidCreatePitEntry (Ptr<Face> inFace,
+                     Ptr<const InterestHeader> header,
+                     Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
 
   virtual bool
-  DetectRetransmittedInterest (const Ptr<Face> &incomingFace,
+  DetectRetransmittedInterest (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
-  // makes sense only for data received from network
   // When Interest is satisfied from the cache, incoming face is 0
   virtual void
-  WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
+  WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
   // for data received both from network and cache
   virtual void
-  SatisfyPendingInterest (const Ptr<Face> &incomingFace, // 0 allowed (from cache)
+  SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
                           Ptr<const ContentObjectHeader> header,
                           Ptr<const Packet> payload,
-                          const Ptr<const Packet> &packet,
+                          Ptr<const Packet> origPacket,
                           Ptr<pit::Entry> pitEntry);
 
   virtual void
-  DidSendOutData (const Ptr<Face> &face,
+  DidSendOutData (Ptr<Face> inFace,
                   Ptr<const ContentObjectHeader> header,
                   Ptr<const Packet> payload,
-                  const Ptr<const Packet> &packet);
+                  Ptr<const Packet> origPacket,
+                  Ptr<pit::Entry> pitEntry);
   
   virtual void
-  DidReceiveUnsolicitedData (const Ptr<Face> &incomingFace,
+  DidReceiveUnsolicitedData (Ptr<Face> inFace,
                              Ptr<const ContentObjectHeader> header,
-                             Ptr<const Packet> payload);
+                             Ptr<const Packet> payload,
+                             Ptr<const Packet> origPacket);
   
   virtual bool
-  ShouldSuppressIncomingInterest (const Ptr<Face> &incomingFace,
+  ShouldSuppressIncomingInterest (Ptr<Face> inFace,
+                                  Ptr<const InterestHeader> header,
+                                  Ptr<const Packet> origPacket,
                                   Ptr<pit::Entry> pitEntry);
 
   /**
@@ -162,23 +167,23 @@ protected:
    * If event returns false, then there is some kind of a problem (e.g., per-face limit reached)
    */
   virtual bool
-  WillSendOutInterest (const Ptr<Face> &outgoingFace,
-                       Ptr<InterestHeader> header,
+  WillSendOutInterest (Ptr<Face> outFace,
+                       Ptr<const InterestHeader> header,
                        Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event fired just after sending out an interest
    */
   virtual void
-  DidSendOutInterest (const Ptr<Face> &outgoingFace,
-                      Ptr<InterestHeader> header,
-                      const Ptr<const Packet> &packet,
+  DidSendOutInterest (Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
   virtual void
-  PropagateInterest (const Ptr<Face> &incomingFace,
-                     Ptr<InterestHeader> header,
-                     const Ptr<const Packet> &packet,
+  PropagateInterest (Ptr<Face> inFace,
+                     Ptr<const InterestHeader> header,
+                     Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
   
   /**
@@ -186,16 +191,16 @@ protected:
    *
    * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
    * @param incomingFace  Incoming face
-   * @param header        InterestHeader
+   * @param header        Interest header
    * @param packet        Original Interest packet
    * @param sendCallback  Send callback
    *
    * @return true if interest was successfully propagated, false if all options have failed
    */
   virtual bool
-  DoPropagateInterest (const Ptr<Face> &incomingFace,
-                       Ptr<InterestHeader> header,
-                       const Ptr<const Packet> &packet,
+  DoPropagateInterest (Ptr<Face> inFace,
+                       Ptr<const InterestHeader> header,
+                       Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry) = 0;
   
 protected:

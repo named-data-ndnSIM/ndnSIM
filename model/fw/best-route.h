@@ -36,6 +36,9 @@ namespace fw {
 class BestRoute :
     public GreenYellowRed
 {
+private:
+  typedef GreenYellowRed super;
+
 public:
   static TypeId
   GetTypeId ();
@@ -45,15 +48,12 @@ public:
    */
   BestRoute ();
         
-  // inherited from  NdnForwardingStrategy
+  // from super
   virtual bool
-  DoPropagateInterest (const Ptr<Face> &incomingFace,
-                       Ptr<InterestHeader> header,
-                       const Ptr<const Packet> &packet,
+  DoPropagateInterest (Ptr<Face> incomingFace,
+                       Ptr<const InterestHeader> header,
+                       Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
-
-private:
-  typedef GreenYellowRed super;
 };
 
 } // namespace fw

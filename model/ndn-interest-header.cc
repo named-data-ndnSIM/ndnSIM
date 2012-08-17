@@ -50,14 +50,30 @@ InterestHeader::GetTypeId (void)
   
 
 InterestHeader::InterestHeader ()
-  : m_minSuffixComponents (-1)
+  : m_name ()
+  , m_minSuffixComponents (-1)
   , m_maxSuffixComponents (-1)
+  , m_exclude ()
   , m_childSelector (false)
   , m_answerOriginKind (false)
   , m_scope (-1)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
   , m_nackType (NORMAL_INTEREST)
+{
+}
+
+InterestHeader::InterestHeader (const InterestHeader &interest)
+  : m_name                (Create<NameComponents> (interest.GetName ()))
+  , m_minSuffixComponents (interest.m_minSuffixComponents)
+  , m_maxSuffixComponents (interest.m_maxSuffixComponents)
+  , m_exclude             (Create<NameComponents> (interest.GetExclude ()))
+  , m_childSelector       (interest.m_childSelector)
+  , m_answerOriginKind    (interest.m_answerOriginKind)
+  , m_scope               (interest.m_scope)
+  , m_interestLifetime    (interest.m_interestLifetime)
+  , m_nonce               (interest.m_nonce)
+  , m_nackType            (interest.m_nackType)
 {
 }
 

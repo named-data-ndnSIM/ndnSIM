@@ -52,7 +52,7 @@ FwStats::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::fw::Stats")
     .SetGroupName ("Ndn")
-    .SetParent <BestRoute> ()
+    .SetParent <super> ()
     .AddConstructor <FwStats> ()
 
     .AddTraceSource ("Stats", "Fired every time stats tree is updated",
@@ -73,65 +73,65 @@ FwStats::DoDispose ()
 }
 
 void
-FwStats::OnInterest (const Ptr<Face> &face,
-                     Ptr<InterestHeader> &header,
-                     const Ptr<const Packet> &packet)
+FwStats::OnInterest (Ptr<Face> face,
+                     Ptr<const InterestHeader> header,
+                     Ptr<const Packet> origPacket)
 {
-  super::OnInterest (face, header, packet);
+  super::OnInterest (face, header, origPacket);
   
-  m_stats.Rx (header->GetName ().cut (1), face, packet->GetSize ());
+  m_stats.Rx (header->GetName ().cut (1), face, origPacket->GetSize ());
 
   ScheduleRefreshingIfNecessary ();
 }
 
 void
-FwStats::OnData (const Ptr<Face> &face,
-                 Ptr<ContentObjectHeader> &header,
-                 Ptr<Packet> &payload,
-                 const Ptr<const Packet> &packet)
+FwStats::OnData (Ptr<Face> face,
+                 Ptr<const ContentObjectHeader> header,
+                 Ptr<Packet> payload,
+                 Ptr<const Packet> origPacket)
 {
-  super::OnData (face, header, payload, packet);
+  super::OnData (face, header, payload, origPacket);
   
-  m_stats.Rx (header->GetName ().cut (1), face, packet->GetSize ());
+  m_stats.Rx (header->GetName ().cut (1), face, origPacket->GetSize ());
 
   ScheduleRefreshingIfNecessary ();
 }
 
 
 void
-FwStats::FailedToCreatePitEntry (const Ptr<Face> &incomingFace,
-                                 Ptr<InterestHeader> header,
-                                 const Ptr<const Packet> &packet)
+FwStats::FailedToCreatePitEntry (Ptr<Face> inFace,
+                                 Ptr<const InterestHeader> header,
+                                 Ptr<const Packet> origPacket)
 {
-  super::FailedToCreatePitEntry (incomingFace, header, packet);
+  super::FailedToCreatePitEntry (inFace, header, origPacket);
 
   // Kind of cheating... But at least this way we will have some statistics
   m_stats.NewPitEntry (header->GetName ().cut (1));
-  m_stats.Incoming (header->GetName ().cut (1), incomingFace);
+  m_stats.Incoming (header->GetName ().cut (1), inFace);
   m_stats.Timeout (header->GetName ().cut (1));
 
   ScheduleRefreshingIfNecessary ();
 }
 
 void
-FwStats::DidCreatePitEntry (const Ptr<Face> &incomingFace,
-                            Ptr<InterestHeader> header,
-                            const Ptr<const Packet> &packet,
+FwStats::DidCreatePitEntry (Ptr<Face> inFace,
+                            Ptr<const InterestHeader> header,
+                            Ptr<const Packet> origPacket,
                             Ptr<pit::Entry> pitEntry)
 {
-  super::DidCreatePitEntry (incomingFace, header, packet, pitEntry);
+  super::DidCreatePitEntry (inFace, header, origPacket, pitEntry);
   
   m_stats.NewPitEntry (header->GetName ().cut (1));
-  m_stats.Incoming (header->GetName ().cut (1), incomingFace);
+  m_stats.Incoming (header->GetName ().cut (1), inFace);
   
   ScheduleRefreshingIfNecessary ();
 }
 
 void
-FwStats::WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
+FwStats::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                      Ptr<pit::Entry> pitEntry)
 {
-  super::WillSatisfyPendingInterest (incomingFace, pitEntry);
+  super::WillSatisfyPendingInterest (inFace, pitEntry);
   
   m_stats.Satisfy (pitEntry->GetPrefix ().cut (1));
   
@@ -139,28 +139,29 @@ FwStats::WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
 }
 
 void
-FwStats::DidSendOutInterest (const Ptr<Face> &outgoingFace,
-                             Ptr<InterestHeader> header,
-                             const Ptr<const Packet> &packet,
+FwStats::DidSendOutInterest (Ptr<Face> outFace,
+                             Ptr<const InterestHeader> header,
+                             Ptr<const Packet> origPacket,
                              Ptr<pit::Entry> pitEntry)
 {
-  super::DidSendOutInterest (outgoingFace, header, packet, pitEntry);
+  super::DidSendOutInterest (outFace, header, origPacket, pitEntry);
 
-  m_stats.Outgoing (header->GetName ().cut (1), outgoingFace);
-  m_stats.Tx (header->GetName ().cut (1), outgoingFace, packet->GetSize ());
+  m_stats.Outgoing (header->GetName ().cut (1), outFace);
+  m_stats.Tx (header->GetName ().cut (1), outFace, origPacket->GetSize ());
   
   ScheduleRefreshingIfNecessary ();
 }
 
 void
-FwStats::DidSendOutData (const Ptr<Face> &face,
+FwStats::DidSendOutData (Ptr<Face> outFace,
                          Ptr<const ContentObjectHeader> header,
                          Ptr<const Packet> payload,
-                         const Ptr<const Packet> &packet)
+                         Ptr<const Packet> origPacket,
+                         Ptr<pit::Entry> pitEntry)
 {
-  super::DidSendOutData (face, header, payload, packet);
+  super::DidSendOutData (outFace, header, payload, origPacket, pitEntry);
 
-  m_stats.Tx (header->GetName ().cut (1), face, packet->GetSize ());
+  m_stats.Tx (header->GetName ().cut (1), outFace, origPacket->GetSize ());
   
   ScheduleRefreshingIfNecessary ();
 }
@@ -177,12 +178,12 @@ FwStats::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 }
 
 void
-FwStats::DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                                      Ptr<InterestHeader> header,
-                                      const Ptr<const Packet> &packet,
+FwStats::DidExhaustForwardingOptions (Ptr<Face> inFace,
+                                      Ptr<const InterestHeader> header,
+                                      Ptr<const Packet> origPacket,
                                       Ptr<pit::Entry> pitEntry)
 {
-  super::DidExhaustForwardingOptions (incomingFace, header, packet, pitEntry);
+  super::DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
   
   if (pitEntry->GetOutgoing ().size () == 0)
     {

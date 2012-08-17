@@ -38,16 +38,16 @@ public:
 
 protected:
   virtual void
-  WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
+  WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
   virtual bool
-  DoPropagateInterest (const Ptr<Face> &incomingFace,
-                       Ptr<InterestHeader> header,
-                       const Ptr<const Packet> &packet,
+  DoPropagateInterest (Ptr<Face> inFace,
+                       Ptr<const InterestHeader> header,
+                       Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
   virtual void
-  DidReceiveValidNack (const Ptr<Face> &incomingFace,
+  DidReceiveValidNack (Ptr<Face> incomingFace,
                        uint32_t nackCode,
                        Ptr<pit::Entry> pitEntry);
 

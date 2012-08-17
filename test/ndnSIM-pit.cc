@@ -21,6 +21,7 @@
 #include "ndnSIM-pit.h"
 #include "ns3/core-module.h"
 #include "ns3/ndnSIM-module.h"
+#include "ns3/point-to-point-module.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -109,8 +110,15 @@ void
 PitTest::DoRun ()
 {
   Ptr<Node> node = CreateObject<Node> ();
+  Ptr<Node> nodeSink = CreateObject<Node> ();
+  PointToPointHelper p2p;
+  p2p.Install (node, nodeSink);
+  
   ndn::StackHelper ndn;
   ndn.Install (node);
+  ndn.Install (nodeSink);
+
+  ndn::StackHelper::AddRoute (node, "/", 0, 0);
 
   Ptr<Client> app1 = CreateObject<Client> ();
   node->AddApplication (app1);

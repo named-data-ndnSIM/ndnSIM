@@ -52,54 +52,55 @@ public:
   GetStatsTree () const;  
 
   virtual void
-  OnInterest (const Ptr<Face> &face,
-              Ptr<InterestHeader> &header,
-              const Ptr<const Packet> &p);
+  OnInterest (Ptr<Face> face,
+              Ptr<const InterestHeader> header,
+              Ptr<const Packet> origPacket);
 
   virtual void
-  OnData (const Ptr<Face> &face,
-          Ptr<ContentObjectHeader> &header,
-          Ptr<Packet> &payload,
-          const Ptr<const Packet> &packet);
+  OnData (Ptr<Face> face,
+          Ptr<const ContentObjectHeader> header,
+          Ptr<Packet> payload,
+          Ptr<const Packet> origPacket);
 
   virtual void
   RemoveFace (Ptr<Face> face);
 
 protected:
   virtual void
-  DidCreatePitEntry (const Ptr<Face> &incomingFace,
-                     Ptr<InterestHeader> header,
-                     const Ptr<const Packet> &packet,
+  DidCreatePitEntry (Ptr<Face> inFace,
+                     Ptr<const InterestHeader> header,
+                     Ptr<const Packet> packet,
                      Ptr<pit::Entry> pitEntry);
 
   virtual void
-  FailedToCreatePitEntry (const Ptr<Face> &incomingFace,
-                          Ptr<InterestHeader> header,
-                          const Ptr<const Packet> &packet);
+  FailedToCreatePitEntry (Ptr<Face> inFace,
+                          Ptr<const InterestHeader> header,
+                          Ptr<const Packet> packet);
 
   virtual void
-  WillSatisfyPendingInterest (const Ptr<Face> &incomingFace,
+  WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
   virtual void
-  DidSendOutInterest (const Ptr<Face> &outgoingFace,
-                      Ptr<InterestHeader> header,
-                      const Ptr<const Packet> &packet,
+  DidSendOutInterest (Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
   virtual void
-  DidSendOutData (const Ptr<Face> &face,
+  DidSendOutData (Ptr<Face> outFace,
                   Ptr<const ContentObjectHeader> header,
                   Ptr<const Packet> payload,
-                  const Ptr<const Packet> &packet);
+                  Ptr<const Packet> origPacket,
+                  Ptr<pit::Entry> pitEntry);
 
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
   virtual void
-  DidExhaustForwardingOptions (const Ptr<Face> &incomingFace,
-                               Ptr<InterestHeader> header,
-                               const Ptr<const Packet> &packet,
+  DidExhaustForwardingOptions (Ptr<Face> inFace,
+                               Ptr<const InterestHeader> header,
+                               Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
   
   // from Object

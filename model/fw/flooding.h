@@ -48,9 +48,9 @@ public:
 protected:
   // inherited from  Nacks/ForwardingStrategy
   virtual bool
-  DoPropagateInterest (const Ptr<Face> &incomingFace,
-                       Ptr<InterestHeader> header,
-                       const Ptr<const Packet> &packet,
+  DoPropagateInterest (Ptr<Face> inFace,
+                       Ptr<const InterestHeader> header,
+                       Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 
 private:
