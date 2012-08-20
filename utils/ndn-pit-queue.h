@@ -22,7 +22,7 @@
 #define NDN_PIT_QUEUE_H
 
 #include <map>
-#include <set>
+#include <list>
 
 #include "ns3/ptr.h"
 
@@ -35,6 +35,14 @@ namespace pit { class Entry; }
 class PitQueue
 {
 public:
+  PitQueue ();
+  
+  void
+  SetMaxQueueSize (uint32_t size);
+
+  uint32_t
+  GetMaxQueueSize () const;
+
   bool
   Enqueue (Ptr<Face> inFace,
            Ptr<pit::Entry> pitEntry);
@@ -49,38 +57,16 @@ public:
   void
   Remove (Ptr<pit::Entry> entry);
 
-private:
-  void
-  DecreasePerFaceCount (Ptr<Face> inFace);
-
-  void
-  UpdateLastVirtTime (Ptr<Face> inFace);
   
 private:
-  // all maps here consider incoming face (the whole Queue structure is per outgoing face)
+  typedef std::list< Ptr<pit::Entry> > Queue;
+  typedef std::map< Ptr<Face>, Queue > PerInFaceQueue;
+
+  uint32_t m_maxQueueSize;
+
+  PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
   
-  double m_lastProcessedVirtualTime;
-
-  typedef std::map< Ptr<Face>, uint32_t > PerInFaceMapOfNumberOfIncomingInterests;
-  PerInFaceMapOfNumberOfIncomingInterests m_numberEnqueuedInterests;
-
-  typedef std::map< Ptr<Face>, double > PerInFaceMapOfLastVirtualTimes;
-  PerInFaceMapOfLastVirtualTimes m_lastVirtualTime;
-
-  struct Entry
-  {
-    Entry (Ptr<Face> inFace, Ptr<pit::Entry> pitEntry, double virtualTime);
-
-    bool
-    operator < (const Entry &otherEntry) const;
-
-    Ptr<Face> m_inFace;
-    Ptr<pit::Entry> m_pitEntry;
-    double m_virtualTime;
-  };
-
-  typedef std::multiset< Entry > PendingInterestsQueue;
-  PendingInterestsQueue m_queue;
+  PerInFaceQueue m_queues;
 };
 
 } // namespace ndn

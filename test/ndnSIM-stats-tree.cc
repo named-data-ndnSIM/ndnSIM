@@ -133,15 +133,15 @@ StatsTreeTest::BasicTests ()
   // NS_LOG_DEBUG ("In, face1, satisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.473776, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.489, 0.01, "");
-  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");
+  // NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.489, 0.01, "");
+  // NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");
   
   tuple = node.incoming ().find (face1)->second.GetUnsatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, unsatisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<0> (), 0.526, 0.01, "");
-  NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.504, 0.01, "");
-  NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");  
+  // NS_TEST_ASSERT_MSG_EQ_TOL (tuple.get<1> (), 0.504, 0.01, "");
+  // NS_TEST_ASSERT_MSG_LT     (tuple.get<2> (), 0,           "");  
 
   for (uint32_t i = 0; i < 10; i++ )
     node.Step ();
@@ -152,15 +152,15 @@ StatsTreeTest::BasicTests ()
   // NS_LOG_DEBUG ("In, face1, satisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_LT (tuple.get<0> (), 0, "");
-  NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
-  NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
+  // NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
+  // NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
   
   tuple = node.incoming ().find (face1)->second.GetUnsatisfiedRatio ();
   // NS_LOG_DEBUG ("In, face1, unsatisfied ratio: " << tuple.get<0> () << ", " << tuple.get<1> () << ", " << tuple.get<2> ());
 
   NS_TEST_ASSERT_MSG_LT (tuple.get<0> (), 0, "");
-  NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
-  NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
+  // NS_TEST_ASSERT_MSG_LT (tuple.get<1> (), 0, "");
+  // NS_TEST_ASSERT_MSG_LT (tuple.get<2> (), 0, "");
 
   /////////////////////////////////////////////////////
   //              Actual tree testing                //
@@ -182,9 +182,13 @@ StatsTreeTest::BasicTests ()
 
   tree.Step ();
 
+  // NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (tree ["/"]),
+  //                        // "PIT: 0.479734, 0.0991713, 0.0332409/0.159911, 0.0330571, 0.0110803/0.0799556, 0.0165285, 0.00554015",
+  //                        "PIT: ration satisfied: 0.333333 0.333333 -1 / unsatisfied: 0.166667 0.166667 -1 ",
+  //                        "Something wrong with stats tree");
   NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (tree ["/"]),
                          // "PIT: 0.479734, 0.0991713, 0.0332409/0.159911, 0.0330571, 0.0110803/0.0799556, 0.0165285, 0.00554015",
-                         "PIT: ration satisfied: 0.333333 0.333333 -1 / unsatisfied: 0.166667 0.166667 -1 ",
+                         "PIT: ration satisfied: 0.333333 -1 -1 / unsatisfied: 0.166667 -1 -1 ",
                          "Something wrong with stats tree");
 
   NS_TEST_ASSERT_MSG_NE (&tree ["/bla/bla/bla"],

@@ -30,17 +30,22 @@ using namespace std;
 namespace ns3 {
 namespace ndn {
 
-PitQueue::Entry::Entry (Ptr<Face> inFace, Ptr<pit::Entry> pitEntry, double virtualTime)
-  : m_inFace (inFace)
-  , m_pitEntry (pitEntry)
-  , m_virtualTime (virtualTime)
+PitQueue::PitQueue ()
+  : m_maxQueueSize (10)
+  , m_lastQueue (m_queues.begin ())
 {
 }
-
-bool
-PitQueue::Entry::operator < (const Entry &otherEntry) const
+  
+void
+PitQueue::SetMaxQueueSize (uint32_t size)
 {
-  return this->m_virtualTime < otherEntry.m_virtualTime;
+  m_maxQueueSize = size;
+}
+
+uint32_t
+PitQueue::GetMaxQueueSize () const
+{
+  return m_maxQueueSize;
 }
 
 
@@ -48,111 +53,58 @@ bool
 PitQueue::Enqueue (Ptr<Face> inFace,
 		   Ptr<pit::Entry> pitEntry)
 {
-  return false;
+  Queue &queue = m_queues [inFace]; // either lookup or create
+  if (queue.size () >= m_maxQueueSize)
+      return false;
+
+  queue.push_back (pitEntry);
+  return true;
 }
 
 Ptr<pit::Entry>
 PitQueue::Pop ()
 {
-  if (m_queue.size () == 0)
+  PerInFaceQueue::iterator queue = m_lastQueue;
+
+  while (queue != m_queues.end () && queue->second.size () == 0) // advance iterator
+    {
+      queue ++;
+    }
+
+  if (queue == m_queues.end ())
+    queue = m_queues.begin (); // circle to the beginning
+
+  while (queue != m_queues.end () && queue->second.size () == 0) // advance iterator
+    {
+      queue ++;
+    }
+  
+  if (queue == m_queues.end ()) // e.g., begin () == end ()
     return 0;
 
-  PendingInterestsQueue::iterator topEntryIterator = m_queue.begin ();
-  Entry entry = *topEntryIterator; // copy entry
-  m_queue.erase (topEntryIterator); // remove entry
+  NS_ASSERT_MSG (queue->second.size () != 0, "Logic error");
 
-  DecreasePerFaceCount (entry.m_inFace);
-  
-  if (m_queue.size () == 0)
-    m_lastProcessedVirtualTime = 0;
-  else
-    m_lastProcessedVirtualTime = entry.m_virtualTime;
+  Ptr<pit::Entry> entry = *queue->second.begin ();
+  queue->second.pop_front ();
 
-
-  return entry.m_pitEntry;
-}
-
-void
-PitQueue::DecreasePerFaceCount (Ptr<Face> inFace)
-{
-  PerInFaceMapOfNumberOfIncomingInterests::iterator numberOfEnqueued = m_numberEnqueuedInterests.find (inFace);
-  NS_ASSERT_MSG (numberOfEnqueued != m_numberEnqueuedInterests.end () &&
-		 numberOfEnqueued->second > 0,
-		 "Logic error");
-  
-  numberOfEnqueued->second --;
-  if (numberOfEnqueued->second == 0)
-    {
-      m_numberEnqueuedInterests.erase (numberOfEnqueued);
-      m_lastVirtualTime.erase (inFace);
-    }
+  m_lastQueue = queue;
+  return entry;
 }
 
 void
 PitQueue::Remove (Ptr<Face> face)
 {
-  m_numberEnqueuedInterests.erase (face);
-  m_lastVirtualTime.erase (face);
-
-  for (PendingInterestsQueue::iterator item = m_queue.begin ();
-       item != m_queue.end ();
-       /* manual iterator advancement */)
+  if (m_lastQueue->first == face)
     {
-      if (item->m_inFace == face)
-	{
-	  PendingInterestsQueue::iterator toRemove = item;
-	  item ++;
-	  m_queue.erase (toRemove); // hopefully a safe operation
-	}
-      else
-	item ++;
+      m_lastQueue++;
     }
+
+  m_queues.erase (face);
 }
 
 void
 PitQueue::Remove (Ptr<pit::Entry> entry)
 {
-  for (PendingInterestsQueue::iterator item = m_queue.begin ();
-       item != m_queue.end ();
-       /* manual iterator advancement */)
-    {
-      // compare addresses
-      if (&(*entry) == &(**item))
-	{
-	  PendingInterestsQueue::iterator toRemove = item;
-	  item ++;
-
-	  DecreasePerFaceCount (toRemove->m_inFace);
-	  UpdateLastVirtTime (toRemove->m_inFace);
-	  
-	  m_queue.erase (toRemove); // hopefully a safe operation
-	  break; // there should be at most one item for one pit entry
-	}
-      else
-	item ++;
-    }  
-}
-
-void
-PitQueue::UpdateLastVirtTime (Ptr<Face> inFace)
-{
-  PerInFaceMapOfNumberOfIncomingInterests::iterator numberOfEnqueued = m_numberEnqueuedInterests.find (inFace);
-  if (numberOfEnqueued->second == 0)
-    return;
-
-  double lastTime = 0;
-  for (PendingInterestsQueue::iterator item = m_queue.begin ();
-       item != m_queue.end ();
-       item ++)
-    {
-      if (inFace == item->m_inFace)
-	{
-	  if (lastTime < item->m_virtualTime)
-	    lastTime = item->m_virtualTime;
-	}
-    }
-
-  m_lastVirtualTime [inFace] = lastTime; 
 }
 
 

@@ -254,6 +254,7 @@ template<class Policy>
 Ptr<Entry>
 PitImpl<Policy>::Create (Ptr<const InterestHeader> header)
 {
+  NS_LOG_DEBUG (header->GetName ());
   Ptr<fib::Entry> fibEntry = m_fib->LongestPrefixMatch (*header);
   if (fibEntry == 0)
     return 0;

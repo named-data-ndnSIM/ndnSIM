@@ -78,7 +78,7 @@ InterestHeader::InterestHeader (const InterestHeader &interest)
 }
 
 void
-InterestHeader::SetName (const Ptr<NameComponents> &name)
+InterestHeader::SetName (Ptr<NameComponents> name)
 {
   m_name = name;
 }
@@ -121,7 +121,7 @@ InterestHeader::GetMaxSuffixComponents () const
 }
 
 void
-InterestHeader::SetExclude (const Ptr<NameComponents> &exclude)
+InterestHeader::SetExclude (Ptr<NameComponents> exclude)
 {
   m_exclude = exclude;
 }

@@ -148,7 +148,7 @@ public:
    * @param[in] name const pointer to ndnNameComponents object that contains an interest name
    **/
   void
-  SetName (const Ptr<NameComponents> &name);
+  SetName (Ptr<NameComponents> name);
 
 
   /**
@@ -215,7 +215,7 @@ public:
    * @param[in] exclude const pointer to ndnNameComponents to be excluded 
    **/
   void
-  SetExclude (const Ptr<NameComponents> &exclude);
+  SetExclude (Ptr<NameComponents> exclude);
 
   /**
    * \brief Check if interest conatins exclude filter
