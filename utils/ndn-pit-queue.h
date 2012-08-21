@@ -25,6 +25,11 @@
 #include <list>
 
 #include "ns3/ptr.h"
+#include "ns3/ndn-fw-tag.h"
+
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 namespace ns3 {
 namespace ndn {
@@ -57,17 +62,30 @@ public:
   void
   Remove (Ptr<pit::Entry> entry);
 
-  
-private:
+public:  
   typedef std::list< Ptr<pit::Entry> > Queue;
-  typedef std::map< Ptr<Face>, Queue > PerInFaceQueue;
+  typedef std::map< Ptr<Face>, boost::shared_ptr<Queue> > PerInFaceQueue;
 
-  uint32_t m_maxQueueSize;
-
-  PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
+private:
   
+  uint32_t m_maxQueueSize;
+  PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
   PerInFaceQueue m_queues;
 };
+
+namespace fw {
+
+class PitQueueTag :
+    public Tag
+{
+public:
+  virtual
+  ~PitQueueTag () { };
+
+  typedef boost::tuple< boost::shared_ptr<PitQueue::Queue>, PitQueue::Queue::iterator > Item;
+};
+
+} // namespace fw
 
 } // namespace ndn
 } // namespace ns3

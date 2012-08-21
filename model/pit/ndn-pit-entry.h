@@ -37,11 +37,14 @@
 #include <boost/multi_index/member.hpp>
 // #include <boost/multi_index/mem_fun.hpp>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 namespace ns3 {
 namespace ndn {
 
 class Pit;
+
+namespace fw { class Tag; }
 
 namespace pit {
 
@@ -249,6 +252,26 @@ public:
   const out_container &
   GetOutgoing () const;
 
+  /**
+   * @brief Add new forwarding strategy tag
+   */
+  inline void
+  AddFwTag (boost::shared_ptr< fw::Tag > tag);
+
+  /**
+   * @brief Get forwarding strategy tag (tag is not removed)
+   */
+  template<class T>
+  inline boost::shared_ptr< T >
+  GetFwTag ();
+
+  /**
+   * @brief Remove the forwarding strategy tag
+   */
+  template<class T>
+  inline void
+  RemoveFwTag ();
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
   
@@ -266,9 +289,77 @@ protected:
 
   Time m_lastRetransmission; ///< @brief Last time when number of retransmissions were increased
   uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
+
+  std::list< boost::shared_ptr<fw::Tag> > m_fwTags; ///< @brief Forwarding strategy tags
 };
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);
+
+inline void
+Entry::AddFwTag (boost::shared_ptr< fw::Tag > tag)
+{
+  m_fwTags.push_back (tag);
+}
+
+/**
+ * @brief Get and remove forwarding strategy tag
+ */
+template<class T>
+inline boost::shared_ptr< T >
+Entry::GetFwTag ()
+{
+  for (std::list< boost::shared_ptr<fw::Tag> >::iterator item = m_fwTags.begin ();
+       item != m_fwTags.end ();
+       item ++)
+    {
+      boost::shared_ptr< T > retPtr = boost::dynamic_pointer_cast<T> (*item);
+      if (retPtr != 0)
+        {
+          return retPtr;
+        }
+    }
+
+  return 0;
+}
+
+// /**
+//  * @brief Peek the forwarding strategy tag
+//  */
+// template<class T>
+// inline boost::shared_ptr< const T >
+// Entry::PeekFwTag () const
+// {
+//   for (std::list< boost::shared_ptr<fw::Tag> >::const_iterator item = m_fwTags.begin ();
+//        item != m_fwTags.end ();
+//        item ++)
+//     {
+//       boost::shared_ptr< const T > retPtr = boost::dynamic_pointer_cast<const T> (*item);
+//       if (retPtr != 0)
+//         {
+//           return retPtr;
+//         }
+//     }
+
+//   return 0;
+// }
+
+template<class T>
+inline void
+Entry::RemoveFwTag ()
+{
+  for (std::list< boost::shared_ptr<fw::Tag> >::iterator item = m_fwTags.begin ();
+       item != m_fwTags.end ();
+       item ++)
+    {
+      boost::shared_ptr< T > retPtr = boost::dynamic_pointer_cast< T > (*item);
+      if (retPtr != 0)
+        {
+          m_fwTags.erase (item);
+          return;
+        }
+    }
+}
+
 
 } // namespace pit
 } // namespace ndn

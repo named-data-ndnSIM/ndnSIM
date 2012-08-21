@@ -53,11 +53,19 @@ bool
 PitQueue::Enqueue (Ptr<Face> inFace,
 		   Ptr<pit::Entry> pitEntry)
 {
-  Queue &queue = m_queues [inFace]; // either lookup or create
-  if (queue.size () >= m_maxQueueSize)
+  PerInFaceQueue::iterator queue = m_queues.find (inFace);
+  if (queue == m_queues.end ())
+    {
+      pair<PerInFaceQueue::iterator, bool> itemPair = m_queues.insert (make_pair (inFace, boost::make_shared<Queue> ()));
+      NS_ASSERT (itemPair.second == true);
+
+      queue = itemPair.first;
+    }
+  
+  if (queue->second->size () >= m_maxQueueSize)
       return false;
 
-  queue.push_back (pitEntry);
+  queue->second->push_back (pitEntry);
   return true;
 }
 
@@ -66,7 +74,7 @@ PitQueue::Pop ()
 {
   PerInFaceQueue::iterator queue = m_lastQueue;
 
-  while (queue != m_queues.end () && queue->second.size () == 0) // advance iterator
+  while (queue != m_queues.end () && queue->second->size () == 0) // advance iterator
     {
       queue ++;
     }
@@ -74,7 +82,7 @@ PitQueue::Pop ()
   if (queue == m_queues.end ())
     queue = m_queues.begin (); // circle to the beginning
 
-  while (queue != m_queues.end () && queue->second.size () == 0) // advance iterator
+  while (queue != m_queues.end () && queue->second->size () == 0) // advance iterator
     {
       queue ++;
     }
@@ -82,10 +90,10 @@ PitQueue::Pop ()
   if (queue == m_queues.end ()) // e.g., begin () == end ()
     return 0;
 
-  NS_ASSERT_MSG (queue->second.size () != 0, "Logic error");
+  NS_ASSERT_MSG (queue->second->size () != 0, "Logic error");
 
-  Ptr<pit::Entry> entry = *queue->second.begin ();
-  queue->second.pop_front ();
+  Ptr<pit::Entry> entry = *queue->second->begin ();
+  queue->second->pop_front ();
 
   m_lastQueue = queue;
   return entry;
