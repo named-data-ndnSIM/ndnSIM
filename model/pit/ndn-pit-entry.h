@@ -313,13 +313,13 @@ Entry::GetFwTag ()
        item ++)
     {
       boost::shared_ptr< T > retPtr = boost::dynamic_pointer_cast<T> (*item);
-      if (retPtr != 0)
+      if (retPtr != boost::shared_ptr< T > ())
         {
           return retPtr;
         }
     }
 
-  return 0;
+  return boost::shared_ptr< T > ();
 }
 
 // /**
@@ -352,7 +352,7 @@ Entry::RemoveFwTag ()
        item ++)
     {
       boost::shared_ptr< T > retPtr = boost::dynamic_pointer_cast< T > (*item);
-      if (retPtr != 0)
+      if (retPtr != boost::shared_ptr< T > ())
         {
           m_fwTags.erase (item);
           return;

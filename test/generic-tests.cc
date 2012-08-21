@@ -28,8 +28,11 @@
 #include "../apps/ndn-producer.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 using namespace std;
+using namespace boost;
 
 NS_LOG_COMPONENT_DEFINE ("ndn.test.Generic");
 
@@ -82,6 +85,20 @@ GenericTests::DoRun ()
   BOOST_FOREACH (Ptr<pit::Entry> entry, l)
     {
       cout << "* " << entry->GetPrefix () << endl;
+    }
+
+
+  cerr << "===========\n\n";
+
+  struct Bla {
+  };
+
+  shared_ptr<Bla> p1 = make_shared <Bla> ();
+  shared_ptr<Bla> p2 = make_shared <Bla> ();
+
+  if (p1 < p2)
+    {
+      cerr << "They are equal\n";
     }
 }
 

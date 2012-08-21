@@ -67,7 +67,6 @@ public:
   typedef std::map< Ptr<Face>, boost::shared_ptr<Queue> > PerInFaceQueue;
 
 private:
-  
   uint32_t m_maxQueueSize;
   PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
   PerInFaceQueue m_queues;
@@ -79,10 +78,24 @@ class PitQueueTag :
     public Tag
 {
 public:
-  virtual
-  ~PitQueueTag () { };
+  // map based on addresses, should be good enough
+  typedef std::map< boost::shared_ptr<PitQueue::Queue>, PitQueue::Queue::iterator > MapOfItems;
 
-  typedef boost::tuple< boost::shared_ptr<PitQueue::Queue>, PitQueue::Queue::iterator > Item;
+public:
+  virtual
+  ~PitQueueTag () { };  
+
+  void
+  InsertQueue (boost::shared_ptr<PitQueue::Queue> item, PitQueue::Queue::iterator iterator);
+  
+  void
+  RemoveFromAllQueues ();
+
+  void
+  RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue);
+  
+private:
+  MapOfItems m_items;
 };
 
 } // namespace fw

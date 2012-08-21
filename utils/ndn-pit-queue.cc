@@ -26,6 +26,7 @@
 #include "ns3/assert.h"
 
 using namespace std;
+using namespace boost;
 
 namespace ns3 {
 namespace ndn {
@@ -65,9 +66,18 @@ PitQueue::Enqueue (Ptr<Face> inFace,
   if (queue->second->size () >= m_maxQueueSize)
       return false;
 
-  queue->second->push_back (pitEntry);
+  Queue::iterator itemIterator = queue->second->insert (queue->second->end (), pitEntry);
+  
+  shared_ptr<fw::PitQueueTag> tag = pitEntry->GetFwTag<fw::PitQueueTag> ();
+  if (tag == shared_ptr<fw::PitQueueTag> ())
+    {
+      tag = make_shared<fw::PitQueueTag> ();
+      pitEntry->AddFwTag (tag);
+    }
+  tag->InsertQueue (queue->second, itemIterator);
   return true;
 }
+
 
 Ptr<pit::Entry>
 PitQueue::Pop ()
@@ -93,8 +103,17 @@ PitQueue::Pop ()
   NS_ASSERT_MSG (queue->second->size () != 0, "Logic error");
 
   Ptr<pit::Entry> entry = *queue->second->begin ();
-  queue->second->pop_front ();
+  shared_ptr<fw::PitQueueTag> tag = entry->GetFwTag<fw::PitQueueTag> ();
+  NS_ASSERT (tag != shared_ptr<fw::PitQueueTag> ());
 
+#ifdef NS3_LOG_ENABLE
+  size_t queueSize = queue->second->size ();
+#endif
+  tag->RemoveFromQueue (queue->second);
+#ifdef NS3_LOG_ENABLE
+  NS_ASSERT_MSG (queue->second->size () == queueSize-1, "Queue size should be reduced by one");
+#endif
+    
   m_lastQueue = queue;
   return entry;
 }
@@ -107,14 +126,63 @@ PitQueue::Remove (Ptr<Face> face)
       m_lastQueue++;
     }
 
-  m_queues.erase (face);
+  PerInFaceQueue::iterator queue = m_queues.find (face);
+  if (queue == m_queues.end ())
+    return;
+
+  for (Queue::iterator pitEntry = queue->second->begin ();
+       pitEntry != queue->second->end ();
+       pitEntry ++)
+    {
+      shared_ptr<fw::PitQueueTag> tag = (*pitEntry)->GetFwTag<fw::PitQueueTag> ();
+      NS_ASSERT (tag != shared_ptr<fw::PitQueueTag> ());
+
+      tag->RemoveFromQueue (queue->second);
+    }
+
+  NS_ASSERT_MSG (queue->second->size () == 0, "Queue size should be 0 by now");
+  m_queues.erase (queue);
 }
 
 void
 PitQueue::Remove (Ptr<pit::Entry> entry)
 {
+  shared_ptr<fw::PitQueueTag> tag = entry->GetFwTag<fw::PitQueueTag> ();
+  if (tag == shared_ptr<fw::PitQueueTag> ())
+    return;
+
+  tag->RemoveFromAllQueues ();
 }
 
+void
+fw::PitQueueTag::InsertQueue (boost::shared_ptr<PitQueue::Queue> queue, PitQueue::Queue::iterator iterator)
+{
+  pair<MapOfItems::iterator, bool> item = m_items.insert (make_pair (queue, iterator));
+  NS_ASSERT (item.second == true);
+}
+
+void
+fw::PitQueueTag::RemoveFromAllQueues ()
+{
+  for (MapOfItems::iterator item = m_items.begin ();
+       item != m_items.end ();
+       item ++)
+    {
+      item->first->erase (item->second);
+    }
+  m_items.clear ();
+}
+
+void
+fw::PitQueueTag::RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue)
+{
+  MapOfItems::iterator item = m_items.find (queue);
+  if (item == m_items.end ())
+    return;
+
+  item->first->erase (item->second);
+  m_items.erase (item);
+}
 
 } // namespace ndn
 } // namespace ns3
