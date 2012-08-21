@@ -57,41 +57,30 @@ BestRoute::BestRoute ()
 }
     
 bool
-BestRoute::DoPropagateInterest (Ptr<Face> incomingFace,
+BestRoute::DoPropagateInterest (Ptr<Face> inFace,
                                 Ptr<const InterestHeader> header,
                                 Ptr<const Packet> origPacket,
                                 Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
-
   // Try to work out with just green faces
-  bool greenOk = super::DoPropagateInterest (incomingFace, header, origPacket, pitEntry);
+  bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
   if (greenOk)
     return true;
 
   int propagatedCount = 0;
+  
   BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())
     {
+      NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
       if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
-      
-      if (metricFace.m_face == incomingFace) 
-        continue; // same face as incoming, don't forward
 
-      if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
-        continue; // don't forward to face that we received interest from
-
-      if (!WillSendOutInterest (metricFace.m_face, header, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
         {
           continue;
         }
-
-      //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      metricFace.m_face->Send (packetToSend);
-
-      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
 
       propagatedCount++;
       break; // do only once

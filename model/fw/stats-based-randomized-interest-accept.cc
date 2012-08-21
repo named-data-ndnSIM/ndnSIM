@@ -76,9 +76,11 @@ StatsBasedRandomizedInterestAccept::DoDispose ()
 }
 
 bool
-StatsBasedRandomizedInterestAccept::WillSendOutInterest (Ptr<Face> outFace,
-                                                         Ptr<const InterestHeader> header,
-                                                         Ptr<pit::Entry> pitEntry)
+StatsBasedRandomizedInterestAccept::TrySendOutInterest (Ptr<Face> inFace,
+                                                        Ptr<Face> outFace,
+                                                        Ptr<const InterestHeader> header,
+                                                        Ptr<const Packet> origPacket,
+                                                        Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   // override all (if any) parent processing
@@ -91,8 +93,6 @@ StatsBasedRandomizedInterestAccept::WillSendOutInterest (Ptr<Face> outFace,
       return false;
     }
 
-  // check stats
-  Ptr<Face> inFace = pitEntry->GetIncoming ().begin ()->m_face;
   // const ndnSIM::LoadStatsFace &stats = GetStatsTree ()[header->GetName ()].incoming ().find (inFace)->second;
   const ndnSIM::LoadStatsFace &stats = GetStatsTree ()["/"].incoming ().find (inFace)->second;
 
@@ -118,6 +118,13 @@ StatsBasedRandomizedInterestAccept::WillSendOutInterest (Ptr<Face> outFace,
       if (outFace->GetLimits ().IsBelowLimit ())
         {
           pitEntry->AddOutgoing (outFace);
+
+          //transmission
+          Ptr<Packet> packetToSend = origPacket->Copy ();
+          outFace->Send (packetToSend);
+
+          DidSendOutInterest (outFace, header, origPacket, pitEntry);
+
           return true;
         }
       else

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "per-fib-limits.h"
@@ -52,16 +51,6 @@ PerFibLimits::GetTypeId (void)
     .SetGroupName ("Ndn")
     .SetParent <super> ()
     .AddConstructor <PerFibLimits> ()
-
-    .AddAttribute ("Threshold", "Minimum number of incoming interests to enable dropping decision",
-                   DoubleValue (0.25),
-                   MakeDoubleAccessor (&PerFibLimits::m_threshold),
-                   MakeDoubleChecker<double> ())
-    
-    .AddAttribute ("GraceAcceptProbability", "Probability to accept Interest even though stats telling that satisfaction ratio is 0",
-                   DoubleValue (0.01),
-                   MakeDoubleAccessor (&PerFibLimits::m_graceAcceptProbability),
-                   MakeDoubleChecker<double> ())
     ;
   return tid;
 }
@@ -74,63 +63,101 @@ void
 PerFibLimits::DoDispose ()
 {
   super::DoDispose ();
-  m_decayLimitsEvent.Cancel ();
+  // m_decayLimitsEvent.Cancel ();
 }
 
+void
+PerFibLimits::RemoveFace (Ptr<Face> face)
+{  
+  super::RemoveFace (face);
+
+  for (PitQueueMap::iterator item = m_pitQueues.begin ();
+       item != m_pitQueues.end ();
+       item ++)
+    {
+      item->second.Remove (face);
+    }
+  m_pitQueues.erase (face);
+}
+
+
 bool
-PerFibLimits::WillSendOutInterest (Ptr<Face> outFace,
-                                   Ptr<const InterestHeader> header,
-                                   Ptr<pit::Entry> pitEntry)
+PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
+                                  Ptr<Face> outFace,
+                                  Ptr<const InterestHeader> header,
+                                  Ptr<const Packet> origPacket,
+                                  Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-  // override all (if any) parent processing
+  // totally override all (if any) parent processing
   
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outFace);
 
   if (outgoing != pitEntry->GetOutgoing ().end ())
     {
+      // just suppress without any other action
       return false;
     }
   
-  if (pitEntry->GetFibEntry ()->GetLimits ().IsBelowLimit ())
+  // if (pitEntry->GetFibEntry ()->GetLimits ().IsBelowLimit ())
+  //   {
+  //     if (outFace->GetLimits ().IsBelowLimit ())
+  //       {
+  //         pitEntry->AddOutgoing (outFace);
+  //         return true;
+  //       }
+  //     else
+  //       {
+  //         NS_LOG_DEBUG ("Face limit. Reverting back per-prefix allowance");
+  //         pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
+  //       }
+  //   }
+
+  if (outFace->GetLimits ().IsBelowLimit ())
     {
-      if (outFace->GetLimits ().IsBelowLimit ())
-        {
-          pitEntry->AddOutgoing (outFace);
-          return true;
-        }
-      else
-        {
-          NS_LOG_DEBUG ("Face limit. Reverting back per-prefix allowance");
-          pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-        }
+      pitEntry->AddOutgoing (outFace);
+
+      //transmission
+      Ptr<Packet> packetToSend = origPacket->Copy ();
+      outFace->Send (packetToSend);
+
+      DidSendOutInterest (outFace, header, origPacket, pitEntry);
+      
+      return true;
+    }
+  else
+    {
+      NS_LOG_DEBUG ("Face limit");
     }
   
-  return false;
+  bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry);
+  if (enqueued)
+    {
+      NS_LOG_DEBUG ("PIT entry is enqueued for delayed processing. Telling that we forwarding possible");
+      return true;
+    }
+  else
+    return false;
 }
 
 void
 PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  super::WillEraseTimedOutPendingInterest (pitEntry);
 
+  PitQueue::Remove (pitEntry);
+  
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
       face->m_face->GetLimits ().RemoveOutstanding ();
-      // face->m_face->GetLimits ()->DecreaseLimit (); !!! do not decrease per-face limit. it doesn't make sense !!!
     }
-  
-  pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-  // pitEntry->GetFibEntry ()->GetLimits ().DecreaseLimit (); // multiplicative decrease
 
-  if (!m_decayLimitsEvent.IsRunning ())
-    {
-      UniformVariable rand (0,5);
-      m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0) + Seconds (0.001 * rand.GetValue ()), &PerFibLimits::DecayLimits, this);
-    }
+  ProcessFromQueue ();
+  // pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
 }
 
 
@@ -139,21 +166,43 @@ PerFibLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-
   super::WillSatisfyPendingInterest (inFace, pitEntry);
+  
+  PitQueue::Remove (pitEntry);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
       face->m_face->GetLimits ().RemoveOutstanding ();
-      // face->m_face->GetLimits ()->IncreaseLimit (); !!! do not increase (as do not decrease) per-face limit. again, it doesn't make sense
     }
+
+  ProcessFromQueue ();
   
-  pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-  // pitEntry->GetFibEntry ()->GetLimits ().IncreaseLimit (); // additive increase
+  // pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
 }
 
+
+void
+PerFibLimits::ProcessFromQueue ()
+{
+  for (PitQueueMap::iterator queue = m_pitQueues.begin ();
+       queue != m_pitQueues.end ();
+       queue++)
+    {
+      if (queue->second.IsEmpty ())
+        continue;
+
+      // if (outFace->GetLimits ().IsBelowLimit ())
+      //   {
+      //     pitEntry->AddOutgoing (outFace);
+      //   }
+      // else
+      //   {
+      //     // do nothing
+      //   }
+    }
+}
 
 // void
 // PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
@@ -165,18 +214,18 @@ PerFibLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
 //   // ??
 // }
 
-void
-PerFibLimits::DecayLimits ()
-{
-  for (Ptr<fib::Entry> entry = m_fib->Begin ();
-       entry != m_fib->End ();
-       entry = m_fib->Next (entry))
-    {
-      entry->GetLimits ().DecayCurrentLimit ();
-    }
+// void
+// PerFibLimits::DecayLimits ()
+// {
+//   for (Ptr<fib::Entry> entry = m_fib->Begin ();
+//        entry != m_fib->End ();
+//        entry = m_fib->Next (entry))
+//     {
+//       entry->GetLimits ().DecayCurrentLimit ();
+//     }
 
-  m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0), &PerFibLimits::DecayLimits, this);
-}
+//   m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0), &PerFibLimits::DecayLimits, this);
+// }
 
 
 } // namespace fw

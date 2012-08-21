@@ -167,9 +167,11 @@ protected:
    * If event returns false, then there is some kind of a problem (e.g., per-face limit reached)
    */
   virtual bool
-  WillSendOutInterest (Ptr<Face> outFace,
-                       Ptr<const InterestHeader> header,
-                       Ptr<pit::Entry> pitEntry);
+  TrySendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
+                      Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event fired just after sending out an interest

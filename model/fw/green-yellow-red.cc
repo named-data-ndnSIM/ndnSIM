@@ -79,19 +79,10 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
           metricFace.m_status == fib::FaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
-      if (pitEntry->GetIncoming ().find (metricFace.m_face) != pitEntry->GetIncoming ().end ()) 
-        continue; // don't forward to face that we received interest from
-
-      if (!WillSendOutInterest (metricFace.m_face, header, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
         {
           continue;
         }
-
-      //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      metricFace.m_face->Send (packetToSend);
-
-      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
       
       propagatedCount++;
       break; // propagate only one interest

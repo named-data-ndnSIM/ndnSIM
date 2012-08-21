@@ -79,22 +79,10 @@ SmartFlooding::DoPropagateInterest (Ptr<Face> inFace,
       if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
       
-      if (metricFace.m_face == inFace) 
-        {
-          NS_LOG_DEBUG ("continue (same as incoming)");
-          continue; // same face as incoming, don't forward
-        }
-
-      if (!WillSendOutInterest (metricFace.m_face, header, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
         {
           continue;
         }
-
-      //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      metricFace.m_face->Send (packetToSend);
-
-      DidSendOutInterest (metricFace.m_face, header, origPacket, pitEntry);
       
       propagatedCount++;
     }

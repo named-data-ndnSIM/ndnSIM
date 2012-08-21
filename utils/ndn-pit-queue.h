@@ -37,31 +37,73 @@ namespace ndn {
 class Face;
 namespace pit { class Entry; }
 
+/**
+ * @ingroup ndn
+ * @brief Queue for PIT entries, interests for which cannot be immediately forwarded
+ */
 class PitQueue
 {
 public:
+  /**
+   * @brief Default constructor
+   */
   PitQueue ();
-  
+
+  /**
+   * @brief Set maximum queue size
+   * @param size per-incoming face maximum queue size
+   *
+   * Each per-incoming-face queue will have this maximum size
+   */
   void
   SetMaxQueueSize (uint32_t size);
 
+  /**
+   * @brief Get current maximum queue size
+   * @returns per-incoming face maximum queue size
+   */
   uint32_t
   GetMaxQueueSize () const;
 
+  /**
+   * @brief Enqueue PIT entry for delayed processing
+   * @param inFace incoming face to which queue PIT entry should enqueued
+   * @param pitEntry smart pointer to PIT entry
+   * return true if successfully enqueued, false if limit is reached or some other reason
+   */
   bool
   Enqueue (Ptr<Face> inFace,
            Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Get next PIT entry
+   * @returns next PIT entry or 0 if no entries available
+   *
+   * This method implement round-robin (in future weighted round-robin) to pick elements from different per-in-face queues
+   */
   Ptr<pit::Entry>
   Pop ();
 
-  // cleanup procedures
+  /**
+   * @brief Remove all references to face from all queues and enqueued PIT entries
+   * @param face smart pointer to face
+   */
   void
   Remove (Ptr<Face> face);
 
-  void
+  /**
+   * @brief Remove all references to PIT entry from queues
+   * @param entry smart pointer to PIT entry
+   */
+  static void
   Remove (Ptr<pit::Entry> entry);
 
+  /**
+   * @brief Check if queue is empty
+   */
+  bool
+  IsEmpty () const;
+  
 public:  
   typedef std::list< Ptr<pit::Entry> > Queue;
   typedef std::map< Ptr<Face>, boost::shared_ptr<Queue> > PerInFaceQueue;
@@ -74,6 +116,10 @@ private:
 
 namespace fw {
 
+/**
+ * @ingroup ndn
+ * @brief Forwarding strategy tag that stores queue-related information in PIT entries
+ */
 class PitQueueTag :
     public Tag
 {
@@ -82,15 +128,30 @@ public:
   typedef std::map< boost::shared_ptr<PitQueue::Queue>, PitQueue::Queue::iterator > MapOfItems;
 
 public:
+  /**
+   * @brief Virtual destructor
+   */
   virtual
   ~PitQueueTag () { };  
 
+  /**
+   * @brief Remember in which queue at which position PIT entry is enqueued
+   * @brief item     smart pointer to Queue
+   * @brief iterator queue's iterator
+   */
   void
   InsertQueue (boost::shared_ptr<PitQueue::Queue> item, PitQueue::Queue::iterator iterator);
-  
+
+  /**
+   * @brief Remove PIT entry from all queues
+   */
   void
   RemoveFromAllQueues ();
 
+  /**
+   * @brief Remove PIT entry from the specified queue
+   * @param queue Queue from which PIT entry should be removed
+   */
   void
   RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue);
   

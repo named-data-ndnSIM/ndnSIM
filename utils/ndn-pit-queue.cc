@@ -154,6 +154,21 @@ PitQueue::Remove (Ptr<pit::Entry> entry)
   tag->RemoveFromAllQueues ();
 }
 
+bool
+PitQueue::IsEmpty () const
+{
+  bool isEmpty = (m_queues.size () == 0);
+
+  for (PerInFaceQueue::const_iterator queue = m_queues.begin ();
+       queue != m_queues.end ();
+       queue ++)
+    {
+      isEmpty &= (queue->second->size () == 0);
+    }
+
+  return isEmpty;
+}
+
 void
 fw::PitQueueTag::InsertQueue (boost::shared_ptr<PitQueue::Queue> queue, PitQueue::Queue::iterator iterator)
 {

@@ -59,9 +59,11 @@ public:
 
 protected:
   virtual bool
-  WillSendOutInterest (Ptr<Face> outFace,
-                       Ptr<const InterestHeader> header,
-                       Ptr<pit::Entry> pitEntry);
+  TrySendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
+                      Ptr<pit::Entry> pitEntry);
   
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,

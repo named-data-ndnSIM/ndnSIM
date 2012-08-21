@@ -443,21 +443,40 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
 }
 
 bool
-ForwardingStrategy::WillSendOutInterest (Ptr<Face> outFace,
-                                         Ptr<const InterestHeader> header,
-                                         Ptr<pit::Entry> pitEntry)
+ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
+                                        Ptr<Face> outFace,
+                                        Ptr<const InterestHeader> header,
+                                        Ptr<const Packet> origPacket,
+                                        Ptr<pit::Entry> pitEntry)
 {
+  if (outFace == inFace) 
+    {
+      NS_LOG_DEBUG ("Same as incoming");
+      return false; // same face as incoming, don't forward
+    }
+  
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outFace);
-      
-  if (outgoing != pitEntry->GetOutgoing ().end () &&
-      outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
-    {
-      NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount ());
-      return false; // already forwarded before during this retransmission cycle
-    }
 
+  if (outgoing != pitEntry->GetOutgoing ().end ())
+    {
+      if (!m_detectRetransmissions)
+        return false; // suppress
+      else if (outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
+        {
+          NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount ());
+          return false; // already forwarded before during this retransmission cycle
+        }
+   }
+  
   pitEntry->AddOutgoing (outFace);
+
+  //transmission
+  Ptr<Packet> packetToSend = origPacket->Copy ();
+  outFace->Send (packetToSend);
+
+  DidSendOutInterest (outFace, header, origPacket, pitEntry);
+
   return true;
 }
 

@@ -25,6 +25,7 @@
 #include "ns3/event-id.h"
 
 #include "fw-stats.h"
+#include "../../utils/ndn-pit-queue.h"
 
 namespace ns3 {
 namespace ndn {
@@ -52,29 +53,32 @@ public:
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  RemoveFace (Ptr<Face> face);
+  
 protected:
   virtual bool
-  WillSendOutInterest (Ptr<Face> outFace,
-                       Ptr<const InterestHeader> header,
-                       Ptr<pit::Entry> pitEntry);
+  TrySendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
+                      Ptr<pit::Entry> pitEntry);
   
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
+private:
+  void
+  ProcessFromQueue ();
+  
   // from Object
   void
   DoDispose ();
-  
+    
 private:
-  void
-  DecayLimits ();
-  
-private:
-  EventId m_decayLimitsEvent;
-
-  double m_threshold;
-  double m_graceAcceptProbability;
+  typedef std::map< Ptr<Face>, PitQueue > PitQueueMap;
+  PitQueueMap m_pitQueues; // per-outgoing face pit queue
 };
 
 
