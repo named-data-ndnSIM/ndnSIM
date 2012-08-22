@@ -109,7 +109,7 @@ public:
   typedef std::map< Ptr<Face>, boost::shared_ptr<Queue> > PerInFaceQueue;
 
 private:
-  uint32_t m_maxQueueSize;
+  // uint32_t m_maxQueueSize;
   PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
   PerInFaceQueue m_queues;
 };

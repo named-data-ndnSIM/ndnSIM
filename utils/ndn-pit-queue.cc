@@ -35,22 +35,22 @@ namespace ns3 {
 namespace ndn {
 
 PitQueue::PitQueue ()
-  : m_maxQueueSize (20)
-  , m_lastQueue (m_queues.end ())
+  // : m_maxQueueSize (20)
+  : m_lastQueue (m_queues.end ())
 {
 }
   
-void
-PitQueue::SetMaxQueueSize (uint32_t size)
-{
-  m_maxQueueSize = size;
-}
+// void
+// PitQueue::SetMaxQueueSize (uint32_t size)
+// {
+//   m_maxQueueSize = size;
+// }
 
-uint32_t
-PitQueue::GetMaxQueueSize () const
-{
-  return m_maxQueueSize;
-}
+// uint32_t
+// PitQueue::GetMaxQueueSize () const
+// {
+//   return m_maxQueueSize;
+// }
 
 
 bool
@@ -67,7 +67,7 @@ PitQueue::Enqueue (Ptr<Face> inFace,
       queue = itemPair.first;
     }
   
-  if (queue->second->size () >= m_maxQueueSize)
+  if (queue->second->size () >= inFace->GetLimits ().GetMaxLimit ())
       return false;
 
   Queue::iterator itemIterator = queue->second->insert (queue->second->end (), pitEntry);
