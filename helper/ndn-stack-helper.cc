@@ -267,8 +267,9 @@ StackHelper::Install (Ptr<Node> node) const
               NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
               double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
-              NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
-              NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+              // NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
+              // NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+              NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));
 
               // Set max to BDP
               face->GetLimits ().SetMaxLimit (m_avgRtt.ToDouble (Time::S) * maxInterestPackets);

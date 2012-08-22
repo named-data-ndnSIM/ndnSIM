@@ -140,7 +140,7 @@ Limits::IsBelowLimit ()
 {
   if (!IsEnabled ()) return true;
 
-  if (m_curMaxLimit - m_outstanding > 1.0)
+  if (m_curMaxLimit - m_outstanding >= 1.0)
     {
       // static UniformVariable acceptanceProbability (0, m_curMaxLimit);
       // double value = acceptanceProbability.GetValue ();

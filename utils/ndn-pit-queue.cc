@@ -22,18 +22,21 @@
 
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-pit-entry.h"
+#include "ns3/log.h"
 
 #include "ns3/assert.h"
 
 using namespace std;
 using namespace boost;
 
+NS_LOG_COMPONENT_DEFINE ("ndn.PitQueue");
+
 namespace ns3 {
 namespace ndn {
 
 PitQueue::PitQueue ()
-  : m_maxQueueSize (10)
-  , m_lastQueue (m_queues.begin ())
+  : m_maxQueueSize (20)
+  , m_lastQueue (m_queues.end ())
 {
 }
   
@@ -58,6 +61,7 @@ PitQueue::Enqueue (Ptr<Face> inFace,
   if (queue == m_queues.end ())
     {
       pair<PerInFaceQueue::iterator, bool> itemPair = m_queues.insert (make_pair (inFace, boost::make_shared<Queue> ()));
+      m_lastQueue = m_queues.end (); // for some reason end() iterator is invalidated when new item is inserted
       NS_ASSERT (itemPair.second == true);
 
       queue = itemPair.first;
@@ -90,7 +94,9 @@ PitQueue::Pop ()
     }
 
   if (queue == m_queues.end ())
-    queue = m_queues.begin (); // circle to the beginning
+    {
+      queue = m_queues.begin (); // circle to the beginning
+    }
 
   while (queue != m_queues.end () && queue->second->size () == 0) // advance iterator
     {
@@ -157,7 +163,7 @@ PitQueue::Remove (Ptr<pit::Entry> entry)
 bool
 PitQueue::IsEmpty () const
 {
-  bool isEmpty = (m_queues.size () == 0);
+  bool isEmpty = true;
 
   for (PerInFaceQueue::const_iterator queue = m_queues.begin ();
        queue != m_queues.end ();

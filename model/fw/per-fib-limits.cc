@@ -63,7 +63,6 @@ void
 PerFibLimits::DoDispose ()
 {
   super::DoDispose ();
-  // m_decayLimitsEvent.Cancel ();
 }
 
 void
@@ -99,21 +98,9 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
       // just suppress without any other action
       return false;
     }
-  
-  // if (pitEntry->GetFibEntry ()->GetLimits ().IsBelowLimit ())
-  //   {
-  //     if (outFace->GetLimits ().IsBelowLimit ())
-  //       {
-  //         pitEntry->AddOutgoing (outFace);
-  //         return true;
-  //       }
-  //     else
-  //       {
-  //         NS_LOG_DEBUG ("Face limit. Reverting back per-prefix allowance");
-  //         pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
-  //       }
-  //   }
 
+  NS_LOG_DEBUG ("Limit: " << outFace->GetLimits ().m_curMaxLimit << ", outstanding: " << outFace->GetLimits ().m_outstanding);
+  
   if (outFace->GetLimits ().IsBelowLimit ())
     {
       pitEntry->AddOutgoing (outFace);
@@ -122,15 +109,14 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
       Ptr<Packet> packetToSend = origPacket->Copy ();
       outFace->Send (packetToSend);
 
-      DidSendOutInterest (outFace, header, origPacket, pitEntry);
-      
+      DidSendOutInterest (outFace, header, origPacket, pitEntry);      
       return true;
     }
   else
     {
-      NS_LOG_DEBUG ("Face limit");
+      NS_LOG_DEBUG ("Face limit for " << header->GetName ());
     }
-  
+
   bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry);
   if (enqueued)
     {
@@ -157,7 +143,6 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
     }
 
   ProcessFromQueue ();
-  // pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
 }
 
 
@@ -178,29 +163,38 @@ PerFibLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
     }
 
   ProcessFromQueue ();
-  
-  // pitEntry->GetFibEntry ()->GetLimits ().RemoveOutstanding ();
 }
 
 
 void
 PerFibLimits::ProcessFromQueue ()
 {
+  NS_LOG_FUNCTION (this);
+  
   for (PitQueueMap::iterator queue = m_pitQueues.begin ();
        queue != m_pitQueues.end ();
        queue++)
     {
       Ptr<Face> outFace = queue->first;
+
+      NS_LOG_DEBUG ("Processing " << *outFace);
       
       while (!queue->second.IsEmpty () && outFace->GetLimits ().IsBelowLimit ())
         {
           // now we have enqueued packet and have slot available. Send out delayed packet
           Ptr<pit::Entry> pitEntry = queue->second.Pop ();
+
+          // wrong, but for experimental purposes
+          // pitEntry->UpdateLifetime (pitEntry->GetInterest ()->GetInterestLifetime ());
+          
+          NS_ASSERT_MSG (pitEntry != 0, "There *have to* be an entry in queue");
+          
           pitEntry->AddOutgoing (outFace);
 
           Ptr<Packet> packetToSend = Create<Packet> ();
           packetToSend->AddHeader (*pitEntry->GetInterest ());
-          
+
+          NS_LOG_DEBUG ("Delayed sending for " << pitEntry->GetPrefix ());
           outFace->Send (packetToSend);
           DidSendOutInterest (outFace, pitEntry->GetInterest (), packetToSend, pitEntry);
         }
@@ -215,19 +209,6 @@ PerFibLimits::ProcessFromQueue ()
 //   // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
 
 //   // ??
-// }
-
-// void
-// PerFibLimits::DecayLimits ()
-// {
-//   for (Ptr<fib::Entry> entry = m_fib->Begin ();
-//        entry != m_fib->End ();
-//        entry = m_fib->Next (entry))
-//     {
-//       entry->GetLimits ().DecayCurrentLimit ();
-//     }
-
-//   m_decayLimitsEvent = Simulator::Schedule (Seconds (1.0), &PerFibLimits::DecayLimits, this);
 // }
 
 

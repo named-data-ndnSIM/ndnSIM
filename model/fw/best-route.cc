@@ -62,7 +62,7 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
                                 Ptr<const Packet> origPacket,
                                 Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << header->GetName ());
 
   // Try to work out with just green faces
   bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
