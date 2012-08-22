@@ -241,6 +241,11 @@ Entry::GetMaxRetxCount () const
   return m_maxRetxCount;
 }
 
+Ptr<const InterestHeader>
+Entry::GetInterest () const
+{
+  return m_interest;
+}
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {

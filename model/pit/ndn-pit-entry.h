@@ -272,6 +272,12 @@ public:
   inline void
   RemoveFwTag ();
 
+  /**
+   * @brief Get InterestHeader (if several interests are received, then nonce is from the first Interest)
+   */
+  Ptr<const InterestHeader>
+  GetInterest () const;
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
   

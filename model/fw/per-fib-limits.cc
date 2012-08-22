@@ -190,17 +190,20 @@ PerFibLimits::ProcessFromQueue ()
        queue != m_pitQueues.end ();
        queue++)
     {
-      if (queue->second.IsEmpty ())
-        continue;
+      Ptr<Face> outFace = queue->first;
+      
+      while (!queue->second.IsEmpty () && outFace->GetLimits ().IsBelowLimit ())
+        {
+          // now we have enqueued packet and have slot available. Send out delayed packet
+          Ptr<pit::Entry> pitEntry = queue->second.Pop ();
+          pitEntry->AddOutgoing (outFace);
 
-      // if (outFace->GetLimits ().IsBelowLimit ())
-      //   {
-      //     pitEntry->AddOutgoing (outFace);
-      //   }
-      // else
-      //   {
-      //     // do nothing
-      //   }
+          Ptr<Packet> packetToSend = Create<Packet> ();
+          packetToSend->AddHeader (*pitEntry->GetInterest ());
+          
+          outFace->Send (packetToSend);
+          DidSendOutInterest (outFace, pitEntry->GetInterest (), packetToSend, pitEntry);
+        }
     }
 }
 
