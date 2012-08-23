@@ -262,6 +262,12 @@ public:
   GetOutgoing () const;
 
   /**
+   * @brief Get number of outgoing faces (needed for python bindings)
+   */
+  uint32_t
+  GetOutgoingCount () const;
+  
+  /**
    * @brief Add new forwarding strategy tag
    */
   inline void

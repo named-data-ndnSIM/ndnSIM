@@ -89,6 +89,11 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   // totally override all (if any) parent processing
+
+  if (header->GetInterestLifetime () < Seconds (0.1))
+    {
+      NS_LOG_DEBUG( "What the fuck? Why interest lifetime is so short? [" << header->GetInterestLifetime ().ToDouble (Time::S) << "s]");
+    }
   
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outFace);
@@ -119,9 +124,18 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
 
   // hack
   // offset lifetime, so we don't keep entries in queue for too long
-  pitEntry->OffsetLifetime (Seconds (- 0.9 * pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
+  // pitEntry->OffsetLifetime (Seconds (0.010) + );
+  // std::cerr << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) * 1000 << "ms" << std::endl;
+  pitEntry->OffsetLifetime (Seconds (-pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
+  pitEntry->UpdateLifetime (Seconds (0.10));
   
   bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry);
+
+  // if (Simulator::GetContext () == 6)
+  //   {
+  //     // std::cerr << "Attempt to enqueue packet for " << pitEntry->GetPrefix () << ": " << (enqueued?"succeeded":"failed") << std::endl;
+  //   }
+  
   if (enqueued)
     {
       NS_LOG_DEBUG ("PIT entry is enqueued for delayed processing. Telling that we forwarding possible");
@@ -137,17 +151,17 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   super::WillEraseTimedOutPendingInterest (pitEntry);
 
-  Ptr<Packet> pkt = Create<Packet> ();
-  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  nackHeader->SetNack (99);
-  pkt->AddHeader (*nackHeader);
+  // Ptr<Packet> pkt = Create<Packet> ();
+  // Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  // nackHeader->SetNack (99);
+  // pkt->AddHeader (*nackHeader);
 
-  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-       face != pitEntry->GetIncoming ().end ();
-       face ++)
-    {
-      face->m_face->Send (pkt->Copy ());
-    }
+  // for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+  //      face != pitEntry->GetIncoming ().end ();
+  //      face ++)
+  //   {
+  //     face->m_face->Send (pkt->Copy ());
+  //   }
   
   PitQueue::Remove (pitEntry);
   
@@ -199,17 +213,26 @@ PerFibLimits::ProcessFromQueue ()
         {
           // now we have enqueued packet and have slot available. Send out delayed packet
           Ptr<pit::Entry> pitEntry = queue->second.Pop ();
+          NS_ASSERT_MSG (pitEntry != 0, "There *have to* be an entry in queue");
 
           // hack
           // offset lifetime back, so PIT entry wouldn't prematurely expire
-          pitEntry->OffsetLifetime (Seconds (0.7 * pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
           
-          NS_ASSERT_MSG (pitEntry != 0, "There *have to* be an entry in queue");
-          
+          // std::cerr << Simulator::GetContext () << ", Lifetime before " << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) << "s" << std::endl;
+          pitEntry->OffsetLifetime (Seconds (-0.10) + Seconds (pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
+          // std::cerr << Simulator::GetContext () << ", Lifetime after " << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) << "s" << std::endl;
+                    
           pitEntry->AddOutgoing (outFace);
 
           Ptr<Packet> packetToSend = Create<Packet> ();
-          packetToSend->AddHeader (*pitEntry->GetInterest ());
+          Ptr<InterestHeader> header = Create<InterestHeader> (*pitEntry->GetInterest ());
+          NS_LOG_DEBUG ("Adjust interest lifetime to " << pitEntry->GetExpireTime () - Simulator::Now () << "s");
+          // header->SetInterestLifetime (
+          //                              // header->GetInterestLifetime () - ()
+          //                              pitEntry->GetExpireTime () - Simulator::Now ()
+          //                              );
+          // std::cerr << "New lifetime: " << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) << "s" << std::endl;
+          packetToSend->AddHeader (*header);
 
           NS_LOG_DEBUG ("Delayed sending for " << pitEntry->GetPrefix ());
           outFace->Send (packetToSend);
@@ -226,30 +249,30 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
   // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  Ptr<Packet> pkt = Create<Packet> ();
-  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  nackHeader->SetNack (99);
-  pkt->AddHeader (*nackHeader);
+  // Ptr<Packet> pkt = Create<Packet> ();
+  // Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  // nackHeader->SetNack (99);
+  // pkt->AddHeader (*nackHeader);
 
-  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-       face != pitEntry->GetIncoming ().end ();
-       face ++)
-    {
-      face->m_face->Send (pkt->Copy ());
-    }
+  // for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+  //      face != pitEntry->GetIncoming ().end ();
+  //      face ++)
+  //   {
+  //     face->m_face->Send (pkt->Copy ());
+  //   }
   
-  PitQueue::Remove (pitEntry);
+  // PitQueue::Remove (pitEntry);
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
-    {
-      face->m_face->GetLimits ().RemoveOutstanding ();
-    }
+  // for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+  //      face != pitEntry->GetOutgoing ().end ();
+  //      face ++)
+  //   {
+  //     face->m_face->GetLimits ().RemoveOutstanding ();
+  //   }
 
-  m_pit->MarkErased (pitEntry);
+  // m_pit->MarkErased (pitEntry);
   
-  ProcessFromQueue ();
+  // ProcessFromQueue ();
 }
 
 

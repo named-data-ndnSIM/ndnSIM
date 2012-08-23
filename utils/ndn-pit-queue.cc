@@ -66,9 +66,12 @@ PitQueue::Enqueue (Ptr<Face> inFace,
 
       queue = itemPair.first;
     }
-  
-  if (queue->second->size () >= inFace->GetLimits ().GetMaxLimit ())
+
+  if ((inFace->GetLimits ().GetMaxLimit () == 0 && queue->second->size () > 100) ||
+      (inFace->GetLimits ().GetMaxLimit () != 0 && queue->second->size () >= 0.5 * inFace->GetLimits ().GetMaxLimit ()))
+    {
       return false;
+    }
 
   Queue::iterator itemIterator = queue->second->insert (queue->second->end (), pitEntry);
   

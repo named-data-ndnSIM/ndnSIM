@@ -248,6 +248,13 @@ Entry::GetOutgoing () const
 }
 
 uint32_t
+Entry::GetOutgoingCount () const
+{
+  return m_outgoing.size ();
+}
+
+
+uint32_t
 Entry::GetMaxRetxCount () const
 {
   return m_maxRetxCount;
