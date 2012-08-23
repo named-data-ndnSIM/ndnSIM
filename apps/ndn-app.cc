@@ -155,7 +155,7 @@ App::StopApplication () // Called at time specified by Stop
   GetNode ()->GetObject<ForwardingStrategy> ()->RemoveFace (m_face); // notify that face is removed
 
   // step 3. Destroy face
-  NS_ASSERT_MSG (m_face->GetReferenceCount ()==1,
+  NS_ASSERT_MSG (m_face->GetReferenceCount ()==2,
                  "At this point, nobody else should have referenced this face, but we have "
                  << m_face->GetReferenceCount () << " references");
   m_face = 0;

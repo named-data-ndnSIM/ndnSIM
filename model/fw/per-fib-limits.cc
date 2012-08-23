@@ -68,8 +68,6 @@ PerFibLimits::DoDispose ()
 void
 PerFibLimits::RemoveFace (Ptr<Face> face)
 {  
-  super::RemoveFace (face);
-
   for (PitQueueMap::iterator item = m_pitQueues.begin ();
        item != m_pitQueues.end ();
        item ++)
@@ -77,6 +75,8 @@ PerFibLimits::RemoveFace (Ptr<Face> face)
       item->second.Remove (face);
     }
   m_pitQueues.erase (face);
+
+  super::RemoveFace (face);
 }
 
 
@@ -117,6 +117,10 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
       NS_LOG_DEBUG ("Face limit for " << header->GetName ());
     }
 
+  // hack
+  // offset lifetime, so we don't keep entries in queue for too long
+  pitEntry->OffsetLifetime (Seconds (- 0.9 * pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
+  
   bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry);
   if (enqueued)
     {
@@ -133,6 +137,18 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   super::WillEraseTimedOutPendingInterest (pitEntry);
 
+  Ptr<Packet> pkt = Create<Packet> ();
+  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  nackHeader->SetNack (99);
+  pkt->AddHeader (*nackHeader);
+
+  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+       face != pitEntry->GetIncoming ().end ();
+       face ++)
+    {
+      face->m_face->Send (pkt->Copy ());
+    }
+  
   PitQueue::Remove (pitEntry);
   
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
@@ -184,8 +200,9 @@ PerFibLimits::ProcessFromQueue ()
           // now we have enqueued packet and have slot available. Send out delayed packet
           Ptr<pit::Entry> pitEntry = queue->second.Pop ();
 
-          // wrong, but for experimental purposes
-          // pitEntry->UpdateLifetime (pitEntry->GetInterest ()->GetInterestLifetime ());
+          // hack
+          // offset lifetime back, so PIT entry wouldn't prematurely expire
+          pitEntry->OffsetLifetime (Seconds (0.7 * pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
           
           NS_ASSERT_MSG (pitEntry != 0, "There *have to* be an entry in queue");
           
@@ -201,15 +218,39 @@ PerFibLimits::ProcessFromQueue ()
     }
 }
 
-// void
-// PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
-//                                    uint32_t nackCode,
-//                                    Ptr<pit::Entry> pitEntry)
-// {
-//   // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
+void
+PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
+                                   uint32_t nackCode,
+                                   Ptr<pit::Entry> pitEntry)
+{
+  // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
+  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-//   // ??
-// }
+  Ptr<Packet> pkt = Create<Packet> ();
+  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  nackHeader->SetNack (99);
+  pkt->AddHeader (*nackHeader);
+
+  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+       face != pitEntry->GetIncoming ().end ();
+       face ++)
+    {
+      face->m_face->Send (pkt->Copy ());
+    }
+  
+  PitQueue::Remove (pitEntry);
+
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      face->m_face->GetLimits ().RemoveOutstanding ();
+    }
+
+  m_pit->MarkErased (pitEntry);
+  
+  ProcessFromQueue ();
+}
 
 
 } // namespace fw

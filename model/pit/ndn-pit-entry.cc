@@ -70,6 +70,18 @@ Entry::UpdateLifetime (const Time &offsetTime)
   NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
 }
 
+void
+Entry::OffsetLifetime (const Time &offsetTime)
+{
+  m_expireTime += offsetTime;
+  if (m_expireTime < Simulator::Now ())
+    {
+      m_expireTime = Simulator::Now ();
+    }
+  NS_LOG_INFO ("Offsetting lifetime to " << m_expireTime.ToDouble (Time::S));
+}
+
+
 const NameComponents &
 Entry::GetPrefix () const
 {

@@ -88,8 +88,6 @@ Nacks::OnNack (Ptr<Face> inFace,
                Ptr<const InterestHeader> header,
                Ptr<const Packet> origPacket)
 {
-  NS_ASSERT (m_nacksEnabled);
-
   // NS_LOG_FUNCTION (inFace << header << origPacket);
   m_inNacks (header, inFace);
 
@@ -106,29 +104,29 @@ Nacks::OnNack (Ptr<Face> inFace,
   //
   // inFace->LeakBucketByOnePacket ();
 
-  pitEntry->SetWaitingInVain (inFace);
+  // pitEntry->SetWaitingInVain (inFace);
 
   DidReceiveValidNack (inFace, header->GetNack (), pitEntry);
   
-  if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
-    {
-      NS_LOG_DEBUG ("Not all outgoing are in vain");
-      // suppress
-      // Don't do anything, we are still expecting data from some other face
-      m_dropNacks (header, inFace);
-      return;
-    }
+  // if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
+  //   {
+  //     NS_LOG_DEBUG ("Not all outgoing are in vain");
+  //     // suppress
+  //     // Don't do anything, we are still expecting data from some other face
+  //     m_dropNacks (header, inFace);
+  //     return;
+  //   }
   
-  Ptr<Packet> nonNackInterest = Create<Packet> ();
-  Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
-  nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
-  nonNackInterest->AddHeader (*nonNackHeader);
+  // Ptr<Packet> nonNackInterest = Create<Packet> ();
+  // Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
+  // nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
+  // nonNackInterest->AddHeader (*nonNackHeader);
   
-  bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
-  if (!propagated)
-    {
-      DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
-    }  
+  // bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
+  // if (!propagated)
+  //   {
+  //     DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
+  //   }  
 }
 
 void

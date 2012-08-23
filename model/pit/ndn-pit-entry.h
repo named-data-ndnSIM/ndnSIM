@@ -119,11 +119,20 @@ public:
    * This function will update PIT entry lifetime to the maximum of the current lifetime and
    * the lifetime Simulator::Now () + offsetTime
    *
-   * @param offsetTime Relative time to the current moment, representing PIT entry lifetime
+   * @param lifetime Relative time to the current moment, representing PIT entry lifetime
    */
   virtual void
-  UpdateLifetime (const Time &offsetTime);
+  UpdateLifetime (const Time &lifetime);
 
+  /**
+   * @brief Offset the currently set PIT lifetime (allowed both negative and positive offsets)
+   * @param offsetTime positive or negative offset for the PIT lifetime.
+   *
+   * If PIT expire time becomes less than Simulator::Now, then it is adjusted to Simulator::Now.
+   */
+  virtual void
+  OffsetLifetime (const Time &offsetTime);
+  
   /**
    * @brief Get prefix of the PIT entry
    */

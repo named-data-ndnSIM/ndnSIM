@@ -62,6 +62,15 @@ public:
     CONTAINER.RescheduleCleaning ();
   }
 
+  virtual void
+  OffsetLifetime (const Time &offsetTime)
+  {
+    CONTAINER.i_time.erase (Pit::time_index::s_iterator_to (*this));
+    super::OffsetLifetime (offsetTime);
+    CONTAINER.i_time.insert (*this);
+
+    CONTAINER.RescheduleCleaning ();
+  }
   
   // to make sure policies work
   void

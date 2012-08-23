@@ -39,6 +39,9 @@ NS_LOG_COMPONENT_DEFINE ("ndn.test.Generic");
 namespace ns3 {
 namespace ndn {
 
+struct Bla {
+};
+
 void
 GenericTests::DoRun ()
 {
@@ -90,9 +93,6 @@ GenericTests::DoRun ()
 
   cerr << "===========\n\n";
 
-  struct Bla {
-  };
-
   shared_ptr<Bla> p1 = make_shared <Bla> ();
   shared_ptr<Bla> p2 = make_shared <Bla> ();
 
@@ -100,6 +100,10 @@ GenericTests::DoRun ()
     {
       cerr << "They are equal\n";
     }
+
+
+  Time x = Seconds (-1);
+  cout << x << endl;
 }
 
 } // namespace ndn
