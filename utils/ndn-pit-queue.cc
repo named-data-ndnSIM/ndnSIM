@@ -146,7 +146,7 @@ PitQueue::Remove (Ptr<Face> face)
       shared_ptr<fw::PitQueueTag> tag = (*pitEntry)->GetFwTag<fw::PitQueueTag> ();
       NS_ASSERT (tag != shared_ptr<fw::PitQueueTag> ());
 
-      tag->RemoveFromQueue (queue->second);
+      tag->RemoveFromQueuesExcept (queue->second);
     }
 
   NS_ASSERT_MSG (queue->second->size () == 0, "Queue size should be 0 by now");
@@ -207,6 +207,27 @@ fw::PitQueueTag::RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue)
   item->first->erase (item->second);
   m_items.erase (item);
 }
+
+void
+fw::PitQueueTag::RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::Queue> queue)
+{
+  for (MapOfItems::iterator item = m_items.begin ();
+       item != m_items.end (); )
+    {
+      if (item->first == queue)
+        {
+          item ++;
+          continue;
+        }
+
+      item->first->erase (item->second);
+
+      MapOfItems::iterator itemToDelete = item;
+      item ++;
+      m_items.erase (itemToDelete);
+    }
+}
+
 
 } // namespace ndn
 } // namespace ns3

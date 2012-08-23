@@ -151,17 +151,20 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   super::WillEraseTimedOutPendingInterest (pitEntry);
 
-  // Ptr<Packet> pkt = Create<Packet> ();
-  // Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  // nackHeader->SetNack (99);
-  // pkt->AddHeader (*nackHeader);
+  if (pitEntry->GetOutgoing ().size () == 0)
+    {
+      Ptr<Packet> pkt = Create<Packet> ();
+      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+      nackHeader->SetNack (99);
+      pkt->AddHeader (*nackHeader);
 
-  // for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-  //      face != pitEntry->GetIncoming ().end ();
-  //      face ++)
-  //   {
-  //     face->m_face->Send (pkt->Copy ());
-  //   }
+      for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+           face != pitEntry->GetIncoming ().end ();
+           face ++)
+        {
+          face->m_face->Send (pkt->Copy ());
+        }
+    }
   
   PitQueue::Remove (pitEntry);
   
@@ -246,33 +249,32 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
                                    uint32_t nackCode,
                                    Ptr<pit::Entry> pitEntry)
 {
-  // super::DidReceiveValidNack (inFace, nackCode, pitEntry);
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  // Ptr<Packet> pkt = Create<Packet> ();
-  // Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  // nackHeader->SetNack (99);
-  // pkt->AddHeader (*nackHeader);
+  Ptr<Packet> pkt = Create<Packet> ();
+  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  nackHeader->SetNack (99);
+  pkt->AddHeader (*nackHeader);
 
-  // for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-  //      face != pitEntry->GetIncoming ().end ();
-  //      face ++)
-  //   {
-  //     face->m_face->Send (pkt->Copy ());
-  //   }
+  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+       face != pitEntry->GetIncoming ().end ();
+       face ++)
+    {
+      face->m_face->Send (pkt->Copy ());
+    }
   
-  // PitQueue::Remove (pitEntry);
+  PitQueue::Remove (pitEntry);
 
-  // for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-  //      face != pitEntry->GetOutgoing ().end ();
-  //      face ++)
-  //   {
-  //     face->m_face->GetLimits ().RemoveOutstanding ();
-  //   }
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      face->m_face->GetLimits ().RemoveOutstanding ();
+    }
 
-  // m_pit->MarkErased (pitEntry);
+  m_pit->MarkErased (pitEntry);
   
-  // ProcessFromQueue ();
+  ProcessFromQueue ();
 }
 
 

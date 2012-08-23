@@ -154,6 +154,13 @@ public:
    */
   void
   RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue);
+
+  /**
+   * @brief Remove reference to PIT from queues except the queue in parameter
+   * @param queue Queue from which PIT entry should not be removed (to preserve iterator)
+   */
+  void
+  RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::Queue> queue);
   
 private:
   MapOfItems m_items;
