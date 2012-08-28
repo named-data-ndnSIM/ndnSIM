@@ -167,30 +167,30 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   super::WillEraseTimedOutPendingInterest (pitEntry);
 
-  if (pitEntry->GetOutgoing ().size () == 0)
-    {
-      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  // if (pitEntry->GetOutgoing ().size () == 0)
+  //   {
+  //     Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
       
-      NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
-      if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
-        {
-          nackHeader->SetNack (100);
-        }
-      else
-        {
-          nackHeader->SetNack (101);
-        }
+  //     NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
+  //     if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
+  //       {
+  //         nackHeader->SetNack (100);
+  //       }
+  //     else
+  //       {
+  //         nackHeader->SetNack (101);
+  //       }
           
-      Ptr<Packet> pkt = Create<Packet> ();
-      pkt->AddHeader (*nackHeader);
+  //     Ptr<Packet> pkt = Create<Packet> ();
+  //     pkt->AddHeader (*nackHeader);
       
-      for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-           face != pitEntry->GetIncoming ().end ();
-           face ++)
-        {
-          face->m_face->Send (pkt->Copy ());
-        }
-    }
+  //     for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+  //          face != pitEntry->GetIncoming ().end ();
+  //          face ++)
+  //       {
+  //         face->m_face->Send (pkt->Copy ());
+  //       }
+  //   }
   
   PitQueue::Remove (pitEntry);
   

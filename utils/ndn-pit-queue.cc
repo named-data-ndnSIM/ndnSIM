@@ -23,6 +23,7 @@
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-pit-entry.h"
 #include "ns3/log.h"
+#include "ns3/simulator.h"
 
 #include "ns3/assert.h"
 
@@ -99,11 +100,11 @@ PitQueue::Pop ()
 {
   PerInFaceQueue::iterator queue = m_lastQueue;
 
-  // if (queue != m_queues.end () &&
-  //     true)
-  //   {
-  //     queue ++; // actually implement round robin...
-  //   } 
+  if (queue != m_queues.end () &&
+      true)
+    {
+      queue ++; // actually implement round robin...
+    } 
 
   while (queue != m_queues.end () && queue->second->get<0> ().size () == 0) // advance iterator
     {
@@ -125,6 +126,18 @@ PitQueue::Pop ()
   
   if (queue == m_queues.end ()) // e.g., begin () == end ()
     return 0;
+
+  // if (Simulator::GetContext () == 7)
+  //   {
+  //     for (PerInFaceQueue::const_iterator somequeue = m_queues.begin ();
+  //          somequeue != m_queues.end ();
+  //          somequeue ++)
+  //       {
+  //         if (somequeue == queue) cout << "*";
+  //         cout << somequeue->second->get<0> ().size () << " ";
+  //       }
+  //     cout << endl;
+  //   }
 
   NS_ASSERT_MSG (queue->second->get<0> ().size () != 0, "Logic error");
 
