@@ -69,11 +69,13 @@ public:
    * @brief Enqueue PIT entry for delayed processing
    * @param inFace incoming face to which queue PIT entry should enqueued
    * @param pitEntry smart pointer to PIT entry
+   * @param updatedWeight the current value for the inFace weight (stats-based weight)
    * return true if successfully enqueued, false if limit is reached or some other reason
    */
   bool
   Enqueue (Ptr<Face> inFace,
-           Ptr<pit::Entry> pitEntry);
+           Ptr<pit::Entry> pitEntry,
+           double updatedWeight);
 
   /**
    * @brief Get next PIT entry
@@ -99,19 +101,33 @@ public:
   Remove (Ptr<pit::Entry> entry);
 
   /**
-   * @brief Check if queue is empty
+   * @brief Check if all per-in-face queues is empty
    */
   bool
   IsEmpty () const;
+
+  /**
+   * @brief Check if the specified per-in-face queue is empty
+   */
+  bool
+  IsEmpty (Ptr<Face> inFace) const;
+
+private:
+  void
+  UpdateWeightedRounds ();
   
 public:  
   typedef std::list< Ptr<pit::Entry> > Queue;
-  typedef std::map< Ptr<Face>, boost::shared_ptr<Queue> > PerInFaceQueue;
+  typedef boost::tuple< Queue, double, uint32_t > WeightedQueue;
+  typedef std::map< Ptr<Face>, boost::shared_ptr<WeightedQueue> > PerInFaceQueue;
 
 private:
   // uint32_t m_maxQueueSize;
   PerInFaceQueue::iterator m_lastQueue; // last queue from which interest was taken
   PerInFaceQueue m_queues;
+
+  uint32_t m_serviceCounter;
+  
 };
 
 namespace fw {
@@ -125,7 +141,7 @@ class PitQueueTag :
 {
 public:
   // map based on addresses, should be good enough
-  typedef std::map< boost::shared_ptr<PitQueue::Queue>, PitQueue::Queue::iterator > MapOfItems;
+  typedef std::map< boost::shared_ptr<PitQueue::WeightedQueue>, PitQueue::Queue::iterator > MapOfItems;
 
 public:
   /**
@@ -140,7 +156,7 @@ public:
    * @brief iterator queue's iterator
    */
   void
-  InsertQueue (boost::shared_ptr<PitQueue::Queue> item, PitQueue::Queue::iterator iterator);
+  InsertQueue (boost::shared_ptr<PitQueue::WeightedQueue> item, PitQueue::Queue::iterator iterator);
 
   /**
    * @brief Remove PIT entry from all queues
@@ -153,14 +169,20 @@ public:
    * @param queue Queue from which PIT entry should be removed
    */
   void
-  RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue);
+  RemoveFromQueue (boost::shared_ptr<PitQueue::WeightedQueue> queue);
 
   /**
    * @brief Remove reference to PIT from queues except the queue in parameter
    * @param queue Queue from which PIT entry should not be removed (to preserve iterator)
    */
   void
-  RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::Queue> queue);
+  RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::WeightedQueue> queue);
+
+  /**
+   * @brief Check if removal of the entry will empty all the queues
+   */
+  bool
+  IsLastOneInQueues () const;
   
 private:
   MapOfItems m_items;

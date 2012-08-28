@@ -90,6 +90,13 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   // totally override all (if any) parent processing
 
+  if (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ())
+    {
+      pitEntry->UpdateLifetime (Seconds (0.10));
+      NS_LOG_DEBUG ("Packet is still in queue and is waiting for its processing");
+      return true; // already in the queue
+    }
+  
   if (header->GetInterestLifetime () < Seconds (0.1))
     {
       NS_LOG_DEBUG( "What the fuck? Why interest lifetime is so short? [" << header->GetInterestLifetime ().ToDouble (Time::S) << "s]");
@@ -128,8 +135,17 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
   // std::cerr << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) * 1000 << "ms" << std::endl;
   pitEntry->OffsetLifetime (Seconds (-pitEntry->GetInterest ()->GetInterestLifetime ().ToDouble (Time::S)));
   pitEntry->UpdateLifetime (Seconds (0.10));
+
+  // const ndnSIM::LoadStatsFace &stats = GetStatsTree ()[header->GetName ()].incoming ().find (inFace)->second;
+  const ndnSIM::LoadStatsFace &stats = GetStatsTree ()["/"].incoming ().find (inFace)->second;
+  double weight = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
+  if (weight < 0)
+    {
+      // if stats is unknown, gracefully accept interest with normal priority
+      weight = 1.0;
+    }
   
-  bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry);
+  bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry, weight);
 
   // if (Simulator::GetContext () == 6)
   //   {
@@ -153,11 +169,21 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 
   if (pitEntry->GetOutgoing ().size () == 0)
     {
-      Ptr<Packet> pkt = Create<Packet> ();
       Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-      nackHeader->SetNack (99);
+      
+      NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
+      if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
+        {
+          nackHeader->SetNack (100);
+        }
+      else
+        {
+          nackHeader->SetNack (101);
+        }
+          
+      Ptr<Packet> pkt = Create<Packet> ();
       pkt->AddHeader (*nackHeader);
-
+      
       for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
            face != pitEntry->GetIncoming ().end ();
            face ++)
@@ -250,10 +276,12 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
                                    Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  PitQueue::Remove (pitEntry);
+ 
 
-  Ptr<Packet> pkt = Create<Packet> ();
   Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  nackHeader->SetNack (99);
+  nackHeader->SetNack (100);
+  Ptr<Packet> pkt = Create<Packet> ();
   pkt->AddHeader (*nackHeader);
 
   for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
@@ -262,9 +290,9 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
     {
       face->m_face->Send (pkt->Copy ());
     }
-  
-  PitQueue::Remove (pitEntry);
 
+
+  
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
        face ++)

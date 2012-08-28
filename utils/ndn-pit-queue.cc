@@ -34,6 +34,8 @@ NS_LOG_COMPONENT_DEFINE ("ndn.PitQueue");
 namespace ns3 {
 namespace ndn {
 
+const double MIN_WEIGHT = 0.01;
+
 PitQueue::PitQueue ()
   // : m_maxQueueSize (20)
   : m_lastQueue (m_queues.end ())
@@ -55,25 +57,29 @@ PitQueue::PitQueue ()
 
 bool
 PitQueue::Enqueue (Ptr<Face> inFace,
-		   Ptr<pit::Entry> pitEntry)
+		   Ptr<pit::Entry> pitEntry,
+                   double updatedWeight)
 {
+  if (updatedWeight < MIN_WEIGHT) updatedWeight = MIN_WEIGHT;
+  
   PerInFaceQueue::iterator queue = m_queues.find (inFace);
   if (queue == m_queues.end ())
     {
-      pair<PerInFaceQueue::iterator, bool> itemPair = m_queues.insert (make_pair (inFace, boost::make_shared<Queue> ()));
+      pair<PerInFaceQueue::iterator, bool> itemPair =
+        m_queues.insert (make_pair (inFace, boost::make_shared< WeightedQueue > (make_tuple (Queue (), updatedWeight, 0))));
       m_lastQueue = m_queues.end (); // for some reason end() iterator is invalidated when new item is inserted
       NS_ASSERT (itemPair.second == true);
 
       queue = itemPair.first;
     }
 
-  if ((inFace->GetLimits ().GetMaxLimit () == 0 && queue->second->size () > 100) ||
-      (inFace->GetLimits ().GetMaxLimit () != 0 && queue->second->size () >= 0.5 * inFace->GetLimits ().GetMaxLimit ()))
+  if ((inFace->GetLimits ().GetMaxLimit () == 0 && queue->second->get<0> ().size () > 100) ||
+      (inFace->GetLimits ().GetMaxLimit () != 0 && queue->second->get<0> ().size () >= 0.5 * inFace->GetLimits ().GetMaxLimit ()))
     {
       return false;
     }
 
-  Queue::iterator itemIterator = queue->second->insert (queue->second->end (), pitEntry);
+  Queue::iterator itemIterator = queue->second->get<0> ().insert (queue->second->get<0> ().end (), pitEntry);
   
   shared_ptr<fw::PitQueueTag> tag = pitEntry->GetFwTag<fw::PitQueueTag> ();
   if (tag == shared_ptr<fw::PitQueueTag> ())
@@ -82,6 +88,8 @@ PitQueue::Enqueue (Ptr<Face> inFace,
       pitEntry->AddFwTag (tag);
     }
   tag->InsertQueue (queue->second, itemIterator);
+
+  UpdateWeightedRounds ();
   return true;
 }
 
@@ -91,36 +99,45 @@ PitQueue::Pop ()
 {
   PerInFaceQueue::iterator queue = m_lastQueue;
 
-  while (queue != m_queues.end () && queue->second->size () == 0) // advance iterator
+  // if (queue != m_queues.end () &&
+  //     true)
+  //   {
+  //     queue ++; // actually implement round robin...
+  //   } 
+
+  while (queue != m_queues.end () && queue->second->get<0> ().size () == 0) // advance iterator
     {
       queue ++;
+      m_serviceCounter = 0;
     }
 
   if (queue == m_queues.end ())
     {
       queue = m_queues.begin (); // circle to the beginning
+      m_serviceCounter = 0;
     }
 
-  while (queue != m_queues.end () && queue->second->size () == 0) // advance iterator
+  while (queue != m_queues.end () && queue->second->get<0> ().size () == 0) // advance iterator
     {
       queue ++;
+      m_serviceCounter = 0;
     }
   
   if (queue == m_queues.end ()) // e.g., begin () == end ()
     return 0;
 
-  NS_ASSERT_MSG (queue->second->size () != 0, "Logic error");
+  NS_ASSERT_MSG (queue->second->get<0> ().size () != 0, "Logic error");
 
-  Ptr<pit::Entry> entry = *queue->second->begin ();
+  Ptr<pit::Entry> entry = *queue->second->get<0> ().begin ();
   shared_ptr<fw::PitQueueTag> tag = entry->GetFwTag<fw::PitQueueTag> ();
   NS_ASSERT (tag != shared_ptr<fw::PitQueueTag> ());
 
 #ifdef NS3_LOG_ENABLE
-  size_t queueSize = queue->second->size ();
+  size_t queueSize = queue->second->get<0> ().size ();
 #endif
   tag->RemoveFromQueue (queue->second);
 #ifdef NS3_LOG_ENABLE
-  NS_ASSERT_MSG (queue->second->size () == queueSize-1, "Queue size should be reduced by one");
+  NS_ASSERT_MSG (queue->second->get<0> ().size () == queueSize-1, "Queue size should be reduced by one");
 #endif
     
   m_lastQueue = queue;
@@ -139,8 +156,8 @@ PitQueue::Remove (Ptr<Face> face)
   if (queue == m_queues.end ())
     return;
 
-  for (Queue::iterator pitEntry = queue->second->begin ();
-       pitEntry != queue->second->end ();
+  for (Queue::iterator pitEntry = queue->second->get<0> ().begin ();
+       pitEntry != queue->second->get<0> ().end ();
        pitEntry ++)
     {
       shared_ptr<fw::PitQueueTag> tag = (*pitEntry)->GetFwTag<fw::PitQueueTag> ();
@@ -149,7 +166,7 @@ PitQueue::Remove (Ptr<Face> face)
       tag->RemoveFromQueuesExcept (queue->second);
     }
 
-  NS_ASSERT_MSG (queue->second->size () == 0, "Queue size should be 0 by now");
+  NS_ASSERT_MSG (queue->second->get<0> ().size () == 0, "Queue size should be 0 by now");
   m_queues.erase (queue);
 }
 
@@ -172,17 +189,53 @@ PitQueue::IsEmpty () const
        queue != m_queues.end ();
        queue ++)
     {
-      isEmpty &= (queue->second->size () == 0);
+      isEmpty &= (queue->second->get<0> ().size () == 0);
     }
 
   return isEmpty;
 }
 
-void
-fw::PitQueueTag::InsertQueue (boost::shared_ptr<PitQueue::Queue> queue, PitQueue::Queue::iterator iterator)
+bool
+PitQueue::IsEmpty (Ptr<Face> inFace) const
 {
+  PerInFaceQueue::const_iterator queue = m_queues.find (inFace);
+  if (queue == m_queues.end ())
+    return true;
+
+  return queue->second->get<0> ().size () == 0;
+}
+
+
+void
+PitQueue::UpdateWeightedRounds ()
+{
+  double minWeight = 100.0;
+  for (PerInFaceQueue::const_iterator queue = m_queues.begin ();
+       queue != m_queues.end ();
+       queue ++)
+    {
+      if (queue->second->get<1> () < minWeight)
+        minWeight = queue->second->get<1> ();
+    }
+
+  for (PerInFaceQueue::const_iterator queue = m_queues.begin ();
+       queue != m_queues.end ();
+       queue ++)
+    {
+      queue->second->get<2> () = static_cast<uint32_t>((queue->second->get<1> () + 0.5) / minWeight);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+void
+fw::PitQueueTag::InsertQueue (boost::shared_ptr<PitQueue::WeightedQueue> queue, PitQueue::Queue::iterator iterator)
+{
+  // std::cerr << "size before: " << m_items.size () << " item: " << (*iterator)->GetPrefix ();
   pair<MapOfItems::iterator, bool> item = m_items.insert (make_pair (queue, iterator));
-  NS_ASSERT (item.second == true);
+  // std::cerr << " and after: " << m_items.size () << std::endl; 
+  NS_ASSERT_MSG (item.second == true, "Should be a new tag for PIT entry, but something is wrong");
 }
 
 void
@@ -192,24 +245,24 @@ fw::PitQueueTag::RemoveFromAllQueues ()
        item != m_items.end ();
        item ++)
     {
-      item->first->erase (item->second);
+      item->first->get<0> ().erase (item->second);
     }
   m_items.clear ();
 }
 
 void
-fw::PitQueueTag::RemoveFromQueue (boost::shared_ptr<PitQueue::Queue> queue)
+fw::PitQueueTag::RemoveFromQueue (boost::shared_ptr<PitQueue::WeightedQueue> queue)
 {
   MapOfItems::iterator item = m_items.find (queue);
   if (item == m_items.end ())
     return;
 
-  item->first->erase (item->second);
+  item->first->get<0> ().erase (item->second);
   m_items.erase (item);
 }
 
 void
-fw::PitQueueTag::RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::Queue> queue)
+fw::PitQueueTag::RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::WeightedQueue> queue)
 {
   for (MapOfItems::iterator item = m_items.begin ();
        item != m_items.end (); )
@@ -220,12 +273,27 @@ fw::PitQueueTag::RemoveFromQueuesExcept (boost::shared_ptr<PitQueue::Queue> queu
           continue;
         }
 
-      item->first->erase (item->second);
+      item->first->get<0> ().erase (item->second);
 
       MapOfItems::iterator itemToDelete = item;
       item ++;
       m_items.erase (itemToDelete);
     }
+}
+
+bool
+fw::PitQueueTag::IsLastOneInQueues () const
+{
+  bool lastOne = true;
+  
+  for (MapOfItems::const_iterator item = m_items.begin ();
+       item != m_items.end ();
+       item ++)
+    {
+      lastOne &= (item->first->get<0> ().size () == 1);
+    }
+
+  return lastOne;
 }
 
 
