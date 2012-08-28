@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.PitQueue");
 namespace ns3 {
 namespace ndn {
 
-const double MIN_WEIGHT = 0.01;
+const double MIN_WEIGHT = 0.1;
 
 PitQueue::PitQueue ()
   // : m_maxQueueSize (20)
@@ -61,6 +61,7 @@ PitQueue::Enqueue (Ptr<Face> inFace,
 		   Ptr<pit::Entry> pitEntry,
                    double updatedWeight)
 {
+  if (updatedWeight < 0) updatedWeight = 0.5;
   if (updatedWeight < MIN_WEIGHT) updatedWeight = MIN_WEIGHT;
   
   PerInFaceQueue::iterator queue = m_queues.find (inFace);
@@ -101,9 +102,10 @@ PitQueue::Pop ()
   PerInFaceQueue::iterator queue = m_lastQueue;
 
   if (queue != m_queues.end () &&
-      true)
+      m_serviceCounter >= queue->second->get<2> ())
     {
-      queue ++; // actually implement round robin...
+      queue ++; // actually implement weighted round robin...
+      m_serviceCounter = 0;
     } 
 
   while (queue != m_queues.end () && queue->second->get<0> ().size () == 0) // advance iterator
@@ -124,11 +126,12 @@ PitQueue::Pop ()
       m_serviceCounter = 0;
     }
   
-  if (queue == m_queues.end ()) // e.g., begin () == end ()
-    return 0;
-
-  // if (Simulator::GetContext () == 7)
+  m_serviceCounter ++;
+  
+  // if (Simulator::GetContext () == 4)
   //   {
+  //     cout << "====== " << Simulator::Now ().ToDouble (Time::S) << "s " << *queue->first << endl;
+  //     cout << "       " << m_serviceCounter << " / " << queue->second->get<2> () << "\n";
   //     for (PerInFaceQueue::const_iterator somequeue = m_queues.begin ();
   //          somequeue != m_queues.end ();
   //          somequeue ++)
@@ -139,6 +142,9 @@ PitQueue::Pop ()
   //     cout << endl;
   //   }
 
+  if (queue == m_queues.end () || queue->second->get<0> ().size () == 0) 
+    return 0;
+  
   NS_ASSERT_MSG (queue->second->get<0> ().size () != 0, "Logic error");
 
   Ptr<pit::Entry> entry = *queue->second->get<0> ().begin ();
@@ -152,7 +158,7 @@ PitQueue::Pop ()
 #ifdef NS3_LOG_ENABLE
   NS_ASSERT_MSG (queue->second->get<0> ().size () == queueSize-1, "Queue size should be reduced by one");
 #endif
-    
+
   m_lastQueue = queue;
   return entry;
 }
@@ -235,8 +241,22 @@ PitQueue::UpdateWeightedRounds ()
        queue != m_queues.end ();
        queue ++)
     {
-      queue->second->get<2> () = static_cast<uint32_t>((queue->second->get<1> () + 0.5) / minWeight);
+      queue->second->get<2> () = static_cast<uint32_t>(queue->second->get<1> () / minWeight);
+      if (queue->second->get<2> () < 1)
+        queue->second->get<2> () = 1;
     }
+
+  // if (m_queues.size () > 1)
+  //   {
+  //     cout << "Node " << Simulator::GetContext () << " (min = " << minWeight << "): ";
+  //     for (PerInFaceQueue::const_iterator queue = m_queues.begin ();
+  //          queue != m_queues.end ();
+  //          queue ++)
+  //       {
+  //         cout << queue->second->get<1> () << "/" << queue->second->get<2> () << "  ";
+  //       }
+  //     cout << endl;
+  //   }
 }
 
 

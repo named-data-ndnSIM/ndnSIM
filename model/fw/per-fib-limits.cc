@@ -139,11 +139,11 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
   // const ndnSIM::LoadStatsFace &stats = GetStatsTree ()[header->GetName ()].incoming ().find (inFace)->second;
   const ndnSIM::LoadStatsFace &stats = GetStatsTree ()["/"].incoming ().find (inFace)->second;
   double weight = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
-  if (weight < 0)
-    {
-      // if stats is unknown, gracefully accept interest with normal priority
-      weight = 1.0;
-    }
+  // if (weight < 0)
+  //   {
+  //     // if stats is unknown, gracefully accept interest with normal priority
+  //     weight = 1.0;
+  //   }
   
   bool enqueued = m_pitQueues[outFace].Enqueue (inFace, pitEntry, weight);
 
@@ -191,7 +191,7 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   //         face->m_face->Send (pkt->Copy ());
   //       }
   //   }
-  
+
   PitQueue::Remove (pitEntry);
   
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
@@ -242,7 +242,12 @@ PerFibLimits::ProcessFromQueue ()
         {
           // now we have enqueued packet and have slot available. Send out delayed packet
           Ptr<pit::Entry> pitEntry = queue->second.Pop ();
-          NS_ASSERT_MSG (pitEntry != 0, "There *have to* be an entry in queue");
+          if (pitEntry == 0)
+            {
+              outFace->GetLimits ().RemoveOutstanding ();
+              NS_LOG_DEBUG ("Though there are Interests in queue, weighted round robin decided that packet is not allowed yet");
+              break;
+            }
 
           // hack
           // offset lifetime back, so PIT entry wouldn't prematurely expire
@@ -275,12 +280,14 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
                                    uint32_t nackCode,
                                    Ptr<pit::Entry> pitEntry)
 {
+  super::DidReceiveValidNack (inFace, nackCode, pitEntry);
+  
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   PitQueue::Remove (pitEntry);
  
 
   Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-  nackHeader->SetNack (100);
+  // nackHeader->SetNack (100);
   Ptr<Packet> pkt = Create<Packet> ();
   pkt->AddHeader (*nackHeader);
 

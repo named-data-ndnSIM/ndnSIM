@@ -222,6 +222,25 @@ FwStats::RemoveFace (Ptr<Face> face)
   super::RemoveFace (face);
 }
 
+void
+FwStats::DidReceiveValidNack (Ptr<Face> inFace,
+                              uint32_t nackCode,
+                              Ptr<pit::Entry> pitEntry)
+{
+  m_stats.Satisfy (pitEntry->GetPrefix ().cut (1));
+  ScheduleRefreshingIfNecessary ();
+  
+  // m_stats.UndoNewPitEntry (header->GetName ().cut (1));
+  // m_stats.UndoOutgoing (header->GetName ().cut (1), inFace);
+
+  // for (pit::Enty::in_container::iterator item = pitEntry->GetIncoming ().begin ();
+  //      item != pitEntry->GetIncoming ().end ();
+  //      item ++)
+  //   {
+  //     m_stats.UndoIncoming (header->GetName ().cut (1), item->m_face);
+  //   }
+}
+
 
 } // namespace fw
 } // namespace ndn

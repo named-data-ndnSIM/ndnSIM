@@ -149,6 +149,7 @@ Limits::IsBelowLimit ()
       if (m_outstanding < value)
         {
           m_outstanding += 1.0;
+          // if (Simulator::GetContext () == 6) std::cout << "." << std::flush;
           return true;
         }
       else
@@ -166,6 +167,8 @@ Limits::RemoveOutstanding ()
 {
   if (!IsEnabled ()) return; //limits are disabled
   
+  // if (Simulator::GetContext () == 6) std::cout << "*" << std::flush;
+
   NS_LOG_DEBUG (m_outstanding);
   NS_ASSERT_MSG (m_outstanding >= 1, "Should not be possible, unless we decreasing this number twice somewhere");
   m_outstanding -= 1;

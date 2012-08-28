@@ -102,6 +102,11 @@ protected:
                                Ptr<const InterestHeader> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
+
+  virtual void
+  DidReceiveValidNack (Ptr<Face> inFace,
+                       uint32_t nackCode,
+                       Ptr<pit::Entry> pitEntry);
   
   // from Object
   void
