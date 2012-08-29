@@ -186,6 +186,13 @@ L3Protocol::RemoveFace (Ptr<Face> face)
 Ptr<Face>
 L3Protocol::GetFace (uint32_t index) const
 {
+  NS_ASSERT (0 <= index && index < m_faces.size ());
+  return m_faces[index];
+}
+
+Ptr<Face>
+L3Protocol::GetFaceById (uint32_t index) const
+{
   BOOST_FOREACH (const Ptr<Face> &face, m_faces) // this function is not supposed to be called often, so linear search is fine
     {
       if (face->GetId () == index)

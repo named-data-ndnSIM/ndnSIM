@@ -67,6 +67,8 @@ class L3Protocol :
     public Object
 {
 public:
+  typedef std::vector<Ptr<Face> > FaceList;
+
   /**
    * \brief Interface ID
    *
@@ -103,14 +105,22 @@ public:
    */
   virtual uint32_t
   GetNFaces () const;
-  
+
   /**
    * \brief Get face by face index
-   * \param face The face number of an Ndn interface.
+   * \param face The face number (number in face list)
    * \returns The NdnFace associated with the Ndn face number.
    */
   virtual Ptr<Face>
   GetFace (uint32_t face) const;
+  
+  /**
+   * \brief Get face by face ID
+   * \param face The face ID number
+   * \returns The NdnFace associated with the Ndn face number.
+   */
+  virtual Ptr<Face>
+  GetFaceById (uint32_t face) const;
 
   /**
    * \brief Remove face from ndn stack (remove callbacks)
@@ -143,7 +153,6 @@ private:
   
 private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
-  typedef std::vector<Ptr<Face> > FaceList;
   FaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
 
   // These objects are aggregated, but for optimization, get them here
