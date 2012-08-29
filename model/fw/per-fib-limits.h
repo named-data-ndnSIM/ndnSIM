@@ -51,6 +51,11 @@ public:
   PerFibLimits ();
 
   virtual void
+  OnInterest (Ptr<Face> face,
+              Ptr<const InterestHeader> header,
+              Ptr<const Packet> origPacket);
+  
+  virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
   virtual void
@@ -76,14 +81,26 @@ protected:
 private:
   void
   ProcessFromQueue ();
+
+  void
+  AnnounceLimits ();
+
+  void
+  ApplyAnnouncedLimit (Ptr<Face> inFace,
+                       Ptr<const InterestHeader> header);
   
   // from Object
-  void
+  virtual void
+  NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
+
+  virtual void
   DoDispose ();
     
 private:
   typedef std::map< Ptr<Face>, PitQueue > PitQueueMap;
   PitQueueMap m_pitQueues; // per-outgoing face pit queue
+
+  EventId m_announceEvent;
 };
 
 
