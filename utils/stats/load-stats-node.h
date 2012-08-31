@@ -71,6 +71,12 @@ public:
   Satisfy ();
 
   /**
+   * Remove a packet from all stats
+   */
+  void
+  RemoveFromStats ();
+
+  /**
    * Increment counter to both incoming and outgoing lists, for all faces
    */
   void

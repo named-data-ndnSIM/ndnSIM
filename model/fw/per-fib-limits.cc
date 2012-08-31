@@ -53,6 +53,11 @@ PerFibLimits::GetTypeId (void)
     .SetGroupName ("Ndn")
     .SetParent <super> ()
     .AddConstructor <PerFibLimits> ()
+
+    .AddAttribute ("AnnounceLimits", "Enable limit announcement using scope 0 interests",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&PerFibLimits::m_announceLimits),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -74,10 +79,13 @@ PerFibLimits::NotifyNewAggregate ()
 {
   super::NotifyNewAggregate ();
 
-  if (m_pit != 0 && m_fib != 0)
+  if (m_announceLimits)
     {
-      m_announceEvent = Simulator::Schedule (Seconds (1.0),
-                                             &PerFibLimits::AnnounceLimits, this);
+      if (m_pit != 0 && m_fib != 0)
+        {
+          m_announceEvent = Simulator::Schedule (Seconds (1.0),
+                                                 &PerFibLimits::AnnounceLimits, this);
+        }
     }
 }
 
@@ -125,7 +133,7 @@ PerFibLimits::TrySendOutInterest (Ptr<Face> inFace,
   
   if (header->GetInterestLifetime () < Seconds (0.1))
     {
-      NS_LOG_DEBUG( "What the fuck? Why interest lifetime is so short? [" << header->GetInterestLifetime ().ToDouble (Time::S) << "s]");
+      NS_LOG_DEBUG( "??? Why interest lifetime is so short? [" << header->GetInterestLifetime ().ToDouble (Time::S) << "s]");
     }
   
   pit::Entry::out_iterator outgoing =
@@ -180,32 +188,38 @@ void
 PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-  super::WillEraseTimedOutPendingInterest (pitEntry);
 
-  // if (pitEntry->GetOutgoing ().size () == 0)
-  //   {
-  //     Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  if (pitEntry->GetOutgoing ().size () == 0)
+    {
+      super::DidReceiveValidNack (0, 0, pitEntry); // semi safe
       
-  //     NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
-  //     if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
-  //       {
-  //         nackHeader->SetNack (100);
-  //       }
-  //     else
-  //       {
-  //         nackHeader->SetNack (101);
-  //       }
+      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+      
+      NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
+      if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
+        {
+          nackHeader->SetNack (100);
+        }
+      else
+        {
+          nackHeader->SetNack (101);
+        }
           
-  //     Ptr<Packet> pkt = Create<Packet> ();
-  //     pkt->AddHeader (*nackHeader);
+      Ptr<Packet> pkt = Create<Packet> ();
+      pkt->AddHeader (*nackHeader);
       
-  //     for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-  //          face != pitEntry->GetIncoming ().end ();
-  //          face ++)
-  //       {
-  //         face->m_face->Send (pkt->Copy ());
-  //       }
-  //   }
+      for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+           face != pitEntry->GetIncoming ().end ();
+           face ++)
+        {
+          face->m_face->Send (pkt->Copy ());
+        }
+    }
+  else
+    {
+      // make bad stats only for "legitimately" timed out interests
+      super::WillEraseTimedOutPendingInterest (pitEntry);
+    }    
 
   PitQueue::Remove (pitEntry);
   
@@ -295,36 +309,33 @@ PerFibLimits::DidReceiveValidNack (Ptr<Face> inFace,
                                    uint32_t nackCode,
                                    Ptr<pit::Entry> pitEntry)
 {
-//   super::DidReceiveValidNack (inFace, nackCode, pitEntry);
+  super::DidReceiveValidNack (inFace, nackCode, pitEntry); // will reset count stats
   
-//   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-//   PitQueue::Remove (pitEntry);
+  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  PitQueue::Remove (pitEntry);
  
+  Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+  nackHeader->SetNack (100);
+  Ptr<Packet> pkt = Create<Packet> ();
+  pkt->AddHeader (*nackHeader);
 
-//   Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-//   // nackHeader->SetNack (100);
-//   Ptr<Packet> pkt = Create<Packet> ();
-//   pkt->AddHeader (*nackHeader);
-
-//   for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-//        face != pitEntry->GetIncoming ().end ();
-//        face ++)
-//     {
-//       face->m_face->Send (pkt->Copy ());
-//     }
-
-
+  for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+       face != pitEntry->GetIncoming ().end ();
+       face ++)
+    {
+      face->m_face->Send (pkt->Copy ());
+    }
   
-//   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-//        face != pitEntry->GetOutgoing ().end ();
-//        face ++)
-//     {
-//       face->m_face->GetLimits ().RemoveOutstanding ();
-//     }
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      face->m_face->GetLimits ().RemoveOutstanding ();
+    }
 
-//   m_pit->MarkErased (pitEntry);
+  m_pit->MarkErased (pitEntry);
   
-//   ProcessFromQueue ();
+  ProcessFromQueue ();
 }
 
 void

@@ -79,6 +79,14 @@ StatsTree::Satisfy (const NameComponents &key)
 }
 
 void
+StatsTree::RemoveFromStats (const NameComponents &key)
+{
+  std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());
+
+  item.first->payload ().RemoveFromStats ();
+}
+
+void
 StatsTree::Timeout (const NameComponents &key)
 {
   std::pair<tree_type::iterator, bool> item = m_tree.insert (key, LoadStatsNode ());

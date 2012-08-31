@@ -54,6 +54,9 @@ public:
   Satisfy (const NameComponents &key);
 
   void
+  RemoveFromStats (const NameComponents &key);
+
+  void
   Timeout (const NameComponents &key);
 
   void

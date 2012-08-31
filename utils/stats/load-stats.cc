@@ -66,6 +66,13 @@ LoadStats::operator ++ (int)
 }
 
 LoadStats &
+LoadStats::operator -- (int)
+{
+  counter_ --;
+  return *this;
+}
+
+LoadStats &
 LoadStats::operator += (uint32_t amount)
 {
   counter_ += amount;

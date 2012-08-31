@@ -100,6 +100,8 @@ private:
   typedef std::map< Ptr<Face>, PitQueue > PitQueueMap;
   PitQueueMap m_pitQueues; // per-outgoing face pit queue
 
+  bool    m_announceLimits;
+
   EventId m_announceEvent;
 };
 

@@ -93,6 +93,26 @@ LoadStatsNode::Satisfy ()
 }
 
 void
+LoadStatsNode::RemoveFromStats ()
+{
+  m_pit.count ()--;
+  
+  for (stats_container::iterator item = m_incoming.begin ();
+       item != m_incoming.end ();
+       item ++)
+    {
+      item->second.count ()--;
+    }
+
+  for (stats_container::iterator item = m_outgoing.begin ();
+       item != m_outgoing.end ();
+       item ++)
+    {
+      item->second.count ()--;
+    }
+}
+
+void
 LoadStatsNode::Timeout ()
 {
   m_pit.unsatisfied ()++;

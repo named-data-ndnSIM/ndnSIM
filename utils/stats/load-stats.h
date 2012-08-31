@@ -45,6 +45,9 @@ public:
 
   LoadStats &
   operator ++ (int);
+
+  LoadStats &
+  operator -- (int);
   
   // uint32_t
   // GetCounter () const;

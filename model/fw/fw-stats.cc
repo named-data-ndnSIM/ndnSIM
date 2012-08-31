@@ -227,7 +227,8 @@ FwStats::DidReceiveValidNack (Ptr<Face> inFace,
                               uint32_t nackCode,
                               Ptr<pit::Entry> pitEntry)
 {
-  m_stats.Satisfy (pitEntry->GetPrefix ().cut (1));
+  // m_stats.Satisfy (pitEntry->GetPrefix ().cut (1));
+  m_stats.RemoveFromStats (pitEntry->GetPrefix ().cut (1));
   ScheduleRefreshingIfNecessary ();
   
   // m_stats.UndoNewPitEntry (header->GetName ().cut (1));
