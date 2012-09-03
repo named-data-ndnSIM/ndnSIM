@@ -51,8 +51,23 @@ namespace ndn {
 
 const uint16_t L3Protocol::ETHERNET_FRAME_TYPE = 0x7777;
 
+uint64_t L3Protocol::s_interestCounter = 0;
+uint64_t L3Protocol::s_dataCounter = 0;
 
 NS_OBJECT_ENSURE_REGISTERED (L3Protocol);
+
+uint64_t
+L3Protocol::GetInterestCounter ()
+{
+  return s_interestCounter;
+}
+
+uint64_t
+L3Protocol::GetDataCounter ()
+{
+  return s_dataCounter;
+}
+
 
 TypeId 
 L3Protocol::GetTypeId (void)
@@ -240,6 +255,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
         {
         case HeaderHelper::INTEREST:
           {
+            s_interestCounter ++;
             Ptr<InterestHeader> header = Create<InterestHeader> ();
 
             // Deserialization. Exception may be thrown
@@ -255,6 +271,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
           }
         case HeaderHelper::CONTENT_OBJECT:
           {
+            s_dataCounter ++;
             Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
             
             static ContentObjectTail contentObjectTrailer; //there is no data in this object

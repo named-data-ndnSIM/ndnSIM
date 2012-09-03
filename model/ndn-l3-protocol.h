@@ -134,6 +134,12 @@ public:
   virtual Ptr<Face>
   GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
 
+  static uint64_t
+  GetInterestCounter ();
+
+  static uint64_t
+  GetDataCounter ();
+  
 private:
   void
   Receive (const Ptr<Face> &face, const Ptr<const Packet> &p);
@@ -155,6 +161,9 @@ private:
   uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
   FaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
 
+  static uint64_t s_interestCounter;
+  static uint64_t s_dataCounter;
+  
   // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
   Ptr<ForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
