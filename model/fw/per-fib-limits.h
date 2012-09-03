@@ -101,6 +101,7 @@ private:
   PitQueueMap m_pitQueues; // per-outgoing face pit queue
 
   bool    m_announceLimits;
+  bool m_queueDropNotifications;
 
   EventId m_announceEvent;
 };

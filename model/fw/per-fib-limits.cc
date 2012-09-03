@@ -58,6 +58,11 @@ PerFibLimits::GetTypeId (void)
                    BooleanValue (false),
                    MakeBooleanAccessor (&PerFibLimits::m_announceLimits),
                    MakeBooleanChecker ())
+
+    .AddAttribute ("QueueDropNotifications", "Enable explicit notifications (using nacks) that packet was dropped from queue",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&PerFibLimits::m_queueDropNotifications),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -192,27 +197,30 @@ PerFibLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   if (pitEntry->GetOutgoing ().size () == 0)
     {
       super::DidReceiveValidNack (0, 0, pitEntry); // semi safe
-      
-      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
-      
-      NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
-      if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
+
+      if (m_queueDropNotifications)
         {
-          nackHeader->SetNack (100);
-        }
-      else
-        {
-          nackHeader->SetNack (101);
-        }
+          Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*pitEntry->GetInterest ());
+      
+          NS_ASSERT (pitEntry->GetFwTag<PitQueueTag> () != boost::shared_ptr<PitQueueTag> ());
+          if (pitEntry->GetFwTag<PitQueueTag> ()->IsLastOneInQueues ())
+            {
+              nackHeader->SetNack (100);
+            }
+          else
+            {
+              nackHeader->SetNack (101);
+            }
           
-      Ptr<Packet> pkt = Create<Packet> ();
-      pkt->AddHeader (*nackHeader);
+          Ptr<Packet> pkt = Create<Packet> ();
+          pkt->AddHeader (*nackHeader);
       
-      for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
-           face != pitEntry->GetIncoming ().end ();
-           face ++)
-        {
-          face->m_face->Send (pkt->Copy ());
+          for (pit::Entry::in_container::iterator face = pitEntry->GetIncoming ().begin ();
+               face != pitEntry->GetIncoming ().end ();
+               face ++)
+            {
+              face->m_face->Send (pkt->Copy ());
+            }
         }
     }
   else
