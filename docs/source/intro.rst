@@ -123,21 +123,41 @@ There are quite a few modification to the base NS-3 code that are necessary to r
 Compiling and running ndnSIM
 ----------------------------
 
-ndnSIM uses standard NS-3 compilation procedure.  For example::
+ndnSIM uses standard NS-3 compilation procedure.  Normally the following commands should be sufficient to configure and build ndnSIM with python bindings enabled::
 
 	cd <ns-3-folder>
 	./waf configure --enable-examples --enable-ndn-plugins=topology,mobility
 	./waf
 
+On MacOS (with macports), you may need to modify the configure command to use macports version of python::
 
+	cd <ns-3-folder>
+	./waf configure --with-python=/opt/local/bin/python2.7 --enable-examples --enable-ndn-plugins=topology,mobility
+	./waf
+
+Python bindings is an optional and not very stable feature of NS-3 simulator.  It is possible to disable python bindings compilation either to speed up compilation or to avoid certain compilation errors (e.g., "Could not find a task generator for the name 'ns3-visualizer'")::
+
+	cd <ns-3-folder>
+	./waf configure --disable-python --enable-examples --enable-ndn-plugins=topology,mobility
+	./waf
+
+For more configuration options, please refer to ``./waf --help``.
 
 To run :doc:`sample ndnSIM simulations <examples>`::
 
-	./waf --run=ccnx-simple
+	./waf --run=ndn-simple
 
 or::
 
-	./waf --run=ccnx-grid
+	./waf --run=ndn-grid
+
+If you have compiled with python bindings, then you can try to run these simulations with visualizer::
+
+	./waf --run=ndn-simple --vis
+
+or::
+
+	./waf --run=ndn-grid --vis
 
 .. note::
    Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
