@@ -170,7 +170,7 @@ Limits::RemoveOutstanding ()
   // if (Simulator::GetContext () == 6) std::cout << "*" << std::flush;
 
   NS_LOG_DEBUG (m_outstanding);
-  NS_ASSERT_MSG (m_outstanding >= 1, "Should not be possible, unless we decreasing this number twice somewhere");
+  NS_ASSERT_MSG (m_outstanding >= (uint32_t)1, "Should not be possible, unless we decreasing this number twice somewhere");
   m_outstanding -= 1;
 }
 
