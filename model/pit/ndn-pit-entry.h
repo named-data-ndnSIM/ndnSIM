@@ -57,25 +57,26 @@ class i_retx {};
  * Indexes:
  * - by face (may be it will be possible to replace with just the std::map)
  */
-struct OutgoingFaceContainer
-{
-  /// @cond include_hidden
-  typedef boost::multi_index::multi_index_container<
-    OutgoingFace,
-    boost::multi_index::indexed_by<
-      // For fast access to elements using NdnFace
-      boost::multi_index::ordered_unique<
-        boost::multi_index::tag<i_face>,
-        boost::multi_index::member<OutgoingFace, Ptr<Face>, &OutgoingFace::m_face>
-      >,
-      boost::multi_index::ordered_non_unique<
-        boost::multi_index::tag<i_retx>,
-        boost::multi_index::member<OutgoingFace, uint32_t, &OutgoingFace::m_retxCount>
-      >    
-    >
-   > type;
-  /// @endcond
-};
+// struct OutgoingFaceContainer
+// {
+//   /// @cond include_hidden
+//   typedef boost::multi_index::multi_index_container<
+//     OutgoingFace,
+//     boost::multi_index::indexed_by<
+//       // For fast access to elements using NdnFace
+//       boost::multi_index::ordered_unique<
+//         boost::multi_index::tag<i_face>,
+//         boost::multi_index::member<OutgoingFace, Ptr<Face>, &OutgoingFace::m_face>
+//       >
+//       // ,
+//       // boost::multi_index::ordered_non_unique<
+//       //   boost::multi_index::tag<i_retx>,
+//       //   boost::multi_index::member<OutgoingFace, uint32_t, &OutgoingFace::m_retxCount>
+//       // >    
+//     >
+//    > type;
+//   /// @endcond
+// };
 
 
 /**
@@ -90,7 +91,8 @@ public:
   typedef std::set< IncomingFace > in_container; ///< @brief incoming faces container type
   typedef in_container::iterator in_iterator;                ///< @brief iterator to incoming faces
 
-  typedef OutgoingFaceContainer::type out_container; ///< @brief outgoing faces container type
+  // typedef OutgoingFaceContainer::type out_container; ///< @brief outgoing faces container type
+  typedef std::set< OutgoingFace > out_container; ///< @brief outgoing faces container type
   typedef out_container::iterator out_iterator;              ///< @brief iterator to outgoing faces
 
   typedef std::set< uint32_t > nonce_container;  ///< @brief nonce container type

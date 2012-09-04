@@ -34,6 +34,26 @@ OutgoingFace::OutgoingFace (Ptr<Face> face)
 {
 }
 
+OutgoingFace::OutgoingFace ()
+  : m_face (0)
+  , m_sendTime (0)
+  , m_retxCount (0)
+  , m_waitingInVain (false)
+{
+}
+
+OutgoingFace &
+OutgoingFace::operator = (const OutgoingFace &other)
+{
+  m_face = other.m_face;
+  m_sendTime = other.m_sendTime;
+  m_retxCount = other.m_retxCount;
+  m_waitingInVain = other.m_waitingInVain;
+
+  return *this;
+}
+
+
 void
 OutgoingFace::UpdateOnRetransmit ()
 {

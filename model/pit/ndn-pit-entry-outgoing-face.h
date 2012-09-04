@@ -51,6 +51,17 @@ public:
   OutgoingFace (Ptr<Face> face);
 
   /**
+   * @brief Default constructor, necessary for Python bindings, but should not be used anywhere else.
+   */
+  OutgoingFace ();
+
+  /**
+   * @brie Copy operator
+   */
+  OutgoingFace &
+  operator = (const OutgoingFace &other);
+  
+  /**
    * @brief Update outgoing entry upon retransmission
    */
   void

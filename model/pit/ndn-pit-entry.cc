@@ -90,8 +90,9 @@ Entry::AddOutgoing (Ptr<Face> face)
 
   if (!ret.second)
     { // outgoing face already exists
-      m_outgoing.modify (ret.first,
-                         ll::bind (&OutgoingFace::UpdateOnRetransmit, ll::_1));
+      const_cast<OutgoingFace&>(*ret.first).UpdateOnRetransmit ();
+      // m_outgoing.modify (ret.first,
+      //                    ll::bind (&OutgoingFace::UpdateOnRetransmit, ll::_1));
     }
 
   return ret.first;
@@ -129,9 +130,10 @@ Entry::SetWaitingInVain (Ptr<Face> face)
   out_iterator item = m_outgoing.find (face);
   if (item == m_outgoing.end ())
     return;
-  
-  m_outgoing.modify (item,
-                     (&ll::_1)->*&OutgoingFace::m_waitingInVain = true);
+
+  const_cast<OutgoingFace&>(*item).m_waitingInVain = true;
+  // m_outgoing.modify (item,
+  //                    (&ll::_1)->*&OutgoingFace::m_waitingInVain = true);
 }
 
 

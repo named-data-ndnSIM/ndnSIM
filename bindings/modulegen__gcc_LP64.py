@@ -302,6 +302,7 @@ def register_types_ns3_ndn(module):
     module.add_class('UnknownHeaderException')
     ## ndn-app-face.h (module 'ndnSIM'): ns3::ndn::AppFace [class]
     module.add_class('AppFace', parent=root_module['ns3::ndn::Face'])
+    module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
     module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
     
@@ -358,13 +359,12 @@ def register_types_ns3_ndn_pit(module):
     module.add_class('IncomingFace')
     ## ndn-pit-entry-outgoing-face.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFace [struct]
     module.add_class('OutgoingFace')
-    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFaceContainer [struct]
-    module.add_class('OutgoingFaceContainer')
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::i_face [class]
     module.add_class('i_face')
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::i_retx [class]
     module.add_class('i_retx')
     module.add_container('std::set< ns3::ndn::pit::IncomingFace >', 'ns3::ndn::pit::IncomingFace', container_type='set')
+    module.add_container('std::set< ns3::ndn::pit::OutgoingFace >', 'ns3::ndn::pit::OutgoingFace', container_type='set')
     module.add_container('std::set< unsigned int >', 'unsigned int', container_type='set')
 
 def register_methods(root_module):
@@ -494,7 +494,6 @@ def register_methods(root_module):
     register_Ns3NdnPitEntry_methods(root_module, root_module['ns3::ndn::pit::Entry'])
     register_Ns3NdnPitIncomingFace_methods(root_module, root_module['ns3::ndn::pit::IncomingFace'])
     register_Ns3NdnPitOutgoingFace_methods(root_module, root_module['ns3::ndn::pit::OutgoingFace'])
-    register_Ns3NdnPitOutgoingFaceContainer_methods(root_module, root_module['ns3::ndn::pit::OutgoingFaceContainer'])
     register_Ns3NdnPitI_face_methods(root_module, root_module['ns3::ndn::pit::i_face'])
     register_Ns3NdnPitI_retx_methods(root_module, root_module['ns3::ndn::pit::i_retx'])
     return
@@ -4649,6 +4648,11 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::Face >', 
                    [param('uint32_t', 'face')], 
                    is_const=True, is_virtual=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Face> ns3::ndn::L3Protocol::GetFaceById(uint32_t face) const [member function]
+    cls.add_method('GetFaceById', 
+                   'ns3::Ptr< ns3::ndn::Face >', 
+                   [param('uint32_t', 'face')], 
+                   is_const=True, is_virtual=True)
     ## ndn-l3-protocol.h (module 'ndnSIM'): void ns3::ndn::L3Protocol::RemoveFace(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('RemoveFace', 
                    'void', 
@@ -4659,6 +4663,16 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::Face >', 
                    [param('ns3::Ptr< ns3::NetDevice >', 'netDevice')], 
                    is_const=True, is_virtual=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): static uint64_t ns3::ndn::L3Protocol::GetInterestCounter() [member function]
+    cls.add_method('GetInterestCounter', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): static uint64_t ns3::ndn::L3Protocol::GetDataCounter() [member function]
+    cls.add_method('GetDataCounter', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
     ## ndn-l3-protocol.h (module 'ndnSIM'): void ns3::ndn::L3Protocol::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
@@ -5113,9 +5127,9 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    'std::_Rb_tree_const_iterator< ns3::ndn::pit::IncomingFace >', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
                    is_virtual=True)
-    ## ndn-pit-entry.h (module 'ndnSIM'): boost::multi_index::detail::bidir_node_iterator<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::ordered_index_node<boost::multi_index::detail::index_node_base<ns3::ndn::pit::OutgoingFace, std::allocator<ns3::ndn::pit::OutgoingFace> > > > > ns3::ndn::pit::Entry::AddOutgoing(ns3::Ptr<ns3::ndn::Face> face) [member function]
+    ## ndn-pit-entry.h (module 'ndnSIM'): std::_Rb_tree_const_iterator<ns3::ndn::pit::OutgoingFace> ns3::ndn::pit::Entry::AddOutgoing(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('AddOutgoing', 
-                   'boost::multi_index::detail::bidir_node_iterator< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::ordered_index_node< boost::multi_index::detail::index_node_base< ns3::ndn::pit::OutgoingFace, std::allocator< ns3::ndn::pit::OutgoingFace > > > > >', 
+                   'std::_Rb_tree_const_iterator< ns3::ndn::pit::OutgoingFace >', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
                    is_virtual=True)
     ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::AddSeenNonce(uint32_t nonce) [member function]
@@ -5162,9 +5176,9 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ndn-pit-entry.h (module 'ndnSIM'): boost::multi_index::multi_index_container<ns3::ndn::pit::OutgoingFace, boost::multi_index::indexed_by<boost::multi_index::ordered_unique<boost::multi_index::tag<ns3::ndn::pit::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, boost::multi_index::member<ns3::ndn::pit::OutgoingFace, ns3::Ptr<ns3::ndn::Face>, &(ns3::ndn::pit::OutgoingFace::m_face)>, mpl_::na>, boost::multi_index::ordered_non_unique<boost::multi_index::tag<ns3::ndn::pit::i_retx, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, boost::multi_index::member<ns3::ndn::pit::OutgoingFace, unsigned int, &(ns3::ndn::pit::OutgoingFace::m_retxCount)>, mpl_::na>, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na>, std::allocator<ns3::ndn::pit::OutgoingFace> > const & ns3::ndn::pit::Entry::GetOutgoing() const [member function]
+    ## ndn-pit-entry.h (module 'ndnSIM'): std::set<ns3::ndn::pit::OutgoingFace, std::less<ns3::ndn::pit::OutgoingFace>, std::allocator<ns3::ndn::pit::OutgoingFace> > const & ns3::ndn::pit::Entry::GetOutgoing() const [member function]
     cls.add_method('GetOutgoing', 
-                   'boost::multi_index::multi_index_container< ns3::ndn::pit::OutgoingFace, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::pit::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::ndn::pit::OutgoingFace, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::pit::OutgoingFace::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::pit::i_retx, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::ndn::pit::OutgoingFace, unsigned int, & ( ns3::ndn::pit::OutgoingFace::m_retxCount ) >, mpl_::na >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::pit::OutgoingFace > > const &', 
+                   'std::set< ns3::ndn::pit::OutgoingFace > const &', 
                    [], 
                    is_const=True)
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::pit::Entry::GetPrefix() const [member function]
@@ -5238,13 +5252,6 @@ def register_Ns3NdnPitOutgoingFace_methods(root_module, cls):
     cls.add_instance_attribute('m_sendTime', 'ns3::Time', is_const=False)
     ## ndn-pit-entry-outgoing-face.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFace::m_waitingInVain [variable]
     cls.add_instance_attribute('m_waitingInVain', 'bool', is_const=False)
-    return
-
-def register_Ns3NdnPitOutgoingFaceContainer_methods(root_module, cls):
-    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFaceContainer::OutgoingFaceContainer() [constructor]
-    cls.add_constructor([])
-    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFaceContainer::OutgoingFaceContainer(ns3::ndn::pit::OutgoingFaceContainer const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::pit::OutgoingFaceContainer const &', 'arg0')])
     return
 
 def register_Ns3NdnPitI_face_methods(root_module, cls):
