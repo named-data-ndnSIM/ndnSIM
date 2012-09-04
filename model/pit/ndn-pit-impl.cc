@@ -170,8 +170,9 @@ PitImpl<Policy>::DoDispose ()
 template<class Policy>
 void
 PitImpl<Policy>::RescheduleCleaning ()
-{
-  m_cleanEvent.Cancel ();
+{  
+  // m_cleanEvent.Cancel ();
+  Simulator::Remove (m_cleanEvent); // slower, but better for memory
   if (i_time.empty ())
     {
       // NS_LOG_DEBUG ("No items in PIT");
