@@ -35,7 +35,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.PitQueue");
 namespace ns3 {
 namespace ndn {
 
-const double MIN_WEIGHT = 0.1;
+const double MIN_WEIGHT = 0.01;
 
 PitQueue::PitQueue ()
   // : m_maxQueueSize (20)
@@ -74,6 +74,10 @@ PitQueue::Enqueue (Ptr<Face> inFace,
 
       queue = itemPair.first;
     }
+  else
+    {
+      queue->second->get<1> () = updatedWeight;
+    }
 
   if ((inFace->GetLimits ().GetMaxLimit () == 0 && queue->second->get<0> ().size () > 100) ||
       (inFace->GetLimits ().GetMaxLimit () != 0 && queue->second->get<0> ().size () >= 0.5 * inFace->GetLimits ().GetMaxLimit ()))
@@ -91,7 +95,22 @@ PitQueue::Enqueue (Ptr<Face> inFace,
     }
   tag->InsertQueue (queue->second, itemIterator);
 
+  // if (Simulator::GetContext () == 4)
+  //   {
+  //     cout << "====== " << Simulator::Now ().ToDouble (Time::S) << "s " << *queue->first << endl;
+  //     cout << "       " << m_serviceCounter << " / " << queue->second->get<1> () << " / " << queue->second->get<2> () << "\n";
+  //     for (PerInFaceQueue::const_iterator somequeue = m_queues.begin ();
+  //          somequeue != m_queues.end ();
+  //          somequeue ++)
+  //       {
+  //         if (somequeue == queue) cout << "*";
+  //         cout << somequeue->second->get<0> ().size () << " ";
+  //       }
+  //     cout << endl;
+  //   }
+
   UpdateWeightedRounds ();
+  
   return true;
 }
 
@@ -131,7 +150,7 @@ PitQueue::Pop ()
   // if (Simulator::GetContext () == 4)
   //   {
   //     cout << "====== " << Simulator::Now ().ToDouble (Time::S) << "s " << *queue->first << endl;
-  //     cout << "       " << m_serviceCounter << " / " << queue->second->get<2> () << "\n";
+  //     cout << "       " << m_serviceCounter << " / " << queue->second->get<1> () << " / " << queue->second->get<2> () << "\n";
   //     for (PerInFaceQueue::const_iterator somequeue = m_queues.begin ();
   //          somequeue != m_queues.end ();
   //          somequeue ++)
@@ -241,7 +260,7 @@ PitQueue::UpdateWeightedRounds ()
        queue != m_queues.end ();
        queue ++)
     {
-      queue->second->get<2> () = static_cast<uint32_t>(queue->second->get<1> () / minWeight);
+      queue->second->get<2> () = static_cast<uint32_t>((queue->second->get<1> () / minWeight) + 0.5);
       if (queue->second->get<2> () < 1)
         queue->second->get<2> () = 1;
     }

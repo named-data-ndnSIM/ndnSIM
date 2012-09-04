@@ -19,13 +19,12 @@
  */
 
 
-#ifndef NDNSIM_PER_FIB_LIMITS_H
-#define NDNSIM_PER_FIB_LIMITS_H
+#ifndef NDNSIM_DYNAMIC_LIMITS_H
+#define NDNSIM_DYNAMIC_LIMITS_H
 
 #include "ns3/event-id.h"
 
-#include "dynamic-limits.h"
-#include "../../utils/ndn-pit-queue.h"
+#include "fw-stats.h"
 
 namespace ns3 {
 namespace ndn {
@@ -35,11 +34,11 @@ namespace fw {
  * \ingroup ndn
  * \brief Strategy implementing per-FIB entry limits
  */
-class PerFibLimits :
-    public DynamicLimits
+class DynamicLimits :
+    public FwStats
 {
 private:
-  typedef DynamicLimits super;
+  typedef FwStats super;
 
 public:
   static TypeId
@@ -48,35 +47,22 @@ public:
   /**
    * @brief Default constructor
    */
-  PerFibLimits ();
-  
-  virtual void
-  WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
+  DynamicLimits ();
 
   virtual void
-  RemoveFace (Ptr<Face> face);
-  
-protected:
-  virtual bool
-  TrySendOutInterest (Ptr<Face> inFace,
-                      Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
-                      Ptr<const Packet> origPacket,
-                      Ptr<pit::Entry> pitEntry);
-  
-  virtual void
-  WillSatisfyPendingInterest (Ptr<Face> inFace,
-                              Ptr<pit::Entry> pitEntry);
-
-  virtual void
-  DidReceiveValidNack (Ptr<Face> inFace,
-                       uint32_t nackCode,
-                       Ptr<pit::Entry> pitEntry);
-  
+  OnInterest (Ptr<Face> face,
+              Ptr<const InterestHeader> header,
+              Ptr<const Packet> origPacket);
+      
 private:
   void
-  ProcessFromQueue ();
-  
+  AnnounceLimits ();
+
+  void
+  ApplyAnnouncedLimit (Ptr<Face> inFace,
+                       Ptr<const InterestHeader> header);
+
+protected:
   // from Object
   virtual void
   NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
@@ -85,11 +71,7 @@ private:
   DoDispose ();
     
 private:
-  typedef std::map< Ptr<Face>, PitQueue > PitQueueMap;
-  PitQueueMap m_pitQueues; // per-outgoing face pit queue
-
-  bool m_queueDropNotifications;
-  bool m_weightedRoundRobin;
+  bool m_announceLimits;
 
   EventId m_announceEvent;
 };

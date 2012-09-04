@@ -24,7 +24,7 @@
 
 #include "ns3/event-id.h"
 
-#include "fw-stats.h"
+#include "dynamic-limits.h"
 
 namespace ns3 {
 namespace ndn {
@@ -43,7 +43,7 @@ namespace fw {
  * (probability is shifted to allow small rate of acceptance (1% by default) of Interests from faces with 0 satisfaction ratio.
  */
 class StatsBasedRandomizedInterestAccept :
-    public FwStats
+    public DynamicLimits
 {
 public:
   static TypeId

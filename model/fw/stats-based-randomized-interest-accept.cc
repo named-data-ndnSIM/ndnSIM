@@ -97,21 +97,23 @@ StatsBasedRandomizedInterestAccept::TrySendOutInterest (Ptr<Face> inFace,
   const ndnSIM::LoadStatsFace &stats = GetStatsTree ()["/"].incoming ().find (inFace)->second;
 
   if (stats.count ().GetStats ().get<0> () >= m_threshold * pitEntry->GetFibEntry ()->GetLimits ().GetMaxLimit ())
-  {
-    double ratio = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
-    // NS_ASSERT_MSG (ratio > 0, "If count is a reasonable value, ratio cannot be negative");
-    UniformVariable randAccept (0, 1);
-    double dice = randAccept.GetValue ();
-    if (ratio < 0 || dice < ratio + m_graceAcceptProbability)
-      {
-        // ok, accepting the interests
-      }
-    else
-      {
-        // boo. bad luck
-        return false;
-      }
-  }
+    {
+      double ratio = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
+      if (ratio < 0) ratio = 0.5;
+      // NS_ASSERT_MSG (ratio > 0, "If count is a reasonable value, ratio cannot be negative");
+      UniformVariable randAccept (0, 1);
+      double dice = randAccept.GetValue ();
+
+      if (ratio < 0 || dice < ratio + m_graceAcceptProbability)
+        {
+          // ok, accepting the interests
+        }
+      else
+        {
+          // boo. bad luck
+          return false;
+        }
+    }
   
   if (pitEntry->GetFibEntry ()->GetLimits ().IsBelowLimit ())
     {
