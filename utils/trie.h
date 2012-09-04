@@ -210,6 +210,8 @@ public:
             if (trieNode->children_.size () >= trieNode->bucketSize_)
               {
                 trieNode->bucketSize_ += trieNode->bucketIncrement_;
+                trieNode->bucketIncrement_ *= 2; // increase bucketIncrement exponentially
+                
                 buckets_array newBuckets (new bucket_type [trieNode->bucketSize_]);
                 trieNode->children_.rehash (bucket_traits (newBuckets.get (), trieNode->bucketSize_));
                 trieNode->buckets_.swap (newBuckets);
