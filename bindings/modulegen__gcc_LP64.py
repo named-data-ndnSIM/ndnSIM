@@ -100,6 +100,10 @@ def register_types(module):
     module.add_class('Tag', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## tag-buffer.h (module 'network'): ns3::TagBuffer [class]
     module.add_class('TagBuffer', import_from_module='ns.network')
+    ## traced-value.h (module 'core'): ns3::TracedValue<double> [class]
+    module.add_class('TracedValue', import_from_module='ns.core', template_parameters=['double'])
+    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int> [class]
+    module.add_class('TracedValue', import_from_module='ns.core', template_parameters=['unsigned int'])
     ## random-variable.h (module 'core'): ns3::TriangularVariable [class]
     module.add_class('TriangularVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## type-id.h (module 'core'): ns3::TypeId [class]
@@ -214,14 +218,24 @@ def register_types(module):
     module.add_class('BatchesChecker', parent=root_module['ns3::AttributeChecker'])
     ## batches.h (module 'ndnSIM'): ns3::BatchesValue [class]
     module.add_class('BatchesValue', parent=root_module['ns3::AttributeValue'])
+    ## boolean.h (module 'core'): ns3::BooleanChecker [class]
+    module.add_class('BooleanChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
+    ## boolean.h (module 'core'): ns3::BooleanValue [class]
+    module.add_class('BooleanValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## callback.h (module 'core'): ns3::CallbackChecker [class]
     module.add_class('CallbackChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## callback.h (module 'core'): ns3::CallbackImplBase [class]
     module.add_class('CallbackImplBase', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
     ## callback.h (module 'core'): ns3::CallbackValue [class]
     module.add_class('CallbackValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
+    ## double.h (module 'core'): ns3::DoubleValue [class]
+    module.add_class('DoubleValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## attribute.h (module 'core'): ns3::EmptyAttributeValue [class]
     module.add_class('EmptyAttributeValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
+    ## enum.h (module 'core'): ns3::EnumChecker [class]
+    module.add_class('EnumChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
+    ## enum.h (module 'core'): ns3::EnumValue [class]
+    module.add_class('EnumValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## event-impl.h (module 'core'): ns3::EventImpl [class]
     module.add_class('EventImpl', import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
     ## integer.h (module 'core'): ns3::IntegerValue [class]
@@ -276,6 +290,8 @@ def register_types(module):
     module.add_class('TypeIdChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## type-id.h (module 'core'): ns3::TypeIdValue [class]
     module.add_class('TypeIdValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
+    ## uinteger.h (module 'core'): ns3::UintegerValue [class]
+    module.add_class('UintegerValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## vector.h (module 'core'): ns3::Vector2DChecker [class]
     module.add_class('Vector2DChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## vector.h (module 'core'): ns3::Vector2DValue [class]
@@ -376,6 +392,8 @@ def register_types_ns3_ndn(module):
     module.add_class('InterestHeaderException')
     ## ndn-l3-protocol.h (module 'ndnSIM'): ns3::ndn::L3Protocol [class]
     module.add_class('L3Protocol', parent=root_module['ns3::Object'])
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits [class]
+    module.add_class('Limits', parent=root_module['ns3::Object'])
     ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents [class]
     module.add_class('NameComponents', parent=root_module['ns3::SimpleRefCount< ns3::ndn::NameComponents, ns3::empty, ns3::DefaultDeleter<ns3::ndn::NameComponents> >'])
     ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker [class]
@@ -392,6 +410,7 @@ def register_types_ns3_ndn(module):
     module.add_class('UnknownHeaderException')
     ## ndn-app-face.h (module 'ndnSIM'): ns3::ndn::AppFace [class]
     module.add_class('AppFace', parent=root_module['ns3::ndn::Face'])
+    module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
     module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
     
@@ -405,6 +424,12 @@ def register_types_ns3_ndn(module):
     
     nested_module = module.add_cpp_namespace('fib')
     register_types_ns3_ndn_fib(nested_module)
+    
+    
+    ## Register a nested module for the namespace fw
+    
+    nested_module = module.add_cpp_namespace('fw')
+    register_types_ns3_ndn_fw(nested_module)
     
     
     ## Register a nested module for the namespace pit
@@ -438,6 +463,12 @@ def register_types_ns3_ndn_fib(module):
     module.add_class('i_metric')
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::i_nth [class]
     module.add_class('i_nth')
+
+def register_types_ns3_ndn_fw(module):
+    root_module = module.get_root()
+    
+    ## ndn-fw-tag.h (module 'ndnSIM'): ns3::ndn::fw::Tag [class]
+    module.add_class('Tag')
 
 def register_types_ns3_ndn_pit(module):
     root_module = module.get_root()
@@ -493,6 +524,8 @@ def register_methods(root_module):
     register_Ns3SpringMobilityHelper_methods(root_module, root_module['ns3::SpringMobilityHelper'])
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
+    register_Ns3TracedValue__Double_methods(root_module, root_module['ns3::TracedValue< double >'])
+    register_Ns3TracedValue__Unsigned_int_methods(root_module, root_module['ns3::TracedValue< unsigned int >'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
     register_Ns3TypeId_methods(root_module, root_module['ns3::TypeId'])
     register_Ns3TypeIdAttributeInformation_methods(root_module, root_module['ns3::TypeId::AttributeInformation'])
@@ -547,10 +580,15 @@ def register_methods(root_module):
     register_Ns3AttributeValue_methods(root_module, root_module['ns3::AttributeValue'])
     register_Ns3BatchesChecker_methods(root_module, root_module['ns3::BatchesChecker'])
     register_Ns3BatchesValue_methods(root_module, root_module['ns3::BatchesValue'])
+    register_Ns3BooleanChecker_methods(root_module, root_module['ns3::BooleanChecker'])
+    register_Ns3BooleanValue_methods(root_module, root_module['ns3::BooleanValue'])
     register_Ns3CallbackChecker_methods(root_module, root_module['ns3::CallbackChecker'])
     register_Ns3CallbackImplBase_methods(root_module, root_module['ns3::CallbackImplBase'])
     register_Ns3CallbackValue_methods(root_module, root_module['ns3::CallbackValue'])
+    register_Ns3DoubleValue_methods(root_module, root_module['ns3::DoubleValue'])
     register_Ns3EmptyAttributeValue_methods(root_module, root_module['ns3::EmptyAttributeValue'])
+    register_Ns3EnumChecker_methods(root_module, root_module['ns3::EnumChecker'])
+    register_Ns3EnumValue_methods(root_module, root_module['ns3::EnumValue'])
     register_Ns3EventImpl_methods(root_module, root_module['ns3::EventImpl'])
     register_Ns3IntegerValue_methods(root_module, root_module['ns3::IntegerValue'])
     register_Ns3Ipv4AddressChecker_methods(root_module, root_module['ns3::Ipv4AddressChecker'])
@@ -576,6 +614,7 @@ def register_methods(root_module):
     register_Ns3TimeValue_methods(root_module, root_module['ns3::TimeValue'])
     register_Ns3TypeIdChecker_methods(root_module, root_module['ns3::TypeIdChecker'])
     register_Ns3TypeIdValue_methods(root_module, root_module['ns3::TypeIdValue'])
+    register_Ns3UintegerValue_methods(root_module, root_module['ns3::UintegerValue'])
     register_Ns3Vector2DChecker_methods(root_module, root_module['ns3::Vector2DChecker'])
     register_Ns3Vector2DValue_methods(root_module, root_module['ns3::Vector2DValue'])
     register_Ns3Vector3DChecker_methods(root_module, root_module['ns3::Vector3DChecker'])
@@ -599,6 +638,7 @@ def register_methods(root_module):
     register_Ns3NdnInterestHeader_methods(root_module, root_module['ns3::ndn::InterestHeader'])
     register_Ns3NdnInterestHeaderException_methods(root_module, root_module['ns3::ndn::InterestHeaderException'])
     register_Ns3NdnL3Protocol_methods(root_module, root_module['ns3::ndn::L3Protocol'])
+    register_Ns3NdnLimits_methods(root_module, root_module['ns3::ndn::Limits'])
     register_Ns3NdnNameComponents_methods(root_module, root_module['ns3::ndn::NameComponents'])
     register_Ns3NdnNameComponentsChecker_methods(root_module, root_module['ns3::ndn::NameComponentsChecker'])
     register_Ns3NdnNameComponentsValue_methods(root_module, root_module['ns3::ndn::NameComponentsValue'])
@@ -615,6 +655,7 @@ def register_methods(root_module):
     register_Ns3NdnFibI_face_methods(root_module, root_module['ns3::ndn::fib::i_face'])
     register_Ns3NdnFibI_metric_methods(root_module, root_module['ns3::ndn::fib::i_metric'])
     register_Ns3NdnFibI_nth_methods(root_module, root_module['ns3::ndn::fib::i_nth'])
+    register_Ns3NdnFwTag_methods(root_module, root_module['ns3::ndn::fw::Tag'])
     register_Ns3NdnPitEntry_methods(root_module, root_module['ns3::ndn::pit::Entry'])
     register_Ns3NdnPitIncomingFace_methods(root_module, root_module['ns3::ndn::pit::IncomingFace'])
     register_Ns3NdnPitOutgoingFace_methods(root_module, root_module['ns3::ndn::pit::OutgoingFace'])
@@ -624,8 +665,8 @@ def register_methods(root_module):
 
 def register_Ns3Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     ## address.h (module 'network'): ns3::Address::Address() [constructor]
     cls.add_constructor([])
@@ -1206,8 +1247,8 @@ def register_Ns3EventId_methods(root_module, cls):
 
 def register_Ns3Ipv4Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     ## ipv4-address.h (module 'network'): ns3::Ipv4Address::Ipv4Address(ns3::Ipv4Address const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Ipv4Address const &', 'arg0')])
@@ -1314,8 +1355,8 @@ def register_Ns3Ipv4Address_methods(root_module, cls):
 
 def register_Ns3Ipv4Mask_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     ## ipv4-address.h (module 'network'): ns3::Ipv4Mask::Ipv4Mask(ns3::Ipv4Mask const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Ipv4Mask const &', 'arg0')])
     ## ipv4-address.h (module 'network'): ns3::Ipv4Mask::Ipv4Mask() [constructor]
@@ -1377,8 +1418,8 @@ def register_Ns3Ipv4Mask_methods(root_module, cls):
 
 def register_Ns3Ipv6Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     ## ipv6-address.h (module 'network'): ns3::Ipv6Address::Ipv6Address() [constructor]
     cls.add_constructor([])
@@ -1550,8 +1591,8 @@ def register_Ns3Ipv6Address_methods(root_module, cls):
 
 def register_Ns3Ipv6Prefix_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     ## ipv6-address.h (module 'network'): ns3::Ipv6Prefix::Ipv6Prefix() [constructor]
     cls.add_constructor([])
     ## ipv6-address.h (module 'network'): ns3::Ipv6Prefix::Ipv6Prefix(uint8_t * prefix) [constructor]
@@ -2194,6 +2235,74 @@ def register_Ns3TagBuffer_methods(root_module, cls):
                    [param('uint8_t', 'v')])
     return
 
+def register_Ns3TracedValue__Double_methods(root_module, cls):
+    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue() [constructor]
+    cls.add_constructor([])
+    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue(ns3::TracedValue<double> const & o) [copy constructor]
+    cls.add_constructor([param('ns3::TracedValue< double > const &', 'o')])
+    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue(double const & v) [constructor]
+    cls.add_constructor([param('double const &', 'v')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Connect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Connect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::ConnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('ConnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Disconnect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Disconnect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::DisconnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('DisconnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): double ns3::TracedValue<double>::Get() const [member function]
+    cls.add_method('Get', 
+                   'double', 
+                   [], 
+                   is_const=True)
+    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Set(double const & v) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('double const &', 'v')])
+    return
+
+def register_Ns3TracedValue__Unsigned_int_methods(root_module, cls):
+    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue() [constructor]
+    cls.add_constructor([])
+    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue(ns3::TracedValue<unsigned int> const & o) [copy constructor]
+    cls.add_constructor([param('ns3::TracedValue< unsigned int > const &', 'o')])
+    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue(unsigned int const & v) [constructor]
+    cls.add_constructor([param('unsigned int const &', 'v')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Connect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Connect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::ConnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('ConnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Disconnect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Disconnect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::DisconnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('DisconnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): unsigned int ns3::TracedValue<unsigned int>::Get() const [member function]
+    cls.add_method('Get', 
+                   'unsigned int', 
+                   [], 
+                   is_const=True)
+    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Set(unsigned int const & v) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('unsigned int const &', 'v')])
+    return
+
 def register_Ns3TriangularVariable_methods(root_module, cls):
     ## random-variable.h (module 'core'): ns3::TriangularVariable::TriangularVariable(ns3::TriangularVariable const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::TriangularVariable const &', 'arg0')])
@@ -2205,8 +2314,8 @@ def register_Ns3TriangularVariable_methods(root_module, cls):
 
 def register_Ns3TypeId_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     ## type-id.h (module 'core'): ns3::TypeId::TypeId(char const * name) [constructor]
     cls.add_constructor([param('char const *', 'name')])
@@ -2499,9 +2608,9 @@ def register_Ns3Int64x64_t_methods(root_module, cls):
     cls.add_inplace_numeric_operator('*=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::int64x64_t const &', 'right'))
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
+    cls.add_output_stream_operator()
     cls.add_inplace_numeric_operator('/=', param('ns3::int64x64_t const &', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long long unsigned int const', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long unsigned int const', 'right'))
@@ -3060,9 +3169,9 @@ def register_Ns3Time_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
     cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::Time const &', 'right'))
-    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
+    cls.add_output_stream_operator()
     cls.add_binary_numeric_operator('+', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_numeric_operator('-', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_comparison_operator('<')
@@ -3615,6 +3724,47 @@ def register_Ns3BatchesValue_methods(root_module, cls):
                    [param('ns3::Batches const &', 'value')])
     return
 
+def register_Ns3BooleanChecker_methods(root_module, cls):
+    ## boolean.h (module 'core'): ns3::BooleanChecker::BooleanChecker() [constructor]
+    cls.add_constructor([])
+    ## boolean.h (module 'core'): ns3::BooleanChecker::BooleanChecker(ns3::BooleanChecker const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::BooleanChecker const &', 'arg0')])
+    return
+
+def register_Ns3BooleanValue_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue(ns3::BooleanValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::BooleanValue const &', 'arg0')])
+    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue() [constructor]
+    cls.add_constructor([])
+    ## boolean.h (module 'core'): ns3::BooleanValue::BooleanValue(bool value) [constructor]
+    cls.add_constructor([param('bool', 'value')])
+    ## boolean.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::BooleanValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## boolean.h (module 'core'): bool ns3::BooleanValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## boolean.h (module 'core'): bool ns3::BooleanValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'bool', 
+                   [], 
+                   is_const=True)
+    ## boolean.h (module 'core'): std::string ns3::BooleanValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## boolean.h (module 'core'): void ns3::BooleanValue::Set(bool value) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('bool', 'value')])
+    return
+
 def register_Ns3CallbackChecker_methods(root_module, cls):
     ## callback.h (module 'core'): ns3::CallbackChecker::CallbackChecker() [constructor]
     cls.add_constructor([])
@@ -3662,6 +3812,39 @@ def register_Ns3CallbackValue_methods(root_module, cls):
                    [param('ns3::CallbackBase', 'base')])
     return
 
+def register_Ns3DoubleValue_methods(root_module, cls):
+    ## double.h (module 'core'): ns3::DoubleValue::DoubleValue() [constructor]
+    cls.add_constructor([])
+    ## double.h (module 'core'): ns3::DoubleValue::DoubleValue(ns3::DoubleValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::DoubleValue const &', 'arg0')])
+    ## double.h (module 'core'): ns3::DoubleValue::DoubleValue(double const & value) [constructor]
+    cls.add_constructor([param('double const &', 'value')])
+    ## double.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::DoubleValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## double.h (module 'core'): bool ns3::DoubleValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## double.h (module 'core'): double ns3::DoubleValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'double', 
+                   [], 
+                   is_const=True)
+    ## double.h (module 'core'): std::string ns3::DoubleValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## double.h (module 'core'): void ns3::DoubleValue::Set(double const & value) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('double const &', 'value')])
+    return
+
 def register_Ns3EmptyAttributeValue_methods(root_module, cls):
     ## attribute.h (module 'core'): ns3::EmptyAttributeValue::EmptyAttributeValue(ns3::EmptyAttributeValue const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::EmptyAttributeValue const &', 'arg0')])
@@ -3682,6 +3865,84 @@ def register_Ns3EmptyAttributeValue_methods(root_module, cls):
                    'std::string', 
                    [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_const=True, visibility='private', is_virtual=True)
+    return
+
+def register_Ns3EnumChecker_methods(root_module, cls):
+    ## enum.h (module 'core'): ns3::EnumChecker::EnumChecker(ns3::EnumChecker const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::EnumChecker const &', 'arg0')])
+    ## enum.h (module 'core'): ns3::EnumChecker::EnumChecker() [constructor]
+    cls.add_constructor([])
+    ## enum.h (module 'core'): void ns3::EnumChecker::Add(int v, std::string name) [member function]
+    cls.add_method('Add', 
+                   'void', 
+                   [param('int', 'v'), param('std::string', 'name')])
+    ## enum.h (module 'core'): void ns3::EnumChecker::AddDefault(int v, std::string name) [member function]
+    cls.add_method('AddDefault', 
+                   'void', 
+                   [param('int', 'v'), param('std::string', 'name')])
+    ## enum.h (module 'core'): bool ns3::EnumChecker::Check(ns3::AttributeValue const & value) const [member function]
+    cls.add_method('Check', 
+                   'bool', 
+                   [param('ns3::AttributeValue const &', 'value')], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): bool ns3::EnumChecker::Copy(ns3::AttributeValue const & src, ns3::AttributeValue & dst) const [member function]
+    cls.add_method('Copy', 
+                   'bool', 
+                   [param('ns3::AttributeValue const &', 'src'), param('ns3::AttributeValue &', 'dst')], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::EnumChecker::Create() const [member function]
+    cls.add_method('Create', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): std::string ns3::EnumChecker::GetUnderlyingTypeInformation() const [member function]
+    cls.add_method('GetUnderlyingTypeInformation', 
+                   'std::string', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): std::string ns3::EnumChecker::GetValueTypeName() const [member function]
+    cls.add_method('GetValueTypeName', 
+                   'std::string', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): bool ns3::EnumChecker::HasUnderlyingTypeInformation() const [member function]
+    cls.add_method('HasUnderlyingTypeInformation', 
+                   'bool', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    return
+
+def register_Ns3EnumValue_methods(root_module, cls):
+    ## enum.h (module 'core'): ns3::EnumValue::EnumValue(ns3::EnumValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::EnumValue const &', 'arg0')])
+    ## enum.h (module 'core'): ns3::EnumValue::EnumValue() [constructor]
+    cls.add_constructor([])
+    ## enum.h (module 'core'): ns3::EnumValue::EnumValue(int v) [constructor]
+    cls.add_constructor([param('int', 'v')])
+    ## enum.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::EnumValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): bool ns3::EnumValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## enum.h (module 'core'): int ns3::EnumValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'int', 
+                   [], 
+                   is_const=True)
+    ## enum.h (module 'core'): std::string ns3::EnumValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## enum.h (module 'core'): void ns3::EnumValue::Set(int v) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('int', 'v')])
     return
 
 def register_Ns3EventImpl_methods(root_module, cls):
@@ -4616,6 +4877,39 @@ def register_Ns3TypeIdValue_methods(root_module, cls):
                    [param('ns3::TypeId const &', 'value')])
     return
 
+def register_Ns3UintegerValue_methods(root_module, cls):
+    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue() [constructor]
+    cls.add_constructor([])
+    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue(ns3::UintegerValue const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::UintegerValue const &', 'arg0')])
+    ## uinteger.h (module 'core'): ns3::UintegerValue::UintegerValue(uint64_t const & value) [constructor]
+    cls.add_constructor([param('uint64_t const &', 'value')])
+    ## uinteger.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::UintegerValue::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::AttributeValue >', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## uinteger.h (module 'core'): bool ns3::UintegerValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    cls.add_method('DeserializeFromString', 
+                   'bool', 
+                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_virtual=True)
+    ## uinteger.h (module 'core'): uint64_t ns3::UintegerValue::Get() const [member function]
+    cls.add_method('Get', 
+                   'uint64_t', 
+                   [], 
+                   is_const=True)
+    ## uinteger.h (module 'core'): std::string ns3::UintegerValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    cls.add_method('SerializeToString', 
+                   'std::string', 
+                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
+                   is_const=True, is_virtual=True)
+    ## uinteger.h (module 'core'): void ns3::UintegerValue::Set(uint64_t const & value) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('uint64_t const &', 'value')])
+    return
+
 def register_Ns3Vector2DChecker_methods(root_module, cls):
     ## vector.h (module 'core'): ns3::Vector2DChecker::Vector2DChecker() [constructor]
     cls.add_constructor([])
@@ -4751,12 +5045,12 @@ def register_Ns3NdnApp_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::ContentObjectHeader const > const &', 'contentObject'), param('ns3::Ptr< ns3::Packet >', 'payload')], 
                    is_virtual=True)
-    ## ndn-app.h (module 'ndnSIM'): void ns3::ndn::App::OnInterest(ns3::Ptr<const ns3::ndn::InterestHeader> const & interest, ns3::Ptr<ns3::Packet> packet) [member function]
+    ## ndn-app.h (module 'ndnSIM'): void ns3::ndn::App::OnInterest(ns3::Ptr<ns3::ndn::InterestHeader const> const & interest, ns3::Ptr<ns3::Packet> packet) [member function]
     cls.add_method('OnInterest', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::InterestHeader const > const &', 'interest'), param('ns3::Ptr< ns3::Packet >', 'packet')], 
                    is_virtual=True)
-    ## ndn-app.h (module 'ndnSIM'): void ns3::ndn::App::OnNack(ns3::Ptr<const ns3::ndn::InterestHeader> const & interest, ns3::Ptr<ns3::Packet> packet) [member function]
+    ## ndn-app.h (module 'ndnSIM'): void ns3::ndn::App::OnNack(ns3::Ptr<ns3::ndn::InterestHeader const> const & interest, ns3::Ptr<ns3::Packet> packet) [member function]
     cls.add_method('OnNack', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::InterestHeader const > const &', 'interest'), param('ns3::Ptr< ns3::Packet >', 'packet')], 
@@ -5037,7 +5331,7 @@ def register_Ns3NdnContentStore_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-content-store.h (module 'ndnSIM'): boost::tuples::tuple<ns3::Ptr<ns3::Packet>,ns3::Ptr<const ns3::ndn::ContentObjectHeader>,ns3::Ptr<const ns3::Packet>,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type> ns3::ndn::ContentStore::Lookup(ns3::Ptr<const ns3::ndn::InterestHeader> interest) [member function]
+    ## ndn-content-store.h (module 'ndnSIM'): boost::tuples::tuple<ns3::Ptr<ns3::Packet>,ns3::Ptr<const ns3::ndn::ContentObjectHeader>,ns3::Ptr<const ns3::Packet>,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type> ns3::ndn::ContentStore::Lookup(ns3::Ptr<ns3::ndn::InterestHeader const> interest) [member function]
     cls.add_method('Lookup', 
                    'boost::tuples::tuple< ns3::Ptr< ns3::Packet >, ns3::Ptr< ns3::ndn::ContentObjectHeader const >, ns3::Ptr< ns3::Packet const >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >', 
                    [param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'interest')], 
@@ -5066,6 +5360,10 @@ def register_Ns3NdnFace_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
+    ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Limits & ns3::ndn::Face::GetLimits() [member function]
+    cls.add_method('GetLimits', 
+                   'ns3::ndn::Limits &', 
+                   [])
     ## ndn-face.h (module 'ndnSIM'): uint16_t ns3::ndn::Face::GetMetric() const [member function]
     cls.add_method('GetMetric', 
                    'uint16_t', 
@@ -5081,19 +5379,11 @@ def register_Ns3NdnFace_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-face.h (module 'ndnSIM'): bool ns3::ndn::Face::IsBelowLimit() [member function]
-    cls.add_method('IsBelowLimit', 
-                   'bool', 
-                   [])
     ## ndn-face.h (module 'ndnSIM'): bool ns3::ndn::Face::IsUp() const [member function]
     cls.add_method('IsUp', 
                    'bool', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-face.h (module 'ndnSIM'): void ns3::ndn::Face::LeakBucket() [member function]
-    cls.add_method('LeakBucket', 
-                   'void', 
-                   [])
     ## ndn-face.h (module 'ndnSIM'): std::ostream & ns3::ndn::Face::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'std::ostream &', 
@@ -5112,14 +5402,6 @@ def register_Ns3NdnFace_methods(root_module, cls):
     cls.add_method('Send', 
                    'bool', 
                    [param('ns3::Ptr< ns3::Packet >', 'p')])
-    ## ndn-face.h (module 'ndnSIM'): void ns3::ndn::Face::SetBucketLeak(double leak) [member function]
-    cls.add_method('SetBucketLeak', 
-                   'void', 
-                   [param('double', 'leak')])
-    ## ndn-face.h (module 'ndnSIM'): void ns3::ndn::Face::SetBucketMax(double bucket) [member function]
-    cls.add_method('SetBucketMax', 
-                   'void', 
-                   [param('double', 'bucket')])
     ## ndn-face.h (module 'ndnSIM'): void ns3::ndn::Face::SetId(uint32_t id) [member function]
     cls.add_method('SetId', 
                    'void', 
@@ -5194,14 +5476,24 @@ def register_Ns3NdnFib_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::fib::Entry >', 
                    [param('ns3::Ptr< ns3::ndn::NameComponents const > const &', 'prefix'), param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('int32_t', 'metric')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::Begin() [member function]
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::Begin() const [member function]
     cls.add_method('Begin', 
                    'ns3::Ptr< ns3::ndn::fib::Entry const >', 
                    [], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::fib::Entry> ns3::ndn::Fib::Begin() [member function]
+    cls.add_method('Begin', 
+                   'ns3::Ptr< ns3::ndn::fib::Entry >', 
+                   [], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::End() [member function]
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::End() const [member function]
     cls.add_method('End', 
                    'ns3::Ptr< ns3::ndn::fib::Entry const >', 
+                   [], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::fib::Entry> ns3::ndn::Fib::End() [member function]
+    cls.add_method('End', 
+                   'ns3::Ptr< ns3::ndn::fib::Entry >', 
                    [], 
                    is_pure_virtual=True, is_virtual=True)
     ## ndn-fib.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::Fib> ns3::ndn::Fib::GetFib(ns3::Ptr<ns3::Object> node) [member function]
@@ -5229,10 +5521,15 @@ def register_Ns3NdnFib_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::fib::Entry >', 
                    [param('ns3::ndn::InterestHeader const &', 'interest')], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::Next(ns3::Ptr<const ns3::ndn::fib::Entry> arg0) [member function]
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::fib::Entry> ns3::ndn::Fib::Next(ns3::Ptr<const ns3::ndn::fib::Entry> arg0) const [member function]
     cls.add_method('Next', 
                    'ns3::Ptr< ns3::ndn::fib::Entry const >', 
                    [param('ns3::Ptr< ns3::ndn::fib::Entry const >', 'arg0')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-fib.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::fib::Entry> ns3::ndn::Fib::Next(ns3::Ptr<ns3::ndn::fib::Entry> arg0) [member function]
+    cls.add_method('Next', 
+                   'ns3::Ptr< ns3::ndn::fib::Entry >', 
+                   [param('ns3::Ptr< ns3::ndn::fib::Entry >', 'arg0')], 
                    is_pure_virtual=True, is_virtual=True)
     ## ndn-fib.h (module 'ndnSIM'): void ns3::ndn::Fib::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
@@ -5261,105 +5558,105 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::OnData(ns3::Ptr<ns3::ndn::Face> const & face, ns3::Ptr<ns3::ndn::ContentObjectHeader> & header, ns3::Ptr<ns3::Packet> & payload, ns3::Ptr<const ns3::Packet> const & packet) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::OnData(ns3::Ptr<ns3::ndn::Face> face, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket) [member function]
     cls.add_method('OnData', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'face'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader > &', 'header'), param('ns3::Ptr< ns3::Packet > &', 'payload'), param('ns3::Ptr< ns3::Packet const > const &', 'packet')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
                    is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::OnInterest(ns3::Ptr<ns3::ndn::Face> const & face, ns3::Ptr<ns3::ndn::InterestHeader> & header, ns3::Ptr<const ns3::Packet> const & p) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::OnInterest(ns3::Ptr<ns3::ndn::Face> face, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket) [member function]
     cls.add_method('OnInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'face'), param('ns3::Ptr< ns3::ndn::InterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'p')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
                    is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::RemoveFace(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('RemoveFace', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
                    is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::WillErasePendingInterest(ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
-    cls.add_method('WillErasePendingInterest', 
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::WillEraseTimedOutPendingInterest(ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    cls.add_method('WillEraseTimedOutPendingInterest', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DetectRetransmittedInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DetectRetransmittedInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DetectRetransmittedInterest', 
                    'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidCreatePitEntry(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidCreatePitEntry(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidCreatePitEntry', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidExhaustForwardingOptions(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidExhaustForwardingOptions(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidExhaustForwardingOptions', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveDuplicateInterest(ns3::Ptr<ns3::ndn::Face> const & face, ns3::Ptr<ns3::ndn::InterestHeader> & header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveDuplicateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidReceiveDuplicateInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'face'), param('ns3::Ptr< ns3::ndn::InterestHeader > &', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveUnsolicitedData(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveUnsolicitedData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket) [member function]
     cls.add_method('DidReceiveUnsolicitedData', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutData(ns3::Ptr<ns3::ndn::Face> const & face, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> const & packet) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSendOutData', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'face'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const > const &', 'packet')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutInterest(ns3::Ptr<ns3::ndn::Face> const & outgoingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutInterest(ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSendOutInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'outgoingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DoPropagateInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::DoPropagateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DoPropagateInterest', 
                    'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    is_pure_virtual=True, visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::FailedToCreatePitEntry(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::FailedToCreatePitEntry(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket) [member function]
     cls.add_method('FailedToCreatePitEntry', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::NotifyNewAggregate() [member function]
     cls.add_method('NotifyNewAggregate', 
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::PropagateInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::PropagateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('PropagateInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::SatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> const & packet, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::SatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('SatisfyPendingInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const > const &', 'packet'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::ShouldSuppressIncomingInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::ShouldSuppressIncomingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('ShouldSuppressIncomingInterest', 
                    'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::WillSatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> const & incomingFace, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::TrySendOutInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    cls.add_method('TrySendOutInterest', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::WillSatisfyPendingInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('WillSatisfyPendingInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'incomingFace'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
-                   visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): bool ns3::ndn::ForwardingStrategy::WillSendOutInterest(ns3::Ptr<ns3::ndn::Face> const & outgoingFace, ns3::Ptr<ns3::ndn::InterestHeader> header, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
-    cls.add_method('WillSendOutInterest', 
-                   'bool', 
-                   [param('ns3::Ptr< ns3::ndn::Face > const &', 'outgoingFace'), param('ns3::Ptr< ns3::ndn::InterestHeader >', 'header'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     return
 
@@ -5411,10 +5708,10 @@ def register_Ns3NdnHeaderHelper_methods(root_module, cls):
     return
 
 def register_Ns3NdnInterestHeader_methods(root_module, cls):
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader(ns3::ndn::InterestHeader const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::InterestHeader const &', 'arg0')])
     ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader() [constructor]
     cls.add_constructor([])
+    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader(ns3::ndn::InterestHeader const & interest) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::InterestHeader const &', 'interest')])
     ## ndn-interest-header.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
@@ -5513,10 +5810,10 @@ def register_Ns3NdnInterestHeader_methods(root_module, cls):
     cls.add_method('SetChildSelector', 
                    'void', 
                    [param('bool', 'value')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetExclude(ns3::Ptr<ns3::ndn::NameComponents> const & exclude) [member function]
+    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetExclude(ns3::Ptr<ns3::ndn::NameComponents> exclude) [member function]
     cls.add_method('SetExclude', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::NameComponents > const &', 'exclude')])
+                   [param('ns3::Ptr< ns3::ndn::NameComponents >', 'exclude')])
     ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetInterestLifetime(ns3::Time time) [member function]
     cls.add_method('SetInterestLifetime', 
                    'void', 
@@ -5533,10 +5830,10 @@ def register_Ns3NdnInterestHeader_methods(root_module, cls):
     cls.add_method('SetNack', 
                    'void', 
                    [param('uint32_t', 'nackType')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> const & name) [member function]
+    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> name) [member function]
     cls.add_method('SetName', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::NameComponents > const &', 'name')])
+                   [param('ns3::Ptr< ns3::ndn::NameComponents >', 'name')])
     ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetNonce(uint32_t nonce) [member function]
     cls.add_method('SetNonce', 
                    'void', 
@@ -5579,6 +5876,11 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::Face >', 
                    [param('uint32_t', 'face')], 
                    is_const=True, is_virtual=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Face> ns3::ndn::L3Protocol::GetFaceById(uint32_t face) const [member function]
+    cls.add_method('GetFaceById', 
+                   'ns3::Ptr< ns3::ndn::Face >', 
+                   [param('uint32_t', 'face')], 
+                   is_const=True, is_virtual=True)
     ## ndn-l3-protocol.h (module 'ndnSIM'): void ns3::ndn::L3Protocol::RemoveFace(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('RemoveFace', 
                    'void', 
@@ -5589,6 +5891,16 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::Face >', 
                    [param('ns3::Ptr< ns3::NetDevice >', 'netDevice')], 
                    is_const=True, is_virtual=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): static uint64_t ns3::ndn::L3Protocol::GetInterestCounter() [member function]
+    cls.add_method('GetInterestCounter', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
+    ## ndn-l3-protocol.h (module 'ndnSIM'): static uint64_t ns3::ndn::L3Protocol::GetDataCounter() [member function]
+    cls.add_method('GetDataCounter', 
+                   'uint64_t', 
+                   [], 
+                   is_static=True)
     ## ndn-l3-protocol.h (module 'ndnSIM'): void ns3::ndn::L3Protocol::DoDispose() [member function]
     cls.add_method('DoDispose', 
                    'void', 
@@ -5599,6 +5911,70 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
+    return
+
+def register_Ns3NdnLimits_methods(root_module, cls):
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::Limits(ns3::ndn::Limits const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::Limits const &', 'arg0')])
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::Limits() [constructor]
+    cls.add_constructor([])
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::DecayCurrentLimit() [member function]
+    cls.add_method('DecayCurrentLimit', 
+                   'void', 
+                   [])
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::DecreaseLimit() [member function]
+    cls.add_method('DecreaseLimit', 
+                   'void', 
+                   [])
+    ## ndn-limits.h (module 'ndnSIM'): uint32_t ns3::ndn::Limits::GetMaxLimit() const [member function]
+    cls.add_method('GetMaxLimit', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ndn-limits.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::Limits::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::IncreaseLimit() [member function]
+    cls.add_method('IncreaseLimit', 
+                   'void', 
+                   [])
+    ## ndn-limits.h (module 'ndnSIM'): bool ns3::ndn::Limits::IsBelowLimit() [member function]
+    cls.add_method('IsBelowLimit', 
+                   'bool', 
+                   [])
+    ## ndn-limits.h (module 'ndnSIM'): bool ns3::ndn::Limits::IsEnabled() const [member function]
+    cls.add_method('IsEnabled', 
+                   'bool', 
+                   [], 
+                   is_const=True)
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::RemoveOutstanding() [member function]
+    cls.add_method('RemoveOutstanding', 
+                   'void', 
+                   [])
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetMaxLimit(uint32_t max) [member function]
+    cls.add_method('SetMaxLimit', 
+                   'void', 
+                   [param('uint32_t', 'max')])
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_additiveIncrease [variable]
+    cls.add_instance_attribute('m_additiveIncrease', 'double', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_curMaxLimit [variable]
+    cls.add_instance_attribute('m_curMaxLimit', 'ns3::TracedValue< double >', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_exponentialDecayTau [variable]
+    cls.add_instance_attribute('m_exponentialDecayTau', 'ns3::Time', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_lastDecay [variable]
+    cls.add_instance_attribute('m_lastDecay', 'ns3::Time', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_lastDecrease [variable]
+    cls.add_instance_attribute('m_lastDecrease', 'ns3::Time', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_maxLimit [variable]
+    cls.add_instance_attribute('m_maxLimit', 'uint32_t', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_multiplicativeDecrease [variable]
+    cls.add_instance_attribute('m_multiplicativeDecrease', 'double', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_nonDecreasePeriod [variable]
+    cls.add_instance_attribute('m_nonDecreasePeriod', 'ns3::Time', is_const=False)
+    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_outstanding [variable]
+    cls.add_instance_attribute('m_outstanding', 'ns3::TracedValue< unsigned int >', is_const=False)
     return
 
 def register_Ns3NdnNameComponents_methods(root_module, cls):
@@ -5746,7 +6122,7 @@ def register_Ns3NdnPit_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::pit::Entry >', 
                    [], 
                    is_pure_virtual=True, is_virtual=True)
-    ## ndn-pit.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::pit::Entry> ns3::ndn::Pit::Create(ns3::Ptr<const ns3::ndn::InterestHeader> header) [member function]
+    ## ndn-pit.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::pit::Entry> ns3::ndn::Pit::Create(ns3::Ptr<ns3::ndn::InterestHeader const> header) [member function]
     cls.add_method('Create', 
                    'ns3::Ptr< ns3::ndn::pit::Entry >', 
                    [param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header')], 
@@ -5940,6 +6316,10 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    'ns3::ndn::fib::FaceMetric const &', 
                    [param('uint32_t', 'skip', default_value='0')], 
                    is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::Limits & ns3::ndn::fib::Entry::GetLimits() [member function]
+    cls.add_method('GetLimits', 
+                   'ns3::ndn::Limits &', 
+                   [])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::fib::Entry::GetPrefix() const [member function]
     cls.add_method('GetPrefix', 
                    'ns3::ndn::NameComponents const &', 
@@ -5963,6 +6343,8 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::ndn::fib::FaceMetric::Status', 'status')])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_faces [variable]
     cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::ndn::fib::FaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::fib::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::fib::FaceMetric::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::fib::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::ndn::fib::FaceMetric, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::ndn::fib::FaceMetric::Status, & ( ns3::ndn::fib::FaceMetric::m_status ) >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, int, & ( ns3::ndn::fib::FaceMetric::m_routingCost ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::ndn::fib::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::fib::FaceMetric > >', is_const=False)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_limits [variable]
+    cls.add_instance_attribute('m_limits', 'ns3::Ptr< ns3::ndn::Limits >', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_needsProbing [variable]
     cls.add_instance_attribute('m_needsProbing', 'bool', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_prefix [variable]
@@ -6032,12 +6414,23 @@ def register_Ns3NdnFibI_nth_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::fib::i_nth const &', 'arg0')])
     return
 
+def register_Ns3NdnFwTag_methods(root_module, cls):
+    ## ndn-fw-tag.h (module 'ndnSIM'): ns3::ndn::fw::Tag::Tag() [constructor]
+    cls.add_constructor([])
+    ## ndn-fw-tag.h (module 'ndnSIM'): ns3::ndn::fw::Tag::Tag(ns3::ndn::fw::Tag const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::fw::Tag const &', 'arg0')])
+    return
+
 def register_Ns3NdnPitEntry_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::Entry::Entry(ns3::ndn::pit::Entry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::pit::Entry const &', 'arg0')])
-    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::Entry::Entry(ns3::ndn::Pit & container, ns3::Ptr<const ns3::ndn::InterestHeader> header, ns3::Ptr<ns3::ndn::fib::Entry> fibEntry) [constructor]
+    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::Entry::Entry(ns3::ndn::Pit & container, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<ns3::ndn::fib::Entry> fibEntry) [constructor]
     cls.add_constructor([param('ns3::ndn::Pit &', 'container'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::ndn::fib::Entry >', 'fibEntry')])
+    ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::AddFwTag(boost::shared_ptr<ns3::ndn::fw::Tag> tag) [member function]
+    cls.add_method('AddFwTag', 
+                   'void', 
+                   [param('boost::shared_ptr< ns3::ndn::fw::Tag >', 'tag')])
     ## ndn-pit-entry.h (module 'ndnSIM'): std::_Rb_tree_const_iterator<ns3::ndn::pit::IncomingFace> ns3::ndn::pit::Entry::AddIncoming(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('AddIncoming', 
                    'std::_Rb_tree_const_iterator< ns3::ndn::pit::IncomingFace >', 
@@ -6087,6 +6480,11 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    'std::set< ns3::ndn::pit::IncomingFace > const &', 
                    [], 
                    is_const=True)
+    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::InterestHeader const> ns3::ndn::pit::Entry::GetInterest() const [member function]
+    cls.add_method('GetInterest', 
+                   'ns3::Ptr< ns3::ndn::InterestHeader const >', 
+                   [], 
+                   is_const=True)
     ## ndn-pit-entry.h (module 'ndnSIM'): uint32_t ns3::ndn::pit::Entry::GetMaxRetxCount() const [member function]
     cls.add_method('GetMaxRetxCount', 
                    'uint32_t', 
@@ -6095,6 +6493,11 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
     ## ndn-pit-entry.h (module 'ndnSIM'): std::set<ns3::ndn::pit::OutgoingFace, std::less<ns3::ndn::pit::OutgoingFace>, std::allocator<ns3::ndn::pit::OutgoingFace> > const & ns3::ndn::pit::Entry::GetOutgoing() const [member function]
     cls.add_method('GetOutgoing', 
                    'std::set< ns3::ndn::pit::OutgoingFace > const &', 
+                   [], 
+                   is_const=True)
+    ## ndn-pit-entry.h (module 'ndnSIM'): uint32_t ns3::ndn::pit::Entry::GetOutgoingCount() const [member function]
+    cls.add_method('GetOutgoingCount', 
+                   'uint32_t', 
                    [], 
                    is_const=True)
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::pit::Entry::GetPrefix() const [member function]
@@ -6112,6 +6515,11 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    'bool', 
                    [param('uint32_t', 'nonce')], 
                    is_const=True)
+    ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::OffsetLifetime(ns3::Time const & offsetTime) [member function]
+    cls.add_method('OffsetLifetime', 
+                   'void', 
+                   [param('ns3::Time const &', 'offsetTime')], 
+                   is_virtual=True)
     ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::RemoveAllReferencesToFace(ns3::Ptr<ns3::ndn::Face> face) [member function]
     cls.add_method('RemoveAllReferencesToFace', 
                    'void', 
@@ -6127,10 +6535,10 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
                    is_virtual=True)
-    ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::UpdateLifetime(ns3::Time const & offsetTime) [member function]
+    ## ndn-pit-entry.h (module 'ndnSIM'): void ns3::ndn::pit::Entry::UpdateLifetime(ns3::Time const & lifetime) [member function]
     cls.add_method('UpdateLifetime', 
                    'void', 
-                   [param('ns3::Time const &', 'offsetTime')], 
+                   [param('ns3::Time const &', 'lifetime')], 
                    is_virtual=True)
     return
 
@@ -6210,6 +6618,7 @@ def register_functions_ns3_ndn(module, root_module):
                         [])
     register_functions_ns3_ndn_cs(module.get_submodule('cs'), root_module)
     register_functions_ns3_ndn_fib(module.get_submodule('fib'), root_module)
+    register_functions_ns3_ndn_fw(module.get_submodule('fw'), root_module)
     register_functions_ns3_ndn_pit(module.get_submodule('pit'), root_module)
     return
 
@@ -6217,6 +6626,9 @@ def register_functions_ns3_ndn_cs(module, root_module):
     return
 
 def register_functions_ns3_ndn_fib(module, root_module):
+    return
+
+def register_functions_ns3_ndn_fw(module, root_module):
     return
 
 def register_functions_ns3_ndn_pit(module, root_module):
