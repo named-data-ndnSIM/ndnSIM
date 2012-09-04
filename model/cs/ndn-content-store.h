@@ -162,6 +162,41 @@ public:
   virtual void
   Print (std::ostream &os) const = 0;
 
+
+  /**
+   * @brief Get number of entries in content store
+   */
+  virtual uint32_t
+  GetSize () const = 0;
+
+  /**
+   * @brief Return first element of content store (no order guaranteed)
+   */
+  virtual Ptr<cs::Entry>
+  Begin () = 0;
+
+  /**
+   * @brief Return item next after last (no order guaranteed)
+   */
+  virtual Ptr<cs::Entry>
+  End () = 0;
+
+  /**
+   * @brief Advance the iterator
+   */
+  virtual Ptr<cs::Entry>
+  Next (Ptr<cs::Entry>) = 0;
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  
+  /**
+   * @brief Static call to cheat python bindings
+   */
+  static inline Ptr<ContentStore>
+  GetContentStore (Ptr<Object> node);
+  
 protected:
   TracedCallback<Ptr<const InterestHeader>,
                  Ptr<const ContentObjectHeader> > m_cacheHitsTrace; ///< @brief trace of cache hits
@@ -175,6 +210,13 @@ operator<< (std::ostream &os, const ContentStore &cs)
   cs.Print (os);
   return os;
 }
+
+inline Ptr<ContentStore>
+ContentStore::GetContentStore (Ptr<Object> node)
+{
+  return node->GetObject<ContentStore> ();
+}
+
 
 } // namespace ndn
 } // namespace ns3

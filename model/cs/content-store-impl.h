@@ -33,19 +33,44 @@ namespace ns3 {
 namespace ndn {
 namespace cs {
 
+template<class CS>
+class EntryImpl : public Entry
+{
+public:
+  EntryImpl (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+    : Entry (header, packet)
+    , item_ (0)
+  {
+  }
+
+  void
+  SetTrie (typename CS::super::iterator item)
+  {
+    item_ = item;
+  }
+
+  typename CS::super::iterator to_iterator () { return item_; }
+  typename CS::super::const_iterator to_iterator () const { return item_; }
+  
+private:
+  typename CS::super::iterator item_;
+};
+
+
 
 template<class Policy>
 class ContentStoreImpl : public ContentStore,
                          protected ndnSIM::trie_with_policy< NameComponents,
-                                                             ndnSIM::smart_pointer_payload_traits< Entry >,
+                                                             ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > > >,
                                                              Policy >
 {
-private:
+public:
   typedef ndnSIM::trie_with_policy< NameComponents,
-                                    ndnSIM::smart_pointer_payload_traits< Entry >,
+                                    ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > > >,
                                     Policy > super;
   
-public:
+  typedef EntryImpl< ContentStoreImpl< Policy > > entry;
+  
   static TypeId
   GetTypeId ();
   
@@ -65,6 +90,18 @@ public:
   
   virtual inline void
   Print (std::ostream &os) const;  
+
+  virtual uint32_t
+  GetSize () const;
+
+  virtual Ptr<Entry>
+  Begin ();
+
+  virtual Ptr<Entry>
+  End ();
+
+  virtual Ptr<Entry>
+  Next (Ptr<Entry>);
 
 private:
   void

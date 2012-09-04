@@ -138,11 +138,27 @@ ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const 
 {
   // NS_LOG_FUNCTION (this << header->GetName ());
 
-  return
-    this->insert (header->GetName (), Create<Entry> (header, packet))
-    .second;
+  Ptr< entry > newEntry = Create< entry > (header, packet);
+  std::pair< typename super::iterator, bool > result = super::insert (header->GetName (), newEntry);
+
+  if (result.first != super::end ())
+    {
+      if (result.second)
+        {
+          newEntry->SetTrie (result.first);
+          return newEntry;
+        }
+      else
+        {
+          // should we do anything?
+          // update payload? add new payload?
+          return false;
+        }
+    }
+  else
+    return false; // cannot insert entry
 }
-    
+
 template<class Policy>
 void 
 ContentStoreImpl<Policy>::Print (std::ostream &os) const
@@ -169,6 +185,60 @@ ContentStoreImpl<Policy>::GetMaxSize () const
 {
   return this->getPolicy ().get_max_size ();
 }
+
+template<class Policy>
+uint32_t
+ContentStoreImpl<Policy>::GetSize () const
+{
+  return this->getPolicy ().size ();
+}
+
+template<class Policy>
+Ptr<Entry>
+ContentStoreImpl<Policy>::Begin ()
+{
+  typename super::parent_trie::recursive_iterator item (super::getTrie ()), end (0);
+  for (; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
+template<class Policy>
+Ptr<Entry>
+ContentStoreImpl<Policy>::End ()
+{
+  return 0;
+}
+
+template<class Policy>
+Ptr<Entry>
+ContentStoreImpl<Policy>::Next (Ptr<Entry> from)
+{
+  if (from == 0) return 0;
+  
+  typename super::parent_trie::recursive_iterator
+    item (*StaticCast< entry > (from)->to_iterator ()),
+    end (0);
+  
+  for (item++; item != end; item++)
+    {
+      if (item->payload () == 0) continue;
+      break;
+    }
+
+  if (item == end)
+    return End ();
+  else
+    return item->payload ();
+}
+
 
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
