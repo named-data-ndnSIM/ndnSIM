@@ -34,6 +34,9 @@
 #include "ndn-name-components.h"
 
 namespace ns3 {
+
+class Packet;
+
 namespace ndn {
   
 /**
@@ -385,6 +388,12 @@ public:
    */ 
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
+  /**
+   * @brief Cheat for python bindings
+   */
+  static Ptr<InterestHeader>
+  GetInterest (Ptr<Packet> packet);
+  
 private:
   Ptr<NameComponents> m_name;    ///< Interest name
   int32_t m_minSuffixComponents; ///< Minimum suffix components. not used if negative

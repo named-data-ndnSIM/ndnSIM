@@ -5727,6 +5727,11 @@ def register_Ns3NdnInterestHeader_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
+    ## ndn-interest-header.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::InterestHeader> ns3::ndn::InterestHeader::GetInterest(ns3::Ptr<ns3::Packet> packet) [member function]
+    cls.add_method('GetInterest', 
+                   'ns3::Ptr< ns3::ndn::InterestHeader >', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
+                   is_static=True)
     ## ndn-interest-header.h (module 'ndnSIM'): ns3::Time ns3::ndn::InterestHeader::GetInterestLifetime() const [member function]
     cls.add_method('GetInterestLifetime', 
                    'ns3::Time', 

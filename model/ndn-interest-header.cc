@@ -27,6 +27,7 @@
 
 #include "ns3/log.h"
 #include "ns3/unused.h"
+#include "ns3/packet.h"
 #include "../helper/ndn-encoding-helper.h"
 #include "../helper/ndn-decoding-helper.h"
 
@@ -75,6 +76,15 @@ InterestHeader::InterestHeader (const InterestHeader &interest)
   , m_nonce               (interest.m_nonce)
   , m_nackType            (interest.m_nackType)
 {
+}
+
+Ptr<InterestHeader>
+InterestHeader::GetInterest (Ptr<Packet> packet)
+{
+  Ptr<InterestHeader> interest = Create<InterestHeader> ();
+  packet->RemoveHeader (*interest);
+
+  return interest;
 }
 
 void
