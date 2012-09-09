@@ -84,8 +84,11 @@ DynamicLimits::NotifyNewAggregate ()
     {
       if (m_pit != 0 && m_fib != 0)
         {
-          m_announceEvent = Simulator::Schedule (Seconds (1.0),
-                                                 &DynamicLimits::AnnounceLimits, this);
+          if (!m_announceEvent.IsRunning ())
+            {
+              m_announceEvent = Simulator::Schedule (Seconds (1.0),
+                                                     &DynamicLimits::AnnounceLimits, this);
+            }
         }
     }
 }
