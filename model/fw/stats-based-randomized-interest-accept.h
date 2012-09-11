@@ -43,9 +43,11 @@ namespace fw {
  * (probability is shifted to allow small rate of acceptance (1% by default) of Interests from faces with 0 satisfaction ratio.
  */
 class StatsBasedRandomizedInterestAccept :
-    public DynamicLimits
+    public FwStats
 {
 public:
+  typedef FwStats super;
+  
   static TypeId
   GetTypeId ();
 
@@ -76,8 +78,6 @@ protected:
 private:
   double m_threshold;
   double m_graceAcceptProbability;
-
-  typedef FwStats super;
 };
 
 

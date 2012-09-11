@@ -99,7 +99,7 @@ StatsBasedRandomizedInterestAccept::TrySendOutInterest (Ptr<Face> inFace,
   if (stats.count ().GetStats ().get<0> () >= m_threshold * pitEntry->GetFibEntry ()->GetLimits ().GetMaxLimit ())
     {
       double ratio = std::min (1.0, stats.GetSatisfiedRatio ().get<0> ());
-      if (ratio < 0) ratio = 0.5;
+      // if (ratio < 0) ratio = 0.5;
       // NS_ASSERT_MSG (ratio > 0, "If count is a reasonable value, ratio cannot be negative");
       UniformVariable randAccept (0, 1);
       double dice = randAccept.GetValue ();
@@ -143,6 +143,7 @@ void
 StatsBasedRandomizedInterestAccept::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  super::WillEraseTimedOutPendingInterest (pitEntry);
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
