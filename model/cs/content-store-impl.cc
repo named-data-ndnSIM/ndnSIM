@@ -244,8 +244,19 @@ ContentStoreImpl<Policy>::Next (Ptr<Entry> from)
 ////////////////////////////////////////////////////////////////////
 
 // explicit instantiation and registering
+/**
+ * @brief ContentStore with LRU cache replacement policy
+ **/
 template class ContentStoreImpl<lru_policy_traits>;
+
+/**
+ * @brief ContentStore with random cache replacement policy
+ **/
 template class ContentStoreImpl<random_policy_traits>;
+
+/**
+ * @brief ContentStore with FIFO cache replacement policy
+ **/
 template class ContentStoreImpl<fifo_policy_traits>;
 
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lru_policy_traits);
