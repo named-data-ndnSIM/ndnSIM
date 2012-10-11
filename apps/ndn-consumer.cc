@@ -245,8 +245,6 @@ Consumer::SendPacket ()
   packet->AddHeader (interestHeader);
   NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
 
-  m_protocolHandler (packet);
-
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
   
   m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
@@ -254,6 +252,9 @@ Consumer::SendPacket ()
   m_transmittedInterests (&interestHeader, this, m_face);
 
   m_rtt->SentSeq (SequenceNumber32 (seq), 1);
+
+  m_protocolHandler (packet);
+
   ScheduleNextPacket ();
 }
 
