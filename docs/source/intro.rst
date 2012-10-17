@@ -85,6 +85,10 @@ Requirements
 
        sudo port instal boost
 
+.. note::
+   !!! If you do not have root permissions to install boost, you can install it in your home folder.  However, you need to be make sure that `libboost_iostreams` library is successfully compiled and is installed.  Please refer to :doc:`the following example <boost-custom-install>` for the hints how to successfully compile and install boost libraries on Ubuntu Linux. 
+
+
 3. If you are planning to use other modules, like visualizer, a number of additional dependencies should be installed.  For example, in
 order to run `visualizer`_ module, the following should be installed:
 
