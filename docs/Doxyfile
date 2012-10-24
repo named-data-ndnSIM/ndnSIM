@@ -571,6 +571,7 @@ WARN_LOGFILE           = doxygen.warnings.log
 # with spaces.
 
 INPUT                  = ../model ../helper ../utils ../apps \
+						 ../plugins/topology ../plugins/mobility \
 						 introspected-doxygen.h doxygen.h
 
 # introspected-doxygen.h should be manually created:

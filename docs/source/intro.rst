@@ -70,6 +70,8 @@ Portability
 
 ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (stock gcc, boost 1.48), Mac OS 10.8 (gcc-4.2 apple/llvm, macports gcc 4.7, boost 1.49 or 1.50).
 
+.. _requirements:
+
 Requirements
 -------------
 

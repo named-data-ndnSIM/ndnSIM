@@ -1,3 +1,5 @@
+.. _boost-custom-install:
+
 Installing boost libraries
 ==========================
 

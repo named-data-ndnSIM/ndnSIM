@@ -132,10 +132,11 @@ To simplify implementation of specific NDN application, ndnSIM provides a base :
 
 
 
-Example
-^^^^^^^
+Customer example
+^^^^^^^^^^^^^^^^
 
-The following code shows how a simple ndnSIM application can be created.  For details refer to API documentation of ndnSIM and NS-3.
+The following code shows how a simple ndnSIM application can be created.  
+For details refer to API documentation of ndnSIM and NS-3.
 
 .. code-block:: c++
 
@@ -230,3 +231,78 @@ The following code shows how a simple ndnSIM application can be created.  For de
         std::cout << "DATA received for name " << contentObject->GetName () << std::endl; 
       }
     };
+
+Producer example (Interest hijacker)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following code demonstrates how to implement a basic producer application that "hijacks" all incoming Interests.
+
+.. code-block:: c++
+
+    #include "ns3/core-module.h"
+    #include "ns3/network-module.h"
+    #include "ns3/ndnSIM-module.h"
+        
+    using namespace ns3;
+    
+    class Hijacker : public ndn::App
+    {
+    public: 
+      static TypeId
+      GetTypeId ();
+            
+      Hijacker ()
+      {
+      }
+    
+      // inherited from NdnApp
+      void OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packet> packet)
+      {
+        ndn::App::OnInterest (interest, packet); // forward call to perform app-level tracing
+        // do nothing else (hijack interest)
+      }
+    
+    protected:
+      // inherited from Application base class.
+      virtual void
+      StartApplication ()
+      {
+        App::StartApplication ();
+    
+        // equivalent to setting interest filter for "/" prefix
+        Ptr<ndn::Fib> fib = GetNode ()->GetObject<ndn::Fib> ();
+        Ptr<ndn::fib::Entry> fibEntry = fib->Add ("/", m_face, 0);
+        fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
+      }
+    
+      virtual void
+      StopApplication ()
+      {
+        App::StopApplication ();
+      }
+    };
+    
+    // Necessary if you are planning to use ndn::AppHelper
+    NS_OBJECT_ENSURE_REGISTERED (Hijacker);
+    
+    TypeId
+    Hijacker::GetTypeId ()
+    {
+      static TypeId tid = TypeId ("ndn::Hijacker")
+        .SetParent<ndn::App> ()
+        .AddConstructor<Hijacker> ()
+        ;
+            
+      return tid;
+    }
+
+
+After defining this class, you can use it with :ndnsim:`ndn::AppHelper`. For example:
+
+.. code-block:: c++
+
+    ...
+    ndn::AppHelper producerHelper ("ndn::Hijacker");
+    producerHelper.Install (producerNode);
+    ...
+

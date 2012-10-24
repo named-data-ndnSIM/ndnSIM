@@ -12,4 +12,5 @@ Contents:
    helpers
    applications
    examples
+   faq
    boost-custom-install
