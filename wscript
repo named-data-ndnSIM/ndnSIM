@@ -7,6 +7,8 @@ import Options
 
 from waflib.Errors import WafError
 
+import wutils
+
 def options(opt):
     opt.tool_options('boost', tooldir=["waf-tools"])
     opt.add_option('--enable-ndn-plugins',
@@ -95,6 +97,7 @@ def build(bld):
         "utils/batches.h",
         "utils/ndn-limits.h",
         # "utils/weights-path-stretch-tag.h",
+
         ]
 
     if 'topology' in bld.env['NDN_plugins']:
@@ -110,9 +113,18 @@ def build(bld):
             "plugins/mobility/spring-mobility-helper.h",
             ])
         module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
+
+    ndnSIM_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
+                'utils/**/*.h',
+                'model/**/*.h',
+                'apps/**/*.h',
+                'helper/**/*.h',
+                ])]
+    bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
+    # bld.install_files('$PREFIX/include', ndnSIM_headers)
     
     tests = bld.create_ns3_module_test_library('ndnSIM')
-    tests.source = bld.path.ant_glob('test/*.cc');
+    tests.source = bld.path.ant_glob('test/*.cc')
 
     if bld.env.ENABLE_EXAMPLES:
         bld.add_subdirs('examples')
