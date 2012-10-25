@@ -130,8 +130,10 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
   m_inInterests (header, inFace);
 
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
+  bool similarInterest = true;
   if (pitEntry == 0)
     {
+      similarInterest = false;
       pitEntry = m_pit->Create (header);
       if (pitEntry != 0)
         {
@@ -175,7 +177,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       return;
     }
 
-  if (ShouldSuppressIncomingInterest (inFace, header, origPacket, pitEntry))
+  if (similarInterest && ShouldSuppressIncomingInterest (inFace, header, origPacket, pitEntry))
     {
       pitEntry->AddIncoming (inFace/*, header->GetInterestLifetime ()*/);
       // update PIT entry lifetime
@@ -184,7 +186,14 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       // Suppress this interest if we're still expecting data from some other face
       NS_LOG_DEBUG ("Suppress interests");
       m_dropInterests (header, inFace);
+
+      DidSuppressSimilarInterest (inFace, header, origPacket, pitEntry);
       return;
+    }
+
+  if (similarInterest)
+    {
+      DidForwardSimilarInterest (inFace, header, origPacket, pitEntry);
     }
 
   PropagateInterest (inFace, header, origPacket, pitEntry);
@@ -225,6 +234,21 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
     }
 }
 
+void
+ForwardingStrategy::DidCreatePitEntry (Ptr<Face> inFace,
+                                       Ptr<const InterestHeader> header,
+                                       Ptr<const Packet> origPacket,
+                                       Ptr<pit::Entry> pitEntrypitEntry)
+{
+}
+
+void
+ForwardingStrategy::FailedToCreatePitEntry (Ptr<Face> inFace,
+                                            Ptr<const InterestHeader> header,
+                                            Ptr<const Packet> origPacket)
+{
+  m_dropInterests (header, inFace);
+}
 
 void
 ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
@@ -232,7 +256,6 @@ ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
                                                  Ptr<const Packet> origPacket,
                                                  Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << boost::cref (*inFace));
   /////////////////////////////////////////////////////////////////////////////////////////
   //                                                                                     //
   // !!!! IMPORTANT CHANGE !!!! Duplicate interests will create incoming face entry !!!! //
@@ -240,6 +263,22 @@ ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
   /////////////////////////////////////////////////////////////////////////////////////////
   pitEntry->AddIncoming (inFace);
   m_dropInterests (header, inFace);
+}
+
+void
+ForwardingStrategy::DidSuppressSimilarInterest (Ptr<Face> face,
+                                                Ptr<const InterestHeader> header,
+                                                Ptr<const Packet> origPacket,
+                                                Ptr<pit::Entry> pitEntry)
+{
+}
+
+void
+ForwardingStrategy::DidForwardSimilarInterest (Ptr<Face> inFace,
+                                               Ptr<const InterestHeader> header,
+                                               Ptr<const Packet> origPacket,
+                                               Ptr<pit::Entry> pitEntry)
+{
 }
 
 void
@@ -263,23 +302,8 @@ ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
       m_pit->MarkErased (pitEntry);
     }
 }
-
-void
-ForwardingStrategy::FailedToCreatePitEntry (Ptr<Face> inFace,
-                                            Ptr<const InterestHeader> header,
-                                            Ptr<const Packet> origPacket)
-{
-  NS_LOG_FUNCTION (this);
-  m_dropInterests (header, inFace);
-}
   
-void
-ForwardingStrategy::DidCreatePitEntry (Ptr<Face> inFace,
-                                       Ptr<const InterestHeader> header,
-                                       Ptr<const Packet> origPacket,
-                                       Ptr<pit::Entry> pitEntrypitEntry)
-{
-}
+
 
 bool
 ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,

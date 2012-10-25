@@ -99,29 +99,115 @@ public:
   RemoveFace (Ptr<Face> face);
   
 protected:
-  // events
+  /**
+   * @brief An event that is fired every time a new PIT entry is created
+   *
+   * Note that if NDN node is receiving a similar interest (interest for the same name),
+   * then either DidReceiveDuplicateInterest, DidSuppressSimilarInterest, or DidForwardSimilarInterest
+   * will be called
+   * 
+   * Suppression of similar Interests is controlled using ShouldSuppressIncomingInterest virtual method
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry created PIT entry (incoming and outgoing face sets are empty)
+   *
+   * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
+   */
+  virtual void
+  DidCreatePitEntry (Ptr<Face> inFace,
+                     Ptr<const InterestHeader> header,
+                     Ptr<const Packet> origPacket,
+                     Ptr<pit::Entry> pitEntry);
+  
+  /**
+   * @brief An event that is fired every time a new PIT entry cannot be created (e.g., PIT container imposes a limit)
+   *
+   * Note that this call can be called only for non-similar Interest (i.e., there is an attempt to create a new PIT entry).
+   * For any non-similar Interests, either FailedToCreatePitEntry or DidCreatePitEntry is called.
+   * 
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   */
+  virtual void
+  FailedToCreatePitEntry (Ptr<Face> inFace,
+                          Ptr<const InterestHeader> header,
+                          Ptr<const Packet> origPacket);
+  
+  /**
+   * @brief An event that is fired every time a duplicated Interest is received
+   *
+   * This even is the last action that is performed before the Interest processing is halted
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   *
+   * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
+   */
   virtual void
   DidReceiveDuplicateInterest (Ptr<Face> inFace,
                                Ptr<const InterestHeader> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief An event that is fired every time when a similar Interest is received and suppressed (collapsed)
+   *
+   * This even is the last action that is performed before the Interest processing is halted
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   *
+   * @see DidReceiveDuplicateInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
+   */
+  virtual void
+  DidSuppressSimilarInterest (Ptr<Face> inFace,
+                              Ptr<const InterestHeader> header,
+                              Ptr<const Packet> origPacket,
+                              Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief An event that is fired every time when a similar Interest is received and further forwarded (not suppressed/collapsed)
+   *
+   * This even is fired just before handling the Interest to PropagateInterest method
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   *
+   * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, ShouldSuppressIncomingInterest
+   */
+  virtual void
+  DidForwardSimilarInterest (Ptr<Face> inFace,
+                             Ptr<const InterestHeader> header,
+                             Ptr<const Packet> origPacket,
+                             Ptr<pit::Entry> pitEntry);
+
+  /**
+   * @brief An even that is fired when Interest cannot be forwarded
+   *
+   * Note that the event will not fire if  retransmission detection is enabled (by default)
+   * and retransmitted Interest cannot by forwarded.  For more details, refer to the implementation.
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   *
+   * @see DetectRetransmittedInterest
+   */
   virtual void
   DidExhaustForwardingOptions (Ptr<Face> inFace,
                                Ptr<const InterestHeader> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
-
-  virtual void
-  FailedToCreatePitEntry (Ptr<Face> inFace,
-                          Ptr<const InterestHeader> header,
-                          Ptr<const Packet> origPacket);
-  
-  virtual void
-  DidCreatePitEntry (Ptr<Face> inFace,
-                     Ptr<const InterestHeader> header,
-                     Ptr<const Packet> origPacket,
-                     Ptr<pit::Entry> pitEntry);
 
   virtual bool
   DetectRetransmittedInterest (Ptr<Face> inFace,
@@ -182,6 +268,19 @@ protected:
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Wrapper method, which performs general tasks and calls DoPropagateInterest method
+   *
+   * General tasks so far are adding face to the list of incoming face, updating
+   * PIT entry lifetime, calling DoPropagateInterest, and retransmissions (enabled by default).
+   *
+   * @param inFace     incoming face
+   * @param header     Interest header
+   * @param origPacket original Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   *
+   * @see DoPropagateInterest
+   */
   virtual void
   PropagateInterest (Ptr<Face> inFace,
                      Ptr<const InterestHeader> header,
@@ -189,15 +288,23 @@ protected:
                      Ptr<pit::Entry> pitEntry);
   
   /**
-   * @brief Base method to propagate the interest according to the forwarding strategy
+   * @brief Virtual method to perform Interest propagation according to the forwarding strategy logic
    *
-   * @param pitEntry      Reference to PIT entry (reference to corresponding FIB entry inside)
-   * @param incomingFace  Incoming face
-   * @param header        Interest header
-   * @param packet        Original Interest packet
-   * @param sendCallback  Send callback
+   * In most cases, this is the call that needs to be implemented/re-implemented in order
+   * to perform forwarding of Interests according to the desired logic.
+   *
+   * There is also PropagateInterest method (generally, do not require to be overriden)
+   * which performs general tasks (adding face to the list of incoming face, updating
+   * PIT entry lifetime, calling DoPropagateInterest, as well as perform retransmissions (enabled by default).
+   *
+   * @param inFace     incoming face
+   * @param header     Interest header
+   * @param origPacket original Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    *
    * @return true if interest was successfully propagated, false if all options have failed
+   *
+   * @see PropagateInterest
    */
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
