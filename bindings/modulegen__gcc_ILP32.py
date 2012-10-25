@@ -102,8 +102,6 @@ def register_types(module):
     module.add_class('TagBuffer', import_from_module='ns.network')
     ## traced-value.h (module 'core'): ns3::TracedValue<double> [class]
     module.add_class('TracedValue', import_from_module='ns.core', template_parameters=['double'])
-    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int> [class]
-    module.add_class('TracedValue', import_from_module='ns.core', template_parameters=['unsigned int'])
     ## random-variable.h (module 'core'): ns3::TriangularVariable [class]
     module.add_class('TriangularVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## type-id.h (module 'core'): ns3::TypeId [class]
@@ -525,7 +523,6 @@ def register_methods(root_module):
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
     register_Ns3TracedValue__Double_methods(root_module, root_module['ns3::TracedValue< double >'])
-    register_Ns3TracedValue__Unsigned_int_methods(root_module, root_module['ns3::TracedValue< unsigned int >'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
     register_Ns3TypeId_methods(root_module, root_module['ns3::TypeId'])
     register_Ns3TypeIdAttributeInformation_methods(root_module, root_module['ns3::TypeId::AttributeInformation'])
@@ -665,8 +662,8 @@ def register_methods(root_module):
 
 def register_Ns3Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('<')
     ## address.h (module 'network'): ns3::Address::Address() [constructor]
     cls.add_constructor([])
@@ -1247,8 +1244,8 @@ def register_Ns3EventId_methods(root_module, cls):
 
 def register_Ns3Ipv4Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('<')
     ## ipv4-address.h (module 'network'): ns3::Ipv4Address::Ipv4Address(ns3::Ipv4Address const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Ipv4Address const &', 'arg0')])
@@ -1355,8 +1352,8 @@ def register_Ns3Ipv4Address_methods(root_module, cls):
 
 def register_Ns3Ipv4Mask_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     ## ipv4-address.h (module 'network'): ns3::Ipv4Mask::Ipv4Mask(ns3::Ipv4Mask const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Ipv4Mask const &', 'arg0')])
     ## ipv4-address.h (module 'network'): ns3::Ipv4Mask::Ipv4Mask() [constructor]
@@ -1418,8 +1415,8 @@ def register_Ns3Ipv4Mask_methods(root_module, cls):
 
 def register_Ns3Ipv6Address_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('<')
     ## ipv6-address.h (module 'network'): ns3::Ipv6Address::Ipv6Address() [constructor]
     cls.add_constructor([])
@@ -1591,8 +1588,8 @@ def register_Ns3Ipv6Address_methods(root_module, cls):
 
 def register_Ns3Ipv6Prefix_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     ## ipv6-address.h (module 'network'): ns3::Ipv6Prefix::Ipv6Prefix() [constructor]
     cls.add_constructor([])
     ## ipv6-address.h (module 'network'): ns3::Ipv6Prefix::Ipv6Prefix(uint8_t * prefix) [constructor]
@@ -2269,40 +2266,6 @@ def register_Ns3TracedValue__Double_methods(root_module, cls):
                    [param('double const &', 'v')])
     return
 
-def register_Ns3TracedValue__Unsigned_int_methods(root_module, cls):
-    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue() [constructor]
-    cls.add_constructor([])
-    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue(ns3::TracedValue<unsigned int> const & o) [copy constructor]
-    cls.add_constructor([param('ns3::TracedValue< unsigned int > const &', 'o')])
-    ## traced-value.h (module 'core'): ns3::TracedValue<unsigned int>::TracedValue(unsigned int const & v) [constructor]
-    cls.add_constructor([param('unsigned int const &', 'v')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Connect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
-    cls.add_method('Connect', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::ConnectWithoutContext(ns3::CallbackBase const & cb) [member function]
-    cls.add_method('ConnectWithoutContext', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Disconnect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
-    cls.add_method('Disconnect', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::DisconnectWithoutContext(ns3::CallbackBase const & cb) [member function]
-    cls.add_method('DisconnectWithoutContext', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb')])
-    ## traced-value.h (module 'core'): unsigned int ns3::TracedValue<unsigned int>::Get() const [member function]
-    cls.add_method('Get', 
-                   'unsigned int', 
-                   [], 
-                   is_const=True)
-    ## traced-value.h (module 'core'): void ns3::TracedValue<unsigned int>::Set(unsigned int const & v) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('unsigned int const &', 'v')])
-    return
-
 def register_Ns3TriangularVariable_methods(root_module, cls):
     ## random-variable.h (module 'core'): ns3::TriangularVariable::TriangularVariable(ns3::TriangularVariable const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::TriangularVariable const &', 'arg0')])
@@ -2314,8 +2277,8 @@ def register_Ns3TriangularVariable_methods(root_module, cls):
 
 def register_Ns3TypeId_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
-    cls.add_binary_comparison_operator('==')
     cls.add_output_stream_operator()
+    cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('<')
     ## type-id.h (module 'core'): ns3::TypeId::TypeId(char const * name) [constructor]
     cls.add_constructor([param('char const *', 'name')])
@@ -2608,9 +2571,9 @@ def register_Ns3Int64x64_t_methods(root_module, cls):
     cls.add_inplace_numeric_operator('*=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('+=', param('ns3::int64x64_t const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::int64x64_t const &', 'right'))
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
-    cls.add_output_stream_operator()
     cls.add_inplace_numeric_operator('/=', param('ns3::int64x64_t const &', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long long unsigned int const', 'right'))
     cls.add_binary_numeric_operator('*', root_module['ns3::int64x64_t'], root_module['ns3::int64x64_t'], param('long unsigned int const', 'right'))
@@ -3169,9 +3132,9 @@ def register_Ns3Time_methods(root_module, cls):
     cls.add_binary_comparison_operator('!=')
     cls.add_inplace_numeric_operator('+=', param('ns3::Time const &', 'right'))
     cls.add_inplace_numeric_operator('-=', param('ns3::Time const &', 'right'))
+    cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('>=')
-    cls.add_output_stream_operator()
     cls.add_binary_numeric_operator('+', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_numeric_operator('-', root_module['ns3::Time'], root_module['ns3::Time'], param('ns3::Time const &', 'right'))
     cls.add_binary_comparison_operator('<')
@@ -5593,6 +5556,11 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidForwardSimilarInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    cls.add_method('DidForwardSimilarInterest', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveDuplicateInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidReceiveDuplicateInterest', 
                    'void', 
@@ -5612,6 +5580,11 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     cls.add_method('DidSendOutInterest', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSuppressSimilarInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    cls.add_method('DidSuppressSimilarInterest', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DoDispose() [member function]
     cls.add_method('DoDispose', 
@@ -5923,17 +5896,9 @@ def register_Ns3NdnLimits_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::Limits const &', 'arg0')])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::Limits() [constructor]
     cls.add_constructor([])
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::DecayCurrentLimit() [member function]
-    cls.add_method('DecayCurrentLimit', 
-                   'void', 
-                   [])
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::DecreaseLimit() [member function]
-    cls.add_method('DecreaseLimit', 
-                   'void', 
-                   [])
-    ## ndn-limits.h (module 'ndnSIM'): uint32_t ns3::ndn::Limits::GetMaxLimit() const [member function]
+    ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetMaxLimit() const [member function]
     cls.add_method('GetMaxLimit', 
-                   'uint32_t', 
+                   'double', 
                    [], 
                    is_const=True)
     ## ndn-limits.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::Limits::GetTypeId() [member function]
@@ -5941,10 +5906,6 @@ def register_Ns3NdnLimits_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::IncreaseLimit() [member function]
-    cls.add_method('IncreaseLimit', 
-                   'void', 
-                   [])
     ## ndn-limits.h (module 'ndnSIM'): bool ns3::ndn::Limits::IsBelowLimit() [member function]
     cls.add_method('IsBelowLimit', 
                    'bool', 
@@ -5958,28 +5919,20 @@ def register_Ns3NdnLimits_methods(root_module, cls):
     cls.add_method('RemoveOutstanding', 
                    'void', 
                    [])
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetMaxLimit(uint32_t max) [member function]
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetMaxLimit(double max) [member function]
     cls.add_method('SetMaxLimit', 
                    'void', 
-                   [param('uint32_t', 'max')])
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_additiveIncrease [variable]
-    cls.add_instance_attribute('m_additiveIncrease', 'double', is_const=False)
+                   [param('double', 'max')])
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::UpdateCurrentLimit(double limit) [member function]
+    cls.add_method('UpdateCurrentLimit', 
+                   'void', 
+                   [param('double', 'limit')])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_curMaxLimit [variable]
     cls.add_instance_attribute('m_curMaxLimit', 'ns3::TracedValue< double >', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_exponentialDecayTau [variable]
-    cls.add_instance_attribute('m_exponentialDecayTau', 'ns3::Time', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_lastDecay [variable]
-    cls.add_instance_attribute('m_lastDecay', 'ns3::Time', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_lastDecrease [variable]
-    cls.add_instance_attribute('m_lastDecrease', 'ns3::Time', is_const=False)
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_maxLimit [variable]
-    cls.add_instance_attribute('m_maxLimit', 'uint32_t', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_multiplicativeDecrease [variable]
-    cls.add_instance_attribute('m_multiplicativeDecrease', 'double', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_nonDecreasePeriod [variable]
-    cls.add_instance_attribute('m_nonDecreasePeriod', 'ns3::Time', is_const=False)
+    cls.add_instance_attribute('m_maxLimit', 'double', is_const=False)
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_outstanding [variable]
-    cls.add_instance_attribute('m_outstanding', 'ns3::TracedValue< unsigned int >', is_const=False)
+    cls.add_instance_attribute('m_outstanding', 'ns3::TracedValue< double >', is_const=False)
     return
 
 def register_Ns3NdnNameComponents_methods(root_module, cls):

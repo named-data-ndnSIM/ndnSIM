@@ -45,7 +45,7 @@ public:
    * \param prefix smart pointer to the prefix for the FIB entry
    */
   Limits ()
-  : m_maxLimit (0)
+  : m_maxLimit (-1)
   , m_curMaxLimit (0)
   , m_outstanding (0)
   { }
@@ -54,40 +54,31 @@ public:
    * @brief Set limit for the number of outstanding interests
    */
   void
-  SetMaxLimit (uint32_t max);
+  SetMaxLimit (double max);
 
   /**
    * @brief Get limit for the number of outstanding interests
    */
-  uint32_t
+  double
   GetMaxLimit () const;
 
   /**
    * @brief Check whether limits are enabled or not
    */
   inline bool
-  IsEnabled () const;
+  IsEnabled () const
+  {
+    return m_maxLimit > 0.0;
+  }
 
   /**
-   * @brief Decay current limit (exponential decaying)
+   * @brief Update a current value of the limit
    *
-   * If needed, this method should be called externally periodically (doesn't matter how often, decaying amount will remain the same).
-   * Decaying is most likely needed for per-prefix limits, but definitely not needed for per-face limits.
+   * If limit is larger than previously set value of maximum limit (SetMaxLimit), then the current limit will
+   * be limited to that maximum value
    */
   void
-  DecayCurrentLimit ();
-
-  /**
-   * @brief Increase current limit (additive increase)
-   */
-  void
-  IncreaseLimit ();
-
-  /**
-   * @brief Decrease current limit (multiplicative decrease)
-   */
-  void
-  DecreaseLimit ();
+  UpdateCurrentLimit (double limit);
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -106,25 +97,11 @@ public:
   RemoveOutstanding ();
   
 public:
-  uint32_t m_maxLimit;
+  double m_maxLimit;
   
-  TracedValue< double >   m_curMaxLimit;
-  TracedValue< uint32_t > m_outstanding;
-
-  Time     m_exponentialDecayTau;
-  Time     m_nonDecreasePeriod;
-  double   m_additiveIncrease;
-  double   m_multiplicativeDecrease;
-
-  Time     m_lastDecrease;
-  Time     m_lastDecay;
+  TracedValue< double > m_curMaxLimit;
+  TracedValue< double > m_outstanding;
 };
-
-inline bool
-Limits::IsEnabled () const
-{
-  return m_maxLimit != 0;
-}
   
 
 } // namespace ndn
