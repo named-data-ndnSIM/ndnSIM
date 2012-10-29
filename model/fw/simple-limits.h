@@ -23,7 +23,10 @@
 #define NDNSIM_SIMPLE_LIMITS_H
 
 #include "ns3/event-id.h"
-#include "best-route.h"
+#include "ns3/ndn-pit.h"
+#include "ns3/ndn-pit-entry.h"
+
+#include "ns3/ndn-forwarding-strategy.h"
 
 namespace ns3 {
 namespace ndn {
@@ -33,11 +36,12 @@ namespace fw {
  * \ingroup ndn
  * \brief Strategy implementing per-FIB entry limits
  */
+template<class Parent>
 class SimpleLimits :
-    public BestRoute
+    public Parent
 {
 private:
-  typedef BestRoute super;
+  typedef Parent super;
 
 public:
   static TypeId
@@ -46,7 +50,9 @@ public:
   /**
    * @brief Default constructor
    */
-  SimpleLimits ();
+  SimpleLimits ()
+  {
+  }
   
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
@@ -62,16 +68,95 @@ protected:
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
-  
-private:
-  // from Object
-  virtual void
-  NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
 
-  virtual void
-  DoDispose ();
 };
 
+template<class Parent>
+TypeId
+SimpleLimits<Parent>::GetTypeId (void)
+{
+  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleLimits").c_str ())
+    .SetGroupName ("Ndn")
+    .template SetParent <super> ()
+    .template AddConstructor <SimpleLimits> ()
+    ;
+  return tid;
+}
+
+template<class Parent>
+bool
+SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
+                                          Ptr<Face> outFace,
+                                          Ptr<const InterestHeader> header,
+                                          Ptr<const Packet> origPacket,
+                                          Ptr<pit::Entry> pitEntry)
+{
+  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  // totally override all (if any) parent processing
+  
+  pit::Entry::out_iterator outgoing =
+    pitEntry->GetOutgoing ().find (outFace);
+
+  if (outgoing != pitEntry->GetOutgoing ().end ())
+    {
+      // just suppress without any other action
+      return false;
+    }
+
+  // NS_LOG_DEBUG ("Limit: " << outFace->GetLimits ().m_curMaxLimit << ", outstanding: " << outFace->GetLimits ().m_outstanding);
+  
+  if (outFace->GetLimits ().IsBelowLimit ())
+    {
+      pitEntry->AddOutgoing (outFace);
+
+      //transmission
+      Ptr<Packet> packetToSend = origPacket->Copy ();
+      outFace->Send (packetToSend);
+
+      this->DidSendOutInterest (outFace, header, origPacket, pitEntry);      
+      return true;
+    }
+  else
+    {
+      // NS_LOG_DEBUG ("Face limit for " << header->GetName ());
+    }
+
+  return false;
+}
+
+template<class Parent>
+void
+SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+{
+  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      face->m_face->GetLimits ().RemoveOutstanding ();
+    }
+
+  super::WillEraseTimedOutPendingInterest (pitEntry);
+}
+
+
+template<class Parent>
+void
+SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
+                                                  Ptr<pit::Entry> pitEntry)
+{
+  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      face->m_face->GetLimits ().RemoveOutstanding ();
+    }
+  
+  super::WillSatisfyPendingInterest (inFace, pitEntry);
+}
 
 } // namespace fw
 } // namespace ndn

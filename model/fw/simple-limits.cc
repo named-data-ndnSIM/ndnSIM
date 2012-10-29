@@ -23,126 +23,31 @@
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"
-#include "ns3/ndn-pit.h"
-#include "ns3/ndn-pit-entry.h"
 
-#include "ns3/assert.h"
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/random-variable.h"
-#include "ns3/double.h"
-
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-namespace ll = boost::lambda;
-
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.SimpleLimits");
+#include "best-route.h"
+#include "flooding.h"
+#include "smart-flooding.h"
 
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
-NS_OBJECT_ENSURE_REGISTERED (SimpleLimits);
-  
-TypeId
-SimpleLimits::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::ndn::fw::SimpleLimits")
-    .SetGroupName ("Ndn")
-    .SetParent <super> ()
-    .AddConstructor <SimpleLimits> ()
-    ;
-  return tid;
-}
-    
-SimpleLimits::SimpleLimits ()
-{
-}
+typedef SimpleLimits<BestRoute> SimpleLimitsBestRoute;
+NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsBestRoute);
 
-void
-SimpleLimits::DoDispose ()
-{
-  super::DoDispose ();
-}
+typedef SimpleLimits<Flooding> SimpleLimitsFlooding;
+NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsFlooding);
 
-void
-SimpleLimits::NotifyNewAggregate ()
-{
-  super::NotifyNewAggregate ();
-}
+typedef SimpleLimits<SmartFlooding> SimpleLimitsSmartFlooding;
+NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsSmartFlooding);
 
-bool
-SimpleLimits::TrySendOutInterest (Ptr<Face> inFace,
-                                  Ptr<Face> outFace,
-                                  Ptr<const InterestHeader> header,
-                                  Ptr<const Packet> origPacket,
-                                  Ptr<pit::Entry> pitEntry)
-{
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-  // totally override all (if any) parent processing
-  
-  pit::Entry::out_iterator outgoing =
-    pitEntry->GetOutgoing ().find (outFace);
+#ifdef DOXYGEN
 
-  if (outgoing != pitEntry->GetOutgoing ().end ())
-    {
-      // just suppress without any other action
-      return false;
-    }
+class SimpleLimitsBestRoute : public SimpleLimits<BestRoute> { };
+class SimpleLimitsFlooding : public SimpleLimits<Flooding> { };
+class SimpleLimitsSmartFlooding : public SimpleLimits<SmartFlooding> { };
 
-  NS_LOG_DEBUG ("Limit: " << outFace->GetLimits ().m_curMaxLimit << ", outstanding: " << outFace->GetLimits ().m_outstanding);
-  
-  if (outFace->GetLimits ().IsBelowLimit ())
-    {
-      pitEntry->AddOutgoing (outFace);
-
-      //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      outFace->Send (packetToSend);
-
-      DidSendOutInterest (outFace, header, origPacket, pitEntry);      
-      return true;
-    }
-  else
-    {
-      NS_LOG_DEBUG ("Face limit for " << header->GetName ());
-    }
-
-  return false;
-}
-
-void
-SimpleLimits::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
-{
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
-    {
-      face->m_face->GetLimits ().RemoveOutstanding ();
-    }
-}
-
-
-void
-SimpleLimits::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                          Ptr<pit::Entry> pitEntry)
-{
-  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-  super::WillSatisfyPendingInterest (inFace, pitEntry);
-
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
-    {
-      face->m_face->GetLimits ().RemoveOutstanding ();
-    }
-}
-
-
+#endif
 
 } // namespace fw
 } // namespace ndn
