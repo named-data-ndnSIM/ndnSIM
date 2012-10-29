@@ -107,12 +107,15 @@ GreenYellowRed::WillSatisfyPendingInterest (Ptr<Face> inFace,
 void
 GreenYellowRed::DidReceiveValidNack (Ptr<Face> inFace,
                                      uint32_t nackCode,
+                                     Ptr<const InterestHeader> header,
+                                     Ptr<const Packet> origPacket,
                                      Ptr<pit::Entry> pitEntry)
 {
-  super::DidReceiveValidNack (inFace, nackCode, pitEntry);
+  super::DidReceiveValidNack (inFace, nackCode, header, origPacket, pitEntry);
 
   if (inFace != 0 &&
-      nackCode != InterestHeader::NACK_LOOP)
+      (nackCode == InterestHeader::NACK_CONGESTION ||
+       nackCode == InterestHeader::NACK_GIVEUP_PIT))
     {
       pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
     }

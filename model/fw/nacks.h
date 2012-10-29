@@ -69,6 +69,8 @@ protected:
   virtual void
   DidReceiveValidNack (Ptr<Face> inFace,
                        uint32_t nackCode,
+                       Ptr<const InterestHeader> header,
+                       Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
   
 protected:  

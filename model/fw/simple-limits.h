@@ -25,6 +25,7 @@
 #include "ns3/event-id.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
+#include "ns3/simulator.h"
 
 #include "ns3/ndn-forwarding-strategy.h"
 
@@ -103,8 +104,6 @@ SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
       return false;
     }
 
-  // NS_LOG_DEBUG ("Limit: " << outFace->GetLimits ().m_curMaxLimit << ", outstanding: " << outFace->GetLimits ().m_outstanding);
-  
   if (outFace->GetLimits ().IsBelowLimit ())
     {
       pitEntry->AddOutgoing (outFace);

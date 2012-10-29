@@ -104,29 +104,7 @@ Nacks::OnNack (Ptr<Face> inFace,
   //
   // inFace->LeakBucketByOnePacket ();
 
-  // pitEntry->SetWaitingInVain (inFace);
-
-  DidReceiveValidNack (inFace, header->GetNack (), pitEntry);
-  
-  // if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
-  //   {
-  //     NS_LOG_DEBUG ("Not all outgoing are in vain");
-  //     // suppress
-  //     // Don't do anything, we are still expecting data from some other face
-  //     m_dropNacks (header, inFace);
-  //     return;
-  //   }
-  
-  // Ptr<Packet> nonNackInterest = Create<Packet> ();
-  // Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
-  // nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
-  // nonNackInterest->AddHeader (*nonNackHeader);
-  
-  // bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
-  // if (!propagated)
-  //   {
-  //     DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
-  //   }  
+  DidReceiveValidNack (inFace, header->GetNack (), header, origPacket, pitEntry);
 }
 
 void
@@ -178,6 +156,8 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 void
 Nacks::DidReceiveValidNack (Ptr<Face> inFace,
                             uint32_t nackCode,
+                            Ptr<const InterestHeader> header,
+                            Ptr<const Packet> origPacket,
                             Ptr<pit::Entry> pitEntry)
 {
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
@@ -187,7 +167,32 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
       pitEntry->RemoveIncoming (inFace);
     }
 
-  pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
+  if (nackCode == InterestHeader::NACK_LOOP ||
+      nackCode == InterestHeader::NACK_CONGESTION ||
+      nackCode == InterestHeader::NACK_GIVEUP_PIT)
+    {
+      pitEntry->SetWaitingInVain (inFace);
+
+      if (!pitEntry->AreAllOutgoingInVain ()) // not all ougtoing are in vain
+        {
+          NS_LOG_DEBUG ("Not all outgoing are in vain");
+          // suppress
+          // Don't do anything, we are still expecting data from some other face
+          m_dropNacks (header, inFace);
+          return;
+        }
+  
+      Ptr<Packet> nonNackInterest = Create<Packet> ();
+      Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
+      nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
+      nonNackInterest->AddHeader (*nonNackHeader);
+  
+      bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
+      if (!propagated)
+        {
+          DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
+        }
+    }
 }
 
 } // namespace fw
