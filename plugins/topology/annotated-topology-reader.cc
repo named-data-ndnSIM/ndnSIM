@@ -132,9 +132,9 @@ AnnotatedTopologyReader::Read (void)
   ifstream topgen;
   topgen.open (GetFileName ().c_str ());
         
-  if ( !topgen.is_open () )
+  if ( !topgen.is_open () || !topgen.good () )
     {
-      NS_LOG_ERROR ("Cannot open file " << GetFileName () << " for reading");
+      NS_FATAL_ERROR ("Cannot open file " << GetFileName () << " for reading");
       return m_nodes;
     }
 
@@ -144,6 +144,12 @@ AnnotatedTopologyReader::Read (void)
       getline (topgen, line);
 
       if (line == "router") break;
+    }
+
+  if (topgen.eof ())
+    {
+      NS_FATAL_ERROR ("Topology file " << GetFileName () << " does not have \"router\" section");
+      return m_nodes;
     }
 
   while (!topgen.eof ())
@@ -166,6 +172,12 @@ AnnotatedTopologyReader::Read (void)
 
   map<string, set<string> > processedLinks; // to eliminate duplications
   
+  if (topgen.eof ())
+    {
+      NS_FATAL_ERROR ("Topology file " << GetFileName () << " does not have \"link\" section");
+      return m_nodes;
+    }
+
   // SeekToSection ("link"); 
   while (!topgen.eof ())
     {
