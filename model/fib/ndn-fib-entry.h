@@ -165,7 +165,7 @@ struct FaceMetricContainer
  * \brief Structure for FIB table entry, holding indexed list of
  *        available faces and their respective metrics
  */
-class Entry : public SimpleRefCount<Entry>
+class Entry : public Object
 {
 public:
   class NoFaces {}; ///< @brief Exception class for the case when FIB entry is not found
@@ -178,7 +178,6 @@ public:
   : m_prefix (prefix)
   , m_needsProbing (false)
   {
-    m_limits = CreateObject<Limits> ();
   }
   
   /**
@@ -231,15 +230,6 @@ public:
     m_faces.erase (face);
   }
 
-  /**
-   * @brief Get reference to limits object
-   */
-  Limits &
-  GetLimits ()
-  {
-    return *m_limits;
-  }
-    
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
@@ -248,8 +238,6 @@ public:
   FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
   bool m_needsProbing;      ///< \brief flag indicating that probing should be performed
-
-  Ptr<Limits> m_limits;
 };
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);

@@ -29,38 +29,19 @@ NS_LOG_COMPONENT_DEFINE ("ndn.Limits");
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (Limits);
-
 TypeId
 Limits::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::ndn::Limits")
     .SetGroupName ("Ndn")
     .SetParent <Object> ()
-    .AddConstructor <Limits> ()
     
     .AddTraceSource ("CurMaxLimit",
                      "Current maximum limit",
                      MakeTraceSourceAccessor (&Limits::m_curMaxLimit))
                      
-    .AddTraceSource ("Outstanding",
-                     "Number of outstanding interests",
-                     MakeTraceSourceAccessor (&Limits::m_outstanding))
     ;
   return tid;
-}
-
-void
-Limits::SetMaxLimit (double max)
-{
-  m_maxLimit = max;
-  m_curMaxLimit = max;
-}
-
-double
-Limits::GetMaxLimit () const
-{
-  return m_maxLimit;
 }
 
 void
@@ -69,39 +50,6 @@ Limits::UpdateCurrentLimit (double limit)
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
   
   m_curMaxLimit = std::min (limit, m_maxLimit);
-}
-
-bool
-Limits::IsBelowLimit ()
-{
-  if (!IsEnabled ()) return true;
-
-  if (m_curMaxLimit - m_outstanding >= 1.0)
-    {
-      // static UniformVariable acceptanceProbability (0, m_curMaxLimit);
-      // double value = acceptanceProbability.GetValue ();
-      double value = m_outstanding + 1;
-      
-      if (m_outstanding < value)
-        {
-          m_outstanding += 1.0;
-          return true;
-        }
-      else
-        return false;
-    }
-  else
-    return false;
-}
-
-void
-Limits::RemoveOutstanding ()
-{
-  if (!IsEnabled ()) return; 
-
-  NS_LOG_DEBUG (m_outstanding);
-  NS_ASSERT_MSG (m_outstanding >= (uint32_t)1, "Should not be possible, unless we decreasing this number twice somewhere");
-  m_outstanding -= 1;
 }
 
 } // namespace ndn

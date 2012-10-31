@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "simple-limits.h"
+#include "simple-window-limits.h"
 
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-interest-header.h"
@@ -32,20 +32,23 @@ namespace ns3 {
 namespace ndn {
 namespace fw {
 
-typedef SimpleLimits<BestRoute> SimpleLimitsBestRoute;
+template class SimpleWindowLimits<BestRoute>;
+typedef SimpleWindowLimits<BestRoute> SimpleLimitsBestRoute;
 NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsBestRoute);
 
-typedef SimpleLimits<Flooding> SimpleLimitsFlooding;
+template class SimpleWindowLimits<Flooding>;
+typedef SimpleWindowLimits<Flooding> SimpleLimitsFlooding;
 NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsFlooding);
 
-typedef SimpleLimits<SmartFlooding> SimpleLimitsSmartFlooding;
+template class SimpleWindowLimits<SmartFlooding>;
+typedef SimpleWindowLimits<SmartFlooding> SimpleLimitsSmartFlooding;
 NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsSmartFlooding);
 
 #ifdef DOXYGEN
 
-class SimpleLimitsBestRoute : public SimpleLimits<BestRoute> { };
-class SimpleLimitsFlooding : public SimpleLimits<Flooding> { };
-class SimpleLimitsSmartFlooding : public SimpleLimits<SmartFlooding> { };
+class SimpleWindowLimitsBestRoute : public SimpleWindowLimits<BestRoute> { };
+class SimpleWindowLimitsFlooding : public SimpleWindowLimits<Flooding> { };
+class SimpleWindowLimitsSmartFlooding : public SimpleWindowLimits<SmartFlooding> { };
 
 #endif
 

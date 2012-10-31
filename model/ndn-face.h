@@ -90,12 +90,6 @@ public:
   RegisterProtocolHandler (ProtocolHandler handler);
 
   /**
-   * @brief Get reference to Limits object
-   */
-  inline Limits&
-  GetLimits ();    
-  
-  /**
    * \brief Send packet on a face
    *
    * This method will be called by lower layers to send data to device or application
@@ -221,7 +215,6 @@ private:
   uint32_t m_id; ///< \brief id of the interface in Ndn stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
 
-  Ptr<Limits> m_limits;
   // bool m_enableMetricTagging;
 
   TracedCallback<Ptr<const Packet> > m_txTrace;
@@ -254,13 +247,6 @@ Face::operator!= (const Face &face) const
 {
   return !(*this == face);
 }
-
-inline Limits&
-Face::GetLimits ()
-{
-  return *m_limits;
-}
-
 
 } // namespace ndn
 } // namespace ns3

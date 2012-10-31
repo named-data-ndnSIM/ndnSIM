@@ -164,6 +164,8 @@ L3Protocol::AddFace (const Ptr<Face> &face)
 
   m_faces.push_back (face);
   m_faceCounter++;
+
+  m_forwardingStrategy->AddFace (face); // notify that face is added    
   return face->GetId ();
 }
 
@@ -196,6 +198,9 @@ L3Protocol::RemoveFace (Ptr<Face> face)
   FaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
   NS_ASSERT_MSG (face_it != m_faces.end (), "Attempt to remove face that doesn't exist");
   m_faces.erase (face_it);
+
+  GetObject<Fib> ()->RemoveFromAll (face);
+  m_forwardingStrategy->RemoveFace (face); // notify that face is removed  
 }
 
 Ptr<Face>

@@ -18,12 +18,10 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef _NDN_LIMITS_H_
-#define	_NDN_LIMITS_H_
+#ifndef _NDN_LIMITS_WINDOW_H_
+#define	_NDN_LIMITS_WINDOW_H_
 
-#include "ns3/ptr.h"
-#include "ns3/object.h"
-#include "ns3/traced-value.h"
+#include "ndn-limits.h"
 
 namespace ns3 {
 namespace ndn {
@@ -32,81 +30,55 @@ namespace ndn {
  * \ingroup ndn
  * \brief Structure to manage limits for outstanding interests
  */
-class Limits :
-    public Object
+class LimitsWindow :
+    public Limits
 {
 public:
+  typedef Limits super;
+  
   static TypeId
   GetTypeId ();
-
-  Limits ()
-  : m_maxLimit (-1)
-  , m_curMaxLimit (0)
+  
+  /**
+   * \brief Constructor
+   * \param prefix smart pointer to the prefix for the FIB entry
+   */
+  LimitsWindow ()
+  : m_outstanding (0)
   { }
 
   virtual
-  ~Limits () {}
+  ~LimitsWindow () { }
+
+
+  // from limits
+  virtual bool
+  IsBelowLimit ();
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  // specific to window-based limits
   
   /**
-   * @brief Set limit for the number of outstanding interests
-   */
-  virtual void
-  SetMaxLimit (double max)
-  {
-    m_maxLimit = max;
-    m_curMaxLimit = max;
-  }    
-
-  /**
-   * @brief Get limit for the number of outstanding interests
-   */
-  virtual double
-  GetMaxLimit () const
-  {
-    return m_maxLimit;
-  }
-
-  /**
-   * @brief Check whether limits are enabled or not
-   */
-  virtual inline bool
-  IsEnabled () const
-  {
-    return m_maxLimit > 0.0;
-  }
-
-  /**
-   * @brief Update a current value of the limit
-   *
-   * If limit is larger than previously set value of maximum limit (SetMaxLimit), then the current limit will
-   * be limited to that maximum value
+   * @brief Remove outstanding interests
    */
   void
-  UpdateCurrentLimit (double limit);
+  RemoveOutstanding ();
 
   double
-  GetCurrentLimit () const
+  GetOutstanding () const
   {
-    return m_curMaxLimit;
+    return m_outstanding;
   }
   
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  
-  /**
-   * @brief Check if new interest can be send out, if yes, number of outstanding will be increased
-   */
-  virtual bool
-  IsBelowLimit () = 0;
-  
 protected:
-  double m_maxLimit;
-  TracedValue< double > m_curMaxLimit;
+  TracedValue< double > m_outstanding;
 };
   
 
 } // namespace ndn
 } // namespace ns3
 
-#endif // _NDN_LIMITS_H_
+#endif // _NDN_LIMITS_WINDOW_H_

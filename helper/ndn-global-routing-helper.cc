@@ -35,6 +35,7 @@
 #include "ns3/names.h"
 #include "ns3/node-list.h"
 #include "ns3/channel-list.h"
+#include "ns3/object-factory.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -279,9 +280,17 @@ GlobalRoutingHelper::CalculateRoutes ()
 		BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
 		  {
 		    Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
-                    if (i->second.get<0> ()->GetLimits ().IsEnabled ())
+                    Ptr<Limits> limits = i->second.get<0> ()->GetObject<Limits> ();
+                    
+                    if (limits != 0 && limits->IsEnabled ())
                       {
-                        entry->GetLimits ().SetMaxLimit (i->second.get<0> ()->GetLimits ().GetMaxLimit ());
+                        ObjectFactory limitsFactory;
+                        limitsFactory.SetTypeId (limits->GetInstanceTypeId ());
+
+                        Ptr<Limits> entryLimits = limitsFactory.Create<Limits> ();
+                        entryLimits->SetMaxLimit (limits->GetMaxLimit ());
+
+                        entry->AggregateObject (entryLimits);
                       }
 		  }
 		}

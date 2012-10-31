@@ -528,6 +528,11 @@ ForwardingStrategy::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
   // do nothing for now. may be need to do some logging
 }
 
+void
+ForwardingStrategy::AddFace (Ptr<Face> face)
+{
+  // do nothing here
+}
 
 void
 ForwardingStrategy::RemoveFace (Ptr<Face> face)

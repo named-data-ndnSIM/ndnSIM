@@ -151,8 +151,6 @@ App::StopApplication () // Called at time specified by Stop
 
   // step 2. Remove face from Ndn stack
   GetNode ()->GetObject<L3Protocol> ()->RemoveFace (m_face);
-  GetNode ()->GetObject<Fib> ()->RemoveFromAll (m_face);
-  GetNode ()->GetObject<ForwardingStrategy> ()->RemoveFace (m_face); // notify that face is removed
 
   // step 3. Destroy face
   if (m_face->GetReferenceCount () != 1)

@@ -55,12 +55,6 @@ Face::GetTypeId ()
                    MakeUintegerAccessor (&Face::m_id),
                    MakeUintegerChecker<uint32_t> ())
 
-    .AddAttribute ("Limits", "Limits object",
-                   TypeId::ATTR_GET, // allow only getting it.
-                   PointerValue (0), // this is not really used, but needed for the compiler... so sad
-                   MakePointerAccessor (&Face::m_limits),
-                   MakePointerChecker<Limits> ())
-
     // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
     //                BooleanValue (false),
     //                MakeBooleanAccessor (&Face::m_enableMetricTagging),
@@ -87,7 +81,6 @@ Face::Face (Ptr<Node> node)
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
-  , m_limits (CreateObject<Limits> ())
   // , m_enableMetricTagging (false)
 {
   NS_LOG_FUNCTION (this);

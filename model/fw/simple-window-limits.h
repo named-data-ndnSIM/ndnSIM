@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NDNSIM_SIMPLE_LIMITS_H
-#define NDNSIM_SIMPLE_LIMITS_H
+#ifndef NDNSIM_SIMPLE_WINDOW_LIMITS_H
+#define NDNSIM_SIMPLE_WINDOW_LIMITS_H
 
 #include "ns3/event-id.h"
 #include "ns3/ndn-pit.h"
@@ -28,6 +28,9 @@
 #include "ns3/simulator.h"
 
 #include "ns3/ndn-forwarding-strategy.h"
+
+#include "../../utils/ndn-limits-window.h"
+
 
 namespace ns3 {
 namespace ndn {
@@ -38,7 +41,7 @@ namespace fw {
  * \brief Strategy implementing per-FIB entry limits
  */
 template<class Parent>
-class SimpleLimits :
+class SimpleWindowLimits :
     public Parent
 {
 private:
@@ -51,13 +54,21 @@ public:
   /**
    * @brief Default constructor
    */
-  SimpleLimits ()
-  {
-  }
+  SimpleWindowLimits ()
+  { }
   
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
+  virtual void
+  AddFace (Ptr<Face> face)
+  {
+    Ptr<Limits> limits = CreateObject<LimitsWindow> ();
+    face->AggregateObject (limits);
+
+    super::AddFace (face);
+  }
+  
 protected:
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
@@ -74,23 +85,23 @@ protected:
 
 template<class Parent>
 TypeId
-SimpleLimits<Parent>::GetTypeId (void)
+SimpleWindowLimits<Parent>::GetTypeId (void)
 {
-  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleLimits").c_str ())
+  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleWindowLimits").c_str ())
     .SetGroupName ("Ndn")
     .template SetParent <super> ()
-    .template AddConstructor <SimpleLimits> ()
+    .template AddConstructor <SimpleWindowLimits> ()
     ;
   return tid;
 }
 
 template<class Parent>
 bool
-SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
-                                          Ptr<Face> outFace,
-                                          Ptr<const InterestHeader> header,
-                                          Ptr<const Packet> origPacket,
-                                          Ptr<pit::Entry> pitEntry)
+SimpleWindowLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
+                                                Ptr<Face> outFace,
+                                                Ptr<const InterestHeader> header,
+                                                Ptr<const Packet> origPacket,
+                                                Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   // totally override all (if any) parent processing
@@ -104,7 +115,7 @@ SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
       return false;
     }
 
-  if (outFace->GetLimits ().IsBelowLimit ())
+  if (outFace->template GetObject<LimitsWindow> ()->IsBelowLimit ())
     {
       pitEntry->AddOutgoing (outFace);
 
@@ -125,7 +136,7 @@ SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
 
 template<class Parent>
 void
-SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+SimpleWindowLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -133,7 +144,7 @@ SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetLimits ().RemoveOutstanding ();
+      face->m_face->GetObject<LimitsWindow> ()->RemoveOutstanding ();
     }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
@@ -142,8 +153,8 @@ SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
 
 template<class Parent>
 void
-SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                                  Ptr<pit::Entry> pitEntry)
+SimpleWindowLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
+                                                        Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -151,7 +162,7 @@ SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetLimits ().RemoveOutstanding ();
+      face->m_face->GetObject<LimitsWindow> ()->RemoveOutstanding ();
     }
   
   super::WillSatisfyPendingInterest (inFace, pitEntry);
@@ -161,4 +172,4 @@ SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDNSIM_SIMPLE_LIMITS_H
+#endif // NDNSIM_SIMPLE_WINDOW_LIMITS_H

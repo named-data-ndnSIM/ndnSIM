@@ -254,6 +254,13 @@ StackHelper::Install (Ptr<Node> node) const
       
       if (m_limitsEnabled)
         {
+          Ptr<Limits> limits = face->GetObject<Limits> ();
+          if (limits == 0)
+            {
+              NS_FATAL_ERROR ("Limits are enabled, but the selected forwarding strategy does not support limits. Please revise your scenario");
+              exit (1);
+            }
+          
           NS_LOG_INFO ("Limits are enabled");
           Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
           if (p2p != 0)
@@ -272,7 +279,7 @@ StackHelper::Install (Ptr<Node> node) const
               NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));
 
               // Set max to BDP
-              face->GetLimits ().SetMaxLimit (m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+              limits->SetMaxLimit (m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
             }
         }
         

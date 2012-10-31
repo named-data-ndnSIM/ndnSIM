@@ -184,8 +184,6 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::NameComponents', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::NameComponents>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::cs::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::cs::Entry> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::cs::Entry', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::cs::Entry>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> > [class]
-    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::fib::Entry', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::fib::Entry>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::pit::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::pit::Entry> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::pit::Entry', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::pit::Entry>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## nstime.h (module 'core'): ns3::Time [class]
@@ -212,10 +210,6 @@ def register_types(module):
     module.add_class('AttributeChecker', allow_subclassing=False, automatic_type_narrowing=True, import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::AttributeChecker, ns3::empty, ns3::DefaultDeleter<ns3::AttributeChecker> >'])
     ## attribute.h (module 'core'): ns3::AttributeValue [class]
     module.add_class('AttributeValue', allow_subclassing=False, automatic_type_narrowing=True, import_from_module='ns.core', parent=root_module['ns3::SimpleRefCount< ns3::AttributeValue, ns3::empty, ns3::DefaultDeleter<ns3::AttributeValue> >'])
-    ## batches.h (module 'ndnSIM'): ns3::BatchesChecker [class]
-    module.add_class('BatchesChecker', parent=root_module['ns3::AttributeChecker'])
-    ## batches.h (module 'ndnSIM'): ns3::BatchesValue [class]
-    module.add_class('BatchesValue', parent=root_module['ns3::AttributeValue'])
     ## boolean.h (module 'core'): ns3::BooleanChecker [class]
     module.add_class('BooleanChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## boolean.h (module 'core'): ns3::BooleanValue [class]
@@ -446,7 +440,7 @@ def register_types_ns3_ndn_fib(module):
     root_module = module.get_root()
     
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry [class]
-    module.add_class('Entry', parent=root_module['ns3::SimpleRefCount< ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> >'])
+    module.add_class('Entry', parent=root_module['ns3::Object'])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::NoFaces [class]
     module.add_class('NoFaces', outer_class=root_module['ns3::ndn::fib::Entry'])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric [class]
@@ -563,7 +557,6 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3NdnInterestHeader_Ns3Header_Ns3DefaultDeleter__lt__ns3NdnInterestHeader__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::InterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::ndn::InterestHeader> >'])
     register_Ns3SimpleRefCount__Ns3NdnNameComponents_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnNameComponents__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::NameComponents, ns3::empty, ns3::DefaultDeleter<ns3::ndn::NameComponents> >'])
     register_Ns3SimpleRefCount__Ns3NdnCsEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnCsEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::cs::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::cs::Entry> >'])
-    register_Ns3SimpleRefCount__Ns3NdnFibEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnFibEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> >'])
     register_Ns3SimpleRefCount__Ns3NdnPitEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnPitEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::pit::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::pit::Entry> >'])
     register_Ns3Time_methods(root_module, root_module['ns3::Time'])
     register_Ns3TopologyReader_methods(root_module, root_module['ns3::TopologyReader'])
@@ -575,8 +568,6 @@ def register_methods(root_module):
     register_Ns3AttributeAccessor_methods(root_module, root_module['ns3::AttributeAccessor'])
     register_Ns3AttributeChecker_methods(root_module, root_module['ns3::AttributeChecker'])
     register_Ns3AttributeValue_methods(root_module, root_module['ns3::AttributeValue'])
-    register_Ns3BatchesChecker_methods(root_module, root_module['ns3::BatchesChecker'])
-    register_Ns3BatchesValue_methods(root_module, root_module['ns3::BatchesValue'])
     register_Ns3BooleanChecker_methods(root_module, root_module['ns3::BooleanChecker'])
     register_Ns3BooleanValue_methods(root_module, root_module['ns3::BooleanValue'])
     register_Ns3CallbackChecker_methods(root_module, root_module['ns3::CallbackChecker'])
@@ -3103,18 +3094,6 @@ def register_Ns3SimpleRefCount__Ns3NdnCsEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns
                    is_static=True)
     return
 
-def register_Ns3SimpleRefCount__Ns3NdnFibEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnFibEntry__gt___methods(root_module, cls):
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> >::SimpleRefCount() [constructor]
-    cls.add_constructor([])
-    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> >::SimpleRefCount(ns3::SimpleRefCount<ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> > const & o) [copy constructor]
-    cls.add_constructor([param('ns3::SimpleRefCount< ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter< ns3::ndn::fib::Entry > > const &', 'o')])
-    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::ndn::fib::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::fib::Entry> >::Cleanup() [member function]
-    cls.add_method('Cleanup', 
-                   'void', 
-                   [], 
-                   is_static=True)
-    return
-
 def register_Ns3SimpleRefCount__Ns3NdnPitEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnPitEntry__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::pit::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::pit::Entry> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -3645,46 +3624,6 @@ def register_Ns3AttributeValue_methods(root_module, cls):
                    'std::string', 
                    [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
-    return
-
-def register_Ns3BatchesChecker_methods(root_module, cls):
-    ## batches.h (module 'ndnSIM'): ns3::BatchesChecker::BatchesChecker() [constructor]
-    cls.add_constructor([])
-    ## batches.h (module 'ndnSIM'): ns3::BatchesChecker::BatchesChecker(ns3::BatchesChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::BatchesChecker const &', 'arg0')])
-    return
-
-def register_Ns3BatchesValue_methods(root_module, cls):
-    ## batches.h (module 'ndnSIM'): ns3::BatchesValue::BatchesValue() [constructor]
-    cls.add_constructor([])
-    ## batches.h (module 'ndnSIM'): ns3::BatchesValue::BatchesValue(ns3::BatchesValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::BatchesValue const &', 'arg0')])
-    ## batches.h (module 'ndnSIM'): ns3::BatchesValue::BatchesValue(ns3::Batches const & value) [constructor]
-    cls.add_constructor([param('ns3::Batches const &', 'value')])
-    ## batches.h (module 'ndnSIM'): ns3::Ptr<ns3::AttributeValue> ns3::BatchesValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## batches.h (module 'ndnSIM'): bool ns3::BatchesValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## batches.h (module 'ndnSIM'): ns3::Batches ns3::BatchesValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::Batches', 
-                   [], 
-                   is_const=True)
-    ## batches.h (module 'ndnSIM'): std::string ns3::BatchesValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## batches.h (module 'ndnSIM'): void ns3::BatchesValue::Set(ns3::Batches const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::Batches const &', 'value')])
     return
 
 def register_Ns3BooleanChecker_methods(root_module, cls):
@@ -5323,10 +5262,6 @@ def register_Ns3NdnFace_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Limits & ns3::ndn::Face::GetLimits() [member function]
-    cls.add_method('GetLimits', 
-                   'ns3::ndn::Limits &', 
-                   [])
     ## ndn-face.h (module 'ndnSIM'): uint16_t ns3::ndn::Face::GetMetric() const [member function]
     cls.add_method('GetMetric', 
                    'uint16_t', 
@@ -5516,6 +5451,11 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::ForwardingStrategy const &', 'arg0')])
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): ns3::ndn::ForwardingStrategy::ForwardingStrategy() [constructor]
     cls.add_constructor([])
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::AddFace(ns3::Ptr<ns3::ndn::Face> face) [member function]
+    cls.add_method('AddFace', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
+                   is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ForwardingStrategy::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -5896,11 +5836,16 @@ def register_Ns3NdnLimits_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::Limits const &', 'arg0')])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::Limits() [constructor]
     cls.add_constructor([])
+    ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetCurrentLimit() const [member function]
+    cls.add_method('GetCurrentLimit', 
+                   'double', 
+                   [], 
+                   is_const=True)
     ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetMaxLimit() const [member function]
     cls.add_method('GetMaxLimit', 
                    'double', 
                    [], 
-                   is_const=True)
+                   is_const=True, is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::Limits::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -5909,30 +5854,22 @@ def register_Ns3NdnLimits_methods(root_module, cls):
     ## ndn-limits.h (module 'ndnSIM'): bool ns3::ndn::Limits::IsBelowLimit() [member function]
     cls.add_method('IsBelowLimit', 
                    'bool', 
-                   [])
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): bool ns3::ndn::Limits::IsEnabled() const [member function]
     cls.add_method('IsEnabled', 
                    'bool', 
                    [], 
-                   is_const=True)
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::RemoveOutstanding() [member function]
-    cls.add_method('RemoveOutstanding', 
-                   'void', 
-                   [])
+                   is_const=True, is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetMaxLimit(double max) [member function]
     cls.add_method('SetMaxLimit', 
                    'void', 
-                   [param('double', 'max')])
+                   [param('double', 'max')], 
+                   is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::UpdateCurrentLimit(double limit) [member function]
     cls.add_method('UpdateCurrentLimit', 
                    'void', 
                    [param('double', 'limit')])
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_curMaxLimit [variable]
-    cls.add_instance_attribute('m_curMaxLimit', 'ns3::TracedValue< double >', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_maxLimit [variable]
-    cls.add_instance_attribute('m_maxLimit', 'double', is_const=False)
-    ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::m_outstanding [variable]
-    cls.add_instance_attribute('m_outstanding', 'ns3::TracedValue< double >', is_const=False)
     return
 
 def register_Ns3NdnNameComponents_methods(root_module, cls):
@@ -6274,10 +6211,6 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    'ns3::ndn::fib::FaceMetric const &', 
                    [param('uint32_t', 'skip', default_value='0')], 
                    is_const=True)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::Limits & ns3::ndn::fib::Entry::GetLimits() [member function]
-    cls.add_method('GetLimits', 
-                   'ns3::ndn::Limits &', 
-                   [])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::fib::Entry::GetPrefix() const [member function]
     cls.add_method('GetPrefix', 
                    'ns3::ndn::NameComponents const &', 
@@ -6301,8 +6234,6 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::ndn::fib::FaceMetric::Status', 'status')])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_faces [variable]
     cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::ndn::fib::FaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::fib::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::fib::FaceMetric::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::fib::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::ndn::fib::FaceMetric, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::ndn::fib::FaceMetric::Status, & ( ns3::ndn::fib::FaceMetric::m_status ) >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, int, & ( ns3::ndn::fib::FaceMetric::m_routingCost ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::ndn::fib::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::fib::FaceMetric > >', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_limits [variable]
-    cls.add_instance_attribute('m_limits', 'ns3::Ptr< ns3::ndn::Limits >', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_needsProbing [variable]
     cls.add_instance_attribute('m_needsProbing', 'bool', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_prefix [variable]
@@ -6554,10 +6485,6 @@ def register_Ns3NdnPitI_retx_methods(root_module, cls):
 
 def register_functions(root_module):
     module = root_module
-    ## batches.h (module 'ndnSIM'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::MakeBatchesChecker() [free function]
-    module.add_function('MakeBatchesChecker', 
-                        'ns3::Ptr< ns3::AttributeChecker const >', 
-                        [])
     register_functions_ns3_FatalImpl(module.get_submodule('FatalImpl'), root_module)
     register_functions_ns3_internal(module.get_submodule('internal'), root_module)
     register_functions_ns3_ndn(module.get_submodule('ndn'), root_module)

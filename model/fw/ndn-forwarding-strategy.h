@@ -90,6 +90,13 @@ public:
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
   /**
+   * @brief Event fired every time face is added to NDN stack
+   * @param face face to be removed
+   */
+  virtual void
+  AddFace (Ptr<Face> face);
+  
+  /**
    * @brief Event fired every time face is removed from NDN stack
    * @param face face to be removed
    *

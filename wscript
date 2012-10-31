@@ -94,7 +94,7 @@ def build(bld):
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
 
-        "utils/batches.h",
+        # "utils/batches.h",
         "utils/ndn-limits.h",
         # "utils/weights-path-stretch-tag.h",
 
