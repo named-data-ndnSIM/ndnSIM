@@ -23,6 +23,8 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
+#include "ns3/ndn-face.h"
+#include "ns3/node.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Rate");
 
@@ -42,6 +44,26 @@ LimitsRate::GetTypeId ()
     ;
   return tid;
 }
+
+void
+LimitsRate::NotifyNewAggregate ()
+{
+  super::NotifyNewAggregate ();
+
+  if (!m_isLeakScheduled)
+    {
+      if (GetObject<Face> () != 0)
+        {
+          NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
+          
+          m_isLeakScheduled = true;
+          UniformVariable r (0,1);
+          Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+                                          Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+        }
+    }
+}
+
 
 void
 LimitsRate::UpdateCurrentLimit (double limit)
@@ -80,7 +102,23 @@ LimitsRate::LeakBucket (double interval)
 {
   const double leak = m_bucketLeak * interval;
 
+#ifdef NS3_LOG_ENABLE  
+  if (m_bucket>1)
+    {
+      NS_LOG_DEBUG ("Leak from " << m_bucket << " to " << std::max (0.0, m_bucket - leak));
+    }
+#endif
+  
   m_bucket = std::max (0.0, m_bucket - leak);
+
+  // calculate interval so next time we will leak by 1.001, unless such interval would be more than 1 second
+  double newInterval = 1.0;
+  if (m_bucketLeak > 1.0)
+    {
+      newInterval = 1.001 / m_bucketLeak;
+    }
+  
+  Simulator::Schedule (Seconds (newInterval), &LimitsRate::LeakBucket, this, newInterval);
 }
 
 } // namespace ndn

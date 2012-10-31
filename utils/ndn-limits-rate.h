@@ -44,8 +44,9 @@ public:
    * \param prefix smart pointer to the prefix for the FIB entry
    */
   LimitsRate ()
-    : m_bucketMax (0)
-    , m_bucketLeak (0)
+    : m_isLeakScheduled (false)
+    , m_bucketMax (0)
+    , m_bucketLeak (1)
     , m_bucket (0)
   { }
 
@@ -96,6 +97,11 @@ public:
     return m_bucketLeak;
   }
 
+protected:
+  // from Node
+  void
+  NotifyNewAggregate ();
+    
 private:
   /**
    * @brief Leak bucket, assuming `interval' seconds between leakages
@@ -106,6 +112,8 @@ private:
   LeakBucket (double interval);
 
 private:
+  bool m_isLeakScheduled;
+  
   double m_bucketMax;   ///< \brief Maximum Interest allowance for this face (maximum tokens that can be issued at the same time)
   double m_bucketLeak;  ///< \brief Normalized amount that should be leaked every second (token bucket leak rate)
   double m_bucket;      ///< \brief Value representing current size of the Interest allowance for this face (current size of token bucket)

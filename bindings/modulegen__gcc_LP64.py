@@ -100,8 +100,6 @@ def register_types(module):
     module.add_class('Tag', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## tag-buffer.h (module 'network'): ns3::TagBuffer [class]
     module.add_class('TagBuffer', import_from_module='ns.network')
-    ## traced-value.h (module 'core'): ns3::TracedValue<double> [class]
-    module.add_class('TracedValue', import_from_module='ns.core', template_parameters=['double'])
     ## random-variable.h (module 'core'): ns3::TriangularVariable [class]
     module.add_class('TriangularVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## type-id.h (module 'core'): ns3::TypeId [class]
@@ -516,7 +514,6 @@ def register_methods(root_module):
     register_Ns3SpringMobilityHelper_methods(root_module, root_module['ns3::SpringMobilityHelper'])
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
-    register_Ns3TracedValue__Double_methods(root_module, root_module['ns3::TracedValue< double >'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
     register_Ns3TypeId_methods(root_module, root_module['ns3::TypeId'])
     register_Ns3TypeIdAttributeInformation_methods(root_module, root_module['ns3::TypeId::AttributeInformation'])
@@ -2221,40 +2218,6 @@ def register_Ns3TagBuffer_methods(root_module, cls):
     cls.add_method('WriteU8', 
                    'void', 
                    [param('uint8_t', 'v')])
-    return
-
-def register_Ns3TracedValue__Double_methods(root_module, cls):
-    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue() [constructor]
-    cls.add_constructor([])
-    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue(ns3::TracedValue<double> const & o) [copy constructor]
-    cls.add_constructor([param('ns3::TracedValue< double > const &', 'o')])
-    ## traced-value.h (module 'core'): ns3::TracedValue<double>::TracedValue(double const & v) [constructor]
-    cls.add_constructor([param('double const &', 'v')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Connect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
-    cls.add_method('Connect', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::ConnectWithoutContext(ns3::CallbackBase const & cb) [member function]
-    cls.add_method('ConnectWithoutContext', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Disconnect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
-    cls.add_method('Disconnect', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
-    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::DisconnectWithoutContext(ns3::CallbackBase const & cb) [member function]
-    cls.add_method('DisconnectWithoutContext', 
-                   'void', 
-                   [param('ns3::CallbackBase const &', 'cb')])
-    ## traced-value.h (module 'core'): double ns3::TracedValue<double>::Get() const [member function]
-    cls.add_method('Get', 
-                   'double', 
-                   [], 
-                   is_const=True)
-    ## traced-value.h (module 'core'): void ns3::TracedValue<double>::Set(double const & v) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('double const &', 'v')])
     return
 
 def register_Ns3TriangularVariable_methods(root_module, cls):
@@ -5836,13 +5799,23 @@ def register_Ns3NdnLimits_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::Limits const &', 'arg0')])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits::Limits() [constructor]
     cls.add_constructor([])
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::BorrowLimit() [member function]
+    cls.add_method('BorrowLimit', 
+                   'void', 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetCurrentLimit() const [member function]
     cls.add_method('GetCurrentLimit', 
                    'double', 
                    [], 
-                   is_const=True)
-    ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetMaxLimit() const [member function]
-    cls.add_method('GetMaxLimit', 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetMaxDelay() const [member function]
+    cls.add_method('GetMaxDelay', 
+                   'double', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndn-limits.h (module 'ndnSIM'): double ns3::ndn::Limits::GetMaxRate() const [member function]
+    cls.add_method('GetMaxRate', 
                    'double', 
                    [], 
                    is_const=True, is_virtual=True)
@@ -5861,15 +5834,21 @@ def register_Ns3NdnLimits_methods(root_module, cls):
                    'bool', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetMaxLimit(double max) [member function]
-    cls.add_method('SetMaxLimit', 
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::ReturnLimit() [member function]
+    cls.add_method('ReturnLimit', 
                    'void', 
-                   [param('double', 'max')], 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::SetLimits(double rate, double delay) [member function]
+    cls.add_method('SetLimits', 
+                   'void', 
+                   [param('double', 'rate'), param('double', 'delay')], 
                    is_virtual=True)
     ## ndn-limits.h (module 'ndnSIM'): void ns3::ndn::Limits::UpdateCurrentLimit(double limit) [member function]
     cls.add_method('UpdateCurrentLimit', 
                    'void', 
-                   [param('double', 'limit')])
+                   [param('double', 'limit')], 
+                   is_pure_virtual=True, is_virtual=True)
     return
 
 def register_Ns3NdnNameComponents_methods(root_module, cls):
