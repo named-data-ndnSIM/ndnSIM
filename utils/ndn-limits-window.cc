@@ -21,15 +21,13 @@
 #include "ndn-limits-window.h"
 
 #include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/random-variable.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Window");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (Limits);
+NS_OBJECT_ENSURE_REGISTERED (LimitsWindow);
 
 TypeId
 LimitsWindow::GetTypeId ()
@@ -39,6 +37,10 @@ LimitsWindow::GetTypeId ()
     .SetParent <Limits> () 
     .AddConstructor <LimitsWindow> ()
     
+    .AddTraceSource ("CurMaxLimit",
+                     "Current maximum limit",
+                     MakeTraceSourceAccessor (&LimitsWindow::m_curMaxLimit))
+
     .AddTraceSource ("Outstanding",
                      "Number of outstanding interests",
                      MakeTraceSourceAccessor (&LimitsWindow::m_outstanding))
@@ -46,35 +48,36 @@ LimitsWindow::GetTypeId ()
   return tid;
 }
 
+void
+LimitsWindow::UpdateCurrentLimit (double limit)
+{
+  NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
+  
+  m_curMaxLimit = std::min (limit, GetMaxRate () * GetMaxDelay ());
+}
+
 bool
 LimitsWindow::IsBelowLimit ()
 {
   if (!IsEnabled ()) return true;
 
-  if (m_curMaxLimit - m_outstanding >= 1.0)
-    {
-      // static UniformVariable acceptanceProbability (0, m_curMaxLimit);
-      // double value = acceptanceProbability.GetValue ();
-      double value = m_outstanding + 1;
-      
-      if (m_outstanding < value)
-        {
-          m_outstanding += 1.0;
-          return true;
-        }
-      else
-        return false;
-    }
-  else
-    return false;
+  return (m_curMaxLimit - m_outstanding >= 1.0);
 }
 
 void
-LimitsWindow::RemoveOutstanding ()
+LimitsWindow::BorrowLimit ()
 {
   if (!IsEnabled ()) return; 
 
-  NS_LOG_DEBUG (m_outstanding);
+  NS_ASSERT_MSG (m_curMaxLimit - m_outstanding >= 1.0, "Should not be possible, unless we IsBelowLimit was not checked correctly");
+  m_outstanding += 1;
+}
+
+void
+LimitsWindow::ReturnLimit ()
+{
+  if (!IsEnabled ()) return; 
+
   NS_ASSERT_MSG (m_outstanding >= (uint32_t)1, "Should not be possible, unless we decreasing this number twice somewhere");
   m_outstanding -= 1;
 }

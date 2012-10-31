@@ -26,11 +26,11 @@
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
 #include "ns3/simulator.h"
+#include "ns3/string.h"
 
 #include "ns3/ndn-forwarding-strategy.h"
 
-#include "../../utils/ndn-limits-window.h"
-
+#include "ns3/ndn-limits.h"
 
 namespace ns3 {
 namespace ndn {
@@ -63,7 +63,8 @@ public:
   virtual void
   AddFace (Ptr<Face> face)
   {
-    Ptr<Limits> limits = CreateObject<LimitsWindow> ();
+    ObjectFactory factory (m_limitType);
+    Ptr<Limits> limits = factory.template Create<Limits> ();
     face->AggregateObject (limits);
 
     super::AddFace (face);
@@ -81,6 +82,8 @@ protected:
   WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
+private:
+  std::string m_limitType;
 };
 
 template<class Parent>
@@ -91,6 +94,11 @@ SimpleWindowLimits<Parent>::GetTypeId (void)
     .SetGroupName ("Ndn")
     .template SetParent <super> ()
     .template AddConstructor <SimpleWindowLimits> ()
+
+    .template AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
+                            StringValue ("ns3::ndn::Limits::Window"),
+                            MakeStringAccessor (&SimpleWindowLimits<Parent>::m_limitType),
+                            MakeStringChecker ())    
     ;
   return tid;
 }
@@ -115,8 +123,10 @@ SimpleWindowLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
       return false;
     }
 
-  if (outFace->template GetObject<LimitsWindow> ()->IsBelowLimit ())
+  Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
+  if (faceLimits->IsBelowLimit ())
     {
+      faceLimits->BorrowLimit ();
       pitEntry->AddOutgoing (outFace);
 
       //transmission
@@ -144,7 +154,8 @@ SimpleWindowLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pi
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetObject<LimitsWindow> ()->RemoveOutstanding ();
+      Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
+      faceLimits->ReturnLimit ();
     }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
@@ -162,7 +173,8 @@ SimpleWindowLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      face->m_face->GetObject<LimitsWindow> ()->RemoveOutstanding ();
+      Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
+      faceLimits->ReturnLimit ();
     }
   
   super::WillSatisfyPendingInterest (inFace, pitEntry);

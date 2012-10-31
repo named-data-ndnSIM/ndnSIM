@@ -30,7 +30,7 @@ namespace ndn {
 
 /**
  * \ingroup ndn
- * \brief Structure to manage limits for outstanding interests
+ * \brief Abstract class to manage Interest limits 
  */
 class Limits :
     public Object
@@ -39,31 +39,48 @@ public:
   static TypeId
   GetTypeId ();
 
+  /**
+   * @brief Default constructor
+   */
   Limits ()
-  : m_maxLimit (-1)
-  , m_curMaxLimit (0)
+  : m_maxRate (-1)
+  , m_maxDelay (1.0)
   { }
 
+  /**
+   * @brief Virtual destructor
+   */
   virtual
   ~Limits () {}
   
   /**
    * @brief Set limit for the number of outstanding interests
+   * @param rate   Maximum rate that needs to be enforced
+   * @param delay  Maximum delay for BDP product for window-based limits
    */
   virtual void
-  SetMaxLimit (double max)
+  SetLimits (double rate, double delay)
   {
-    m_maxLimit = max;
-    m_curMaxLimit = max;
+    m_maxRate = rate;
+    m_maxDelay = delay;
   }    
 
   /**
-   * @brief Get limit for the number of outstanding interests
+   * @brief Get maximum rate that needs to be enforced
    */
   virtual double
-  GetMaxLimit () const
+  GetMaxRate () const
   {
-    return m_maxLimit;
+    return m_maxRate;
+  }
+
+  /**
+   * @brief Get maximum delay for BDP product for window-based limits
+   */
+  virtual double
+  GetMaxDelay () const
+  {
+    return m_maxDelay;
   }
 
   /**
@@ -72,37 +89,56 @@ public:
   virtual inline bool
   IsEnabled () const
   {
-    return m_maxLimit > 0.0;
+    return m_maxRate > 0.0;
   }
 
   /**
    * @brief Update a current value of the limit
+   * @param limit Value of current limit.
    *
-   * If limit is larger than previously set value of maximum limit (SetMaxLimit), then the current limit will
-   * be limited to that maximum value
+   * Note that interpretation of this value may be different in different ndn::Limit realizations
+   *
+   * All realizations will try to guarantee that if limit is larger than previously set value of maximum limit,
+   * then the current limit will be limited to that maximum value
    */
-  void
-  UpdateCurrentLimit (double limit);
+  virtual void
+  UpdateCurrentLimit (double limit) = 0;
 
-  double
-  GetCurrentLimit () const
-  {
-    return m_curMaxLimit;
-  }
-  
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  
   /**
-   * @brief Check if new interest can be send out, if yes, number of outstanding will be increased
+   * @brief Get value of the current limit
+   *
+   * Note that interpretation of this value may be different in different ndn::Limit realizations
+   */
+  virtual double
+  GetCurrentLimit () const = 0;
+  
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @brief Realization-specific method called to check availability of the limit
    */
   virtual bool
   IsBelowLimit () = 0;
+
+  /**
+   * @brief "Borrow" limit
+   *
+   * IsBelowLimit **must** be true, otherwise assert fail
+   */
+  virtual void
+  BorrowLimit () = 0;
+
+  /**
+   * @brief "Return" limit
+   */
+  virtual void
+  ReturnLimit () = 0;
   
-protected:
-  double m_maxLimit;
-  TracedValue< double > m_curMaxLimit;
+private:
+  double m_maxRate;
+  double m_maxDelay;
 };
   
 

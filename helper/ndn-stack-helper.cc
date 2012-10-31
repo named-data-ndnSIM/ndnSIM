@@ -279,7 +279,7 @@ StackHelper::Install (Ptr<Node> node) const
               NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));
 
               // Set max to BDP
-              limits->SetMaxLimit (m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+              limits->SetLimits (maxInterestPackets, m_avgRtt.ToDouble (Time::S));
             }
         }
         

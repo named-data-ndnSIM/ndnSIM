@@ -288,7 +288,7 @@ GlobalRoutingHelper::CalculateRoutes ()
                         limitsFactory.SetTypeId (limits->GetInstanceTypeId ());
 
                         Ptr<Limits> entryLimits = limitsFactory.Create<Limits> ();
-                        entryLimits->SetMaxLimit (limits->GetMaxLimit ());
+                        entryLimits->SetLimits (limits->GetMaxRate (), limits->GetMaxDelay ());
 
                         entry->AggregateObject (entryLimits);
                       }

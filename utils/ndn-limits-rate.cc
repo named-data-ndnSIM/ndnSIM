@@ -18,26 +18,69 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-limits.h"
+#include "ndn-limits-rate.h"
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.Limits");
+NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Rate");
 
 namespace ns3 {
 namespace ndn {
 
+NS_OBJECT_ENSURE_REGISTERED (LimitsRate);
+
 TypeId
-Limits::GetTypeId ()
+LimitsRate::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::ndn::Limits")
+  static TypeId tid = TypeId ("ns3::ndn::Limits::Rate")
     .SetGroupName ("Ndn")
-    .SetParent <Object> ()
+    .SetParent <Limits> () 
+    .AddConstructor <LimitsRate> ()
     
     ;
   return tid;
+}
+
+void
+LimitsRate::UpdateCurrentLimit (double limit)
+{
+  NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
+  
+  m_bucketLeak = std::min (limit, GetMaxRate ());
+  m_bucketMax  = m_bucketLeak * GetMaxDelay ();
+}
+
+bool
+LimitsRate::IsBelowLimit ()
+{
+  if (!IsEnabled ()) return true;
+
+  return (m_bucketMax - m_bucket >= 1.0);
+}
+
+void
+LimitsRate::BorrowLimit ()
+{
+  if (!IsEnabled ()) return; 
+
+  NS_ASSERT_MSG (m_bucketMax - m_bucket >= 1.0, "Should not be possible, unless we IsBelowLimit was not checked correctly");
+  m_bucket += 1; 
+}
+
+void
+LimitsRate::ReturnLimit ()
+{
+  // do nothing
+}
+
+void
+LimitsRate::LeakBucket (double interval)
+{
+  const double leak = m_bucketLeak * interval;
+
+  m_bucket = std::max (0.0, m_bucket - leak);
 }
 
 } // namespace ndn

@@ -28,7 +28,7 @@ namespace ndn {
 
 /**
  * \ingroup ndn
- * \brief Structure to manage limits for outstanding interests
+ * \brief Structure to manage limits for outstanding interests (window-based limiting)
  */
 class LimitsWindow :
     public Limits
@@ -40,40 +40,57 @@ public:
   GetTypeId ();
   
   /**
-   * \brief Constructor
-   * \param prefix smart pointer to the prefix for the FIB entry
+   * @brief Default Constructor
    */
   LimitsWindow ()
   : m_outstanding (0)
   { }
 
+  /**
+   * @brief Virtual destructor
+   */
   virtual
   ~LimitsWindow () { }
 
+  // from ndn::Limits
 
-  // from limits
+  virtual void
+  SetLimits (double rate, double delay)
+  {
+    super::SetLimits (rate, delay);
+
+    m_curMaxLimit = GetMaxRate () * GetMaxDelay ();
+  }
+
+  virtual void
+  UpdateCurrentLimit (double limit);
+  
+  virtual double
+  GetCurrentLimit () const
+  {
+    return m_curMaxLimit;
+  }
+
+  /**
+   * @brief Check if current interest window (number of pending interests) if less than maximum 
+   */
   virtual bool
   IsBelowLimit ();
 
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-
-  // specific to window-based limits
-  
   /**
-   * @brief Remove outstanding interests
+   * @brief Increase current window of outstanding interests
    */
-  void
-  RemoveOutstanding ();
+  virtual void
+  BorrowLimit ();
 
-  double
-  GetOutstanding () const
-  {
-    return m_outstanding;
-  }
+  /**
+   * @brief Decrease current window of outstanding interests
+   */
+  virtual void
+  ReturnLimit ();
   
-protected:
+private:
+  TracedValue< double > m_curMaxLimit;
   TracedValue< double > m_outstanding;
 };
   
