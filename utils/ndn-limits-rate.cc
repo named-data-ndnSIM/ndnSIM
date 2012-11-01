@@ -64,6 +64,18 @@ LimitsRate::NotifyNewAggregate ()
     }
 }
 
+void
+LimitsRate::SetLimits (double rate, double delay)
+{
+  super::SetLimits (rate, delay);
+
+  // maximum allowed burst
+  m_bucketMax = GetMaxRate () * GetMaxDelay ();
+
+  // amount of packets allowed every second (leak rate)
+  m_bucketLeak = GetMaxRate ();
+}
+
 
 void
 LimitsRate::UpdateCurrentLimit (double limit)

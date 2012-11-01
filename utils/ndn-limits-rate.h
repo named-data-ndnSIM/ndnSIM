@@ -54,16 +54,7 @@ public:
   ~LimitsRate () { }
 
   virtual void
-  SetLimits (double rate, double delay)
-  {
-    super::SetLimits (rate, delay);
-
-    // maximum allowed burst
-    m_bucketMax = GetMaxRate () * GetMaxDelay ();
-
-    // amount of packets allowed every second (leak rate)
-    m_bucketLeak = GetMaxRate ();
-  }
+  SetLimits (double rate, double delay);
 
   /**
    * @brief Check if Interest limit is reached (token bucket is not empty)
@@ -84,12 +75,13 @@ public:
   ReturnLimit ();
 
   /**
-   * @brief Update current leak ratio and maximum burst
+   * @brief Update normalized amount that should be leaked every second (token bucket leak rate) and leak rate
    */
   virtual void
   UpdateCurrentLimit (double limit);
 
   /**
+   * @brief Get normalized amount that should be leaked every second (token bucket leak rate)
    */
   virtual double
   GetCurrentLimit () const

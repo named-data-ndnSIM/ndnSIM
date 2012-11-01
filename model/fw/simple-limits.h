@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NDNSIM_SIMPLE_WINDOW_LIMITS_H
-#define NDNSIM_SIMPLE_WINDOW_LIMITS_H
+#ifndef NDNSIM_SIMPLE_LIMITS_H
+#define NDNSIM_SIMPLE_LIMITS_H
 
 #include "ns3/event-id.h"
 #include "ns3/ndn-pit.h"
@@ -41,7 +41,7 @@ namespace fw {
  * \brief Strategy implementing per-FIB entry limits
  */
 template<class Parent>
-class SimpleWindowLimits :
+class SimpleLimits :
     public Parent
 {
 private:
@@ -54,7 +54,7 @@ public:
   /**
    * @brief Default constructor
    */
-  SimpleWindowLimits ()
+  SimpleLimits ()
   { }
   
   virtual void
@@ -88,16 +88,16 @@ private:
 
 template<class Parent>
 TypeId
-SimpleWindowLimits<Parent>::GetTypeId (void)
+SimpleLimits<Parent>::GetTypeId (void)
 {
-  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleWindowLimits").c_str ())
+  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleLimits").c_str ())
     .SetGroupName ("Ndn")
     .template SetParent <super> ()
-    .template AddConstructor <SimpleWindowLimits> ()
+    .template AddConstructor <SimpleLimits> ()
 
     .template AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
                             StringValue ("ns3::ndn::Limits::Window"),
-                            MakeStringAccessor (&SimpleWindowLimits<Parent>::m_limitType),
+                            MakeStringAccessor (&SimpleLimits<Parent>::m_limitType),
                             MakeStringChecker ())    
     ;
   return tid;
@@ -105,7 +105,7 @@ SimpleWindowLimits<Parent>::GetTypeId (void)
 
 template<class Parent>
 bool
-SimpleWindowLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
+SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
                                                 Ptr<Face> outFace,
                                                 Ptr<const InterestHeader> header,
                                                 Ptr<const Packet> origPacket,
@@ -146,7 +146,7 @@ SimpleWindowLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
 
 template<class Parent>
 void
-SimpleWindowLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -164,7 +164,7 @@ SimpleWindowLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pi
 
 template<class Parent>
 void
-SimpleWindowLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
+SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                         Ptr<pit::Entry> pitEntry)
 {
   // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -184,4 +184,4 @@ SimpleWindowLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDNSIM_SIMPLE_WINDOW_LIMITS_H
+#endif // NDNSIM_SIMPLE_LIMITS_H
