@@ -55,13 +55,13 @@ TypeId HighwayPositionAllocator::GetTypeId (void){
   return tid;
 }
 
-HighwayPositionAllocator::HighwayPositionAllocator (){
-  m_previous_position = Vector(0.0, 0.0, 0.0);
+HighwayPositionAllocator::HighwayPositionAllocator ()
+  : m_previous_position (Vector (0.0, 0.0, 0.0))
+{
 }
 
 Vector HighwayPositionAllocator::GetNext (void) const{
-  UniformVariable random_gap_var (1.0, 10.0);
-  double random_gap = random_gap_var.GetValue();
+  double random_gap = m_random_gap_var.GetValue (1.0, 10.0);
   
   double delta_x = random_gap * cos(m_direction);
   double delta_y = random_gap * sin(m_direction);
@@ -98,6 +98,14 @@ void HighwayPositionAllocator::SetLength(double length){
 
 double HighwayPositionAllocator::GetLength(void) const {
   return m_length;
+}
+
+
+int64_t
+HighwayPositionAllocator::AssignStreams (int64_t stream)
+{
+  m_random_gap_var.SetStream (stream);
+  return 1;
 }
 
 }

@@ -42,11 +42,15 @@ public:
   void SetLength(double length);
   double GetLength(void) const ;
 
+  virtual int64_t AssignStreams (int64_t stream);
+
 private:
   mutable Vector m_previous_position; // previously generated vehicle position
   Vector m_start; // highway starting point
   double m_direction; //highway direction
   double m_length; // highway length
+
+  mutable UniformRandomVariable m_random_gap_var;
 };
 }
 
