@@ -23,7 +23,7 @@
 
 #include "ndn-consumer.h"
 #include "ns3/traced-value.h"
-#include "ns3/batches.h"
+#include "../utils/batches.h"
 
 namespace ns3 {
 namespace ndn {

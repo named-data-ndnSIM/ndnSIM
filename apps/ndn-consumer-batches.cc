@@ -27,7 +27,8 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ns3/batches.h"
+
+#include "../utils/batches.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerBatches");
 
