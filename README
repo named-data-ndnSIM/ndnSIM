@@ -1,9 +1,0 @@
-Unless a custom branch of NS-3 is used (recommended), ndnSIM requires a number of patches to be applied on NS-3.
-Patches are in patches/ folder
-
-For more information, refer to documentation in doc/ or on http://irl.cs.ucla.edu/ndnSIM/
-
-Depending on which base NS-3 is used, you may need to rescan python binding
-
-./waf --apiscan=ndnSIM
-
