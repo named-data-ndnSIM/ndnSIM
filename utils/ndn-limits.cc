@@ -40,5 +40,27 @@ Limits::GetTypeId ()
   return tid;
 }
 
+Limits::Limits ()
+  : m_maxRate (-1)
+  , m_maxDelay (1.0)
+  , m_handler (MakeNullCallback<void> ())
+{
+}
+
+
+void
+Limits::RegisterAvailableSlotCallback (CallbackHandler handler)
+{
+  m_handler = handler;
+}
+
+void
+Limits::FireAvailableSlotCallback ()
+{
+  if (!m_handler.IsNull ())
+    m_handler ();
+}
+
+
 } // namespace ndn
 } // namespace ns3

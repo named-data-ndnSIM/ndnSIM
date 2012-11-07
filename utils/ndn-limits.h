@@ -36,16 +36,15 @@ class Limits :
     public Object
 {
 public:
+  typedef Callback<void> CallbackHandler;
+
   static TypeId
   GetTypeId ();
 
   /**
    * @brief Default constructor
    */
-  Limits ()
-  : m_maxRate (-1)
-  , m_maxDelay (1.0)
-  { }
+  Limits ();
 
   /**
    * @brief Virtual destructor
@@ -135,10 +134,26 @@ public:
    */
   virtual void
   ReturnLimit () = 0;
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * @brief Set callback which will be called when exhausted limit gets a new slot
+   */
+  void
+  RegisterAvailableSlotCallback (CallbackHandler handler);
+
+protected:
+  void
+  FireAvailableSlotCallback ();
   
 private:
   double m_maxRate;
   double m_maxDelay;
+
+  CallbackHandler m_handler;
 };
   
 

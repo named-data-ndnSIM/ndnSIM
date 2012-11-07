@@ -57,7 +57,7 @@ LimitsRate::NotifyNewAggregate ()
           NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
           
           m_isLeakScheduled = true;
-          UniformVariable r (0,1);
+          UniformVariable r (0.0, 1.0);
           Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
                                           Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
         }
@@ -120,6 +120,8 @@ LimitsRate::LeakBucket (double interval)
       NS_LOG_DEBUG ("Leak from " << m_bucket << " to " << std::max (0.0, m_bucket - leak));
     }
 #endif
+
+  double bucketOld = m_bucket;
   
   m_bucket = std::max (0.0, m_bucket - leak);
 
@@ -128,6 +130,12 @@ LimitsRate::LeakBucket (double interval)
   if (m_bucketLeak > 1.0)
     {
       newInterval = 1.001 / m_bucketLeak;
+    }
+
+  if (m_bucketMax - bucketOld < 1.0 &&
+      m_bucketMax - m_bucket >= 1.0) // limit number of times this stuff is called
+    {
+      this->FireAvailableSlotCallback ();
     }
   
   Simulator::Schedule (Seconds (newInterval), &LimitsRate::LeakBucket, this, newInterval);
