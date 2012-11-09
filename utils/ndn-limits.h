@@ -83,6 +83,13 @@ public:
   }
 
   /**
+   * @brief Get maximum limit (interpretation of the limit depends on realization)
+   */
+  virtual
+  double
+  GetMaxLimit () const = 0;
+
+  /**
    * @brief Check whether limits are enabled or not
    */
   virtual inline bool
@@ -110,6 +117,15 @@ public:
    */
   virtual double
   GetCurrentLimit () const = 0;
+
+  /**
+   * @brief Get value of the current limit in terms of maximum rate that needs to be enforced
+   *
+   * Compared to GetCurrentLimit, this method guarantees that the returned value is maximum number of packets
+   * that can be send out within one second (max "rate")
+   */
+  virtual double
+  GetCurrentLimitRate () const = 0;
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -135,6 +151,26 @@ public:
   virtual void
   ReturnLimit () = 0;
 
+  /**
+   * @brief Set link delay (in seconds)
+   *
+   * This is a supplementary information that may or may not be useful for limits
+   */
+  virtual void
+  SetLinkDelay (double delay)
+  {
+    m_linkDelay = delay;
+  }
+
+  /**
+   * @brief Get link delay (in seconds)
+   */
+  virtual double
+  GetLinkDelay () const
+  {
+    return m_linkDelay;
+  }
+  
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -154,6 +190,8 @@ private:
   double m_maxDelay;
 
   CallbackHandler m_handler;
+
+  double m_linkDelay;
 };
   
 

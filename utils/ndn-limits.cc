@@ -44,6 +44,7 @@ Limits::Limits ()
   : m_maxRate (-1)
   , m_maxDelay (1.0)
   , m_handler (MakeNullCallback<void> ())
+  , m_linkDelay (0)
 {
 }
 

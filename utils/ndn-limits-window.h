@@ -62,6 +62,13 @@ public:
     m_curMaxLimit = GetMaxRate () * GetMaxDelay ();
   }
 
+  virtual
+  double
+  GetMaxLimit () const
+  {
+    return GetMaxRate () * GetMaxDelay ();
+  }
+  
   virtual void
   UpdateCurrentLimit (double limit);
   
@@ -71,6 +78,12 @@ public:
     return m_curMaxLimit;
   }
 
+  virtual double
+  GetCurrentLimitRate () const
+  {
+    return m_curMaxLimit / GetMaxDelay ();
+  }
+  
   /**
    * @brief Check if current interest window (number of pending interests) if less than maximum 
    */

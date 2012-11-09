@@ -28,6 +28,7 @@
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/net-device.h"
+#include "ns3/channel.h"
 #include "ns3/callback.h"
 #include "ns3/node.h"
 #include "ns3/core-config.h"
@@ -270,6 +271,7 @@ StackHelper::Install (Ptr<Node> node) const
               // Set maximum buckets (averaging over 1 second)
       
               DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
+              TimeValue linkDelay;   device->GetChannel ()->GetAttribute ("Delay", linkDelay);
           
               NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
@@ -280,6 +282,7 @@ StackHelper::Install (Ptr<Node> node) const
 
               // Set max to BDP
               limits->SetLimits (maxInterestPackets, m_avgRtt.ToDouble (Time::S));
+              limits->SetLinkDelay (linkDelay.Get ().ToDouble (Time::S));
             }
         }
         

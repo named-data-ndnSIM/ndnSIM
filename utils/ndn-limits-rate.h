@@ -56,6 +56,13 @@ public:
   virtual void
   SetLimits (double rate, double delay);
 
+  virtual
+  double
+  GetMaxLimit () const
+  {
+    return GetMaxRate ();
+  }
+
   /**
    * @brief Check if Interest limit is reached (token bucket is not empty)
    */
@@ -89,6 +96,12 @@ public:
     return m_bucketLeak;
   }
 
+  virtual double
+  GetCurrentLimitRate () const
+  {
+    return m_bucketLeak;
+  }
+  
 protected:
   // from Node
   void

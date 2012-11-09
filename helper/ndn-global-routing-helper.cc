@@ -258,7 +258,7 @@ GlobalRoutingHelper::CalculateRoutes ()
       fib->InvalidateAll ();
       NS_ASSERT (fib != 0);
       
-      // cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
+      cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
       for (DistancesMap::iterator i = distances.begin ();
 	   i != distances.end ();
 	   i++)
@@ -274,25 +274,26 @@ GlobalRoutingHelper::CalculateRoutes ()
 		}
 	      else
 		{
-		// cout << " reachable via face " << *i->second.get<0> ()
-		//      << " with distance " << i->second.get<1> () << endl;
-
-		BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
-		  {
-		    Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
-                    Ptr<Limits> limits = i->second.get<0> ()->GetObject<Limits> ();
+                  BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
+                    {
+                      cout << " prefix " << prefix << " reachable via face " << *i->second.get<0> ()
+                           << " with distance " << i->second.get<1> ()
+                           << " with delay " << i->second.get<2> () << endl;
                     
-                    if (limits != 0 && limits->IsEnabled ())
-                      {
-                        ObjectFactory limitsFactory;
-                        limitsFactory.SetTypeId (limits->GetInstanceTypeId ());
+                      Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
+                      Ptr<Limits> limits = i->second.get<0> ()->GetObject<Limits> ();
+                    
+                      if (limits != 0 && limits->IsEnabled ())
+                        {
+                          ObjectFactory limitsFactory;
+                          limitsFactory.SetTypeId (limits->GetInstanceTypeId ());
 
-                        Ptr<Limits> entryLimits = limitsFactory.Create<Limits> ();
-                        entryLimits->SetLimits (limits->GetMaxRate (), limits->GetMaxDelay ());
+                          Ptr<Limits> entryLimits = limitsFactory.Create<Limits> ();
+                          entryLimits->SetLimits (limits->GetMaxRate (), 2*i->second.get<2> ());
 
-                        entry->AggregateObject (entryLimits);
-                      }
-		  }
+                          entry->AggregateObject (entryLimits);
+                        }
+                    }
 		}
 	    }
 	}
