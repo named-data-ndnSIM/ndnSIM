@@ -467,7 +467,7 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
 }
 
 bool
-ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
+ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
                                         Ptr<const InterestHeader> header,
                                         Ptr<const Packet> origPacket,
@@ -492,6 +492,22 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
           return false; // already forwarded before during this retransmission cycle
         }
    }
+
+  return true;
+}
+
+
+bool
+ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
+                                        Ptr<Face> outFace,
+                                        Ptr<const InterestHeader> header,
+                                        Ptr<const Packet> origPacket,
+                                        Ptr<pit::Entry> pitEntry)
+{
+  if (!CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+    {
+      return false;
+    }
   
   pitEntry->AddOutgoing (outFace);
 
@@ -514,7 +530,7 @@ ForwardingStrategy::DidSendOutInterest (Ptr<Face> outFace,
 }
 
 void
-ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
+ForwardingStrategy::DidSendOutData (Ptr<Face> outFace,
                                     Ptr<const ContentObjectHeader> header,
                                     Ptr<const Packet> payload,
                                     Ptr<const Packet> origPacket,

@@ -23,6 +23,7 @@
 #define NDNSIM_SIMPLE_LIMITS_H
 
 #include "ns3/event-id.h"
+#include "ns3/log.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
 #include "ns3/simulator.h"
@@ -72,7 +73,7 @@ public:
   
 protected:
   virtual bool
-  TrySendOutInterest (Ptr<Face> inFace,
+  CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
                       Ptr<const InterestHeader> header,
                       Ptr<const Packet> origPacket,
@@ -84,7 +85,12 @@ protected:
 
 private:
   std::string m_limitType;
+
+  static LogComponent g_log;
 };
+
+template<class Parent>
+LogComponent SimpleLimits<Parent>::g_log = LogComponent ("ndn.SimpleLimits");
 
 template<class Parent>
 TypeId
@@ -105,50 +111,36 @@ SimpleLimits<Parent>::GetTypeId (void)
 
 template<class Parent>
 bool
-SimpleLimits<Parent>::TrySendOutInterest (Ptr<Face> inFace,
-                                                Ptr<Face> outFace,
-                                                Ptr<const InterestHeader> header,
-                                                Ptr<const Packet> origPacket,
-                                                Ptr<pit::Entry> pitEntry)
+SimpleLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
+                                          Ptr<Face> outFace,
+                                          Ptr<const InterestHeader> header,
+                                          Ptr<const Packet> origPacket,
+                                          Ptr<pit::Entry> pitEntry)
 {
-  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
-  // totally override all (if any) parent processing
-  
-  pit::Entry::out_iterator outgoing =
-    pitEntry->GetOutgoing ().find (outFace);
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  if (outgoing != pitEntry->GetOutgoing ().end ())
+  if (!super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
     {
-      // just suppress without any other action
       return false;
     }
-
+  
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
   if (faceLimits->IsBelowLimit ())
     {
       faceLimits->BorrowLimit ();
-      pitEntry->AddOutgoing (outFace);
-
-      //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      outFace->Send (packetToSend);
-
-      this->DidSendOutInterest (outFace, header, origPacket, pitEntry);      
       return true;
     }
   else
     {
-      // NS_LOG_DEBUG ("Face limit for " << header->GetName ());
+      return false;
     }
-
-  return false;
 }
 
 template<class Parent>
 void
 SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
-  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
@@ -167,7 +159,7 @@ void
 SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                         Ptr<pit::Entry> pitEntry)
 {
-  // NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
+  NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();

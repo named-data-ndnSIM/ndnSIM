@@ -216,18 +216,49 @@ protected:
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Method that implements logic to distinguish between new and retransmitted interest
+   *
+   * This method is called only when DetectRetransmissions attribute is set true (by default).
+   *
+   * Currently, the retransmission detection logic relies on the fact that list of incoming faces
+   * already has inFace (i.e., a similar interest is received on the same face more than once).
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized Interest header
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   * @return true if Interest should be considered as retransmitted
+   */
   virtual bool
   DetectRetransmittedInterest (Ptr<Face> inFace,
                                Ptr<const InterestHeader> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
-  // When Interest is satisfied from the cache, incoming face is 0
+  /**
+   * @brief Even fired just before Interest will be satisfied
+   *
+   * Note that when Interest is satisfied from the cache, incoming face will be 0
+   *
+   * @param inFace  incoming face
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest   
+   */
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
-  // for data received both from network and cache
+  /**
+   * @brief Actual procedure to satisfy Interest
+   *
+   * Note that when Interest is satisfied from the cache, incoming face will be 0
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload ContentObject payload
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   */
   virtual void
   SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
                           Ptr<const ContentObjectHeader> header,
@@ -235,19 +266,52 @@ protected:
                           Ptr<const Packet> origPacket,
                           Ptr<pit::Entry> pitEntry);
 
+  /**
+   * @brief Event which is fired just after data was send out on the face
+   *
+   * @param outFace  outgoing face
+   * @param header  deserialized ContentObject header
+   * @param payload ContentObject payload
+   * @param origPacket  original packet
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
+   */
   virtual void
-  DidSendOutData (Ptr<Face> inFace,
+  DidSendOutData (Ptr<Face> outFace,
                   Ptr<const ContentObjectHeader> header,
                   Ptr<const Packet> payload,
                   Ptr<const Packet> origPacket,
                   Ptr<pit::Entry> pitEntry);
-  
+
+  /**
+   * @brief Event which is fired every time an unsolicited DATA packet (no active PIT entry) is received
+   *
+   * The current implementation allows ignoring unsolicited DATA (by default), or cache it by setting
+   * attribute CacheUnsolicitedData true
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload ContentObject payload
+   * @param origPacket  original packet
+   */
   virtual void
   DidReceiveUnsolicitedData (Ptr<Face> inFace,
                              Ptr<const ContentObjectHeader> header,
                              Ptr<const Packet> payload,
                              Ptr<const Packet> origPacket);
-  
+
+  /**
+   * @brief Method implementing logic to suppress (collapse) similar Interests
+   *
+   * In the base class implementation this method checks list of incoming/outgoing faces of the PIT entry
+   * (for new Intersets, both lists are empty before this call)
+   *
+   * For more details, refer to the source code.
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload ContentObject payload
+   * @param origPacket  original packet
+   */
   virtual bool
   ShouldSuppressIncomingInterest (Ptr<Face> inFace,
                                   Ptr<const InterestHeader> header,
@@ -255,9 +319,40 @@ protected:
                                   Ptr<pit::Entry> pitEntry);
 
   /**
-   * @brief Event fired before actually sending out an interest
+   * @brief Method to check whether Interest can be send out on the particular face or not
    *
-   * If event returns false, then there is some kind of a problem (e.g., per-face limit reached)
+   * In the base class, this method perfoms two checks:
+   * 1. If inFace is equal to outFace (when equal, Interest forwarding is prohibited)
+   * 2. Whether Interest should be suppressed (list of outgoing faces include outFace),
+   * considering (if enabled) retransmission logic
+   *
+   * @param inFace     incoming face of the Interest
+   * @param outFace    proposed outgoing face of the Interest
+   * @param header     parsed Interest header
+   * @param origPacket original Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   *
+   * @see DetectRetransmittedInterest
+   */
+  virtual bool
+  CanSendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
+                      Ptr<const InterestHeader> header,
+                      Ptr<const Packet> origPacket,
+                      Ptr<pit::Entry> pitEntry);
+  
+  /**
+   * @brief Method implementing actual interest forwarding, taking into account CanSendOutInterest decision
+   *
+   * If event returns false, then there is some kind of a problem exists
+   *
+   * @param inFace     incoming face of the Interest
+   * @param outFace    proposed outgoing face of the Interest
+   * @param header     parsed Interest header
+   * @param origPacket original Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
+   *
+   * @see CanSendOutInterest
    */
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
@@ -267,7 +362,12 @@ protected:
                       Ptr<pit::Entry> pitEntry);
 
   /**
-   * @brief Event fired just after sending out an interest
+   * @brief Event fired just after forwarding the Interest
+   *
+   * @param outFace    outgoing face of the Interest
+   * @param header     parsed Interest header
+   * @param origPacket original Interest packet
+   * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    */
   virtual void
   DidSendOutInterest (Ptr<Face> outFace,
