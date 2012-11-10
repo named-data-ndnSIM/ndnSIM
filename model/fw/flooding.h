@@ -23,6 +23,7 @@
 #define NDNSIM_FLOODING_H
 
 #include "nacks.h"
+#include "ns3/log.h"
 
 namespace ns3 {
 namespace ndn {
@@ -37,9 +38,19 @@ namespace fw {
 class Flooding :
     public Nacks
 {
-public:
-  static TypeId GetTypeId ();
+private:
+  typedef Nacks super;
 
+public:
+  static TypeId
+  GetTypeId ();
+
+  /**
+   * @brief Helper function to retrieve logging name for the forwarding strategy
+   */
+  static std::string
+  GetLogName ();
+  
   /**
    * @brief Default constructor
    */
@@ -53,8 +64,8 @@ protected:
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 
-private:
-  typedef Nacks super;
+protected:
+  static LogComponent g_log;
 };
 
 } // namespace fw

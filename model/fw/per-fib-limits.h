@@ -1,6 +1,6 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2012 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NDNSIM_SIMPLE_LIMITS_H
-#define NDNSIM_SIMPLE_LIMITS_H
+#ifndef NDNSIM_PER_FIB_LIMITS_H
+#define NDNSIM_PER_FIB_LIMITS_H
 
 #include "ns3/event-id.h"
 #include "ns3/log.h"
@@ -42,7 +42,7 @@ namespace fw {
  * \brief Strategy implementing per-FIB entry limits
  */
 template<class Parent>
-class SimpleLimits :
+class PerFibLimits :
     public Parent
 {
 private:
@@ -53,25 +53,36 @@ public:
   GetTypeId ();
 
   /**
+   * @brief Helper function to retrieve logging name for the forwarding strategy
+   */
+  static std::string
+  GetLogName ();
+  
+  /**
    * @brief Default constructor
    */
-  SimpleLimits ()
+  PerFibLimits ()
   { }
   
+  /// \copydoc ForwardingStrategy::WillEraseTimedOutPendingInterest
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
 
+  /// \copydoc ForwardingStrategy::AddFace
   virtual void
   AddFace (Ptr<Face> face)
   {
-    ObjectFactory factory (m_limitType);
-    Ptr<Limits> limits = factory.template Create<Limits> ();
-    face->AggregateObject (limits);
-
     super::AddFace (face);
+
+    if (face->GetObject<Limits> () == 0)
+      {
+        NS_FATAL_ERROR ("At least per-face limits should be enabled");
+        exit (1);
+      }
   }
   
 protected:
+  /// \copydoc ForwardingStrategy::CanSendOutInterest
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
@@ -79,39 +90,43 @@ protected:
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
   
+  /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
                               Ptr<pit::Entry> pitEntry);
 
+protected:
+  static LogComponent g_log; ///< @brief Logging variable
+  
 private:
   std::string m_limitType;
-
-  static LogComponent g_log;
 };
 
 template<class Parent>
-LogComponent SimpleLimits<Parent>::g_log = LogComponent ("ndn.SimpleLimits");
+LogComponent PerFibLimits<Parent>::g_log = LogComponent (PerFibLimits<Parent>::GetLogName ().c_str ());
+
+template<class Parent>
+std::string
+PerFibLimits<Parent>::GetLogName ()
+{
+  return super::GetLogName ()+".PerFibLimits";
+}
 
 template<class Parent>
 TypeId
-SimpleLimits<Parent>::GetTypeId (void)
+PerFibLimits<Parent>::GetTypeId (void)
 {
-  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::SimpleLimits").c_str ())
+  static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::PerFibLimits").c_str ())
     .SetGroupName ("Ndn")
     .template SetParent <super> ()
-    .template AddConstructor <SimpleLimits> ()
-
-    .template AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
-                            StringValue ("ns3::ndn::Limits::Window"),
-                            MakeStringAccessor (&SimpleLimits<Parent>::m_limitType),
-                            MakeStringChecker ())    
+    .template AddConstructor <PerFibLimits> ()
     ;
   return tid;
 }
 
 template<class Parent>
 bool
-SimpleLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
+PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
                                           Ptr<const InterestHeader> header,
                                           Ptr<const Packet> origPacket,
@@ -119,36 +134,29 @@ SimpleLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  if (!super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+  Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
+  // no checks for the limit here. the check should be somewhere elese
+  
+  if (fibLimits->IsBelowLimit ())
     {
-      return false;
+      if (super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+        {
+          fibLimits->BorrowLimit ();
+          return true;
+        }
     }
   
-  Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
-  if (faceLimits->IsBelowLimit ())
-    {
-      faceLimits->BorrowLimit ();
-      return true;
-    }
-  else
-    {
-      return false;
-    }
+  return false;
 }
 
 template<class Parent>
 void
-SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
-    {
-      Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
-      faceLimits->ReturnLimit ();
-    }
+  Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
+  fibLimits->ReturnLimit ();
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }
@@ -156,18 +164,13 @@ SimpleLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
 
 template<class Parent>
 void
-SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
+PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                         Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
-  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
-       face != pitEntry->GetOutgoing ().end ();
-       face ++)
-    {
-      Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
-      faceLimits->ReturnLimit ();
-    }
+  Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
+  fibLimits->ReturnLimit ();
   
   super::WillSatisfyPendingInterest (inFace, pitEntry);
 }
@@ -176,4 +179,4 @@ SimpleLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDNSIM_SIMPLE_LIMITS_H
+#endif // NDNSIM_PER_FIB_LIMITS_H

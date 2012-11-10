@@ -35,11 +35,11 @@ class Nacks :
 {
 private:
   typedef ForwardingStrategy super;
-
+  
 public:
   static TypeId
   GetTypeId ();
-
+  
   // from super
   virtual void
   OnInterest (Ptr<Face> face,

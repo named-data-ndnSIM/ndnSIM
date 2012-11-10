@@ -36,14 +36,20 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.Flooding");
-
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
 NS_OBJECT_ENSURE_REGISTERED (Flooding);
-    
+
+LogComponent Flooding::g_log = LogComponent (Flooding::GetLogName ().c_str ());
+
+std::string
+Flooding::GetLogName ()
+{
+  return super::GetLogName ()+".Flooding";
+}
+
 TypeId Flooding::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::ndn::fw::Flooding")

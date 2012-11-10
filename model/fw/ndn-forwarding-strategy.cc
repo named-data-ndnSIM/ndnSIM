@@ -44,12 +44,18 @@
 #include <boost/tuple/tuple.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.ForwardingStrategy");
-
 namespace ns3 {
 namespace ndn {
 
 NS_OBJECT_ENSURE_REGISTERED (ForwardingStrategy);
+
+NS_LOG_COMPONENT_DEFINE (ForwardingStrategy::GetLogName ().c_str ());
+
+std::string
+ForwardingStrategy::GetLogName ()
+{
+  return "ndn.fw";
+}
 
 TypeId ForwardingStrategy::GetTypeId (void)
 {

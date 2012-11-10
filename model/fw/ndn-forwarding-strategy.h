@@ -49,6 +49,11 @@ public:
   static TypeId GetTypeId (void);
 
   /**
+   * @brief Helper function to retrieve logging name for the forwarding strategy
+   */
+  static std::string GetLogName ();
+
+  /**
    * @brief Default constructor
    */
   ForwardingStrategy ();

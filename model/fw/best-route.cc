@@ -33,14 +33,21 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.BestRoute");
-
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
 NS_OBJECT_ENSURE_REGISTERED (BestRoute);
-  
+
+LogComponent BestRoute::g_log = LogComponent (BestRoute::GetLogName ().c_str ());
+
+std::string
+BestRoute::GetLogName ()
+{
+  return super::GetLogName ()+".BestRoute";
+}
+
+
 TypeId
 BestRoute::GetTypeId (void)
 {

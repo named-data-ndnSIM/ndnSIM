@@ -56,7 +56,7 @@ public:
   OutgoingFace ();
 
   /**
-   * @brie Copy operator
+   * @brief Copy operator
    */
   OutgoingFace &
   operator = (const OutgoingFace &other);

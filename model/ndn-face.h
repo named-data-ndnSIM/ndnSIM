@@ -111,7 +111,7 @@ public:
   ////////////////////////////////////////////////////////////////////
 
   /**
-   * \Brief Assign routing/forwarding metric with face
+   * \brief Assign routing/forwarding metric with face
    *
    * \param metric configured routing metric (cost) of this face
    */

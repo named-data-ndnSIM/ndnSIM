@@ -35,14 +35,20 @@
 #include <boost/lambda/bind.hpp>
 namespace ll = boost::lambda;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.fw.SmartFlooding");
-
 namespace ns3 {
 namespace ndn {
 namespace fw {
 
 NS_OBJECT_ENSURE_REGISTERED (SmartFlooding);
-    
+
+LogComponent SmartFlooding::g_log = LogComponent (SmartFlooding::GetLogName ().c_str ());
+
+std::string
+SmartFlooding::GetLogName ()
+{
+  return super::GetLogName ()+".SmartFlooding";
+}
+
 TypeId
 SmartFlooding::GetTypeId (void)
 {

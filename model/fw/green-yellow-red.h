@@ -34,7 +34,8 @@ class GreenYellowRed :
     public Nacks
 {
 public:
-  static TypeId GetTypeId (void);
+  static TypeId
+  GetTypeId (void);
 
 protected:
   virtual void

@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "simple-limits.h"
+#include "per-out-face-limits.h"
 
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-interest-header.h"
@@ -32,26 +32,36 @@ namespace ns3 {
 namespace ndn {
 namespace fw {
 
-template class SimpleLimits<BestRoute>;
-typedef SimpleLimits<BestRoute> SimpleLimitsBestRoute;
-NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsBestRoute);
+template class PerOutFaceLimits<BestRoute>;
+typedef PerOutFaceLimits<BestRoute> PerOutFaceLimitsBestRoute;
+NS_OBJECT_ENSURE_REGISTERED (PerOutFaceLimitsBestRoute);
 
-template class SimpleLimits<Flooding>;
-typedef SimpleLimits<Flooding> SimpleLimitsFlooding;
-NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsFlooding);
+template class PerOutFaceLimits<Flooding>;
+typedef PerOutFaceLimits<Flooding> PerOutFaceLimitsFlooding;
+NS_OBJECT_ENSURE_REGISTERED (PerOutFaceLimitsFlooding);
 
-template class SimpleLimits<SmartFlooding>;
-typedef SimpleLimits<SmartFlooding> SimpleLimitsSmartFlooding;
-NS_OBJECT_ENSURE_REGISTERED (SimpleLimitsSmartFlooding);
+template class PerOutFaceLimits<SmartFlooding>;
+typedef PerOutFaceLimits<SmartFlooding> PerOutFaceLimitsSmartFlooding;
+NS_OBJECT_ENSURE_REGISTERED (PerOutFaceLimitsSmartFlooding);
 
 #ifdef DOXYGEN
+// /**
+//  * \brief Strategy implementing per-out-face limits on top of BestRoute strategy
+//  */
+class BestRoute::PerOutFaceLimits : public ::ns3::ndn::fw::PerOutFaceLimits<BestRoute> { };
 
-class SimpleLimitsBestRoute     : public SimpleLimits<BestRoute> { };
-class SimpleLimitsFlooding      : public SimpleLimits<Flooding> { };
-class SimpleLimitsSmartFlooding : public SimpleLimits<SmartFlooding> { };
+/**
+ * \brief Strategy implementing per-out-face limits on top of Flooding strategy
+ */
+class Flooding::PerOutFaceLimits : public ::ns3::ndn::fw::PerOutFaceLimits<Flooding> { };
 
+/**
+ * \brief Strategy implementing per-out-face limits on top of SmartFlooding strategy
+ */
+class SmartFlooding::PerOutFaceLimits : public ::ns3::ndn::fw::PerOutFaceLimits<SmartFlooding> { };
 #endif
 
 } // namespace fw
 } // namespace ndn
 } // namespace ns3
+

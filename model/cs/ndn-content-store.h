@@ -147,7 +147,7 @@ public:
   virtual bool
   Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet) = 0;
 
-  // /**
+  // /*
   //  * \brief Add a new content to the content store.
   //  *
   //  * \param header Interest header for which an entry should be removed

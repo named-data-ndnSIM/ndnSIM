@@ -24,6 +24,7 @@
 #define NDNSIM_BEST_ROUTE_H
 
 #include "green-yellow-red.h"
+#include "ns3/log.h"
 
 namespace ns3 {
 namespace ndn {
@@ -44,6 +45,12 @@ public:
   GetTypeId ();
 
   /**
+   * @brief Helper function to retrieve logging name for the forwarding strategy
+   */
+  static std::string
+  GetLogName ();
+  
+  /**
    * @brief Default constructor
    */
   BestRoute ();
@@ -54,6 +61,8 @@ public:
                        Ptr<const InterestHeader> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
+protected:
+  static LogComponent g_log;
 };
 
 } // namespace fw

@@ -22,6 +22,7 @@
 #define NDNSIM_SMART_FLOODING_H
 
 #include "green-yellow-red.h"
+#include "ns3/log.h"
 
 namespace ns3 {
 namespace ndn {
@@ -33,8 +34,18 @@ namespace fw {
 class SmartFlooding :
     public GreenYellowRed
 {
+private:
+  typedef GreenYellowRed super;
+
 public:
-  static TypeId GetTypeId ();
+  static TypeId
+  GetTypeId ();
+
+  /**
+   * @brief Helper function to retrieve logging name for the forwarding strategy
+   */
+  static std::string
+  GetLogName ();
 
   /**
    * @brief Default constructor
@@ -48,8 +59,8 @@ public:
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 
-private:
-  typedef GreenYellowRed super;
+protected:
+  static LogComponent g_log;
 };
 
 } // namespace fw
