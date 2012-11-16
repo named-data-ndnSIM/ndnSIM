@@ -129,13 +129,19 @@ ConsumerWindow::ScheduleNextPacket ()
   if (m_window == static_cast<uint32_t> (0) || m_inFlight >= m_window)
     {
       if (!m_sendEvent.IsRunning ())
-        m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1), &Consumer::SendPacket, this);
-      return;
+        {
+          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1),
+                                             &Consumer::SendPacket, this);
+        }
     }
-  
-  // std::cout << "Window: " << m_window << ", InFlight: " << m_inFlight << "\n";
-  if (!m_sendEvent.IsRunning ())
+  else
     {
+      if (m_sendEvent.IsRunning ())
+        {
+          Simulator::Remove (m_sendEvent);
+        }
+
+      NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
       m_inFlight++;
       m_sendEvent = Simulator::ScheduleNow (&Consumer::SendPacket, this);
     }
@@ -154,6 +160,8 @@ ConsumerWindow::OnContentObject (const Ptr<const ContentObjectHeader> &contentOb
   m_window = m_window + 1;
 
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
+  NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
+
   ScheduleNextPacket ();
 }
 
@@ -161,6 +169,7 @@ void
 ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> payload)
 {
   Consumer::OnNack (interest, payload);
+  
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 
   if (m_window > static_cast<uint32_t> (0))
@@ -168,6 +177,8 @@ ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> p
       // m_window = 0.5 * m_window;//m_window - 1;
       m_window = m_window - 1;
     }
+  
+  // NS_LOG_DEBUG ("Window: " << m_window);
 }
 
 void

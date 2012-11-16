@@ -309,9 +309,9 @@ Consumer::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPac
   
   App::OnNack (interest, origPacket); // tracing inside
   
-  NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
+  // NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
 
-  NS_LOG_FUNCTION (this << interest);
+  // NS_LOG_FUNCTION (interest->GetName ());
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
   uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ().GetComponents ().back ());
@@ -319,9 +319,9 @@ Consumer::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPac
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << "NACK for " << seq << "\n"; 
 
   // put in the queue of interests to be retransmitted
-  NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
+  // NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
   m_retxSeqs.insert (seq);
-  NS_LOG_INFO ("After: " << m_retxSeqs.size ());
+  // NS_LOG_INFO ("After: " << m_retxSeqs.size ());
 
   m_rtt->IncreaseMultiplier ();             // Double the next RTO ??
   ScheduleNextPacket ();
