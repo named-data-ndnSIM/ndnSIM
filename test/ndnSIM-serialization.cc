@@ -71,8 +71,28 @@ InterestSerializationTest::DoRun ()
 void
 ContentObjectSerializationTest::DoRun ()
 {
-  // NS_TEST_ASSERT_MSG_EQ (true, false, "test not implemented yet");
+  ContentObjectHeader source;
+  
+  source.SetName (Create<NameComponents> (boost::lexical_cast<NameComponents> ("/test/test2/1")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NameComponents> ("/test/test2/1"), "set/get name failed");
+  
+  source.SetFreshness (Seconds (10));
+  NS_TEST_ASSERT_MSG_EQ (source.GetFreshness (), Seconds (10), "set/get freshness failed");
+
+  source.SetTimestamp (Seconds (100));
+  NS_TEST_ASSERT_MSG_EQ (source.GetTimestamp (), Seconds (100), "set/get timestamp failed");
+
+  Packet packet (0);
+  //serialization
+  packet.AddHeader (source);
+	
+  //deserialization
+  ContentObjectHeader target;
+  packet.RemoveHeader (target);
+  
+  NS_TEST_ASSERT_MSG_EQ (source.GetName ()     , target.GetName ()     , "source/target name failed");
+  NS_TEST_ASSERT_MSG_EQ (source.GetFreshness (), target.GetFreshness (), "source/target freshness failed");
+  NS_TEST_ASSERT_MSG_EQ (source.GetTimestamp (), target.GetTimestamp (), "source/target timestamp failed");
 }
 
 }
-

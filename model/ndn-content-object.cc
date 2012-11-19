@@ -67,10 +67,36 @@ ContentObjectHeader::GetNamePtr () const
   return m_name;
 }
 
+
+void
+ContentObjectHeader::SetTimestamp (const Time &timestamp)
+{
+  m_timestamp = timestamp;
+}
+
+Time
+ContentObjectHeader::GetTimestamp () const
+{
+  return m_timestamp;
+}
+    
+void
+ContentObjectHeader::SetFreshness (const Time &freshness)
+{
+  m_freshness = freshness;
+}
+
+Time
+ContentObjectHeader::GetFreshness () const
+{
+  return m_freshness;
+}
+
+
 uint32_t
 ContentObjectHeader::GetSerializedSize () const
 {
-  uint32_t size = 2 + ((2 + 1) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
+  uint32_t size = 2 + ((2 + 2) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
   NS_LOG_INFO ("Serialize size = " << size);
   return size;
 }
@@ -86,6 +112,7 @@ ContentObjectHeader::Serialize (Buffer::Iterator start) const
 
   // name
   uint32_t offset = m_name->Serialize (start);
+  NS_LOG_DEBUG ("Offset: " << offset);
   start.Next (offset);
 
   // content
@@ -136,7 +163,7 @@ ContentObjectHeader::Deserialize (Buffer::Iterator start)
   if (i.ReadU16 () != 0) // Length (ContentInfoOptions)
     throw new ContentObjectHeaderException ();
 
-  NS_ASSERT_MSG (i.GetDistanceFrom (start) != GetSerializedSize (),
+  NS_ASSERT_MSG (i.GetDistanceFrom (start) == GetSerializedSize (),
                  "Something wrong with ContentObjectHeader::Deserialize");
   
   return i.GetDistanceFrom (start);
