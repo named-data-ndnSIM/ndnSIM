@@ -22,7 +22,7 @@
 
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-name-components.h"
-#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-interest.h"
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"

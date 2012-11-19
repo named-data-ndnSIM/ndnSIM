@@ -23,8 +23,8 @@
 
 #include "ndn-content-store.h"
 #include "ns3/packet.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 #include <boost/foreach.hpp>
 
 #include "../../utils/trie/trie-with-policy.h"

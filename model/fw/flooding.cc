@@ -21,7 +21,7 @@
 
 #include "flooding.h"
 
-#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-interest.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
 

@@ -21,7 +21,7 @@
 #include "ndn-fib-impl.h"
 
 #include "ns3/ndn-face.h"
-#include "ns3/ndn-interest-header.h"
+#include "ns3/ndn-interest.h"
 
 #include "ns3/node.h"
 #include "ns3/assert.h"

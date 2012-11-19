@@ -109,6 +109,7 @@ size_t
 NameComponents::GetSerializedSize () const
 {
   size_t nameSerializedSize = 2;
+  
   for (std::list<std::string>::const_iterator i = this->begin ();
        i != this->end ();
        i++)

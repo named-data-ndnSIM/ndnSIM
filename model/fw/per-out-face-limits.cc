@@ -21,8 +21,8 @@
 #include "per-out-face-limits.h"
 
 #include "ns3/ndn-l3-protocol.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 
 #include "best-route.h"
 #include "flooding.h"

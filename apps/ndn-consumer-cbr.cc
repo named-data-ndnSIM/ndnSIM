@@ -30,8 +30,8 @@
 #include "ns3/double.h"
 
 #include "ns3/ndn-app-face.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerCbr");
 

@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-interest-header.h"
+#include "ndn-interest.h"
 
 #include "ns3/log.h"
 #include "ns3/unused.h"
@@ -180,12 +180,14 @@ InterestHeader::Deserialize (Buffer::Iterator start)
   if (i.ReadU8 () != 0x00)
     throw new InterestHeaderException ();
 
+  m_nonce = i.ReadU32 ();
   m_scope = i.ReadU8 ();
   m_nackType = i.ReadU8 ();
+  
   m_interestLifetime = Seconds (i.ReadU16 ());
 
   m_name = Create<NameComponents> ();
-  uint32_t offset = m_name->Deserialize (start);
+  uint32_t offset = m_name->Deserialize (i);
   i.Next (offset);
   
   i.ReadU16 ();
@@ -194,7 +196,6 @@ InterestHeader::Deserialize (Buffer::Iterator start)
   NS_ASSERT (GetSerializedSize () == (i.GetDistanceFrom (start)));
 
   return i.GetDistanceFrom (start);
-  // return DecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
 }
 
 TypeId

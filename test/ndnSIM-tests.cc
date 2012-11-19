@@ -37,7 +37,7 @@ public:
     
     AddTestCase (new InterestSerializationTest ());
     AddTestCase (new ContentObjectSerializationTest ());
-    AddTestCase (new PitTest ());
+    // AddTestCase (new PitTest ());
   }
 };
 

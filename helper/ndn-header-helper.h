@@ -48,10 +48,25 @@ public:
   /**
      @brief enum for Ndn packet types
    */
-  enum Type {INTEREST, CONTENT_OBJECT}; 
+  enum Type {INTEREST_CCNB, CONTENT_OBJECT_CCNB,
+             INTEREST_NDNSIM, CONTENT_OBJECT_NDNSIM}; 
 
   /**
-   * Static function to create an appropriate Ndn header
+   *	Packet ::= Version 
+   *		   PacketType
+   *		   (Interest | ContentObject)
+   *
+   *        0                   1             
+   *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 
+   *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   *        |    Version    |   PacketType  |
+   *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   *
+   * For ccnb-encoding compatibility, ``Version`` / ``PacketType`` has two reserved values to denote ccnb-encoded packet:
+   *
+   * Version 0x01, PacketType 0xD2 --- ccnb-encoded ``Interest`` packet
+   * Version 0x04, PacketType 0x82 --- ccnb-encoded ``ContentObject`` packet
+   *
    *
    * It peeks first 2 bytes of a packet.
    *

@@ -31,8 +31,8 @@
 #include "ns3/ndn-header-helper.h"
 #include "ns3/ndn-app.h"
 
-#include "ndn-interest-header.h"
-#include "ndn-content-object-header.h"
+#include "ndn-interest.h"
+#include "ndn-content-object.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.AppFace");
 
@@ -101,7 +101,7 @@ AppFace::SendImpl (Ptr<Packet> p)
       HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
       switch (type)
         {
-        case HeaderHelper::INTEREST:
+        case HeaderHelper::INTEREST_NDNSIM:
           {
             Ptr<InterestHeader> header = Create<InterestHeader> ();
             p->RemoveHeader (*header);
@@ -113,7 +113,7 @@ AppFace::SendImpl (Ptr<Packet> p)
           
             break;
           }
-        case HeaderHelper::CONTENT_OBJECT:
+        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
             static ContentObjectTail tail;
             Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
@@ -123,6 +123,9 @@ AppFace::SendImpl (Ptr<Packet> p)
           
             break;
           }
+        default:
+          NS_FATAL_ERROR ("ccnb support is currently broken");
+          break;
         }
       
       return true;

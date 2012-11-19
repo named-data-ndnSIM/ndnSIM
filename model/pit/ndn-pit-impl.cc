@@ -20,8 +20,8 @@
 
 #include "ndn-pit-impl.h"
 
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 #include "ns3/ndn-forwarding-strategy.h"
 
 #include "../../utils/trie/empty-policy.h"

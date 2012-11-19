@@ -26,7 +26,7 @@
 
 #include "ns3/ptr.h"
 #include "ns3/ndn-name-components.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-content-object.h"
 
 namespace ns3 {
 namespace ndn {

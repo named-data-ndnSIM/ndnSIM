@@ -25,18 +25,17 @@
 #include "ns3/header.h"
 #include "ns3/object.h"
 
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 #include <iomanip>
 
 NS_LOG_COMPONENT_DEFINE ("ndn.HeaderHelper");
 
-#define INTEREST_BYTE0 0x01
-#define INTEREST_BYTE1 0xD2
+const uint8_t INTEREST_CCNB_BYTES[]       = {0x01, 0xD2};
+const uint8_t CONTENT_OBJECT_CCNB_BYTES[] = {0x04, 0x82};
 
-#define CONTENT_OBJECT_BYTE0 0x04
-#define CONTENT_OBJECT_BYTE1 0x82
-
+const uint8_t INTEREST_NDNSIM_BYTES[]       = {0x80, 0x00};
+const uint8_t CONTENT_OBJECT_NDNSIM_BYTES[] = {0x80, 0x01};
 
 namespace ns3 {
 namespace ndn {
@@ -50,13 +49,21 @@ HeaderHelper::GetNdnHeaderType (Ptr<const Packet> packet)
   if (read!=2) throw UnknownHeaderException();
 
   NS_LOG_DEBUG (*packet);
-  if (type[0] == INTEREST_BYTE0 && type[1] == INTEREST_BYTE1)
+  if (type[0] == INTEREST_CCNB_BYTES[0] && type[1] == INTEREST_CCNB_BYTES[1])
     {
-      return HeaderHelper::INTEREST;
+      return HeaderHelper::INTEREST_CCNB;
     }
-  else if (type[0] == CONTENT_OBJECT_BYTE0 && type[1] == CONTENT_OBJECT_BYTE1)
+  else if (type[0] == CONTENT_OBJECT_CCNB_BYTES[0] && type[1] == CONTENT_OBJECT_CCNB_BYTES[1])
     {
-      return HeaderHelper::CONTENT_OBJECT;
+      return HeaderHelper::CONTENT_OBJECT_CCNB;
+    }
+  else if (type[0] == INTEREST_NDNSIM_BYTES[0] && type[1] == INTEREST_NDNSIM_BYTES[1])
+    {
+      return HeaderHelper::INTEREST_NDNSIM;
+    }
+  else if (type[0] == CONTENT_OBJECT_NDNSIM_BYTES[0] && type[1] == CONTENT_OBJECT_NDNSIM_BYTES[1])
+    {
+      return HeaderHelper::CONTENT_OBJECT_NDNSIM;
     }
 
   NS_LOG_DEBUG (*packet);

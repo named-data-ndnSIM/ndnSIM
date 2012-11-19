@@ -24,8 +24,8 @@
 #include "ns3/log.h"
 #include "ns3/packet.h"
 #include "ns3/ndn-name-components.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.cs.ContentStore");
 

@@ -19,7 +19,7 @@
  *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-content-object-header.h"
+#include "ndn-content-object.h"
 
 #include "ns3/log.h"
 
@@ -119,7 +119,7 @@ ContentObjectHeader::Deserialize (Buffer::Iterator start)
     throw new ContentObjectHeaderException ();
 
   m_name = Create<NameComponents> ();
-  uint32_t offset = m_name->Deserialize (start);
+  uint32_t offset = m_name->Deserialize (i);
   i.Next (offset);
 
   if (i.ReadU16 () != (2 + 4 + 2 + 2 + (2 + 0))) // content length

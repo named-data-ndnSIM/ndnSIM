@@ -346,17 +346,11 @@ def register_types_ns3_ndn(module):
     module.add_class('App', parent=root_module['ns3::Application'])
     ## ndn-app-helper.h (module 'ndnSIM'): ns3::ndn::AppHelper [class]
     module.add_class('AppHelper')
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader [class]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader [class]
     module.add_class('ContentObjectHeader', parent=root_module['ns3::SimpleRefCount< ns3::ndn::ContentObjectHeader, ns3::Header, ns3::DefaultDeleter<ns3::ndn::ContentObjectHeader> >'])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentType [enumeration]
-    module.add_enum('ContentType', ['DATA', 'ENCR', 'GONE', 'KEY', 'LINK', 'NACK'], outer_class=root_module['ns3::ndn::ContentObjectHeader'])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature [class]
-    module.add_class('Signature', outer_class=root_module['ns3::ndn::ContentObjectHeader'])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::SignedInfo [class]
-    module.add_class('SignedInfo', outer_class=root_module['ns3::ndn::ContentObjectHeader'])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException [class]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException [class]
     module.add_class('ContentObjectHeaderException')
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail [class]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail [class]
     module.add_class('ContentObjectTail', parent=root_module['ns3::Trailer'])
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::ContentStore [class]
     module.add_class('ContentStore', parent=root_module['ns3::Object'])
@@ -373,12 +367,12 @@ def register_types_ns3_ndn(module):
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::HeaderHelper [class]
     module.add_class('HeaderHelper')
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::HeaderHelper::Type [enumeration]
-    module.add_enum('Type', ['INTEREST', 'CONTENT_OBJECT'], outer_class=root_module['ns3::ndn::HeaderHelper'])
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader [class]
+    module.add_enum('Type', ['INTEREST_CCNB', 'CONTENT_OBJECT_CCNB', 'INTEREST_NDNSIM', 'CONTENT_OBJECT_NDNSIM'], outer_class=root_module['ns3::ndn::HeaderHelper'])
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeader [class]
     module.add_class('InterestHeader', parent=root_module['ns3::SimpleRefCount< ns3::ndn::InterestHeader, ns3::Header, ns3::DefaultDeleter<ns3::ndn::InterestHeader> >'])
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader [enumeration]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeader [enumeration]
     module.add_enum('', ['NORMAL_INTEREST', 'NACK_LOOP', 'NACK_CONGESTION', 'NACK_GIVEUP_PIT'], outer_class=root_module['ns3::ndn::InterestHeader'])
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException [class]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException [class]
     module.add_class('InterestHeaderException')
     ## ndn-l3-protocol.h (module 'ndnSIM'): ns3::ndn::L3Protocol [class]
     module.add_class('L3Protocol', parent=root_module['ns3::Object'])
@@ -609,8 +603,6 @@ def register_methods(root_module):
     register_Ns3NdnApp_methods(root_module, root_module['ns3::ndn::App'])
     register_Ns3NdnAppHelper_methods(root_module, root_module['ns3::ndn::AppHelper'])
     register_Ns3NdnContentObjectHeader_methods(root_module, root_module['ns3::ndn::ContentObjectHeader'])
-    register_Ns3NdnContentObjectHeaderSignature_methods(root_module, root_module['ns3::ndn::ContentObjectHeader::Signature'])
-    register_Ns3NdnContentObjectHeaderSignedInfo_methods(root_module, root_module['ns3::ndn::ContentObjectHeader::SignedInfo'])
     register_Ns3NdnContentObjectHeaderException_methods(root_module, root_module['ns3::ndn::ContentObjectHeaderException'])
     register_Ns3NdnContentObjectTail_methods(root_module, root_module['ns3::ndn::ContentObjectTail'])
     register_Ns3NdnContentStore_methods(root_module, root_module['ns3::ndn::ContentStore'])
@@ -4978,191 +4970,112 @@ def register_Ns3NdnAppHelper_methods(root_module, cls):
     return
 
 def register_Ns3NdnContentObjectHeader_methods(root_module, cls):
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentObjectHeader(ns3::ndn::ContentObjectHeader const & arg0) [copy constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentObjectHeader(ns3::ndn::ContentObjectHeader const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::ContentObjectHeader const &', 'arg0')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentObjectHeader() [constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentObjectHeader() [constructor]
     cls.add_constructor([])
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::ContentObjectHeader::GetInstanceTypeId() const [member function]
-    cls.add_method('GetInstanceTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::ContentObjectHeader::GetName() const [member function]
-    cls.add_method('GetName', 
-                   'ns3::ndn::NameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::NameComponents const> ns3::ndn::ContentObjectHeader::GetNamePtr() const [member function]
-    cls.add_method('GetNamePtr', 
-                   'ns3::Ptr< ns3::ndn::NameComponents const >', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::GetSerializedSize() const [member function]
-    cls.add_method('GetSerializedSize', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature & ns3::ndn::ContentObjectHeader::GetSignature() [member function]
-    cls.add_method('GetSignature', 
-                   'ns3::ndn::ContentObjectHeader::Signature &', 
-                   [])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature const & ns3::ndn::ContentObjectHeader::GetSignature() const [member function]
-    cls.add_method('GetSignature', 
-                   'ns3::ndn::ContentObjectHeader::Signature const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::SignedInfo & ns3::ndn::ContentObjectHeader::GetSignedInfo() [member function]
-    cls.add_method('GetSignedInfo', 
-                   'ns3::ndn::ContentObjectHeader::SignedInfo &', 
-                   [])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::SignedInfo const & ns3::ndn::ContentObjectHeader::GetSignedInfo() const [member function]
-    cls.add_method('GetSignedInfo', 
-                   'ns3::ndn::ContentObjectHeader::SignedInfo const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ContentObjectHeader::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
-    cls.add_method('Serialize', 
-                   'void', 
-                   [param('ns3::Buffer::Iterator', 'start')], 
-                   is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> const & name) [member function]
-    cls.add_method('SetName', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::ndn::NameComponents > const &', 'name')])
-    return
-
-def register_Ns3NdnContentObjectHeaderSignature_methods(root_module, cls):
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature::Signature(ns3::ndn::ContentObjectHeader::Signature const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::ContentObjectHeader::Signature const &', 'arg0')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature::Signature() [constructor]
-    cls.add_constructor([])
-    ## ndn-content-object-header.h (module 'ndnSIM'): std::string const & ns3::ndn::ContentObjectHeader::Signature::GetDigestAlgorithm() const [member function]
-    cls.add_method('GetDigestAlgorithm', 
-                   'std::string const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::Signature::GetSignatureBits() const [member function]
-    cls.add_method('GetSignatureBits', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Signature::SetDigestAlgorithm(std::string const & digestAlgorithm) [member function]
-    cls.add_method('SetDigestAlgorithm', 
-                   'void', 
-                   [param('std::string const &', 'digestAlgorithm')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Signature::SetSignatureBits(uint32_t signature) [member function]
-    cls.add_method('SetSignatureBits', 
-                   'void', 
-                   [param('uint32_t', 'signature')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::Signature::DefaultDigestAlgorithm [variable]
-    cls.add_static_attribute('DefaultDigestAlgorithm', 'std::string const', is_const=True)
-    return
-
-def register_Ns3NdnContentObjectHeaderSignedInfo_methods(root_module, cls):
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::SignedInfo::SignedInfo(ns3::ndn::ContentObjectHeader::SignedInfo const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::ContentObjectHeader::SignedInfo const &', 'arg0')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::SignedInfo::SignedInfo() [constructor]
-    cls.add_constructor([])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeader::ContentType ns3::ndn::ContentObjectHeader::SignedInfo::GetContentType() const [member function]
-    cls.add_method('GetContentType', 
-                   'ns3::ndn::ContentObjectHeader::ContentType', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::Time ns3::ndn::ContentObjectHeader::SignedInfo::GetFreshness() const [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::Time ns3::ndn::ContentObjectHeader::GetFreshness() const [member function]
     cls.add_method('GetFreshness', 
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::NameComponents const> ns3::ndn::ContentObjectHeader::SignedInfo::GetKeyLocator() const [member function]
-    cls.add_method('GetKeyLocator', 
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::ContentObjectHeader::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::ContentObjectHeader::GetName() const [member function]
+    cls.add_method('GetName', 
+                   'ns3::ndn::NameComponents const &', 
+                   [], 
+                   is_const=True)
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::NameComponents const> ns3::ndn::ContentObjectHeader::GetNamePtr() const [member function]
+    cls.add_method('GetNamePtr', 
                    'ns3::Ptr< ns3::ndn::NameComponents const >', 
                    [], 
                    is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::SignedInfo::GetPublisherPublicKeyDigest() const [member function]
-    cls.add_method('GetPublisherPublicKeyDigest', 
+    ## ndn-content-object.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectHeader::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
-                   is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::Time ns3::ndn::ContentObjectHeader::SignedInfo::GetTimestamp() const [member function]
+                   is_const=True, is_virtual=True)
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::Time ns3::ndn::ContentObjectHeader::GetTimestamp() const [member function]
     cls.add_method('GetTimestamp', 
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SignedInfo::SetContentType(ns3::ndn::ContentObjectHeader::ContentType type) [member function]
-    cls.add_method('SetContentType', 
+    ## ndn-content-object.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ContentObjectHeader::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
                    'void', 
-                   [param('ns3::ndn::ContentObjectHeader::ContentType', 'type')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SignedInfo::SetFreshness(ns3::Time const & freshness) [member function]
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SetFreshness(ns3::Time const & freshness) [member function]
     cls.add_method('SetFreshness', 
                    'void', 
                    [param('ns3::Time const &', 'freshness')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SignedInfo::SetKeyLocator(ns3::Ptr<ns3::ndn::NameComponents const> keyLocator) [member function]
-    cls.add_method('SetKeyLocator', 
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> const & name) [member function]
+    cls.add_method('SetName', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::NameComponents const >', 'keyLocator')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SignedInfo::SetPublisherPublicKeyDigest(uint32_t digest) [member function]
-    cls.add_method('SetPublisherPublicKeyDigest', 
-                   'void', 
-                   [param('uint32_t', 'digest')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SignedInfo::SetTimestamp(ns3::Time const & timestamp) [member function]
+                   [param('ns3::Ptr< ns3::ndn::NameComponents > const &', 'name')])
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectHeader::SetTimestamp(ns3::Time const & timestamp) [member function]
     cls.add_method('SetTimestamp', 
                    'void', 
                    [param('ns3::Time const &', 'timestamp')])
     return
 
 def register_Ns3NdnContentObjectHeaderException_methods(root_module, cls):
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException::ContentObjectHeaderException() [constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException::ContentObjectHeaderException() [constructor]
     cls.add_constructor([])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException::ContentObjectHeaderException(ns3::ndn::ContentObjectHeaderException const & arg0) [copy constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectHeaderException::ContentObjectHeaderException(ns3::ndn::ContentObjectHeaderException const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::ContentObjectHeaderException const &', 'arg0')])
     return
 
 def register_Ns3NdnContentObjectTail_methods(root_module, cls):
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail::ContentObjectTail(ns3::ndn::ContentObjectTail const & arg0) [copy constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail::ContentObjectTail(ns3::ndn::ContentObjectTail const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::ContentObjectTail const &', 'arg0')])
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail::ContentObjectTail() [constructor]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObjectTail::ContentObjectTail() [constructor]
     cls.add_constructor([])
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectTail::Deserialize(ns3::Buffer::Iterator start) [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectTail::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::ContentObjectTail::GetInstanceTypeId() const [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::ContentObjectTail::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectTail::GetSerializedSize() const [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): uint32_t ns3::ndn::ContentObjectTail::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ContentObjectTail::GetTypeId() [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ContentObjectTail::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectTail::Print(std::ostream & os) const [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectTail::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ndn-content-object-header.h (module 'ndnSIM'): void ns3::ndn::ContentObjectTail::Serialize(ns3::Buffer::Iterator start) const [member function]
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObjectTail::Serialize(ns3::Buffer::Iterator start) const [member function]
     cls.add_method('Serialize', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'start')], 
@@ -5428,6 +5341,11 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face')], 
                    is_virtual=True)
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): static std::string ns3::ndn::ForwardingStrategy::GetLogName() [member function]
+    cls.add_method('GetLogName', 
+                   'std::string', 
+                   [], 
+                   is_static=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::ForwardingStrategy::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
@@ -5598,151 +5516,101 @@ def register_Ns3NdnHeaderHelper_methods(root_module, cls):
     return
 
 def register_Ns3NdnInterestHeader_methods(root_module, cls):
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader() [constructor]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader() [constructor]
     cls.add_constructor([])
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader(ns3::ndn::InterestHeader const & interest) [copy constructor]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeader::InterestHeader(ns3::ndn::InterestHeader const & interest) [copy constructor]
     cls.add_constructor([param('ns3::ndn::InterestHeader const &', 'interest')])
-    ## ndn-interest-header.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_virtual=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::InterestHeader::GetExclude() const [member function]
-    cls.add_method('GetExclude', 
-                   'ns3::ndn::NameComponents const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::InterestHeader::GetInstanceTypeId() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::InterestHeader::GetInstanceTypeId() const [member function]
     cls.add_method('GetInstanceTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::InterestHeader> ns3::ndn::InterestHeader::GetInterest(ns3::Ptr<ns3::Packet> packet) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::InterestHeader> ns3::ndn::InterestHeader::GetInterest(ns3::Ptr<ns3::Packet> packet) [member function]
     cls.add_method('GetInterest', 
                    'ns3::Ptr< ns3::ndn::InterestHeader >', 
                    [param('ns3::Ptr< ns3::Packet >', 'packet')], 
                    is_static=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::Time ns3::ndn::InterestHeader::GetInterestLifetime() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::Time ns3::ndn::InterestHeader::GetInterestLifetime() const [member function]
     cls.add_method('GetInterestLifetime', 
                    'ns3::Time', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): int32_t ns3::ndn::InterestHeader::GetMaxSuffixComponents() const [member function]
-    cls.add_method('GetMaxSuffixComponents', 
-                   'int32_t', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): int32_t ns3::ndn::InterestHeader::GetMinSuffixComponents() const [member function]
-    cls.add_method('GetMinSuffixComponents', 
-                   'int32_t', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::GetNack() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): uint8_t ns3::ndn::InterestHeader::GetNack() const [member function]
     cls.add_method('GetNack', 
-                   'uint32_t', 
+                   'uint8_t', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::InterestHeader::GetName() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::NameComponents const & ns3::ndn::InterestHeader::GetName() const [member function]
     cls.add_method('GetName', 
                    'ns3::ndn::NameComponents const &', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::NameComponents const> ns3::ndn::InterestHeader::GetNamePtr() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::NameComponents const> ns3::ndn::InterestHeader::GetNamePtr() const [member function]
     cls.add_method('GetNamePtr', 
                    'ns3::Ptr< ns3::ndn::NameComponents const >', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::GetNonce() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::GetNonce() const [member function]
     cls.add_method('GetNonce', 
                    'uint32_t', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): int8_t ns3::ndn::InterestHeader::GetScope() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): int8_t ns3::ndn::InterestHeader::GetScope() const [member function]
     cls.add_method('GetScope', 
                    'int8_t', 
                    [], 
                    is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::GetSerializedSize() const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): uint32_t ns3::ndn::InterestHeader::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'uint32_t', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::InterestHeader::GetTypeId() [member function]
+    ## ndn-interest.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::InterestHeader::GetTypeId() [member function]
     cls.add_method('GetTypeId', 
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): bool ns3::ndn::InterestHeader::IsEnabledAnswerOriginKind() const [member function]
-    cls.add_method('IsEnabledAnswerOriginKind', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): bool ns3::ndn::InterestHeader::IsEnabledChildSelector() const [member function]
-    cls.add_method('IsEnabledChildSelector', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): bool ns3::ndn::InterestHeader::IsEnabledExclude() const [member function]
-    cls.add_method('IsEnabledExclude', 
-                   'bool', 
-                   [], 
-                   is_const=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::Print(std::ostream & os) const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True, is_virtual=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::Serialize(ns3::Buffer::Iterator start) const [member function]
     cls.add_method('Serialize', 
                    'void', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True, is_virtual=True)
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetAnswerOriginKind(bool value) [member function]
-    cls.add_method('SetAnswerOriginKind', 
-                   'void', 
-                   [param('bool', 'value')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetChildSelector(bool value) [member function]
-    cls.add_method('SetChildSelector', 
-                   'void', 
-                   [param('bool', 'value')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetExclude(ns3::Ptr<ns3::ndn::NameComponents> exclude) [member function]
-    cls.add_method('SetExclude', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::ndn::NameComponents >', 'exclude')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetInterestLifetime(ns3::Time time) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetInterestLifetime(ns3::Time time) [member function]
     cls.add_method('SetInterestLifetime', 
                    'void', 
                    [param('ns3::Time', 'time')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetMaxSuffixComponents(int32_t value) [member function]
-    cls.add_method('SetMaxSuffixComponents', 
-                   'void', 
-                   [param('int32_t', 'value')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetMinSuffixComponents(int32_t value) [member function]
-    cls.add_method('SetMinSuffixComponents', 
-                   'void', 
-                   [param('int32_t', 'value')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetNack(uint32_t nackType) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetNack(uint8_t nackType) [member function]
     cls.add_method('SetNack', 
                    'void', 
-                   [param('uint32_t', 'nackType')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> name) [member function]
+                   [param('uint8_t', 'nackType')])
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetName(ns3::Ptr<ns3::ndn::NameComponents> name) [member function]
     cls.add_method('SetName', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::NameComponents >', 'name')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetNonce(uint32_t nonce) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetNonce(uint32_t nonce) [member function]
     cls.add_method('SetNonce', 
                    'void', 
                    [param('uint32_t', 'nonce')])
-    ## ndn-interest-header.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetScope(int8_t scope) [member function]
+    ## ndn-interest.h (module 'ndnSIM'): void ns3::ndn::InterestHeader::SetScope(int8_t scope) [member function]
     cls.add_method('SetScope', 
                    'void', 
                    [param('int8_t', 'scope')])
     return
 
 def register_Ns3NdnInterestHeaderException_methods(root_module, cls):
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException::InterestHeaderException() [constructor]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException::InterestHeaderException() [constructor]
     cls.add_constructor([])
-    ## ndn-interest-header.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException::InterestHeaderException(ns3::ndn::InterestHeaderException const & arg0) [copy constructor]
+    ## ndn-interest.h (module 'ndnSIM'): ns3::ndn::InterestHeaderException::InterestHeaderException(ns3::ndn::InterestHeaderException const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::InterestHeaderException const &', 'arg0')])
     return
 
@@ -5908,6 +5776,10 @@ def register_Ns3NdnNameComponents_methods(root_module, cls):
     cls.add_constructor([param('std::string const &', 'prefix')])
     ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(char const * prefix) [constructor]
     cls.add_constructor([param('char const *', 'prefix')])
+    ## ndn-name-components.h (module 'ndnSIM'): uint32_t ns3::ndn::NameComponents::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')])
     ## ndn-name-components.h (module 'ndnSIM'): std::list<std::string, std::allocator<std::string> > const & ns3::ndn::NameComponents::GetComponents() const [member function]
     cls.add_method('GetComponents', 
                    'std::list< std::string > const &', 
@@ -5916,6 +5788,11 @@ def register_Ns3NdnNameComponents_methods(root_module, cls):
     ## ndn-name-components.h (module 'ndnSIM'): std::string ns3::ndn::NameComponents::GetLastComponent() const [member function]
     cls.add_method('GetLastComponent', 
                    'std::string', 
+                   [], 
+                   is_const=True)
+    ## ndn-name-components.h (module 'ndnSIM'): size_t ns3::ndn::NameComponents::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'size_t', 
                    [], 
                    is_const=True)
     ## ndn-name-components.h (module 'ndnSIM'): std::list<boost::reference_wrapper<const std::basic_string<char, std::char_traits<char>, std::allocator<char> > >,std::allocator<boost::reference_wrapper<const std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > ns3::ndn::NameComponents::GetSubComponents(size_t num) const [member function]
@@ -5927,6 +5804,11 @@ def register_Ns3NdnNameComponents_methods(root_module, cls):
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
+                   is_const=True)
+    ## ndn-name-components.h (module 'ndnSIM'): uint32_t ns3::ndn::NameComponents::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True)
     ## ndn-name-components.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::ndn::NameComponents::begin() [member function]
     cls.add_method('begin', 

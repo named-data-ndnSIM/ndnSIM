@@ -34,8 +34,8 @@
 
 #include "ns3/ndn-header-helper.h"
 #include "ns3/ndn-pit.h"
-#include "ns3/ndn-interest-header.h"
-#include "ns3/ndn-content-object-header.h"
+#include "ns3/ndn-interest.h"
+#include "ns3/ndn-content-object.h"
 
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-forwarding-strategy.h"
@@ -258,7 +258,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
       HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
       switch (type)
         {
-        case HeaderHelper::INTEREST:
+        case HeaderHelper::INTEREST_NDNSIM:
           {
             s_interestCounter ++;
             Ptr<InterestHeader> header = Create<InterestHeader> ();
@@ -274,7 +274,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
             //   OnInterest (face, header, p/*original packet*/);  
             break;
           }
-        case HeaderHelper::CONTENT_OBJECT:
+        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
             s_dataCounter ++;
             Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
@@ -288,6 +288,10 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
             m_forwardingStrategy->OnData (face, header, packet/*payload*/, p/*original packet*/);  
             break;
           }
+        case HeaderHelper::INTEREST_CCNB:
+        case HeaderHelper::CONTENT_OBJECT_CCNB:
+          NS_FATAL_ERROR ("ccnb support is broken in this implementation");
+          break;
         }
       
       // exception will be thrown if packet is not recognized
