@@ -61,9 +61,6 @@ protected:
 private:
   NameComponents m_prefix;
   uint32_t m_virtualPayloadSize;
-  
-  uint32_t m_signatureBits;
-  // ContentObjectHeader::SignedInfo m_signedInfo;
 };
 
 } // namespace ndn

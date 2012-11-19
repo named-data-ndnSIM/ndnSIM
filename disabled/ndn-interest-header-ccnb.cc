@@ -15,14 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-interest-header.h"
+///< #CCN_PR_SCOPE0 (0x20) local scope,
+///< #CCN_PR_SCOPE1 (0x40) this host,
+///< #CCN_PR_SCOPE2 (0x80) immediate neighborhood
+
+#include "ndn-interest-header-ccnb.h"
 
 #include "ns3/log.h"
 #include "ns3/unused.h"
 #include "ns3/packet.h"
+#include "../helper/ndn-encoding-helper.h"
+#include "../helper/ndn-decoding-helper.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.InterestHeader");
 
@@ -45,7 +52,12 @@ InterestHeader::GetTypeId (void)
 
 InterestHeader::InterestHeader ()
   : m_name ()
-  , m_scope (0xFF)
+  , m_minSuffixComponents (-1)
+  , m_maxSuffixComponents (-1)
+  , m_exclude ()
+  , m_childSelector (false)
+  , m_answerOriginKind (false)
+  , m_scope (-1)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
   , m_nackType (NORMAL_INTEREST)
@@ -54,6 +66,11 @@ InterestHeader::InterestHeader ()
 
 InterestHeader::InterestHeader (const InterestHeader &interest)
   : m_name                (Create<NameComponents> (interest.GetName ()))
+  , m_minSuffixComponents (interest.m_minSuffixComponents)
+  , m_maxSuffixComponents (interest.m_maxSuffixComponents)
+  , m_exclude             (interest.IsEnabledExclude () ? Create<NameComponents> (interest.GetExclude ()) : 0)
+  , m_childSelector       (interest.m_childSelector)
+  , m_answerOriginKind    (interest.m_answerOriginKind)
   , m_scope               (interest.m_scope)
   , m_interestLifetime    (interest.m_interestLifetime)
   , m_nonce               (interest.m_nonce)
@@ -87,6 +104,73 @@ Ptr<const NameComponents>
 InterestHeader::GetNamePtr () const
 {
   return m_name;
+}
+
+void
+InterestHeader::SetMinSuffixComponents (int32_t value)
+{
+  m_minSuffixComponents = value;
+}
+
+int32_t
+InterestHeader::GetMinSuffixComponents () const
+{
+  return m_minSuffixComponents;
+}
+
+void
+InterestHeader::SetMaxSuffixComponents (int32_t value)
+{
+  m_maxSuffixComponents = value;
+}
+
+int32_t
+InterestHeader::GetMaxSuffixComponents () const
+{
+  return m_maxSuffixComponents;
+}
+
+void
+InterestHeader::SetExclude (Ptr<NameComponents> exclude)
+{
+  m_exclude = exclude;
+}
+
+bool
+InterestHeader::IsEnabledExclude () const
+{
+  return m_exclude!=0;
+}
+
+const NameComponents&
+InterestHeader::GetExclude () const
+{
+  if (m_exclude==0) throw InterestHeaderException();
+  return *m_exclude;
+}
+
+void
+InterestHeader::SetChildSelector (bool value)
+{
+  m_childSelector = value;
+}
+
+bool
+InterestHeader::IsEnabledChildSelector () const
+{
+  return m_childSelector;
+}
+
+void
+InterestHeader::SetAnswerOriginKind (bool value)
+{
+  m_answerOriginKind = value;
+}
+
+bool
+InterestHeader::IsEnabledAnswerOriginKind () const
+{
+  return m_answerOriginKind;
 }
 
 void
@@ -126,12 +210,12 @@ InterestHeader::GetNonce () const
 }
 
 void
-InterestHeader::SetNack (uint8_t nackType)
+InterestHeader::SetNack (uint32_t nackType)
 {
   m_nackType = nackType;
 }
 
-uint8_t
+uint32_t
 InterestHeader::GetNack () const
 {
   return m_nackType;
@@ -140,61 +224,22 @@ InterestHeader::GetNack () const
 uint32_t
 InterestHeader::GetSerializedSize (void) const
 {
-  size_t size = 2 + (1 + 4 + 2 + 1 + (m_name->GetSerializedSize ()) + (2 + 0) + (2 + 0));
-  NS_LOG_INFO ("Serialize size = " << size);
-
-  return size;
+  // unfortunately, we don't know exact header size in advance
+  return EncodingHelper::GetSerializedSize (*this);
 }
     
 void
 InterestHeader::Serialize (Buffer::Iterator start) const
 {
-  start.WriteU8 (0x80); // version
-  start.WriteU8 (0x00); // packet type
-
-  start.WriteU32 (m_nonce);
-  start.WriteU8 (m_scope);
-  start.WriteU8 (m_nackType);
-
-  NS_ASSERT_MSG (0 <= m_interestLifetime.ToInteger (Time::S) && m_interestLifetime.ToInteger (Time::S) < 65535,
-                 "Incorrect InterestLifetime (should not be smaller than 0 and larger than 65535");
-  
-  // rounding timestamp value to seconds
-  start.WriteU16 (static_cast<uint16_t> (m_interestLifetime.ToInteger (Time::S)));
-
-  uint32_t offset = m_name->Serialize (start);
-  start.Next (offset);
-  
-  start.WriteU16 (0); // no selectors
-  start.WriteU16 (0); // no options
+  size_t size = EncodingHelper::Serialize (start, *this);
+  NS_UNUSED (size);
+  NS_LOG_INFO ("Serialize size = " << size);
 }
 
 uint32_t
 InterestHeader::Deserialize (Buffer::Iterator start)
 {
-  Buffer::Iterator i = start;
-  
-  if (i.ReadU8 () != 0x80)
-    throw new InterestHeaderException ();
-
-  if (i.ReadU8 () != 0x00)
-    throw new InterestHeaderException ();
-
-  m_scope = i.ReadU8 ();
-  m_nackType = i.ReadU8 ();
-  m_interestLifetime = Seconds (i.ReadU16 ());
-
-  m_name = Create<NameComponents> ();
-  uint32_t offset = m_name->Deserialize (start);
-  i.Next (offset);
-  
-  i.ReadU16 ();
-  i.ReadU16 ();
-
-  NS_ASSERT (GetSerializedSize () == (i.GetDistanceFrom (start)));
-
-  return i.GetDistanceFrom (start);
-  // return DecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
+  return DecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
 }
 
 TypeId
@@ -227,7 +272,18 @@ InterestHeader::Print (std::ostream &os) const
         }
       os << "</NACK>\n";
     }
-  os << "  <Scope>" << GetScope () << "</Scope>\n";
+  if (GetMinSuffixComponents () >= 0)
+    os << "  <MinSuffixComponents>" << GetMinSuffixComponents () << "</MinSuffixComponents>\n";
+  if (GetMaxSuffixComponents () >= 0)
+    os << "  <MaxSuffixComponents>" << m_maxSuffixComponents << "</MaxSuffixComponents>\n";
+  if (IsEnabledExclude () && GetExclude ().size()>0)
+    os << "  <Exclude>" << GetExclude () << "</Exclude>\n";
+  if (IsEnabledChildSelector ())
+    os << "  <ChildSelector />\n";
+  if (IsEnabledAnswerOriginKind ())
+    os << "  <AnswerOriginKind />\n";
+  if (GetScope () >= 0)
+    os << "  <Scope>" << GetScope () << "</Scope>\n";
   if ( !GetInterestLifetime ().IsZero() )
     os << "  <InterestLifetime>" << GetInterestLifetime () << "</InterestLifetime>\n";
   if (GetNonce ()>0)

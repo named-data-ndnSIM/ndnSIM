@@ -38,13 +38,18 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * Ndn XML definition of ContentObject
+ * ContentObject header
  * 
  * Only few important fields are actually implemented in the simulation
  *
- *
  * ContentObjectHeader serializes/deserializes header up-to and including <Content> tags
  * Necessary closing tags should be added using ContentObjectTail
+ *
+ * Optimized and simplified formatting of Interest packets 
+ *
+ *	ContentObject ::= Signature
+ *                	  Name
+ *                   	  Content
  *
  * This hacks are necessary to optimize memory use (i.e., virtual payload)
  *
@@ -54,173 +59,6 @@ namespace ndn {
 class ContentObjectHeader : public SimpleRefCount<ContentObjectHeader,Header>
 {
 public:
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  /**
-   * @brief Class representing Signature section of the content object
-   */
-  class Signature
-  {
-  public:
-    /**
-     * @brief Default constructor. Creates a fake-type signature
-     */
-    inline Signature ();
-
-    /**
-     * @brief Get digest algorithm
-     */
-    inline const std::string &
-    GetDigestAlgorithm () const;
-
-    /**
-     * @brief Set digest algorithm
-     */
-    inline void
-    SetDigestAlgorithm (const std::string &digestAlgorithm);
-
-    /**
-     * @brief Get signature bits
-     */
-    inline uint32_t
-    GetSignatureBits () const;
-
-    /**
-     * @brief Set signature bits
-     */
-    inline void
-    SetSignatureBits (uint32_t signatureBits);
-
-    /**
-     * @brief Default digest algorithm ("2.16.840.1.101.3.4.2.1")
-     */
-    static const std::string DefaultDigestAlgorithm; // = "2.16.840.1.101.3.4.2.1";
-    
-  private:
-    std::string m_digestAlgorithm; // if value is `2.16.840.1.101.3.4.2.1`, then SHA-256 (not supported)
-                                   // in NS-3 value `99.0` represents a fake digest
-    // Witness // not used in NS-3
-    uint32_t m_signatureBits; // in NS-3 a fake signature is a just 32-bits
-  };
-  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-
-  /**
-   * @brief Options for the data packet Type
-   */
-  enum ContentType
-    {
-      DATA = 0x0C04C0, // default value. If ContentObject is type of DATA, then ContentType tag will be omitted
-      ENCR = 0x10D091,
-      GONE = 0x18E344,
-      KEY  = 0x28463F,
-      LINK = 0x2C834A,
-      NACK = 0x34008A
-    };
-
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-
-  /**
-   * @brief Class representing SignedInfo section of the content object
-   */
-  class SignedInfo
-  {
-  public:
-    /**
-     * @brief Default constructor
-     */
-    SignedInfo (); 
-    
-    /**
-     * @brief Set PublisherPublicKey digest
-     * @param digest a fake 32-bit digest is supported
-     */
-    void
-    SetPublisherPublicKeyDigest (uint32_t digest);
-
-    /**
-     * @brief Get PublisherPublicKey digest
-     */
-    uint32_t
-    GetPublisherPublicKeyDigest () const;
-
-    /**
-     * @brief Set content object timestamp
-     * @param timestamp timestamp
-     */
-    void
-    SetTimestamp (const Time &timestamp);
-
-    /**
-     * @brief Get timestamp of the content object
-     */
-    Time
-    GetTimestamp () const;
-
-    /**
-     * @brief Set ContentObject type
-     * @param type type of the content object
-     */
-    void
-    SetContentType (ContentType type);
-
-    /**
-     * @brief Get ContentObject type
-     */
-    ContentType
-    GetContentType () const;
-    
-    /**
-     * @brief Set freshness of the content object
-     * @param freshness Freshness, 0s means infinity
-     */
-    void
-    SetFreshness (const Time &freshness);
-
-    /**
-     * @brief Get freshness of the content object
-     */
-    Time
-    GetFreshness () const;
-
-    /**
-     * @brief Set key locator
-     * @param keyLocator name of the key
-     *
-     * Note that only <KeyName> option for the key locator is supported
-     */
-    void
-    SetKeyLocator (Ptr<const NameComponents> keyLocator);
-
-    /**
-     * @brief Get key locator
-     *
-     * Note that only <KeyName> option for the key locator is supported
-     */
-    Ptr<const NameComponents>
-    GetKeyLocator () const;
-    
-  private:
-    uint32_t m_publisherPublicKeyDigest; // fake publisher key digest
-    Time m_timestamp;
-    ContentType m_type;
-    Time m_freshness;
-    // FinalBlockID
-    Ptr<const NameComponents> m_keyLocator; // support only <KeyName> option for KeyLocator
-  };
-
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-  ////////////////////////////////////////////////////////////////////////////  
-
   /**
    * Constructor
    *
@@ -249,28 +87,30 @@ public:
   GetNamePtr () const;
 
   /**
-   * @brief Get editable reference to content object's Signature
+   * @brief Set content object timestamp
+   * @param timestamp timestamp
    */
-  inline Signature &
-  GetSignature ();
+  void
+  SetTimestamp (const Time &timestamp);
 
   /**
-   * @brief Get read-only reference to content object's Signature
+   * @brief Get timestamp of the content object
    */
-  inline const Signature &
-  GetSignature () const;
+  Time
+  GetTimestamp () const;
+    
+  /**
+   * @brief Set freshness of the content object
+   * @param freshness Freshness, 0s means infinity
+   */
+  void
+  SetFreshness (const Time &freshness);
 
   /**
-   * @brief Get editable reference to content object's SignedInfo
+   * @brief Get freshness of the content object
    */
-  inline SignedInfo &
-  GetSignedInfo ();
-
-  /**
-   * @brief Get read-only reference to content object's SignedInfo
-   */
-  inline const SignedInfo &
-  GetSignedInfo () const;
+  Time
+  GetFreshness () const;
   
   //////////////////////////////////////////////////////////////////
   
@@ -282,14 +122,13 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
   
 private:
-  Signature  m_signature;
   Ptr<NameComponents> m_name;
-  SignedInfo m_signedInfo;
+  Time m_freshness;
+  Time m_timestamp;
 };
 
 /**
- * ContentObjectTail should always be 2 bytes, representing two closing tags:
- * "</Content><ContentObject>"
+ * ContentObjectTail for compatibility with other packet formats
  */
 class ContentObjectTail : public Trailer
 {
@@ -305,61 +144,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Tail
 };
 
-
-ContentObjectHeader::Signature::Signature ()
-  : m_digestAlgorithm ("99.0")
-  , m_signatureBits (0)
-{
-}
-
-const std::string &
-ContentObjectHeader::Signature::GetDigestAlgorithm () const
-{
-  return m_digestAlgorithm;
-}
-
-void
-ContentObjectHeader::Signature::SetDigestAlgorithm (const std::string &digestAlgorithm)
-{
-  m_digestAlgorithm = digestAlgorithm;
-}
-
-uint32_t
-ContentObjectHeader::Signature::GetSignatureBits () const
-{
-  return m_signatureBits;
-}
-
-inline void
-ContentObjectHeader::Signature::SetSignatureBits (uint32_t signature)
-{
-  m_signatureBits = signature;
-}
-
-
-ContentObjectHeader::Signature &
-ContentObjectHeader::GetSignature ()
-{
-  return m_signature;
-}
-
-const ContentObjectHeader::Signature &
-ContentObjectHeader::GetSignature () const
-{
-  return m_signature;
-}
-
-ContentObjectHeader::SignedInfo &
-ContentObjectHeader::GetSignedInfo ()
-{
-  return m_signedInfo;
-}
-
-const ContentObjectHeader::SignedInfo &
-ContentObjectHeader::GetSignedInfo () const
-{
-  return m_signedInfo;
-}
 
 /**
  * @ingroup ndn-exceptions

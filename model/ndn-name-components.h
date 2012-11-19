@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <list>
 #include "ns3/object.h"
+#include "ns3/buffer.h"
 
 #include <boost/ref.hpp>
 
@@ -127,6 +128,26 @@ public:
    */
   void Print (std::ostream &os) const;
 
+  /**
+   * @brief Get serialized size for ndnSIM packet encoding
+   */
+  size_t
+  GetSerializedSize () const;
+  
+  /**
+   * @brief Serialize Name in ndnSIM packet encoding
+   * @param[in] start buffer to contain serialized name 
+   */
+  uint32_t
+  Serialize (Buffer::Iterator start) const;
+  
+  /**
+   * \brief Deserialize Name in ndnSIM packet encoding
+   * @param[in] start buffer that contains serialized name
+   */ 
+  uint32_t
+  Deserialize (Buffer::Iterator start);
+  
   /**
    * \brief Returns the size of NameComponents
    */

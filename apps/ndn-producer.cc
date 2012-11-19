@@ -59,12 +59,6 @@ Producer::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor(&Producer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
-
-    // optional attributes
-    .AddAttribute ("SignatureBits", "SignatureBits field",
-                   UintegerValue (0),
-                   MakeUintegerAccessor(&Producer::m_signatureBits),
-                   MakeUintegerChecker<uint32_t> ())
     ;
         
   return tid;
@@ -120,8 +114,6 @@ Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> ori
   static ContentObjectTail tail;
   Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
   header->SetName (Create<NameComponents> (interest->GetName ()));
-  header->GetSignedInfo ().SetTimestamp (Simulator::Now ());
-  header->GetSignature ().SetSignatureBits (m_signatureBits);
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   

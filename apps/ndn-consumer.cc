@@ -69,22 +69,6 @@ Consumer::GetTypeId (void)
                    StringValue ("2s"),
                    MakeTimeAccessor (&Consumer::m_interestLifeTime),
                    MakeTimeChecker ())
-    .AddAttribute ("MinSuffixComponents", "MinSuffixComponents",
-                   IntegerValue(-1),
-                   MakeIntegerAccessor(&Consumer::m_minSuffixComponents),
-                   MakeIntegerChecker<int32_t>())
-    .AddAttribute ("MaxSuffixComponents", "MaxSuffixComponents",
-                   IntegerValue(-1),
-                   MakeIntegerAccessor(&Consumer::m_maxSuffixComponents),
-                   MakeIntegerChecker<int32_t>())
-    .AddAttribute ("ChildSelector", "ChildSelector",
-                   BooleanValue(false),
-                   MakeBooleanAccessor(&Consumer::m_childSelector),
-                   MakeBooleanChecker())
-    .AddAttribute ("Exclude", "only simple name matching is supported (use NameComponents)",
-                   NameComponentsValue (),
-                   MakeNameComponentsAccessor (&Consumer::m_exclude),
-                   MakeNameComponentsChecker ())
 
     .AddAttribute ("RetxTimer",
                    "Timeout defining how frequent retransmission timeouts should be checked",
@@ -229,14 +213,6 @@ Consumer::SendPacket ()
   InterestHeader interestHeader;
   interestHeader.SetNonce               (m_rand.GetValue ());
   interestHeader.SetName                (nameWithSequence);
-  interestHeader.SetInterestLifetime    (m_interestLifeTime);
-  interestHeader.SetChildSelector       (m_childSelector);
-  if (m_exclude.size ()>0)
-    {
-      interestHeader.SetExclude (Create<NameComponents> (m_exclude));
-    }
-  interestHeader.SetMaxSuffixComponents (m_maxSuffixComponents);
-  interestHeader.SetMinSuffixComponents (m_minSuffixComponents);
         
   // NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
   NS_LOG_INFO ("> Interest for " << seq);

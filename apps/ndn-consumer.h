@@ -128,10 +128,6 @@ protected:
   Time               m_offTime;             ///< \brief Time interval between packets
   NameComponents     m_interestName;        ///< \brief NDN Name of the Interest (use NameComponents)
   Time               m_interestLifeTime;    ///< \brief LifeTime for interest packet
-  int32_t            m_minSuffixComponents; ///< \brief MinSuffixComponents. See InterestHeader for more information
-  int32_t            m_maxSuffixComponents; ///< \brief MaxSuffixComponents. See InterestHeader for more information
-  bool               m_childSelector;       ///< \brief ChildSelector. See InterestHeader for more information
-  NameComponents     m_exclude;             ///< \brief Exclude. See InterestHeader for more information
 
 /// @cond include_hidden  
   /**
