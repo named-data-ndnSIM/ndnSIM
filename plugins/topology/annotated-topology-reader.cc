@@ -93,7 +93,15 @@ AnnotatedTopologyReader::~AnnotatedTopologyReader ()
 Ptr<Node>
 AnnotatedTopologyReader::CreateNode (const std::string name, uint32_t systemId)
 {
-  return CreateNode (name, m_randX.GetValue (), m_randY.GetValue (), systemId);
+  NS_LOG_FUNCTION (this << name);
+  m_requiredPartitions = std::max (m_requiredPartitions, systemId + 1);
+  
+  Ptr<Node> node = CreateObject<Node> (systemId);
+
+  Names::Add (m_path, name, node);
+  m_nodes.Add (node);
+
+  return node;
 }
 
 Ptr<Node>
@@ -161,13 +169,18 @@ AnnotatedTopologyReader::Read (void)
       
       istringstream lineBuffer (line);
       string name, city;
-      double latitude, longitude;
+      double latitude = 0, longitude = 0;
       uint32_t systemId = 0;
 
       lineBuffer >> name >> city >> latitude >> longitude >> systemId;
       if (name.empty ()) continue;
 
-      Ptr<Node> node = CreateNode (name, m_scale*longitude, -m_scale*latitude, systemId);
+      Ptr<Node> node;
+      
+      if (abs(latitude) > 0.001 && abs(latitude) > 0.001)
+        node = CreateNode (name, m_scale*longitude, -m_scale*latitude, systemId);
+      else
+        node = CreateNode (name, systemId);
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
@@ -201,9 +214,9 @@ AnnotatedTopologyReader::Read (void)
       processedLinks[from].insert (to);
       
       Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
-      NS_ASSERT (fromNode != 0);
+      NS_ASSERT_MSG (fromNode != 0, from << " node not found");
       Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
-      NS_ASSERT (fromNode != 0);
+      NS_ASSERT_MSG (toNode != 0, to << " node not found");
 
       Link link (fromNode, from, toNode, to);
       
@@ -214,7 +227,7 @@ AnnotatedTopologyReader::Read (void)
           link.SetAttribute ("Delay", delay);
       if (!maxPackets.empty ())
         link.SetAttribute ("MaxPackets", maxPackets);
-
+      
       AddLink (link);
       NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << " with " << metric << " metric (" << delay << ", " << maxPackets << ")");
     }
@@ -309,6 +322,7 @@ AnnotatedTopologyReader::ApplySettings ()
 
   BOOST_FOREACH (Link &link, m_linksList)
     {
+      // cout << "Link: " << Findlink.GetFromNode () << ", " << link.GetToNode () << endl;
       string tmp;
 
       if (link.GetAttributeFailSafe ("DataRate", tmp))

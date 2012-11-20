@@ -258,7 +258,7 @@ GlobalRoutingHelper::CalculateRoutes ()
       fib->InvalidateAll ();
       NS_ASSERT (fib != 0);
       
-      cout << "Reachability from Node: " << source->GetObject<Node> ()->GetId () << endl;
+      NS_LOG_DEBUG ("Reachability from Node: " << source->GetObject<Node> ()->GetId ());
       for (DistancesMap::iterator i = distances.begin ();
 	   i != distances.end ();
 	   i++)
@@ -276,9 +276,9 @@ GlobalRoutingHelper::CalculateRoutes ()
 		{
                   BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
                     {
-                      cout << " prefix " << prefix << " reachable via face " << *i->second.get<0> ()
-                           << " with distance " << i->second.get<1> ()
-                           << " with delay " << i->second.get<2> () << endl;
+                      NS_LOG_DEBUG (" prefix " << prefix << " reachable via face " << *i->second.get<0> ()
+                                    << " with distance " << i->second.get<1> ()
+                                    << " with delay " << i->second.get<2> ());
                     
                       Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
                       Ptr<Limits> limits = i->second.get<0> ()->GetObject<Limits> ();
