@@ -106,7 +106,7 @@ public:
    * \brief Save positions (e.g., after manual modification using visualizer)
    */
   void
-  SavePositions (const std::string &file) const;
+  SaveTopology (const std::string &file) const;
 
 protected:
   Ptr<Node>

@@ -3419,8 +3419,8 @@ def register_Ns3AnnotatedTopologyReader_methods(root_module, cls):
     cls.add_method('ApplyOspfMetric', 
                    'void', 
                    [])
-    ## annotated-topology-reader.h (module 'ndnSIM'): void ns3::AnnotatedTopologyReader::SavePositions(std::string const & file) const [member function]
-    cls.add_method('SavePositions', 
+    ## annotated-topology-reader.h (module 'ndnSIM'): void ns3::AnnotatedTopologyReader::SaveTopology(std::string const & file) const [member function]
+    cls.add_method('SaveTopology', 
                    'void', 
                    [param('std::string const &', 'file')], 
                    is_const=True)

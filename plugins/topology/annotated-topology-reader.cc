@@ -39,6 +39,7 @@
 #include "ns3/ipv4-address.h"
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-face.h"
+#include "ns3/random-variable.h"
 
 #include "ns3/constant-position-mobility-model.h"
 
@@ -180,7 +181,11 @@ AnnotatedTopologyReader::Read (void)
       if (abs(latitude) > 0.001 && abs(latitude) > 0.001)
         node = CreateNode (name, m_scale*longitude, -m_scale*latitude, systemId);
       else
-        node = CreateNode (name, systemId);
+        {
+          UniformVariable var (0,200);
+          node = CreateNode (name, var.GetValue (), var.GetValue (), systemId);
+          // node = CreateNode (name, systemId);
+        }
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
@@ -359,10 +364,18 @@ AnnotatedTopologyReader::ApplySettings ()
 }
 
 void
-AnnotatedTopologyReader::SavePositions (const std::string &file) const
+AnnotatedTopologyReader::SaveTopology (const std::string &file) const
 {
   ofstream os (file.c_str (), ios::trunc);
-  os << "router\n";
+  os << "# any empty lines and lines starting with '#' symbol is ignored\n"
+     << "\n"
+     << "# The file should contain exactly two sections: router and link, each starting with the corresponding keyword\n"
+     << "\n" 
+     << "# router section defines topology nodes and their relative positions (e.g., to use in visualizer)\n"
+     << "router\n"
+     << "\n"
+     << "# each line in this section represents one router and should have the following data\n"
+     << "# node  comment     yPos    xPos\n";
   
   for (NodeContainer::Iterator node = m_nodes.Begin ();
        node != m_nodes.End ();
@@ -374,6 +387,47 @@ AnnotatedTopologyReader::SavePositions (const std::string &file) const
 
       os << name << "\t" << "NA" << "\t" << -position.y << "\t" << position.x << "\n";
     }
+
+  os << "# link section defines point-to-point links between nodes and characteristics of these links\n"
+     << "\n"
+     << "link\n"
+     << "\n"
+     << "# Each line should be in the following format (only first two are required, the rest can be omitted)\n"
+     << "# srcNode   dstNode     bandwidth   metric  delay   queue\n"
+     << "# bandwidth: link bandwidth\n"
+     << "# metric: routing metric\n"
+     << "# delay:  link delay\n"
+     << "# queue:  MaxPackets for transmission queue on the link (both directions)\n";
+
+  for (std::list<Link>::const_iterator link = m_linksList.begin ();
+       link != m_linksList.end ();
+       link ++)
+    {
+      os << Names::FindName (link->GetFromNode ()) << "\t";
+      os << Names::FindName (link->GetToNode ()) << "\t";
+
+      string tmp;
+      if (link->GetAttributeFailSafe ("DataRate", tmp))
+        os << link->GetAttribute("DataRate") << "\t";
+      else
+        NS_FATAL_ERROR ("DataRate must be specified for the link");
+
+      if (link->GetAttributeFailSafe ("OSPF", tmp))
+        os << link->GetAttribute("OSPF") << "\t";
+      else
+        os << "1\t";
+
+      if (link->GetAttributeFailSafe ("Delay", tmp))
+        {
+          os << link->GetAttribute("Delay") << "\t";
+
+          if (link->GetAttributeFailSafe ("MaxPackets", tmp))
+            {
+              os << link->GetAttribute("MaxPackets") << "\t";
+            }
+        }
+      os << "\n";
+    }  
 }
 
 }
