@@ -14,4 +14,5 @@ Contents:
    fw
    applications
    examples
+   metric
    faq
