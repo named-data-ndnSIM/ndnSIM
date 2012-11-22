@@ -20,6 +20,9 @@
 
 #include "ns3/core-module.h"
 #include "ns3/ndnSIM-module.h"
+
+#include "ndnSIM-trie.h"
+
 #include "../utils/trie/trie-with-policy.h"
 #include "../utils/trie/lru-policy.h"
 #include "../utils/trie/random-policy.h"
@@ -52,12 +55,10 @@ NS_LOG_COMPONENT_DEFINE ("ndn.Trie");
 //   return os;
 // }
 
-int
-main (int argc, char *argv[])
+void
+TrieTest::DoRun ()
 {
-  CommandLine args;
-  args.Parse (argc, argv);
-
+  cerr << "TrieTest is temporarily broken" << endl;
   // typedef trie_with_policy<
   //   ns3::NdnNameComponents,
   //   smart_pointer_payload_traits<Integer>,
@@ -96,29 +97,29 @@ main (int argc, char *argv[])
   // std::cout << x.getTrie ();
   // std::cout << "}\n";
 
-  Ptr<Node> node = CreateObject<Node> ();
-  Names::Add ("TestNode", node);
-  Ptr<ndn::App> app = CreateObject<ndn::App> ();
-  node->AddApplication (app);
+  // Ptr<Node> node = CreateObject<Node> ();
+  // Names::Add ("TestNode", node);
+  // Ptr<ndn::App> app = CreateObject<ndn::App> ();
+  // node->AddApplication (app);
   
-  ObjectFactory factory ("ns3::ndn::fib::Default");
+  // ObjectFactory factory ("ns3::ndn::fib::Default");
   
-  Ptr<ndn::Fib> fib = factory.Create<ndn::Fib> ();
-  node->AggregateObject (fib);
-  Ptr<ndn::Face> face = CreateObject<ndn::AppFace> (app);
+  // Ptr<ndn::Fib> fib = factory.Create<ndn::Fib> ();
+  // node->AggregateObject (fib);
+  // Ptr<ndn::Face> face = CreateObject<ndn::AppFace> (app);
 
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla"), face, 1);
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1"), face, 1);
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/2"), face, 1);
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/3"), face, 1);
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/1"), face, 1);
-  fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/2"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/2"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/3"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/1"), face, 1);
+  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/2"), face, 1);
   
-  cout << *fib << endl;
+  // cout << *fib << endl;
 
-  fib->RemoveFromAll (face);
+  // fib->RemoveFromAll (face);
 
-  cout << *fib << endl;
+  // cout << *fib << endl;
   // BOOST_FOREACH (const trie::parent_trie &item, x.getPolicy ())
   //   {
   //     std::cout << *item.payload () << " " << std::endl;
@@ -140,7 +141,5 @@ main (int argc, char *argv[])
   // x->PrintStat (std::cout);
 
   // delete x;
-  
-  return 0;
 }
 
