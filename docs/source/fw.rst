@@ -6,6 +6,8 @@ ndnSIM provides simple ways to experiment with custom Interest/Data forwarding s
 A new forwarding strategy can be implement completely different processing or override just specific actions/events of the :ndnsim:`forwarding strategy interface <ndn::ForwardingStrategy>`.
 Please refer to :ndnsim:`API documentation <ndn::ForwardingStrategy>` of the forwarding strategy interface, which lists all default actions/events.
 
+.. _Writing your own custom strategy:
+
 Writing your own custom strategy
 ++++++++++++++++++++++++++++++++
 
@@ -14,15 +16,16 @@ The following example assumes that we are realizing :ndnsim:`forwarding strategy
 
 The follwoing are template strategy h/cc files:
 
-.. literalinclude:: _static/code-samples/custom-strategy.h
+.. literalinclude:: ../../examples/custom-strategies/custom-strategy.h
    :language: c++
    :linenos:
    :lines: 1-36,51-55,59-
 
-.. literalinclude:: _static/code-samples/custom-strategy.cc
+.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
    :language: c++
    :linenos:
    :lines: 1-40,42-50,75-76,115-
+   :emphasize-lines: 21,27
 
 After having the template, we can fill the necesasry functionality.  
 
@@ -30,7 +33,7 @@ Let us say, that we want Interest be forwarded to first two best-metric faces sp
 That is, if node has two or more alternative paths to forward the Interests, this Interest will be forwarded to the best two neighbors.
 The following implementation of CustomStrategy::DoPropagateInterest accomplishes the task:
 
-.. literalinclude:: _static/code-samples/custom-strategy.cc
+.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
    :language: c++
    :linenos:
    :lines: 45-75
@@ -54,12 +57,19 @@ For example, if we want to perform special logging of all forwarded, timed out, 
 
 The highlighted ares of the following code demonstrates how it can be impelmented:
 
-.. literalinclude:: _static/code-samples/custom-strategy.h
+.. literalinclude:: ../../examples/custom-strategies/custom-strategy.h
    :language: c++
    :linenos:
    :emphasize-lines: 37-50,56-58
 
-.. literalinclude:: _static/code-samples/custom-strategy.cc
+.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
    :language: c++
    :linenos:
-   :emphasize-lines: 41,51-74,77-114
+   :emphasize-lines: 41,77-114
+
+
+Example of using custom strategy
+++++++++++++++++++++++++++++++++
+
+Please refer to :ref:`this example <11-node 2-bottleneck topology with custom forwarding strategy>`.
+

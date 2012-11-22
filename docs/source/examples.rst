@@ -105,6 +105,7 @@ While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be 
 .. literalinclude:: ../../examples/topologies/topo-grid-3x3.txt
    :language: bash
    :linenos:
+   :lines: 1-2,19-
    :emphasize-lines: 8,24
 
 
@@ -175,6 +176,7 @@ This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-rel
 .. literalinclude:: ../../examples/topologies/topo-6-node.txt
     :language: bash
     :linenos:
+    :lines: 1-2,15-
     :emphasize-lines: 3,13
    
 .. literalinclude:: ../../examples/ndn-congestion-topo-plugin.cc
@@ -184,3 +186,72 @@ This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-rel
    :emphasize-lines: 15,21-22,29-34,41-47,52-62
 
 .. :lines: 20-25,53-
+
+To run this scenario and see what is happening, use the following command::
+
+        NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-congestion-topo-plugin
+
+.. _11-node 2-bottleneck topology with custom forwarding strategy:
+
+11-node 2-bottleneck topology with custom forwarding strategy
+-------------------------------------------------------------
+
+To effectively use the example :ref:`custom strategy <Writing your own custom strategy>`, we need to make sure that FIB entries contain at least two entries.
+In the current version of ndnSIM, this can be accomplished using manual route configuration.
+
+The following example illustrates how the strategy can be used in simulation scenario.
+
+Let us first define a meaningful topology:
+
+.. aafig::
+    :aspect: 60
+    :scale: 120
+                                                                
+     /------\ 0                                                 0 /------\
+     |  c1  |<-----+                                       +----->|  p1  |
+     \------/       \                                     /       \------/
+                     \              /-----\              /        
+     /------\ 0       \         +==>| r12 |<==+         /       0 /------\
+     |  c2  |<--+      \       /    \-----/    \       /      +-->|  p2  |
+     \------/    \      \     |                 |     /      /    \------/
+                  \      |    |   1Mbps links   |    |      /     
+                   \  1  v0   v5               1v   2v  3  /      
+                    +->/------\                 /------\<-+       
+                      2|  r1  |<===============>|  r2  |4         
+                    +->\------/4               0\------/<-+       
+                   /    3^                           ^5    \      
+                  /      |                           |      \     
+     /------\ 0  /      /                             \      \  0 /------\
+     |  c3  |<--+      /                               \      +-->|  p3  |
+     \------/         /                                 \         \------/
+                     /     "All consumer-router and"     \        
+     /------\ 0     /      "router-producer links are"    \    0 /------\
+     |  c4  |<-----+       "10Mbps"                        +---->|  p4  |
+     \------/                                                    \------/
+                                                                 
+     "Numbers near nodes denote face IDs. Face ID is assigned based on the order of link"
+     "definitions in the topology file"
+
+The corresponding topology file (``topo-11-node-two-bottlenecks.txt``):
+
+.. literalinclude:: ../../examples/topologies/topo-11-node-two-bottlenecks.txt
+    :language: bash
+    :linenos:
+    :lines: 1-2,28-
+
+Example simulation (``ndn-congestion-alt-topo-plugin.cc``) scenario that utilizes CustomStrategy forwarding strategy:
+
+.. literalinclude:: ../../examples/ndn-congestion-alt-topo-plugin.cc
+    :language: c++
+    :linenos:
+    :lines: 21-28,61-
+    :emphasize-lines: 16,21,49-50,65-79
+
+
+To run this scenario and see what is happening, use the following command::
+
+        NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-congestion-alt-topo-plugin
+
+You can also run using visualizer module to verify that both bottleneck links are utilized::
+
+        ./waf --run=ndn-congestion-alt-topo-plugin --visualize
