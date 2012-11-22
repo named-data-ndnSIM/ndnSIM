@@ -370,6 +370,24 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, persistent_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, lru_policy_traits);
 
+#ifdef DOXYGEN
+// /**
+//  * \brief PIT in which new entries will be rejected if PIT size reached its limit
+//  */
+class Persistent : public PitImpl<persistent_policy_traits> { };
+
+/**
+ * \brief PIT in which PIT reaches its limit, random entry (could be the newly created one) will be removed from PIT
+ */
+class Random : public PitImpl<random_policy_traits> { };
+
+/**
+ * \brief PIT in which  the least recently used entry (the oldest entry with minimum number of incoming faces)
+ * will be removed when PIT size reached its limit
+ */
+class Lru : public PitImpl<lru_policy_traits> { };
+#endif
+
 } // namespace pit
 } // namespace ndn
 } // namespace ns3

@@ -263,6 +263,23 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lru_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, fifo_policy_traits);
 
+#ifdef DOXYGEN
+// /**
+//  * \brief Content Store implementing LRU cache replacement policy
+//  */
+class Lru : public ContentStoreImpl<lru_policy_traits> { };
+
+/**
+ * \brief Content Store implementing FIFO cache replacement policy
+ */
+class Fifo : public ContentStoreImpl<fifo_policy_traits> { };
+
+/**
+ * \brief Content Store implementing Random cache replacement policy
+ */
+class Random : public ContentStoreImpl<random_policy_traits> { };
+#endif
+
 
 } // namespace cs
 } // namespace ndn

@@ -1,7 +1,7 @@
 .. _boost-custom-install:
 
-Installing boost libraries
-==========================
+.. Installing boost libraries
+.. ++++++++++++++++++++++++++
 
 Normally, to compile and install boost libraries in non-privileged mode, you would need to issue following commands (e.g., for boost version 1.51.0)::
 
@@ -16,7 +16,7 @@ Normally, to compile and install boost libraries in non-privileged mode, you wou
 However, after the following steps you may still not able to use ndnSIM.
 
 Common pitfalls
----------------
+^^^^^^^^^^^^^^^
 
 The common pitfalls is with boost iostreams library, which is failed to build because of missing bzip2 library.
 This problem can be easily fixed by downloading and installing bzip2 library, e.g., using the following steps::
@@ -40,7 +40,7 @@ And then compiling and installing boost without custom compilation flags::
 
 
 Compiling NS-3 with custom boost libraries
-==========================================
+++++++++++++++++++++++++++++++++++++++++++
 
 The following commands should allow compilation and run of NS-3 simulations with custom install of boost libraries::
 

@@ -9,9 +9,9 @@ Contents:
    :maxdepth: 4
 
    intro
+   getting-started
    helpers
    fw
    applications
    examples
    faq
-   boost-custom-install

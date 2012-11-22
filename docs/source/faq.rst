@@ -8,8 +8,9 @@ Boost libraries
 
     I'm trying to use custom boost libraries, but something is going wrong. What should I do?
 
-Please refer to :ref:`boost-custom-install` section for an example how custom boost libraries could be built.
+.. Please refer to :ref:`boost-custom-install` section for an example how custom boost libraries could be built.
 
+.. include::  boost-custom-install.rst
 
 Visualizer problems
 -------------------

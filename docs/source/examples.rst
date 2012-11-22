@@ -33,7 +33,7 @@ simple scenario
 .. literalinclude:: ../../examples/ndn-simple.cc
    :language: c++
    :linenos:
-   :lines: 20-27,50-
+   :lines: 20-27,48-
    :emphasize-lines: 30-33,37-49
 
 If this code is placed into ``scratch/ndn-simple.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
@@ -73,7 +73,7 @@ This scenario (``ndn-grid.cc``) simulates a grid topology, which is constructed 
 FIB is populated using :ndnsim:`GlobalRoutingHelper` (see :doc:`helpers`).
 
 Consumer is simulated using :ndnsim:`ConsumerCbr` reference application and generates Interests towards the producer
-with frequency of 10 Interests per second (see :doc:`applications`).
+with frequency of 100 interests per second (see :doc:`applications`).
 
 Producer is simulated using :ndnsim:`Producer` class, which is used to satisfy all incoming Interests with virtual payload data (1024 bytes).
 
@@ -82,8 +82,8 @@ The following code represents all that is necessary to run such a simple scenari
 .. literalinclude:: ../../examples/ndn-grid.cc
    :language: c++
    :linenos:
-   :lines: 20-27,55-
-   :emphasize-lines: 30-32,34-37,52-56
+   :lines: 20-27,53-
+   :emphasize-lines: 28,31-33,35-38,53-57
     
 
 If this code is placed into ``scratch/ndn-grid.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
@@ -98,21 +98,43 @@ simulation using the following command (in optimized mode nothing will be printe
 
 Instead of defining topology directly as in :ref:`simple-scenario` or using specialized helpers as in :ref:`9-node-grid-example`, ndnSIM provides experimental extended versions of TopologyReader classes: :ndnsim:`AnnotatedTopologyReader` and :ndnsim:`RocketfuelWeightsReader`.
 
-While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be used with `Rocketfuel <http://www.cs.washington.edu/research/networking/rocketfuel/>`_ topology and link weights files (examples will be provided later), :ndnsim:`AnnotatedTopologyReader` is a general-use tool that allows creation of any custom topologies.  
-The based format for the input file the :ndnsim:`AnnotatedTopologyReader` expects:
+While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be used with `Rocketfuel <http://www.cs.washington.edu/research/networking/rocketfuel/>`_ topology and link weights files (examples will be provided later), :ndnsim:`AnnotatedTopologyReader` is a more general-use class that uses simple user-readable format.
+
+:ndnsim:`AnnotatedTopologyReader` expects the following format:
 
 .. literalinclude:: ../../examples/topologies/topo-grid-3x3.txt
    :language: bash
    :linenos:
    :emphasize-lines: 8,24
 
-If you save the topology file to `topo-grid-3x3.txt` into ``src/ndnSIM/examples/topology/topo-grid-3x3.txt`` directory, then the following code will duplicate the functionality of :ref:`9-node-grid-example` but with the use of :ndnsim:`AnnotatedTopologyReader`:
+
+This scenario (``ndn-grid-topo-plugin.cc``) duplicates the functionality of :ref:`9-node-grid-example` but with the use of :ndnsim:`AnnotatedTopologyReader`.
+
+.. aafig::
+    :aspect: 60
+    :scale: 120
+
+    /--------\	    /-\	        /-\
+    |Consumer|<---->| |<------->| |
+    \--------/	    \-/	        \-/
+	^   	     ^ 	         ^
+        |            |           |   1Mbps/10ms delay
+        v            v           v
+       /-\          /-\         /-\
+       | |<-------->| |<------->| |
+       \-/          \-/         \-/
+	^   	     ^ 	         ^
+        |            |           |
+        v            v           v
+       /-\	    /-\	     /--------\
+       | |<-------->| |<---->|Producer|
+       \-/          \-/      \--------/
 
 .. literalinclude:: ../../examples/ndn-grid-topo-plugin.cc
    :language: c++
    :linenos:
-   :lines: 20-25,53-
-   :emphasize-lines: 13-15,26-28
+   :lines: 20-26,51-
+   :emphasize-lines: 14-16,20,27-30
     
 As you can see, scenario code became more compact and more readable.
 
@@ -124,15 +146,15 @@ For this purpose,:ndnsim:`AnnotatedTopologyReader` automatically registers all c
 For more information about `Names` class, please refer to `NS-3 documentation <.. http://www.nsnam.org/doxygen/classns3_1_1_names.html>`_
 .
 
-If the topology file is placed into ``src/ndnSIM/examples/topology/topo-grid-3x3.txt`` and the code is placed into ``scratch/ndn-grid-topo-plugin.cc``, you can run and see progress of the simulation using the following command (in optimized mode nothing will be printed out)::
+If the topology file is placed into ``src/ndnSIM/examples/topologies/topo-grid-3x3.txt`` and the code is placed into ``scratch/ndn-grid-topo-plugin.cc``, you can run and see progress of the simulation using the following command (in optimized mode nothing will be printed out)::
 
     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid-topo-plugin
 
 
-6-node topology
----------------
+6-node bottleneck topology
+--------------------------
 
-This scenario can be used for congestion-related scenarios 
+This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-related scenarios 
 
 .. aafig::
     :aspect: 60
@@ -152,11 +174,13 @@ This scenario can be used for congestion-related scenarios
 
 .. literalinclude:: ../../examples/topologies/topo-6-node.txt
     :language: bash
+    :linenos:
     :emphasize-lines: 3,13
    
 .. literalinclude:: ../../examples/ndn-congestion-topo-plugin.cc
    :language: c++
    :linenos:
+   :lines: 20-26,47-
+   :emphasize-lines: 15,21-22,29-34,41-47,52-62
 
 .. :lines: 20-25,53-
-.. :emphasize-lines: 13-15,26-28

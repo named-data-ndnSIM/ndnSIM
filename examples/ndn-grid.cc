@@ -39,7 +39,7 @@ using namespace ns3;
  *
  * FIB is populated using NdnGlobalRoutingHelper.
  *
- * Consumer requests data from producer with frequency 10 interests per second
+ * Consumer requests data from producer with frequency 100 interests per second
  * (interests contain constantly increasing sequence number).
  *
  * For every received interest, producer replies with a data packet, containing
@@ -56,7 +56,7 @@ main (int argc, char *argv[])
   // Setting default parameters for PointToPoint links and channels
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
-  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
+  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("10"));
 
   // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;
@@ -69,6 +69,7 @@ main (int argc, char *argv[])
 
   // Install CCNx stack on all nodes
   ndn::StackHelper ccnxHelper;
+  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
   ccnxHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
@@ -85,7 +86,7 @@ main (int argc, char *argv[])
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetPrefix (prefix);
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+  consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 100 interests a second
   consumerHelper.Install (consumerNodes);
 
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");

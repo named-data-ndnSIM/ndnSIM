@@ -9,79 +9,26 @@ StackHelper
 
 :ndnsim:`StackHelper` is used to install ndnSIM network stack on requested nodes, as well to provide a simple way configure several important parameters of NDN simulation.
 
-Example::
+Example:
 
-   ndn::StackHelper ndnHelper;
-   NodeContainer nodes;
-   ...
-   ndnHelper.Install (nodes);
+.. code-block:: c++
 
-Forwarding strategy
-+++++++++++++++++++
+        ndn::StackHelper ndnHelper;
+        NodeContainer nodes;
+        ...
+        ndnHelper.Install (nodes);
 
-A desired :ndnsim:`forwarding strategy <ForwardingStrategy>` parameter need to be set before installing stack on a node.
+Routing
++++++++
 
-  Currently, there are 2 implemented forwarding strategies that can be used in simulations:
-
-  - :ndnsim:`Flooding` (default)
-
-      Interests will be forwarded to all available faces available for a route (FIB entry).
-      If there are no available GREEN or YELLOW faces, interests is dropped.
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
-	 ...
-	 ndnHelper.Install (nodes);
-	 
-      
-
-  - :ndnsim:`SmartFlooding`
-
-      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face. 
-      If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
-      If there are no available GREEN or YELLOW faces, interests is dropped.
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
-	 ...
-	 ndnHelper.Install (nodes);
-
-  - :ndnsim:`BestRoute`
-
-      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-      If not, Interest will be forwarded to the highest-ranked YELLOW face.
-      If there are no available GREEN or YELLOW faces, interests is dropped.
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-	 ...
-	 ndnHelper.Install (nodes);
-
-Default routes
-++++++++++++++
+All forwarding strategies require knowledge of where Interests can be forwarded (Forwarding Information Base).  
+Unlike IP routing, this knowledge may be imprecise, but without such knowledge forwarding strategies will not be able to make any decision and will drop any Interests.
 
 .. note::
-   Disabled by default
-
-In simple topologies, like in :doc:`examples <examples>`, or when
-simulating broadcast environment, it is possible to set up *default*
-FIB entries using :ndnsim:`StackHelper::SetDefaultRoutes` call.
-More specifically, every installed NDN stack will have a FIB entry to ``/`` prefix, containing all available faces.
-
-The following should be done before installing stack on a node:
-
-  .. code-block:: c++
-
-     ndnHelper.SetDefaultRoutes (true);
-     ...
-     ndnHelper.Install (nodes);
-
+   By default, all nodes have empty FIB.  You need either to manually configure routes, use global routing controller, or (not recommended) enable default routes.
 
 Manually routes
-+++++++++++++++
+^^^^^^^^^^^^^^^
 
 Routes can be configured manually using :ndnsim:`StackHelper::AddRoute` static methods of :ndnsim:`StackHelper`.
 
@@ -97,14 +44,8 @@ These routes **should** be created **after** installing NDN stack on a node:
      int32_t metric = ...     // some routing metric
      ndn::StackHelper::AddRoute (node, prefix, face, metric);
 
-
-.. Enable optional interest limiting
-.. +++++++++++++++++++++++++++++++++
-
-.. EnableLimits
-
-GlobalRoutingHelper
------------------------
+Global routing controller
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To simplify FIB management in large topologies, ndnSIM contains a global routing controller (:ndnsim:`helper <GlobalRoutingHelper>` and :ndnsim:`special interface <GlobalRouter>`), similar in spirit to ``Ipv4GlobalRoutingHelper``.
 
@@ -134,6 +75,154 @@ There are several necessary steps, in order to take advantage of the global rout
    
      cdnGlobalRoutingHelper.CalculateRoutes ();
    
+Default routes
+^^^^^^^^^^^^^^
+
+In simple topologies, like in :doc:`examples <examples>`, or when
+simulating broadcast environment, it is possible to set up *default*
+FIB entries using :ndnsim:`StackHelper::SetDefaultRoutes` call.
+More specifically, every installed NDN stack will have a FIB entry to ``/`` prefix, containing all available faces.
+
+The following should be done before installing stack on a node:
+
+  .. code-block:: c++
+
+     ndnHelper.SetDefaultRoutes (true);
+     ...
+     ndnHelper.Install (nodes);
+
+
+Content Store
++++++++++++++
+
+ndnSIM comes with several different in-memory :ndnsim:`content store <ndn::ContentStore>` implementations, featuring different cache replacement policies.
+
+.. note:
+
+    The default content store uses LRU replacement policity and constrained with 100 cached ContentObjects.
+
+To select a particular content store and configure its capacity, use :ndnsim:`SetContentStore <ndn::StackHelper::SetContentStore>` helper method:
+
+- :ndnsim:`Least Recently Used (LRU) <ndn::cs::Lru>` (default):
+
+      .. code-block:: c++
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Lru",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+- :ndnsim:`First-In-First-Out (FIFO) <ndn::cs::Fifo>`:
+
+      .. code-block:: c++
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Fifo",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+- :ndnsim:`Random <ndn::cs::Random>`:
+
+      .. code-block:: c++
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Random",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+.. note::
+
+    If ``MaxSize`` parameter is omitted, then will be used a default value (100).
+
+.. note::
+
+    If ``MaxSize`` is set to 0, then no limit on ContentStore will be enforced 
+
+Pending Interest Table
+++++++++++++++++++++++
+
+The current version of ndnSIM provides :ndnsim:`templated realizations <ndn::pit::PitImpl>` of :ndnsim:`PIT abstraction <ndn::Pit>`, allowing optional bounding the number of PIT entries and different replacement policies (i.e., perform different actions when limit on number of PIT entries is reached).
+
+To select a particular PIT implementation and configure its policies, use :ndnsim:`SetPit <ndn::StackHelper::SetPit>` helper method:
+
+- :ndnsim:`persistent <ndn::pit::Persistent>` (default):
+
+    New entries will be rejected if PIT size reached its limit
+
+      .. code-block:: c++
+
+         ndnHelper.SetPit ("ns3::ndn::pit::Persistent",
+                           "MaxSize", "0");
+	 ...
+	 ndnHelper.Install (nodes);
+
+- :ndnsim:`random <ndn::pit::Random>`:
+    
+    when PIT reaches its limit, random entry (could be the newly created one) will be removed from PIT;
+
+      .. code-block:: c++
+
+         ndnHelper.SetPit ("ns3::ndn::pit::Random",
+                           "MaxSize", "0");
+	 ...
+	 ndnHelper.Install (nodes);
+
+- :ndnsim:`least-recently-used <ndn::pit::Lru>`:
+
+    the least recently used entry (the oldest entry with minimum number of incoming faces) will be removed when PIT size reached its limit.
+
+      .. code-block:: c++
+
+         ndnHelper.SetPit ("ns3::ndn::pit::Lru",
+                           "MaxSize", "0");
+	 ...
+	 ndnHelper.Install (nodes);
+
+Forwarding strategy
++++++++++++++++++++
+
+A desired :ndnsim:`forwarding strategy <ForwardingStrategy>` parameter need to be set before installing stack on a node.
+
+  Currently, there are following forwarding strategies that can be used in simulations:
+
+  - :ndnsim:`Flooding` (default)
+
+      Interests will be forwarded to all available faces available for a route (FIB entry).
+      If there are no available GREEN or YELLOW faces, interests is dropped.
+
+      .. code-block:: c++
+
+         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
+	 ...
+	 ndnHelper.Install (nodes);
+      
+
+  - :ndnsim:`SmartFlooding`
+
+      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face. 
+      If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
+      If there are no available GREEN or YELLOW faces, interests is dropped.
+
+      .. code-block:: c++
+
+         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
+	 ...
+	 ndnHelper.Install (nodes);
+
+  - :ndnsim:`BestRoute`
+
+      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
+      If not, Interest will be forwarded to the highest-ranked YELLOW face.
+      If there are no available GREEN or YELLOW faces, interests is dropped.
+
+      .. code-block:: c++
+
+         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
+	 ...
+	 ndnHelper.Install (nodes);
+
+
+
 
 AppHelper
 ---------------

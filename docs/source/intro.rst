@@ -62,122 +62,9 @@ The wire format of Interest and Data packets follows the format of the existing 
 
 .. _CCNx Project's NDN implementation: http://www.ccnx.org/
 
-Getting Started
-===============
 
-Portability
-------------
-
-ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (stock gcc, boost 1.48), Mac OS 10.8 (gcc-4.2 apple/llvm, macports gcc 4.7, boost 1.49 or 1.50).
-
-.. _requirements:
-
-Requirements
--------------
-
-1. ndnSIM requires the customized version of NS-3 simulator (a number of patches required to make ndnSIM work with the latest development branch of NS-3).
-
-2. Boost libraries should be installed on the system:
-
-   * For Ubuntu::
-
-       sudo aptitude install libboost-all-dev
-
-   * For MacOS (macports)::
-
-       sudo port instal boost
-
-.. note::
-   !!! If you do not have root permissions to install boost, you can install it in your home folder.  However, you need to be make sure that `libboost_iostreams` library is successfully compiled and is installed.  Please refer to :doc:`the following example <boost-custom-install>` for the hints how to successfully compile and install boost libraries on Ubuntu Linux. 
-
-
-3. If you are planning to use other modules, like visualizer, a number of additional dependencies should be installed.  For example, in
-order to run `visualizer`_ module, the following should be installed:
-
-   * For Ubuntu::
-
-       sudo apt-get install python-dev python-pygraphviz python-kiwi
-       sudo apt-get install python-pygoocanvas python-gnome2
-       sudo apt-get install python-gnomedesktop python-rsvg ipython
-
-   * For MacOS (macports)::
-
-       sudo port install  py27-pygraphviz py27-goocanvas
-
-.. py27-kiwi 
-
-.. _visualizer: http://www.nsnam.org/wiki/index.php/PyViz
-
-Downloading ndnSIM source
--------------------------
-
-Download a custom branch of NS-3 that contains all necessary patches and more::
-
-	mkdir ndnSIM
-	cd ndnSIM
-	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
-	git clone git://github.com/cawka/pybindgen.git pybindgen
-
-The first command is to create a directory, which will contain everything NS-3 related.  The bare minimum is just base NS-3 (the first clone above). The second clone gets a module necessary to build python bindings, which are necessary for the visualizer module.  
-
-Finally, clone actual ndnSIM code and place it in src/ folder::
-
-	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
-
-There are quite a few modification to the base NS-3 code that are necessary to run ndnSIM, and the code is periodically synchronized with the official developer branch.  Eventually, all the changes will be merged to the official branch, but for the time being, it is necessary to use the customized branch.
-
-Compiling and running ndnSIM
-----------------------------
-
-ndnSIM uses standard NS-3 compilation procedure.  Normally the following commands should be sufficient to configure and build ndnSIM with python bindings enabled::
-
-	cd <ns-3-folder>
-	./waf configure --enable-examples --enable-ndn-plugins=topology,mobility
-	./waf
-
-On MacOS (with macports), you may need to modify the configure command to use macports version of python::
-
-	cd <ns-3-folder>
-	./waf configure --with-python=/opt/local/bin/python2.7 --enable-examples --enable-ndn-plugins=topology,mobility
-	./waf
-
-Python bindings is an optional and not very stable feature of NS-3 simulator.  It is possible to disable python bindings compilation either to speed up compilation or to avoid certain compilation errors (e.g., "Could not find a task generator for the name 'ns3-visualizer'")::
-
-	cd <ns-3-folder>
-	./waf configure --disable-python --enable-examples --enable-ndn-plugins=topology,mobility
-	./waf
-
-For more configuration options, please refer to ``./waf --help``.
-
-To run :doc:`sample ndnSIM simulations <examples>`::
-
-	./waf --run=ndn-simple
-
-or::
-
-	./waf --run=ndn-grid
-
-If you have compiled with python bindings, then you can try to run these simulations with visualizer::
-
-	./waf --run=ndn-simple --vis
-
-or::
-
-	./waf --run=ndn-grid --vis
-
-.. note::
-   Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
-
-Additional compiling options
-++++++++++++++++++++++++++++
-
-ndnSIM contains a number of NS-3 extensions that are not technically part of the ndnSIM.  Right now there are two optional plugins---topology and mobility---which can be enabled using the following configuration option::
-
-	./waf configure --enable-ndn-plugins=topology,mobility
-
-
-Documentation
-=============
+More documentation
+------------------
 
 Overall structure of ndnSIM is described in our `technical report <http://lasr.cs.ucla.edu/afanasyev/data/files/Afanasyev/ndnSIM-TR.pdf>`_.
 
@@ -188,7 +75,7 @@ Overall structure of ndnSIM is described in our `technical report <http://lasr.c
 ..     ./waf doxygen
 
 Support
-=======
+-------
 
 The code of ndnSIM is in active development.  Bug reports (issues) as well as new feature implementation are always welcome. 
 
@@ -230,13 +117,15 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 +-----------------+---------------------------------------------------------------------+
 
 Logging
------------------
+-------
 
-Almost every component in ndnSIM exports logging interface, so it is possible in debug compilation of simulator to track many details. For example, by enabling logging of :ndnsim:`Face` and :ndnsim:`Consumer` will show everything what happens on :ndnsim:`Face` and :ndnsim:`Consumer` classes::
+Almost every component in ndnSIM exports logging interface, so in debug compilation it is possible to track many internal details. 
+For example, logging of :ndnsim:`Face` and :ndnsim:`Consumer` shows everything what happens in :ndnsim:`Face` and :ndnsim:`Consumer` classes::
 
     NS_LOG=ndn.Face:ndn.Consumer ./waf --run=ndn-simple
 
 Refer to the source code and NS-3 documentation to see what logging interfaces are available and about details how enable one or more logging interfaces.
+
 
 .. Indices and tables
 .. ==================
