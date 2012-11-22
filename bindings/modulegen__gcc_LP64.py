@@ -94,8 +94,6 @@ def register_types(module):
     module.add_class('SequentialVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Object', 'ns3::ObjectBase', 'ns3::ObjectDeleter'], parent=root_module['ns3::ObjectBase'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
-    ## spring-mobility-helper.h (module 'ndnSIM'): ns3::SpringMobilityHelper [class]
-    module.add_class('SpringMobilityHelper')
     ## tag.h (module 'network'): ns3::Tag [class]
     module.add_class('Tag', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## tag-buffer.h (module 'network'): ns3::TagBuffer [class]
@@ -112,10 +110,6 @@ def register_types(module):
     module.add_class('TraceSourceInformation', import_from_module='ns.core', outer_class=root_module['ns3::TypeId'])
     ## random-variable.h (module 'core'): ns3::UniformVariable [class]
     module.add_class('UniformVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
-    ## vector.h (module 'core'): ns3::Vector2D [class]
-    module.add_class('Vector2D', import_from_module='ns.core')
-    ## vector.h (module 'core'): ns3::Vector3D [class]
-    module.add_class('Vector3D', import_from_module='ns.core')
     ## random-variable.h (module 'core'): ns3::WeibullVariable [class]
     module.add_class('WeibullVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## random-variable.h (module 'core'): ns3::ZetaVariable [class]
@@ -246,8 +240,6 @@ def register_types(module):
     module.add_class('Ipv6PrefixChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## ipv6-address.h (module 'network'): ns3::Ipv6PrefixValue [class]
     module.add_class('Ipv6PrefixValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
-    ## mobility-model.h (module 'mobility'): ns3::MobilityModel [class]
-    module.add_class('MobilityModel', import_from_module='ns.mobility', parent=root_module['ns3::Object'])
     ## net-device.h (module 'network'): ns3::NetDevice [class]
     module.add_class('NetDevice', import_from_module='ns.network', parent=root_module['ns3::Object'])
     ## net-device.h (module 'network'): ns3::NetDevice::PacketType [enumeration]
@@ -270,8 +262,6 @@ def register_types(module):
     module.add_class('RocketfuelWeightsReader', parent=root_module['ns3::AnnotatedTopologyReader'])
     ## rocketfuel-weights-reader.h (module 'ndnSIM'): ns3::RocketfuelWeightsReader [enumeration]
     module.add_enum('', ['LINKS', 'WEIGHTS', 'LATENCIES', 'POSITIONS'], outer_class=root_module['ns3::RocketfuelWeightsReader'])
-    ## spring-mobility-model.h (module 'ndnSIM'): ns3::SpringMobilityModel [class]
-    module.add_class('SpringMobilityModel', parent=root_module['ns3::MobilityModel'])
     ## nstime.h (module 'core'): ns3::TimeChecker [class]
     module.add_class('TimeChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## nstime.h (module 'core'): ns3::TimeValue [class]
@@ -282,36 +272,16 @@ def register_types(module):
     module.add_class('TypeIdValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## uinteger.h (module 'core'): ns3::UintegerValue [class]
     module.add_class('UintegerValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## vector.h (module 'core'): ns3::Vector2DChecker [class]
-    module.add_class('Vector2DChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
-    ## vector.h (module 'core'): ns3::Vector2DValue [class]
-    module.add_class('Vector2DValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
-    ## vector.h (module 'core'): ns3::Vector3DChecker [class]
-    module.add_class('Vector3DChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
-    ## vector.h (module 'core'): ns3::Vector3DValue [class]
-    module.add_class('Vector3DValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
     ## address.h (module 'network'): ns3::AddressChecker [class]
     module.add_class('AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## address.h (module 'network'): ns3::AddressValue [class]
     module.add_class('AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
     module.add_container('std::map< std::string, std::string >', ('std::string', 'std::string'), container_type='map')
     module.add_container('std::list< ns3::TopologyReader::Link >', 'ns3::TopologyReader::Link', container_type='list')
-    typehandlers.add_type_alias('ns3::Vector3DChecker', 'ns3::VectorChecker')
-    typehandlers.add_type_alias('ns3::Vector3DChecker*', 'ns3::VectorChecker*')
-    typehandlers.add_type_alias('ns3::Vector3DChecker&', 'ns3::VectorChecker&')
-    module.add_typedef(root_module['ns3::Vector3DChecker'], 'VectorChecker')
     typehandlers.add_type_alias('ns3::RngSeedManager', 'ns3::SeedManager')
     typehandlers.add_type_alias('ns3::RngSeedManager*', 'ns3::SeedManager*')
     typehandlers.add_type_alias('ns3::RngSeedManager&', 'ns3::SeedManager&')
     module.add_typedef(root_module['ns3::RngSeedManager'], 'SeedManager')
-    typehandlers.add_type_alias('ns3::Vector3D', 'ns3::Vector')
-    typehandlers.add_type_alias('ns3::Vector3D*', 'ns3::Vector*')
-    typehandlers.add_type_alias('ns3::Vector3D&', 'ns3::Vector&')
-    module.add_typedef(root_module['ns3::Vector3D'], 'Vector')
-    typehandlers.add_type_alias('ns3::Vector3DValue', 'ns3::VectorValue')
-    typehandlers.add_type_alias('ns3::Vector3DValue*', 'ns3::VectorValue*')
-    typehandlers.add_type_alias('ns3::Vector3DValue&', 'ns3::VectorValue&')
-    module.add_typedef(root_module['ns3::Vector3DValue'], 'VectorValue')
     
     ## Register a nested module for the namespace FatalImpl
     
@@ -505,7 +475,6 @@ def register_methods(root_module):
     register_Ns3RngSeedManager_methods(root_module, root_module['ns3::RngSeedManager'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
-    register_Ns3SpringMobilityHelper_methods(root_module, root_module['ns3::SpringMobilityHelper'])
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
@@ -513,8 +482,6 @@ def register_methods(root_module):
     register_Ns3TypeIdAttributeInformation_methods(root_module, root_module['ns3::TypeId::AttributeInformation'])
     register_Ns3TypeIdTraceSourceInformation_methods(root_module, root_module['ns3::TypeId::TraceSourceInformation'])
     register_Ns3UniformVariable_methods(root_module, root_module['ns3::UniformVariable'])
-    register_Ns3Vector2D_methods(root_module, root_module['ns3::Vector2D'])
-    register_Ns3Vector3D_methods(root_module, root_module['ns3::Vector3D'])
     register_Ns3WeibullVariable_methods(root_module, root_module['ns3::WeibullVariable'])
     register_Ns3ZetaVariable_methods(root_module, root_module['ns3::ZetaVariable'])
     register_Ns3ZipfVariable_methods(root_module, root_module['ns3::ZipfVariable'])
@@ -578,7 +545,6 @@ def register_methods(root_module):
     register_Ns3Ipv6AddressValue_methods(root_module, root_module['ns3::Ipv6AddressValue'])
     register_Ns3Ipv6PrefixChecker_methods(root_module, root_module['ns3::Ipv6PrefixChecker'])
     register_Ns3Ipv6PrefixValue_methods(root_module, root_module['ns3::Ipv6PrefixValue'])
-    register_Ns3MobilityModel_methods(root_module, root_module['ns3::MobilityModel'])
     register_Ns3NetDevice_methods(root_module, root_module['ns3::NetDevice'])
     register_Ns3NixVector_methods(root_module, root_module['ns3::NixVector'])
     register_Ns3Node_methods(root_module, root_module['ns3::Node'])
@@ -588,16 +554,11 @@ def register_methods(root_module):
     register_Ns3RandomVariableChecker_methods(root_module, root_module['ns3::RandomVariableChecker'])
     register_Ns3RandomVariableValue_methods(root_module, root_module['ns3::RandomVariableValue'])
     register_Ns3RocketfuelWeightsReader_methods(root_module, root_module['ns3::RocketfuelWeightsReader'])
-    register_Ns3SpringMobilityModel_methods(root_module, root_module['ns3::SpringMobilityModel'])
     register_Ns3TimeChecker_methods(root_module, root_module['ns3::TimeChecker'])
     register_Ns3TimeValue_methods(root_module, root_module['ns3::TimeValue'])
     register_Ns3TypeIdChecker_methods(root_module, root_module['ns3::TypeIdChecker'])
     register_Ns3TypeIdValue_methods(root_module, root_module['ns3::TypeIdValue'])
     register_Ns3UintegerValue_methods(root_module, root_module['ns3::UintegerValue'])
-    register_Ns3Vector2DChecker_methods(root_module, root_module['ns3::Vector2DChecker'])
-    register_Ns3Vector2DValue_methods(root_module, root_module['ns3::Vector2DValue'])
-    register_Ns3Vector3DChecker_methods(root_module, root_module['ns3::Vector3DChecker'])
-    register_Ns3Vector3DValue_methods(root_module, root_module['ns3::Vector3DValue'])
     register_Ns3AddressChecker_methods(root_module, root_module['ns3::AddressChecker'])
     register_Ns3AddressValue_methods(root_module, root_module['ns3::AddressValue'])
     register_Ns3NdnApp_methods(root_module, root_module['ns3::ndn::App'])
@@ -2100,23 +2061,6 @@ def register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods
                    is_static=True)
     return
 
-def register_Ns3SpringMobilityHelper_methods(root_module, cls):
-    ## spring-mobility-helper.h (module 'ndnSIM'): ns3::SpringMobilityHelper::SpringMobilityHelper() [constructor]
-    cls.add_constructor([])
-    ## spring-mobility-helper.h (module 'ndnSIM'): ns3::SpringMobilityHelper::SpringMobilityHelper(ns3::SpringMobilityHelper const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SpringMobilityHelper const &', 'arg0')])
-    ## spring-mobility-helper.h (module 'ndnSIM'): static void ns3::SpringMobilityHelper::InstallSprings(ns3::Ptr<ns3::Node> node1, ns3::Ptr<ns3::Node> node2) [member function]
-    cls.add_method('InstallSprings', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node1'), param('ns3::Ptr< ns3::Node >', 'node2')], 
-                   is_static=True)
-    ## spring-mobility-helper.h (module 'ndnSIM'): static void ns3::SpringMobilityHelper::InstallSprings(std::_List_const_iterator<ns3::TopologyReader::Link> first, std::_List_const_iterator<ns3::TopologyReader::Link> end) [member function]
-    cls.add_method('InstallSprings', 
-                   'void', 
-                   [param('std::_List_const_iterator< ns3::TopologyReader::Link >', 'first'), param('std::_List_const_iterator< ns3::TopologyReader::Link >', 'end')], 
-                   is_static=True)
-    return
-
 def register_Ns3Tag_methods(root_module, cls):
     ## tag.h (module 'network'): ns3::Tag::Tag() [constructor]
     cls.add_constructor([])
@@ -2415,62 +2359,6 @@ def register_Ns3UniformVariable_methods(root_module, cls):
     cls.add_method('GetValue', 
                    'double', 
                    [param('double', 's'), param('double', 'l')])
-    return
-
-def register_Ns3Vector2D_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    cls.add_binary_numeric_operator('*', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
-    cls.add_binary_numeric_operator('*', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
-    cls.add_binary_numeric_operator('+', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
-    cls.add_binary_numeric_operator('+', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
-    cls.add_inplace_numeric_operator('+=', param('ns3::Vector2D const &', 'right'))
-    cls.add_inplace_numeric_operator('+=', param('double', 'right'))
-    cls.add_binary_numeric_operator('-', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('ns3::Vector2D const &', 'right'))
-    cls.add_binary_numeric_operator('/', root_module['ns3::Vector2D'], root_module['ns3::Vector2D'], param('double', 'right'))
-    ## vector.h (module 'core'): ns3::Vector2D::Vector2D(ns3::Vector2D const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector2D const &', 'arg0')])
-    ## vector.h (module 'core'): ns3::Vector2D::Vector2D(double _x, double _y) [constructor]
-    cls.add_constructor([param('double', '_x'), param('double', '_y')])
-    ## vector.h (module 'core'): ns3::Vector2D::Vector2D() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): double ns3::Vector2D::GetLength() const [member function]
-    cls.add_method('GetLength', 
-                   'double', 
-                   [], 
-                   is_const=True)
-    ## vector.h (module 'core'): ns3::Vector2D::x [variable]
-    cls.add_instance_attribute('x', 'double', is_const=False)
-    ## vector.h (module 'core'): ns3::Vector2D::y [variable]
-    cls.add_instance_attribute('y', 'double', is_const=False)
-    return
-
-def register_Ns3Vector3D_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    cls.add_binary_numeric_operator('*', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
-    cls.add_binary_numeric_operator('*', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
-    cls.add_binary_numeric_operator('+', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
-    cls.add_binary_numeric_operator('+', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
-    cls.add_inplace_numeric_operator('+=', param('ns3::Vector3D const &', 'right'))
-    cls.add_inplace_numeric_operator('+=', param('double', 'right'))
-    cls.add_binary_numeric_operator('-', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('ns3::Vector3D const &', 'right'))
-    cls.add_binary_numeric_operator('/', root_module['ns3::Vector3D'], root_module['ns3::Vector3D'], param('double', 'right'))
-    ## vector.h (module 'core'): ns3::Vector3D::Vector3D(ns3::Vector3D const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector3D const &', 'arg0')])
-    ## vector.h (module 'core'): ns3::Vector3D::Vector3D(double _x, double _y, double _z) [constructor]
-    cls.add_constructor([param('double', '_x'), param('double', '_y'), param('double', '_z')])
-    ## vector.h (module 'core'): ns3::Vector3D::Vector3D() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): double ns3::Vector3D::GetLength() const [member function]
-    cls.add_method('GetLength', 
-                   'double', 
-                   [], 
-                   is_const=True)
-    ## vector.h (module 'core'): ns3::Vector3D::x [variable]
-    cls.add_instance_attribute('x', 'double', is_const=False)
-    ## vector.h (module 'core'): ns3::Vector3D::y [variable]
-    cls.add_instance_attribute('y', 'double', is_const=False)
-    ## vector.h (module 'core'): ns3::Vector3D::z [variable]
-    cls.add_instance_attribute('z', 'double', is_const=False)
     return
 
 def register_Ns3WeibullVariable_methods(root_module, cls):
@@ -2799,11 +2687,6 @@ def register_Ns3Object_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## object.h (module 'core'): ns3::Ptr<ns3::MobilityModel> ns3::Object::GetObject() const [member function]
-    cls.add_method('GetObject', 
-                   'ns3::Ptr< ns3::MobilityModel >', 
-                   [], 
-                   is_const=True, template_parameters=['ns3::MobilityModel'])
     ## object.h (module 'core'): ns3::Ptr<ns3::ndn::ContentStore> ns3::Object::GetObject() const [member function]
     cls.add_method('GetObject', 
                    'ns3::Ptr< ns3::ndn::ContentStore >', 
@@ -4019,76 +3902,6 @@ def register_Ns3Ipv6PrefixValue_methods(root_module, cls):
                    [param('ns3::Ipv6Prefix const &', 'value')])
     return
 
-def register_Ns3MobilityModel_methods(root_module, cls):
-    ## mobility-model.h (module 'mobility'): ns3::MobilityModel::MobilityModel(ns3::MobilityModel const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::MobilityModel const &', 'arg0')])
-    ## mobility-model.h (module 'mobility'): ns3::MobilityModel::MobilityModel() [constructor]
-    cls.add_constructor([])
-    ## mobility-model.h (module 'mobility'): int64_t ns3::MobilityModel::AssignStreams(int64_t stream) [member function]
-    cls.add_method('AssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'stream')])
-    ## mobility-model.h (module 'mobility'): double ns3::MobilityModel::GetDistanceFrom(ns3::Ptr<const ns3::MobilityModel> position) const [member function]
-    cls.add_method('GetDistanceFrom', 
-                   'double', 
-                   [param('ns3::Ptr< ns3::MobilityModel const >', 'position')], 
-                   is_const=True)
-    ## mobility-model.h (module 'mobility'): static ns3::Ptr<ns3::MobilityModel> ns3::MobilityModel::GetMobilityModel(ns3::Ptr<ns3::Object> node) [member function]
-    cls.add_method('GetMobilityModel', 
-                   'ns3::Ptr< ns3::MobilityModel >', 
-                   [param('ns3::Ptr< ns3::Object >', 'node')], 
-                   is_static=True)
-    ## mobility-model.h (module 'mobility'): ns3::Vector ns3::MobilityModel::GetPosition() const [member function]
-    cls.add_method('GetPosition', 
-                   'ns3::Vector', 
-                   [], 
-                   is_const=True)
-    ## mobility-model.h (module 'mobility'): double ns3::MobilityModel::GetRelativeSpeed(ns3::Ptr<const ns3::MobilityModel> other) const [member function]
-    cls.add_method('GetRelativeSpeed', 
-                   'double', 
-                   [param('ns3::Ptr< ns3::MobilityModel const >', 'other')], 
-                   is_const=True)
-    ## mobility-model.h (module 'mobility'): static ns3::TypeId ns3::MobilityModel::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## mobility-model.h (module 'mobility'): ns3::Vector ns3::MobilityModel::GetVelocity() const [member function]
-    cls.add_method('GetVelocity', 
-                   'ns3::Vector', 
-                   [], 
-                   is_const=True)
-    ## mobility-model.h (module 'mobility'): void ns3::MobilityModel::SetPosition(ns3::Vector const & position) [member function]
-    cls.add_method('SetPosition', 
-                   'void', 
-                   [param('ns3::Vector const &', 'position')])
-    ## mobility-model.h (module 'mobility'): void ns3::MobilityModel::NotifyCourseChange() const [member function]
-    cls.add_method('NotifyCourseChange', 
-                   'void', 
-                   [], 
-                   is_const=True, visibility='protected')
-    ## mobility-model.h (module 'mobility'): int64_t ns3::MobilityModel::DoAssignStreams(int64_t start) [member function]
-    cls.add_method('DoAssignStreams', 
-                   'int64_t', 
-                   [param('int64_t', 'start')], 
-                   visibility='private', is_virtual=True)
-    ## mobility-model.h (module 'mobility'): ns3::Vector ns3::MobilityModel::DoGetPosition() const [member function]
-    cls.add_method('DoGetPosition', 
-                   'ns3::Vector', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, visibility='private', is_virtual=True)
-    ## mobility-model.h (module 'mobility'): ns3::Vector ns3::MobilityModel::DoGetVelocity() const [member function]
-    cls.add_method('DoGetVelocity', 
-                   'ns3::Vector', 
-                   [], 
-                   is_pure_virtual=True, is_const=True, visibility='private', is_virtual=True)
-    ## mobility-model.h (module 'mobility'): void ns3::MobilityModel::DoSetPosition(ns3::Vector const & position) [member function]
-    cls.add_method('DoSetPosition', 
-                   'void', 
-                   [param('ns3::Vector const &', 'position')], 
-                   is_pure_virtual=True, visibility='private', is_virtual=True)
-    return
-
 def register_Ns3NetDevice_methods(root_module, cls):
     ## net-device.h (module 'network'): ns3::NetDevice::NetDevice() [constructor]
     cls.add_constructor([])
@@ -4627,42 +4440,6 @@ def register_Ns3RocketfuelWeightsReader_methods(root_module, cls):
                    [])
     return
 
-def register_Ns3SpringMobilityModel_methods(root_module, cls):
-    ## spring-mobility-model.h (module 'ndnSIM'): ns3::SpringMobilityModel::SpringMobilityModel(ns3::SpringMobilityModel const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::SpringMobilityModel const &', 'arg0')])
-    ## spring-mobility-model.h (module 'ndnSIM'): ns3::SpringMobilityModel::SpringMobilityModel() [constructor]
-    cls.add_constructor([])
-    ## spring-mobility-model.h (module 'ndnSIM'): void ns3::SpringMobilityModel::AddSpring(ns3::Ptr<ns3::MobilityModel> node) [member function]
-    cls.add_method('AddSpring', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::MobilityModel >', 'node')])
-    ## spring-mobility-model.h (module 'ndnSIM'): static ns3::TypeId ns3::SpringMobilityModel::GetTypeId() [member function]
-    cls.add_method('GetTypeId', 
-                   'ns3::TypeId', 
-                   [], 
-                   is_static=True)
-    ## spring-mobility-model.h (module 'ndnSIM'): ns3::Vector ns3::SpringMobilityModel::DoGetPosition() const [member function]
-    cls.add_method('DoGetPosition', 
-                   'ns3::Vector', 
-                   [], 
-                   is_const=True, visibility='private', is_virtual=True)
-    ## spring-mobility-model.h (module 'ndnSIM'): ns3::Vector ns3::SpringMobilityModel::DoGetVelocity() const [member function]
-    cls.add_method('DoGetVelocity', 
-                   'ns3::Vector', 
-                   [], 
-                   is_const=True, visibility='private', is_virtual=True)
-    ## spring-mobility-model.h (module 'ndnSIM'): void ns3::SpringMobilityModel::DoSetPosition(ns3::Vector const & position) [member function]
-    cls.add_method('DoSetPosition', 
-                   'void', 
-                   [param('ns3::Vector const &', 'position')], 
-                   visibility='private', is_virtual=True)
-    ## spring-mobility-model.h (module 'ndnSIM'): void ns3::SpringMobilityModel::DoStart() [member function]
-    cls.add_method('DoStart', 
-                   'void', 
-                   [], 
-                   visibility='private', is_virtual=True)
-    return
-
 def register_Ns3TimeChecker_methods(root_module, cls):
     ## nstime.h (module 'core'): ns3::TimeChecker::TimeChecker() [constructor]
     cls.add_constructor([])
@@ -4774,86 +4551,6 @@ def register_Ns3UintegerValue_methods(root_module, cls):
     cls.add_method('Set', 
                    'void', 
                    [param('uint64_t const &', 'value')])
-    return
-
-def register_Ns3Vector2DChecker_methods(root_module, cls):
-    ## vector.h (module 'core'): ns3::Vector2DChecker::Vector2DChecker() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): ns3::Vector2DChecker::Vector2DChecker(ns3::Vector2DChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector2DChecker const &', 'arg0')])
-    return
-
-def register_Ns3Vector2DValue_methods(root_module, cls):
-    ## vector.h (module 'core'): ns3::Vector2DValue::Vector2DValue() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): ns3::Vector2DValue::Vector2DValue(ns3::Vector2DValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector2DValue const &', 'arg0')])
-    ## vector.h (module 'core'): ns3::Vector2DValue::Vector2DValue(ns3::Vector2D const & value) [constructor]
-    cls.add_constructor([param('ns3::Vector2D const &', 'value')])
-    ## vector.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::Vector2DValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## vector.h (module 'core'): bool ns3::Vector2DValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## vector.h (module 'core'): ns3::Vector2D ns3::Vector2DValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::Vector2D', 
-                   [], 
-                   is_const=True)
-    ## vector.h (module 'core'): std::string ns3::Vector2DValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## vector.h (module 'core'): void ns3::Vector2DValue::Set(ns3::Vector2D const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::Vector2D const &', 'value')])
-    return
-
-def register_Ns3Vector3DChecker_methods(root_module, cls):
-    ## vector.h (module 'core'): ns3::Vector3DChecker::Vector3DChecker() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): ns3::Vector3DChecker::Vector3DChecker(ns3::Vector3DChecker const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector3DChecker const &', 'arg0')])
-    return
-
-def register_Ns3Vector3DValue_methods(root_module, cls):
-    ## vector.h (module 'core'): ns3::Vector3DValue::Vector3DValue() [constructor]
-    cls.add_constructor([])
-    ## vector.h (module 'core'): ns3::Vector3DValue::Vector3DValue(ns3::Vector3DValue const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::Vector3DValue const &', 'arg0')])
-    ## vector.h (module 'core'): ns3::Vector3DValue::Vector3DValue(ns3::Vector3D const & value) [constructor]
-    cls.add_constructor([param('ns3::Vector3D const &', 'value')])
-    ## vector.h (module 'core'): ns3::Ptr<ns3::AttributeValue> ns3::Vector3DValue::Copy() const [member function]
-    cls.add_method('Copy', 
-                   'ns3::Ptr< ns3::AttributeValue >', 
-                   [], 
-                   is_const=True, is_virtual=True)
-    ## vector.h (module 'core'): bool ns3::Vector3DValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
-    cls.add_method('DeserializeFromString', 
-                   'bool', 
-                   [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_virtual=True)
-    ## vector.h (module 'core'): ns3::Vector3D ns3::Vector3DValue::Get() const [member function]
-    cls.add_method('Get', 
-                   'ns3::Vector3D', 
-                   [], 
-                   is_const=True)
-    ## vector.h (module 'core'): std::string ns3::Vector3DValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
-    cls.add_method('SerializeToString', 
-                   'std::string', 
-                   [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
-                   is_const=True, is_virtual=True)
-    ## vector.h (module 'core'): void ns3::Vector3DValue::Set(ns3::Vector3D const & value) [member function]
-    cls.add_method('Set', 
-                   'void', 
-                   [param('ns3::Vector3D const &', 'value')])
     return
 
 def register_Ns3AddressChecker_methods(root_module, cls):

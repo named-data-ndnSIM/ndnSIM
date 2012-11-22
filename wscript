@@ -12,8 +12,12 @@ import wutils
 def options(opt):
     opt.tool_options('boost', tooldir=["waf-tools"])
     opt.add_option('--enable-ndn-plugins',
-                   help=("Enable NDN plugins (may require patching)"),
+                   help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
                    dest='enable_ndn_plugins')
+
+    opt.add_option('--disable-ndn-plugins',
+                   help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
+                   dest='disable_ndn_plugins')
 
 def configure(conf):
     try:
@@ -29,9 +33,12 @@ def configure(conf):
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
-    conf.env['NDN_plugins'] = []
+    conf.env['NDN_plugins'] = ['topology']
     if Options.options.enable_ndn_plugins:
-        conf.env['NDN_plugins'] = Options.options.enable_ndn_plugins.split(',')
+        conf.env['NDN_plugins'] = conf.env['NDN_plugins'] + Options.options.enable_ndn_plugins.split(',')
+
+    if Options.options.disable_ndn_plugins:
+        conf.env['NDN_plugins'] = conf.env['NDN_plugins'] - Options.options.disable_ndn_plugins.split(',')
     
     conf.env['ENABLE_NDN_ABSTRACT']=True;
 
