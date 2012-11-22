@@ -4,8 +4,15 @@ def build(bld):
     obj = bld.create_ns3_program('ndn-simple', ['ndnSIM'])
     obj.source = 'ndn-simple.cc'
 
-    obj = bld.create_ns3_program('ndn-grid', ['ndnSIM', 'point-to-point', 'point-to-point-layout'])
+    obj = bld.create_ns3_program('ndn-grid', ['ndnSIM', 'point-to-point-layout'])
     obj.source = 'ndn-grid.cc'
 
     obj = bld.create_ns3_program('trie', ['ndnSIM'])
     obj.source = 'trie.cc'
+    
+    if 'topology' in bld.env['NDN_plugins']:
+        obj = bld.create_ns3_program('ndn-grid-topo-plugin', ['ndnSIM'])
+        obj.source = 'ndn-grid-topo-plugin.cc'
+
+        obj = bld.create_ns3_program('ndn-congestion-topo-plugin', ['ndnSIM'])
+        obj.source = 'ndn-congestion-topo-plugin.cc'

@@ -249,3 +249,6 @@ googleanalytics_id = "UA-21372502-8"
 
 googleanalytics_enabled = True
 
+# aafig_format = dict(latex='pdf', html='png', text=None)
+
+# aafig_default_options = dict(Fixed=True)

@@ -1,6 +1,6 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2012 University of California, Los Angeles
+ * Copyright (c) 2011-2012 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -17,22 +17,25 @@
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
-// ndn-simple.cc
+// ndn-grid-topo-plugin.cc
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
 
 using namespace ns3;
 
 /**
- * This scenario simulates a very simple network topology:
+ * This scenario simulates a grid topology (using topology reader module)
  *
+ * (consumer) -- ( ) ----- ( )
+ *     |          |         |
+ *    ( ) ------ ( ) ----- ( )
+ *     |          |         |
+ *    ( ) ------ ( ) -- (producer)
  *
- *      +----------+     1Mbps      +--------+     1Mbps      +----------+
- *      | consumer | <------------> | router | <------------> | producer |
- *      +----------+         10ms   +--------+          10ms  +----------+
+ * All links are 1Mbps with propagation 10ms delay. 
  *
+ * FIB is populated using NdnGlobalRoutingHelper.
  *
  * Consumer requests data from producer with frequency 10 interests per second
  * (interests contain constantly increasing sequence number).
@@ -42,50 +45,50 @@ using namespace ns3;
  *
  * To run scenario and see what is happening, use the following command:
  *
- *     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple
+ *     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid-topo-plugin
  */
 
-int 
+int
 main (int argc, char *argv[])
 {
-  // setting default parameters for PointToPoint links and channels
-  Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
-  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
-  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
-
-  // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;
   cmd.Parse (argc, argv);
 
-  // Creating nodes
-  NodeContainer nodes;
-  nodes.Create (3);
-
-  // Connecting nodes using two links
-  PointToPointHelper p2p;
-  p2p.Install (nodes.Get (0), nodes.Get (1));
-  p2p.Install (nodes.Get (1), nodes.Get (2));
+  AnnotatedTopologyReader topologyReader ("", 25);
+  topologyReader.SetFileName ("src/ndnSIM/examples/topology/topo-grid-3x3.txt");
+  topologyReader.Read ();
 
   // Install CCNx stack on all nodes
   ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetDefaultRoutes (true);
   ccnxHelper.InstallAll ();
 
-  // Installing applications
+  // Installing global routing interface on all nodes
+  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
+  ccnxGlobalRoutingHelper.InstallAll ();
 
-  // Consumer
+  // Getting containers for the consumer/producer
+  Ptr<Node> producer = Names::Find<Node> ("Node8");
+  NodeContainer consumerNodes;
+  consumerNodes.Add (Names::Find<Node> ("Node0"));
+
+  // Install CCNx applications
+  std::string prefix = "/prefix";
+
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  // Consumer will request /prefix/0, /prefix/1, ...
-  consumerHelper.SetPrefix ("/prefix");
-  consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
-  consumerHelper.Install (nodes.Get (0)); // first node
+  consumerHelper.SetPrefix (prefix);
+  consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 100 interests a second
+  consumerHelper.Install (consumerNodes);
 
-  // Producer
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");
-  // Producer will reply to all requests starting with /prefix
-  producerHelper.SetPrefix ("/prefix");
+  producerHelper.SetPrefix (prefix);
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
-  producerHelper.Install (nodes.Get (2)); // last node
+  producerHelper.Install (producer);
+
+  // Add /prefix origins to ndn::GlobalRouter
+  ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+
+  // Calculate and install FIBs
+  ccnxGlobalRoutingHelper.CalculateRoutes ();
 
   Simulator::Stop (Seconds (20.0));
 
