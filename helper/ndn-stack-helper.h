@@ -151,7 +151,7 @@ public:
    * to NdnFaceContainer object
    */
   Ptr<FaceContainer>
-  Install (std::string nodeName) const;
+  Install (const std::string &nodeName) const;
 
   /**
    * \brief Install Ndn stack on the node
@@ -180,7 +180,7 @@ public:
    * to FaceContainer object
    */
   Ptr<FaceContainer>
-  Install (NodeContainer c) const;
+  Install (const NodeContainer &c) const;
 
   /**
    * \brief Install Ndn stack on all nodes in the simulation
@@ -192,7 +192,7 @@ public:
   InstallAll () const;
 
   /**
-   * \brief Add forwarding entry in FIB
+   * \brief Add forwarding entry to FIB
    *
    * \param nodeName Node name
    * \param prefix Routing prefix
@@ -200,10 +200,10 @@ public:
    * \param metric Routing metric
    */
   static void
-  AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric);
+  AddRoute (const std::string &nodeName, const std::string &prefix, uint32_t faceId, int32_t metric);
 
   /**
-   * \brief Add forwarding entry in FIB
+   * \brief Add forwarding entry to FIB
    *
    * \param nodeName Node
    * \param prefix Routing prefix
@@ -211,10 +211,10 @@ public:
    * \param metric Routing metric
    */
   static void
-  AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric);
+  AddRoute (Ptr<Node> node, const std::string &prefix, uint32_t faceId, int32_t metric);
 
   /**
-   * \brief Add forwarding entry in FIB
+   * \brief Add forwarding entry to FIB
    *
    * \param node   Node
    * \param prefix Routing prefix
@@ -222,8 +222,30 @@ public:
    * \param metric Routing metric
    */
   static void
-  AddRoute (Ptr<Node> node, std::string prefix, Ptr<Face> face, int32_t metric);
+  AddRoute (Ptr<Node> node, const std::string &prefix, Ptr<Face> face, int32_t metric);
 
+  /**
+   * @brief Add forwarding entry to FIB (work only with point-to-point links)
+   *
+   * \param node Node
+   * \param prefix Routing prefix
+   * \param otherNode The other node, to which interests (will be used to infer face id
+   * \param metric Routing metric
+   */
+  static void
+  AddRoute (Ptr<Node> node, const std::string &prefix, Ptr<Node> otherNode, int32_t metric);
+
+  /**
+   * @brief Add forwarding entry to FIB (work only with point-to-point links)
+   *
+   * \param nodeName Node name (refer to ns3::Names)
+   * \param prefix Routing prefix
+   * \param otherNode The other node name, to which interests (will be used to infer face id (refer to ns3::Names)
+   * \param metric Routing metric
+   */
+  static void
+  AddRoute (const std::string &nodeName, const std::string &prefix, const std::string &otherNodeName, int32_t metric);
+  
   /**
    * \brief Set flag indicating necessity to install default routes in FIB
    */
@@ -241,11 +263,11 @@ private:
   ObjectFactory m_pitFactory;
   ObjectFactory m_fibFactory;
   
-  bool m_limitsEnabled;
+  bool     m_limitsEnabled;
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;
   uint32_t m_avgInterestSize;
-  bool m_needSetDefaultRoutes;  
+  bool     m_needSetDefaultRoutes;  
 };
 
 } // namespace ndn

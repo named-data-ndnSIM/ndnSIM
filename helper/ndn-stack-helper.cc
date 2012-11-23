@@ -95,10 +95,10 @@ StackHelper::SetStackAttributes (const std::string &attr1, const std::string &va
 
 void 
 StackHelper::SetForwardingStrategy (const std::string &strategy,
-                                        const std::string &attr1, const std::string &value1,
-                                        const std::string &attr2, const std::string &value2,
-                                        const std::string &attr3, const std::string &value3,
-                                        const std::string &attr4, const std::string &value4)
+                                    const std::string &attr1, const std::string &value1,
+                                    const std::string &attr2, const std::string &value2,
+                                    const std::string &attr3, const std::string &value3,
+                                    const std::string &attr4, const std::string &value4)
 {
   m_strategyFactory.SetTypeId (strategy);
   if (attr1 != "")
@@ -113,10 +113,10 @@ StackHelper::SetForwardingStrategy (const std::string &strategy,
 
 void
 StackHelper::SetContentStore (const std::string &contentStore,
-                                  const std::string &attr1, const std::string &value1,
-                                  const std::string &attr2, const std::string &value2,
-                                  const std::string &attr3, const std::string &value3,
-                                  const std::string &attr4, const std::string &value4)
+                              const std::string &attr1, const std::string &value1,
+                              const std::string &attr2, const std::string &value2,
+                              const std::string &attr3, const std::string &value3,
+                              const std::string &attr4, const std::string &value4)
 {
   m_contentStoreFactory.SetTypeId (contentStore);
   if (attr1 != "")
@@ -131,10 +131,10 @@ StackHelper::SetContentStore (const std::string &contentStore,
 
 void
 StackHelper::SetPit (const std::string &pitClass,
-                         const std::string &attr1, const std::string &value1,
-                         const std::string &attr2, const std::string &value2,
-                         const std::string &attr3, const std::string &value3,
-                         const std::string &attr4, const std::string &value4)
+                     const std::string &attr1, const std::string &value1,
+                     const std::string &attr2, const std::string &value2,
+                     const std::string &attr3, const std::string &value3,
+                     const std::string &attr4, const std::string &value4)
 {
   m_pitFactory.SetTypeId (pitClass);
   if (attr1 != "")
@@ -149,10 +149,10 @@ StackHelper::SetPit (const std::string &pitClass,
 
 void
 StackHelper::SetFib (const std::string &fibClass,
-                         const std::string &attr1, const std::string &value1,
-                         const std::string &attr2, const std::string &value2,
-                         const std::string &attr3, const std::string &value3,
-                         const std::string &attr4, const std::string &value4)
+                     const std::string &attr1, const std::string &value1,
+                     const std::string &attr2, const std::string &value2,
+                     const std::string &attr3, const std::string &value3,
+                     const std::string &attr4, const std::string &value4)
 {
   m_fibFactory.SetTypeId (fibClass);
   if (attr1 != "")
@@ -174,9 +174,9 @@ StackHelper::SetDefaultRoutes (bool needSet)
 
 void
 StackHelper::EnableLimits (bool enable/* = true*/,
-                               Time avgRtt/*=Seconds(0.1)*/,
-                               uint32_t avgContentObject/*=1100*/,
-                               uint32_t avgInterest/*=40*/)
+                           Time avgRtt/*=Seconds(0.1)*/,
+                           uint32_t avgContentObject/*=1100*/,
+                           uint32_t avgInterest/*=40*/)
 {
   NS_LOG_INFO ("EnableLimits: " << enable);
   m_limitsEnabled = enable;
@@ -186,7 +186,7 @@ StackHelper::EnableLimits (bool enable/* = true*/,
 }
 
 Ptr<FaceContainer>
-StackHelper::Install (NodeContainer c) const
+StackHelper::Install (const NodeContainer &c) const
 {
   Ptr<FaceContainer> faces = Create<FaceContainer> ();
   for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
@@ -197,7 +197,7 @@ StackHelper::Install (NodeContainer c) const
 }
 
 Ptr<FaceContainer>
-StackHelper::InstallAll (void) const
+StackHelper::InstallAll () const
 {
   return Install (NodeContainer::GetGlobal ());
 }
@@ -250,7 +250,7 @@ StackHelper::Install (Ptr<Node> node) const
       if (m_needSetDefaultRoutes)
         {
           // default route with lowest priority possible
-          AddRoute (node, "/", face, std::numeric_limits<int32_t>::max ()); 
+          AddRoute (node, "/", StaticCast<Face> (face), std::numeric_limits<int32_t>::max ()); 
         }
       
       if (m_limitsEnabled)
@@ -294,7 +294,7 @@ StackHelper::Install (Ptr<Node> node) const
 }
 
 Ptr<FaceContainer>
-StackHelper::Install (std::string nodeName) const
+StackHelper::Install (const std::string &nodeName) const
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   return Install (node);
@@ -302,7 +302,7 @@ StackHelper::Install (std::string nodeName) const
 
 
 void
-StackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<Face> face, int32_t metric)
+StackHelper::AddRoute (Ptr<Node> node, const std::string &prefix, Ptr<Face> face, int32_t metric)
 {
   NS_LOG_LOGIC ("[" << node->GetId () << "]$ route add " << prefix << " via " << *face << " metric " << metric);
 
@@ -314,7 +314,7 @@ StackHelper::AddRoute (Ptr<Node> node, std::string prefix, Ptr<Face> face, int32
 }
 
 void
-StackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int32_t metric)
+StackHelper::AddRoute (Ptr<Node> node, const std::string &prefix, uint32_t faceId, int32_t metric)
 {
   Ptr<L3Protocol>     ndn = node->GetObject<L3Protocol> ();
   NS_ASSERT_MSG (ndn != 0, "Ndn stack should be installed on the node");
@@ -326,7 +326,7 @@ StackHelper::AddRoute (Ptr<Node> node, std::string prefix, uint32_t faceId, int3
 }
 
 void
-StackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric)
+StackHelper::AddRoute (const std::string &nodeName, const std::string &prefix, uint32_t faceId, int32_t metric)
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
@@ -339,6 +339,50 @@ StackHelper::AddRoute (std::string nodeName, std::string prefix, uint32_t faceId
 
   AddRoute (node, prefix, face, metric);
 }
+
+void
+StackHelper::AddRoute (Ptr<Node> node, const std::string &prefix, Ptr<Node> otherNode, int32_t metric)
+{
+  for (uint32_t deviceId = 0; deviceId < node->GetNDevices (); deviceId ++)
+    {
+      Ptr<PointToPointNetDevice> netDevice = DynamicCast<PointToPointNetDevice> (node->GetDevice (deviceId));
+      if (netDevice == 0)
+        continue;
+
+      Ptr<Channel> channel = netDevice->GetChannel ();
+      if (channel == 0)
+        continue;
+
+      if (channel->GetDevice (0)->GetNode () == otherNode ||
+          channel->GetDevice (1)->GetNode () == otherNode)
+        {
+          Ptr<L3Protocol> ndn = node->GetObject<L3Protocol> ();
+          NS_ASSERT_MSG (ndn != 0, "Ndn stack should be installed on the node");
+
+          Ptr<Face> face = ndn->GetFaceByNetDevice (netDevice);
+          NS_ASSERT_MSG (face != 0, "There is no face associated with the p2p link");
+
+          AddRoute (node, prefix, face, metric);
+
+          return;
+        }
+    }
+
+  NS_FATAL_ERROR ("Cannot add route: Node# " << node->GetId () << " and Node# " << otherNode->GetId () << " are not connected");
+}
+
+void
+StackHelper::AddRoute (const std::string &nodeName, const std::string &prefix, const std::string &otherNodeName, int32_t metric)
+{
+  Ptr<Node> node = Names::Find<Node> (nodeName);
+  NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
+
+  Ptr<Node> otherNode = Names::Find<Node> (otherNodeName);
+  NS_ASSERT_MSG (otherNode != 0, "Node [" << otherNodeName << "] does not exist");
+
+  AddRoute (node, prefix, otherNode, metric);
+}
+
 
 } // namespace ndn
 } // namespace ns3

@@ -115,20 +115,20 @@ main (int argc, char *argv[])
     }
 
   // Manually configure FIB routes
-  ndn::StackHelper::AddRoute	("c1", "/data", 0, 1); // link to n1
-  ndn::StackHelper::AddRoute	("c2", "/data", 0, 1); // link to n1
-  ndn::StackHelper::AddRoute	("c3", "/data", 0, 1); // link to n1
-  ndn::StackHelper::AddRoute	("c4", "/data", 0, 1); // link to n1
+  ndn::StackHelper::AddRoute	("c1", "/data", "n1", 1); // link to n1
+  ndn::StackHelper::AddRoute	("c2", "/data", "n1", 1); // link to n1
+  ndn::StackHelper::AddRoute	("c3", "/data", "n1", 1); // link to n1
+  ndn::StackHelper::AddRoute	("c4", "/data", "n1", 1); // link to n1
 
-  ndn::StackHelper::AddRoute	("n1", "/data", 4, 1); // link to n2
-  ndn::StackHelper::AddRoute	("n1", "/data", 5, 2); // link to n12
+  ndn::StackHelper::AddRoute	("n1", "/data", "n2", 1); // link to n2
+  ndn::StackHelper::AddRoute	("n1", "/data", "n12", 2); // link to n12
 
-  ndn::StackHelper::AddRoute	("n12", "/data", 1, 2); // link to n2
+  ndn::StackHelper::AddRoute	("n12", "/data", "n2", 1); // link to n2
 
-  ndn::StackHelper::AddRoute	("n2", "/data/p1", 2, 2); // link to p1
-  ndn::StackHelper::AddRoute	("n2", "/data/p2", 3, 2); // link to p2
-  ndn::StackHelper::AddRoute	("n2", "/data/p3", 4, 2); // link to p3
-  ndn::StackHelper::AddRoute	("n2", "/data/p4", 5, 2); // link to p4
+  ndn::StackHelper::AddRoute	("n2", "/data/p1", "p1", 1); // link to p1
+  ndn::StackHelper::AddRoute	("n2", "/data/p2", "p2", 1); // link to p2
+  ndn::StackHelper::AddRoute	("n2", "/data/p3", "p3", 1); // link to p3
+  ndn::StackHelper::AddRoute	("n2", "/data/p4", "p4", 1); // link to p4
 
   // Schedule simulation time and run the simulation
   Simulator::Stop (Seconds (20.0));
