@@ -26,12 +26,23 @@ def configure(conf):
     except WafError:
         conf.env['LIB_BOOST'] = []
 
+    conf.env['ENABLE_NDNSIM']=False;
+
     if not conf.env['LIB_BOOST']:
-        conf.report_optional_feature("ndn-abstract", "NDN abstraction", False,
+        conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                      "Required boost libraries not found")
-        conf.env['ENABLE_NDN_ABSTRACT']=False;
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
+    else:
+        boost_version = conf.env.BOOST_VERSION.split('_')
+        if int(boost_version[0]) < 1 or int(boost_version[1]) < 48:
+            conf.report_optional_feature("ndnSIM", "ndnSIM", False,
+                                         "ndnSIM requires at least boost version 1.48")
+            conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
+
+            Logs.error ("ndnSIM requires at least boost version 1.48")
+            Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
+            return
 
     conf.env['NDN_plugins'] = ['topology']
     if Options.options.enable_ndn_plugins:
@@ -40,8 +51,10 @@ def configure(conf):
     if Options.options.disable_ndn_plugins:
         conf.env['NDN_plugins'] = conf.env['NDN_plugins'] - Options.options.disable_ndn_plugins.split(',')
     
-    conf.env['ENABLE_NDN_ABSTRACT']=True;
+    conf.env['ENABLE_NDNSIM']=True;
+    conf.env['MODULES_BUILT'].append('ndnSIM')
 
+    conf.report_optional_feature("ndnSIM", "ndnSIM", True, "")
 
 def build(bld):
     deps = ['core', 'network', 'point-to-point']
@@ -61,7 +74,7 @@ def build(bld):
     headers = bld.new_task_gen(features=['ns3header'])
     headers.module = 'ndnSIM'
 
-    if not bld.env['ENABLE_NDN_ABSTRACT']:
+    if not bld.env['ENABLE_NDNSIM']:
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
    
