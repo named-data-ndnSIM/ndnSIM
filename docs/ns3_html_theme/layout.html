@@ -54,8 +54,11 @@
 {% endblock %}
 
 {% block rootrellink %}
-    <li class="navelem"><a href="{{ theme_homepage }}">{{ theme_projectname }}</a><span class="navelem">&nbsp;</span></li>
+    <li style="background: none"><a href="{{ theme_homepage }}">{{ theme_projectname }}</a><span class="navelem">&nbsp;</span></li>
+    <li style="background: none"><a href="{{ theme_apidocsurl }}">{{ theme_apidocs }}</a><span class="">&nbsp;</span></li>
+{#
     {{ super() }}
+#}
 {% endblock %}
       
 {% if theme_collapsiblesidebar|tobool %}
