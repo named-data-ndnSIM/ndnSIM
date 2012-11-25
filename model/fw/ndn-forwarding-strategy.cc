@@ -347,7 +347,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
       if (ok)
         {
           m_outData (header, payload, inFace == 0, incoming.m_face);
-          DidSendOutData (incoming.m_face, header, payload, origPacket, pitEntry);
+          DidSendOutData (inFace, incoming.m_face, header, payload, origPacket, pitEntry);
           
           NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
         }
@@ -521,13 +521,14 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   Ptr<Packet> packetToSend = origPacket->Copy ();
   outFace->Send (packetToSend);
 
-  DidSendOutInterest (outFace, header, origPacket, pitEntry);
+  DidSendOutInterest (inFace, outFace, header, origPacket, pitEntry);
 
   return true;
 }
 
 void
-ForwardingStrategy::DidSendOutInterest (Ptr<Face> outFace,
+ForwardingStrategy::DidSendOutInterest (Ptr<Face> inFace,
+                                        Ptr<Face> outFace,
                                         Ptr<const InterestHeader> header,
                                         Ptr<const Packet> origPacket,
                                         Ptr<pit::Entry> pitEntry)
@@ -536,7 +537,8 @@ ForwardingStrategy::DidSendOutInterest (Ptr<Face> outFace,
 }
 
 void
-ForwardingStrategy::DidSendOutData (Ptr<Face> outFace,
+ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
+                                    Ptr<Face> outFace,
                                     Ptr<const ContentObjectHeader> header,
                                     Ptr<const Packet> payload,
                                     Ptr<const Packet> origPacket,

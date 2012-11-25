@@ -5103,15 +5103,15 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutData(ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSendOutData', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutInterest(ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSendOutInterest', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::Face >', 'outFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSuppressSimilarInterest(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::InterestHeader const> header, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSuppressSimilarInterest', 
@@ -5697,40 +5697,50 @@ def register_Ns3NdnStackHelper_methods(root_module, cls):
     cls.add_method('EnableLimits', 
                    'void', 
                    [param('bool', 'enable', default_value='true'), param('ns3::Time', 'avgRtt', default_value='ns3::Seconds(0)'), param('uint32_t', 'avgContentObject', default_value='1100'), param('uint32_t', 'avgInterest', default_value='40')])
-    ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::Install(std::string nodeName) const [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::Install(std::string const & nodeName) const [member function]
     cls.add_method('Install', 
                    'ns3::Ptr< ns3::ndn::FaceContainer >', 
-                   [param('std::string', 'nodeName')], 
+                   [param('std::string const &', 'nodeName')], 
                    is_const=True)
     ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::Install(ns3::Ptr<ns3::Node> node) const [member function]
     cls.add_method('Install', 
                    'ns3::Ptr< ns3::ndn::FaceContainer >', 
                    [param('ns3::Ptr< ns3::Node >', 'node')], 
                    is_const=True)
-    ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::Install(ns3::NodeContainer c) const [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::Install(ns3::NodeContainer const & c) const [member function]
     cls.add_method('Install', 
                    'ns3::Ptr< ns3::ndn::FaceContainer >', 
-                   [param('ns3::NodeContainer', 'c')], 
+                   [param('ns3::NodeContainer const &', 'c')], 
                    is_const=True)
     ## ndn-stack-helper.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::FaceContainer> ns3::ndn::StackHelper::InstallAll() const [member function]
     cls.add_method('InstallAll', 
                    'ns3::Ptr< ns3::ndn::FaceContainer >', 
                    [], 
                    is_const=True)
-    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(std::string nodeName, std::string prefix, uint32_t faceId, int32_t metric) [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(std::string const & nodeName, std::string const & prefix, uint32_t faceId, int32_t metric) [member function]
     cls.add_method('AddRoute', 
                    'void', 
-                   [param('std::string', 'nodeName'), param('std::string', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')], 
+                   [param('std::string const &', 'nodeName'), param('std::string const &', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')], 
                    is_static=True)
-    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string prefix, uint32_t faceId, int32_t metric) [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string const & prefix, uint32_t faceId, int32_t metric) [member function]
     cls.add_method('AddRoute', 
                    'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')], 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'prefix'), param('uint32_t', 'faceId'), param('int32_t', 'metric')], 
                    is_static=True)
-    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string prefix, ns3::Ptr<ns3::ndn::Face> face, int32_t metric) [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string const & prefix, ns3::Ptr<ns3::ndn::Face> face, int32_t metric) [member function]
     cls.add_method('AddRoute', 
                    'void', 
-                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string', 'prefix'), param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('int32_t', 'metric')], 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'prefix'), param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('int32_t', 'metric')], 
+                   is_static=True)
+    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(ns3::Ptr<ns3::Node> node, std::string const & prefix, ns3::Ptr<ns3::Node> otherNode, int32_t metric) [member function]
+    cls.add_method('AddRoute', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'prefix'), param('ns3::Ptr< ns3::Node >', 'otherNode'), param('int32_t', 'metric')], 
+                   is_static=True)
+    ## ndn-stack-helper.h (module 'ndnSIM'): static void ns3::ndn::StackHelper::AddRoute(std::string const & nodeName, std::string const & prefix, std::string const & otherNodeName, int32_t metric) [member function]
+    cls.add_method('AddRoute', 
+                   'void', 
+                   [param('std::string const &', 'nodeName'), param('std::string const &', 'prefix'), param('std::string const &', 'otherNodeName'), param('int32_t', 'metric')], 
                    is_static=True)
     ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::SetDefaultRoutes(bool needSet) [member function]
     cls.add_method('SetDefaultRoutes', 

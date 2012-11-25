@@ -274,6 +274,7 @@ protected:
   /**
    * @brief Event which is fired just after data was send out on the face
    *
+   * @param inFace     incoming face of the ContentObject
    * @param outFace  outgoing face
    * @param header  deserialized ContentObject header
    * @param payload ContentObject payload
@@ -281,7 +282,8 @@ protected:
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    */
   virtual void
-  DidSendOutData (Ptr<Face> outFace,
+  DidSendOutData (Ptr<Face> inFace,
+                  Ptr<Face> outFace,
                   Ptr<const ContentObjectHeader> header,
                   Ptr<const Packet> payload,
                   Ptr<const Packet> origPacket,
@@ -369,13 +371,15 @@ protected:
   /**
    * @brief Event fired just after forwarding the Interest
    *
+   * @param inFace     incoming face of the Interest
    * @param outFace    outgoing face of the Interest
    * @param header     parsed Interest header
    * @param origPacket original Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    */
   virtual void
-  DidSendOutInterest (Ptr<Face> outFace,
+  DidSendOutInterest (Ptr<Face> inFace,
+                      Ptr<Face> outFace,
                       Ptr<const InterestHeader> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
