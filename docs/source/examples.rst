@@ -255,3 +255,77 @@ To run this scenario and see what is happening, use the following command::
 You can also run using visualizer module to verify that both bottleneck links are utilized::
 
         ./waf --run=ndn-congestion-alt-topo-plugin --visualize
+
+.. _trace example:
+
+Example of using trace helpers
+------------------------------
+
+This example (``ndn-tree-tracers.cc``) demonstrates basic usage of :ref:`trace classes`.   
+
+In this scenario we will use a tree-like topology, where consumers are installed on leaf nodes and producer is in the root of the tree:
+
+.. aafig::
+    :aspect: 60
+    :scale: 120
+                                                 
+     /--------\    /--------\    /--------\    /--------\
+     |"leaf-1"|    |"leaf-2"|    |"leaf-3"|    |"leaf-4"|
+     \--------/    \--------/    \--------/    \--------/
+           ^          ^                ^           ^	
+           |          |                |           |
+      	    \        /                  \         / 
+             \      /  			 \  	 /    10Mbps / 1ms
+              \    /  			  \ 	/
+               |  |  			   |   | 
+      	       v  v                        v   v     
+	    /-------\                    /-------\
+	    |"rtr-1"|                    |"rtr-2"|
+            \-------/                    \-------/
+                  ^                        ^                      
+		  |	 		   |
+		   \			  /  10 Mpbs / 1ms 
+		    +--------\  /--------+ 
+			     |  |      
+                             v  v
+			  /--------\
+			  | "root" |                                   
+                          \--------/
+
+The corresponding topology file (``topo-tree.txt``):
+
+.. literalinclude:: ../../examples/topologies/topo-tree.txt
+    :language: bash
+    :linenos:
+    :lines: 1-2,27-
+
+Example simulation (``ndn-tree-tracers.cc``) scenario that utilizes trace helpers:
+
+.. literalinclude:: ../../examples/ndn-tree-tracers.cc
+    :language: c++
+    :linenos:
+    :lines: 21-34,67-
+    :emphasize-lines: 7-11,63-67
+
+
+To run this scenario, use the following command::
+
+        ./waf --run=ndn-tree-tracers
+
+The successful run will create ``rate-trace.txt`` and ``aggregate-trace.txt`` files in the current directly, which can be analyzed manually or used as input to some graph/stats packages.
+
+For example, the following `R script <http://www.r-project.org/>`_ will build a number of nice graphs:
+
+.. image:: _static/root-rates.png
+   :alt: Interest/Data packet rates at the root node
+   :align: right
+
+.. image:: _static/root-5sec-counts.png
+   :alt: Interest/Data packet counts at the root node in 5-second intervals
+   :align: right
+
+.. literalinclude:: ../../examples/graphs/rate-graph.R
+    :language: r
+    :linenos:
+
+For more information about R and ggplot2, please refer to `R language manual <http://cran.r-project.org/manuals.html>`_, `ggplot2 module manual <http://docs.ggplot2.org/current/>`_.

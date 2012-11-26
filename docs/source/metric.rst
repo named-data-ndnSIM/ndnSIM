@@ -4,6 +4,7 @@ Obtaining metrics
 
 To obtain simulation results, you would need to connect to one or more `trace sources <doxygen/group___trace_source_list.html>`_ provided by ndnSIM classes.
 
+.. _trace classes:
 
 Tracer classes
 --------------
@@ -20,12 +21,19 @@ Currently, there are only 2 useful tracers:
 
     .. code-block:: c++
 
+        // necessary includes
+	#include <ns3/ndnSIM/utils/tracers/ndn-l3-aggregate-tracer.h>
+
+	...        
+
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
-            tracers = L3RateTracer::InstallAll ("aggregate-trace.txt", Seconds (1.0));
+        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3AggregateTracer> > >
+          aggTracers = ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (1.0));
         
         Simulator::Run ();
+        
+        ...
 
 
 - :ndnsim:`ndn::L3RateTracer`
@@ -36,12 +44,19 @@ Currently, there are only 2 useful tracers:
 
     .. code-block:: c++
 
+        // necessary includes
+	#include <ns3/ndnSIM/utils/tracers/ndn-l3-rate-tracer.h>
+
+	...        
+
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
-            tracers = L3RateTracer::InstallAll ("rate-trace.txt", Seconds (1.0));
+        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3RateTracer> > >
+          rateTracers = ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (1.0));
         
         Simulator::Run ();
+        
+        ...
 
 
 .. note::
@@ -50,3 +65,7 @@ Currently, there are only 2 useful tracers:
     Eventually, we will port most of them to the current code, but it is not our main priority at the moment and would really appreciate help with writing new tracers and porting the old ones. 
 
 
+Example
++++++++
+
+Please refer to the :ref:`this example <trace example>`.

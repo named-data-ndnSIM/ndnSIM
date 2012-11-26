@@ -35,31 +35,54 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ccnx
+ * @ingroup ndn
  * @brief CCNx network-layer rate tracer
  */
 class L3RateTracer : public L3Tracer
 {
 public:
   /**
-   * @brief Network layer tracer constructor
+   * @brief Trace constructor that attaches to the node using node pointer
+   * @param os    reference to the output stream
+   * @param node  pointer to the node
    */
   L3RateTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+
+  /**
+   * @brief Trace constructor that attaches to the node using node name
+   * @param os        reference to the output stream
+   * @param nodeName  name of the node registered using Names::Add
+   */
   L3RateTracer (boost::shared_ptr<std::ostream> os, const std::string &node);
+
+  /**
+   * @brief Destructor
+   */
   virtual ~L3RateTracer ();
 
+  /**
+   * @brief Helper method to install tracers on all simulation nodes
+   *
+   * @param file File to which traces will be written
+   * @param averagingPeriod Defines averaging period for the rate calculation,
+   *        as well as how often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   * 
+   */
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
-  
-  void
-  SetAveragingPeriod (const Time &period);
-  
+
+  // from L3Tracer
   virtual void
   PrintHeader (std::ostream &os) const;
 
   virtual void
   Print (std::ostream &os) const;
 
+protected:
+  // from L3Tracer
   virtual void
   OutInterests  (std::string context,
                  Ptr<const InterestHeader>, Ptr<const Face>);
@@ -97,6 +120,9 @@ public:
             Ptr<const ContentObjectHeader>, Ptr<const Packet>, Ptr<const Face>);
 
 private:
+  void
+  SetAveragingPeriod (const Time &period);
+
   void
   PeriodicPrinter ();
   

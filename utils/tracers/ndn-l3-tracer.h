@@ -38,18 +38,42 @@ class ContentObjectHeader;
 class L3Tracer : public SimpleRefCount<L3Tracer>
 {
 public:
+  /**
+   * @brief Trace constructor that attaches to the node using node pointer
+   * @param node  pointer to the node
+   */
   L3Tracer (Ptr<Node> node);
+
+  /**
+   * @brief Trace constructor that attaches to the node using node name
+   * @param nodeName  name of the node registered using Names::Add
+   */
   L3Tracer (const std::string &node);
+
+  /**
+   * @brief Destructor
+   */
   virtual ~L3Tracer ();
 
-  void
-  Connect ();
-  
+  /**
+   * @brief Print head of the trace (e.g., for post-processing)
+   *
+   * @param os reference to output stream
+   */
   virtual void
   PrintHeader (std::ostream &os) const = 0;
 
+  /**
+   * @brief Print current trace data
+   *
+   * @param os reference to output stream
+   */
   virtual void
   Print (std::ostream &os) const = 0;
+  
+protected:
+  void
+  Connect ();
   
   virtual void
   OutInterests  (std::string context,
@@ -119,6 +143,9 @@ protected:
   };
 };
 
+/**
+ * @brief Helper to dump the trace to an output stream
+ */
 inline std::ostream&
 operator << (std::ostream &os, const L3Tracer &tracer)
 {

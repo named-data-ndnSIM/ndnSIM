@@ -157,7 +157,7 @@ const double alpha = 0.8;
   << STATS(2).fieldName << "\t"                                         \
   << STATS(3).fieldName << "\t"                                         \
   << STATS(0).fieldName << "\t"                                         \
-  << STATS(1).fieldName << "\n";
+  << STATS(1).fieldName / 1024.0 << "\n";
 
 void
 L3RateTracer::Print (std::ostream &os) const
@@ -236,8 +236,8 @@ L3RateTracer::OutData  (std::string context,
                         Ptr<const ContentObjectHeader> header, Ptr<const Packet> payload,
                         bool fromCache, Ptr<const Face> face)
 {
-  m_stats[face].get<0> ().m_inData ++;
-  m_stats[face].get<1> ().m_inData += header->GetSerializedSize () + payload->GetSize ();
+  m_stats[face].get<0> ().m_outData ++;
+  m_stats[face].get<1> ().m_outData += header->GetSerializedSize () + payload->GetSize ();
 }
 
 void
@@ -245,8 +245,8 @@ L3RateTracer::InData   (std::string context,
                         Ptr<const ContentObjectHeader> header, Ptr<const Packet> payload,
                         Ptr<const Face> face)
 {
-  m_stats[face].get<0> ().m_outData ++;
-  m_stats[face].get<1> ().m_outData += header->GetSerializedSize () + payload->GetSize ();
+  m_stats[face].get<0> ().m_inData ++;
+  m_stats[face].get<1> ().m_inData += header->GetSerializedSize () + payload->GetSize ();
 }
 
 void

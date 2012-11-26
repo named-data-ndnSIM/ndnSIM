@@ -26,16 +26,55 @@
 #include <ns3/nstime.h>
 #include <ns3/event-id.h>
 
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#include <map>
+#include <list>
+
 namespace ns3 {
 namespace ndn {
 
+/**
+ * @ingroup ndn
+ * @brief CCNx network-layer tracer for aggregate packet counts
+ */
 class L3AggregateTracer : public L3Tracer
 {
 public:
-  L3AggregateTracer (Ptr<Node> node);
-  L3AggregateTracer (const std::string &node);
-  virtual ~L3AggregateTracer ();
+  /**
+   * @brief Trace constructor that attaches to the node using node pointer
+   * @param os    reference to the output stream
+   * @param node  pointer to the node
+   */
+  L3AggregateTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
   
+  /**
+   * @brief Trace constructor that attaches to the node using node name
+   * @param os        reference to the output stream
+   * @param nodeName  name of the node registered using Names::Add
+   */
+  L3AggregateTracer (boost::shared_ptr<std::ostream> os, const std::string &nodeName);
+
+  /**
+   * @brief Destructor
+   */
+  virtual ~L3AggregateTracer ();
+
+  /**
+   * @brief Helper method to install tracers on all simulation nodes
+   *
+   * @param file File to which traces will be written
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   * 
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
+  InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+protected: 
+  // from L3Tracer
   virtual void
   PrintHeader (std::ostream &os) const;
 
@@ -80,17 +119,21 @@ public:
 
 protected:
   void
+  SetAveragingPeriod (const Time &period);
+
+  void
   Reset ();
 
   void
   PeriodicPrinter ();
   
 protected:
-  Stats m_packets;
-  Stats m_bytes;
+  boost::shared_ptr<std::ostream> m_os;
 
   Time m_period;
   EventId m_printEvent;
+  
+  mutable std::map<Ptr<const Face>, boost::tuple<Stats, Stats> > m_stats;
 };
 
 } // namespace ndn

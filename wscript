@@ -8,6 +8,8 @@ import Options
 from waflib.Errors import WafError
 
 import wutils
+import TaskGen
+import Task
 
 def options(opt):
     opt.tool_options('boost', tooldir=["waf-tools"])
@@ -70,6 +72,8 @@ def build(bld):
         deps.append ('mobility')
 
     module = bld.create_ns3_module ('ndnSIM', deps)
+    module.module = 'ndnSIM'
+    module.features += ['ns3fullmoduleheaders']
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
     headers = bld.new_task_gen(features=['ns3header'])
@@ -84,6 +88,12 @@ def build(bld):
                                        'utils/**/*.cc',
                                        'helper/**/*.cc',
                                        ])
+    module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
+                           'utils/**/*.h',
+                           'model/**/*.h',
+                           'apps/**/*.h',
+                           'helper/**/*.h',
+                           ])]
 
     headers.source = [
         "helper/ndn-stack-helper.h",
@@ -135,13 +145,7 @@ def build(bld):
             ])
         module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
 
-    ndnSIM_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
-                'utils/**/*.h',
-                'model/**/*.h',
-                'apps/**/*.h',
-                'helper/**/*.h',
-                ])]
-    bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
+    # bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
     # bld.install_files('$PREFIX/include', ndnSIM_headers)
     
     tests = bld.create_ns3_module_test_library('ndnSIM')
@@ -151,3 +155,32 @@ def build(bld):
         bld.add_subdirs('examples')
 
     bld.ns3_python_bindings()
+
+
+@TaskGen.feature('ns3fullmoduleheaders')
+@TaskGen.after_method('process_rule')
+def apply_ns3fullmoduleheaders(self):
+    # ## get all of the ns3 headers
+    ns3_dir_node = self.bld.path.find_dir("ns3")
+
+    mode = getattr(self, "mode", "install")
+
+    for filename in set(self.to_list(self.full_headers)):
+        src_node = self.path.find_resource(filename)
+        if src_node is None:
+            raise WafError("source ns3 header file %s not found" % (filename,))
+        dst_node = ns3_dir_node.find_or_declare(src_node.path_from(self.bld.path.find_dir('src')))
+        assert dst_node is not None
+
+        relpath = src_node.parent.path_from(self.bld.path.find_dir('src'))
+
+        task = self.create_task('ns3header')
+        task.mode = getattr(self, 'mode', 'install')
+        if task.mode == 'install':
+            self.bld.install_files('${INCLUDEDIR}/%s%s/ns3/%s' % (wutils.APPNAME, wutils.VERSION, relpath), 
+                                   [src_node])
+            task.set_inputs([src_node])
+            task.set_outputs([dst_node])
+        else:
+            task.header_to_remove = dst_node
+
