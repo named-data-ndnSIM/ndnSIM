@@ -64,6 +64,7 @@ def build(bld):
 
     if 'topology' in bld.env['NDN_plugins']:
         deps.append ('topology-read')
+        deps.append ('mobility')
 
     if 'mobility' in bld.env['NDN_plugins']:
         deps.append ('mobility')
