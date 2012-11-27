@@ -564,5 +564,18 @@ ForwardingStrategy::RemoveFace (Ptr<Face> face)
   // do nothing here
 }
 
+void
+ForwardingStrategy::DidAddFibEntry (Ptr<fib::Entry> fibEntry)
+{
+  // do nothing here
+}
+
+void
+ForwardingStrategy::WillRemoveFibEntry (Ptr<fib::Entry> fibEntry)
+{
+  // do nothing here
+}
+
+
 } // namespace ndn
 } // namespace ns3

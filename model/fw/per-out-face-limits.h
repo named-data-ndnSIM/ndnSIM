@@ -133,10 +133,10 @@ PerOutFaceLimits<Parent>::GetTypeId (void)
 template<class Parent>
 bool
 PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
-                                          Ptr<Face> outFace,
-                                          Ptr<const InterestHeader> header,
-                                          Ptr<const Packet> origPacket,
-                                          Ptr<pit::Entry> pitEntry)
+                                              Ptr<Face> outFace,
+                                              Ptr<const InterestHeader> header,
+                                              Ptr<const Packet> origPacket,
+                                              Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   

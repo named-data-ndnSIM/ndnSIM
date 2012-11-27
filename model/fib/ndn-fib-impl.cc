@@ -22,6 +22,7 @@
 
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-interest.h"
+#include "ns3/ndn-forwarding-strategy.h"
 
 #include "ns3/node.h"
 #include "ns3/assert.h"
@@ -107,7 +108,14 @@ FibImpl::Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t m
   
       super::modify (result.first,
                      ll::bind (&Entry::AddOrUpdateRoutingMetric, ll::_1, face, metric));
-    
+
+      if (result.second)
+        {
+          // notify forwarding strategy about new FIB entry
+          NS_ASSERT (this->GetObject<ForwardingStrategy> () != 0);
+          this->GetObject<ForwardingStrategy> ()->DidAddFibEntry (result.first->payload ());
+        }
+      
       return result.first->payload ();
     }
   else
@@ -119,7 +127,16 @@ FibImpl::Remove (const Ptr<const NameComponents> &prefix)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 
-  super::erase (*prefix);
+  super::iterator fibEntry = super::find_exact (*prefix);
+  if (fibEntry != super::end ())
+    {
+      // notify forwarding strategy about soon be removed FIB entry
+      NS_ASSERT (this->GetObject<ForwardingStrategy> () != 0);
+      this->GetObject<ForwardingStrategy> ()->WillRemoveFibEntry (fibEntry->payload ());
+
+      super::erase (fibEntry);
+    }
+  // else do nothing
 }
 
 // void
@@ -182,6 +199,10 @@ FibImpl::RemoveFromAll (Ptr<Face> face)
       
       if (trieNode->payload ()->m_faces.size () == 0)
         {
+          // notify forwarding strategy about soon be removed FIB entry
+          NS_ASSERT (this->GetObject<ForwardingStrategy> () != 0);
+          this->GetObject<ForwardingStrategy> ()->WillRemoveFibEntry (trieNode->payload ());
+          
           trieNode = super::parent_trie::recursive_iterator (trieNode->erase ());
         }
     }

@@ -80,6 +80,19 @@ public:
         exit (1);
       }
   }
+
+  /// \copydoc ForwardingStrategy::DidAddFibEntry
+  virtual void
+  DidAddFibEntry (Ptr<fib::Entry> fibEntry)
+  {
+    ObjectFactory factory;
+    factory.SetTypeId (fibEntry->m_faces.begin ()->m_face->GetObject<Limits> ()->GetInstanceTypeId ());
+    
+    Ptr<Limits> limits = factory.template Create<Limits> ();
+    fibEntry->AggregateObject (limits);
+
+    super::DidAddFibEntry (fibEntry);
+  }
   
 protected:
   /// \copydoc ForwardingStrategy::CanSendOutInterest

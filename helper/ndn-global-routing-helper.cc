@@ -281,17 +281,13 @@ GlobalRoutingHelper::CalculateRoutes ()
                                     << " with delay " << i->second.get<2> ());
                     
                       Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
-                      Ptr<Limits> limits = i->second.get<0> ()->GetObject<Limits> ();
-                    
-                      if (limits != 0 && limits->IsEnabled ())
+                      Ptr<Limits> faceLimits = i->second.get<0> ()->GetObject<Limits> ();
+
+                      Ptr<Limits> fibLimits = entry->GetObject<Limits> ();
+                      if (fibLimits != 0)
                         {
-                          ObjectFactory limitsFactory;
-                          limitsFactory.SetTypeId (limits->GetInstanceTypeId ());
-
-                          Ptr<Limits> entryLimits = limitsFactory.Create<Limits> ();
-                          entryLimits->SetLimits (limits->GetMaxRate (), 2*i->second.get<2> ());
-
-                          entry->AggregateObject (entryLimits);
+                          // if it was created by the forwarding strategy via DidAddFibEntry event
+                          fibLimits->SetLimits (faceLimits->GetMaxRate (), 2*i->second.get<2> () /*exact RTT*/);
                         }
                     }
 		}

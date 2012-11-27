@@ -139,9 +139,6 @@ private:
    */
   void
   RemoveFace (super::parent_trie &item, Ptr<Face> face);
-  
-private:
-  Ptr<Node> m_node;
 };
 
 } // namespace fib

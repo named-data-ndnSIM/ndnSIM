@@ -116,6 +116,22 @@ public:
     policy_.update (position);
     return true;
   }
+
+  /**
+   * @brief Find a node that has the exact match with the key
+   */
+  inline iterator
+  find_exact (const FullKey &key)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+    
+    if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
+      return end ();
+
+    return lastItem;
+  }
   
   /**
    * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)

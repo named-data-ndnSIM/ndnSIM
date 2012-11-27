@@ -36,6 +36,7 @@ class Pit;
 namespace pit { class Entry; }
 class FibFaceMetric;
 class Fib;
+namespace fib { class Entry; }
 class ContentStore;
 
 /**
@@ -109,6 +110,20 @@ public:
    */
   virtual void
   RemoveFace (Ptr<Face> face);
+
+  /**
+   * @brief Event fired every time a FIB entry is added to FIB
+   * @param fibEntry FIB entry that was added
+   */
+  virtual void
+  DidAddFibEntry (Ptr<fib::Entry> fibEntry);
+
+  /**
+   * @brief Fired just before FIB entry will be removed from FIB
+   * @param fibEntry FIB entry that will be removed
+   */
+  virtual void
+  WillRemoveFibEntry (Ptr<fib::Entry> fibEntry);
   
 protected:
   /**
