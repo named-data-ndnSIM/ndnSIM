@@ -46,6 +46,8 @@
 
 #include "boost-graph-ndn-global-routing-helper.h"
 
+#include <math.h>
+
 NS_LOG_COMPONENT_DEFINE ("ndn.GlobalRoutingHelper");
 
 using namespace std;
@@ -287,7 +289,9 @@ GlobalRoutingHelper::CalculateRoutes ()
                       if (fibLimits != 0)
                         {
                           // if it was created by the forwarding strategy via DidAddFibEntry event
-                          fibLimits->SetLimits (faceLimits->GetMaxRate (), 2*i->second.get<2> () /*exact RTT*/);
+                          fibLimits->SetLimits (faceLimits->GetMaxRate (), 2 * i->second.get<2> () /*exact RTT*/);
+                          NS_LOG_DEBUG ("Set limit for prefix " << *prefix << " " << faceLimits->GetMaxRate () << " / " <<
+                                        2*i->second.get<2> () << "s (" << faceLimits->GetMaxRate () * 2 * i->second.get<2> () << ")");
                         }
                     }
 		}
