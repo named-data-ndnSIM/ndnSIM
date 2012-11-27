@@ -75,7 +75,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
 }
 
 void
-CustomStrategy::DidSendOutInterest (Ptr<Face> outFace,
+CustomStrategy::DidSendOutInterest (Ptr<Face> inFace, Ptr<Face> outFace,
                                     Ptr<const InterestHeader> header,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)

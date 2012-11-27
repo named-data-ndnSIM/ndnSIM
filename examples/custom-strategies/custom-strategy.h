@@ -36,7 +36,7 @@ protected:
 
 public:
   virtual void
-  DidSendOutInterest (Ptr<Face> outFace,
+  DidSendOutInterest (Ptr<Face> inFace, Ptr<Face> outFace,
                       Ptr<const InterestHeader> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
