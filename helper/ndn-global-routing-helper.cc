@@ -283,6 +283,8 @@ GlobalRoutingHelper::CalculateRoutes ()
                                     << " with delay " << i->second.get<2> ());
                     
                       Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
+                      entry->SetRealDelayToProducer (i->second.get<0> (), Seconds (i->second.get<2> ()));
+                        
                       Ptr<Limits> faceLimits = i->second.get<0> ()->GetObject<Limits> ();
 
                       Ptr<Limits> fibLimits = entry->GetObject<Limits> ();

@@ -132,6 +132,21 @@ Entry::AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric)
 }
 
 void
+Entry::SetRealDelayToProducer (Ptr<Face> face, Time delay)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (face != NULL, "Trying to Update NULL face");
+
+  FaceMetricByFace::type::iterator record = m_faces.get<i_face> ().find (face);
+  if (record != m_faces.get<i_face> ().end ())
+    {
+      m_faces.modify (record,
+                      (&ll::_1)->*&FaceMetric::m_realDelay = delay);
+    }
+}
+
+
+void
 Entry::Invalidate ()
 {
   for (FaceMetricByFace::type::iterator face = m_faces.begin ();

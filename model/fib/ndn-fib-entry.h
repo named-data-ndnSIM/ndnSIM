@@ -69,6 +69,7 @@ public:
     , m_routingCost (cost)
     , m_sRtt   (Seconds (0))
     , m_rttVar (Seconds (0))
+    , m_realDelay (Seconds (0))
   { }
 
   /**
@@ -110,6 +111,8 @@ public:
 
   Time m_sRtt;         ///< \brief smoothed round-trip time
   Time m_rttVar;       ///< \brief round-trip time variation
+
+  Time m_realDelay;    ///< \brief real propagation delay to the producer, calculated based on NS-3 p2p link delays
 };
 
 /// @cond include_hidden
@@ -193,6 +196,12 @@ public:
    */
   void AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric);
 
+  /**
+   * \brief Set real delay to the producer
+   */
+  void
+  SetRealDelayToProducer (Ptr<Face> face, Time delay);
+  
   /**
    * @brief Invalidate face
    *
