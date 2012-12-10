@@ -35,6 +35,9 @@ class InterestHeader;
 class Face;
 class ContentObjectHeader;
 
+/**
+ * @brief Base class for network-layer (incoming/outgoing Interests and Data) tracing of NDN stack
+ */
 class L3Tracer : public SimpleRefCount<L3Tracer>
 {
 public:
