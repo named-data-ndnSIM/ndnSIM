@@ -36,6 +36,9 @@ namespace ndnSIM {
  */
 struct persistent_policy_traits
 {
+  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
+  static std::string GetName () { return "Persistent"; }
+
   struct policy_hook_type : public boost::intrusive::list_member_hook<> {};
 
   template<class Container>

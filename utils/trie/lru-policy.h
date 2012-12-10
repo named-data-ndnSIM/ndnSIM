@@ -33,6 +33,9 @@ namespace ndnSIM {
  */
 struct lru_policy_traits
 {
+  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
+  static std::string GetName () { return "Lru"; }
+  
   struct policy_hook_type : public boost::intrusive::list_member_hook<> {};
 
   template<class Container>

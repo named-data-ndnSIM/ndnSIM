@@ -35,6 +35,9 @@ namespace ndnSIM {
  */
 struct random_policy_traits
 {
+  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
+  static std::string GetName () { return "Random"; }
+
   struct policy_hook_type : public boost::intrusive::set_member_hook<> { uint32_t randomOrder; };
 
   template<class Container>

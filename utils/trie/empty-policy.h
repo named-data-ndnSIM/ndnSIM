@@ -30,6 +30,9 @@ namespace ndnSIM {
  */
 struct empty_policy_traits
 {
+  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
+  static std::string GetName () { return ""; }
+
   typedef void* policy_hook_type;
 
   template<class Container> struct container_hook { typedef void* type; };
