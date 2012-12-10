@@ -113,6 +113,17 @@ struct multi_policy_container
                                                 boost::mpl::_1/*empty/previous*/,
                                                 policy_wrap<Base, boost::mpl::_2>/*element in vector*/>
                               >::type super;
+
+  typedef typename boost::mpl::at_c<Vector, 0>::type::iterator iterator;
+  typedef typename boost::mpl::at_c<Vector, 0>::type::const_iterator const_iterator;
+
+  iterator begin ()             { return this->get<0> ().begin (); }
+  const_iterator begin () const { return this->get<0> ().begin (); }
+
+  iterator end ()             { return this->get<0> ().end (); }
+  const_iterator end () const { return this->get<0> ().end (); }
+
+  size_t size () const { return this->get<0> ().size (); }
   
   multi_policy_container (Base &base)
   : super (base)

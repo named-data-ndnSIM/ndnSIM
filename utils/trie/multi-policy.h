@@ -31,6 +31,7 @@
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/for_each.hpp>
 
 #include <boost/intrusive/options.hpp>
 
@@ -122,8 +123,60 @@ struct multi_policy_traits
       {
         policy_container::clear ();
       }
+
+      struct max_size_setter
+      {
+        max_size_setter (policy_container &container, size_t size) : m_container (container), m_size (size) { }
+        
+        template< typename U > void operator() (U index)
+        {
+          m_container.template get<U::value> ().set_max_size (m_size);
+        }
+
+      private:
+        policy_container &m_container;
+        size_t m_size;
+      };
+      
+      inline void
+      set_max_size (size_t max_size)
+      {
+        boost::mpl::for_each< boost::mpl::range_c<int, 0, boost::mpl::size<policy_traits>::type::value> >
+          (max_size_setter (*this, max_size));
+      }
+
+      inline size_t
+      get_max_size () const
+      {
+        // as max size should be the same everywhere, get the value from the first available policy
+        return policy_container::template get<0> ().get_max_size ();
+      }
+      
     };
   };
+
+
+  struct name_getter
+  {
+    name_getter (std::string &name) : m_name (name) { }
+    
+    template< typename U > void operator() (U index)
+    {
+      m_name += boost::mpl::at_c< policy_traits, U::value >::type::GetName ();
+    }
+
+    std::string &m_name;
+  };
+
+  /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
+  static std::string GetName ()
+  {
+    // combine names of all internal policies
+    std::string name;
+    boost::mpl::for_each< boost::mpl::range_c<int, 0, boost::mpl::size<policy_traits>::type::value> > (name_getter (name));
+    
+    return name;
+  }
 };
 
 } // ndnSIM

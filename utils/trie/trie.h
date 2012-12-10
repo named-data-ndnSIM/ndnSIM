@@ -39,7 +39,7 @@ namespace ndnSIM {
 /////////////////////////////////////////////////////
 // Allow customization for payload
 //
-template<typename Payload>
+template<typename Payload, typename BasePayload = Payload>
 struct pointer_payload_traits
 {
   typedef Payload         payload_type; // general type of the payload
@@ -49,14 +49,17 @@ struct pointer_payload_traits
   typedef Payload*        return_type;  // what is returned on access
   typedef const Payload*  const_return_type; // what is returned on const access
 
+  typedef typename Payload::base_type*       base_type;       // base type of the entry (when implementation details need to be hidden)
+  typedef const typename Payload::base_type* const_base_type; // const base type of the entry (when implementation details need to be hidden)
+  
   static Payload* empty_payload;
 };
 
-template<typename Payload>
+template<typename Payload, typename BasePayload>
 Payload*
-pointer_payload_traits<Payload>::empty_payload = 0;
+pointer_payload_traits<Payload, BasePayload>::empty_payload = 0;
 
-template<typename Payload>
+template<typename Payload, typename BasePayload = Payload>
 struct smart_pointer_payload_traits
 {
   typedef Payload                 payload_type;
@@ -65,15 +68,18 @@ struct smart_pointer_payload_traits
   
   typedef ns3::Ptr<Payload>       return_type;
   typedef ns3::Ptr<const Payload> const_return_type;
+
+  typedef ns3::Ptr<BasePayload> base_type;
+  typedef ns3::Ptr<const BasePayload> const_base_type;
   
   static ns3::Ptr<Payload> empty_payload;
 };
 
-template<typename Payload>
+template<typename Payload, typename BasePayload>
 ns3::Ptr<Payload>
-smart_pointer_payload_traits<Payload>::empty_payload = 0;
+smart_pointer_payload_traits<Payload, BasePayload>::empty_payload = 0;
 
-template<typename Payload>
+template<typename Payload, typename BasePayload = Payload>
 struct non_pointer_traits
 {
   typedef Payload         payload_type;
@@ -83,12 +89,15 @@ struct non_pointer_traits
   typedef Payload&        return_type;
   typedef const Payload & const_return_type;
   
+  typedef typename Payload::base_type&       base_type;
+  typedef const typename Payload::base_type& const_base_type;
+  
   static Payload empty_payload;
 };
 
-template<typename Payload>
+template<typename Payload, typename BasePayload>
 Payload 
-non_pointer_traits<Payload>::empty_payload = Payload ();
+non_pointer_traits<Payload, BasePayload>::empty_payload = Payload ();
 
 
 ////////////////////////////////////////////////////

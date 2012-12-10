@@ -41,6 +41,9 @@ template<class CS>
 class EntryImpl : public Entry
 {
 public:
+  typedef Entry base_type;
+  
+public:
   EntryImpl (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
     : Entry (header, packet)
     , item_ (0)
@@ -65,12 +68,12 @@ private:
 template<class Policy>
 class ContentStoreImpl : public ContentStore,
                          protected ndnSIM::trie_with_policy< NameComponents,
-                                                             ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > > >,
+                                                             ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > >, Entry >,
                                                              Policy >
 {
 public:
   typedef ndnSIM::trie_with_policy< NameComponents,
-                                    ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > > >,
+                                    ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > >, Entry >,
                                     Policy > super;
   
   typedef EntryImpl< ContentStoreImpl< Policy > > entry;

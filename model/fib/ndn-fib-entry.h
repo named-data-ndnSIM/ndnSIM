@@ -171,6 +171,9 @@ struct FaceMetricContainer
 class Entry : public Object
 {
 public:
+  typedef Entry base_type;
+  
+public:
   class NoFaces {}; ///< @brief Exception class for the case when FIB entry is not found
   
   /**

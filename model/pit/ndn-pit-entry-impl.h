@@ -31,6 +31,9 @@ namespace pit {
 template<class Pit>
 class EntryImpl : public Entry
 {
+public:
+  typedef Entry base_type;
+
   typedef Entry super;
   #define CONTAINER static_cast<Pit&> (m_container)
   

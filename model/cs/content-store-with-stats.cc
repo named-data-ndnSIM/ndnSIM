@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "content-store-impl.h"
+#include "content-store-with-stats.h"
 
 #include "../../utils/trie/random-policy.h"
 #include "../../utils/trie/lru-policy.h"
@@ -42,39 +42,41 @@ namespace cs {
 
 // explicit instantiation and registering
 /**
- * @brief ContentStore with LRU cache replacement policy
+ * @brief ContentStore with stats and LRU cache replacement policy
  **/
-template class ContentStoreImpl<lru_policy_traits>;
+template class ContentStoreWithStats<lru_policy_traits>;
 
 /**
- * @brief ContentStore with random cache replacement policy
+ * @brief ContentStore with stats and random cache replacement policy
  **/
-template class ContentStoreImpl<random_policy_traits>;
+template class ContentStoreWithStats<random_policy_traits>;
 
 /**
- * @brief ContentStore with FIFO cache replacement policy
+ * @brief ContentStore with stats and FIFO cache replacement policy
  **/
-template class ContentStoreImpl<fifo_policy_traits>;
+template class ContentStoreWithStats<fifo_policy_traits>;
 
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lru_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, random_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, fifo_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, lru_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, random_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, fifo_policy_traits);
+
 
 #ifdef DOXYGEN
 // /**
 //  * \brief Content Store implementing LRU cache replacement policy
 //  */
-class Lru : public ContentStoreImpl<lru_policy_traits> { };
+class Stats::Lru : public ContentStoreWithStats<lru_policy_traits> { };
 
 /**
  * \brief Content Store implementing FIFO cache replacement policy
  */
-class Fifo : public ContentStoreImpl<fifo_policy_traits> { };
+class Stats::Fifo : public ContentStoreWithStats<fifo_policy_traits> { };
 
 /**
  * \brief Content Store implementing Random cache replacement policy
  */
-class Random : public ContentStoreImpl<random_policy_traits> { };
+class Stats::Random : public ContentStoreWithStats<random_policy_traits> { };
+
 #endif
 
 
