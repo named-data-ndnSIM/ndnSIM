@@ -83,7 +83,7 @@ public:
    *                          |               |
    *                      terminator      DTAG (Dictionary TAG)
    *
-   * \see http://www.ndn.org/releases/latest/doc/technical/BinaryEncoding.html
+   * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
    */
   
   static Type

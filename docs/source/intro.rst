@@ -70,9 +70,9 @@ Overall structure of ndnSIM is described in our `technical report <http://lasr.c
 
 `ndnSIM API documentation <doxygen/index.html>`_
 
-.. It is also possible to build doxygen documentation of ndnSIM API (in ``ns-3/doc/html/``), provided that ``doxygen`` and ``graphviz`` modules are installed on system::
+Also, you can `join our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in discussions about ndnSIM implementation and simulations in general.   
+Do not forget to check mailling list `archives <http://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_.  
 
-..     ./waf doxygen
 
 Support
 -------
