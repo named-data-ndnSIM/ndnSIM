@@ -112,6 +112,7 @@ To select a particular content store and configure its capacity, use :ndnsim:`Se
 	 ...
 	 ndnHelper.Install (nodes);
 
+
 - :ndnsim:`First-In-First-Out (FIFO) <ndn::cs::Fifo>`:
 
       .. code-block:: c++
@@ -137,6 +138,72 @@ To select a particular content store and configure its capacity, use :ndnsim:`Se
 .. note::
 
     If ``MaxSize`` is set to 0, then no limit on ContentStore will be enforced 
+
+
+In order to evaluate lifetime of the content store entries, the special versions of the content store need to be used:
+
+- :ndnsim:`Least Recently Used (LRU) with cache entry lifetime tracking <ndn::cs::Stats::Lru>`:
+
+      .. code-block:: c++
+
+         void
+         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
+         {
+             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
+         }
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Lru",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+         // connect to lifetime trace
+         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Lru/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
+
+
+- :ndnsim:`First-In-First-Out (FIFO) with cache entry lifetime tracking <ndn::cs::Stats::Fifo>`:
+
+      .. code-block:: c++
+
+         void
+         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
+         {
+             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
+         }
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Fifo",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+         // connect to lifetime trace
+         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Fifo/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
+
+- :ndnsim:`Random with cache entry lifetime tracking <ndn::cs::Stats::Random>`:
+
+      .. code-block:: c++
+
+         void
+         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
+         {
+             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
+         }
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Random",
+                                    "MaxSize", "10000");
+	 ...
+	 ndnHelper.Install (nodes);
+
+         // connect to lifetime trace
+         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Random/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
+
+
 
 Pending Interest Table
 ++++++++++++++++++++++

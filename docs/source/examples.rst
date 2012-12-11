@@ -258,8 +258,8 @@ You can also run using visualizer module to verify that both bottleneck links ar
 
 .. _trace example:
 
-Example of using trace helpers
-------------------------------
+3-level binary tree with packet-level trace helpers
+---------------------------------------------------
 
 This example (``ndn-tree-tracers.cc``) demonstrates basic usage of :ref:`trace classes`.   
 
@@ -329,3 +329,31 @@ For example, the following `R script <http://www.r-project.org/>`_ will build a 
     :linenos:
 
 For more information about R and ggplot2, please refer to `R language manual <http://cran.r-project.org/manuals.html>`_, `ggplot2 module manual <http://docs.ggplot2.org/current/>`_.
+
+
+
+.. _cs trace helper example:
+
+3-level binary tree with content store trace helper
+---------------------------------------------------
+
+This example (``ndn-tree-cs-tracers.cc``) demonstrates basic usage of :ref:`content store tracer helper class<cs trace helper>`.   
+
+In this scenario we will use the same tree-like topology as in :ref:`previous example <trace example>`, where consumers are installed on leaf nodes and producer is in the root of the tree.
+The main difference is that each client request data from the same namespace: /root/1, /root/2, ...  Another small difference is that in this scenario we start our application not at the same time, but 10 ms apart.
+
+Example simulation (``ndn-tree-cs-tracers.cc``) scenario that utilizes trace helpers:
+
+.. literalinclude:: ../../examples/ndn-tree-cs-tracers.cc
+    :language: c++
+    :linenos:
+    :lines: 21-31,64-
+    :emphasize-lines: 7-11,25,46,48,65-66
+
+
+To run this scenario, use the following command::
+
+        ./waf --run=ndn-tree-cs-tracers
+
+The successful run will create ``cs-trace.txt``, which similarly to trace file from the :ref:`previous example <trace example>` can be analyzed manually or used as input to some graph/stats packages.
+

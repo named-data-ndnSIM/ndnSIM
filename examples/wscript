@@ -22,3 +22,6 @@ def build(bld):
 
         obj = bld.create_ns3_program('ndn-tree-tracers', ['ndnSIM'])
         obj.source = 'ndn-tree-tracers.cc'
+
+        obj = bld.create_ns3_program('ndn-tree-cs-tracers', ['ndnSIM'])
+        obj.source = 'ndn-tree-cs-tracers.cc'
