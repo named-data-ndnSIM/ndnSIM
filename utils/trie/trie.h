@@ -49,8 +49,8 @@ struct pointer_payload_traits
   typedef Payload*        return_type;  // what is returned on access
   typedef const Payload*  const_return_type; // what is returned on const access
 
-  typedef typename Payload::base_type*       base_type;       // base type of the entry (when implementation details need to be hidden)
-  typedef const typename Payload::base_type* const_base_type; // const base type of the entry (when implementation details need to be hidden)
+  typedef BasePayload*       base_type;       // base type of the entry (when implementation details need to be hidden)
+  typedef const BasePayload* const_base_type; // const base type of the entry (when implementation details need to be hidden)
   
   static Payload* empty_payload;
 };
@@ -89,8 +89,8 @@ struct non_pointer_traits
   typedef Payload&        return_type;
   typedef const Payload & const_return_type;
   
-  typedef typename Payload::base_type&       base_type;
-  typedef const typename Payload::base_type& const_base_type;
+  typedef BasePayload&       base_type;
+  typedef const BasePayload& const_base_type;
   
   static Payload empty_payload;
 };
