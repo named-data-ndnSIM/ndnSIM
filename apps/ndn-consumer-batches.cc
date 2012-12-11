@@ -48,7 +48,7 @@ ConsumerBatches::GetTypeId (void)
     .AddAttribute ("Batches", "Batches to schedule. Should be vector, containing pairs of time and amount",
                    // TypeId::ATTR_SET, 
                    StringValue (""),
-                   MakeBatchesAccessor (&ConsumerBatches::GetBatch, &ConsumerBatches::SetBatch),
+                   MakeBatchesAccessor (&ConsumerBatches::m_batches),
                    MakeBatchesChecker ())
     ;
 
@@ -61,12 +61,14 @@ ConsumerBatches::ConsumerBatches ()
 }
 
 void
-ConsumerBatches::SetBatch (const Batches &batches)
+ConsumerBatches::StartApplication ()
 {
+  Consumer::StartApplication ();
+  
   // std::cout << "Batches: " << batches << "\n";
-  for (Batches::const_iterator i = batches.begin (); i != batches.end (); i++)
+  for (Batches::const_iterator i = m_batches.begin (); i != m_batches.end (); i++)
     {
-      Simulator::Schedule (i->get<0> (), &ConsumerBatches::AddBatch, this, i->get<1> ());
+      Simulator::ScheduleWithContext (GetNode ()->GetId (), i->get<0> (), &ConsumerBatches::AddBatch, this, i->get<1> ());
     }
 }
 

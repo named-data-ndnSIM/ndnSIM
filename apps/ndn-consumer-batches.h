@@ -57,11 +57,8 @@ public:
   // OnTimeout (uint32_t sequenceNumber);
 
 private:
-  Batches
-  GetBatch () const { return Batches(); }
-
-  void
-  SetBatch (const Batches &batch);
+  virtual void
+  StartApplication ();    ///< @brief Called at time specified by Start
   
   void
   AddBatch (uint32_t amount);
@@ -74,6 +71,8 @@ protected:
 
 private:
   bool m_initial;
+
+  Batches m_batches;
 };
 
 } // namespace ndn
