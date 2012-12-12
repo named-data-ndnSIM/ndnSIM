@@ -302,7 +302,7 @@ put (reference_wrapper< M > mapp,
 // void
 // put (cref< std::map< ns3::Ptr<ns3::ndn::GlobalRouter>, ns3::Ptr<ns3::ndn::GlobalRouter> > > map,
 
-uint32_t
+inline uint32_t
 get (const boost::VertexIds&, ns3::Ptr<ns3::ndn::GlobalRouter> &gr)
 {
   return gr->GetId ();
