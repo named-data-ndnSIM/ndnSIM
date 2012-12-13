@@ -23,8 +23,13 @@ Requirements
 
        sudo port instal boost
 
+.. role:: red
+
 .. note::
-   !!! If you do not have root permissions to install boost, you can install it in your home folder.  However, you need to be make sure that `libboost_iostreams` library is successfully compiled and is installed.  Please refer to :doc:`the following example <boost-custom-install>` for the hints how to successfully compile and install boost libraries on Ubuntu Linux. 
+   :red:`!!! ndnSIM requires boost version at least 1.48.`   Many linux distribution (including Ubuntu 12.04.1 at the time of this writing) ship an old version of boost, making it impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following :ref:`these simple instructions <Installing boost libraries>`.
+
+.. note::
+   !!! If you do not have root permissions to install boost, you can install it in your home folder.  However, you need to be make sure that `libboost_iostreams` library is successfully compiled and is installed.  Please refer to :ref:`the following example <Installing boost libraries>` for the hints how to successfully compile and install boost libraries on Ubuntu Linux. 
 
 
 3. If you are planning to use other modules, like visualizer, a number of additional dependencies should be installed.  For example, in
@@ -68,19 +73,19 @@ Compiling and running ndnSIM
 ndnSIM uses standard NS-3 compilation procedure.  Normally the following commands should be sufficient to configure and build ndnSIM with python bindings enabled::
 
 	cd <ns-3-folder>
-	./waf configure --enable-examples --enable-ndn-plugins=topology,mobility
+	./waf configure --enable-examples
 	./waf
 
 On MacOS (with macports), you may need to modify the configure command to use macports version of python::
 
 	cd <ns-3-folder>
-	./waf configure --with-python=/opt/local/bin/python2.7 --enable-examples --enable-ndn-plugins=topology,mobility
+	./waf configure --with-python=/opt/local/bin/python2.7 --enable-examples
 	./waf
 
 Python bindings is an optional and not very stable feature of NS-3 simulator.  It is possible to disable python bindings compilation either to speed up compilation or to avoid certain compilation errors (e.g., "Could not find a task generator for the name 'ns3-visualizer'")::
 
 	cd <ns-3-folder>
-	./waf configure --disable-python --enable-examples --enable-ndn-plugins=topology,mobility
+	./waf configure --disable-python --enable-examples
 	./waf
 
 For more configuration options, please refer to ``./waf --help``.
@@ -104,10 +109,4 @@ or::
 .. note::
    Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
 
-Additional compiling options
-++++++++++++++++++++++++++++
-
-ndnSIM contains a number of NS-3 extensions that are not technically part of the ndnSIM.  Right now there are two optional plugins---topology and mobility---which can be enabled using the following configuration option::
-
-	./waf configure --enable-ndn-plugins=topology,mobility
 

@@ -124,3 +124,8 @@ div.sphinxsidebar a {
 .highlight .hll {
 	background-color: #FFFF88;
 }
+
+.red {
+    color: red;
+    font-weight: bold;
+}

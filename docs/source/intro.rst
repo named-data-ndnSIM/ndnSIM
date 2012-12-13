@@ -83,6 +83,7 @@ To file a bug report, please use `GitHub Issues <https://github.com/NDN-Routing/
 
 To create new feature, please fork the code and submit Pull Request on GitHub.
 
+And of course, `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ is the best way to communicate with and get support from ndnSIM team and other users of ndnSIM.
 
 A very short guide to the code
 ------------------------------
