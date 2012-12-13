@@ -72,7 +72,7 @@ struct lifetime_stats_policy_traits
     class type : public policy_container
     {
     public:
-      typedef policy policy; // to get access to get_time methods from outside
+      typedef policy policy_base; // to get access to get_time methods from outside
       typedef Container parent_trie;
 
       type (Base &base)

@@ -105,7 +105,7 @@ ContentStoreWithFreshness< Policy >::RescheduleCleaning ()
 
   if (freshness.size () > 0)
     {
-      Time nextStateTime = freshness_policy_container::policy::get_freshness (&(*freshness.begin ()));
+      Time nextStateTime = freshness_policy_container::policy_base::get_freshness (&(*freshness.begin ()));
 
       if (m_scheduledCleaningTime.IsZero () || // if not yet scheduled
           m_scheduledCleaningTime > nextStateTime) // if new item expire sooner than already scheduled
@@ -143,7 +143,7 @@ ContentStoreWithFreshness< Policy >::CleanExpired ()
     {
       typename freshness_policy_container::iterator entry = freshness.begin ();
 
-      if (freshness_policy_container::policy::get_freshness (&(*entry)) <= now) // is the record stale?
+      if (freshness_policy_container::policy_base::get_freshness (&(*entry)) <= now) // is the record stale?
         {
           super::erase (&(*entry));
         }
