@@ -59,6 +59,10 @@ Producer::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor(&Producer::m_virtualPayloadSize),
                    MakeUintegerChecker<uint32_t>())
+    .AddAttribute ("Freshness", "Freshness of data packets, if 0, then unlimited freshness",
+                   TimeValue (Seconds (0)),
+                   MakeTimeAccessor (&Producer::m_freshness),
+                   MakeTimeChecker ())
     ;
         
   return tid;
@@ -114,6 +118,7 @@ Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> ori
   static ContentObjectTail tail;
   Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
   header->SetName (Create<NameComponents> (interest->GetName ()));
+  header->SetFreshness (m_freshness);
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   

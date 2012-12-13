@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "content-store-with-stats.h"
+#include "content-store-with-freshness.h"
 
 #include "../../utils/trie/random-policy.h"
 #include "../../utils/trie/lru-policy.h"
@@ -42,40 +42,40 @@ namespace cs {
 
 // explicit instantiation and registering
 /**
- * @brief ContentStore with stats and LRU cache replacement policy
+ * @brief ContentStore with freshness and LRU cache replacement policy
  **/
-template class ContentStoreWithStats<lru_policy_traits>;
+template class ContentStoreWithFreshness<lru_policy_traits>;
 
 /**
- * @brief ContentStore with stats and random cache replacement policy
+ * @brief ContentStore with freshness and random cache replacement policy
  **/
-template class ContentStoreWithStats<random_policy_traits>;
+template class ContentStoreWithFreshness<random_policy_traits>;
 
 /**
- * @brief ContentStore with stats and FIFO cache replacement policy
+ * @brief ContentStore with freshness and FIFO cache replacement policy
  **/
-template class ContentStoreWithStats<fifo_policy_traits>;
+template class ContentStoreWithFreshness<fifo_policy_traits>;
 
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, lru_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, random_policy_traits);
-NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, fifo_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lru_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, random_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, fifo_policy_traits);
 
 
 #ifdef DOXYGEN
 // /**
-//  * \brief Content Store with stats implementing LRU cache replacement policy
+//  * \brief Content Store with freshness implementing LRU cache replacement policy
 //  */
-class Stats::Lru : public ContentStoreWithStats<lru_policy_traits> { };
+class Freshness::Lru : public ContentStoreWithFreshness<lru_policy_traits> { };
 
 /**
- * \brief Content Store with stats implementing FIFO cache replacement policy
+ * \brief Content Store with freshness implementing FIFO cache replacement policy
  */
-class Stats::Fifo : public ContentStoreWithStats<fifo_policy_traits> { };
+class Freshness::Fifo : public ContentStoreWithFreshness<fifo_policy_traits> { };
 
 /**
- * \brief Content Store with stats implementing Random cache replacement policy
+ * \brief Content Store with freshness implementing Random cache replacement policy
  */
-class Stats::Random : public ContentStoreWithStats<random_policy_traits> { };
+class Freshness::Random : public ContentStoreWithFreshness<random_policy_traits> { };
 
 #endif
 

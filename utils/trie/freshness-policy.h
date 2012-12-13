@@ -18,8 +18,8 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef LIFETIME_STATS_POLICY_H_
-#define LIFETIME_STATS_POLICY_H_
+#ifndef FRESHNESS_POLICY_H_
+#define FRESHNESS_POLICY_H_
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
@@ -33,14 +33,14 @@ namespace ndn {
 namespace ndnSIM {
 
 /**
- * @brief Traits for lifetime stats policy
+ * @brief Traits for freshness policy
  */
-struct lifetime_stats_policy_traits
+struct freshness_policy_traits
 {
   /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string GetName () { return "LifetimeStats"; }
+  static std::string GetName () { return "Freshness"; }
 
-  struct policy_hook_type : public boost::intrusive::list_member_hook<> { Time timeWhenAdded; };
+  struct policy_hook_type : public boost::intrusive::set_member_hook<> { Time timeWhenShouldExpire; };
 
   template<class Container>
   struct container_hook
@@ -55,30 +55,41 @@ struct lifetime_stats_policy_traits
            class Hook>
   struct policy 
   {
-    typedef typename boost::intrusive::list< Container, Hook > policy_container;
-    
-    static Time& get_time (typename Container::iterator item)
+    static Time& get_freshness (typename Container::iterator item)
     {
       return static_cast<typename policy_container::value_traits::hook_type*>
-        (policy_container::value_traits::to_node_ptr(*item))->timeWhenAdded;
+        (policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
     }
       
-    static const Time& get_time (typename Container::const_iterator item)
+    static const Time& get_freshness (typename Container::const_iterator item)
     {
       return static_cast<const typename policy_container::value_traits::hook_type*>
-        (policy_container::value_traits::to_node_ptr(*item))->timeWhenAdded;
+        (policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
     }
 
+    template<class Key>
+    struct MemberHookLess
+    {
+      bool operator () (const Key &a, const Key &b) const
+      {
+        return get_freshness (&a) < get_freshness (&b);
+      }
+    };
+
+    typedef boost::intrusive::multiset< Container,
+                                   boost::intrusive::compare< MemberHookLess< Container > >,
+                                   Hook > policy_container;
+
+    
     class type : public policy_container
     {
     public:
-      typedef policy policy; // to get access to get_time methods from outside
+      typedef policy policy; // to get access to get_freshness methods from outside
       typedef Container parent_trie;
 
       type (Base &base)
         : base_ (base)
         , max_size_ (100)
-        , m_willRemoveEntry (0)
       {
       }
 
@@ -91,9 +102,17 @@ struct lifetime_stats_policy_traits
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        get_time (item) = Simulator::Now ();
+        // get_time (item) = Simulator::Now ();
+        Time freshness = item->payload ()->GetHeader ()->GetFreshness ();
+        if (!freshness.IsZero ())
+          {
+            get_freshness (item) = Simulator::Now () + freshness;
 
-        policy_container::push_back (*item);
+            // push item only if freshness is non zero. otherwise, this payload is not controlled by the policy
+            // note that .size() on this policy would return only number of items with non-infinite freshness policy
+            policy_container::push_back (*item);
+          }
+
         return true;
       }
   
@@ -106,14 +125,11 @@ struct lifetime_stats_policy_traits
       inline void
       erase (typename parent_trie::iterator item)
       {
-        Time lifetime = Simulator::Now () - get_time (item);
-
-        if (m_willRemoveEntry != 0)
+        if (!item->payload ()->GetHeader ()->GetFreshness ().IsZero ())
           {
-            (*m_willRemoveEntry) (item->payload (), lifetime);
+            // erase only if freshness is non zero (otherwise an item is not in the policy
+            policy_container::erase (policy_container::s_iterator_to (*item));
           }
-        
-        policy_container::erase (policy_container::s_iterator_to (*item));
       }
 
       inline void
@@ -134,21 +150,12 @@ struct lifetime_stats_policy_traits
         return max_size_;
       }
 
-      void
-      set_traced_callback (TracedCallback< typename parent_trie::payload_traits::const_base_type, Time > *callback)
-      {
-        std::cout << Simulator::GetContext () << " " << callback << std::endl;
-        m_willRemoveEntry = callback;
-      }
-      
     private:
       type () : base_(*((Base*)0)) { };
       
     private:
       Base &base_;
       size_t max_size_;
-
-      TracedCallback< typename parent_trie::payload_traits::const_base_type, Time > *m_willRemoveEntry;
     };
   };
 };

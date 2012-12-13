@@ -82,6 +82,7 @@ struct random_policy_traits
     class type : public policy_container
     {
     public:
+      typedef policy policy; // to get access to get_order methods from outside
       typedef Container parent_trie;
 
       type (Base &base)

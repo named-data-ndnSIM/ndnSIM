@@ -61,6 +61,7 @@ protected:
 private:
   NameComponents m_prefix;
   uint32_t m_virtualPayloadSize;
+  Time m_freshness;
 };
 
 } // namespace ndn

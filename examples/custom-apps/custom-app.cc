@@ -33,7 +33,6 @@
 #include "ns3/ndn-fib.h"
 #include "ns3/random-variable.h"
 
-
 NS_LOG_COMPONENT_DEFINE ("CustomApp");
 
 namespace ns3 {
