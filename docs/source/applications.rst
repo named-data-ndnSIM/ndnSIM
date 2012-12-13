@@ -120,6 +120,7 @@ Producer
    // Create application using the app helper
    ndn::AppHelper consumerHelper ("ns3::ndn::Producer");
 
+.. _Custom applications:
 
 Custom applications
 +++++++++++++++++++
@@ -131,170 +132,67 @@ To simplify implementation of specific NDN application, ndnSIM provides a base :
 .. ^^^^^^^^^^^^^^^^^^
 
 
-
 Customer example
 ^^^^^^^^^^^^^^^^
 
-The following code shows how a simple ndnSIM application can be created.  
-For details refer to API documentation of ndnSIM and NS-3.
+The following code shows how a simple ndnSIM application can be created, and how an application can send Interests and respond with ContentObjects to incoming interests.
 
-.. code-block:: c++
+When this application starts it sets "interest filter" (install FIB entry) for /prefix/sub, as well as sends Interest for this prefix.
+When an Interest is received, it is replied with a ContentObject with 1024-byte fake payload.
 
-    class CustomApp : public ndn::App
-    {
-    public:
-      // overridden from ndn::App
+For more details refer ``examples/custom-apps/custom-app.h``, ``examples/custom-apps/custom-app.cc`` and API documentation of ndnSIM and NS-3.
 
-      // Processing upon start of the application
-      virtual void
-      StartApplication ()
-      {
-        // initialize ndn::App
-        ndn::App::StartApplication ();
-        
-        // Create a name components object for name ``/prefix/sub``
-	Ptr<ndn::NameComponents> prefix = Create<ndn::NameComponents> (); // now prefix contains ``/``
-	prefix->Add ("prefix"); // now prefix contains ``/prefix``
-	prefix->Add ("sub"); // now prefix contains ``/prefix/sub``
+Header file ``examples/custom-apps/custom-app.h``:
 
-        /////////////////////////////////////////////////////////////////////////////
-        // Creating FIB entry that ensures that we will receive incoming Interests //
-        /////////////////////////////////////////////////////////////////////////////
+.. literalinclude:: ../../examples/custom-apps/custom-app.h
+    :language: c++
+    :linenos:
+    :lines: 21-29,40-
 
-        // Get FIB object        
-        Ptr<ndn::Fib> fib = GetNode ()->GetObject<ndn::Fib> ();
+Source file ``examples/custom-apps/custom-app.cc``:
 
-        // Add entry to FIB
-        // Note that ``m_face`` is cretaed by ndn::App
-        ndn::fib::EntryContainer::type::iterator fibEntry = fib->Add (*prefix, m_face, 0);
-      
-        /////////////////////////////////////
-	// Sending one Interest packet out //
-        /////////////////////////////////////
+.. literalinclude:: ../../examples/custom-apps/custom-app.cc
+    :language: c++
+    :linenos:
+    :lines: 21-
 
-        // Create and configure ndn::InterestHeader
-        ndn::InterestHeader interestHeader;
-        UniformVariable rand (0,std::numeric_limits<uint32_t>::max ());
-        interestHeader.SetNonce            (rand.GetValue ());
-        interestHeader.SetName             (prefix);
-        interestHeader.SetInterestLifetime (Seconds (1.0));
-      
-        // Create packet and add ndn::InterestHeader
-        Ptr<Packet> packet = Create<Packet> ();
-        packet->AddHeader (interestHeader);
+Example how to use custom app in a scenario (``ndn-simple-with-custom-app.cc``):
 
-        // Forward packet to lower (network) layer       
-        m_protocolHandler (packet);
-      
-        // Call trace (for logging purposes)
-        m_transmittedInterests (&interestHeader, this, m_face);
-      }
-    
-      // Processing when application is stopped
-      virtual void
-      StopApplication ()
-      {
-        // cleanup ndn::App
-        ndn::App::StopApplication ();
-      }
-    
-      // Callback that will be called when Interest arrives
-      virtual void
-      OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packet> packet)
-      {
-        // Create and configure ndn::ContentObjectHeader and ndn::ContentObjectTail
-        // (header is added in front of the packet, tail is added at the end of the packet)
-        
-        ndn::ContentObjectHeader data;
-        data.SetName (Create<ndn::NameComponents> (interest->GetName ())); // data will have the same name as Interests
-      
-        ndn::ContentObjectTail trailer; // doesn't require any configuration
+ .. *      +------+ <-----> (CustomApp1) 
+ .. *      | Node | 
+ .. *      +------+ <-----> (CustomApp2)
+ .. *
 
-        // Create packet and add header and trailer
-        Ptr<Packet> packet = Create<Packet> (1024);
-        packet->AddHeader (data);
-        packet->AddTrailer (trailer);
-      
-        // Forward packet to lower (network) layer       
-        m_protocolHandler (packet);
-      
-        // Call trace (for logging purposes)
-        m_transmittedInterests (&interestHeader, this, m_face);
-        m_transmittedContentObjects (&data, packet, this, m_face);
-      }
-     
-      // Callback that will be called when Data arrives
-      virtual void
-      OnContentObject (const Ptr<const ndn::ContentObjectHeader> &contentObject,
-                       Ptr<Packet> payload)
-      {
-        std::cout << "DATA received for name " << contentObject->GetName () << std::endl; 
-      }
-    };
+.. literalinclude:: ../../examples/ndn-simple-with-custom-app.cc
+    :language: c++
+    :linenos:
+    :lines: 21-28,39-
+    :emphasize-lines: 26-31
+
+
+To run this scenario, use the following command::
+
+        NS_LOG=CustomApp ./waf --run=ndn-simple-with-custom-app
+
 
 Producer example (Interest hijacker)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following code demonstrates how to implement a basic producer application that "hijacks" all incoming Interests.
 
-.. code-block:: c++
+Header file ``examples/custom-apps/hijacker.h``:
 
-    #include "ns3/core-module.h"
-    #include "ns3/network-module.h"
-    #include "ns3/ndnSIM-module.h"
-        
-    using namespace ns3;
-    
-    class Hijacker : public ndn::App
-    {
-    public: 
-      static TypeId
-      GetTypeId ();
-            
-      Hijacker ()
-      {
-      }
-    
-      // inherited from NdnApp
-      void OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packet> packet)
-      {
-        ndn::App::OnInterest (interest, packet); // forward call to perform app-level tracing
-        // do nothing else (hijack interest)
-      }
-    
-    protected:
-      // inherited from Application base class.
-      virtual void
-      StartApplication ()
-      {
-        App::StartApplication ();
-    
-        // equivalent to setting interest filter for "/" prefix
-        Ptr<ndn::Fib> fib = GetNode ()->GetObject<ndn::Fib> ();
-        Ptr<ndn::fib::Entry> fibEntry = fib->Add ("/", m_face, 0);
-        fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
-      }
-    
-      virtual void
-      StopApplication ()
-      {
-        App::StopApplication ();
-      }
-    };
-    
-    // Necessary if you are planning to use ndn::AppHelper
-    NS_OBJECT_ENSURE_REGISTERED (Hijacker);
-    
-    TypeId
-    Hijacker::GetTypeId ()
-    {
-      static TypeId tid = TypeId ("ndn::Hijacker")
-        .SetParent<ndn::App> ()
-        .AddConstructor<Hijacker> ()
-        ;
-            
-      return tid;
-    }
+.. literalinclude:: ../../examples/custom-apps/hijacker.h
+    :language: c++
+    :linenos:
+    :lines: 21-
+
+Source file ``examples/custom-apps/hijacker.cc``:
+
+.. literalinclude:: ../../examples/custom-apps/hijacker.cc
+    :language: c++
+    :linenos:
+    :lines: 21-
 
 
 After defining this class, you can use it with :ndnsim:`ndn::AppHelper`. For example:
@@ -302,7 +200,26 @@ After defining this class, you can use it with :ndnsim:`ndn::AppHelper`. For exa
 .. code-block:: c++
 
     ...
-    ndn::AppHelper producerHelper ("ndn::Hijacker");
+    ndn::AppHelper producerHelper ("Hijacker");
     producerHelper.Install (producerNode);
     ...
+
+Dumb requester
+^^^^^^^^^^^^^^
+
+This application continually requests the same Data packet.
+
+Header file ``examples/custom-apps/dumb-requester.h``:
+
+.. literalinclude:: ../../examples/custom-apps/dumb-requester.h
+    :language: c++
+    :linenos:
+    :lines: 21-
+
+Source file ``examples/custom-apps/dumb-requester.cc``:
+
+.. literalinclude:: ../../examples/custom-apps/dumb-requester.cc
+    :language: c++
+    :linenos:
+    :lines: 21-
 

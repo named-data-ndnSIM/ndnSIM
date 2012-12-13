@@ -357,3 +357,13 @@ To run this scenario, use the following command::
 
 The successful run will create ``cs-trace.txt``, which similarly to trace file from the :ref:`previous example <trace example>` can be analyzed manually or used as input to some graph/stats packages.
 
+3-node topology with Content Store respecting freshness field of ContentObjects
+-------------------------------------------------------------------------------
+
+:ref:`Content Store respecting freshness field of ContentObjects`
+
+1-node topology with custom application
+---------------------------------------
+
+:ref:`Custom applications`
+

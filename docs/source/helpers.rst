@@ -140,6 +140,9 @@ To select a particular content store and configure its capacity, use :ndnsim:`Se
     If ``MaxSize`` is set to 0, then no limit on ContentStore will be enforced 
 
 
+Content Store with entry lifetime tracking
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 In order to evaluate lifetime of the content store entries, the special versions of the content store need to be used:
 
 - :ndnsim:`Least Recently Used (LRU) with cache entry lifetime tracking <ndn::cs::Stats::Lru>`:
@@ -203,6 +206,71 @@ In order to evaluate lifetime of the content store entries, the special versions
          // connect to lifetime trace
          Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Random/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
 
+.. _Content Store respecting freshness field of ContentObjects:
+
+Content Store respecting freshness field of ContentObjects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If simulations need Content Store which respects freshness of ContentObjects, the following versions of content store should be used:
+
+.. note:
+
+    Please note that currently, Freshness granularity is 1 second and maximum value is 65535 second. Value means infinity.
+
+- :ndnsim:`Least Recently Used (LRU) respecting ContentObject freshness <ndn::cs::Freshness::Lru>`:
+
+      .. code-block:: c++
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Lru",
+                                    "MaxSize", "10000");
+	 ...
+
+
+- :ndnsim:`First-In-First-Out (FIFO) respecting ContentObject freshness <ndn::cs::Freshness::Fifo>`:
+
+      .. code-block:: c++
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Fifo",
+                                    "MaxSize", "10000");
+	 ...
+
+- :ndnsim:`Random respecting ContentObject freshness <ndn::cs::Freshness::Random>`:
+
+      .. code-block:: c++
+
+         ...
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Random",
+                                    "MaxSize", "10000");
+	 ...
+
+The following example demonstrates a basic usage of a customized content store (``ndn-simple-with-content-freshness.cc``).  
+In this scenario two simple consumers (both installed on a consumer node) continually request the same data packet.  
+When Data producer specify unlimited freshness, Content keeps getting satisfied from local caches, while if freshness is specified, Interests periodically are getting through to the Data producer.
+
+.. aafig::
+    :aspect: 60
+    :scale: 120
+
+      +----------+                +--------+                +----------+
+      |          |     1Mbps      |        |      1Mbps     |          |
+      | Consumer |<-------------->| Router |<-------------->| Producer |
+      |          |         10ms   |        |         10ms   |          |
+      +----------+                +--------+                +----------+
+
+
+.. literalinclude:: ../../examples/ndn-simple-with-content-freshness.cc
+    :language: c++
+    :linenos:
+    :lines: 20-27,43-
+
+To run this scenario, use the following command::
+
+        NS_LOG=DumbRequester:ndn.cs.Freshness.Lru ./waf --run=ndn-simple-with-content-freshness
 
 
 Pending Interest Table
