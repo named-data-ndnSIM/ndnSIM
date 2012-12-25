@@ -43,15 +43,15 @@ ConsumerZipfMandelbrot::GetTypeId (void)
     .AddConstructor<ConsumerZipfMandelbrot> ()
     .AddAttribute ("N", "Number of the Contents in total",
                       StringValue ("100"),
-                      MakeUintegerAccessor (&ConsumerZipfMandelbrot::m_N),
+                      MakeUintegerAccessor (&ConsumerZipfMandelbrot::SetN, &ConsumerZipfMandelbrot::GetN),
                       MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("q", "parameter of improve rank",
                       StringValue ("0.7"),
-                      MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_q),
+                      MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetQ, &ConsumerZipfMandelbrot::GetQ),
                       MakeDoubleChecker<double>())
 	  .AddAttribute ("s", "parameter of power",
 							StringValue ("0.7"),
-							MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_s),
+							MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetS, &ConsumerZipfMandelbrot::GetS),
 							MakeDoubleChecker<double>())
     ;
 

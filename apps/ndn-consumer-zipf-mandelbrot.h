@@ -61,6 +61,30 @@ public:
 	virtual void SendPacket();
 	uint32_t GetNextSeq();
 
+	uint32_t GetN() const {
+		return m_N;
+	}
+
+	void SetN(uint32_t n) {
+		m_N = n;
+	}
+
+	double GetQ() const {
+		return m_q;
+	}
+
+	void SetQ(double q) {
+		m_q = q;
+	}
+
+	double GetS() const {
+		return m_s;
+	}
+
+	void SetS(double s) {
+		m_s = s;
+	}
+
 protected:
 	virtual void
 	  ScheduleNextPacket ();
