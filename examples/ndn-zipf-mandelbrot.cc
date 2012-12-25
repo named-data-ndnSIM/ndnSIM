@@ -47,17 +47,13 @@ using namespace ns3;
  *
  * To run scenario and see what is happening, use the following command:
  *
- *     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid
+ *     NS_LOG=ndn.Consumer:ndn.ConsumerZipfMandelbrot:ndn.Producer ./waf --run=ndn-zipf-mandelbrot
  */
 
 int
 main (int argc, char *argv[])
 {
-	LogComponentEnable("ndn.ConsumerZipfMandelbrot", LOG_LEVEL_DEBUG);
-	LogComponentEnable("ndn.ConsumerCbr", LOG_LEVEL_INFO);
-	LogComponentEnable("ndn.Producer", LOG_LEVEL_INFO);
-	LogComponentEnable("ndn.Consumer", LOG_LEVEL_INFO);
-	//LogComponentEnable("ndn.CbisGlobalRoutingHelper", LOG_LEVEL_INFO);
+  //LogComponentEnable("ndn.CbisGlobalRoutingHelper", LOG_LEVEL_INFO);
   // Setting default parameters for PointToPoint links and channels
   Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
@@ -95,6 +91,7 @@ main (int argc, char *argv[])
   //ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
   consumerHelper.SetPrefix (prefix);
   consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 100 interests a second
+  consumerHelper.SetAttribute ("NumberOfContents", StringValue ("100")); // 10 different contents
   //consumerHelper.SetAttribute ("Randomize", StringValue ("uniform")); // 100 interests a second
   consumerHelper.Install (consumerNodes);
 
@@ -104,22 +101,8 @@ main (int argc, char *argv[])
   producerHelper.Install (producer);
   ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
 
-  //Ptr<Node> producer2 = grid.GetNode(1,2);
-  //producerHelper.Install (producer2);
-  // Add /prefix origins to ndn::GlobalRouter
-  //ccnxGlobalRoutingHelper.AddOrigins (prefix, producer2);
-
-
-
-
-  // Add /prefix origins to ndn::GlobalRouter
-  //ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
-
-
   // Calculate and install FIBs
   ccnxGlobalRoutingHelper.CalculateRoutes ();
-
-  //ccnxGlobalRoutingHelper.CalculateRoutes2 ();
 
   Simulator::Stop (Seconds (10.0));
 
