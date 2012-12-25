@@ -7,6 +7,10 @@ def build(bld):
     obj = bld.create_ns3_program('ndn-grid', ['ndnSIM', 'point-to-point-layout'])
     obj.source = 'ndn-grid.cc'
     
+    obj = bld.create_ns3_program('zipf-mandelbrot', ['ndnSIM', 'point-to-point-layout'])
+    obj.source = 'zipf-mandelbrot.cc'
+    
+
     obj = bld.create_ns3_program('ndn-simple-with-content-freshness', ['ndnSIM'])
     obj.source = ['ndn-simple-with-content-freshness.cc',
                   'custom-apps/dumb-requester.cc']
