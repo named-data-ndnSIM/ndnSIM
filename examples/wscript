@@ -6,6 +6,11 @@ def build(bld):
 
     obj = bld.create_ns3_program('ndn-grid', ['ndnSIM', 'point-to-point-layout'])
     obj.source = 'ndn-grid.cc'
+
+    obj = bld.create_ns3_program('xiaoke', ['ndnSIM', 'point-to-point-layout'])
+    obj.source = 'xiaoke.cc'
+    
+
     
     obj = bld.create_ns3_program('zipf-mandelbrot', ['ndnSIM', 'point-to-point-layout'])
     obj.source = 'zipf-mandelbrot.cc'
