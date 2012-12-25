@@ -43,38 +43,41 @@ namespace ndn {
  *
  * The class implements an app which requests contents following Zipf-Mandelbrot Distribution
  * Here is the explaination of Zipf-Mandelbrot Distribution: http://en.wikipedia.org/wiki/Zipf%E2%80%93Mandelbrot_law
-
  */
-//
-class ConsumerZipfMandelbrot: public ns3::ndn::ConsumerCbr {
+class ConsumerZipfMandelbrot: public ConsumerCbr
+{
 public:
-	static TypeId GetTypeId ();
+  static TypeId GetTypeId ();
 
   /**
    * \brief Default constructor
    * Sets up randomized Number Generator (RNG)
    * Note: m_seq of its parent class ConsumerCbr here is used to record the interest number
    */
-	ConsumerZipfMandelbrot();
-	virtual ~ConsumerZipfMandelbrot();
+  ConsumerZipfMandelbrot ();
+  virtual ~ConsumerZipfMandelbrot ();
 
-	virtual void SendPacket();
-	uint32_t GetNextSeq();
+  virtual void SendPacket();
+  uint32_t GetNextSeq();
 
 protected:
-	virtual void
-	  ScheduleNextPacket ();
+  virtual void
+  ScheduleNextPacket ();
 
 private:
-	uint32_t m_N;  //number of the contents
-	double m_q;  //q in (k+q)^s
-	double m_s;  //s in (k+q)^s
-	double * m_Pcum;  //cumulative probability
+  void
+  SetNumberOfContents (uint32_t numOfContents);
 
-	UniformVariable * m_SeqRng; //RNG
+  uint32_t
+  GetNumberOfContents () const;
+  
+private:
+  uint32_t m_N;  //number of the contents
+  double m_q;  //q in (k+q)^s
+  double m_s;  //s in (k+q)^s
+  std::vector<double> m_Pcum;  //cumulative probability
 
-
-
+  UniformVariable m_SeqRng; //RNG
 };
 
 } /* namespace ndn */

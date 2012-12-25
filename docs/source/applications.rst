@@ -18,7 +18,7 @@ ConsumerCbr
 
 This applications has the following attributes:
 
-* Frequency
+* ``Frequency``
 
   .. note::
      default: ``1.0`` (1 per second)
@@ -30,7 +30,7 @@ This applications has the following attributes:
      // Set attribute using the app helper
      helper.SetAttribute ("Frequency", DoubleValue (1.0));
 
-* Randomize
+* ``Randomize``
 
   .. note::
      default: ``"none"``
@@ -48,6 +48,47 @@ This applications has the following attributes:
      // Set attribute using the app helper
      helper.SetAttribute ("Randomize", StringValue ("uniform"));
 
+ConsumerZipfMandelbrot
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    Author: Xiaoke Jiang
+
+An app that requests contents (names in the requests) following Zipf-Mandelbrot distribution (number of Content frequency Distribution). 
+This class is a subclass of :ndnsim:`ConsumerCbr`.
+
+.. code-block:: c++
+
+   // Create application using the app helper
+   ndn::AppHelper helper ("ns3::ndn::ConsumerZipfMandelbrot");
+
+``Frequency`` and ``Randomize`` attributes can be used in the same way as in the base :ndnsim:`ConsumerCbr` applications. 
+
+Additional attributes:
+
+* ``NumberOfContents``
+
+    .. note::
+        default: 100
+
+    Number of different content (sequence numbers) that will be requested by the applications
+
+
+THE following pictures show basic comparison of the generated stream of Interests versus theoretical `Zipf-Mandelbrot <http://en.wikipedia.org/wiki/Zipf%E2%80%93Mandelbrot_law>`_ function (``NumberOfContents`` set to 100 and ``Frequency`` set to 100)
+
+.. image:: _static/apps/zipf-n100-frq100-duration10.png
+   :alt: Comparsion between simulation and theory with simulation duration 10 seconds
+
+.. image:: _static/apps/zipf-n100-frq100-duration50.png
+   :alt: Comparsion between simulation and theory with simulation duration 50 seconds
+
+.. image:: _static/apps/zipf-n100-frq100-duration100.png
+   :alt: Comparsion between simulation and theory with simulation duration 100 seconds
+
+.. image:: _static/apps/zipf-n100-frq100-duration1000.png
+   :alt: Comparsion between simulation and theory with simulation duration 1000 seconds
+
+
 ConsumerBatches
 ^^^^^^^^^^^^^^^^^^^
 
@@ -60,7 +101,7 @@ ConsumerBatches
 
 This applications has the following attributes:
 
-* Batches
+* ``Batches``
 
   .. note::
      default: Empty
@@ -87,21 +128,21 @@ ConsumerWindow
 
 This applications has the following attributes:
 
-* Window
+* ``Window``
 
   .. note::
      default: ``1``
 
   Initial number of Interests that will be send out without waiting for the data (number of outstanding Interests)
 
-* PayloadSize
+* ``PayloadSize``
 
   .. note::
      default: ``1040``
 
   Expected size of the Data payload (necessary only when Size is specified)
 
-* Size
+* ``Size``
 
   .. note::
      default: ``-1``
@@ -222,4 +263,5 @@ Source file ``examples/custom-apps/dumb-requester.cc``:
     :language: c++
     :linenos:
     :lines: 21-
+
 
