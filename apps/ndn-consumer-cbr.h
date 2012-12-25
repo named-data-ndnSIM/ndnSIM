@@ -88,7 +88,6 @@ private:
   // DataRate
   // GetDesiredRate () const;
   
-private:
 protected:
   double              m_frequency; // Frequency of interest packets (in hertz)
   bool                m_firstTime;
