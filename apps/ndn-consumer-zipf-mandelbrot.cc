@@ -46,16 +46,16 @@ ConsumerZipfMandelbrot::GetTypeId (void)
                    MakeUintegerAccessor (&ConsumerZipfMandelbrot::SetNumberOfContents, &ConsumerZipfMandelbrot::GetNumberOfContents),
                    MakeUintegerChecker<uint32_t> ())
 
-    // Alex: q and s are not yet really working
-    //
-    // .AddAttribute ("q", "parameter of improve rank",
-    //                StringValue ("0.7"),
-    //                MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_q),
-    //                MakeDoubleChecker<double>())
-    // .AddAttribute ("s", "parameter of power",
-    //                StringValue ("0.7"),
-    //                MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_s),
-    //                MakeDoubleChecker<double>())
+     //Alex: q and s are not yet really working
+
+     .AddAttribute ("q", "parameter of improve rank",
+                    StringValue ("0.7"),
+                    MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_q),
+                    MakeDoubleChecker<double>())
+     .AddAttribute ("s", "parameter of power",
+                    StringValue ("0.7"),
+                    MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_s),
+                    MakeDoubleChecker<double>())
     ;
 
   return tid;
