@@ -52,10 +52,18 @@ ConsumerCbr::GetTypeId (void)
                    StringValue ("1.0"),
                    MakeDoubleAccessor (&ConsumerCbr::m_frequency),
                    MakeDoubleChecker<double> ())
+    
     .AddAttribute ("Randomize", "Type of send time randomization: none (default), uniform, exponential",
                    StringValue ("none"),
                    MakeStringAccessor (&ConsumerCbr::SetRandomize, &ConsumerCbr::GetRandomize),
                    MakeStringChecker ())
+
+    .AddAttribute ("MaxSeq",
+                   "Maximum sequence number to request",
+                   IntegerValue (std::numeric_limits<uint32_t>::max ()),
+                   MakeIntegerAccessor (&ConsumerCbr::m_seqMax),
+                   MakeIntegerChecker<uint32_t> ())
+
     ;
 
   return tid;
