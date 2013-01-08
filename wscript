@@ -1,18 +1,12 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 import os
-import Logs
-import Utils
-import Options
-
+from waflib import Logs, Utils, Options, TaskGen, Task
 from waflib.Errors import WafError
 
 import wutils
-import TaskGen
-import Task
 
 def options(opt):
-    opt.tool_options('boost', tooldir=["waf-tools"])
     opt.add_option('--enable-ndn-plugins',
                    help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
                    dest='enable_ndn_plugins')
@@ -21,28 +15,47 @@ def options(opt):
                    help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
                    dest='disable_ndn_plugins')
 
-def configure(conf):
-    try:
-        conf.check_tool('boost')
-        conf.check_boost(lib = 'iostreams')
-    except WafError:
-        conf.env['LIB_BOOST'] = []
+REQUIRED_BOOST_LIBS = ['iostreams']
 
+def required_boost_libs(conf):
+    conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
+
+def configure(conf):
     conf.env['ENABLE_NDNSIM']=False;
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                      "Required boost libraries not found")
+        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
     else:
+        present_boost_libs = []
+        for boost_lib_name in conf.env['LIB_BOOST']:
+            if boost_lib_name.startswith("boost_"):
+                boost_lib_name = boost_lib_name[6:]
+            if boost_lib_name.endswith("-mt"):
+                boost_lib_name = boost_lib_name[:-3]
+                present_boost_libs.append(boost_lib_name)
+
+        missing_boost_libs = [lib for lib in REQUIRED_BOOST_LIBS if lib not in present_boost_libs]
+        
+        if missing_boost_libs != []:
+            conf.report_optional_feature("ndnSIM", "ndnSIM", False,
+                                         "ndnSIM requires boost libraries: %s" % ' '.join(missing_boost_libs))
+            conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
+
+            Logs.error ("ndnSIM will not be build as it requires boost libraries: %s" % ' '.join(missing_boost_libs))
+            Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
+            return
+            
         boost_version = conf.env.BOOST_VERSION.split('_')
         if int(boost_version[0]) < 1 or int(boost_version[1]) < 48:
             conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                          "ndnSIM requires at least boost version 1.48")
             conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
 
-            Logs.error ("ndnSIM requires at least boost version 1.48")
+            Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 
@@ -73,10 +86,10 @@ def build(bld):
 
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.module = 'ndnSIM'
-    module.features += ['ns3fullmoduleheaders']
+    module.features += ' ns3fullmoduleheaders'
     module.uselib = 'BOOST BOOST_IOSTREAMS'
 
-    headers = bld.new_task_gen(features=['ns3header'])
+    headers = bld (features='ns3header')
     headers.module = 'ndnSIM'
 
     if not bld.env['ENABLE_NDNSIM']:
@@ -156,9 +169,9 @@ def build(bld):
     tests.source = bld.path.ant_glob('test/*.cc')
 
     if bld.env.ENABLE_EXAMPLES:
-        bld.add_subdirs('examples')
+        bld.recurse ('examples')
 
-    bld.add_subdirs('tools')
+    bld.recurse ('tools')
 
     bld.ns3_python_bindings()
 
