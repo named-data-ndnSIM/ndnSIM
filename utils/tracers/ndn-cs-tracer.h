@@ -24,6 +24,13 @@
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
+#include <ns3/nstime.h>
+#include <ns3/event-id.h>
+
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#include <map>
+#include <list>
 
 namespace ns3 {
 
@@ -35,71 +42,107 @@ namespace ndn {
 class InterestHeader;
 class ContentObjectHeader;
 
+namespace cs {
+
+struct Stats
+{
+  inline void Reset ()
+  {
+    m_cacheHits   = 0;
+    m_cacheMisses = 0;
+  }
+  double m_cacheHits;
+  double m_cacheMisses;
+};
+
+}  
+
 /**
- * @brief Base class for content store tracers (CacheHits and CacheMisses)
+ * @ingroup ndn
+ * @brief NDN tracer for cache performance (hits and misses)
  */
 class CsTracer : public SimpleRefCount<CsTracer>
 {
 public:
   /**
+   * @brief Helper method to install tracers on all simulation nodes
+   *
+   * @param file File to which traces will be written
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   * 
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+  InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
    * @brief Trace constructor that attaches to the node using node pointer
+   * @param os    reference to the output stream
    * @param node  pointer to the node
    */
-  CsTracer (Ptr<Node> node);
+  CsTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
 
   /**
    * @brief Trace constructor that attaches to the node using node name
+   * @param os        reference to the output stream
    * @param nodeName  name of the node registered using Names::Add
    */
-  CsTracer (const std::string &node);
+  CsTracer (boost::shared_ptr<std::ostream> os, const std::string &node);
 
   /**
    * @brief Destructor
    */
-  virtual ~CsTracer ();
+  ~CsTracer ();
 
   /**
    * @brief Print head of the trace (e.g., for post-processing)
    *
    * @param os reference to output stream
    */
-  virtual void
-  PrintHeader (std::ostream &os) const = 0;
+  void
+  PrintHeader (std::ostream &os) const;
 
   /**
    * @brief Print current trace data
    *
    * @param os reference to output stream
    */
-  virtual void
-  Print (std::ostream &os) const = 0;
+  void
+  Print (std::ostream &os) const;
   
-protected:
+private:
   void
   Connect ();
 
-  virtual void 
+  void 
   CacheHits (std::string context,
-  Ptr<const InterestHeader>, Ptr<const ContentObjectHeader>) = 0;
+  Ptr<const InterestHeader>, Ptr<const ContentObjectHeader>);
   
-  virtual void 
+  void 
   CacheMisses (std::string context,
-  Ptr<const InterestHeader>) = 0;
+  Ptr<const InterestHeader>);
 
-protected:
+private:
+  void
+  SetAveragingPeriod (const Time &period);
+
+  void
+  Reset ();
+
+  void
+  PeriodicPrinter ();
+  
+private:
   std::string m_node;
   Ptr<Node> m_nodePtr;
 
-  struct Stats
-  {
-    inline void Reset ()
-    {
-      m_cacheHits   = 0;
-      m_cacheMisses = 0;
-    }
-    double m_cacheHits;
-    double m_cacheMisses;
-  };
+  boost::shared_ptr<std::ostream> m_os;
+
+  Time m_period;
+  EventId m_printEvent;
+  cs::Stats m_stats;  
 };
 
 /**

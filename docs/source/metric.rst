@@ -73,16 +73,16 @@ Please refer to the :ref:`this example <trace example>`.
 Content store trace helper
 --------------------------
 
-- :ndnsim:`ndn::CsImpTracer`
+- :ndnsim:`ndn::CsTracer`
 
-    With the use of :ndnsim:`ndn::CsImpTracer` it is possible to obtain statistics of cache hits/cache misses on simulation nodes.
+    With the use of :ndnsim:`ndn::CsTracer` it is possible to obtain statistics of cache hits/cache misses on simulation nodes.
 
     The following code enables content store tracing:
 
     .. code-block:: c++
 
         // necessary includes
-        #include <ns3/ndnSIM/utils/tracers/ndn-cs-imp-tracer.h>
+        #include <ns3/ndnSIM/utils/tracers/ndn-cs-tracer.h>
 
 	...        
 
@@ -91,8 +91,8 @@ Content store trace helper
 
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsImpTracer> > >
-           aggTracers = ndn::CsImpTracer::InstallAll ("cs-trace.txt", Seconds (1));
+        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsTracer> > >
+           aggTracers = ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
         
         Simulator::Run ();
         

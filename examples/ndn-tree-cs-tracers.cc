@@ -24,8 +24,8 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// for ndn::CsImptTracer
-#include <ns3/ndnSIM/utils/tracers/ndn-cs-imp-tracer.h>
+// for ndn::CsTracer
+#include <ns3/ndnSIM/utils/tracers/ndn-cs-tracer.h>
 
 using namespace ns3;
 
@@ -114,8 +114,8 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (20.0));
 
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsImpTracer> > >
-    aggTracers = ndn::CsImpTracer::InstallAll ("cs-trace.txt", Seconds (1));
+  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsTracer> > >
+    aggTracers = ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
   
   Simulator::Run ();
   Simulator::Destroy ();
