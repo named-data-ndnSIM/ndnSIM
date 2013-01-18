@@ -178,6 +178,9 @@ protected:
   SeqTimeoutsContainer m_seqLifetimes;
   
   TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
+  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */> m_lastRetransmittedInterestDataDelay;
+  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */> m_firstInterestDataDelay;
+  
 /// @endcond
 };
 
