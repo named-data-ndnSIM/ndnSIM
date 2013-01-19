@@ -18,14 +18,14 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-// ndn-tree-cs-tracers.cc
+// ndn-tree-app-delay-tracer.cc
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// for ndn::CsTracer
-#include <ns3/ndnSIM/utils/tracers/ndn-cs-tracer.h>
+// for ndn::AppDelayTracer
+#include <ns3/ndnSIM/utils/tracers/ndn-app-delay-tracer.h>
 
 using namespace ns3;
 
@@ -58,7 +58,7 @@ using namespace ns3;
  *
  * To run scenario and see what is happening, use the following command:
  *
- *     ./waf --run=ndn-tree-cs-tracers
+ *     ./waf --run=ndn-tree-app-delay-tracer
  */
 
 int
@@ -74,7 +74,6 @@ main (int argc, char *argv[])
   // Install CCNx stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-  ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Lru", "MaxSize", "100"); // default ContentStore parameters
   ndnHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
@@ -111,8 +110,8 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (20.0));
 
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsTracer> > >
-    aggTracers = ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
+  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::AppDelayTracer> > >
+    tracers = ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
   
   Simulator::Run ();
   Simulator::Destroy ();

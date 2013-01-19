@@ -253,19 +253,11 @@ Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
     {
       m_lastRetransmittedInterestDataDelay (this, seq, Simulator::Now () - entry->time);
     }
-  else
-    {
-      NS_ASSERT_MSG (entry != m_seqTimeouts.end (), "Something is now right");
-    }
 
   entry = m_seqLifetimes.find (seq);
   if (entry != m_seqLifetimes.end ())
     {
       m_firstInterestDataDelay (this, seq, Simulator::Now () - entry->time);
-    }
-  else
-    {
-      NS_ASSERT_MSG (entry != m_seqLifetimes.end (), "Something is now right");
     }
   
   m_seqLifetimes.erase (seq);

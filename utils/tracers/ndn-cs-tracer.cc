@@ -113,10 +113,10 @@ CsTracer::~CsTracer ()
 void
 CsTracer::Connect ()
 {
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheHits",
-                   MakeCallback (&CsTracer::CacheHits, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheMisses",
-                   MakeCallback (&CsTracer::CacheMisses, this));
+  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheHits",
+                                 MakeCallback (&CsTracer::CacheHits, this));
+  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheMisses",
+                                 MakeCallback (&CsTracer::CacheMisses, this));
 
   Reset ();  
 }
@@ -173,15 +173,13 @@ CsTracer::Print (std::ostream &os) const
 }
 
 void 
-CsTracer::CacheHits (std::string context,
-                     Ptr<const InterestHeader>, Ptr<const ContentObjectHeader>)
+CsTracer::CacheHits (Ptr<const InterestHeader>, Ptr<const ContentObjectHeader>)
 {
   m_stats.m_cacheHits ++;
 }
 
 void 
-CsTracer::CacheMisses (std::string context, 
-                       Ptr<const InterestHeader>)
+CsTracer::CacheMisses (Ptr<const InterestHeader>)
 {
   m_stats.m_cacheMisses ++;
 }

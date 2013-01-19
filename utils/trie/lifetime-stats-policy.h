@@ -137,7 +137,6 @@ struct lifetime_stats_policy_traits
       void
       set_traced_callback (TracedCallback< typename parent_trie::payload_traits::const_base_type, Time > *callback)
       {
-        std::cout << Simulator::GetContext () << " " << callback << std::endl;
         m_willRemoveEntry = callback;
       }
       

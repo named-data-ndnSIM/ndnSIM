@@ -38,3 +38,6 @@ def build(bld):
 
         obj = bld.create_ns3_program('ndn-tree-cs-tracers', ['ndnSIM'])
         obj.source = 'ndn-tree-cs-tracers.cc'
+
+        obj = bld.create_ns3_program('ndn-tree-app-delay-tracer', ['ndnSIM'])
+        obj.source = 'ndn-tree-app-delay-tracer.cc'

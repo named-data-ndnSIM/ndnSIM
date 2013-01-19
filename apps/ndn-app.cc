@@ -90,7 +90,16 @@ App::RegisterProtocolHandler (ProtocolHandler handler)
 {
   m_protocolHandler = handler;
 }
-    
+
+uint32_t
+App::GetId () const
+{
+  if (m_face == 0)
+    return (uint32_t)-1;
+  else
+    return m_face->GetId ();
+}
+
 void
 App::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet)
 {

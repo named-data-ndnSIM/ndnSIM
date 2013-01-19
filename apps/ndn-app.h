@@ -63,7 +63,13 @@ public:
    */
   void
   RegisterProtocolHandler (ProtocolHandler handler);
-  
+
+  /**
+   * @brief Get application ID (ID of applications face)
+   */
+  uint32_t
+  GetId () const;
+   
   /**
    * @brief Method that will be called every time new Interest arrives
    * @param interest Interest header
@@ -88,7 +94,7 @@ public:
   virtual void
   OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
                    Ptr<Packet> payload);
-        
+  
 protected:
   /**
    * @brief Do cleanup when application is destroyed
