@@ -31,6 +31,7 @@
 //#include "ns3/internet-module.h"
 
 #include <set>
+#include <map>
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -175,11 +176,14 @@ protected:
     > { } ;
 
   SeqTimeoutsContainer m_seqTimeouts;       ///< \brief multi-index for the set of SeqTimeout structs
-  SeqTimeoutsContainer m_seqLifetimes;
+
+  SeqTimeoutsContainer m_seqLastDelay;
+  SeqTimeoutsContainer m_seqFullDelay;
+  std::map<uint32_t, uint32_t> m_seqRetxCounts;
   
   TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
   TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */> m_lastRetransmittedInterestDataDelay;
-  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */> m_firstInterestDataDelay;
+  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */, uint32_t /*retx count*/> m_firstInterestDataDelay;
   
 /// @endcond
 };

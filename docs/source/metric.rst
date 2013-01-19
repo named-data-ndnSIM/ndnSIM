@@ -245,6 +245,8 @@ Application-level trace helper
     +-----------------+---------------------------------------------------------------------+
     | ``DelayUS``     | delay value, specified in microseconds (10^-6)                      |
     +-----------------+---------------------------------------------------------------------+
+    | ``RetxCount``   | number of Interest retransmissions (for LastDelay always equal to 1)|
+    +-----------------+---------------------------------------------------------------------+
 
 
 .. _app delay trace helper example:

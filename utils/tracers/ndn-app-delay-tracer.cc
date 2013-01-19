@@ -128,7 +128,8 @@ AppDelayTracer::PrintHeader (std::ostream &os) const
 
      << "Type" << "\t"
      << "DelayS" << "\t"
-     << "DelayUS" << "\n";
+     << "DelayUS" << "\t"
+     << "RetxCount" << "";
 }
 
 void 
@@ -139,18 +140,20 @@ AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno
         << seqno << "\t"
         << "LastDelay" << "\t"
         << delay.ToDouble (Time::S) << "\t"
-        << delay.ToDouble (Time::US) << "\n";
+        << delay.ToDouble (Time::US) << "\t"
+        << 1 << "\n";
 }
   
 void 
-AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay)
+AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount)
 {
   *m_os << m_node << "\t"
         << app->GetId () << "\t"
         << seqno << "\t"
         << "FullDelay" << "\t"
         << delay.ToDouble (Time::S) << "\t"
-        << delay.ToDouble (Time::US) << "\n";
+        << delay.ToDouble (Time::US) << "\t"
+        << retxCount << "\n";
 }
 
 

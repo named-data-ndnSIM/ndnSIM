@@ -94,7 +94,7 @@ private:
   LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay);
   
   void 
-  FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay);
+  FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t rextCount);
   
 private:
   std::string m_node;

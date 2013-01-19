@@ -217,7 +217,12 @@ Consumer::SendPacket ()
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");  
   
   m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
-  m_seqLifetimes.insert (SeqTimeout (seq, Simulator::Now ()));
+  m_seqFullDelay.insert (SeqTimeout (seq, Simulator::Now ()));
+
+  m_seqLastDelay.erase (seq);
+  m_seqLastDelay.insert (SeqTimeout (seq, Simulator::Now ()));
+
+  m_seqRetxCounts[seq] ++;
   
   m_transmittedInterests (&interestHeader, this, m_face);
 
@@ -248,19 +253,22 @@ Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
   uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
-  SeqTimeoutsContainer::iterator entry = m_seqTimeouts.find (seq);
-  if (entry != m_seqTimeouts.end ())
+  SeqTimeoutsContainer::iterator entry = m_seqLastDelay.find (seq);
+  if (entry != m_seqLastDelay.end ())
     {
       m_lastRetransmittedInterestDataDelay (this, seq, Simulator::Now () - entry->time);
     }
 
-  entry = m_seqLifetimes.find (seq);
-  if (entry != m_seqLifetimes.end ())
+  entry = m_seqFullDelay.find (seq);
+  if (entry != m_seqFullDelay.end ())
     {
-      m_firstInterestDataDelay (this, seq, Simulator::Now () - entry->time);
+      m_firstInterestDataDelay (this, seq, Simulator::Now () - entry->time, m_seqRetxCounts[seq]);
     }
+
+  m_seqRetxCounts.erase (seq);  
+  m_seqFullDelay.erase (seq);
+  m_seqLastDelay.erase (seq);
   
-  m_seqLifetimes.erase (seq);
   m_seqTimeouts.erase (seq);
   m_retxSeqs.erase (seq);
 
