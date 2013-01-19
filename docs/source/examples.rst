@@ -268,6 +268,12 @@ You can also run using visualizer module to verify that both bottleneck links ar
 :ref:`cs trace helper example`
 
 
+3-level binary tree with  application-level Interest-Data delay tracer
+----------------------------------------------------------------------
+
+:ref:`app delay trace helper example`
+
+
 3-node topology with Content Store respecting freshness field of ContentObjects
 -------------------------------------------------------------------------------
 

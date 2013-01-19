@@ -1,11 +1,6 @@
 *.pyc
 .waf*
-in-progress/
-waf
 *~
 .DS_Store
-*\#
-*.txt
-*.pdf
-*.dot
-doxygen.warnings.log
+docs/doxygen.warnings.log
+

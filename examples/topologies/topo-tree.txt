@@ -1,0 +1,46 @@
+# topo-tree.txt
+
+#     /------\      /------\      /------\      /------\
+#     |leaf-1|      |leaf-2|      |leaf-3|      |leaf-4|
+#     \------/      \------/      \------/      \------/
+#          ^          ^                ^           ^	
+#          |          |                |           |
+#     	    \        /                  \         / 
+#            \      /  			 \  	 /    10Mbps / 1ms
+#             \    /  			  \ 	/
+#              |  |  			   |   | 
+#     	       v  v                        v   v     
+#	    /-------\                    /-------\
+#	    | rtr-1 |                    | rtr-2 |
+#           \-------/                    \-------/
+#                 ^                        ^                      
+#		  |	 		   |
+#		   \			  /  10 Mpbs / 1ms 
+#		    +--------+  +--------+ 
+#			     |  |      
+#                            v  v
+#			  /--------\
+#			  |  root  |
+#                         \--------/
+#
+
+router
+
+#node	city	y	x	mpi-partition
+leaf-1	NA	80	40	1
+leaf-2	NA	80	20	3
+leaf-3	NA	80	0	2
+leaf-4	NA	80	-20	4
+rtr-1	NA	60	20	1
+rtr-2	NA	60	0	2
+root	NA	40	10	0
+
+link
+
+# from	    to		capacity	metric	delay	queue
+leaf-1	    rtr-1	10Mbps		1	1ms	100
+leaf-2	    rtr-1	10Mbps		1	1ms	100
+leaf-3	    rtr-2	10Mbps		1	1ms	100
+leaf-4	    rtr-2	10Mbps		1	1ms	100
+rtr-1	    root	10Mbps		1	1ms	100
+rtr-2	    root	10Mbps		1	1ms	100
