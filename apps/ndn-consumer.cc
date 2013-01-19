@@ -32,7 +32,7 @@
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
-// #include "ns3/weights-path-stretch-tag.h"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
@@ -75,9 +75,6 @@ Consumer::GetTypeId (void)
                    StringValue ("50ms"),
                    MakeTimeAccessor (&Consumer::GetRetxTimer, &Consumer::SetRetxTimer),
                    MakeTimeChecker ())
-
-    .AddTraceSource ("PathWeightsTrace", "PathWeightsTrace",
-                    MakeTraceSourceAccessor (&Consumer::m_pathWeightsTrace))
 
     .AddTraceSource ("LastRetransmittedInterestDataDelay", "Delay between last retransmitted Interest and received Data",
                      MakeTraceSourceAccessor (&Consumer::m_lastRetransmittedInterestDataDelay))
@@ -228,6 +225,9 @@ Consumer::SendPacket ()
 
   m_rtt->SentSeq (SequenceNumber32 (seq), 1);
 
+  FwHopCountTag hopCountTag;
+  packet->AddPacketTag (hopCountTag);
+  
   m_protocolHandler (packet);
 
   ScheduleNextPacket ();
@@ -253,16 +253,23 @@ Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
   uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
+  int hopCount = -1;
+  FwHopCountTag hopCountTag;
+  if (payload->RemovePacketTag (hopCountTag))
+    {
+      hopCount = hopCountTag.Get ();
+    }
+  
   SeqTimeoutsContainer::iterator entry = m_seqLastDelay.find (seq);
   if (entry != m_seqLastDelay.end ())
     {
-      m_lastRetransmittedInterestDataDelay (this, seq, Simulator::Now () - entry->time);
+      m_lastRetransmittedInterestDataDelay (this, seq, Simulator::Now () - entry->time, hopCount);
     }
 
   entry = m_seqFullDelay.find (seq);
   if (entry != m_seqFullDelay.end ())
     {
-      m_firstInterestDataDelay (this, seq, Simulator::Now () - entry->time, m_seqRetxCounts[seq]);
+      m_firstInterestDataDelay (this, seq, Simulator::Now () - entry->time, m_seqRetxCounts[seq], hopCount);
     }
 
   m_seqRetxCounts.erase (seq);  
@@ -273,15 +280,6 @@ Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
   m_retxSeqs.erase (seq);
 
   m_rtt->AckSeq (SequenceNumber32 (seq));
-
-  // Ptr<const WeightsPathStretchTag> tag = payload->RemovePacketTag<WeightsPathStretchTag> ();
-  // if (tag != 0)
-  //   {
-  //     // Notify trace about path weights vector (e.g., for path-stretch calculation)
-  //     m_pathWeightsTrace (GetNode (), tag->GetSourceNode (), seq, tag->GetTotalWeight ());
-  //     // if (Names::FindName (GetNode ()) == "36")// || Names::FindName (GetNode ()) == "40"|| Names::FindName (GetNode ()) == "5")
-  //     //   std::cout << Simulator::Now () << "\t" << boost::cref(*tag) << " = " << tag->GetTotalWeight () << "\n";
-  //   }
 }
 
 void

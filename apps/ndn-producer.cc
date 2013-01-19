@@ -30,7 +30,8 @@
 
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-fib.h"
-// #include "../model/ndn-fib-impl.h"
+
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 
 #include <boost/ref.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -123,21 +124,16 @@ Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> ori
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
   
   Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
-  // Ptr<const WeightsPathStretchTag> tag = origPacket->RemovePacketTag<WeightsPathStretchTag> ();
-  // if (tag != 0)
-  //   {
-  //     // std::cout << Simulator::Now () << ", " << m_app->GetInstanceTypeId ().GetName () << "\n";
-
-  //     // echo back WeightsPathStretchTag
-  //     packet->AddPacketTag (CreateObject<WeightsPathStretchTag> (*tag));
-
-  //     // \todo
-  //     // packet->AddPacketTag should actually accept Ptr<const WeightsPathStretchTag> instead of
-  //     // Ptr<WeightsPathStretchTag>.  Echoing will be simplified after change is done
-  //   }
   
   packet->AddHeader (*header);
   packet->AddTrailer (tail);
+
+  // Echo back FwHopCountTag if exists
+  FwHopCountTag hopCountTag;
+  if (origPacket->RemovePacketTag (hopCountTag))
+    {
+      packet->AddPacketTag (hopCountTag);
+    }
 
   m_protocolHandler (packet);
   

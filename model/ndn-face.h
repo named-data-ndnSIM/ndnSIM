@@ -215,8 +215,6 @@ private:
   uint32_t m_id; ///< \brief id of the interface in Ndn stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
 
-  // bool m_enableMetricTagging;
-
   TracedCallback<Ptr<const Packet> > m_txTrace;
   TracedCallback<Ptr<const Packet> > m_rxTrace;
   TracedCallback<Ptr<const Packet> > m_dropTrace;

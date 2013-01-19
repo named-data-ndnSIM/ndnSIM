@@ -129,11 +129,12 @@ AppDelayTracer::PrintHeader (std::ostream &os) const
      << "Type" << "\t"
      << "DelayS" << "\t"
      << "DelayUS" << "\t"
-     << "RetxCount" << "";
+     << "RetxCount" << "\t"
+     << "HopCount"  << "";
 }
 
 void 
-AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay)
+AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount)
 {
   *m_os << m_node << "\t"
         << app->GetId () << "\t"
@@ -141,11 +142,12 @@ AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno
         << "LastDelay" << "\t"
         << delay.ToDouble (Time::S) << "\t"
         << delay.ToDouble (Time::US) << "\t"
-        << 1 << "\n";
+        << 1 << "\t"
+        << hopCount << "\n";
 }
   
 void 
-AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount)
+AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount, int32_t hopCount)
 {
   *m_os << m_node << "\t"
         << app->GetId () << "\t"
@@ -153,7 +155,8 @@ AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay
         << "FullDelay" << "\t"
         << delay.ToDouble (Time::S) << "\t"
         << delay.ToDouble (Time::US) << "\t"
-        << retxCount << "\n";
+        << retxCount << "\t"
+        << hopCount << "\n";
 }
 
 

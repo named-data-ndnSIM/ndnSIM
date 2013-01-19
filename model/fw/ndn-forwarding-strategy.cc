@@ -37,6 +37,8 @@
 #include "ns3/boolean.h"
 #include "ns3/string.h"
 
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -171,7 +173,13 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
   boost::tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
   if (contentObject != 0)
     {
-      NS_ASSERT (contentObjectHeader != 0);      
+      NS_ASSERT (contentObjectHeader != 0);
+
+      FwHopCountTag hopCountTag;
+      if (origPacket->PeekPacketTag (hopCountTag))
+        {
+          contentObject->AddPacketTag (hopCountTag);
+        }
 
       pitEntry->AddIncoming (inFace/*, Seconds (1.0)*/);
 
@@ -223,8 +231,20 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
     }
   else
     {
-      // Add or update entry in the content store
-      m_contentStore->Add (header, payload);
+      FwHopCountTag hopCountTag;
+      if (payload->PeekPacketTag (hopCountTag))
+        {
+          Ptr<Packet> payloadCopy = payload->Copy ();
+          payloadCopy->RemovePacketTag (hopCountTag);
+          
+          // Add or update entry in the content store
+          m_contentStore->Add (header, payloadCopy);
+        }
+      else
+        {
+          // Add or update entry in the content store
+          m_contentStore->Add (header, payload); // no need for extra copy
+        }
     }
 
   while (pitEntry != 0)

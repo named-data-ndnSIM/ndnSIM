@@ -247,7 +247,15 @@ Application-level trace helper
     +-----------------+---------------------------------------------------------------------+
     | ``RetxCount``   | number of Interest retransmissions (for LastDelay always equal to 1)|
     +-----------------+---------------------------------------------------------------------+
-
+    | ``HopCount``    | combined number of number of hops for Interest and Data packet.     |
+    |                 | Note that HopCount is increased anytime somebody calls Send method  |
+    |                 | on a face, including delivery of Interest/Data to application via   |
+    |                 | an AppFace (but not from application to ndn::L3Protocol!).          |
+    |                 |                                                                     |
+    |                 | One consequence is that Interests satisfied by an app will have     |
+    |                 | even hop count (min hop count = 2), and Interests satisfied from    |
+    |                 | caches will have off hop count (min hop count = 1)                  |
+    +-----------------+---------------------------------------------------------------------+
 
 .. _app delay trace helper example:
 

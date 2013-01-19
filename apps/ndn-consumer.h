@@ -181,9 +181,11 @@ protected:
   SeqTimeoutsContainer m_seqFullDelay;
   std::map<uint32_t, uint32_t> m_seqRetxCounts;
   
-  TracedCallback<Ptr<Node>, Ptr<Node>, uint32_t, uint32_t > m_pathWeightsTrace;
-  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */> m_lastRetransmittedInterestDataDelay;
-  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */, Time /* delay */, uint32_t /*retx count*/> m_firstInterestDataDelay;
+  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */,
+                 Time /* delay */, int32_t /*hop count*/> m_lastRetransmittedInterestDataDelay;
+  TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */,
+                 Time /* delay */, uint32_t /*retx count*/,
+                 int32_t /*hop count*/> m_firstInterestDataDelay;
   
 /// @endcond
 };

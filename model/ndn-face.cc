@@ -32,7 +32,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/pointer.h"
 
-// #include "ns3/weights-path-stretch-tag.h"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 
 #include <boost/ref.hpp>
 
@@ -55,11 +55,6 @@ Face::GetTypeId ()
                    MakeUintegerAccessor (&Face::m_id),
                    MakeUintegerChecker<uint32_t> ())
 
-    // .AddAttribute ("MetricTagging", "Enable metric tagging (path-stretch calculation)",
-    //                BooleanValue (false),
-    //                MakeBooleanAccessor (&Face::m_enableMetricTagging),
-    //                MakeBooleanChecker ())
-
     .AddTraceSource ("NdnTx", "Transmitted packet trace",
                      MakeTraceSourceAccessor (&Face::m_txTrace))
     .AddTraceSource ("NdnRx", "Received packet trace",
@@ -81,7 +76,6 @@ Face::Face (Ptr<Node> node)
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
-  // , m_enableMetricTagging (false)
 {
   NS_LOG_FUNCTION (this);
 
@@ -128,23 +122,13 @@ Face::Send (Ptr<Packet> packet)
       return false;
     }
 
-  // if (m_enableMetricTagging)
-  //   {
-  //     // update path information
-  //     Ptr<const WeightsPathStretchTag> origTag = packet->RemovePacketTag<WeightsPathStretchTag> ();
-  //     Ptr<WeightsPathStretchTag> tag;
-  //     if (origTag == 0)
-  //       {
-  //         tag = CreateObject<WeightsPathStretchTag> (); // create a new tag
-  //       }
-  //     else
-  //       {
-  //         tag = CreateObject<WeightsPathStretchTag> (*origTag); // will update existing tag
-  //       }
-
-  //     tag->AddPathInfo (m_node, GetMetric ());
-  //     packet->AddPacketTag (tag);
-  //   }
+  FwHopCountTag hopCount;
+  bool tagExists = packet->RemovePacketTag (hopCount);
+  if (tagExists)
+    {
+      hopCount.Increment ();
+      packet->AddPacketTag (hopCount);
+    }
 
   bool ok = SendImpl (packet);
   if (ok)
