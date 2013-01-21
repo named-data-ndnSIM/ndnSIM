@@ -21,7 +21,7 @@ Example:
 Routing
 +++++++
 
-All forwarding strategies require knowledge of where Interests can be forwarded (Forwarding Information Base).  
+All forwarding strategies require knowledge of where Interests can be forwarded (Forwarding Information Base).
 Unlike IP routing, this knowledge may be imprecise, but without such knowledge forwarding strategies will not be able to make any decision and will drop any Interests.
 
 .. note::
@@ -54,27 +54,27 @@ There are several necessary steps, in order to take advantage of the global rout
 * install :ndnsim:`special interfaces <GlobalRouter>` on nodes
 
    .. code-block:: c++
-   
+
      NodeContainer nodes;
      ...
      ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
      ndnGlobalRoutingHelper.Install (nodes);
-   
+
 * specify which node exports which prefix using :ndnsim:`GlobalRoutingHelper::AddOrigins`
 
    .. code-block:: c++
-   
+
      Ptr<Node> producer; // producer node that exports prefix
      std::string prefix; // exported prefix
      ...
      ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
-   
+
 * calculate and install FIBs on every node using :ndnsim:`GlobalRoutingHelper::CalculateRoutes`
 
    .. code-block:: c++
-   
+
      cdnGlobalRoutingHelper.CalculateRoutes ();
-   
+
 Default routes
 ^^^^^^^^^^^^^^
 
@@ -97,180 +97,16 @@ Content Store
 
 ndnSIM comes with several different in-memory :ndnsim:`content store <ndn::ContentStore>` implementations, featuring different cache replacement policies.
 
-.. note:
-
-    The default content store uses LRU replacement policity and constrained with 100 cached ContentObjects.
-
 To select a particular content store and configure its capacity, use :ndnsim:`SetContentStore <ndn::StackHelper::SetContentStore>` helper method:
 
-- :ndnsim:`Least Recently Used (LRU) <ndn::cs::Lru>` (default):
-
       .. code-block:: c++
 
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Lru",
-                                    "MaxSize", "10000");
+         ndnHelper.SetContentStore ("<content store implementation>",
+                                    ["<optional parameter>", "<optional parameter's value>" [, ...]]);
 	 ...
 	 ndnHelper.Install (nodes);
 
-
-- :ndnsim:`First-In-First-Out (FIFO) <ndn::cs::Fifo>`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Fifo",
-                                    "MaxSize", "10000");
-	 ...
-	 ndnHelper.Install (nodes);
-
-- :ndnsim:`Random <ndn::cs::Random>`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Random",
-                                    "MaxSize", "10000");
-	 ...
-	 ndnHelper.Install (nodes);
-
-.. note::
-
-    If ``MaxSize`` parameter is omitted, then will be used a default value (100).
-
-.. note::
-
-    If ``MaxSize`` is set to 0, then no limit on ContentStore will be enforced 
-
-
-Content Store with entry lifetime tracking
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In order to evaluate lifetime of the content store entries, the special versions of the content store need to be used:
-
-- :ndnsim:`Least Recently Used (LRU) with cache entry lifetime tracking <ndn::cs::Stats::Lru>`:
-
-      .. code-block:: c++
-
-         void
-         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
-         {
-             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
-         }
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Lru",
-                                    "MaxSize", "10000");
-	 ...
-	 ndnHelper.Install (nodes);
-
-         // connect to lifetime trace
-         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Lru/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
-
-
-- :ndnsim:`First-In-First-Out (FIFO) with cache entry lifetime tracking <ndn::cs::Stats::Fifo>`:
-
-      .. code-block:: c++
-
-         void
-         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
-         {
-             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
-         }
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Fifo",
-                                    "MaxSize", "10000");
-	 ...
-	 ndnHelper.Install (nodes);
-
-         // connect to lifetime trace
-         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Fifo/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
-
-- :ndnsim:`Random with cache entry lifetime tracking <ndn::cs::Stats::Random>`:
-
-      .. code-block:: c++
-
-         void
-         CacheEntryRemoved (std::string context, Ptr<const ndn::cs::Entry> entry, Time lifetime)
-         {
-             std::cout << entry->GetName () << " " << lifetime.ToDouble (Time::S) << "s" << std::endl;
-         }
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Random",
-                                    "MaxSize", "10000");
-	 ...
-	 ndnHelper.Install (nodes);
-
-         // connect to lifetime trace
-         Config::Connect ("/NodeList/*/$ns3::ndn::cs::Stats::Random/WillRemoveEntry", MakeCallback (CacheEntryRemoved));
-
-.. _Content Store respecting freshness field of ContentObjects:
-
-Content Store respecting freshness field of ContentObjects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If simulations need Content Store which respects freshness of ContentObjects, the following versions of content store should be used:
-
-.. note:
-
-    Please note that currently, Freshness granularity is 1 second and maximum value is 65535 second. Value means infinity.
-
-- :ndnsim:`Least Recently Used (LRU) respecting ContentObject freshness <ndn::cs::Freshness::Lru>`:
-
-      .. code-block:: c++
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Lru",
-                                    "MaxSize", "10000");
-	 ...
-
-
-- :ndnsim:`First-In-First-Out (FIFO) respecting ContentObject freshness <ndn::cs::Freshness::Fifo>`:
-
-      .. code-block:: c++
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Fifo",
-                                    "MaxSize", "10000");
-	 ...
-
-- :ndnsim:`Random respecting ContentObject freshness <ndn::cs::Freshness::Random>`:
-
-      .. code-block:: c++
-
-         ...
-
-         ndnHelper.SetContentStore ("ns3::ndn::cs::Freshness::Random",
-                                    "MaxSize", "10000");
-	 ...
-
-The following example demonstrates a basic usage of a customized content store (``ndn-simple-with-content-freshness.cc``).  
-In this scenario two simple consumers (both installed on a consumer node) continually request the same data packet.  
-When Data producer specify unlimited freshness, Content keeps getting satisfied from local caches, while if freshness is specified, Interests periodically are getting through to the Data producer.
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-      +----------+                +--------+                +----------+
-      |          |     1Mbps      |        |      1Mbps     |          |
-      | Consumer |<-------------->| Router |<-------------->| Producer |
-      |          |         10ms   |        |         10ms   |          |
-      +----------+                +--------+                +----------+
-
-
-.. literalinclude:: ../../examples/ndn-simple-with-content-freshness.cc
-    :language: c++
-    :linenos:
-    :lines: 20-27,43-
-
-To run this scenario, use the following command::
-
-        NS_LOG=DumbRequester:ndn.cs.Freshness.Lru ./waf --run=ndn-simple-with-content-freshness
+In simulation scenarios it is possible to select one of :ref:`the existing implementations of the content store or implement your own <content store>`.
 
 
 Pending Interest Table
@@ -292,7 +128,7 @@ To select a particular PIT implementation and configure its policies, use :ndnsi
 	 ndnHelper.Install (nodes);
 
 - :ndnsim:`random <ndn::pit::Random>`:
-    
+
     when PIT reaches its limit, random entry (could be the newly created one) will be removed from PIT;
 
       .. code-block:: c++
@@ -318,43 +154,55 @@ Forwarding strategy
 
 A desired :ndnsim:`forwarding strategy <ForwardingStrategy>` parameter need to be set before installing stack on a node.
 
-  Currently, there are following forwarding strategies that can be used in simulations:
-
-  - :ndnsim:`Flooding` (default)
-
-      Interests will be forwarded to all available faces available for a route (FIB entry).
-      If there are no available GREEN or YELLOW faces, interests is dropped.
+To select a particular forwarding strategy implementation and configure its parameters, use :ndnsim:`SetForwardingStrategy <ndn::StackHelper::SetContentStore>` helper method:
 
       .. code-block:: c++
 
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
-	 ...
-	 ndnHelper.Install (nodes);
-      
-
-  - :ndnsim:`SmartFlooding`
-
-      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face. 
-      If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
-      If there are no available GREEN or YELLOW faces, interests is dropped.
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
+         ndnHelper.SetForwardingStrategy ("<forwarding strategy implementation>",
+                                          ["<optional parameter>", "<optional parameter's value>" [, ...]]);
 	 ...
 	 ndnHelper.Install (nodes);
 
-  - :ndnsim:`BestRoute`
+In simulation scenarios it is possible to select one of :ref:`the existing implementations of the forwarding strategy or implement your own <forwarding strategies>`.
 
-      If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-      If not, Interest will be forwarded to the highest-ranked YELLOW face.
-      If there are no available GREEN or YELLOW faces, interests is dropped.
 
-      .. code-block:: c++
+.. Currently, there are following forwarding strategies that can be used in simulations:
 
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-	 ...
-	 ndnHelper.Install (nodes);
+..   - :ndnsim:`Flooding` (default)
+
+..       Interests will be forwarded to all available faces available for a route (FIB entry).
+..       If there are no available GREEN or YELLOW faces, interests is dropped.
+
+..       .. code-block:: c++
+
+..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
+.. 	 ...
+.. 	 ndnHelper.Install (nodes);
+
+
+..   - :ndnsim:`SmartFlooding`
+
+..       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
+..       If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
+..       If there are no available GREEN or YELLOW faces, interests is dropped.
+
+..       .. code-block:: c++
+
+..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
+.. 	 ...
+.. 	 ndnHelper.Install (nodes);
+
+..   - :ndnsim:`BestRoute`
+
+..       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
+..       If not, Interest will be forwarded to the highest-ranked YELLOW face.
+..       If there are no available GREEN or YELLOW faces, interests is dropped.
+
+..       .. code-block:: c++
+
+..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
+.. 	 ...
+.. 	 ndnHelper.Install (nodes);
 
 
 
@@ -394,3 +242,6 @@ The basic usage of the :ndnsim:`AppHelper`:
       NodeContainer nodes;
       ...
       consumerHelper.Install (nodes)
+
+
+In simulation scenarios it is possible to select one of :ref:`the existing applications or implement your own <applications>`.

@@ -1,3 +1,5 @@
+.. _applications:
+
 ndnSIM applications
 ===================
 
@@ -36,9 +38,9 @@ This applications has the following attributes:
      default: ``"none"``
 
   Specify whether to do randomization for inter-Interest gap or not.  The following variants are currently supported:
-  
+
   - ``"none"``: no randomization
- 
+
   - ``"uniform"``: uniform distribution in range (0, 1/Frequency)
 
   - ``"exponential"``: exponential distribution with mean 1/Frequency
@@ -54,7 +56,7 @@ ConsumerZipfMandelbrot
 .. note::
     Author: Xiaoke Jiang
 
-An app that requests contents (names in the requests) following Zipf-Mandelbrot distribution (number of Content frequency Distribution). 
+An app that requests contents (names in the requests) following Zipf-Mandelbrot distribution (number of Content frequency Distribution).
 This class is a subclass of :ndnsim:`ConsumerCbr`.
 
 .. code-block:: c++
@@ -62,7 +64,7 @@ This class is a subclass of :ndnsim:`ConsumerCbr`.
    // Create application using the app helper
    ndn::AppHelper helper ("ns3::ndn::ConsumerZipfMandelbrot");
 
-``Frequency`` and ``Randomize`` attributes can be used in the same way as in the base :ndnsim:`ConsumerCbr` applications. 
+``Frequency`` and ``Randomize`` attributes can be used in the same way as in the base :ndnsim:`ConsumerCbr` applications.
 
 Additional attributes:
 
@@ -106,7 +108,7 @@ This applications has the following attributes:
   .. note::
      default: Empty
 
-  Specify exact pattern of Interest packets, specifying when and how many Interest packets should be sent. 
+  Specify exact pattern of Interest packets, specifying when and how many Interest packets should be sent.
   The following example defines that 1 Interest should be requested at time 1s, 5 Interests at time 5s, and 2 Interests at time 10s.:
 
   .. code-block:: c++
@@ -166,7 +168,7 @@ Producer
 Custom applications
 +++++++++++++++++++
 
-Applications interact with the core of the system using :ndnsim:`AppFace` realization of Face abstraction. 
+Applications interact with the core of the system using :ndnsim:`AppFace` realization of Face abstraction.
 To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`App` class that takes care of creating :ndnsim:`AppFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
 
 .. Base App class
@@ -199,8 +201,8 @@ Source file ``examples/custom-apps/custom-app.cc``:
 
 Example how to use custom app in a scenario (``ndn-simple-with-custom-app.cc``):
 
- .. *      +------+ <-----> (CustomApp1) 
- .. *      | Node | 
+ .. *      +------+ <-----> (CustomApp1)
+ .. *      | Node |
  .. *      +------+ <-----> (CustomApp2)
  .. *
 
