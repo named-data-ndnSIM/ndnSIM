@@ -52,7 +52,7 @@ def configure(conf):
 
     if Options.options.disable_ndn_plugins:
         conf.env['NDN_plugins'] = conf.env['NDN_plugins'] - Options.options.disable_ndn_plugins.split(',')
-    
+
     conf.env['ENABLE_NDNSIM']=True;
     conf.env['MODULES_BUILT'].append('ndnSIM')
 
@@ -82,7 +82,7 @@ def build(bld):
     if not bld.env['ENABLE_NDNSIM']:
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
-   
+
     module.source = bld.path.ant_glob(['model/**/*.cc',
                                        'apps/*.cc',
                                        'utils/**/*.cc',
@@ -116,12 +116,12 @@ def build(bld):
 
         "model/fib/ndn-fib.h",
         "model/fib/ndn-fib-entry.h",
-        
+
         "model/pit/ndn-pit.h",
         "model/pit/ndn-pit-entry.h",
         "model/pit/ndn-pit-entry-incoming-face.h",
         "model/pit/ndn-pit-entry-outgoing-face.h",
-        
+
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
 
@@ -137,6 +137,7 @@ def build(bld):
             "plugins/topology/annotated-topology-reader.h",
             ])
         module.source.extend (bld.path.ant_glob(['plugins/topology/*.cc']))
+        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/topology/**/*.h'])])
 
     if 'mobility' in bld.env['NDN_plugins']:
         headers.source.extend ([
@@ -144,15 +145,18 @@ def build(bld):
             "plugins/mobility/spring-mobility-helper.h",
             ])
         module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
+        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/mobility/**/*.h'])])
 
     # bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
     # bld.install_files('$PREFIX/include', ndnSIM_headers)
-    
+
     tests = bld.create_ns3_module_test_library('ndnSIM')
     tests.source = bld.path.ant_glob('test/*.cc')
 
     if bld.env.ENABLE_EXAMPLES:
         bld.add_subdirs('examples')
+
+    bld.add_subdirs('tools')
 
     bld.ns3_python_bindings()
 
@@ -177,7 +181,7 @@ def apply_ns3fullmoduleheaders(self):
         task = self.create_task('ns3header')
         task.mode = getattr(self, 'mode', 'install')
         if task.mode == 'install':
-            self.bld.install_files('${INCLUDEDIR}/%s%s/ns3/%s' % (wutils.APPNAME, wutils.VERSION, relpath), 
+            self.bld.install_files('${INCLUDEDIR}/%s%s/ns3/%s' % (wutils.APPNAME, wutils.VERSION, relpath),
                                    [src_node])
             task.set_inputs([src_node])
             task.set_outputs([dst_node])
