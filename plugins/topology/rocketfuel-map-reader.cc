@@ -139,8 +139,8 @@ RocketfuelMapReader::GenerateFromMapsFile (int argc, char *argv[])
   string ptr;
   string name;
   string nuid;
-  bool dns = false;
-  bool bb = false;
+  // bool dns = false;
+  // bool bb = false;
   int num_neigh_s = 0;
   unsigned int num_neigh = 0;
   int radius = 0;
@@ -149,15 +149,15 @@ RocketfuelMapReader::GenerateFromMapsFile (int argc, char *argv[])
   uid = argv[0];
   loc = argv[1];
 
-  if (argv[2])
-  {
-    dns = true;
-  }
+  // if (argv[2])
+  // {
+  //   dns = true;
+  // }
 
-  if (argv[3])
-  {
-    bb = true;
-  }
+  // if (argv[3])
+  // {
+  //   bb = true;
+  // }
 
   num_neigh_s = ::atoi (argv[4]);
   if (num_neigh_s < 0)
@@ -543,6 +543,20 @@ RocketfuelMapReader::GetCustomerRouters () const
   return m_customerRouters;
 }
 
+
+static
+void nodeWriter (std::ostream &os, NodeContainer& m)
+{
+  for (NodeContainer::Iterator node = m.Begin ();
+       node != m.End ();
+       node ++)
+    {
+      std::string name = Names::FindName (*node);
+
+      os << name << "\t" << "NA" << "\t" << 0 << "\t" << 0 << "\n";
+    }
+};
+
 void
 RocketfuelMapReader::SaveTopology (const std::string &file)
 {
@@ -557,18 +571,9 @@ RocketfuelMapReader::SaveTopology (const std::string &file)
      << "# each line in this section represents one router and should have the following data\n"
      << "# node  comment     yPos    xPos\n";
 
-  auto nodeWriter = [&os](NodeContainer& m) {
-    for_each (m.Begin (), m.End (), [&os](Ptr<Node> node)
-    {
-      std::string name = Names::FindName (node);
-
-      os << name << "\t" << "NA" << "\t" << 0 << "\t" << 0 << "\n";
-    });
-  };
-
-  nodeWriter (m_backboneRouters);
-  nodeWriter (m_gatewayRouters);
-  nodeWriter (m_customerRouters);
+  nodeWriter (os, m_backboneRouters);
+  nodeWriter (os, m_gatewayRouters);
+  nodeWriter (os, m_customerRouters);
 
   os << "# link section defines point-to-point links between nodes and characteristics of these links\n"
      << "\n"
@@ -581,40 +586,43 @@ RocketfuelMapReader::SaveTopology (const std::string &file)
      << "# delay:  link delay\n"
      << "# queue:  MaxPackets for transmission queue on the link (both directions)\n";
 
-  for_each (m_linksList.begin (), m_linksList.end (), [&](const Link &link) {
-      string src = Names::FindName (link.GetFromNode ());
-      string dst = Names::FindName (link.GetToNode ());
+  for (std::list<Link>::iterator link = m_linksList.begin ();
+       link != m_linksList.end ();
+       link ++)
+    {
+      string src = Names::FindName (link->GetFromNode ());
+      string dst = Names::FindName (link->GetToNode ());
       os << src << "\t";
       os << dst << "\t";
 
       string tmp;
-      if (link.GetAttributeFailSafe ("DataRate", tmp))
-        os << link.GetAttribute("DataRate") << "\t";
+      if (link->GetAttributeFailSafe ("DataRate", tmp))
+        os << link->GetAttribute("DataRate") << "\t";
       else
         NS_FATAL_ERROR ("DataRate must be specified for the link");
 
-      if (link.GetAttributeFailSafe ("OSPF", tmp))
-        os << link.GetAttribute("OSPF") << "\t";
+      if (link->GetAttributeFailSafe ("OSPF", tmp))
+        os << link->GetAttribute("OSPF") << "\t";
       else
         {
-          DataRate rate = boost::lexical_cast<DataRate> (link.GetAttribute("DataRate"));
+          DataRate rate = boost::lexical_cast<DataRate> (link->GetAttribute("DataRate"));
 
           int32_t cost = std::max (1, static_cast<int32_t> (1.0 * m_referenceOspfRate.GetBitRate () / rate.GetBitRate ()));
 
           os << cost << "\t";
         }
 
-      if (link.GetAttributeFailSafe ("Delay", tmp))
+      if (link->GetAttributeFailSafe ("Delay", tmp))
         {
-          os << link.GetAttribute("Delay") << "\t";
+          os << link->GetAttribute("Delay") << "\t";
 
-          if (link.GetAttributeFailSafe ("MaxPackets", tmp))
+          if (link->GetAttributeFailSafe ("MaxPackets", tmp))
             {
-              os << link.GetAttribute("MaxPackets") << "\t";
+              os << link->GetAttribute("MaxPackets") << "\t";
             }
         }
       os << "\n";
-    });
+    }
 }
 
 
