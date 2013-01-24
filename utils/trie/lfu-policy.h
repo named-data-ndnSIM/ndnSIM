@@ -1,6 +1,6 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2012 University of California, Los Angeles
+ * Copyright (c) 2011 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -18,29 +18,25 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef FRESHNESS_POLICY_H_
-#define FRESHNESS_POLICY_H_
+#ifndef LFU_POLICY_H_
+#define LFU_POLICY_H_
 
 #include <boost/intrusive/options.hpp>
-#include <boost/intrusive/list.hpp>
-
-#include <ns3/nstime.h>
-#include <ns3/simulator.h>
-#include <ns3/traced-callback.h>
+#include <boost/intrusive/set.hpp>
 
 namespace ns3 {
 namespace ndn {
 namespace ndnSIM {
 
 /**
- * @brief Traits for freshness policy
+ * @brief Traits for LFU replacement policy
  */
-struct freshness_policy_traits
+struct lfu_policy_traits
 {
   /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string GetName () { return "Freshness"; }
+  static std::string GetName () { return "Lfu"; }
 
-  struct policy_hook_type : public boost::intrusive::set_member_hook<> { Time timeWhenShouldExpire; };
+  struct policy_hook_type : public boost::intrusive::set_member_hook<> { double frequency; };
 
   template<class Container>
   struct container_hook
@@ -55,16 +51,16 @@ struct freshness_policy_traits
            class Hook>
   struct policy
   {
-    static Time& get_freshness (typename Container::iterator item)
+    static double& get_order (typename Container::iterator item)
     {
       return static_cast<typename policy_container::value_traits::hook_type*>
-        (policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
+        (policy_container::value_traits::to_node_ptr(*item))->frequency;
     }
 
-    static const Time& get_freshness (typename Container::const_iterator item)
+    static const double& get_order (typename Container::const_iterator item)
     {
       return static_cast<const typename policy_container::value_traits::hook_type*>
-        (policy_container::value_traits::to_node_ptr(*item))->timeWhenShouldExpire;
+        (policy_container::value_traits::to_node_ptr(*item))->frequency;
     }
 
     template<class Key>
@@ -72,7 +68,7 @@ struct freshness_policy_traits
     {
       bool operator () (const Key &a, const Key &b) const
       {
-        return get_freshness (&a) < get_freshness (&b);
+        return get_order (&a) < get_order (&b);
       }
     };
 
@@ -80,11 +76,11 @@ struct freshness_policy_traits
                                    boost::intrusive::compare< MemberHookLess< Container > >,
                                    Hook > policy_container;
 
-
+    // could be just typedef
     class type : public policy_container
     {
     public:
-      typedef policy policy_base; // to get access to get_freshness methods from outside
+      typedef policy policy_base; // to get access to get_order methods from outside
       typedef Container parent_trie;
 
       type (Base &base)
@@ -96,40 +92,38 @@ struct freshness_policy_traits
       inline void
       update (typename parent_trie::iterator item)
       {
-        // do nothing
+        policy_container::erase (*item);
+        get_order (item) += 1;
+        policy_container::insert (*item);
       }
 
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        // get_time (item) = Simulator::Now ();
-        Time freshness = item->payload ()->GetHeader ()->GetFreshness ();
-        if (!freshness.IsZero ())
-          {
-            get_freshness (item) = Simulator::Now () + freshness;
+        get_order (item) = 0;
 
-            // push item only if freshness is non zero. otherwise, this payload is not controlled by the policy
-            // note that .size() on this policy would return only number of items with non-infinite freshness policy
-            policy_container::push_back (*item);
+        if (max_size_ != 0 && policy_container::size () >= max_size_)
+          {
+            // this erases the "least frequently used item" from cache
+            base_.erase (&(*policy_container::begin ()));
           }
 
+        policy_container::insert (*item);
         return true;
       }
 
       inline void
       lookup (typename parent_trie::iterator item)
       {
-        // do nothing. it's random policy
+        policy_container::erase (*item);
+        get_order (item) += 1;
+        policy_container::insert (*item);
       }
 
       inline void
       erase (typename parent_trie::iterator item)
       {
-        if (!item->payload ()->GetHeader ()->GetFreshness ().IsZero ())
-          {
-            // erase only if freshness is non zero (otherwise an item is not in the policy
-            policy_container::erase (policy_container::s_iterator_to (*item));
-          }
+        policy_container::erase (policy_container::s_iterator_to (*item));
       }
 
       inline void
@@ -164,4 +158,4 @@ struct freshness_policy_traits
 } // ndn
 } // ns3
 
-#endif // LIFETIME_STATS_POLICY_H
+#endif // LFU_POLICY_H

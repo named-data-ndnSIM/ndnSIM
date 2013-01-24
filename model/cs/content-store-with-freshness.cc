@@ -23,6 +23,7 @@
 #include "../../utils/trie/random-policy.h"
 #include "../../utils/trie/lru-policy.h"
 #include "../../utils/trie/fifo-policy.h"
+#include "../../utils/trie/lfu-policy.h"
 
 #define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
   static struct X ## type ## templ ## RegistrationClass \
@@ -56,10 +57,17 @@ template class ContentStoreWithFreshness<random_policy_traits>;
  **/
 template class ContentStoreWithFreshness<fifo_policy_traits>;
 
+/**
+ * @brief ContentStore with freshness and Least Frequently Used (LFU) cache replacement policy
+ **/
+template class ContentStoreWithFreshness<lfu_policy_traits>;
+
+
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lru_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, fifo_policy_traits);
 
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithFreshness, lfu_policy_traits);
 
 #ifdef DOXYGEN
 // /**
@@ -76,6 +84,11 @@ class Freshness::Fifo : public ContentStoreWithFreshness<fifo_policy_traits> { }
  * \brief Content Store with freshness implementing Random cache replacement policy
  */
 class Freshness::Random : public ContentStoreWithFreshness<random_policy_traits> { };
+
+/**
+ * \brief Content Store with freshness implementing Least Frequently Used cache replacement policy
+ */
+class Freshness::Lfu : public ContentStoreWithFreshness<lfu_policy_traits> { };
 
 #endif
 
