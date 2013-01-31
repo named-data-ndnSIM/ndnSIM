@@ -57,6 +57,11 @@ ConsumerWindow::GetTypeId (void)
                    MakeDoubleAccessor (&ConsumerWindow::GetMaxSize, &ConsumerWindow::SetMaxSize),
                    MakeDoubleChecker<double> ())
 
+    .AddAttribute ("InitialWindowOnTimeout", "Set window to initial value when timeout occurs",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&ConsumerWindow::m_setInitialWindowOnTimeout),
+                   MakeBooleanChecker ())
+
     .AddTraceSource ("WindowTrace",
                      "Window that controls how many outstanding interests are allowed",
                      MakeTraceSourceAccessor (&ConsumerWindow::m_window))
@@ -77,13 +82,14 @@ ConsumerWindow::ConsumerWindow ()
 void
 ConsumerWindow::SetWindow (uint32_t window)
 {
-  m_window = window;
+  m_initialWindow = window;
+  m_window = m_initialWindow;
 }
 
 uint32_t
 ConsumerWindow::GetWindow () const
 {
-  return m_window;
+  return m_initialWindow;
 }
 
 uint32_t
@@ -130,9 +136,9 @@ ConsumerWindow::ScheduleNextPacket ()
     {
       if (!m_sendEvent.IsRunning ())
         {
-          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S)),
+          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1),
                                              &Consumer::SendPacket, this);
-          m_rtt->IncreaseMultiplier ();
+          // m_rtt->IncreaseMultiplier ();
         }
     }
   else if (m_inFlight >= m_window)
@@ -189,10 +195,13 @@ ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> p
 void
 ConsumerWindow::OnTimeout (uint32_t sequenceNumber)
 {
-  // NS_FATAL_ERROR ("No timeouts should happen: " << sequenceNumber);
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
-  // m_window = std::max<uint32_t> (0, m_window - 1);
-  m_window = 0;
+
+  if (m_setInitialWindowOnTimeout)
+    {
+      // m_window = std::max<uint32_t> (0, m_window - 1);
+      m_window = m_initialWindow;
+    }
   Consumer::OnTimeout (sequenceNumber);
 }
 

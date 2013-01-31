@@ -37,11 +37,11 @@ namespace ndn {
  */
 class ConsumerWindow: public Consumer
 {
-public: 
+public:
   static TypeId GetTypeId ();
-        
+
   /**
-   * \brief Default constructor 
+   * \brief Default constructor
    */
   ConsumerWindow ();
 
@@ -58,14 +58,14 @@ public:
 
   virtual void
   OnTimeout (uint32_t sequenceNumber);
- 
+
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket ();
-  
+
 private:
   virtual void
   SetWindow (uint32_t window);
@@ -84,10 +84,13 @@ private:
 
   void
   SetMaxSize (double size);
-  
+
 private:
   uint32_t m_payloadSize; // expected payload size
   double   m_maxSize; // max size to request
+
+  uint32_t m_initialWindow;
+  bool m_setInitialWindowOnTimeout;
 
   TracedValue<uint32_t> m_window;
   TracedValue<uint32_t> m_inFlight;
