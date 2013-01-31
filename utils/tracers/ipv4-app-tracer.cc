@@ -31,10 +31,9 @@ using namespace std;
 using namespace boost;
 
 namespace ns3 {
-    
-Ipv4AppTracer::Ipv4AppTracer (Ptr<Node> node, const std::string &appId)
-  : m_appId (appId)
-  , m_nodePtr (node)
+
+Ipv4AppTracer::Ipv4AppTracer (Ptr<Node> node)
+  : m_nodePtr (node)
 {
   m_node = boost::lexical_cast<string> (m_nodePtr->GetId ());
 
@@ -55,15 +54,6 @@ Ipv4AppTracer::Connect ()
 
   Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/LocalDeliver",
                    MakeCallback (&Ipv4AppTracer::Rx, this));
-  
-  // Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Tx",
-  //                  MakeCallback (&Ipv4AppTracer::Rx, this));
-
-  // Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$ns3::PacketSink/Rx",
-  //                  MakeCallback (&Ipv4AppTracer::InData, this));
-
-  // Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$ns3::BulkSendApplication/Tx",
-  //                  MakeCallback (&Ipv4AppTracer::OutData, this));
 }
 
 

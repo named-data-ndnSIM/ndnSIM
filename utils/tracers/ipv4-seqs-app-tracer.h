@@ -22,14 +22,29 @@
 #define IPV4_SEQS_APP_TRACER_H
 
 #include "ipv4-app-tracer.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/tuple/tuple.hpp>
 
 namespace ns3 {
 
 class Ipv4SeqsAppTracer : public Ipv4AppTracer
 {
 public:
-  Ipv4SeqsAppTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*");
+  Ipv4SeqsAppTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
   virtual ~Ipv4SeqsAppTracer () { };
+
+  /**
+   * @brief Helper method to install tracers on all simulation nodes
+   *
+   * @param file File to which traces will be written
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4SeqsAppTracer> > >
+  InstallAll (const std::string &file);
+
 
   virtual void
   PrintHeader (std::ostream &os) const;
@@ -50,7 +65,7 @@ protected:
   Reset ();
 
 protected:
-  std::ostream& m_os;
+  boost::shared_ptr<std::ostream> m_os;
 };
 
 } // namespace ns3

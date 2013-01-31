@@ -24,17 +24,58 @@
 #include "ns3/config.h"
 #include "ns3/callback.h"
 #include "ns3/simulator.h"
+#include "ns3/node-list.h"
+#include "ns3/node.h"
+#include "ns3/log.h"
 
 #include "ns3/tcp-l4-protocol.h"
 #include "ns3/tcp-header.h"
 #include "ns3/ipv4-header.h"
 
+#include <boost/lexical_cast.hpp>
+#include <fstream>
+
+NS_LOG_COMPONENT_DEFINE ("Ipv4SeqsAppTracer");
+
+using namespace boost;
+using namespace std;
+
 namespace ns3 {
-    
-Ipv4SeqsAppTracer::Ipv4SeqsAppTracer (std::ostream &os, Ptr<Node> node, const std::string &appId)
-  : Ipv4AppTracer (node, appId)
+
+Ipv4SeqsAppTracer::Ipv4SeqsAppTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node)
+  : Ipv4AppTracer (node)
   , m_os (os)
 {
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4SeqsAppTracer> > >
+Ipv4SeqsAppTracer::InstallAll (const std::string &file)
+{
+  std::list<Ptr<Ipv4SeqsAppTracer> > tracers;
+  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
+  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+  if (!outputStream->is_open ())
+    return boost::make_tuple (outputStream, tracers);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+
+      Ptr<Ipv4SeqsAppTracer> trace = Create<Ipv4SeqsAppTracer> (outputStream, *node);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
 }
 
 void
@@ -47,8 +88,6 @@ Ipv4SeqsAppTracer::PrintHeader (std::ostream &os) const
 {
   os << "Time\t"
      << "Node\t"
-     << "AppName\t"
-     << "AppId\t"
      << "Type\t"
      << "SeqNo";
 }
@@ -59,13 +98,11 @@ Ipv4SeqsAppTracer::Print (std::ostream &os) const
 }
 
 #define PRINTER(type,size)                                         \
- m_os                                                              \
+ *m_os                                                              \
  << Simulator::Now ().ToDouble (Time::S) << "\t"                   \
  << m_node << "\t"                                                 \
- << m_app << "\t"                                                  \
- << m_appId << "\t"                                                \
  << type << "\t"                                                   \
- << size / 1040.0 << std::endl;
+ << static_cast<uint32_t> (size / 1040.0) << std::endl;
 
 void
 Ipv4SeqsAppTracer::Tx (std::string context,
@@ -86,25 +123,11 @@ Ipv4SeqsAppTracer::Rx (std::string context,
 
   if (tcp.GetFlags () | TcpHeader::ACK)
     {
-      PRINTER("InAck", tcp.GetAckNumber ().GetValue ());
+      if (tcp.GetAckNumber ().GetValue () > 1000) // a little bit more cheating
+        {
+          PRINTER("InAck", tcp.GetAckNumber ().GetValue ());
+        }
     }
 }
-  
-
-// void
-// Ipv4SeqsAppTracer::InData (std::string context,
-//                            Ptr<const Packet> packet, const Address &address)
-// {
-//   PRINTER ("InData", m_inSeq);
-//   m_inSeq += packet->GetSize ();
-// }
-  
-// void
-// Ipv4SeqsAppTracer::OutData (std::string context,
-//                             Ptr<const Packet> packet)
-// {
-//   PRINTER ("OutData", m_outSeq);
-//   m_outSeq += packet->GetSize ();
-// }
 
 } // namespace ns3

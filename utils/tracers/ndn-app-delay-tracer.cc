@@ -50,7 +50,7 @@ AppDelayTracer::InstallAll (const std::string &file)
 {
   using namespace boost;
   using namespace std;
-  
+
   std::list<Ptr<AppDelayTracer> > tracers;
   boost::shared_ptr<std::ofstream> outputStream = make_shared<std::ofstream> ();
 
@@ -122,7 +122,8 @@ AppDelayTracer::Connect ()
 void
 AppDelayTracer::PrintHeader (std::ostream &os) const
 {
-  os << "Node" << "\t"
+  os << "Time" << "\t"
+     << "Node" << "\t"
      << "AppId" << "\t"
      << "SeqNo" << "\t"
 
@@ -133,10 +134,11 @@ AppDelayTracer::PrintHeader (std::ostream &os) const
      << "HopCount"  << "";
 }
 
-void 
+void
 AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount)
 {
-  *m_os << m_node << "\t"
+  *m_os << Simulator::Now ().ToDouble (Time::S) << "\t"
+        << m_node << "\t"
         << app->GetId () << "\t"
         << seqno << "\t"
         << "LastDelay" << "\t"
@@ -145,11 +147,12 @@ AppDelayTracer::LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno
         << 1 << "\t"
         << hopCount << "\n";
 }
-  
-void 
+
+void
 AppDelayTracer::FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount, int32_t hopCount)
 {
-  *m_os << m_node << "\t"
+  *m_os << Simulator::Now ().ToDouble (Time::S) << "\t"
+        << m_node << "\t"
         << app->GetId () << "\t"
         << seqno << "\t"
         << "FullDelay" << "\t"

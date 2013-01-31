@@ -13,7 +13,7 @@ Packet-level trace helpers
 
 - :ndnsim:`ndn::L3AggregateTracer`
 
-    Tracing the aggregate number of Interests/Data packets forwarded by an NDN node 
+    Tracing the aggregate number of Interests/Data packets forwarded by an NDN node
 
     The following example enables tracing on all simulation nodes:
 
@@ -22,21 +22,21 @@ Packet-level trace helpers
         // necessary includes
 	#include <ns3/ndnSIM/utils/tracers/ndn-l3-aggregate-tracer.h>
 
-	...        
+	...
 
         // the following should be put just before calling Simulator::Run in the scenario
 
         boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3AggregateTracer> > >
           aggTracers = ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (1.0));
-        
+
         Simulator::Run ();
-        
+
         ...
 
 
 - :ndnsim:`ndn::L3RateTracer`
 
-    Tracing the rate in bytes and in number of packets of Interest/Data packets forwarded by an NDN node 
+    Tracing the rate in bytes and in number of packets of Interest/Data packets forwarded by an NDN node
 
     The following example enables tracing on all simulation nodes:
 
@@ -45,57 +45,57 @@ Packet-level trace helpers
         // necessary includes
 	#include <ns3/ndnSIM/utils/tracers/ndn-l3-rate-tracer.h>
 
-	...        
+	...
 
         // the following should be put just before calling Simulator::Run in the scenario
 
         boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3RateTracer> > >
           rateTracers = ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (1.0));
-        
+
         Simulator::Run ();
-        
+
         ...
 
 
 .. note::
 
     A number of other tracers are available in ``plugins/tracers-broken`` folder, but they do not yet work with the current code.
-    Eventually, we will port most of them to the current code, but it is not our main priority at the moment and would really appreciate help with writing new tracers and porting the old ones. 
+    Eventually, we will port most of them to the current code, but it is not our main priority at the moment and would really appreciate help with writing new tracers and porting the old ones.
 
 .. _packet trace helper example:
 
 Example of packet-level trace helpers
 +++++++++++++++++++++++++++++++++++++
 
-This example (``ndn-tree-tracers.cc``) demonstrates basic usage of :ref:`trace classes`.   
+This example (``ndn-tree-tracers.cc``) demonstrates basic usage of :ref:`trace classes`.
 
 In this scenario we will use a tree-like topology, where consumers are installed on leaf nodes and producer is in the root of the tree:
 
 .. aafig::
     :aspect: 60
     :scale: 120
-                                                 
+
      /--------\    /--------\    /--------\    /--------\
      |"leaf-1"|    |"leaf-2"|    |"leaf-3"|    |"leaf-4"|
      \--------/    \--------/    \--------/    \--------/
-           ^          ^                ^           ^	
+           ^          ^                ^           ^
            |          |                |           |
-      	    \        /                  \         / 
+      	    \        /                  \         /
              \      /  			 \  	 /    10Mbps / 1ms
               \    /  			  \ 	/
-               |  |  			   |   | 
-      	       v  v                        v   v     
+               |  |  			   |   |
+      	       v  v                        v   v
 	    /-------\                    /-------\
 	    |"rtr-1"|                    |"rtr-2"|
             \-------/                    \-------/
-                  ^                        ^                      
+                  ^                        ^
 		  |	 		   |
-		   \			  /  10 Mpbs / 1ms 
-		    +--------\  /--------+ 
-			     |  |      
+		   \			  /  10 Mpbs / 1ms
+		    +--------\  /--------+
+			     |  |
                              v  v
 			  /--------\
-			  | "root" |                                   
+			  | "root" |
                           \--------/
 
 The corresponding topology file (``topo-tree.txt``):
@@ -152,7 +152,7 @@ Content store trace helper
         // necessary includes
         #include <ns3/ndnSIM/utils/tracers/ndn-cs-tracer.h>
 
-	...        
+	...
 
         // Select implementation of content store. By default, the following is applied:
         // ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Lru", "MaxSize", "100");
@@ -161,9 +161,9 @@ Content store trace helper
 
         boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsTracer> > >
            aggTracers = ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
-        
+
         Simulator::Run ();
-        
+
         ...
 
 .. - Tracing lifetime of content store entries
@@ -202,7 +202,7 @@ Application-level trace helper
 
 - :ndnsim:`ndn::AppDelayTracer`
 
-    With the use of :ndnsim:`ndn::AppDelayTracer` it is possible to obtain data about for delays between issuing Interest and receiving corresponding Data packet.  
+    With the use of :ndnsim:`ndn::AppDelayTracer` it is possible to obtain data about for delays between issuing Interest and receiving corresponding Data packet.
 
     The following code enables application-level Interest-Data delay tracing:
 
@@ -211,15 +211,15 @@ Application-level trace helper
         // necessary includes
         #include <ns3/ndnSIM/utils/tracers/ndn-app-delay-tracer.h>
 
-	...        
+	...
 
         // the following should be put just before calling Simulator::Run in the scenario
 
         boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::AppDelayTracer> > >
            tracers = ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
-        
+
         Simulator::Run ();
-        
+
         ...
 
     Output file format is tab-separated values, with first row specifying names of the columns.  Refer to the following table for the description of the columns:
@@ -227,6 +227,8 @@ Application-level trace helper
     +-----------------+---------------------------------------------------------------------+
     | Column          | Description                                                         |
     +=================+=====================================================================+
+    | ``Time``        | simulation time when SeqNo was receivied                            |
+    +-----------------+---------------------------------------------------------------------+
     | ``Node``        | node id, global unique                                              |
     +-----------------+---------------------------------------------------------------------+
     | ``AppId``       | app id, local unique on the node, not global                        |
@@ -264,7 +266,7 @@ Example of application-level trace helper
 
 This example (``ndn-tree-app-delay-tracer.cc``) demonstrates basic usage of application-level Interest-Data delay tracer.
 
-In this scenario we will use the same tree-like topology as in :ref:`packet trace helper example <packet trace helper example>`, where consumers are installed on leaf nodes and producer is in the root of the tree and clients request data from the same namespace: /root/1, /root/2, ...  
+In this scenario we will use the same tree-like topology as in :ref:`packet trace helper example <packet trace helper example>`, where consumers are installed on leaf nodes and producer is in the root of the tree and clients request data from the same namespace: /root/1, /root/2, ...
 
 Example simulation (``ndn-tree-app-delay-tracer.cc``) scenario that utilizes trace helpers:
 

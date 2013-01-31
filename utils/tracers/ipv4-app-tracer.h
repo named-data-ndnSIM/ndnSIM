@@ -32,7 +32,7 @@ class Ipv4Header;
 class Ipv4AppTracer : public SimpleRefCount<Ipv4AppTracer>
 {
 public:
-  Ipv4AppTracer (Ptr<Node> node, const std::string &appId = "*");
+  Ipv4AppTracer (Ptr<Node> node);
   virtual ~Ipv4AppTracer ()  { };
 
   void
@@ -40,21 +40,19 @@ public:
 
   virtual void
   PrintHeader (std::ostream &os) const = 0;
-  
+
   virtual void
   Print (std::ostream &os) const = 0;
 
   virtual void
   Rx (std::string context,
       const Ipv4Header &, Ptr<const Packet>, uint32_t) = 0;
-  
+
   virtual void
   Tx (std::string context,
       const Ipv4Header &, Ptr<const Packet>, uint32_t) = 0;
-  
+
 protected:
-  std::string m_app;
-  std::string m_appId;
   std::string m_node;
   Ptr<Node> m_nodePtr;
 };
