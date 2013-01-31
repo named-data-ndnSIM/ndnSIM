@@ -60,7 +60,7 @@ void
 GlobalRoutingHelper::Install (Ptr<Node> node)
 {
   NS_LOG_LOGIC ("Node: " << node->GetId ());
-  
+
   Ptr<L3Protocol> ndn = node->GetObject<L3Protocol> ();
   NS_ASSERT_MSG (ndn != 0, "Cannot install GlobalRoutingHelper before Ndn is installed on a node");
 
@@ -70,10 +70,10 @@ GlobalRoutingHelper::Install (Ptr<Node> node)
       NS_LOG_DEBUG ("GlobalRouter is already installed: " << gr);
       return; // already installed
     }
-  
+
   gr = CreateObject<GlobalRouter> ();
   node->AggregateObject (gr);
-  
+
   for (uint32_t faceId = 0; faceId < ndn->GetNFaces (); faceId++)
     {
       Ptr<NetDeviceFace> face = DynamicCast<NetDeviceFace> (ndn->GetFace (faceId));
@@ -82,14 +82,14 @@ GlobalRoutingHelper::Install (Ptr<Node> node)
 	  NS_LOG_DEBUG ("Skipping non-netdevice face");
 	  continue;
 	}
-      
+
       Ptr<NetDevice> nd = face->GetNetDevice ();
       if (nd == 0)
 	{
 	  NS_LOG_DEBUG ("Not a NetDevice associated with NetDeviceFace");
 	  continue;
 	}
-      
+
       Ptr<Channel> ch = nd->GetChannel ();
 
       if (ch == 0)
@@ -107,7 +107,7 @@ GlobalRoutingHelper::Install (Ptr<Node> node)
 
 	      Ptr<Node> otherNode = otherSide->GetNode ();
 	      NS_ASSERT (otherNode != 0);
-	      
+
 	      Ptr<GlobalRouter> otherGr = otherNode->GetObject<GlobalRouter> ();
 	      if (otherGr == 0)
 		{
@@ -126,7 +126,7 @@ GlobalRoutingHelper::Install (Ptr<Node> node)
 	      Install (ch);
 	    }
 	  grChannel = ch->GetObject<GlobalRouter> ();
-	  
+
 	  gr->AddIncidency (0, grChannel);
 	}
     }
@@ -143,7 +143,7 @@ GlobalRoutingHelper::Install (Ptr<Channel> channel)
 
   gr = CreateObject<GlobalRouter> ();
   channel->AggregateObject (gr);
-  
+
   for (uint32_t deviceId = 0; deviceId < channel->GetNDevices (); deviceId ++)
     {
       Ptr<NetDevice> dev = channel->GetDevice (deviceId);
@@ -189,7 +189,7 @@ GlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
 		 "GlobalRouter is not installed on the node");
 
   Ptr<NameComponents> name = Create<NameComponents> (boost::lexical_cast<NameComponents> (prefix));
-  gr->AddLocalPrefix (name);  
+  gr->AddLocalPrefix (name);
 }
 
 void
@@ -213,16 +213,31 @@ GlobalRoutingHelper::AddOrigin (const std::string &prefix, const std::string &no
 }
 
 void
+GlobalRoutingHelper::AddOriginsForAll ()
+{
+  for (NodeList::Iterator node = NodeList::Begin (); node != NodeList::End (); node ++)
+    {
+      Ptr<GlobalRouter> gr = (*node)->GetObject<GlobalRouter> ();
+      string name = Names::FindName (*node);
+
+      if (gr != 0 && !name.empty ())
+        {
+          AddOrigin ("/"+name, *node);
+        }
+    }
+}
+
+void
 GlobalRoutingHelper::CalculateRoutes ()
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
    * See http://www.boost.org/doc/libs/1_49_0/libs/graph/doc/table_of_contents.html for more details
    */
-  
+
   BOOST_CONCEPT_ASSERT(( VertexListGraphConcept< NdnGlobalRouterGraph > ));
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< NdnGlobalRouterGraph > ));
-  
+
   NdnGlobalRouterGraph graph;
   typedef graph_traits < NdnGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
 
@@ -237,7 +252,7 @@ GlobalRoutingHelper::CalculateRoutes ()
 	  NS_LOG_DEBUG ("Node " << (*node)->GetId () << " does not export GlobalRouter interface");
 	  continue;
 	}
-  
+
       DistancesMap    distances;
 
       dijkstra_shortest_paths (graph, source,
@@ -259,7 +274,7 @@ GlobalRoutingHelper::CalculateRoutes ()
       Ptr<Fib>  fib  = source->GetObject<Fib> ();
       fib->InvalidateAll ();
       NS_ASSERT (fib != 0);
-      
+
       NS_LOG_DEBUG ("Reachability from Node: " << source->GetObject<Node> ()->GetId ());
       for (DistancesMap::iterator i = distances.begin ();
 	   i != distances.end ();
@@ -281,10 +296,10 @@ GlobalRoutingHelper::CalculateRoutes ()
                       NS_LOG_DEBUG (" prefix " << prefix << " reachable via face " << *i->second.get<0> ()
                                     << " with distance " << i->second.get<1> ()
                                     << " with delay " << i->second.get<2> ());
-                    
+
                       Ptr<fib::Entry> entry = fib->Add (prefix, i->second.get<0> (), i->second.get<1> ());
                       entry->SetRealDelayToProducer (i->second.get<0> (), Seconds (i->second.get<2> ()));
-                        
+
                       Ptr<Limits> faceLimits = i->second.get<0> ()->GetObject<Limits> ();
 
                       Ptr<Limits> fibLimits = entry->GetObject<Limits> ();

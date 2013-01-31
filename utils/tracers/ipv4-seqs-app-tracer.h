@@ -18,35 +18,19 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef IPV4_RATE_L3_TRACER_H
-#define IPV4_RATE_L3_TRACER_H
+#ifndef IPV4_SEQS_APP_TRACER_H
+#define IPV4_SEQS_APP_TRACER_H
 
-#include "ipv4-l3-tracer.h"
-
-#include "ns3/nstime.h"
-#include "ns3/event-id.h"
-
-#include <boost/tuple/tuple.hpp>
-#include <map>
+#include "ipv4-app-tracer.h"
 
 namespace ns3 {
 
-/**
- * @ingroup ccnx
- * @brief CCNx network-layer rate tracer
- */
-class Ipv4RateL3Tracer : public Ipv4L3Tracer
+class Ipv4SeqsAppTracer : public Ipv4AppTracer
 {
 public:
-  /**
-   * @brief Network layer tracer constructor
-   */
-  Ipv4RateL3Tracer (std::ostream &os, Ptr<Node> node);
-  virtual ~Ipv4RateL3Tracer ();
+  Ipv4SeqsAppTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*");
+  virtual ~Ipv4SeqsAppTracer () { };
 
-  void
-  SetAveragingPeriod (const Time &period);
-  
   virtual void
   PrintHeader (std::ostream &os) const;
 
@@ -54,32 +38,21 @@ public:
   Print (std::ostream &os) const;
 
   virtual void
-  Rx  (std::string context,
-       Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
+  Rx (std::string context,
+      const Ipv4Header &, Ptr<const Packet>, uint32_t);
 
   virtual void
-  Tx   (std::string context,
-        Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
+  Tx (std::string context,
+      const Ipv4Header &, Ptr<const Packet>, uint32_t);
 
-  virtual void
-  Drop (std::string context,
-        const Ipv4Header &, Ptr<const Packet>, Ipv4L3Protocol::DropReason, Ptr<Ipv4>, uint32_t);
-
-private:
-  void
-  PeriodicPrinter ();
-  
+protected:
   void
   Reset ();
 
-private:
+protected:
   std::ostream& m_os;
-  Time m_period;
-  EventId m_printEvent;
-
-  mutable std::map<uint32_t, boost::tuple<Stats, Stats, Stats, Stats> > m_stats;
 };
 
 } // namespace ns3
 
-#endif // IPV4_RATE_L3_TRACER_H
+#endif // IPV4_AGGREGATE_APP_TRACER_H

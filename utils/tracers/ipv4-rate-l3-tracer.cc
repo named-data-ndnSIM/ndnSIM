@@ -24,12 +24,54 @@
 #include "ns3/config.h"
 #include "ns3/callback.h"
 #include "ns3/simulator.h"
+#include "ns3/node-list.h"
+#include "ns3/node.h"
+#include "ns3/log.h"
 
 #include "ns3/ipv4-header.h"
 
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
+
+NS_LOG_COMPONENT_DEFINE ("Ipv4RateL3Tracer");
+
 namespace ns3 {
-    
-Ipv4RateL3Tracer::Ipv4RateL3Tracer (std::ostream &os, Ptr<Node> node)
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
+Ipv4RateL3Tracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  std::list<Ptr<Ipv4RateL3Tracer> > tracers;
+  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
+  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+  if (!outputStream->is_open ())
+    return boost::make_tuple (outputStream, tracers);
+
+  for (NodeList::Iterator node = NodeList::Begin ();
+       node != NodeList::End ();
+       node++)
+    {
+      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
+
+      Ptr<Ipv4RateL3Tracer> trace = Create<Ipv4RateL3Tracer> (outputStream, *node);
+      trace->SetAveragingPeriod (averagingPeriod);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ipv4RateL3Tracer::Ipv4RateL3Tracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node)
   : Ipv4L3Tracer (node)
   , m_os (os)
 {
@@ -52,9 +94,9 @@ Ipv4RateL3Tracer::SetAveragingPeriod (const Time &period)
 void
 Ipv4RateL3Tracer::PeriodicPrinter ()
 {
-  Print (m_os);
+  Print (*m_os);
   Reset ();
-  
+
   m_printEvent = Simulator::Schedule (m_period, &Ipv4RateL3Tracer::PeriodicPrinter, this);
 }
 

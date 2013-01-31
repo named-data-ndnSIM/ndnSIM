@@ -48,7 +48,7 @@ public:
   void
   Install (Ptr<Node> node);
 
-  
+
   /**
    * @brief Install GlobalRouter interface on nodes
    *
@@ -80,7 +80,7 @@ public:
    */
   void
   AddOrigins (const std::string &prefix, const NodeContainer &nodes);
-  
+
   /**
    * @brief Add `prefix' as origin on node `nodeName'
    * @param prefix     Prefix that is originated by node, e.g., node is a producer for this prefix
@@ -88,6 +88,12 @@ public:
    */
   void
   AddOrigin (const std::string &prefix, const std::string &nodeName);
+
+  /**
+   * @brief Add origin to each node based on the node's name (using Names class)
+   */
+  void
+  AddOriginsForAll ();
 
   /**
    * @brief Calculate for every node shortest path trees and install routes to all prefix origins

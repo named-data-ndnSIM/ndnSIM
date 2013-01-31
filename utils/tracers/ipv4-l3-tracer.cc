@@ -18,41 +18,41 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef IPV4_SEQS_APP_TRACER_H
-#define IPV4_SEQS_APP_TRACER_H
+#include "ipv4-l3-tracer.h"
+#include "ns3/node.h"
+#include "ns3/config.h"
+#include "ns3/names.h"
+#include "ns3/callback.h"
 
-#include "ns3/ipv4-app-tracer.h"
+#include <boost/lexical_cast.hpp>
+
+using namespace std;
 
 namespace ns3 {
 
-class Ipv4SeqsAppTracer : public Ipv4AppTracer
+Ipv4L3Tracer::Ipv4L3Tracer (Ptr<Node> node)
+: m_nodePtr (node)
 {
-public:
-  Ipv4SeqsAppTracer (std::ostream &os, Ptr<Node> node, const std::string &appId = "*");
-  virtual ~Ipv4SeqsAppTracer () { };
+  m_node = boost::lexical_cast<string> (m_nodePtr->GetId ());
 
-  virtual void
-  PrintHeader (std::ostream &os) const;
+  Connect ();
 
-  virtual void
-  Print (std::ostream &os) const;
+  string name = Names::FindName (node);
+  if (!name.empty ())
+    {
+      m_node = name;
+    }
+}
 
-  virtual void
-  Rx (std::string context,
-      const Ipv4Header &, Ptr<const Packet>, uint32_t);
-  
-  virtual void
-  Tx (std::string context,
-      const Ipv4Header &, Ptr<const Packet>, uint32_t);
-
-protected:
-  void
-  Reset ();
-
-protected:
-  std::ostream& m_os;
-};
+void
+Ipv4L3Tracer::Connect ()
+{
+  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Tx",
+                   MakeCallback (&Ipv4L3Tracer::Tx, this));
+  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Rx",
+                   MakeCallback (&Ipv4L3Tracer::Rx, this));
+  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Drop",
+                   MakeCallback (&Ipv4L3Tracer::Drop, this));
+}
 
 } // namespace ns3
-
-#endif // IPV4_AGGREGATE_APP_TRACER_H
