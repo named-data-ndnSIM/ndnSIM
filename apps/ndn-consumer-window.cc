@@ -134,12 +134,11 @@ ConsumerWindow::ScheduleNextPacket ()
 {
   if (m_window == static_cast<uint32_t> (0))
     {
-      if (!m_sendEvent.IsRunning ())
-        {
-          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1),
-                                             &Consumer::SendPacket, this);
-          // m_rtt->IncreaseMultiplier ();
-        }
+      Simulator::Remove (m_sendEvent);
+
+      NS_LOG_DEBUG ("Next event in " << (std::min<double> (0.5, m_rtt->RetransmitTimeout ().ToDouble (Time::S))) << " sec");
+      m_sendEvent = Simulator::Schedule (Seconds (std::min<double> (0.5, m_rtt->RetransmitTimeout ().ToDouble (Time::S))),
+                                         &Consumer::SendPacket, this);
     }
   else if (m_inFlight >= m_window)
     {
@@ -189,7 +188,9 @@ ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> p
       m_window = std::max<uint32_t> (0, m_window - 1);
     }
 
-  // NS_LOG_DEBUG ("Window: " << m_window);
+  NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
+
+  ScheduleNextPacket ();
 }
 
 void
@@ -202,6 +203,8 @@ ConsumerWindow::OnTimeout (uint32_t sequenceNumber)
       // m_window = std::max<uint32_t> (0, m_window - 1);
       m_window = m_initialWindow;
     }
+
+  NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
   Consumer::OnTimeout (sequenceNumber);
 }
 

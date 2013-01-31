@@ -65,12 +65,12 @@ Face::GetTypeId ()
   return tid;
 }
 
-/** 
+/**
  * By default, Ndn face are created in the "down" state
- *  with no IP addresses.  Before becoming useable, the user must 
+ *  with no IP addresses.  Before becoming useable, the user must
  * invoke SetUp on them once an Ndn address and mask have been set.
  */
-Face::Face (Ptr<Node> node) 
+Face::Face (Ptr<Node> node)
   : m_node (node)
   , m_protocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ())
   , m_ifup (false)
@@ -156,7 +156,7 @@ Face::Receive (const Ptr<const Packet> &packet)
 
   m_rxTrace (packet);
   m_protocolHandler (this, packet);
-  
+
   return true;
 }
 
@@ -175,19 +175,19 @@ Face::GetMetric (void) const
 }
 
 /**
- * These are face states and may be distinct from 
+ * These are face states and may be distinct from
  * NetDevice states, such as found in real implementations
  * (where the device may be down but face state is still up).
  */
 
-bool 
+bool
 Face::IsUp (void) const
 {
   NS_LOG_FUNCTION_NOARGS ();
   return m_ifup;
 }
 
-void 
+void
 Face::SetUp (bool up/* = true*/)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -198,7 +198,7 @@ bool
 Face::operator== (const Face &face) const
 {
   NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
-                 "Faces of different nodes should not be compared to each other");
+                 "Faces of different nodes should not be compared to each other: " << *this << " == " << face);
 
   return (m_id == face.m_id);
 }
@@ -207,7 +207,7 @@ bool
 Face::operator< (const Face &face) const
 {
   NS_ASSERT_MSG (m_node->GetId () == face.m_node->GetId (),
-                 "Faces of different nodes should not be compared to each other");
+                 "Faces of different nodes should not be compared to each other: " << *this << " == " << face);
 
   return (m_id < face.m_id);
 }
