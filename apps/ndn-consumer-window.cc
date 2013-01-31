@@ -32,9 +32,9 @@ NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerWindow");
 
 namespace ns3 {
 namespace ndn {
-    
+
 NS_OBJECT_ENSURE_REGISTERED (ConsumerWindow);
-    
+
 TypeId
 ConsumerWindow::GetTypeId (void)
 {
@@ -126,13 +126,18 @@ ConsumerWindow::SetMaxSize (double size)
 void
 ConsumerWindow::ScheduleNextPacket ()
 {
-  if (m_window == static_cast<uint32_t> (0) || m_inFlight >= m_window)
+  if (m_window == static_cast<uint32_t> (0))
     {
       if (!m_sendEvent.IsRunning ())
         {
-          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S) * 0.1),
+          m_sendEvent = Simulator::Schedule (Seconds (m_rtt->RetransmitTimeout ().ToDouble (Time::S)),
                                              &Consumer::SendPacket, this);
+          m_rtt->IncreaseMultiplier ();
         }
+    }
+  else if (m_inFlight >= m_window)
+    {
+      // simply do nothing
     }
   else
     {
@@ -141,7 +146,7 @@ ConsumerWindow::ScheduleNextPacket ()
           Simulator::Remove (m_sendEvent);
         }
 
-      NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
+      // NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
       m_inFlight++;
       m_sendEvent = Simulator::ScheduleNow (&Consumer::SendPacket, this);
     }
@@ -169,22 +174,25 @@ void
 ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> payload)
 {
   Consumer::OnNack (interest, payload);
-  
+
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 
   if (m_window > static_cast<uint32_t> (0))
     {
       // m_window = 0.5 * m_window;//m_window - 1;
-      m_window = m_window - 1;
+      m_window = std::max<uint32_t> (0, m_window - 1);
     }
-  
+
   // NS_LOG_DEBUG ("Window: " << m_window);
 }
 
 void
 ConsumerWindow::OnTimeout (uint32_t sequenceNumber)
 {
+  // NS_FATAL_ERROR ("No timeouts should happen: " << sequenceNumber);
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
+  // m_window = std::max<uint32_t> (0, m_window - 1);
+  m_window = 0;
   Consumer::OnTimeout (sequenceNumber);
 }
 

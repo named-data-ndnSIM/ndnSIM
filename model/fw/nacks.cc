@@ -56,14 +56,14 @@ Nacks::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::ndn::fw::Nacks")
     .SetGroupName ("Ndn")
     .SetParent<ForwardingStrategy> ()
-    
+
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
     .AddTraceSource ("OutNacks",  "OutNacks",  MakeTraceSourceAccessor (&Nacks::m_outNacks))
     .AddTraceSource ("InNacks",   "InNacks",   MakeTraceSourceAccessor (&Nacks::m_inNacks))
     .AddTraceSource ("DropNacks", "DropNacks", MakeTraceSourceAccessor (&Nacks::m_dropNacks))
-    
+
     .AddAttribute ("EnableNACKs", "Enabling support of NACKs",
                    BooleanValue (false),
                    MakeBooleanAccessor (&Nacks::m_nacksEnabled),
@@ -80,7 +80,7 @@ Nacks::OnInterest (Ptr<Face> inFace,
   if (header->GetNack () > 0)
     OnNack (inFace, header, origPacket/*original packet*/);
   else
-    super::OnInterest (inFace, header, origPacket/*original packet*/);  
+    super::OnInterest (inFace, header, origPacket/*original packet*/);
 }
 
 void
@@ -88,7 +88,7 @@ Nacks::OnNack (Ptr<Face> inFace,
                Ptr<const InterestHeader> header,
                Ptr<const Packet> origPacket)
 {
-  // NS_LOG_FUNCTION (inFace << header << origPacket);
+  // NS_LOG_FUNCTION (inFace << header->GetName ());
   m_inNacks (header, inFace);
 
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
@@ -98,11 +98,6 @@ Nacks::OnNack (Ptr<Face> inFace,
       m_dropNacks (header, inFace);
       return;
     }
-  
-  // This was done in error. Never, never do anything, except normal leakage. This way we ensure that we will not have losses,
-  // at least when there is only one client
-  //
-  // inFace->LeakBucketByOnePacket ();
 
   DidReceiveValidNack (inFace, header->GetNack (), header, origPacket, pitEntry);
 }
@@ -148,8 +143,10 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 
           m_outNacks (nackHeader, incoming.m_face);
         }
+
+      pitEntry->ClearOutgoing (); // to force erasure of the record
     }
-  
+
   super::DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
 }
 
@@ -160,6 +157,8 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
                             Ptr<const Packet> origPacket,
                             Ptr<pit::Entry> pitEntry)
 {
+  NS_LOG_DEBUG ("nackCode: " << nackCode << " for [" << header->GetName () << "]");
+
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
   if (nackCode == InterestHeader::NACK_GIVEUP_PIT)
@@ -181,12 +180,12 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
           m_dropNacks (header, inFace);
           return;
         }
-  
+
       Ptr<Packet> nonNackInterest = Create<Packet> ();
       Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
       nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
       nonNackInterest->AddHeader (*nonNackHeader);
-  
+
       bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
       if (!propagated)
         {

@@ -71,7 +71,7 @@ TypeId ForwardingStrategy::GetTypeId (void)
     .AddTraceSource ("OutInterests",  "OutInterests",  MakeTraceSourceAccessor (&ForwardingStrategy::m_outInterests))
     .AddTraceSource ("InInterests",   "InInterests",   MakeTraceSourceAccessor (&ForwardingStrategy::m_inInterests))
     .AddTraceSource ("DropInterests", "DropInterests", MakeTraceSourceAccessor (&ForwardingStrategy::m_dropInterests))
-    
+
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////
 
@@ -161,7 +161,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       isDuplicated = false;
     }
 
-  if (isDuplicated) 
+  if (isDuplicated)
     {
       DidReceiveDuplicateInterest (inFace, header, origPacket, pitEntry);
       return;
@@ -221,7 +221,7 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (inFace << header->GetName () << payload << origPacket);
   m_inData (header, payload, inFace);
-  
+
   // Lookup PIT entry
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
@@ -236,7 +236,7 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
         {
           Ptr<Packet> payloadCopy = payload->Copy ();
           payloadCopy->RemovePacketTag (hopCountTag);
-          
+
           // Add or update entry in the content store
           m_contentStore->Add (header, payloadCopy);
         }
@@ -314,7 +314,7 @@ ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
                                                  Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << boost::cref (*inFace));
-  if (pitEntry->GetOutgoing ().size () == 0)
+  if (pitEntry->AreAllOutgoingInVain ())
     {
       m_dropInterests (header, inFace);
 
@@ -323,12 +323,12 @@ ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
 
       // Remove also outgoing
       pitEntry->ClearOutgoing ();
-  
+
       // Set pruning timout on PIT entry (instead of deleting the record)
       m_pit->MarkErased (pitEntry);
     }
 }
-  
+
 
 
 bool
@@ -340,7 +340,7 @@ ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
   pit::Entry::in_iterator existingInFace = pitEntry->GetIncoming ().find (inFace);
 
   bool isRetransmitted = false;
-  
+
   if (existingInFace != pitEntry->GetIncoming ().end ())
     {
       // this is almost definitely a retransmission. But should we trust the user on that?
@@ -368,7 +368,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
         {
           m_outData (header, payload, inFace == 0, incoming.m_face);
           DidSendOutData (inFace, incoming.m_face, header, payload, origPacket, pitEntry);
-          
+
           NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
         }
       else
@@ -376,7 +376,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
           m_dropData (header, payload, incoming.m_face);
           NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
         }
-          
+
       // successfull forwarded data trace
     }
 
@@ -385,7 +385,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
   // Remove all outgoing faces
   pitEntry->ClearOutgoing ();
-          
+
   // Set pruning timout on PIT entry (instead of deleting the record)
   m_pit->MarkErased (pitEntry);
 }
@@ -405,7 +405,7 @@ ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
     {
       // Drop data packet if PIT entry is not found
       // (unsolicited data packets should not "poison" content store)
-      
+
       //drop dulicated or not requested data packet
       m_dropData (header, payload, inFace);
     }
@@ -416,12 +416,12 @@ ForwardingStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                                 Ptr<pit::Entry> pitEntry)
 {
   pit::Entry::out_iterator out = pitEntry->GetOutgoing ().find (inFace);
-  
+
   // If we have sent interest for this data via this face, then update stats.
   if (out != pitEntry->GetOutgoing ().end ())
     {
       pitEntry->GetFibEntry ()->UpdateFaceRtt (inFace, Simulator::Now () - out->m_sendTime);
-    } 
+    }
 }
 
 bool
@@ -433,9 +433,9 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
   bool isNew = pitEntry->GetIncoming ().size () == 0 && pitEntry->GetOutgoing ().size () == 0;
 
   if (isNew) return false; // never suppress new interests
-  
+
   bool isRetransmitted = m_detectRetransmissions && // a small guard
-                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);  
+                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);
 
   if (pitEntry->GetOutgoing ().find (inFace) != pitEntry->GetOutgoing ().end ())
     {
@@ -447,7 +447,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
       // Mark interface YELLOW, but keep a small hope that data will come eventually.
 
       // ?? not sure if we need to do that ?? ...
-      
+
       // pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
     }
   else
@@ -466,12 +466,12 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
                                        Ptr<pit::Entry> pitEntry)
 {
   bool isRetransmitted = m_detectRetransmissions && // a small guard
-                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);  
-  
+                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);
+
   pitEntry->AddIncoming (inFace/*, header->GetInterestLifetime ()*/);
   /// @todo Make lifetime per incoming interface
   pitEntry->UpdateLifetime (header->GetInterestLifetime ());
-  
+
   bool propagated = DoPropagateInterest (inFace, header, origPacket, pitEntry);
 
   if (!propagated && isRetransmitted) //give another chance if retransmitted
@@ -483,10 +483,17 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
       propagated = DoPropagateInterest (inFace, header, origPacket, pitEntry);
     }
 
+  // if (!propagated)
+  //   {
+  //     NS_LOG_DEBUG ("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  //     NS_LOG_DEBUG ("+++ Not propagated ["<< header->GetName () <<"], but number of outgoing faces: " << pitEntry->GetOutgoing ().size ());
+  //     NS_LOG_DEBUG ("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  //   }
+
   // ForwardingStrategy will try its best to forward packet to at least one interface.
   // If no interests was propagated, then there is not other option for forwarding or
-  // ForwardingStrategy failed to find it. 
-  if (!propagated && pitEntry->GetOutgoing ().size () == 0)
+  // ForwardingStrategy failed to find it.
+  if (!propagated && pitEntry->AreAllOutgoingInVain ())
     {
       DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
     }
@@ -499,12 +506,12 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
                                         Ptr<const Packet> origPacket,
                                         Ptr<pit::Entry> pitEntry)
 {
-  if (outFace == inFace) 
+  if (outFace == inFace)
     {
-      NS_LOG_DEBUG ("Same as incoming");
+      // NS_LOG_DEBUG ("Same as incoming");
       return false; // same face as incoming, don't forward
     }
-  
+
   pit::Entry::out_iterator outgoing =
     pitEntry->GetOutgoing ().find (outFace);
 
@@ -514,7 +521,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
         return false; // suppress
       else if (outgoing->m_retxCount >= pitEntry->GetMaxRetxCount ())
         {
-          NS_LOG_ERROR (outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount ());
+          // NS_LOG_DEBUG ("Already forwarded before during this retransmission cycle (" <<outgoing->m_retxCount << " >= " << pitEntry->GetMaxRetxCount () << ")");
           return false; // already forwarded before during this retransmission cycle
         }
    }
@@ -534,7 +541,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
     {
       return false;
     }
-  
+
   pitEntry->AddOutgoing (outFace);
 
   //transmission

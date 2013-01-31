@@ -27,8 +27,8 @@
 #include "ns3/ndn-name-components.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
-#include "../../internet/model/rtt-estimator.h"
 //#include "ns3/internet-module.h"
+#include "ns3/rtt-estimator.h"
 
 #include <set>
 #include <map>
@@ -47,11 +47,11 @@ namespace ndn {
  */
 class Consumer: public App
 {
-public: 
+public:
   static TypeId GetTypeId ();
-        
+
   /**
-   * \brief Default constructor 
+   * \brief Default constructor
    * Sets up randomizer function and packet sequence number
    */
   Consumer ();
@@ -80,7 +80,7 @@ public:
    */
   void
   SendPacket ();
-  
+
 protected:
   // from App
   virtual void
@@ -88,19 +88,19 @@ protected:
 
   virtual void
   StopApplication ();
-  
+
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
    */
   virtual void
   ScheduleNextPacket () = 0;
-  
+
   /**
    * \brief Checks if the packet need to be retransmitted becuase of retransmission timer expiration
    */
   void
   CheckRetxTimeout ();
-  
+
   /**
    * \brief Modifies the frequency of checking the retransmission timeouts
    * \param retxTimer Timeout defining how frequent retransmission timeouts should be checked
@@ -114,7 +114,7 @@ protected:
    */
   Time
   GetRetxTimer () const;
-  
+
 protected:
   UniformVariable m_rand; ///< @brief nonce generator
 
@@ -125,37 +125,37 @@ protected:
   EventId         m_retxEvent; ///< @brief Event to check whether or not retransmission should be performed
 
   Ptr<RttEstimator> m_rtt; ///< @brief RTT estimator
-  
+
   Time               m_offTime;             ///< \brief Time interval between packets
   NameComponents     m_interestName;        ///< \brief NDN Name of the Interest (use NameComponents)
   Time               m_interestLifeTime;    ///< \brief LifeTime for interest packet
 
-/// @cond include_hidden  
+/// @cond include_hidden
   /**
    * \struct This struct contains sequence numbers of packets to be retransmitted
    */
   struct RetxSeqsContainer :
     public std::set<uint32_t> { };
-  
+
   RetxSeqsContainer m_retxSeqs;             ///< \brief ordered set of sequence numbers to be retransmitted
 
   /**
    * \struct This struct contains a pair of packet sequence number and its timeout
-   */ 
+   */
   struct SeqTimeout
   {
     SeqTimeout (uint32_t _seq, Time _time) : seq (_seq), time (_time) { }
-    
+
     uint32_t seq;
     Time time;
   };
 /// @endcond
-  
+
 /// @cond include_hidden
   class i_seq { };
-  class i_timestamp { }; 
+  class i_timestamp { };
 /// @endcond
-  
+
 /// @cond include_hidden
   /**
    * \struct This struct contains a multi-index for the set of SeqTimeout structs
@@ -180,13 +180,13 @@ protected:
   SeqTimeoutsContainer m_seqLastDelay;
   SeqTimeoutsContainer m_seqFullDelay;
   std::map<uint32_t, uint32_t> m_seqRetxCounts;
-  
+
   TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */,
                  Time /* delay */, int32_t /*hop count*/> m_lastRetransmittedInterestDataDelay;
   TracedCallback<Ptr<App> /* app */, uint32_t /* seqno */,
                  Time /* delay */, uint32_t /*retx count*/,
                  int32_t /*hop count*/> m_firstInterestDataDelay;
-  
+
 /// @endcond
 };
 
