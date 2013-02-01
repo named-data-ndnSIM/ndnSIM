@@ -27,18 +27,19 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.NameComponents");
+NS_LOG_COMPONENT_DEFINE ("ndn.Name");
 
 namespace ns3 {
 namespace ndn {
 
+ATTRIBUTE_HELPER_CPP (Name);
 ATTRIBUTE_HELPER_CPP (NameComponents);
 
-NameComponents::NameComponents (/* root */)
+Name::Name (/* root */)
 {
 }
 
-NameComponents::NameComponents (const std::list<boost::reference_wrapper<const std::string> > &components)
+Name::Name (const std::list<boost::reference_wrapper<const std::string> > &components)
 {
   BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)
     {
@@ -46,28 +47,28 @@ NameComponents::NameComponents (const std::list<boost::reference_wrapper<const s
     }
 }
 
-NameComponents::NameComponents (const std::string &prefix)
+Name::Name (const std::string &prefix)
 {
   istringstream is (prefix);
   is >> *this;
 }
 
-NameComponents::NameComponents (const char *prefix)
+Name::Name (const char *prefix)
 {
   NS_ASSERT (prefix != 0);
-  
+
   istringstream is (prefix);
   is >> *this;
 }
 
 const std::list<std::string> &
-NameComponents::GetComponents () const
+Name::GetComponents () const
 {
   return m_prefix;
 }
 
 std::string
-NameComponents::GetLastComponent () const
+Name::GetLastComponent () const
 {
   if (m_prefix.size () == 0)
     {
@@ -78,25 +79,25 @@ NameComponents::GetLastComponent () const
 }
 
 std::list<boost::reference_wrapper<const std::string> >
-NameComponents::GetSubComponents (size_t num) const
+Name::GetSubComponents (size_t num) const
 {
   NS_ASSERT_MSG (0<=num && num<=m_prefix.size (), "Invalid number of subcomponents requested");
-  
+
   std::list<boost::reference_wrapper<const std::string> > subComponents;
   std::list<std::string>::const_iterator component = m_prefix.begin();
   for (size_t i=0; i<num; i++, component++)
     {
       subComponents.push_back (boost::ref (*component));
     }
-    
+
   return subComponents;
 }
 
-NameComponents
-NameComponents::cut (size_t minusComponents) const
+Name
+Name::cut (size_t minusComponents) const
 {
-  NameComponents retval;
-  std::list<std::string>::const_iterator component = m_prefix.begin (); 
+  Name retval;
+  std::list<std::string>::const_iterator component = m_prefix.begin ();
   for (uint32_t i = 0; i < m_prefix.size () - minusComponents; i++, component++)
     {
       retval.Add (*component);
@@ -106,10 +107,10 @@ NameComponents::cut (size_t minusComponents) const
 }
 
 size_t
-NameComponents::GetSerializedSize () const
+Name::GetSerializedSize () const
 {
   size_t nameSerializedSize = 2;
-  
+
   for (std::list<std::string>::const_iterator i = this->begin ();
        i != this->end ();
        i++)
@@ -122,7 +123,7 @@ NameComponents::GetSerializedSize () const
 }
 
 uint32_t
-NameComponents::Serialize (Buffer::Iterator start) const
+Name::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
@@ -138,12 +139,12 @@ NameComponents::Serialize (Buffer::Iterator start) const
 
   return i.GetDistanceFrom (start);
 }
-  
+
 uint32_t
-NameComponents::Deserialize (Buffer::Iterator start)
+Name::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
-    
+
   uint16_t nameLength = i.ReadU16 ();
   while (nameLength > 0)
     {
@@ -160,7 +161,7 @@ NameComponents::Deserialize (Buffer::Iterator start)
 }
 
 void
-NameComponents::Print (std::ostream &os) const
+Name::Print (std::ostream &os) const
 {
   for (const_iterator i=m_prefix.begin(); i!=m_prefix.end(); i++)
     {
@@ -168,19 +169,19 @@ NameComponents::Print (std::ostream &os) const
     }
   if (m_prefix.size ()==0) os << "/";
 }
-  
+
 std::ostream &
-operator << (std::ostream &os, const NameComponents &components)
+operator << (std::ostream &os, const Name &components)
 {
   components.Print (os);
   return os;
 }
 
 std::istream &
-operator >> (std::istream &is, NameComponents &components)
+operator >> (std::istream &is, Name &components)
 {
   istream_iterator<char> eos; // end of stream
-  
+
   std::string component = "";
   istream_iterator<char> it (is);
   for (; it != eos; it++)
@@ -197,9 +198,9 @@ operator >> (std::istream &is, NameComponents &components)
   if (component != "")
       components.Add (component);
 
-  is.clear (); 
+  is.clear ();
   // NS_LOG_ERROR (components << ", bad: " << is.bad () <<", fail: " << is.fail ());
-  
+
   return is;
 }
 

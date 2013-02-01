@@ -111,6 +111,7 @@ def build(bld):
         "model/ndn-interest.h",
         "model/ndn-content-object.h",
         "model/ndn-name-components.h",
+        "model/ndn-name.h",
 
         "model/cs/ndn-content-store.h",
 
