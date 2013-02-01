@@ -123,7 +123,7 @@ Consumer::CheckRetxTimeout ()
   Time now = Simulator::Now ();
 
   Time rto = m_rtt->RetransmitTimeout ();
-  NS_LOG_DEBUG ("Current RTO: " << rto.ToDouble (Time::S) << "s");
+  // NS_LOG_DEBUG ("Current RTO: " << rto.ToDouble (Time::S) << "s");
 
   while (!m_seqTimeouts.empty ())
     {
