@@ -70,5 +70,51 @@ HeaderHelper::GetNdnHeaderType (Ptr<const Packet> packet)
   throw UnknownHeaderException();
 }
 
+Ptr<const Name>
+HeaderHelper::GetName (Ptr<const Packet> p)
+{
+  Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
+  try
+    {
+      HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
+      switch (type)
+        {
+        case HeaderHelper::INTEREST_NDNSIM:
+          {
+            Ptr<InterestHeader> header = Create<InterestHeader> ();
+
+            // Deserialization. Exception may be thrown
+            packet->RemoveHeader (*header);
+            NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
+
+            return header->GetNamePtr ();
+            break;
+          }
+        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
+          {
+            Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+
+            // Deserialization. Exception may be thrown
+            packet->RemoveHeader (*header);
+            return header->GetNamePtr ();
+            break;
+          }
+        case HeaderHelper::INTEREST_CCNB:
+        case HeaderHelper::CONTENT_OBJECT_CCNB:
+          NS_FATAL_ERROR ("ccnb support is broken in this implementation");
+          break;
+        }
+
+      // exception will be thrown if packet is not recognized
+    }
+  catch (UnknownHeaderException)
+    {
+      return 0;
+    }
+
+  return 0;
+}
+
+
 } // namespace ndn
 } // namespace ns3

@@ -30,6 +30,8 @@ class Packet;
 
 namespace ndn {
 
+class Name;
+
 /**
  * \ingroup ndn-helpers
  *
@@ -49,15 +51,15 @@ public:
      @brief enum for Ndn packet types
    */
   enum Type {INTEREST_CCNB, CONTENT_OBJECT_CCNB,
-             INTEREST_NDNSIM, CONTENT_OBJECT_NDNSIM}; 
+             INTEREST_NDNSIM, CONTENT_OBJECT_NDNSIM};
 
   /**
-   *	Packet ::= Version 
+   *	Packet ::= Version
    *		   PacketType
    *		   (Interest | ContentObject)
    *
-   *        0                   1             
-   *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 
+   *        0                   1
+   *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
    *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    *        |    Version    |   PacketType  |
    *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -70,12 +72,12 @@ public:
    *
    * It peeks first 2 bytes of a packet.
    *
-   *  All interests start with 
+   *  All interests start with
    *   +-----------------+  +---+---------+-------+
    *   | 0 0 0 0 0 0 0 1 |  | 1 | 1 0 1 0 | 0 1 0 |   (0x01 0xD2)
    *   +-----------------+  +---+---------+-------+
    *
-   *  All content objects start with 
+   *  All content objects start with
    *   +-----------------+  +---+---------+-------+
    *   | 0 0 0 0 0 1 0 0 |  | 1 | 0 0 0 0 | 0 1 0 |   (0x04 0x82)
    *   +-----------------+  +---+---------+-------+
@@ -85,9 +87,17 @@ public:
    *
    * \see http://www.ccnx.org/releases/latest/doc/technical/BinaryEncoding.html
    */
-  
+
   static Type
   GetNdnHeaderType (Ptr<const Packet> packet);
+
+  /**
+   * @brief A heavy-weight operation to get name of the packet
+   *
+   * This function returns name of the packet by deserializing a copy of the packet to a right header
+   */
+  static Ptr<const Name>
+  GetName (Ptr<const Packet> packet);
 };
 
   /**
