@@ -42,7 +42,7 @@ class EntryImpl : public Entry
 {
 public:
   typedef Entry base_type;
-  
+
 public:
   EntryImpl (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
     : Entry (header, packet)
@@ -58,7 +58,7 @@ public:
 
   typename CS::super::iterator to_iterator () { return item_; }
   typename CS::super::const_iterator to_iterator () const { return item_; }
-  
+
 private:
   typename CS::super::iterator item_;
 };
@@ -75,28 +75,28 @@ public:
   typedef ndnSIM::trie_with_policy< NameComponents,
                                     ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > >, Entry >,
                                     Policy > super;
-  
+
   typedef EntryImpl< ContentStoreImpl< Policy > > entry;
-  
+
   static TypeId
   GetTypeId ();
-  
+
   ContentStoreImpl () { };
   virtual ~ContentStoreImpl () { };
-  
+
   // from ContentStore
-  
+
   virtual inline boost::tuple<Ptr<Packet>, Ptr<const ContentObjectHeader>, Ptr<const Packet> >
   Lookup (Ptr<const InterestHeader> interest);
-            
+
   virtual inline bool
   Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
 
   // virtual bool
   // Remove (Ptr<InterestHeader> header);
-  
+
   virtual inline void
-  Print (std::ostream &os) const;  
+  Print (std::ostream &os) const;
 
   virtual uint32_t
   GetSize () const;
@@ -119,6 +119,9 @@ private:
 
 private:
   static LogComponent g_log; ///< @brief Logging variable
+
+  /// @brief trace of for entry additions (fired every time entry is successfully added to the cache): first parameter is pointer to the CS entry
+  TracedCallback< Ptr<const Entry> > m_didAddEntry;
 };
 
 //////////////////////////////////////////
@@ -144,6 +147,9 @@ ContentStoreImpl< Policy >::GetTypeId ()
                    MakeUintegerAccessor (&ContentStoreImpl< Policy >::GetMaxSize,
                                          &ContentStoreImpl< Policy >::SetMaxSize),
                    MakeUintegerChecker<uint32_t> ())
+
+    .AddTraceSource ("DidAddEntry", "Trace fired every time entry is successfully added to the cache",
+                     MakeTraceSourceAccessor (&ContentStoreImpl< Policy >::m_didAddEntry))
     ;
 
   return tid;
@@ -157,7 +163,7 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const InterestHeader> interest)
 
   /// @todo Change to search with predicate
   typename super::const_iterator node = this->deepest_prefix_match (interest->GetName ());
-  
+
   if (node != this->end ())
     {
       this->m_cacheHitsTrace (interest, node->payload ()->GetHeader ());
@@ -173,10 +179,10 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const InterestHeader> interest)
       this->m_cacheMissesTrace (interest);
       return boost::tuple<Ptr<Packet>, Ptr<ContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
     }
-}   
-    
+}
+
 template<class Policy>
-bool 
+bool
 ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << header->GetName ());
@@ -189,7 +195,9 @@ ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const 
       if (result.second)
         {
           newEntry->SetTrie (result.first);
-          return newEntry;
+
+          m_didAddEntry (newEntry);
+          return true;
         }
       else
         {
@@ -203,7 +211,7 @@ ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const 
 }
 
 template<class Policy>
-void 
+void
 ContentStoreImpl<Policy>::Print (std::ostream &os) const
 {
   for (typename super::policy_container::const_iterator item = this->getPolicy ().begin ();
@@ -215,7 +223,7 @@ ContentStoreImpl<Policy>::Print (std::ostream &os) const
 }
 
 template<class Policy>
-void 
+void
 ContentStoreImpl<Policy>::SetMaxSize (uint32_t maxSize)
 {
   this->getPolicy ().set_max_size (maxSize);
@@ -264,11 +272,11 @@ Ptr<Entry>
 ContentStoreImpl<Policy>::Next (Ptr<Entry> from)
 {
   if (from == 0) return 0;
-  
+
   typename super::parent_trie::recursive_iterator
     item (*StaticCast< entry > (from)->to_iterator ()),
     end (0);
-  
+
   for (item++; item != end; item++)
     {
       if (item->payload () == 0) continue;
