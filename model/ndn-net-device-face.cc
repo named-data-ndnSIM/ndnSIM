@@ -50,7 +50,7 @@ NetDeviceFace::GetTypeId ()
   return tid;
 }
 
-/** 
+/**
  * By default, Ndn face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face
  */
@@ -87,7 +87,7 @@ NetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
   NS_LOG_FUNCTION (this);
 
   Face::RegisterProtocolHandler (handler);
-  
+
   m_node->RegisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this),
                                    L3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
 }
@@ -96,13 +96,13 @@ bool
 NetDeviceFace::SendImpl (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
-  
-  NS_ASSERT_MSG (packet->GetSize () <= m_netDevice->GetMtu (), 
+
+  NS_ASSERT_MSG (packet->GetSize () <= m_netDevice->GetMtu (),
                  "Packet size " << packet->GetSize () << " exceeds device MTU "
                  << m_netDevice->GetMtu ()
                  << " for Ndn; fragmentation not supported");
 
-  bool ok = m_netDevice->Send (packet, m_netDevice->GetBroadcast (), 
+  bool ok = m_netDevice->Send (packet, m_netDevice->GetBroadcast (),
                                L3Protocol::ETHERNET_FRAME_TYPE);
   return ok;
 }
@@ -125,14 +125,20 @@ std::ostream&
 NetDeviceFace::Print (std::ostream& os) const
 {
 #ifdef NS3_LOG_ENABLE
-  os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId () << ",";
-  os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (0)->GetNode ()->GetId ();
-  os << "-";
-  os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (1)->GetNode ()->GetId ();
+  os << "dev[" << GetNode ()->GetId () << "]=net(" << GetId ();
+
+  if (DynamicCast<PointToPointNetDevice> (m_netDevice))
+    {
+      // extra debugging information which available ONLY for PointToPointNetDevice's
+      os << ",";
+      os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (0)->GetNode ()->GetId ();
+      os << "-";
+      os << DynamicCast<PointToPointNetDevice> (m_netDevice)->GetChannel ()->GetDevice (1)->GetNode ()->GetId ();
+    }
   os << ")";
 #else
   os << "dev=net(" << GetId () << ")";
-#endif  
+#endif
   return os;
 }
 
