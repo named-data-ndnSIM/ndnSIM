@@ -204,6 +204,7 @@ Consumer::SendPacket ()
   InterestHeader interestHeader;
   interestHeader.SetNonce               (m_rand.GetValue ());
   interestHeader.SetName                (nameWithSequence);
+  interestHeader.SetInterestLifetime    (m_interestLifeTime);
 
   // NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
   NS_LOG_INFO ("> Interest for " << seq);

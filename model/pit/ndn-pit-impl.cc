@@ -28,9 +28,13 @@
 #include "../../utils/trie/persistent-policy.h"
 #include "../../utils/trie/random-policy.h"
 #include "../../utils/trie/lru-policy.h"
-#include "custom-policies/serialized-size-policy.h"
 
 #include "ns3/log.h"
+
+NS_LOG_COMPONENT_DEFINE ("ndn.pit.PitImpl");
+
+#include "custom-policies/serialized-size-policy.h"
+
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
@@ -38,7 +42,6 @@
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("ndn.pit.PitImpl");
 
 using namespace boost::tuples;
 using namespace boost;

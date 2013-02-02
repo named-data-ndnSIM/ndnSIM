@@ -105,15 +105,25 @@ struct serialized_size_policy_traits
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        if (max_size_ != 0 && current_space_used_ >= max_size_)
+        uint32_t interestSize = item->payload ()->GetInterest ()->GetSerializedSize ();
+
+        // can't use logging here
+        NS_LOG_DEBUG ("Number of entries: " << policy_container::size ()
+                      << ", space used: " << current_space_used_
+                      << ", name: " << item->payload ()->GetPrefix ()
+                      << ", interest size: " << interestSize);
+
+        if (max_size_ != 0 && current_space_used_ + interestSize > max_size_)
           {
+            NS_LOG_DEBUG ("Rejecting PIT entry");
+
             // the current version just fails to add an element, but it also possible
             // to remove the largest element (last element in multi_map policy container)
             return false;
           }
 
-        get_size (item) = item->payload ()->GetInterest ()->GetSerializedSize ();
-        current_space_used_ += get_size (item);
+        get_size (item) = interestSize;
+        current_space_used_ += interestSize;
 
         policy_container::insert (*item);
         return true;
@@ -128,6 +138,8 @@ struct serialized_size_policy_traits
       inline void
       erase (typename parent_trie::iterator item)
       {
+        NS_LOG_DEBUG ("Erasing entry with name: " << item->payload ()->GetPrefix ());
+
         current_space_used_ -= get_size (item);
         policy_container::erase (policy_container::s_iterator_to (*item));
       }
