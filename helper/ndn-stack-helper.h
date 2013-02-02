@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *          Ilya Moiseenko <iliamo@cs.ucla.edu> 
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #ifndef NDN_STACK_HELPER_H
@@ -57,14 +57,14 @@ class Face;
  * attribute or a set of functionality that may be of interest to many other
  * classes.
  */
-class StackHelper 
+class StackHelper
 {
 public:
   /**
    * \brief Create a new NdnStackHelper with a default NDN_FLOODING forwarding stategy
    */
   StackHelper();
-  
+
   /**
    * \brief Destroy the NdnStackHelper
    */
@@ -78,8 +78,8 @@ public:
                       const std::string &attr2 = "", const std::string &value2 = "",
                       const std::string &attr3 = "", const std::string &value3 = "",
                       const std::string &attr4 = "", const std::string &value4 = "");
-  
-  
+
+
   /**
    * @brief Set forwarding strategy class and its attributes
    * @param forwardingStrategyClass string containing name of the forwarding strategy class
@@ -116,7 +116,7 @@ public:
           const std::string &attr2 = "", const std::string &value2 = "",
           const std::string &attr3 = "", const std::string &value3 = "",
           const std::string &attr4 = "", const std::string &value4 = "");
-  
+
   /**
    * @brief Set FIB class and its attributes
    * @param pitClass string, representing class of FIB
@@ -128,6 +128,21 @@ public:
           const std::string &attr3 = "", const std::string &value3 = "",
           const std::string &attr4 = "", const std::string &value4 = "");
 
+  typedef Callback< Ptr<NetDeviceFace>, Ptr<Node>, Ptr<NetDevice> > NetDeviceFaceCreateCallback;
+
+  /**
+   * @brief Add callback to create and configure instance of the face, based on supplied Ptr<Node> and Ptr<NetDevice>
+   *
+   * It is possible to set up several callbacks for different NetDevice types.
+   *
+   * Currently, there is only one specialized callback for PointToPointNetDevice, which creates face and sets limits (if enabled)
+   * based on PointToPoint link parameters
+   *
+   * If none of the callbacks fit the TypeId of NetDevice, a default callback is used (DefaultNetDeviceCallback)
+   */
+  void
+  AddNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+
   /**
    * @brief Enable Interest limits (disabled by default)
    *
@@ -138,13 +153,13 @@ public:
    */
   void
   EnableLimits (bool enable = true, Time avgRtt=Seconds(0.1), uint32_t avgContentObject=1100, uint32_t avgInterest=40);
-  
+
   /**
    * \brief Install Ndn stack on the node
    *
    * This method will assert if called on a node that already has Ndn object
    * installed on it
-   * 
+   *
    * \param nodeName The name of the node on which to install the stack.
    *
    * \returns list of installed faces in the form of a smart pointer
@@ -158,7 +173,7 @@ public:
    *
    * This method will assert if called on a node that already has Ndn object
    * installed on it
-   * 
+   *
    * \param node The node on which to install the stack.
    *
    * \returns list of installed faces in the form of a smart pointer
@@ -172,7 +187,7 @@ public:
    *
    * The program will assert if this method is called on a container with a node
    * that already has an ndn object aggregated to it.
-   * 
+   *
    * \param c NodeContainer that holds the set of nodes on which to install the
    * new stacks.
    *
@@ -245,7 +260,7 @@ public:
    */
   static void
   AddRoute (const std::string &nodeName, const std::string &prefix, const std::string &otherNodeName, int32_t metric);
-  
+
   /**
    * \brief Set flag indicating necessity to install default routes in FIB
    */
@@ -253,21 +268,30 @@ public:
   SetDefaultRoutes (bool needSet);
 
 private:
+  Ptr<NetDeviceFace>
+  DefaultNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const;
+
+  Ptr<NetDeviceFace>
+  PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const;
+
+private:
   StackHelper (const StackHelper &);
   StackHelper &operator = (const StackHelper &o);
-  
+
 private:
   ObjectFactory m_ndnFactory;
   ObjectFactory m_strategyFactory;
   ObjectFactory m_contentStoreFactory;
   ObjectFactory m_pitFactory;
   ObjectFactory m_fibFactory;
-  
+
   bool     m_limitsEnabled;
   Time     m_avgRtt;
   uint32_t m_avgContentObjectSize;
   uint32_t m_avgInterestSize;
-  bool     m_needSetDefaultRoutes;  
+  bool     m_needSetDefaultRoutes;
+
+  std::list< std::pair<TypeId, NetDeviceFaceCreateCallback> > m_netDeviceCallbacks;
 };
 
 } // namespace ndn

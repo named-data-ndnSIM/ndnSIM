@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- *          Ilya Moiseenko <iliamo@cs.ucla.edu> 
+ *          Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "ns3/assert.h"
@@ -34,6 +34,7 @@
 #include "ns3/core-config.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-helper.h"
+#include "ns3/callback.h"
 
 #include "../model/ndn-net-device-face.h"
 #include "../model/ndn-l3-protocol.h"
@@ -61,7 +62,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.StackHelper");
 
 namespace ns3 {
 namespace ndn {
-    
+
 StackHelper::StackHelper ()
   : m_limitsEnabled (false)
   , m_needSetDefaultRoutes (false)
@@ -71,8 +72,11 @@ StackHelper::StackHelper ()
   m_contentStoreFactory.SetTypeId ("ns3::ndn::cs::Lru");
   m_fibFactory.         SetTypeId ("ns3::ndn::fib::Default");
   m_pitFactory.         SetTypeId ("ns3::ndn::pit::Persistent");
+
+  m_netDeviceCallbacks.push_back (std::make_pair (PointToPointNetDevice::GetTypeId (), MakeCallback (&StackHelper::PointToPointNetDeviceCallback, this)));
+  // default callback will be fired if non of others callbacks fit or did the job
 }
-    
+
 StackHelper::~StackHelper ()
 {
 }
@@ -93,7 +97,7 @@ StackHelper::SetStackAttributes (const std::string &attr1, const std::string &va
       m_ndnFactory.Set (attr4, StringValue (value4));
 }
 
-void 
+void
 StackHelper::SetForwardingStrategy (const std::string &strategy,
                                     const std::string &attr1, const std::string &value1,
                                     const std::string &attr2, const std::string &value2,
@@ -207,10 +211,10 @@ StackHelper::Install (Ptr<Node> node) const
 {
   // NS_ASSERT_MSG (m_forwarding, "SetForwardingHelper() should be set prior calling Install() method");
   Ptr<FaceContainer> faces = Create<FaceContainer> ();
-  
+
   if (node->GetObject<L3Protocol> () != 0)
     {
-      NS_FATAL_ERROR ("StackHelper::Install (): Installing " 
+      NS_FATAL_ERROR ("StackHelper::Install (): Installing "
                       "a NdnStack to a node with an existing Ndn object");
       return 0;
     }
@@ -224,7 +228,7 @@ StackHelper::Install (Ptr<Node> node) const
 
   // Create and aggregate PIT
   ndn->AggregateObject (m_pitFactory.Create<Pit> ());
-  
+
   // Create and aggregate forwarding strategy
   ndn->AggregateObject (m_strategyFactory.Create<ForwardingStrategy> ());
 
@@ -233,7 +237,7 @@ StackHelper::Install (Ptr<Node> node) const
 
   // Aggregate L3Protocol on node
   node->AggregateObject (ndn);
-  
+
   for (uint32_t index=0; index < node->GetNDevices (); index++)
     {
       Ptr<NetDevice> device = node->GetDevice (index);
@@ -242,7 +246,24 @@ StackHelper::Install (Ptr<Node> node) const
       // if (DynamicCast<LoopbackNetDevice> (device) != 0)
       //   continue; // don't create face for a LoopbackNetDevice
 
-      Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace> (node, device);
+      Ptr<NetDeviceFace> face;
+
+      for (std::list< std::pair<TypeId, NetDeviceFaceCreateCallback> >::const_iterator item = m_netDeviceCallbacks.begin ();
+           item != m_netDeviceCallbacks.end ();
+           item++)
+        {
+          if (device->GetInstanceTypeId () == item->first ||
+              device->GetInstanceTypeId ().IsChildOf (item->first))
+            {
+              face = item->second (node, device);
+              if (face != 0)
+                break;
+            }
+        }
+      if (face == 0)
+        {
+          face = DefaultNetDeviceCallback (node, device);
+        }
 
       ndn->AddFace (face);
       NS_LOG_LOGIC ("Node " << node->GetId () << ": added NetDeviceFace as face #" << *face);
@@ -250,48 +271,74 @@ StackHelper::Install (Ptr<Node> node) const
       if (m_needSetDefaultRoutes)
         {
           // default route with lowest priority possible
-          AddRoute (node, "/", StaticCast<Face> (face), std::numeric_limits<int32_t>::max ()); 
+          AddRoute (node, "/", StaticCast<Face> (face), std::numeric_limits<int32_t>::max ());
         }
-      
-      if (m_limitsEnabled)
-        {
-          Ptr<Limits> limits = face->GetObject<Limits> ();
-          if (limits == 0)
-            {
-              NS_FATAL_ERROR ("Limits are enabled, but the selected forwarding strategy does not support limits. Please revise your scenario");
-              exit (1);
-            }
-          
-          NS_LOG_INFO ("Limits are enabled");
-          Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
-          if (p2p != 0)
-            {
-              // Setup bucket filtering
-              // Assume that we know average data packet size, and this size is equal default size
-              // Set maximum buckets (averaging over 1 second)
-      
-              DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
-              TimeValue linkDelay;   device->GetChannel ()->GetAttribute ("Delay", linkDelay);
-          
-              NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
-              double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
-              // NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
-              // NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
-              NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));
-
-              // Set max to BDP
-              limits->SetLimits (maxInterestPackets, m_avgRtt.ToDouble (Time::S));
-              limits->SetLinkDelay (linkDelay.Get ().ToDouble (Time::S));
-            }
-        }
-        
       face->SetUp ();
       faces->Add (face);
     }
-    
+
   return faces;
 }
+
+void
+StackHelper::AddNetDeviceFaceCreateCallback (TypeId netDeviceType, StackHelper::NetDeviceFaceCreateCallback callback)
+{
+  m_netDeviceCallbacks.push_back (std::make_pair (netDeviceType, callback));
+}
+
+
+Ptr<NetDeviceFace>
+StackHelper::DefaultNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const
+{
+  NS_LOG_DEBUG ("Creating default NetDeviceFace on node " << node->GetId ());
+
+  return CreateObject<NetDeviceFace> (node, netDevice);
+}
+
+Ptr<NetDeviceFace>
+StackHelper::PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> device) const
+{
+  NS_LOG_DEBUG ("Creating point-to-point NetDeviceFace on node " << node->GetId ());
+
+  Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace> (node, device);
+
+  if (m_limitsEnabled)
+    {
+      Ptr<Limits> limits = face->GetObject<Limits> ();
+      if (limits == 0)
+        {
+          NS_FATAL_ERROR ("Limits are enabled, but the selected forwarding strategy does not support limits. Please revise your scenario");
+          exit (1);
+        }
+
+      NS_LOG_INFO ("Limits are enabled");
+      Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice> (device);
+      if (p2p != 0)
+        {
+          // Setup bucket filtering
+          // Assume that we know average data packet size, and this size is equal default size
+          // Set maximum buckets (averaging over 1 second)
+
+          DataRateValue dataRate; device->GetAttribute ("DataRate", dataRate);
+          TimeValue linkDelay;   device->GetChannel ()->GetAttribute ("Delay", linkDelay);
+
+          NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
+
+          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
+          // NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
+          // NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
+          NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));
+
+          // Set max to BDP
+          limits->SetLimits (maxInterestPackets, m_avgRtt.ToDouble (Time::S));
+          limits->SetLinkDelay (linkDelay.Get ().ToDouble (Time::S));
+        }
+    }
+
+  return face;
+}
+
 
 Ptr<FaceContainer>
 StackHelper::Install (const std::string &nodeName) const
@@ -330,7 +377,7 @@ StackHelper::AddRoute (const std::string &nodeName, const std::string &prefix, u
 {
   Ptr<Node> node = Names::Find<Node> (nodeName);
   NS_ASSERT_MSG (node != 0, "Node [" << nodeName << "] does not exist");
-  
+
   Ptr<L3Protocol>     ndn = node->GetObject<L3Protocol> ();
   NS_ASSERT_MSG (ndn != 0, "Ndn stack should be installed on the node");
 
