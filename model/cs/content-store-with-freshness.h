@@ -24,7 +24,7 @@
 #include "content-store-impl.h"
 
 #include "../../utils/trie/multi-policy.h"
-#include "../../utils/trie/freshness-policy.h"
+#include "custom-policies/freshness-policy.h"
 
 namespace ns3 {
 namespace ndn {
@@ -41,7 +41,7 @@ public:
 
   static TypeId
   GetTypeId ();
-  
+
   virtual inline bool
   Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
 
@@ -51,7 +51,7 @@ private:
 
   inline void
   RescheduleCleaning ();
-  
+
 private:
   static LogComponent g_log; ///< @brief Logging variable
 

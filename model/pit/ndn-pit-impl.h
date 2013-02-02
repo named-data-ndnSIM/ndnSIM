@@ -73,7 +73,7 @@ public:
    */
   virtual ~PitImpl ();
 
-  // inherited from Pit  
+  // inherited from Pit
   virtual Ptr<Entry>
   Lookup (const ContentObjectHeader &header);
 
@@ -82,7 +82,7 @@ public:
 
   virtual Ptr<Entry>
   Create (Ptr<const InterestHeader> header);
-  
+
   virtual void
   MarkErased (Ptr<Entry> entry);
 
@@ -100,12 +100,12 @@ public:
 
   virtual Ptr<Entry>
   Next (Ptr<Entry>);
-  
+
 protected:
   void RescheduleCleaning ();
   void CleanExpired ();
-  
-  // inherited from Object class                                                                                                                                                        
+
+  // inherited from Object class
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
   virtual void DoDispose (); ///< @brief Do cleanup
 
@@ -115,7 +115,10 @@ private:
 
   void
   SetMaxSize (uint32_t maxSize);
-  
+
+  uint32_t
+  GetCurrentSize () const;
+
 private:
   EventId m_cleanEvent;
   Ptr<Fib> m_fib; ///< \brief Link to FIB table
@@ -129,8 +132,8 @@ private:
                                                        boost::intrusive::set_member_hook<>,
                                                        &entry::time_hook_>
                         > time_index;
-  time_index i_time; 
-                        
+  time_index i_time;
+
   friend class EntryImpl< PitImpl >;
 };
 

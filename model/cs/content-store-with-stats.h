@@ -24,7 +24,7 @@
 #include "content-store-impl.h"
 
 #include "../../utils/trie/multi-policy.h"
-#include "../../utils/trie/lifetime-stats-policy.h"
+#include "custom-policies/lifetime-stats-policy.h"
 
 namespace ns3 {
 namespace ndn {
@@ -42,15 +42,15 @@ public:
     // connect traceback to the policy
     super::getPolicy ().template get<1> ().set_traced_callback (&m_willRemoveEntry);
   }
-  
+
   static TypeId
   GetTypeId ();
-  
+
 private:
   static LogComponent g_log; ///< @brief Logging variable
 
   /// @brief trace of for entry removal: first parameter is pointer to the CS entry, second is how long entry was in the cache
-  TracedCallback< Ptr<const Entry>, Time > m_willRemoveEntry; 
+  TracedCallback< Ptr<const Entry>, Time > m_willRemoveEntry;
 };
 
 //////////////////////////////////////////

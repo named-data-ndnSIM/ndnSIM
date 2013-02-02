@@ -28,6 +28,7 @@
 #include "../../utils/trie/persistent-policy.h"
 #include "../../utils/trie/random-policy.h"
 #include "../../utils/trie/lru-policy.h"
+#include "custom-policies/serialized-size-policy.h"
 
 #include "ns3/log.h"
 #include "ns3/string.h"
@@ -58,61 +59,18 @@ namespace pit {
 
 using namespace ndnSIM;
 
-template<>
-TypeId
-PitImpl<persistent_policy_traits>::GetTypeId ()
+template<class Policy>
+uint32_t
+PitImpl<Policy>::GetCurrentSize () const
 {
-  static TypeId tid = TypeId ("ns3::ndn::pit::Persistent")
-    .SetGroupName ("Ndn")
-    .SetParent<Pit> ()
-    .AddConstructor< PitImpl< persistent_policy_traits > > ()
-    .AddAttribute ("MaxSize",
-                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
-                   StringValue ("0"),
-                   MakeUintegerAccessor (&PitImpl< persistent_policy_traits >::GetMaxSize,
-                                         &PitImpl< persistent_policy_traits >::SetMaxSize),
-                   MakeUintegerChecker<uint32_t> ())
-    ;
-
-  return tid;
+  return super::getPolicy ().size ();
 }
 
 template<>
-TypeId
-PitImpl<random_policy_traits>::GetTypeId ()
+uint32_t
+PitImpl<serialized_size_policy_traits>::GetCurrentSize () const
 {
-  static TypeId tid = TypeId ("ns3::ndn::pit::Random")
-    .SetGroupName ("Ndn")
-    .SetParent<Pit> ()
-    .AddConstructor< PitImpl< random_policy_traits > > ()
-    .AddAttribute ("MaxSize",
-                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
-                   StringValue ("0"),
-                   MakeUintegerAccessor (&PitImpl< random_policy_traits >::GetMaxSize,
-                                         &PitImpl< random_policy_traits >::SetMaxSize),
-                   MakeUintegerChecker<uint32_t> ())
-    ;
-
-  return tid;
-}
-
-template<>
-TypeId
-PitImpl<lru_policy_traits>::GetTypeId ()
-{
-  static TypeId tid = TypeId ("ns3::ndn::pit::Lru")
-    .SetGroupName ("Ndn")
-    .SetParent<Pit> ()
-    .AddConstructor< PitImpl< lru_policy_traits > > ()
-    .AddAttribute ("MaxSize",
-                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
-                   StringValue ("0"),
-                   MakeUintegerAccessor (&PitImpl< lru_policy_traits >::GetMaxSize,
-                                         &PitImpl< lru_policy_traits >::SetMaxSize),
-                   MakeUintegerChecker<uint32_t> ())
-    ;
-
-  return tid;
+  return super::getPolicy ().get_current_space_used ();
 }
 
 template<class Policy>
@@ -140,7 +98,7 @@ PitImpl<Policy>::SetMaxSize (uint32_t maxSize)
 }
 
 template<class Policy>
-void 
+void
 PitImpl<Policy>::NotifyNewAggregate ()
 {
   if (m_fib == 0)
@@ -156,7 +114,7 @@ PitImpl<Policy>::NotifyNewAggregate ()
 }
 
 template<class Policy>
-void 
+void
 PitImpl<Policy>::DoDispose ()
 {
   super::clear ();
@@ -170,7 +128,7 @@ PitImpl<Policy>::DoDispose ()
 template<class Policy>
 void
 PitImpl<Policy>::RescheduleCleaning ()
-{  
+{
   // m_cleanEvent.Cancel ();
   Simulator::Remove (m_cleanEvent); // slower, but better for memory
   if (i_time.empty ())
@@ -181,11 +139,11 @@ PitImpl<Policy>::RescheduleCleaning ()
 
   Time nextEvent = i_time.begin ()->GetExpireTime () - Simulator::Now ();
   if (nextEvent <= 0) nextEvent = Seconds (0);
-  
+
   NS_LOG_DEBUG ("Schedule next cleaning in " <<
                 nextEvent.ToDouble (Time::S) << "s (at " <<
                 i_time.begin ()->GetExpireTime () << "s abs time");
-  
+
   m_cleanEvent = Simulator::Schedule (nextEvent,
                                       &PitImpl<Policy>::CleanExpired, this);
 }
@@ -223,7 +181,7 @@ template<class Policy>
 Ptr<Entry>
 PitImpl<Policy>::Lookup (const ContentObjectHeader &header)
 {
-  /// @todo use predicate to search with exclude filters  
+  /// @todo use predicate to search with exclude filters
   typename super::iterator item = super::longest_prefix_match (header.GetName ());
 
   if (item == super::end ())
@@ -258,7 +216,7 @@ PitImpl<Policy>::Create (Ptr<const InterestHeader> header)
   Ptr<fib::Entry> fibEntry = m_fib->LongestPrefixMatch (*header);
   if (fibEntry == 0)
     return 0;
-  
+
   // NS_ASSERT_MSG (fibEntry != 0,
   //                "There should be at least default route set" <<
   //                " Prefix = "<< header->GetName() << ", NodeID == " << m_fib->GetObject<Node>()->GetId() << "\n" << *m_fib);
@@ -343,11 +301,11 @@ Ptr<Entry>
 PitImpl<Policy>::Next (Ptr<Entry> from)
 {
   if (from == 0) return 0;
-  
+
   typename super::parent_trie::recursive_iterator
     item (*StaticCast< entry > (from)->to_iterator ()),
     end (0);
-  
+
   for (item++; item != end; item++)
     {
       if (item->payload () == 0) continue;
@@ -360,15 +318,104 @@ PitImpl<Policy>::Next (Ptr<Entry> from)
     return item->payload ();
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template<>
+TypeId
+PitImpl<persistent_policy_traits>::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::ndn::pit::Persistent")
+    .SetGroupName ("Ndn")
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< persistent_policy_traits > > ()
+    .AddAttribute ("MaxSize",
+                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
+                   StringValue ("0"),
+                   MakeUintegerAccessor (&PitImpl< persistent_policy_traits >::GetMaxSize,
+                                         &PitImpl< persistent_policy_traits >::SetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+    ;
+
+  return tid;
+}
+
+template<>
+TypeId
+PitImpl<random_policy_traits>::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::ndn::pit::Random")
+    .SetGroupName ("Ndn")
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< random_policy_traits > > ()
+    .AddAttribute ("MaxSize",
+                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
+                   StringValue ("0"),
+                   MakeUintegerAccessor (&PitImpl< random_policy_traits >::GetMaxSize,
+                                         &PitImpl< random_policy_traits >::SetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+    ;
+
+  return tid;
+}
+
+template<>
+TypeId
+PitImpl<lru_policy_traits>::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::ndn::pit::Lru")
+    .SetGroupName ("Ndn")
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< lru_policy_traits > > ()
+    .AddAttribute ("MaxSize",
+                   "Set maximum number of entries in PIT. If 0, limit is not enforced",
+                   StringValue ("0"),
+                   MakeUintegerAccessor (&PitImpl< lru_policy_traits >::GetMaxSize,
+                                         &PitImpl< lru_policy_traits >::SetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+    ;
+
+  return tid;
+}
+
+template<>
+TypeId
+PitImpl<serialized_size_policy_traits>::GetTypeId ()
+{
+  static TypeId tid = TypeId ("ns3::ndn::pit::SerializedSize")
+    .SetGroupName ("Ndn")
+    .SetParent<Pit> ()
+    .AddConstructor< PitImpl< serialized_size_policy_traits > > ()
+    .AddAttribute ("MaxSize",
+                   "Set maximum size of PIT in bytes. If 0, limit is not enforced",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&PitImpl< serialized_size_policy_traits >::GetMaxSize,
+                                         &PitImpl< serialized_size_policy_traits >::SetMaxSize),
+                   MakeUintegerChecker<uint32_t> ())
+
+    .AddAttribute ("CurrentSize", "Get current size of PIT in bytes",
+                   TypeId::ATTR_GET,
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&PitImpl< serialized_size_policy_traits >::GetCurrentSize),
+                   MakeUintegerChecker<uint32_t> ())
+
+    ;
+
+  return tid;
+}
+
 
 // explicit instantiation and registering
 template class PitImpl<persistent_policy_traits>;
 template class PitImpl<random_policy_traits>;
 template class PitImpl<lru_policy_traits>;
+template class PitImpl<serialized_size_policy_traits>;
 
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, persistent_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, lru_policy_traits);
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(PitImpl, serialized_size_policy_traits);
 
 #ifdef DOXYGEN
 // /**
@@ -386,6 +433,12 @@ class Random : public PitImpl<random_policy_traits> { };
  * will be removed when PIT size reached its limit
  */
 class Lru : public PitImpl<lru_policy_traits> { };
+
+/**
+ * @brief A variant of persistent PIT implementation where size of PIT is based on size of interests in bytes (MaxSize parameter)
+ */
+class SerializedSize : public PitImpl<serialized_size_policy_traits> { };
+
 #endif
 
 } // namespace pit
