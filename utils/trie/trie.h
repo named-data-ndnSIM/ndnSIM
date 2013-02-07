@@ -51,7 +51,7 @@ struct pointer_payload_traits
 
   typedef BasePayload*       base_type;       // base type of the entry (when implementation details need to be hidden)
   typedef const BasePayload* const_base_type; // const base type of the entry (when implementation details need to be hidden)
-  
+
   static Payload* empty_payload;
 };
 
@@ -65,13 +65,13 @@ struct smart_pointer_payload_traits
   typedef Payload                 payload_type;
   typedef ns3::Ptr<Payload>       storage_type;
   typedef ns3::Ptr<Payload>       insert_type;
-  
+
   typedef ns3::Ptr<Payload>       return_type;
   typedef ns3::Ptr<const Payload> const_return_type;
 
   typedef ns3::Ptr<BasePayload> base_type;
   typedef ns3::Ptr<const BasePayload> const_base_type;
-  
+
   static ns3::Ptr<Payload> empty_payload;
 };
 
@@ -88,15 +88,15 @@ struct non_pointer_traits
 
   typedef Payload&        return_type;
   typedef const Payload & const_return_type;
-  
+
   typedef BasePayload&       base_type;
   typedef const BasePayload& const_base_type;
-  
+
   static Payload empty_payload;
 };
 
 template<typename Payload, typename BasePayload>
-Payload 
+Payload
 non_pointer_traits<Payload, BasePayload>::empty_payload = Payload ();
 
 
@@ -106,7 +106,7 @@ non_pointer_traits<Payload, BasePayload>::empty_payload = Payload ();
 template<typename FullKey,
          typename PayloadTraits,
          typename PolicyHook >
-class trie; 
+class trie;
 
 template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 inline std::ostream&
@@ -149,7 +149,7 @@ public:
   typedef trie_point_iterator<const trie> const_point_iterator;
 
   typedef PayloadTraits payload_traits;
-  
+
   inline
   trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10)
     : key_ (key)
@@ -192,7 +192,7 @@ public:
         trieNode ++;
       }
   }
-  
+
   // actual entry
   friend bool
   operator== <> (const trie<FullKey, PayloadTraits, PolicyHook> &a,
@@ -206,7 +206,7 @@ public:
           typename PayloadTraits::insert_type payload)
   {
     trie *trieNode = this;
-  
+
     BOOST_FOREACH (const Key &subkey, key)
       {
         typename unordered_set::iterator item = trieNode->children_.find (subkey);
@@ -220,15 +220,15 @@ public:
               {
                 trieNode->bucketSize_ += trieNode->bucketIncrement_;
                 trieNode->bucketIncrement_ *= 2; // increase bucketIncrement exponentially
-                
+
                 buckets_array newBuckets (new bucket_type [trieNode->bucketSize_]);
                 trieNode->children_.rehash (bucket_traits (newBuckets.get (), trieNode->bucketSize_));
                 trieNode->buckets_.swap (newBuckets);
               }
-	  
+
             std::pair< typename unordered_set::iterator, bool > ret =
               trieNode->children_.insert (*newNode);
-	  
+
             trieNode = &(*ret.first);
           }
         else
@@ -307,7 +307,7 @@ public:
     trie *trieNode = this;
     iterator foundNode = (payload_ != PayloadTraits::empty_payload) ? this : 0;
     bool reachLast = true;
-  
+
     BOOST_FOREACH (const Key &subkey, key)
       {
         typename unordered_set::iterator item = trieNode->children_.find (subkey);
@@ -319,13 +319,50 @@ public:
         else
           {
             trieNode = &(*item);
-	  
+
             if (trieNode->payload_ != PayloadTraits::empty_payload)
               foundNode = trieNode;
           }
       }
 
-    return boost::make_tuple (foundNode, reachLast, trieNode);  
+    return boost::make_tuple (foundNode, reachLast, trieNode);
+  }
+
+  /**
+   * @brief Perform the longest prefix match satisfying preficate
+   * @param key the key for which to perform the longest prefix match
+   *
+   * @return ->second is true if prefix in ->first is longer than key
+   */
+  template<class Predicate>
+  inline boost::tuple<iterator, bool, iterator>
+  find_if (const FullKey &key, Predicate pred)
+  {
+    trie *trieNode = this;
+    iterator foundNode = (payload_ != PayloadTraits::empty_payload) ? this : 0;
+    bool reachLast = true;
+
+    BOOST_FOREACH (const Key &subkey, key)
+      {
+        typename unordered_set::iterator item = trieNode->children_.find (subkey);
+        if (item == trieNode->children_.end ())
+          {
+            reachLast = false;
+            break;
+          }
+        else
+          {
+            trieNode = &(*item);
+
+            if (trieNode->payload_ != PayloadTraits::empty_payload &&
+                pred (trieNode->payload_))
+              {
+                foundNode = trieNode;
+              }
+          }
+      }
+
+    return boost::make_tuple (foundNode, reachLast, trieNode);
   }
 
   /**
@@ -348,7 +385,7 @@ public:
         if (value != 0)
           return value;
       }
-  
+
     return 0;
   }
 
@@ -370,11 +407,11 @@ public:
          subnode++ )
       // BOOST_FOREACH (const trie &subnode, children_)
       {
-        iterator value = subnode->find ();
+        iterator value = subnode->find_if (pred);
         if (value != 0)
           return value;
       }
-  
+
     return 0;
   }
 
@@ -410,10 +447,10 @@ public:
   {
     return key_;
   }
-  
+
   inline void
-  PrintStat (std::ostream &os) const;  
-  
+  PrintStat (std::ostream &os) const;
+
 private:
   //The disposer object function
   struct trie_delete_disposer
@@ -462,7 +499,7 @@ private:
   ////////////////////////////////////////////////
   // Actual data
   ////////////////////////////////////////////////
-  
+
   Key key_; ///< name component
 
   size_t initialBucketSize_;
@@ -472,7 +509,7 @@ private:
   typedef boost::interprocess::unique_ptr< bucket_type, array_disposer<bucket_type> > buckets_array;
   buckets_array buckets_;
   unordered_set children_;
-  
+
   typename PayloadTraits::storage_type payload_;
   trie *parent_; // to make cleaning effective
 };
@@ -494,7 +531,7 @@ operator << (std::ostream &os, const trie<FullKey, PayloadTraits, PolicyHook> &t
     {
       os << "\"" << &trie_node << "\"" << " [label=\"" << trie_node.key_ << ((trie_node.payload_ != PayloadTraits::empty_payload)?"*":"") << "\"]\n";
       os << "\"" << &(*subnode) << "\"" << " [label=\"" << subnode->key_ << ((subnode->payload_ != PayloadTraits::empty_payload)?"*":"") << "\"]""\n";
-      
+
       os << "\"" << &trie_node << "\"" << " -> " << "\"" << &(*subnode) << "\"" << "\n";
       os << *subnode;
     }
@@ -551,7 +588,7 @@ public:
   trie_iterator () : trie_ (0) {}
   trie_iterator (typename Trie::iterator item) : trie_ (item) {}
   trie_iterator (Trie &item) : trie_ (&item) {}
-  
+
   Trie & operator* () { return *trie_; }
   const Trie & operator* () const { return *trie_; }
   Trie * operator-> () { return trie_; }
@@ -560,7 +597,7 @@ public:
   bool operator== (trie_iterator<Trie, NonConstTrie> &other) { return (trie_ == other.trie_); }
   bool operator!= (trie_iterator<const Trie, NonConstTrie> &other) const { return !(*this == other); }
   bool operator!= (trie_iterator<Trie, NonConstTrie> &other) { return !(*this == other); }
-  
+
   trie_iterator<Trie,NonConstTrie> &
   operator++ (int)
   {
@@ -576,13 +613,13 @@ public:
   {
     (*this)++;
     return *this;
-  }  
+  }
 
 private:
   typedef typename boost::mpl::if_< boost::is_same<Trie, NonConstTrie>,
                                     typename Trie::unordered_set::iterator,
                                     typename Trie::unordered_set::const_iterator>::type set_iterator;
-  
+
   Trie* goUp ()
   {
     if (trie_->parent_ != 0)
@@ -611,7 +648,7 @@ private:
 template<class Trie>
 class trie_point_iterator
 {
-private:  
+private:
   typedef typename boost::mpl::if_< boost::is_same<Trie, const Trie>,
                                     typename Trie::unordered_set::const_iterator,
                                     typename Trie::unordered_set::iterator>::type set_iterator;
@@ -626,7 +663,7 @@ public:
     else
       trie_ = 0;
   }
-  
+
   Trie & operator* () { return *trie_; }
   const Trie & operator* () const { return *trie_; }
   Trie * operator-> () { return trie_; }
@@ -635,7 +672,7 @@ public:
   bool operator== (trie_point_iterator<Trie> &other) { return (trie_ == other.trie_); }
   bool operator!= (trie_point_iterator<const Trie> &other) const { return !(*this == other); }
   bool operator!= (trie_point_iterator<Trie> &other) { return !(*this == other); }
-  
+
   trie_point_iterator<Trie> &
   operator++ (int)
   {
@@ -660,7 +697,7 @@ public:
   {
     (*this)++;
     return *this;
-  }  
+  }
 
 private:
   Trie *trie_;

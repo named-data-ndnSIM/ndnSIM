@@ -24,7 +24,7 @@
 #include "ns3/ndn-content-object.h"
 
 #include "ns3/log.h"
-#include "ns3/string.h"
+#include "ns3/nstime.h"
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
 
@@ -44,10 +44,10 @@ Pit::GetTypeId ()
   static TypeId tid = TypeId ("ns3::ndn::Pit")
     .SetGroupName ("Ndn")
     .SetParent<Object> ()
-    
+
     .AddAttribute ("PitEntryPruningTimout",
                    "Timeout for PIT entry to live after being satisfied. To make sure recently satisfied interest will not be satisfied again",
-                   StringValue ("100ms"),
+                   TimeValue (), // by default, PIT entries are removed instantly
                    MakeTimeAccessor (&Pit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
     ;

@@ -75,7 +75,7 @@ class i_retx {};
 //       // boost::multi_index::ordered_non_unique<
 //       //   boost::multi_index::tag<i_retx>,
 //       //   boost::multi_index::member<OutgoingFace, uint32_t, &OutgoingFace::m_retxCount>
-//       // >    
+//       // >
 //     >
 //    > type;
 //   /// @endcond
@@ -99,7 +99,7 @@ public:
   typedef out_container::iterator out_iterator;              ///< @brief iterator to outgoing faces
 
   typedef std::set< uint32_t > nonce_container;  ///< @brief nonce container type
-  
+
   /**
    * \brief PIT entry constructor
    * \param prefix Prefix of the PIT entry
@@ -112,33 +112,34 @@ public:
    * @brief Virtual destructor
    */
   virtual ~Entry ();
-  
+
   /**
    * @brief Update lifetime of PIT entry
    *
-   * This function will update PIT entry lifetime to the maximum of the current lifetime and
-   * the lifetime Simulator::Now () + offsetTime
+   * @param lifetime desired lifetime of the pit entry (relative to the Simulator::Now ())
    *
-   * @param lifetime Relative time to the current moment, representing PIT entry lifetime
+   * This function will update PIT entry lifetime to the maximum of the current lifetime and
+   * the lifetime Simulator::Now () + lifetime
    */
   virtual void
   UpdateLifetime (const Time &lifetime);
 
   /**
    * @brief Offset the currently set PIT lifetime (allowed both negative and positive offsets)
+   *
    * @param offsetTime positive or negative offset for the PIT lifetime.
    *
    * If PIT expire time becomes less than Simulator::Now, then it is adjusted to Simulator::Now.
    */
   virtual void
   OffsetLifetime (const Time &offsetTime);
-  
+
   /**
    * @brief Get prefix of the PIT entry
    */
   const NameComponents &
   GetPrefix () const;
-  
+
   /**
    * @brief Get current expiration time of the record
    *
@@ -146,7 +147,7 @@ public:
    */
   const Time &
   GetExpireTime () const;
-  
+
   /**
    * @brief Check if nonce `nonce` for the same prefix has already been seen
    *
@@ -154,7 +155,7 @@ public:
    */
   bool
   IsNonceSeen (uint32_t nonce) const;
-  
+
   /**
    * @brief Add `nonce` to the list of seen nonces
    *
@@ -164,7 +165,7 @@ public:
    */
   virtual void
   AddSeenNonce (uint32_t nonce);
-  
+
   /**
    * @brief Add `face` to the list of incoming faces
    *
@@ -200,10 +201,10 @@ public:
    */
   virtual void
   ClearOutgoing ();
-  
+
   /**
    * @brief Remove all references to face.
-   * 
+   *
    * This method should be called before face is completely removed from the stack.
    * Face is removed from the lists of incoming and outgoing faces
    */
@@ -217,7 +218,7 @@ public:
   // SetWaitingInVain (out_iterator face);
   virtual void
   SetWaitingInVain (Ptr<Face> face);
-  
+
   /**
    * @brief Check if all outgoing faces are NACKed
    */
@@ -266,7 +267,7 @@ public:
    */
   uint32_t
   GetOutgoingCount () const;
-  
+
   /**
    * @brief Add new forwarding strategy tag
    */
@@ -295,14 +296,14 @@ public:
 
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
-  
+
 protected:
   Pit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
 
   Ptr<const InterestHeader> m_interest; ///< \brief Interest of the PIT entry (if several interests are received, then nonce is from the first Interest)
   Ptr<fib::Entry> m_fibEntry;     ///< \brief FIB entry related to this prefix
-  
-  nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix  
+
+  nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix
   in_container  m_incoming;      ///< \brief container for incoming interests
   out_container m_outgoing;      ///< \brief container for outgoing interests
 
@@ -312,6 +313,15 @@ protected:
   uint32_t m_maxRetxCount;   ///< @brief Maximum allowed number of retransmissions via outgoing faces
 
   std::list< boost::shared_ptr<fw::Tag> > m_fwTags; ///< @brief Forwarding strategy tags
+};
+
+struct EntryIsNotEmpty
+{
+  bool
+  operator () (Ptr<Entry> entry)
+  {
+    return !entry->GetIncoming ().empty ();
+  }
 };
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);

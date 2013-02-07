@@ -62,12 +62,12 @@ void
 Entry::UpdateLifetime (const Time &offsetTime)
 {
   NS_LOG_FUNCTION (offsetTime.ToDouble (Time::S));
-  
+
   Time newExpireTime = Simulator::Now () + offsetTime;
   if (newExpireTime > m_expireTime)
     m_expireTime = newExpireTime;
-  
-  NS_LOG_INFO ("Updated lifetime to " << m_expireTime.ToDouble (Time::S));
+
+  NS_LOG_INFO (this->GetPrefix () << ", Updated lifetime to " << m_expireTime.ToDouble (Time::S) << "s, " << (m_expireTime-Simulator::Now ()).ToDouble (Time::S) << "s left");
 }
 
 void
@@ -78,7 +78,7 @@ Entry::OffsetLifetime (const Time &offsetTime)
     {
       m_expireTime = Simulator::Now ();
     }
-  NS_LOG_INFO ("Offsetting lifetime to " << m_expireTime.ToDouble (Time::S));
+  NS_LOG_INFO (this->GetPrefix () << ", Offsetting lifetime to " << m_expireTime.ToDouble (Time::S) << "s, " << (m_expireTime-Simulator::Now ()).ToDouble (Time::S) << "s left");
 }
 
 
@@ -110,7 +110,7 @@ Entry::AddSeenNonce (uint32_t nonce)
 Entry::in_iterator
 Entry::AddIncoming (Ptr<Face> face)
 {
-  std::pair<in_iterator,bool> ret = 
+  std::pair<in_iterator,bool> ret =
     m_incoming.insert (IncomingFace (face));
 
   // NS_ASSERT_MSG (ret.second, "Something is wrong");
@@ -277,7 +277,7 @@ std::ostream& operator<< (std::ostream& os, const Entry &entry)
         os << ",";
       else
         first = false;
-      
+
       os << *face.m_face;
     }
 
@@ -289,7 +289,7 @@ std::ostream& operator<< (std::ostream& os, const Entry &entry)
         os << ",";
       else
         first = false;
-      
+
       os << *face.m_face;
     }
   os << "\nNonces: ";
@@ -300,7 +300,7 @@ std::ostream& operator<< (std::ostream& os, const Entry &entry)
         os << ",";
       else
         first = false;
-      
+
       os << nonce;
     }
 

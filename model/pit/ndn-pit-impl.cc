@@ -185,7 +185,7 @@ Ptr<Entry>
 PitImpl<Policy>::Lookup (const ContentObjectHeader &header)
 {
   /// @todo use predicate to search with exclude filters
-  typename super::iterator item = super::longest_prefix_match (header.GetName ());
+  typename super::iterator item = super::longest_prefix_match_if (header.GetName (), EntryIsNotEmpty ());
 
   if (item == super::end ())
     return 0;
@@ -249,8 +249,14 @@ template<class Policy>
 void
 PitImpl<Policy>::MarkErased (Ptr<Entry> item)
 {
-  // entry->SetExpireTime (Simulator::Now () + m_PitEntryPruningTimout);
-  super::erase (StaticCast< entry > (item)->to_iterator ());
+  if (this->m_PitEntryPruningTimout.IsZero ())
+    {
+      super::erase (StaticCast< entry > (item)->to_iterator ());
+    }
+  else
+    {
+      item->OffsetLifetime (this->m_PitEntryPruningTimout - item->GetExpireTime () + Simulator::Now ());
+    }
 }
 
 

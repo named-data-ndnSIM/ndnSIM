@@ -82,7 +82,7 @@ public:
     iterator foundItem, lastItem;
     bool reachLast;
     boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
-    
+
     if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
       return; // nothing to invalidate
 
@@ -126,13 +126,13 @@ public:
     iterator foundItem, lastItem;
     bool reachLast;
     boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
-    
+
     if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
       return end ();
 
     return lastItem;
   }
-  
+
   /**
    * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)
    */
@@ -142,6 +142,23 @@ public:
     iterator foundItem, lastItem;
     bool reachLast;
     boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+    if (foundItem != trie_.end ())
+      {
+        policy_.lookup (s_iterator_to (foundItem));
+      }
+    return foundItem;
+  }
+
+  /**
+   * @brief Find a node that has the longest common prefix with key (FIB/PIT lookup)
+   */
+  template<class Predicate>
+  inline iterator
+  longest_prefix_match_if (const FullKey &key, Predicate pred)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find_if (key, pred);
     if (foundItem != trie_.end ())
       {
         policy_.lookup (s_iterator_to (foundItem));
@@ -172,7 +189,7 @@ public:
     // guard in case we don't have anything in the trie
     if (lastItem == trie_.end ())
       return trie_.end ();
-    
+
     if (reachLast)
       {
         if (foundItem == trie_.end ())
@@ -202,7 +219,7 @@ public:
     // guard in case we don't have anything in the trie
     if (lastItem == trie_.end ())
       return trie_.end ();
-    
+
     if (reachLast)
       {
         foundItem = lastItem->find_if (pred); // may or may not find something
@@ -244,7 +261,7 @@ public:
     else
       return &(*item);
   }
-  
+
 private:
   parent_trie      trie_;
   mutable policy_container policy_;
