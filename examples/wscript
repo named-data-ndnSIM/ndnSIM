@@ -44,3 +44,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('ndn-simple-pit-policies', ['ndnSIM'])
     obj.source = 'ndn-simple-pit-policies.cc'
+
+    obj = bld.create_ns3_program('ndn-simple-with-different-sizes-content-store', ['ndnSIM'])
+    obj.source = 'ndn-simple-with-different-sizes-content-store.cc'
