@@ -398,8 +398,13 @@ ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
 {
   if (m_cacheUnsolicitedData)
     {
+      FwHopCountTag hopCountTag;
+
+      Ptr<Packet> payloadCopy = payload->Copy ();
+      payloadCopy->RemovePacketTag (hopCountTag);
+
       // Optimistically add or update entry in the content store
-      m_contentStore->Add (header, payload);
+      m_contentStore->Add (header, payloadCopy);
     }
   else
     {
