@@ -348,17 +348,17 @@ def register_types_ns3_ndn(module):
     module.add_class('L3Protocol', parent=root_module['ns3::Object'])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits [class]
     module.add_class('Limits', parent=root_module['ns3::Object'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name [class]
     module.add_class('Name', parent=root_module['ns3::SimpleRefCount< ns3::ndn::Name, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Name> >'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameChecker [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameChecker [class]
     module.add_class('NameChecker', parent=root_module['ns3::AttributeChecker'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents [class]
     module.add_class('NameComponents', parent=root_module['ns3::ndn::Name'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker [class]
     module.add_class('NameComponentsChecker', parent=root_module['ns3::AttributeChecker'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue [class]
     module.add_class('NameComponentsValue', parent=root_module['ns3::AttributeValue'])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameValue [class]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameValue [class]
     module.add_class('NameValue', parent=root_module['ns3::AttributeValue'])
     ## ndn-net-device-face.h (module 'ndnSIM'): ns3::ndn::NetDeviceFace [class]
     module.add_class('NetDeviceFace', parent=root_module['ns3::ndn::Face'])
@@ -435,6 +435,8 @@ def register_types_ns3_ndn_pit(module):
     
     ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::Entry [class]
     module.add_class('Entry', parent=root_module['ns3::SimpleRefCount< ns3::ndn::pit::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::pit::Entry> >'])
+    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::EntryIsNotEmpty [struct]
+    module.add_class('EntryIsNotEmpty')
     ## ndn-pit-entry-incoming-face.h (module 'ndnSIM'): ns3::ndn::pit::IncomingFace [struct]
     module.add_class('IncomingFace')
     ## ndn-pit-entry-outgoing-face.h (module 'ndnSIM'): ns3::ndn::pit::OutgoingFace [struct]
@@ -604,6 +606,7 @@ def register_methods(root_module):
     register_Ns3NdnFibI_nth_methods(root_module, root_module['ns3::ndn::fib::i_nth'])
     register_Ns3NdnFwTag_methods(root_module, root_module['ns3::ndn::fw::Tag'])
     register_Ns3NdnPitEntry_methods(root_module, root_module['ns3::ndn::pit::Entry'])
+    register_Ns3NdnPitEntryIsNotEmpty_methods(root_module, root_module['ns3::ndn::pit::EntryIsNotEmpty'])
     register_Ns3NdnPitIncomingFace_methods(root_module, root_module['ns3::ndn::pit::IncomingFace'])
     register_Ns3NdnPitOutgoingFace_methods(root_module, root_module['ns3::ndn::pit::OutgoingFace'])
     register_Ns3NdnPitI_face_methods(root_module, root_module['ns3::ndn::pit::i_face'])
@@ -5122,10 +5125,15 @@ def register_Ns3NdnForwardingStrategy_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::InterestHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('ns3::Ptr< ns3::ndn::pit::Entry >', 'pitEntry')], 
                    visibility='protected', is_virtual=True)
-    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveUnsolicitedData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket) [member function]
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveSolicitedData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, bool didCreateCacheEntry) [member function]
+    cls.add_method('DidReceiveSolicitedData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('bool', 'didCreateCacheEntry')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidReceiveUnsolicitedData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, bool didCreateCacheEntry) [member function]
     cls.add_method('DidReceiveUnsolicitedData', 
                    'void', 
-                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket')], 
+                   [param('ns3::Ptr< ns3::ndn::Face >', 'inFace'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'payload'), param('ns3::Ptr< ns3::Packet const >', 'origPacket'), param('bool', 'didCreateCacheEntry')], 
                    visibility='protected', is_virtual=True)
     ## ndn-forwarding-strategy.h (module 'ndnSIM'): void ns3::ndn::ForwardingStrategy::DidSendOutData(ns3::Ptr<ns3::ndn::Face> inFace, ns3::Ptr<ns3::ndn::Face> outFace, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> payload, ns3::Ptr<const ns3::Packet> origPacket, ns3::Ptr<ns3::ndn::pit::Entry> pitEntry) [member function]
     cls.add_method('DidSendOutData', 
@@ -5233,10 +5241,11 @@ def register_Ns3NdnHeaderHelper_methods(root_module, cls):
     cls.add_constructor([])
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::HeaderHelper::HeaderHelper(ns3::ndn::HeaderHelper const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::HeaderHelper const &', 'arg0')])
-    ## ndn-header-helper.h (module 'ndnSIM'): ns3::Ptr<const ns3::ndn::Name> ns3::ndn::HeaderHelper::GetName(ns3::Ptr<const ns3::Packet> packet) [member function]
+    ## ndn-header-helper.h (module 'ndnSIM'): static ns3::Ptr<const ns3::ndn::Name> ns3::ndn::HeaderHelper::GetName(ns3::Ptr<const ns3::Packet> packet) [member function]
     cls.add_method('GetName', 
                    'ns3::Ptr< ns3::ndn::Name const >', 
-                   [param('ns3::Ptr< ns3::Packet const >', 'packet')])
+                   [param('ns3::Ptr< ns3::Packet const >', 'packet')], 
+                   is_static=True)
     ## ndn-header-helper.h (module 'ndnSIM'): static ns3::ndn::HeaderHelper::Type ns3::ndn::HeaderHelper::GetNdnHeaderType(ns3::Ptr<const ns3::Packet> packet) [member function]
     cls.add_method('GetNdnHeaderType', 
                    'ns3::ndn::HeaderHelper::Type', 
@@ -5495,74 +5504,74 @@ def register_Ns3NdnName_methods(root_module, cls):
     cls.add_output_stream_operator()
     cls.add_binary_comparison_operator('<')
     cls.add_binary_comparison_operator('==')
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name::Name(ns3::ndn::Name const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(ns3::ndn::Name const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::Name const &', 'arg0')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name::Name() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > const & components) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > const & components) [constructor]
     cls.add_constructor([param('std::list< boost::reference_wrapper< std::string const > > const &', 'components')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::string const & prefix) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::string const & prefix) [constructor]
     cls.add_constructor([param('std::string const &', 'prefix')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name::Name(char const * prefix) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(char const * prefix) [constructor]
     cls.add_constructor([param('char const *', 'prefix')])
-    ## ndn-name-components.h (module 'ndnSIM'): uint32_t ns3::ndn::Name::Deserialize(ns3::Buffer::Iterator start) [member function]
+    ## ndn-name.h (module 'ndnSIM'): uint32_t ns3::ndn::Name::Deserialize(ns3::Buffer::Iterator start) [member function]
     cls.add_method('Deserialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')])
-    ## ndn-name-components.h (module 'ndnSIM'): std::list<std::string, std::allocator<std::string> > const & ns3::ndn::Name::GetComponents() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::list<std::string, std::allocator<std::string> > const & ns3::ndn::Name::GetComponents() const [member function]
     cls.add_method('GetComponents', 
                    'std::list< std::string > const &', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::string ns3::ndn::Name::GetLastComponent() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::string ns3::ndn::Name::GetLastComponent() const [member function]
     cls.add_method('GetLastComponent', 
                    'std::string', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): size_t ns3::ndn::Name::GetSerializedSize() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): size_t ns3::ndn::Name::GetSerializedSize() const [member function]
     cls.add_method('GetSerializedSize', 
                    'size_t', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > ns3::ndn::Name::GetSubComponents(size_t num) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > ns3::ndn::Name::GetSubComponents(size_t num) const [member function]
     cls.add_method('GetSubComponents', 
                    'std::list< boost::reference_wrapper< std::string const > >', 
                    [param('size_t', 'num')], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): void ns3::ndn::Name::Print(std::ostream & os) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): void ns3::ndn::Name::Print(std::ostream & os) const [member function]
     cls.add_method('Print', 
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): uint32_t ns3::ndn::Name::Serialize(ns3::Buffer::Iterator start) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): uint32_t ns3::ndn::Name::Serialize(ns3::Buffer::Iterator start) const [member function]
     cls.add_method('Serialize', 
                    'uint32_t', 
                    [param('ns3::Buffer::Iterator', 'start')], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::ndn::Name::begin() [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::ndn::Name::begin() [member function]
     cls.add_method('begin', 
                    'std::_List_iterator< std::string >', 
                    [])
-    ## ndn-name-components.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::ndn::Name::begin() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::ndn::Name::begin() const [member function]
     cls.add_method('begin', 
                    'std::_List_const_iterator< std::string >', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name ns3::ndn::Name::cut(size_t minusComponents) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name ns3::ndn::Name::cut(size_t minusComponents) const [member function]
     cls.add_method('cut', 
                    'ns3::ndn::Name', 
                    [param('size_t', 'minusComponents')], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::ndn::Name::end() [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::_List_iterator<std::string> ns3::ndn::Name::end() [member function]
     cls.add_method('end', 
                    'std::_List_iterator< std::string >', 
                    [])
-    ## ndn-name-components.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::ndn::Name::end() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::_List_const_iterator<std::string> ns3::ndn::Name::end() const [member function]
     cls.add_method('end', 
                    'std::_List_const_iterator< std::string >', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): size_t ns3::ndn::Name::size() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): size_t ns3::ndn::Name::size() const [member function]
     cls.add_method('size', 
                    'size_t', 
                    [], 
@@ -5570,93 +5579,93 @@ def register_Ns3NdnName_methods(root_module, cls):
     return
 
 def register_Ns3NdnNameChecker_methods(root_module, cls):
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameChecker::NameChecker() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameChecker::NameChecker() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameChecker::NameChecker(ns3::ndn::NameChecker const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameChecker::NameChecker(ns3::ndn::NameChecker const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::NameChecker const &', 'arg0')])
     return
 
 def register_Ns3NdnNameComponents_methods(root_module, cls):
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(ns3::ndn::NameComponents const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(ns3::ndn::NameComponents const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::NameComponents const &', 'arg0')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > const & components) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(std::list<boost::reference_wrapper<std::string const>, std::allocator<boost::reference_wrapper<std::string const> > > const & components) [constructor]
     cls.add_constructor([param('std::list< boost::reference_wrapper< std::string const > > const &', 'components')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(std::string const & prefix) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(std::string const & prefix) [constructor]
     cls.add_constructor([param('std::string const &', 'prefix')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(char const * prefix) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents::NameComponents(char const * prefix) [constructor]
     cls.add_constructor([param('char const *', 'prefix')])
     return
 
 def register_Ns3NdnNameComponentsChecker_methods(root_module, cls):
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker::NameComponentsChecker() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker::NameComponentsChecker() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker::NameComponentsChecker(ns3::ndn::NameComponentsChecker const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsChecker::NameComponentsChecker(ns3::ndn::NameComponentsChecker const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::NameComponentsChecker const &', 'arg0')])
     return
 
 def register_Ns3NdnNameComponentsValue_methods(root_module, cls):
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue(ns3::ndn::NameComponentsValue const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue(ns3::ndn::NameComponentsValue const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::NameComponentsValue const &', 'arg0')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue(ns3::ndn::NameComponents const & value) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponentsValue::NameComponentsValue(ns3::ndn::NameComponents const & value) [constructor]
     cls.add_constructor([param('ns3::ndn::NameComponents const &', 'value')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::Ptr<ns3::AttributeValue> ns3::ndn::NameComponentsValue::Copy() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): ns3::Ptr<ns3::AttributeValue> ns3::ndn::NameComponentsValue::Copy() const [member function]
     cls.add_method('Copy', 
                    'ns3::Ptr< ns3::AttributeValue >', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): bool ns3::ndn::NameComponentsValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    ## ndn-name.h (module 'ndnSIM'): bool ns3::ndn::NameComponentsValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
     cls.add_method('DeserializeFromString', 
                    'bool', 
                    [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameComponents ns3::ndn::NameComponentsValue::Get() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameComponents ns3::ndn::NameComponentsValue::Get() const [member function]
     cls.add_method('Get', 
                    'ns3::ndn::NameComponents', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::string ns3::ndn::NameComponentsValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::string ns3::ndn::NameComponentsValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
     cls.add_method('SerializeToString', 
                    'std::string', 
                    [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_const=True, is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): void ns3::ndn::NameComponentsValue::Set(ns3::ndn::NameComponents const & value) [member function]
+    ## ndn-name.h (module 'ndnSIM'): void ns3::ndn::NameComponentsValue::Set(ns3::ndn::NameComponents const & value) [member function]
     cls.add_method('Set', 
                    'void', 
                    [param('ns3::ndn::NameComponents const &', 'value')])
     return
 
 def register_Ns3NdnNameValue_methods(root_module, cls):
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue() [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue() [constructor]
     cls.add_constructor([])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue(ns3::ndn::NameValue const & arg0) [copy constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue(ns3::ndn::NameValue const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::NameValue const &', 'arg0')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue(ns3::ndn::Name const & value) [constructor]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::NameValue::NameValue(ns3::ndn::Name const & value) [constructor]
     cls.add_constructor([param('ns3::ndn::Name const &', 'value')])
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::Ptr<ns3::AttributeValue> ns3::ndn::NameValue::Copy() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): ns3::Ptr<ns3::AttributeValue> ns3::ndn::NameValue::Copy() const [member function]
     cls.add_method('Copy', 
                    'ns3::Ptr< ns3::AttributeValue >', 
                    [], 
                    is_const=True, is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): bool ns3::ndn::NameValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
+    ## ndn-name.h (module 'ndnSIM'): bool ns3::ndn::NameValue::DeserializeFromString(std::string value, ns3::Ptr<ns3::AttributeChecker const> checker) [member function]
     cls.add_method('DeserializeFromString', 
                    'bool', 
                    [param('std::string', 'value'), param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): ns3::ndn::Name ns3::ndn::NameValue::Get() const [member function]
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name ns3::ndn::NameValue::Get() const [member function]
     cls.add_method('Get', 
                    'ns3::ndn::Name', 
                    [], 
                    is_const=True)
-    ## ndn-name-components.h (module 'ndnSIM'): std::string ns3::ndn::NameValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
+    ## ndn-name.h (module 'ndnSIM'): std::string ns3::ndn::NameValue::SerializeToString(ns3::Ptr<ns3::AttributeChecker const> checker) const [member function]
     cls.add_method('SerializeToString', 
                    'std::string', 
                    [param('ns3::Ptr< ns3::AttributeChecker const >', 'checker')], 
                    is_const=True, is_virtual=True)
-    ## ndn-name-components.h (module 'ndnSIM'): void ns3::ndn::NameValue::Set(ns3::ndn::Name const & value) [member function]
+    ## ndn-name.h (module 'ndnSIM'): void ns3::ndn::NameValue::Set(ns3::ndn::Name const & value) [member function]
     cls.add_method('Set', 
                    'void', 
                    [param('ns3::ndn::Name const &', 'value')])
@@ -5778,6 +5787,10 @@ def register_Ns3NdnStackHelper_methods(root_module, cls):
     cls.add_method('SetFib', 
                    'void', 
                    [param('std::string const &', 'fibClass'), param('std::string const &', 'attr1', default_value='""'), param('std::string const &', 'value1', default_value='""'), param('std::string const &', 'attr2', default_value='""'), param('std::string const &', 'value2', default_value='""'), param('std::string const &', 'attr3', default_value='""'), param('std::string const &', 'value3', default_value='""'), param('std::string const &', 'attr4', default_value='""'), param('std::string const &', 'value4', default_value='""')])
+    ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::AddNetDeviceFaceCreateCallback(ns3::TypeId netDeviceType, ns3::Callback<ns3::Ptr<ns3::ndn::NetDeviceFace>,ns3::Ptr<ns3::Node>,ns3::Ptr<ns3::NetDevice>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> callback) [member function]
+    cls.add_method('AddNetDeviceFaceCreateCallback', 
+                   'void', 
+                   [param('ns3::TypeId', 'netDeviceType'), param('ns3::Callback< ns3::Ptr< ns3::ndn::NetDeviceFace >, ns3::Ptr< ns3::Node >, ns3::Ptr< ns3::NetDevice >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')])
     ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::EnableLimits(bool enable=true, ns3::Time avgRtt=ns3::Seconds( ), uint32_t avgContentObject=1100, uint32_t avgInterest=40) [member function]
     cls.add_method('EnableLimits', 
                    'void', 
@@ -6133,6 +6146,18 @@ def register_Ns3NdnPitEntry_methods(root_module, cls):
                    is_virtual=True)
     return
 
+def register_Ns3NdnPitEntryIsNotEmpty_methods(root_module, cls):
+    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::EntryIsNotEmpty::EntryIsNotEmpty() [constructor]
+    cls.add_constructor([])
+    ## ndn-pit-entry.h (module 'ndnSIM'): ns3::ndn::pit::EntryIsNotEmpty::EntryIsNotEmpty(ns3::ndn::pit::EntryIsNotEmpty const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::pit::EntryIsNotEmpty const &', 'arg0')])
+    ## ndn-pit-entry.h (module 'ndnSIM'): bool ns3::ndn::pit::EntryIsNotEmpty::operator()(ns3::Ptr<ns3::ndn::pit::Entry> entry) [member operator]
+    cls.add_method('operator()', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry >', 'entry')], 
+                   custom_name='__call__')
+    return
+
 def register_Ns3NdnPitIncomingFace_methods(root_module, cls):
     cls.add_binary_comparison_operator('==')
     cls.add_binary_comparison_operator('<')
@@ -6199,11 +6224,11 @@ def register_functions_ns3_internal(module, root_module):
     return
 
 def register_functions_ns3_ndn(module, root_module):
-    ## ndn-name-components.h (module 'ndnSIM'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::ndn::MakeNameChecker() [free function]
+    ## ndn-name.h (module 'ndnSIM'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::ndn::MakeNameChecker() [free function]
     module.add_function('MakeNameChecker', 
                         'ns3::Ptr< ns3::AttributeChecker const >', 
                         [])
-    ## ndn-name-components.h (module 'ndnSIM'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::ndn::MakeNameComponentsChecker() [free function]
+    ## ndn-name.h (module 'ndnSIM'): extern ns3::Ptr<ns3::AttributeChecker const> ns3::ndn::MakeNameComponentsChecker() [free function]
     module.add_function('MakeNameComponentsChecker', 
                         'ns3::Ptr< ns3::AttributeChecker const >', 
                         [])

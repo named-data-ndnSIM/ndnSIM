@@ -62,7 +62,7 @@ public:
 
   /**
    * \brief Actual processing of incoming Ndn interests. Note, interests do not have payload
-   * 
+   *
    * Processing Interest packets
    * @param face    incoming face
    * @param header  deserialized Interest header
@@ -75,7 +75,7 @@ public:
 
   /**
    * \brief Actual processing of incoming Ndn content objects
-   * 
+   *
    * Processing ContentObject packets
    * @param face    incoming face
    * @param header  deserialized ContentObject header
@@ -101,7 +101,7 @@ public:
    */
   virtual void
   AddFace (Ptr<Face> face);
-  
+
   /**
    * @brief Event fired every time face is removed from NDN stack
    * @param face face to be removed
@@ -124,7 +124,7 @@ public:
    */
   virtual void
   WillRemoveFibEntry (Ptr<fib::Entry> fibEntry);
-  
+
 protected:
   /**
    * @brief An event that is fired every time a new PIT entry is created
@@ -132,7 +132,7 @@ protected:
    * Note that if NDN node is receiving a similar interest (interest for the same name),
    * then either DidReceiveDuplicateInterest, DidSuppressSimilarInterest, or DidForwardSimilarInterest
    * will be called
-   * 
+   *
    * Suppression of similar Interests is controlled using ShouldSuppressIncomingInterest virtual method
    *
    * @param inFace  incoming face
@@ -147,13 +147,13 @@ protected:
                      Ptr<const InterestHeader> header,
                      Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
-  
+
   /**
    * @brief An event that is fired every time a new PIT entry cannot be created (e.g., PIT container imposes a limit)
    *
    * Note that this call can be called only for non-similar Interest (i.e., there is an attempt to create a new PIT entry).
    * For any non-similar Interests, either FailedToCreatePitEntry or DidCreatePitEntry is called.
-   * 
+   *
    * @param inFace  incoming face
    * @param header  deserialized Interest header
    * @param origPacket  original packet
@@ -162,7 +162,7 @@ protected:
   FailedToCreatePitEntry (Ptr<Face> inFace,
                           Ptr<const InterestHeader> header,
                           Ptr<const Packet> origPacket);
-  
+
   /**
    * @brief An event that is fired every time a duplicated Interest is received
    *
@@ -262,7 +262,7 @@ protected:
    * Note that when Interest is satisfied from the cache, incoming face will be 0
    *
    * @param inFace  incoming face
-   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest   
+   * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    */
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
@@ -305,6 +305,22 @@ protected:
                   Ptr<pit::Entry> pitEntry);
 
   /**
+   * @brief Event which is fired every time a requested (solicited) DATA packet (there is an active PIT entry) is received
+   *
+   * @param inFace  incoming face
+   * @param header  deserialized ContentObject header
+   * @param payload ContentObject payload
+   * @param origPacket  original packet
+   * @param didCreateCacheEntry flag indicating whether a cache entry was added for this data packet or not (e.g., packet already exists in cache)
+   */
+  virtual void
+  DidReceiveSolicitedData (Ptr<Face> inFace,
+                           Ptr<const ContentObjectHeader> header,
+                           Ptr<const Packet> payload,
+                           Ptr<const Packet> origPacket,
+                           bool didCreateCacheEntry);
+
+  /**
    * @brief Event which is fired every time an unsolicited DATA packet (no active PIT entry) is received
    *
    * The current implementation allows ignoring unsolicited DATA (by default), or cache it by setting
@@ -314,12 +330,14 @@ protected:
    * @param header  deserialized ContentObject header
    * @param payload ContentObject payload
    * @param origPacket  original packet
+   * @param didCreateCacheEntry flag indicating whether a cache entry was added for this data packet or not (e.g., packet already exists in cache)
    */
   virtual void
   DidReceiveUnsolicitedData (Ptr<Face> inFace,
                              Ptr<const ContentObjectHeader> header,
                              Ptr<const Packet> payload,
-                             Ptr<const Packet> origPacket);
+                             Ptr<const Packet> origPacket,
+                             bool didCreateCacheEntry);
 
   /**
    * @brief Method implementing logic to suppress (collapse) similar Interests
@@ -362,7 +380,7 @@ protected:
                       Ptr<const InterestHeader> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
-  
+
   /**
    * @brief Method implementing actual interest forwarding, taking into account CanSendOutInterest decision
    *
@@ -417,7 +435,7 @@ protected:
                      Ptr<const InterestHeader> header,
                      Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
-  
+
   /**
    * @brief Virtual method to perform Interest propagation according to the forwarding strategy logic
    *
@@ -442,20 +460,20 @@ protected:
                        Ptr<const InterestHeader> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry) = 0;
-  
+
 protected:
-  // inherited from Object class                                                                                                                                                        
+  // inherited from Object class
   virtual void NotifyNewAggregate (); ///< @brief Even when object is aggregated to another Object
   virtual void DoDispose (); ///< @brief Do cleanup
-  
-protected:  
+
+protected:
   Ptr<Pit> m_pit; ///< \brief Reference to PIT to which this forwarding strategy is associated
-  Ptr<Fib> m_fib; ///< \brief FIB  
+  Ptr<Fib> m_fib; ///< \brief FIB
   Ptr<ContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
   bool m_cacheUnsolicitedData;
   bool m_detectRetransmissions;
-  
+
   TracedCallback<Ptr<const InterestHeader>,
                  Ptr<const Face> > m_outInterests; ///< @brief Transmitted interests trace
 
@@ -464,7 +482,7 @@ protected:
 
   TracedCallback<Ptr<const InterestHeader>,
                  Ptr<const Face> > m_dropInterests; ///< @brief trace of dropped Interests
-  
+
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////

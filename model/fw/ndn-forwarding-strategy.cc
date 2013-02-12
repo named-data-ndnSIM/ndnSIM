@@ -226,11 +226,34 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
     {
-      DidReceiveUnsolicitedData (inFace, header, payload, origPacket);
+      bool cached = false;
+
+      if (m_cacheUnsolicitedData)
+        {
+          FwHopCountTag hopCountTag;
+
+          Ptr<Packet> payloadCopy = payload->Copy ();
+          payloadCopy->RemovePacketTag (hopCountTag);
+
+          // Optimistically add or update entry in the content store
+          cached = m_contentStore->Add (header, payloadCopy);
+        }
+      else
+        {
+          // Drop data packet if PIT entry is not found
+          // (unsolicited data packets should not "poison" content store)
+
+          //drop dulicated or not requested data packet
+          m_dropData (header, payload, inFace);
+        }
+
+      DidReceiveUnsolicitedData (inFace, header, payload, origPacket, cached);
       return;
     }
   else
     {
+      bool cached = false;
+
       FwHopCountTag hopCountTag;
       if (payload->PeekPacketTag (hopCountTag))
         {
@@ -238,13 +261,15 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
           payloadCopy->RemovePacketTag (hopCountTag);
 
           // Add or update entry in the content store
-          m_contentStore->Add (header, payloadCopy);
+          cached = m_contentStore->Add (header, payloadCopy);
         }
       else
         {
           // Add or update entry in the content store
-          m_contentStore->Add (header, payload); // no need for extra copy
+          cached = m_contentStore->Add (header, payload); // no need for extra copy
         }
+
+      DidReceiveSolicitedData (inFace, header, payload, origPacket, cached);
     }
 
   while (pitEntry != 0)
@@ -391,29 +416,23 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 }
 
 void
+ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
+                                             Ptr<const ContentObjectHeader> header,
+                                             Ptr<const Packet> payload,
+                                             Ptr<const Packet> origPacket,
+                                             bool didCreateCacheEntry)
+{
+  // do nothing
+}
+
+void
 ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
                                                Ptr<const ContentObjectHeader> header,
                                                Ptr<const Packet> payload,
-                                               Ptr<const Packet> origPacket)
+                                               Ptr<const Packet> origPacket,
+                                               bool didCreateCacheEntry)
 {
-  if (m_cacheUnsolicitedData)
-    {
-      FwHopCountTag hopCountTag;
-
-      Ptr<Packet> payloadCopy = payload->Copy ();
-      payloadCopy->RemovePacketTag (hopCountTag);
-
-      // Optimistically add or update entry in the content store
-      m_contentStore->Add (header, payloadCopy);
-    }
-  else
-    {
-      // Drop data packet if PIT entry is not found
-      // (unsolicited data packets should not "poison" content store)
-
-      //drop dulicated or not requested data packet
-      m_dropData (header, payload, inFace);
-    }
+  // do nothing
 }
 
 void
