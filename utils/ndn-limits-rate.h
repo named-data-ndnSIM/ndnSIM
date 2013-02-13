@@ -22,6 +22,7 @@
 #define	_NDN_LIMITS_RATE_H_
 
 #include "ndn-limits.h"
+#include <ns3/nstime.h>
 
 namespace ns3 {
 namespace ndn {
@@ -35,10 +36,10 @@ class LimitsRate :
 {
 public:
   typedef Limits super;
-  
+
   static TypeId
   GetTypeId ();
-  
+
   /**
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
@@ -101,12 +102,12 @@ public:
   {
     return m_bucketLeak;
   }
-  
+
 protected:
   // from Node
   void
   NotifyNewAggregate ();
-    
+
 private:
   /**
    * @brief Leak bucket, assuming `interval' seconds between leakages
@@ -118,12 +119,14 @@ private:
 
 private:
   bool m_isLeakScheduled;
-  
+
   double m_bucketMax;   ///< \brief Maximum Interest allowance for this face (maximum tokens that can be issued at the same time)
   double m_bucketLeak;  ///< \brief Normalized amount that should be leaked every second (token bucket leak rate)
   double m_bucket;      ///< \brief Value representing current size of the Interest allowance for this face (current size of token bucket)
+
+  Time m_leakRandomizationInteral;
 };
-  
+
 
 } // namespace ndn
 } // namespace ns3

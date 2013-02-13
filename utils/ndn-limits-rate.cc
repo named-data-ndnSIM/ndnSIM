@@ -38,9 +38,14 @@ LimitsRate::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::ndn::Limits::Rate")
     .SetGroupName ("Ndn")
-    .SetParent <Limits> () 
+    .SetParent <Limits> ()
     .AddConstructor <LimitsRate> ()
-    
+
+    .AddAttribute ("RandomizeLeak", "Randomize start time for token bucket leakage. May be helpful to prevent leak synchronizations",
+                   TimeValue (Seconds (0.001)),
+                   MakeTimeAccessor (&LimitsRate::m_leakRandomizationInteral),
+                   MakeTimeChecker ())
+
     ;
   return tid;
 }
@@ -55,11 +60,21 @@ LimitsRate::NotifyNewAggregate ()
       if (GetObject<Face> () != 0)
         {
           NS_ASSERT_MSG (GetObject<Face> ()->GetNode () != 0, "Node object should exist on the face");
-          
+
           m_isLeakScheduled = true;
-          UniformVariable r (0.0, 1.0);
-          Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
-                                          Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+
+          if (!m_leakRandomizationInteral.IsZero ())
+            {
+              UniformVariable r (0.0, m_leakRandomizationInteral.ToDouble (Time::S));
+              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+                                              Seconds (r.GetValue ()), &LimitsRate::LeakBucket, this, 0.0);
+            }
+          else
+            {
+              Simulator::ScheduleWithContext (GetObject<Face> ()->GetNode ()->GetId (),
+                                              Seconds (0), &LimitsRate::LeakBucket, this, 0.0);
+            }
+
         }
     }
 }
@@ -81,7 +96,7 @@ void
 LimitsRate::UpdateCurrentLimit (double limit)
 {
   NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
-  
+
   m_bucketLeak = std::min (limit, GetMaxRate ());
   m_bucketMax  = m_bucketLeak * GetMaxDelay ();
 }
@@ -97,10 +112,10 @@ LimitsRate::IsBelowLimit ()
 void
 LimitsRate::BorrowLimit ()
 {
-  if (!IsEnabled ()) return; 
+  if (!IsEnabled ()) return;
 
   NS_ASSERT_MSG (m_bucketMax - m_bucket >= 1.0, "Should not be possible, unless we IsBelowLimit was not checked correctly");
-  m_bucket += 1; 
+  m_bucket += 1;
 }
 
 void
@@ -114,7 +129,7 @@ LimitsRate::LeakBucket (double interval)
 {
   const double leak = m_bucketLeak * interval;
 
-#ifdef NS3_LOG_ENABLE  
+#ifdef NS3_LOG_ENABLE
   if (m_bucket>1)
     {
       NS_LOG_DEBUG ("Leak from " << m_bucket << " to " << std::max (0.0, m_bucket - leak));
@@ -122,7 +137,7 @@ LimitsRate::LeakBucket (double interval)
 #endif
 
   double bucketOld = m_bucket;
-  
+
   m_bucket = std::max (0.0, m_bucket - leak);
 
   // calculate interval so next time we will leak by 1.001, unless such interval would be more than 1 second
@@ -137,7 +152,7 @@ LimitsRate::LeakBucket (double interval)
     {
       this->FireAvailableSlotCallback ();
     }
-  
+
   Simulator::Schedule (Seconds (newInterval), &LimitsRate::LeakBucket, this, newInterval);
 }
 
