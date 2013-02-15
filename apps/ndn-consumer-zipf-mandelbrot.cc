@@ -44,21 +44,20 @@ ConsumerZipfMandelbrot::GetTypeId (void)
     .SetParent<ConsumerCbr> ()
     .AddConstructor<ConsumerZipfMandelbrot> ()
 
+    .AddAttribute ("q", "parameter of improve rank",
+                   StringValue ("0.7"),
+                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetQ, &ConsumerZipfMandelbrot::GetQ),
+                   MakeDoubleChecker<double> ())
+    .AddAttribute ("s", "parameter of power",
+                   StringValue ("0.7"),
+                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetS, &ConsumerZipfMandelbrot::GetS),
+                   MakeDoubleChecker<double> ())
+
     .AddAttribute ("NumberOfContents", "Number of the Contents in total",
                    StringValue ("100"),
                    MakeUintegerAccessor (&ConsumerZipfMandelbrot::SetNumberOfContents, &ConsumerZipfMandelbrot::GetNumberOfContents),
                    MakeUintegerChecker<uint32_t> ())
 
-    // Alex: q and s are not yet really working
-    //
-    // .AddAttribute ("q", "parameter of improve rank",
-    //                StringValue ("0.7"),
-    //                MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_q),
-    //                MakeDoubleChecker<double>())
-    // .AddAttribute ("s", "parameter of power",
-    //                StringValue ("0.7"),
-    //                MakeDoubleAccessor (&ConsumerZipfMandelbrot::m_s),
-    //                MakeDoubleChecker<double>())
     ;
 
   return tid;
@@ -82,18 +81,20 @@ ConsumerZipfMandelbrot::SetNumberOfContents (uint32_t numOfContents)
 {
   m_N = numOfContents;
 
+  // NS_LOG_DEBUG (m_q << " and " << m_s << " and " << m_N);
+
   m_Pcum = std::vector<double> (m_N + 1);
 
   m_Pcum[0] = 0.0;
   for (uint32_t i=1; i<=m_N; i++)
     {
-      m_Pcum[i] = m_Pcum[i-1] + 1.0/pow(i+m_q, m_s);
+      m_Pcum[i] = m_Pcum[i-1] + 1.0 / std::pow(i+m_q, m_s);
     }
-  
+
   for (uint32_t i=1; i<=m_N; i++)
     {
       m_Pcum[i] = m_Pcum[i] / m_Pcum[m_N];
-      NS_LOG_LOGIC("cum Probability ["<<i<<"]="<<m_Pcum[i]);
+      NS_LOG_LOGIC ("Cumulative probability [" << i << "]=" << m_Pcum[i]);
   }
 }
 
@@ -103,6 +104,31 @@ ConsumerZipfMandelbrot::GetNumberOfContents () const
   return m_N;
 }
 
+void
+ConsumerZipfMandelbrot::SetQ (double q)
+{
+  m_q = q;
+  SetNumberOfContents (m_N);
+}
+
+double
+ConsumerZipfMandelbrot::GetQ () const
+{
+  return m_q;
+}
+
+void
+ConsumerZipfMandelbrot::SetS (double s)
+{
+  m_s = s;
+  SetNumberOfContents (m_N);
+}
+
+double
+ConsumerZipfMandelbrot::GetS () const
+{
+  return m_s;
+}
 
 void
 ConsumerZipfMandelbrot::SendPacket() {
@@ -174,14 +200,14 @@ ConsumerZipfMandelbrot::SendPacket() {
   m_seqLastDelay.insert (SeqTimeout (seq, Simulator::Now ()));
 
   m_seqRetxCounts[seq] ++;
-  
+
   m_transmittedInterests (&interestHeader, this, m_face);
 
   m_rtt->SentSeq (SequenceNumber32 (seq), 1);
 
   FwHopCountTag hopCountTag;
   packet->AddPacketTag (hopCountTag);
-  
+
   m_protocolHandler (packet);
 
   ConsumerZipfMandelbrot::ScheduleNextPacket ();

@@ -70,7 +70,19 @@ private:
 
   uint32_t
   GetNumberOfContents () const;
-  
+
+  void
+  SetQ (double q);
+
+  double
+  GetQ () const;
+
+  void
+  SetS (double s);
+
+  double
+  GetS () const;
+
 private:
   uint32_t m_N;  //number of the contents
   double m_q;  //q in (k+q)^s
