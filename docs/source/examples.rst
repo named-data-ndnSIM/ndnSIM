@@ -1,6 +1,11 @@
 Examples
 ========
 
+.. role:: red
+
+.. note::
+   :red:`!!! This page only shows up examples of how to config topology and perform basic operations in ndnSIM (an example equivalent to "Hello, world1") !!!  These are **NOT** examples of real experimentations (just like "Hello, world!" is not a real program).`
+
 .. _simple-scenario:
 
 Simple scenario
@@ -43,7 +48,7 @@ simulation using the following command (in optimized mode nothing will be printe
 
 
 .. _9-node-grid-example:
- 
+
 9-node grid example
 -------------------
 
@@ -84,7 +89,7 @@ The following code represents all that is necessary to run such a simple scenari
    :linenos:
    :lines: 20-27,53-
    :emphasize-lines: 28,31-33,35-38,53-57
-    
+
 
 If this code is placed into ``scratch/ndn-grid.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
 simulation using the following command (in optimized mode nothing will be printed out)::
@@ -136,10 +141,10 @@ This scenario (``ndn-grid-topo-plugin.cc``) duplicates the functionality of :ref
    :linenos:
    :lines: 20-26,51-
    :emphasize-lines: 14-16,20,27-30
-    
+
 As you can see, scenario code became more compact and more readable.
 
-:ndnsim:`AnnotatedTopologyReader` provides two ways to access topology nodes.  
+:ndnsim:`AnnotatedTopologyReader` provides two ways to access topology nodes.
 First, you can use the method :ndnsim:`AnnotatedTopologyReader::GetNodes` which returns NodeContainer.
 
 Alternatively, nodes can be accessed by name using `Names::Find<Node> ("nodename")` call, as in the above example.
@@ -155,7 +160,7 @@ If the topology file is placed into ``src/ndnSIM/examples/topologies/topo-grid-3
 6-node bottleneck topology
 --------------------------
 
-This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-related scenarios 
+This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-related scenarios
 
 .. aafig::
     :aspect: 60
@@ -164,10 +169,10 @@ This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-rel
     /------\	                                                /------\
     | Src1 |<--+                                            +-->| Dst1 |
     \------/    \                                          /    \------/
-	     	 \                                        /     
-                  +-->/------\   "bottleneck"  /------\<-+      
-                      | Rtr1 |<===============>| Rtr2 |         
-                  +-->\------/                 \------/<-+      
+	     	 \                                        /
+                  +-->/------\   "bottleneck"  /------\<-+
+                      | Rtr1 |<===============>| Rtr2 |
+                  +-->\------/                 \------/<-+
                  /                                        \
     /------\    /                                          \    /------\
     | Src2 |<--+                                            +-->| Dst2 |
@@ -178,7 +183,7 @@ This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-rel
     :linenos:
     :lines: 1-2,15-
     :emphasize-lines: 3,13
-   
+
 .. literalinclude:: ../../examples/ndn-congestion-topo-plugin.cc
    :language: c++
    :linenos:
@@ -206,29 +211,29 @@ Let us first define a meaningful topology:
 .. aafig::
     :aspect: 60
     :scale: 120
-                                                                
+
      /------\ 0                                                 0 /------\
      |  c1  |<-----+                                       +----->|  p1  |
      \------/       \                                     /       \------/
-                     \              /-----\              /        
+                     \              /-----\              /
      /------\ 0       \         +==>| r12 |<==+         /       0 /------\
      |  c2  |<--+      \       /    \-----/    \       /      +-->|  p2  |
      \------/    \      \     |                 |     /      /    \------/
-                  \      |    |   1Mbps links   |    |      /     
-                   \  1  v0   v5               1v   2v  3  /      
-                    +->/------\                 /------\<-+       
-                      2|  r1  |<===============>|  r2  |4         
-                    +->\------/4               0\------/<-+       
-                   /    3^                           ^5    \      
-                  /      |                           |      \     
+                  \      |    |   1Mbps links   |    |      /
+                   \  1  v0   v5               1v   2v  3  /
+                    +->/------\                 /------\<-+
+                      2|  r1  |<===============>|  r2  |4
+                    +->\------/4               0\------/<-+
+                   /    3^                           ^5    \
+                  /      |                           |      \
      /------\ 0  /      /                             \      \  0 /------\
      |  c3  |<--+      /                               \      +-->|  p3  |
      \------/         /                                 \         \------/
-                     /     "All consumer-router and"     \        
+                     /     "All consumer-router and"     \
      /------\ 0     /      "router-producer links are"    \    0 /------\
      |  c4  |<-----+       "10Mbps"                        +---->|  p4  |
      \------/                                                    \------/
-                                                                 
+
      "Numbers near nodes denote face IDs. Face ID is assigned based on the order of link"
      "definitions in the topology file"
 
