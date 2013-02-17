@@ -5787,10 +5787,10 @@ def register_Ns3NdnStackHelper_methods(root_module, cls):
     cls.add_method('SetFib', 
                    'void', 
                    [param('std::string const &', 'fibClass'), param('std::string const &', 'attr1', default_value='""'), param('std::string const &', 'value1', default_value='""'), param('std::string const &', 'attr2', default_value='""'), param('std::string const &', 'value2', default_value='""'), param('std::string const &', 'attr3', default_value='""'), param('std::string const &', 'value3', default_value='""'), param('std::string const &', 'attr4', default_value='""'), param('std::string const &', 'value4', default_value='""')])
-    ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::AddNetDeviceFaceCreateCallback(ns3::TypeId netDeviceType, ns3::Callback<ns3::Ptr<ns3::ndn::NetDeviceFace>,ns3::Ptr<ns3::Node>,ns3::Ptr<ns3::NetDevice>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> callback) [member function]
+    ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::AddNetDeviceFaceCreateCallback(ns3::TypeId netDeviceType, ns3::Callback<ns3::Ptr<ns3::ndn::NetDeviceFace>,ns3::Ptr<ns3::Node>,ns3::Ptr<ns3::ndn::L3Protocol>,ns3::Ptr<ns3::NetDevice>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> callback) [member function]
     cls.add_method('AddNetDeviceFaceCreateCallback', 
                    'void', 
-                   [param('ns3::TypeId', 'netDeviceType'), param('ns3::Callback< ns3::Ptr< ns3::ndn::NetDeviceFace >, ns3::Ptr< ns3::Node >, ns3::Ptr< ns3::NetDevice >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')])
+                   [param('ns3::TypeId', 'netDeviceType'), param('ns3::Callback< ns3::Ptr< ns3::ndn::NetDeviceFace >, ns3::Ptr< ns3::Node >, ns3::Ptr< ns3::ndn::L3Protocol >, ns3::Ptr< ns3::NetDevice >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'callback')])
     ## ndn-stack-helper.h (module 'ndnSIM'): void ns3::ndn::StackHelper::EnableLimits(bool enable=true, ns3::Time avgRtt=ns3::Seconds( ), uint32_t avgContentObject=1100, uint32_t avgInterest=40) [member function]
     cls.add_method('EnableLimits', 
                    'void', 

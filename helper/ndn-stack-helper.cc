@@ -255,18 +255,15 @@ StackHelper::Install (Ptr<Node> node) const
           if (device->GetInstanceTypeId () == item->first ||
               device->GetInstanceTypeId ().IsChildOf (item->first))
             {
-              face = item->second (node, device);
+              face = item->second (node, ndn, device);
               if (face != 0)
                 break;
             }
         }
       if (face == 0)
         {
-          face = DefaultNetDeviceCallback (node, device);
+          face = DefaultNetDeviceCallback (node, ndn, device);
         }
-
-      ndn->AddFace (face);
-      NS_LOG_LOGIC ("Node " << node->GetId () << ": added NetDeviceFace as face #" << *face);
 
       if (m_needSetDefaultRoutes)
         {
@@ -289,19 +286,27 @@ StackHelper::AddNetDeviceFaceCreateCallback (TypeId netDeviceType, StackHelper::
 
 
 Ptr<NetDeviceFace>
-StackHelper::DefaultNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const
+StackHelper::DefaultNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const
 {
   NS_LOG_DEBUG ("Creating default NetDeviceFace on node " << node->GetId ());
 
-  return CreateObject<NetDeviceFace> (node, netDevice);
+  Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace> (node, netDevice);
+
+  ndn->AddFace (face);
+  NS_LOG_LOGIC ("Node " << node->GetId () << ": added NetDeviceFace as face #" << *face);
+
+  return face;
 }
 
 Ptr<NetDeviceFace>
-StackHelper::PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> device) const
+StackHelper::PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const
 {
   NS_LOG_DEBUG ("Creating point-to-point NetDeviceFace on node " << node->GetId ());
 
   Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace> (node, device);
+
+  ndn->AddFace (face);
+  NS_LOG_LOGIC ("Node " << node->GetId () << ": added NetDeviceFace as face #" << *face);
 
   if (m_limitsEnabled)
     {

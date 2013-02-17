@@ -35,6 +35,8 @@ namespace ndn {
 
 class FaceContainer;
 class Face;
+class NetDeviceFace;
+class L3Protocol;
 
 /**
  * \ingroup ndn
@@ -128,7 +130,7 @@ public:
           const std::string &attr3 = "", const std::string &value3 = "",
           const std::string &attr4 = "", const std::string &value4 = "");
 
-  typedef Callback< Ptr<NetDeviceFace>, Ptr<Node>, Ptr<NetDevice> > NetDeviceFaceCreateCallback;
+  typedef Callback< Ptr<NetDeviceFace>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice> > NetDeviceFaceCreateCallback;
 
   /**
    * @brief Add callback to create and configure instance of the face, based on supplied Ptr<Node> and Ptr<NetDevice>
@@ -269,10 +271,10 @@ public:
 
 private:
   Ptr<NetDeviceFace>
-  DefaultNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const;
+  DefaultNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
 
   Ptr<NetDeviceFace>
-  PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<NetDevice> netDevice) const;
+  PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
 
 private:
   StackHelper (const StackHelper &);
