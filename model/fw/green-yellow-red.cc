@@ -72,18 +72,18 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
   NS_ASSERT_MSG (m_pit != 0, "PIT should be aggregated with forwarding strategy");
 
   int propagatedCount = 0;
-  
+
   BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())
     {
-      if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED ||
-          metricFace.m_status == fib::FaceMetric::NDN_FIB_YELLOW)
+      if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED ||
+          metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
-      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
         {
           continue;
         }
-      
+
       propagatedCount++;
       break; // propagate only one interest
     }

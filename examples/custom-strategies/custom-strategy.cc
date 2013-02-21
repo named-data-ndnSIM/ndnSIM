@@ -14,13 +14,13 @@ namespace fw {
 NS_OBJECT_ENSURE_REGISTERED(CustomStrategy);
 
 LogComponent CustomStrategy::g_log = LogComponent (CustomStrategy::GetLogName ().c_str ());
-    
+
 std::string
 CustomStrategy::GetLogName ()
 {
   return "ndn.fw.CustomStrategy";
 }
-    
+
 TypeId
 CustomStrategy::GetTypeId (void)
 {
@@ -28,11 +28,11 @@ CustomStrategy::GetTypeId (void)
     .SetGroupName ("Ndn")
     .SetParent <BaseStrategy> ()
     .AddConstructor <CustomStrategy> ()
-        
+
     // .AddAttribute ("Attribute", "Attribute spec",
     //                         StringValue ("DefaultValue"),
     //                         MakeStringAccessor (&BaseStrategy::m_variable),
-    //                         MakeStringChecker ())    
+    //                         MakeStringChecker ())
     ;
   return tid;
 }
@@ -57,7 +57,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
   // forward to best-metric face
   if (faceIterator != faces.end ())
     {
-      if (TrySendOutInterest (inFace, faceIterator->m_face, header, origPacket, pitEntry))
+      if (TrySendOutInterest (inFace, faceIterator->GetFace (), header, origPacket, pitEntry))
         propagatedCount ++;
 
       faceIterator ++;
@@ -66,7 +66,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
   // forward to second-best-metric face
   if (faceIterator != faces.end ())
     {
-      if (TrySendOutInterest (inFace, faceIterator->m_face, header, origPacket, pitEntry))
+      if (TrySendOutInterest (inFace, faceIterator->GetFace (), header, origPacket, pitEntry))
         propagatedCount ++;
 
       faceIterator ++;
@@ -92,11 +92,11 @@ CustomStrategy::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
     {
       m_counter --;
     }
-        
+
   BaseStrategy::WillEraseTimedOutPendingInterest (pitEntry);
 }
-        
-        
+
+
 void
 CustomStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                             Ptr<pit::Entry> pitEntry)
@@ -107,11 +107,11 @@ CustomStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
     {
       m_counter --;
     }
-          
+
   BaseStrategy::WillSatisfyPendingInterest (inFace, pitEntry);
 }
 
-        
+
 } // namespace fw
 } // namespace ndn
 } // namespace ns3

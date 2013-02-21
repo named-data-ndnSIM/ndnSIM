@@ -57,13 +57,13 @@ public:
    */
   static std::string
   GetLogName ();
-  
+
   /**
    * @brief Default constructor
    */
   PerFibLimits ()
   { }
-  
+
   /// \copydoc ForwardingStrategy::WillEraseTimedOutPendingInterest
   virtual void
   WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
@@ -86,14 +86,14 @@ public:
   DidAddFibEntry (Ptr<fib::Entry> fibEntry)
   {
     ObjectFactory factory;
-    factory.SetTypeId (fibEntry->m_faces.begin ()->m_face->GetObject<Limits> ()->GetInstanceTypeId ());
-    
+    factory.SetTypeId (fibEntry->m_faces.begin ()->GetFace ()->GetObject<Limits> ()->GetInstanceTypeId ());
+
     Ptr<Limits> limits = factory.template Create<Limits> ();
     fibEntry->AggregateObject (limits);
 
     super::DidAddFibEntry (fibEntry);
   }
-  
+
 protected:
   /// \copydoc ForwardingStrategy::CanSendOutInterest
   virtual bool
@@ -102,7 +102,7 @@ protected:
                       Ptr<const InterestHeader> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
-  
+
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
   virtual void
   WillSatisfyPendingInterest (Ptr<Face> inFace,
@@ -110,7 +110,7 @@ protected:
 
 protected:
   static LogComponent g_log; ///< @brief Logging variable
-  
+
 private:
   std::string m_limitType;
 };
@@ -149,7 +149,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   // no checks for the limit here. the check should be somewhere elese
-  
+
   if (fibLimits->IsBelowLimit ())
     {
       if (super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
@@ -158,7 +158,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
           return true;
         }
     }
-  
+
   return false;
 }
 
@@ -184,7 +184,7 @@ PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
   fibLimits->ReturnLimit ();
-  
+
   super::WillSatisfyPendingInterest (inFace, pitEntry);
 }
 

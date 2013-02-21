@@ -69,7 +69,7 @@ L3Protocol::GetDataCounter ()
 }
 
 
-TypeId 
+TypeId
 L3Protocol::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::L3Protocol")
@@ -134,7 +134,7 @@ L3Protocol::NotifyNewAggregate ()
   Object::NotifyNewAggregate ();
 }
 
-void 
+void
 L3Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
@@ -152,7 +152,7 @@ L3Protocol::DoDispose (void)
   Object::DoDispose ();
 }
 
-uint32_t 
+uint32_t
 L3Protocol::AddFace (const Ptr<Face> &face)
 {
   NS_LOG_FUNCTION (this << &face);
@@ -165,7 +165,7 @@ L3Protocol::AddFace (const Ptr<Face> &face)
   m_faces.push_back (face);
   m_faceCounter++;
 
-  m_forwardingStrategy->AddFace (face); // notify that face is added    
+  m_forwardingStrategy->AddFace (face); // notify that face is added
   return face->GetId ();
 }
 
@@ -181,11 +181,11 @@ L3Protocol::RemoveFace (Ptr<Face> face)
   for (Ptr<pit::Entry> pitEntry = pit->Begin (); pitEntry != 0; pitEntry = pit->Next (pitEntry))
     {
       pitEntry->RemoveAllReferencesToFace (face);
-      
+
       // If this face is the only for the associated FIB entry, then FIB entry will be removed soon.
       // Thus, we have to remove the whole PIT entry
       if (pitEntry->GetFibEntry ()->m_faces.size () == 1 &&
-          pitEntry->GetFibEntry ()->m_faces.begin ()->m_face == face)
+          pitEntry->GetFibEntry ()->m_faces.begin ()->GetFace () == face)
         {
           entriesToRemoves.push_back (pitEntry);
         }
@@ -200,7 +200,7 @@ L3Protocol::RemoveFace (Ptr<Face> face)
   m_faces.erase (face_it);
 
   GetObject<Fib> ()->RemoveFromAll (face);
-  m_forwardingStrategy->RemoveFace (face); // notify that face is removed  
+  m_forwardingStrategy->RemoveFace (face); // notify that face is removed
 }
 
 Ptr<Face>
@@ -235,21 +235,21 @@ L3Protocol::GetFaceByNetDevice (Ptr<NetDevice> netDevice) const
   return 0;
 }
 
-uint32_t 
+uint32_t
 L3Protocol::GetNFaces (void) const
 {
   return m_faces.size ();
 }
 
 // Callback from lower layer
-void 
+void
 L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
 {
   if (!face->IsUp ())
     return;
 
   NS_LOG_DEBUG (*p);
-  
+
   NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
 
   Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
@@ -271,21 +271,21 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
             // if (header->GetNack () > 0)
             //   OnNack (face, header, p/*original packet*/);
             // else
-            //   OnInterest (face, header, p/*original packet*/);  
+            //   OnInterest (face, header, p/*original packet*/);
             break;
           }
         case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
             s_dataCounter ++;
             Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
-            
+
             static ContentObjectTail contentObjectTrailer; //there is no data in this object
 
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);
             packet->RemoveTrailer (contentObjectTrailer);
 
-            m_forwardingStrategy->OnData (face, header, packet/*payload*/, p/*original packet*/);  
+            m_forwardingStrategy->OnData (face, header, packet/*payload*/, p/*original packet*/);
             break;
           }
         case HeaderHelper::INTEREST_CCNB:
@@ -293,7 +293,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
           NS_FATAL_ERROR ("ccnb support is broken in this implementation");
           break;
         }
-      
+
       // exception will be thrown if packet is not recognized
     }
   catch (UnknownHeaderException)

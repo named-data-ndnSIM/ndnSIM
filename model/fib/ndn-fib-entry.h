@@ -82,7 +82,7 @@ public:
    * @brief Comparison between FaceMetric and Face
    */
   bool
-  operator< (const Ptr<Face> &face) const { return *m_face < *face; } 
+  operator< (const Ptr<Face> &face) const { return *m_face < *face; }
 
   /**
    * @brief Return Face associated with FaceMetric
@@ -96,17 +96,72 @@ public:
    */
   void
   UpdateRtt (const Time &rttSample);
-  
+
+  /**
+   * @brief Get current status of FIB entry
+   */
+  Status
+  GetStatus () const
+  {
+    return m_status;
+  }
+
+  /**
+   * @brief Set current status of FIB entry
+   */
+  void
+  SetStatus (Status status)
+  {
+    m_status = status;
+  }
+
+  /**
+   * @brief Get current routing cost
+   */
+  int32_t
+  GetRoutingCost () const
+  {
+    return m_routingCost;
+  }
+
+  /**
+   * @brief Set routing cost
+   */
+  void
+  SetRoutingCost (int32_t routingCost)
+  {
+    m_routingCost = routingCost;
+  }
+
+  /**
+   * @brief Get real propagation delay to the producer, calculated based on NS-3 p2p link delays
+   */
+  Time
+  GetRealDelay () const
+  {
+    return m_realDelay;
+  }
+
+  /**
+   * @brief Set real propagation delay to the producer, calculated based on NS-3 p2p link delays
+   */
+  void
+  SetRealDelay (Time realDelay)
+  {
+    m_realDelay = realDelay;
+  }
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const FaceMetric &metric);
-public:
+
+private:
   Ptr<Face> m_face; ///< Face
-  
-  Status m_status;		///< \brief Status of the next hop: 
+
+  Status m_status;		///< \brief Status of the next hop:
 				///<		- NDN_FIB_GREEN
 				///<		- NDN_FIB_YELLOW
 				///<		- NDN_FIB_RED
-  
+
   int32_t m_routingCost; ///< \brief routing protocol cost (interpretation of the value depends on the underlying routing protocol)
 
   Time m_sRtt;         ///< \brief smoothed round-trip time
@@ -141,7 +196,7 @@ struct FaceMetricContainer
       // For fast access to elements using Face
       boost::multi_index::ordered_unique<
         boost::multi_index::tag<i_face>,
-        boost::multi_index::member<FaceMetric,Ptr<Face>,&FaceMetric::m_face>
+        boost::multi_index::const_mem_fun<FaceMetric,Ptr<Face>,&FaceMetric::GetFace>
       >,
 
       // List of available faces ordered by (status, m_routingCost)
@@ -149,8 +204,8 @@ struct FaceMetricContainer
         boost::multi_index::tag<i_metric>,
         boost::multi_index::composite_key<
           FaceMetric,
-          boost::multi_index::member<FaceMetric,FaceMetric::Status,&FaceMetric::m_status>,
-          boost::multi_index::member<FaceMetric,int32_t,&FaceMetric::m_routingCost>
+          boost::multi_index::const_mem_fun<FaceMetric,FaceMetric::Status,&FaceMetric::GetStatus>,
+          boost::multi_index::const_mem_fun<FaceMetric,int32_t,&FaceMetric::GetRoutingCost>
         >
       >,
 
@@ -172,10 +227,10 @@ class Entry : public Object
 {
 public:
   typedef Entry base_type;
-  
+
 public:
   class NoFaces {}; ///< @brief Exception class for the case when FIB entry is not found
-  
+
   /**
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
@@ -185,7 +240,7 @@ public:
   , m_needsProbing (false)
   {
   }
-  
+
   /**
    * \brief Update status of FIB next hop
    * \param status Status to set on the FIB entry
@@ -204,7 +259,7 @@ public:
    */
   void
   SetRealDelayToProducer (Ptr<Face> face, Time delay);
-  
+
   /**
    * @brief Invalidate face
    *
@@ -218,7 +273,7 @@ public:
    */
   void
   UpdateFaceRtt (Ptr<Face> face, const Time &sample);
-  
+
   /**
    * \brief Get prefix for the FIB entry
    */

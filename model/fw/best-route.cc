@@ -58,11 +58,11 @@ BestRoute::GetTypeId (void)
     ;
   return tid;
 }
-    
+
 BestRoute::BestRoute ()
 {
 }
-    
+
 bool
 BestRoute::DoPropagateInterest (Ptr<Face> inFace,
                                 Ptr<const InterestHeader> header,
@@ -77,14 +77,14 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
     return true;
 
   int propagatedCount = 0;
-  
+
   BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())
     {
       NS_LOG_DEBUG ("Trying " << boost::cref(metricFace));
-      if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
+      if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
 
-      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
         {
           continue;
         }
