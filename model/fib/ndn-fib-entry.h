@@ -26,6 +26,7 @@
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-name-components.h"
 #include "ns3/ndn-limits.h"
+#include "ns3/traced-value.h"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/tag.hpp>
@@ -112,7 +113,7 @@ public:
   void
   SetStatus (Status status)
   {
-    m_status = status;
+    m_status.Set (status);
   }
 
   /**
@@ -151,13 +152,22 @@ public:
     m_realDelay = realDelay;
   }
 
+  /**
+   * @brief Get direct access to status trace
+   */
+  TracedValue<Status> &
+  GetStatusTrace ()
+  {
+    return m_status;
+  }
+
 private:
   friend std::ostream& operator<< (std::ostream& os, const FaceMetric &metric);
 
 private:
   Ptr<Face> m_face; ///< Face
 
-  Status m_status;		///< \brief Status of the next hop:
+  TracedValue<Status> m_status; ///< \brief Status of the next hop:
 				///<		- NDN_FIB_GREEN
 				///<		- NDN_FIB_YELLOW
 				///<		- NDN_FIB_RED

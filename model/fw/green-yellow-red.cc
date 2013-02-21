@@ -105,6 +105,19 @@ GreenYellowRed::WillSatisfyPendingInterest (Ptr<Face> inFace,
 }
 
 void
+GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+{
+  super::WillEraseTimedOutPendingInterest (pitEntry);
+
+  for (ndn::pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      pitEntry->GetFibEntry ()->UpdateStatus (face->m_face, fib::FaceMetric::NDN_FIB_YELLOW);
+    }
+}
+
+void
 GreenYellowRed::DidReceiveValidNack (Ptr<Face> inFace,
                                      uint32_t nackCode,
                                      Ptr<const InterestHeader> header,
