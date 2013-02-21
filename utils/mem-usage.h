@@ -21,11 +21,11 @@
 #ifndef MEM_USAGE_H
 #define MEM_USAGE_H
 
-#ifdef __linux__
-#include <proc/readproc.h>
-#include <unistd.h>
-// #include <sys/resource.h>
-#endif
+// #ifdef __linux__
+// #include <proc/readproc.h>
+// #include <unistd.h>
+// // #include <sys/resource.h>
+// #endif
 #ifdef __APPLE__
 #include <mach/task.h>
 #include <mach/mach_traps.h>
@@ -49,22 +49,22 @@ public:
   int64_t
   Get ()
   {
-#ifdef __linux__
-    struct proc_t usage;
-    look_up_our_self(&usage);
-    return usage.rss * getpagesize ();
-    //  struct rusage usage;
-    //
-    //  int ret = getrusage (RUSAGE_SELF, &usage);
-    //  if (ret < 0)
-    //    {
-    //      os << "NA";
-    //      return os;
-    //    }
-    //
-    //  os << (usage.ru_ixrss + usage.ru_idrss + usage.ru_isrss);
-    //  return os;
-#endif
+// #ifdef __linux__
+//     struct proc_t usage;
+//     look_up_our_self(&usage);
+//     return usage.rss * getpagesize ();
+//     //  struct rusage usage;
+//     //
+//     //  int ret = getrusage (RUSAGE_SELF, &usage);
+//     //  if (ret < 0)
+//     //    {
+//     //      os << "NA";
+//     //      return os;
+//     //    }
+//     //
+//     //  os << (usage.ru_ixrss + usage.ru_idrss + usage.ru_isrss);
+//     //  return os;
+// #endif
 #ifdef __APPLE__
     task_t task = MACH_PORT_NULL;
     struct task_basic_info t_info;
