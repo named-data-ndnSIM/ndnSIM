@@ -50,3 +50,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('ndn-simple-with-cs-lfu', ['ndnSIM'])
     obj.source = 'ndn-simple-with-cs-lfu.cc'
+
+    obj = bld.create_ns3_program('ndn-simple-with-pcap', ['ndnSIM'])
+    obj.source = 'ndn-simple-with-pcap.cc'

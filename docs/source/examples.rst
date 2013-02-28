@@ -46,7 +46,6 @@ simulation using the following command (in optimized mode nothing will be printe
 
      NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple
 
-
 .. _9-node-grid-example:
 
 9-node grid example
@@ -289,3 +288,23 @@ You can also run using visualizer module to verify that both bottleneck links ar
 
 :ref:`Custom applications`
 
+Simple scenario with pcap dump
+------------------------------
+
+The following example (``ndn-simple-with-pcap.cc``) demonstrates how to dump all simulated traffic
+in pcap-formatted data, which can be used for later analysis by conventional tools, like tcpdump and wireshark.
+
+.. literalinclude:: ../../examples/ndn-simple-with-pcap.cc
+   :language: c++
+   :linenos:
+   :lines: 20-
+   :emphasize-lines: 7-29,70-72
+
+If this code is placed into ``scratch/ndn-simple-with-pcap.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
+simulation using the following command (in optimized mode nothing will be printed out)::
+
+     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple-with-pcap
+
+This will generate ``ndn-simple-trace.pcap``, which can be fed to tcpdump::
+
+     tcpdump -r ndn-simple-trace.pcap
