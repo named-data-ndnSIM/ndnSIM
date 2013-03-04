@@ -47,6 +47,10 @@ protected:
                        Ptr<const InterestHeader> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
+
+  virtual void
+  WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry);
+
   virtual void
   DidReceiveValidNack (Ptr<Face> incomingFace,
                        uint32_t nackCode,

@@ -72,7 +72,7 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
   NS_ASSERT_MSG (m_pit != 0, "PIT should be aggregated with forwarding strategy");
 
   int propagatedCount = 0;
-  
+
   BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())
     {
       if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED ||
@@ -83,7 +83,7 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
         {
           continue;
         }
-      
+
       propagatedCount++;
       break; // propagate only one interest
     }
@@ -102,6 +102,21 @@ GreenYellowRed::WillSatisfyPendingInterest (Ptr<Face> inFace,
     }
 
   super::WillSatisfyPendingInterest (inFace, pitEntry);
+}
+
+void
+GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+{
+  NS_LOG_DEBUG ("WillEraseTimedOutPendingInterest for " << pitEntry->GetPrefix ());
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      NS_LOG_DEBUG ("Face: " << face->m_face);
+      pitEntry->GetFibEntry ()->UpdateStatus (face->m_face, fib::FaceMetric::NDN_FIB_YELLOW);
+    }
+
+  super::WillEraseTimedOutPendingInterest (pitEntry);
 }
 
 void
