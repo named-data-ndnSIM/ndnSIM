@@ -98,8 +98,18 @@ public:
   /**
    * @brief Calculate for every node shortest path trees and install routes to all prefix origins
    */
-  void
+  static void
   CalculateRoutes ();
+
+  /**
+   * @brief Calculate all possible next-hop independent alternative routes
+   *
+   * Refer to the implementation for more details.
+   *
+   * Note that this method is highly experimental and should be used with caution (very time consuming).
+   */
+  static void
+  CalculateAllPossibleRoutes ();
 
 private:
   void
