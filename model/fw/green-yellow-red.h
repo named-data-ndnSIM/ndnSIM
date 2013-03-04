@@ -57,7 +57,6 @@ protected:
                        Ptr<const InterestHeader> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
-
 private:
   typedef Nacks super;
 };

@@ -54,13 +54,13 @@ void
 FaceMetric::UpdateRtt (const Time &rttSample)
 {
   // const Time & this->m_rttSample
-  
+
   //update srtt and rttvar (RFC 2988)
   if (m_sRtt.IsZero ())
     {
       //first RTT measurement
       NS_ASSERT_MSG (m_rttVar.IsZero (), "SRTT is zero, but variation is not");
-      
+
       m_sRtt = rttSample;
       m_rttVar = Time (m_sRtt / 2.0);
     }
@@ -97,7 +97,7 @@ Entry::UpdateStatus (Ptr<Face> face, FaceMetric::Status status)
                  "Update status can be performed only on existing faces of CcxnFibEntry");
 
   m_faces.modify (record,
-                  (&ll::_1)->*&FaceMetric::m_status = status);
+                  ll::bind (&FaceMetric::SetStatus, ll::_1, status));
 
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
@@ -117,16 +117,16 @@ Entry::AddOrUpdateRoutingMetric (Ptr<Face> face, int32_t metric)
   else
   {
     // don't update metric to higher value
-    if (record->m_routingCost > metric || record->m_status == FaceMetric::NDN_FIB_RED)
+    if (record->GetRoutingCost () > metric || record->GetStatus () == FaceMetric::NDN_FIB_RED)
       {
         m_faces.modify (record,
-                        (&ll::_1)->*&FaceMetric::m_routingCost = metric);
+                        ll::bind (&FaceMetric::SetRoutingCost, ll::_1, metric));
 
         m_faces.modify (record,
-                        (&ll::_1)->*&FaceMetric::m_status = FaceMetric::NDN_FIB_YELLOW);
+                        ll::bind (&FaceMetric::SetStatus, ll::_1, FaceMetric::NDN_FIB_YELLOW));
       }
   }
-  
+
   // reordering random access index same way as by metric index
   m_faces.get<i_nth> ().rearrange (m_faces.get<i_metric> ().begin ());
 }
@@ -141,7 +141,7 @@ Entry::SetRealDelayToProducer (Ptr<Face> face, Time delay)
   if (record != m_faces.get<i_face> ().end ())
     {
       m_faces.modify (record,
-                      (&ll::_1)->*&FaceMetric::m_realDelay = delay);
+                      ll::bind (&FaceMetric::SetRealDelay, ll::_1, delay));
     }
 }
 
@@ -154,10 +154,10 @@ Entry::Invalidate ()
        face++)
     {
       m_faces.modify (face,
-                      (&ll::_1)->*&FaceMetric::m_routingCost = std::numeric_limits<uint16_t>::max ());
+                      ll::bind (&FaceMetric::SetRoutingCost, ll::_1, std::numeric_limits<uint16_t>::max ()));
 
       m_faces.modify (face,
-                      (&ll::_1)->*&FaceMetric::m_status = FaceMetric::NDN_FIB_RED);
+                      ll::bind (&FaceMetric::SetStatus, ll::_1, FaceMetric::NDN_FIB_RED));
     }
 }
 

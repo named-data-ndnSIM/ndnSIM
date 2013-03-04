@@ -5946,7 +5946,7 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::ndn::fib::FaceMetric::Status', 'status')])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_faces [variable]
-    cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::ndn::fib::FaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::fib::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::fib::FaceMetric::m_face ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::fib::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::ndn::fib::FaceMetric, boost::multi_index::member< ns3::ndn::fib::FaceMetric, ns3::ndn::fib::FaceMetric::Status, & ( ns3::ndn::fib::FaceMetric::m_status ) >, boost::multi_index::member< ns3::ndn::fib::FaceMetric, int, & ( ns3::ndn::fib::FaceMetric::m_routingCost ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::ndn::fib::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::fib::FaceMetric > >', is_const=False)
+    cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::ndn::fib::FaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::fib::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::fib::FaceMetric::GetFace (  ) const ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::fib::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::ndn::fib::FaceMetric, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, ns3::ndn::fib::FaceMetric::Status, & ( ns3::ndn::fib::FaceMetric::GetStatus (  ) const ) >, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, int, & ( ns3::ndn::fib::FaceMetric::GetRoutingCost (  ) const ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::ndn::fib::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::fib::FaceMetric > >', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_needsProbing [variable]
     cls.add_instance_attribute('m_needsProbing', 'bool', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_prefix [variable]
@@ -5972,22 +5972,37 @@ def register_Ns3NdnFibFaceMetric_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::Face >', 
                    [], 
                    is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::Time ns3::ndn::fib::FaceMetric::GetRealDelay() const [member function]
+    cls.add_method('GetRealDelay', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): int32_t ns3::ndn::fib::FaceMetric::GetRoutingCost() const [member function]
+    cls.add_method('GetRoutingCost', 
+                   'int32_t', 
+                   [], 
+                   is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::Status ns3::ndn::fib::FaceMetric::GetStatus() const [member function]
+    cls.add_method('GetStatus', 
+                   'ns3::ndn::fib::FaceMetric::Status', 
+                   [], 
+                   is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::FaceMetric::SetRealDelay(ns3::Time realDelay) [member function]
+    cls.add_method('SetRealDelay', 
+                   'void', 
+                   [param('ns3::Time', 'realDelay')])
+    ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::FaceMetric::SetRoutingCost(int32_t routingCost) [member function]
+    cls.add_method('SetRoutingCost', 
+                   'void', 
+                   [param('int32_t', 'routingCost')])
+    ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::FaceMetric::SetStatus(ns3::ndn::fib::FaceMetric::Status status) [member function]
+    cls.add_method('SetStatus', 
+                   'void', 
+                   [param('ns3::ndn::fib::FaceMetric::Status', 'status')])
     ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::FaceMetric::UpdateRtt(ns3::Time const & rttSample) [member function]
     cls.add_method('UpdateRtt', 
                    'void', 
                    [param('ns3::Time const &', 'rttSample')])
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_face [variable]
-    cls.add_instance_attribute('m_face', 'ns3::Ptr< ns3::ndn::Face >', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_realDelay [variable]
-    cls.add_instance_attribute('m_realDelay', 'ns3::Time', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_routingCost [variable]
-    cls.add_instance_attribute('m_routingCost', 'int32_t', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_rttVar [variable]
-    cls.add_instance_attribute('m_rttVar', 'ns3::Time', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_sRtt [variable]
-    cls.add_instance_attribute('m_sRtt', 'ns3::Time', is_const=False)
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::FaceMetric::m_status [variable]
-    cls.add_instance_attribute('m_status', 'ns3::ndn::fib::FaceMetric::Status', is_const=False)
     return
 
 def register_Ns3NdnFibFaceMetricContainer_methods(root_module, cls):

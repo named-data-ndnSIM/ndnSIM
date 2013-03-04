@@ -75,11 +75,11 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
 
   BOOST_FOREACH (const fib::FaceMetric &metricFace, pitEntry->GetFibEntry ()->m_faces.get<fib::i_metric> ())
     {
-      if (metricFace.m_status == fib::FaceMetric::NDN_FIB_RED ||
-          metricFace.m_status == fib::FaceMetric::NDN_FIB_YELLOW)
+      if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED ||
+          metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
-      if (!TrySendOutInterest (inFace, metricFace.m_face, header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
         {
           continue;
         }
@@ -108,11 +108,12 @@ void
 GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_DEBUG ("WillEraseTimedOutPendingInterest for " << pitEntry->GetPrefix ());
+
   for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
        face != pitEntry->GetOutgoing ().end ();
        face ++)
     {
-      NS_LOG_DEBUG ("Face: " << face->m_face);
+      // NS_LOG_DEBUG ("Face: " << face->m_face);
       pitEntry->GetFibEntry ()->UpdateStatus (face->m_face, fib::FaceMetric::NDN_FIB_YELLOW);
     }
 
