@@ -325,8 +325,6 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes ()
    * See http://www.boost.org/doc/libs/1_49_0/libs/graph/doc/table_of_contents.html for more details
    */
 
-  int counter = 0;
-
   BOOST_CONCEPT_ASSERT(( VertexListGraphConcept< NdnGlobalRouterGraph > ));
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< NdnGlobalRouterGraph > ));
 
