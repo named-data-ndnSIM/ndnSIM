@@ -135,7 +135,11 @@ int main (int argc, char**argv)
   topologyReader.SaveGraphviz (graph);
   if (buildGraphvizGraph)
     {
-      system (("neato -Tpdf \"" + graph + "\" > \"" + graph_pdf + "\"").c_str ());
+      int ret = system (("neato -Tpdf \"" + graph + "\" > \"" + graph_pdf + "\"").c_str ());
+      if (ret != 0)
+        {
+          std::cerr << "WARN: failed to build a graph for the topology. Check if `neato' command is installed (part of graphviz package)" << std::endl;
+        }
     }
 
   topologyReader.SaveTopology (output);
