@@ -33,6 +33,7 @@
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+#include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.h"
 
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>

@@ -128,6 +128,7 @@ def build(bld):
 
         # "utils/batches.h",
         "utils/ndn-limits.h",
+        "utils/ndn-rtt-estimator.h",
         # "utils/weights-path-stretch-tag.h",
 
         ]
