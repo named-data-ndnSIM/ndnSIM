@@ -131,6 +131,25 @@ void RttMeanDeviation::Gain (double g)
   m_gain = g;
 }
 
+void RttMeanDeviation::SentSeq (SequenceNumber32 seq, uint32_t size)
+{ 
+  NS_LOG_FUNCTION (this << seq << size);
+
+  RttHistory_t::iterator i;
+  for (i = m_history.begin (); i != m_history.end (); ++i)
+  {
+      if (seq == i->seq)
+      { // Found it
+          i->retx = true;
+          break;
+      }
+  }
+
+  // Note that a particular sequence has been sent
+  if (i == m_history.end())
+      m_history.push_back (RttHistory (seq, size, Simulator::Now () ));
+}
+
 Time RttMeanDeviation::AckSeq (SequenceNumber32 ackSeq)
 {
   NS_LOG_FUNCTION (this << ackSeq);
@@ -144,9 +163,11 @@ Time RttMeanDeviation::AckSeq (SequenceNumber32 ackSeq)
   {
       if (ackSeq == i->seq)
       { // Found it
-          m = Simulator::Now () - i->time;// Elapsed time
-          Measurement (m);                // Log the measurement
-          ResetMultiplier ();             // Reset multiplier on valid measurement
+          if (!i->retx) {
+              m = Simulator::Now () - i->time;// Elapsed time
+              Measurement (m);                // Log the measurement
+              ResetMultiplier ();             // Reset multiplier on valid measurement
+          }
           m_history.erase(i);
           break;
       }
