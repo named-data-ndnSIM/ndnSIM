@@ -4,7 +4,7 @@ FAQ
 Boost libraries
 ---------------
 
-.. note:: 
+.. note::
     **My ubuntu/redhat/freebsd have an old version of boost libraries.  How can I get the latest one?**
 
 .. _Installing boost libraries:
@@ -14,10 +14,10 @@ Installing boost libraries to ``/usr/local``
 
 .. role:: red
 
-.. note:: 
+.. note::
     **The following instructions are for those who want to install latest version of boost libraries** :red:`and has root access`.
 
-The following commands would install the latest version of boost libraries (at the time of writing, version 1.52) ot ``/usr/local``, assuming you have a root access to your machine. 
+The following commands would install the latest version of boost libraries (at the time of writing, version 1.53) ot ``/usr/local``, assuming you have a root access to your machine.
 If you don't have root access, please refer to section :ref:`Installing boost libraries to a non-privileged location`.
 
 .. note::
@@ -26,9 +26,9 @@ If you don't have root access, please refer to section :ref:`Installing boost li
 .. code-block:: bash
    :linenos:
 
-    wget http://downloads.sourceforge.net/project/boost/boost/1.52.0/boost_1_52_0.tar.bz2
-    tar jxf boost_1_52_0.tar.bz2
-    cd boost_1_52_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.53.0/boost_1_53_0.tar.bz2
+    tar jxf boost_1_53_0.tar.bz2
+    cd boost_1_53_0
     ./bootstrap.sh
     sudo ./b2 --prefix=/usr/local install
 
@@ -51,18 +51,18 @@ The following commands should allow compilation and run of NS-3 simulations with
 Installing boost libraries to a non-privileged location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. note:: 
+.. note::
     **Follow these general instructions if you are trying to installboost libraries to a non-privileged location** :red:`(i.e., you do not have root access),` **but something is going wrong.**
 
-Normally, to compile and install boost libraries in non-privileged mode, you would need to issue following commands (e.g., for boost version 1.52.0):
+Normally, to compile and install boost libraries in non-privileged mode, you would need to issue following commands (e.g., for boost version 1.53.0):
 
 .. code-block:: bash
    :linenos:
 
     export BOOSTDIR=/home/non-privileged-user/boost
-    wget http://downloads.sourceforge.net/project/boost/boost/1.52.0/boost_1_52_0.tar.bz2
-    tar jxf boost_1_52_0.tar.bz2
-    cd boost_1_52_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.53.0/boost_1_53_0.tar.bz2
+    tar jxf boost_1_53_0.tar.bz2
+    cd boost_1_53_0
     ./bootstrap.sh
     ./b2 --prefix=$BOOSTDIR install
 
@@ -119,7 +119,7 @@ Visualizer problems
         Waf: Entering directory `/ndnSIM/ns-3/build'
         Could not find a task generator for the name 'ns3-visualizer'..
 
-Something is wrong with your python bindings and python bindings dependencies. 
+Something is wrong with your python bindings and python bindings dependencies.
 Please follow the :ref:`requirements` section that lists what should be installed in order to run visualizer.
 
 Code questions
@@ -143,37 +143,37 @@ Here is an example of function to "fail" a point-to-point link between two NDN n
     {
       Ptr<ndn::L3Protocol> ndn1 = node1->GetObject<ndn::L3Protocol> ();
       Ptr<ndn::L3Protocol> ndn2 = node2->GetObject<ndn::L3Protocol> ();
-    
+
       // iterate over all faces to find the right one
       for (uint32_t faceId = 0; faceId < ndn1->GetNFaces (); faceId++)
         {
           Ptr<ndn::NetDeviceFace> ndFace = ndn1->GetFace (faceId)->GetObject<ndn::NetDeviceFace> ();
           if (ndFace == 0) continue;
-     
+
           Ptr<PointToPointNetDevice> nd1 = ndFace->GetNetDevice ()->GetObject<PointToPointNetDevice> ();
           if (nd1 == 0) continue;
-     
+
           Ptr<Channel> channel = nd1->GetChannel ();
           if (channel == 0) continue;
-     
+
           Ptr<PointToPointChannel> ppChannel = DynamicCast<PointToPointChannel> (channel);
-     
+
           Ptr<NetDevice> nd2 = ppChannel->GetDevice (0);
           if (nd2->GetNode () == node1)
             nd2 = ppChannel->GetDevice (1);
-     
+
           if (nd2->GetNode () == node2)
             {
               Ptr<ndn::Face> face1 = ndn1->GetFaceByNetDevice (nd1);
               Ptr<ndn::Face> face2 = ndn2->GetFaceByNetDevice (nd2);
-     
+
               face1->SetUp (false);
               face2->SetUp (false);
               break;
             }
         }
     }
-     
+
 
 General questions
 -----------------
