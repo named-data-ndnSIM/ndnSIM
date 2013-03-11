@@ -27,8 +27,7 @@
 #include "ns3/ndn-name-components.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
-//#include "ns3/internet-module.h"
-#include "ns3/rtt-estimator.h"
+#include "ns3/ndn-rtt-estimator.h"
 
 #include <set>
 #include <map>
