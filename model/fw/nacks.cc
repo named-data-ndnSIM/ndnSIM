@@ -27,6 +27,7 @@
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-content-store.h"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 
 #include "ns3/assert.h"
 #include "ns3/ptr.h"
@@ -118,6 +119,16 @@ Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
       Ptr<Packet> nack = Create<Packet> ();
       nack->AddHeader (*nackHeader);
 
+      FwHopCountTag hopCountTag;
+      if (origPacket->PeekPacketTag (hopCountTag))
+        {
+     	  nack->AddPacketTag (hopCountTag);
+        }
+      else
+        {
+          NS_LOG_DEBUG ("No FwHopCountTag tag associated with received duplicated Interest");
+        }
+
       inFace->Send (nack);
       m_outNacks (nackHeader, inFace);
     }
@@ -135,6 +146,16 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
       Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*header);
       nackHeader->SetNack (InterestHeader::NACK_GIVEUP_PIT);
       packet->AddHeader (*nackHeader);
+
+      FwHopCountTag hopCountTag;
+      if (origPacket->PeekPacketTag (hopCountTag))
+        {
+     	  packet->AddPacketTag (hopCountTag);
+        }
+      else
+        {
+          NS_LOG_DEBUG ("No FwHopCountTag tag associated with original Interest");
+        }
 
       BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
         {
@@ -185,6 +206,16 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
       Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
       nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
       nonNackInterest->AddHeader (*nonNackHeader);
+
+      FwHopCountTag hopCountTag;
+      if (origPacket->PeekPacketTag (hopCountTag))
+        {
+     	  nonNackInterest->AddPacketTag (hopCountTag);
+        }
+      else
+        {
+          NS_LOG_DEBUG ("No FwHopCountTag tag associated with received NACK");
+        }
 
       bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
       if (!propagated)
