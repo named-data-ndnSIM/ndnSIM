@@ -56,6 +56,28 @@ Packet-level trace helpers
 
         ...
 
+- :ndnsim:`L2Tracer`
+ 
+   This tracer is similar in spirit to :ndnsim:`ndn::L3RateTracer`, but it currently traces only packet drop on layer 2 (e.g.,
+   due to transmission queue overflow).
+
+   The following example enables tracing on all simulation nodes:
+
+    .. code-block:: c++
+
+        // necessary includes
+	#include <ns3/ndnSIM/utils/tracers/l2-rate-tracer.h>
+
+	...
+
+        // the following should be put just before calling Simulator::Run in the scenario
+
+        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > >
+            l2tracers = L2RateTracer::InstallAll ("drop-trace.txt", Seconds (0.5));
+
+        Simulator::Run ();
+
+        ...
 
 .. note::
 
@@ -135,6 +157,48 @@ For example, the following `R script <http://www.r-project.org/>`_ will build a 
     :linenos:
 
 For more information about R and ggplot2, please refer to `R language manual <http://cran.r-project.org/manuals.html>`_, `ggplot2 module manual <http://docs.ggplot2.org/current/>`_.
+
+.. _Example of packet drop tracer (L2Tracer):
+
+Example of packet drop tracer (L2Tracer)
+----------------------------------------
+
+This example (``ndn-tree-with-l2tracer.cc``) demonstrates basic usage of :ref:`trace classes`.
+
+In this scenario we will use a tree-like topology:
+
+.. image:: _static/topo-tree-25-node.png
+   :alt: 25-node tree topology
+
+The corresponding topology file (``topo-tree-25-node.txt``):
+
+.. literalinclude:: ../../examples/topologies/topo-tree-25-node.txt
+    :language: bash
+    :linenos:
+    :lines: 2-
+
+Example simulation (``ndn-tree-with-l2tracer.cc``) scenario that utilizes trace helpers:
+
+.. literalinclude:: ../../examples/ndn-tree-with-l2tracer.cc
+    :language: c++
+    :linenos:
+    :lines: 1-
+    :emphasize-lines: 7-8,19,135-139
+
+To run this scenario, use the following command::
+
+        ./waf --run=ndn-tree-with-l2tracer
+
+The successful run will create ``drop-trace.txt`` file in the current directly, which can be analyzed manually or used as input to some graph/stats packages.
+
+For example, the following `R script <http://www.r-project.org/>`_ will build a number of nice graphs:
+
+.. literalinclude:: ../../examples/graphs/drop-graph.R
+    :language: r
+    :linenos:
+
+.. image:: _static/l2-rate-tracer.png
+   :alt: Packet drop rates on routers
 
 .. _cs trace helper:
 

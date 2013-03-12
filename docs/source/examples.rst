@@ -308,3 +308,8 @@ simulation using the following command (in optimized mode nothing will be printe
 This will generate ``ndn-simple-trace.pcap``, which can be fed to tcpdump::
 
      tcpdump -r ndn-simple-trace.pcap
+
+25-node tree topology with L2Tracer
+-----------------------------------
+
+:ref:`Example of packet drop tracer (L2Tracer)`
