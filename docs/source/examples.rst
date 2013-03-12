@@ -46,7 +46,6 @@ simulation using the following command (in optimized mode nothing will be printe
 
      NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple
 
-
 .. _9-node-grid-example:
 
 9-node grid example
@@ -289,3 +288,7 @@ You can also run using visualizer module to verify that both bottleneck links ar
 
 :ref:`Custom applications`
 
+25-node tree topology with L2Tracer
+-----------------------------------
+
+:ref:`Example of packet drop tracer (L2Tracer)`
