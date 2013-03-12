@@ -90,6 +90,8 @@ def register_types(module):
     module.add_class('RandomVariable', import_from_module='ns.core')
     ## rng-seed-manager.h (module 'core'): ns3::RngSeedManager [class]
     module.add_class('RngSeedManager', import_from_module='ns.core')
+    ## sequence-number.h (module 'network'): ns3::SequenceNumber<unsigned int, int> [class]
+    module.add_class('SequenceNumber32', import_from_module='ns.network')
     ## random-variable.h (module 'core'): ns3::SequentialVariable [class]
     module.add_class('SequentialVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter> [class]
@@ -98,6 +100,8 @@ def register_types(module):
     module.add_class('Tag', import_from_module='ns.network', parent=root_module['ns3::ObjectBase'])
     ## tag-buffer.h (module 'network'): ns3::TagBuffer [class]
     module.add_class('TagBuffer', import_from_module='ns.network')
+    ## traced-value.h (module 'core'): ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status> [class]
+    module.add_class('TracedValue', template_parameters=['ns3::ndn::fib::FaceMetric::Status'])
     ## random-variable.h (module 'core'): ns3::TriangularVariable [class]
     module.add_class('TriangularVariable', import_from_module='ns.core', parent=root_module['ns3::RandomVariable'])
     ## type-id.h (module 'core'): ns3::TypeId [class]
@@ -278,6 +282,12 @@ def register_types(module):
     module.add_class('AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
     module.add_container('std::map< std::string, std::string >', ('std::string', 'std::string'), container_type='map')
     module.add_container('std::list< ns3::TopologyReader::Link >', 'ns3::TopologyReader::Link', container_type='list')
+    typehandlers.add_type_alias('ns3::SequenceNumber< short unsigned int, short int >', 'ns3::SequenceNumber16')
+    typehandlers.add_type_alias('ns3::SequenceNumber< short unsigned int, short int >*', 'ns3::SequenceNumber16*')
+    typehandlers.add_type_alias('ns3::SequenceNumber< short unsigned int, short int >&', 'ns3::SequenceNumber16&')
+    typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >', 'ns3::SequenceNumber32')
+    typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >*', 'ns3::SequenceNumber32*')
+    typehandlers.add_type_alias('ns3::SequenceNumber< unsigned int, int >&', 'ns3::SequenceNumber32&')
     typehandlers.add_type_alias('ns3::RngSeedManager', 'ns3::SeedManager')
     typehandlers.add_type_alias('ns3::RngSeedManager*', 'ns3::SeedManager*')
     typehandlers.add_type_alias('ns3::RngSeedManager&', 'ns3::SeedManager&')
@@ -364,6 +374,10 @@ def register_types_ns3_ndn(module):
     module.add_class('NetDeviceFace', parent=root_module['ns3::ndn::Face'])
     ## ndn-pit.h (module 'ndnSIM'): ns3::ndn::Pit [class]
     module.add_class('Pit', parent=root_module['ns3::Object'])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttEstimator [class]
+    module.add_class('RttEstimator', parent=root_module['ns3::Object'])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory [class]
+    module.add_class('RttHistory')
     ## ndn-stack-helper.h (module 'ndnSIM'): ns3::ndn::StackHelper [class]
     module.add_class('StackHelper')
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::UnknownHeaderException [class]
@@ -373,6 +387,9 @@ def register_types_ns3_ndn(module):
     module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
     module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
+    typehandlers.add_type_alias('std::deque< ns3::ndn::RttHistory, std::allocator< ns3::ndn::RttHistory > >', 'ns3::ndn::RttHistory_t')
+    typehandlers.add_type_alias('std::deque< ns3::ndn::RttHistory, std::allocator< ns3::ndn::RttHistory > >*', 'ns3::ndn::RttHistory_t*')
+    typehandlers.add_type_alias('std::deque< ns3::ndn::RttHistory, std::allocator< ns3::ndn::RttHistory > >&', 'ns3::ndn::RttHistory_t&')
     
     ## Register a nested module for the namespace cs
     
@@ -481,10 +498,12 @@ def register_methods(root_module):
     register_Ns3PacketTagListTagData_methods(root_module, root_module['ns3::PacketTagList::TagData'])
     register_Ns3RandomVariable_methods(root_module, root_module['ns3::RandomVariable'])
     register_Ns3RngSeedManager_methods(root_module, root_module['ns3::RngSeedManager'])
+    register_Ns3SequenceNumber32_methods(root_module, root_module['ns3::SequenceNumber32'])
     register_Ns3SequentialVariable_methods(root_module, root_module['ns3::SequentialVariable'])
     register_Ns3SimpleRefCount__Ns3Object_Ns3ObjectBase_Ns3ObjectDeleter_methods(root_module, root_module['ns3::SimpleRefCount< ns3::Object, ns3::ObjectBase, ns3::ObjectDeleter >'])
     register_Ns3Tag_methods(root_module, root_module['ns3::Tag'])
     register_Ns3TagBuffer_methods(root_module, root_module['ns3::TagBuffer'])
+    register_Ns3TracedValue__Ns3NdnFibFaceMetricStatus_methods(root_module, root_module['ns3::TracedValue< ns3::ndn::fib::FaceMetric::Status >'])
     register_Ns3TriangularVariable_methods(root_module, root_module['ns3::TriangularVariable'])
     register_Ns3TypeId_methods(root_module, root_module['ns3::TypeId'])
     register_Ns3TypeIdAttributeInformation_methods(root_module, root_module['ns3::TypeId::AttributeInformation'])
@@ -593,6 +612,8 @@ def register_methods(root_module):
     register_Ns3NdnNameValue_methods(root_module, root_module['ns3::ndn::NameValue'])
     register_Ns3NdnNetDeviceFace_methods(root_module, root_module['ns3::ndn::NetDeviceFace'])
     register_Ns3NdnPit_methods(root_module, root_module['ns3::ndn::Pit'])
+    register_Ns3NdnRttEstimator_methods(root_module, root_module['ns3::ndn::RttEstimator'])
+    register_Ns3NdnRttHistory_methods(root_module, root_module['ns3::ndn::RttHistory'])
     register_Ns3NdnStackHelper_methods(root_module, root_module['ns3::ndn::StackHelper'])
     register_Ns3NdnUnknownHeaderException_methods(root_module, root_module['ns3::ndn::UnknownHeaderException'])
     register_Ns3NdnAppFace_methods(root_module, root_module['ns3::ndn::AppFace'])
@@ -2052,6 +2073,31 @@ def register_Ns3RngSeedManager_methods(root_module, cls):
                    is_static=True)
     return
 
+def register_Ns3SequenceNumber32_methods(root_module, cls):
+    cls.add_binary_comparison_operator('!=')
+    cls.add_binary_numeric_operator('+', root_module['ns3::SequenceNumber32'], root_module['ns3::SequenceNumber32'], param('ns3::SequenceNumber< unsigned int, int > const &', 'right'))
+    cls.add_binary_numeric_operator('+', root_module['ns3::SequenceNumber32'], root_module['ns3::SequenceNumber32'], param('int', 'right'))
+    cls.add_inplace_numeric_operator('+=', param('int', 'right'))
+    cls.add_binary_numeric_operator('-', root_module['ns3::SequenceNumber32'], root_module['ns3::SequenceNumber32'], param('int', 'right'))
+    cls.add_inplace_numeric_operator('-=', param('int', 'right'))
+    cls.add_binary_comparison_operator('<')
+    cls.add_binary_comparison_operator('<=')
+    cls.add_binary_comparison_operator('==')
+    cls.add_binary_comparison_operator('>')
+    cls.add_binary_comparison_operator('>=')
+    ## sequence-number.h (module 'network'): ns3::SequenceNumber<unsigned int, int>::SequenceNumber() [constructor]
+    cls.add_constructor([])
+    ## sequence-number.h (module 'network'): ns3::SequenceNumber<unsigned int, int>::SequenceNumber(unsigned int value) [constructor]
+    cls.add_constructor([param('unsigned int', 'value')])
+    ## sequence-number.h (module 'network'): ns3::SequenceNumber<unsigned int, int>::SequenceNumber(ns3::SequenceNumber<unsigned int, int> const & value) [copy constructor]
+    cls.add_constructor([param('ns3::SequenceNumber< unsigned int, int > const &', 'value')])
+    ## sequence-number.h (module 'network'): unsigned int ns3::SequenceNumber<unsigned int, int>::GetValue() const [member function]
+    cls.add_method('GetValue', 
+                   'unsigned int', 
+                   [], 
+                   is_const=True)
+    return
+
 def register_Ns3SequentialVariable_methods(root_module, cls):
     ## random-variable.h (module 'core'): ns3::SequentialVariable::SequentialVariable(ns3::SequentialVariable const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::SequentialVariable const &', 'arg0')])
@@ -2166,6 +2212,40 @@ def register_Ns3TagBuffer_methods(root_module, cls):
     cls.add_method('WriteU8', 
                    'void', 
                    [param('uint8_t', 'v')])
+    return
+
+def register_Ns3TracedValue__Ns3NdnFibFaceMetricStatus_methods(root_module, cls):
+    ## traced-value.h (module 'core'): ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::TracedValue() [constructor]
+    cls.add_constructor([])
+    ## traced-value.h (module 'core'): ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::TracedValue(ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status> const & o) [copy constructor]
+    cls.add_constructor([param('ns3::TracedValue< ns3::ndn::fib::FaceMetric::Status > const &', 'o')])
+    ## traced-value.h (module 'core'): ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::TracedValue(ns3::ndn::fib::FaceMetric::Status const & v) [constructor]
+    cls.add_constructor([param('ns3::ndn::fib::FaceMetric::Status const &', 'v')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::Connect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Connect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::ConnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('ConnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::Disconnect(ns3::CallbackBase const & cb, std::basic_string<char,std::char_traits<char>,std::allocator<char> > path) [member function]
+    cls.add_method('Disconnect', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb'), param('std::string', 'path')])
+    ## traced-value.h (module 'core'): void ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::DisconnectWithoutContext(ns3::CallbackBase const & cb) [member function]
+    cls.add_method('DisconnectWithoutContext', 
+                   'void', 
+                   [param('ns3::CallbackBase const &', 'cb')])
+    ## traced-value.h (module 'core'): ns3::ndn::fib::FaceMetric::Status ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::Get() const [member function]
+    cls.add_method('Get', 
+                   'ns3::ndn::fib::FaceMetric::Status', 
+                   [], 
+                   is_const=True)
+    ## traced-value.h (module 'core'): void ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status>::Set(ns3::ndn::fib::FaceMetric::Status const & v) [member function]
+    cls.add_method('Set', 
+                   'void', 
+                   [param('ns3::ndn::fib::FaceMetric::Status const &', 'v')])
     return
 
 def register_Ns3TriangularVariable_methods(root_module, cls):
@@ -5218,10 +5298,16 @@ def register_Ns3NdnGlobalRoutingHelper_methods(root_module, cls):
     cls.add_method('AddOriginsForAll', 
                    'void', 
                    [])
-    ## ndn-global-routing-helper.h (module 'ndnSIM'): void ns3::ndn::GlobalRoutingHelper::CalculateRoutes() [member function]
+    ## ndn-global-routing-helper.h (module 'ndnSIM'): static void ns3::ndn::GlobalRoutingHelper::CalculateAllPossibleRoutes() [member function]
+    cls.add_method('CalculateAllPossibleRoutes', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    ## ndn-global-routing-helper.h (module 'ndnSIM'): static void ns3::ndn::GlobalRoutingHelper::CalculateRoutes() [member function]
     cls.add_method('CalculateRoutes', 
                    'void', 
-                   [])
+                   [], 
+                   is_static=True)
     ## ndn-global-routing-helper.h (module 'ndnSIM'): void ns3::ndn::GlobalRoutingHelper::Install(ns3::Ptr<ns3::Node> node) [member function]
     cls.add_method('Install', 
                    'void', 
@@ -5764,6 +5850,105 @@ def register_Ns3NdnPit_methods(root_module, cls):
                    is_pure_virtual=True, is_const=True, is_virtual=True)
     return
 
+def register_Ns3NdnRttEstimator_methods(root_module, cls):
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttEstimator::RttEstimator() [constructor]
+    cls.add_constructor([])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttEstimator::RttEstimator(ns3::ndn::RttEstimator const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::RttEstimator const &', 'arg0')])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Time ns3::ndn::RttEstimator::AckSeq(ns3::SequenceNumber32 ackSeq) [member function]
+    cls.add_method('AckSeq', 
+                   'ns3::Time', 
+                   [param('ns3::SequenceNumber32', 'ackSeq')], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::ClearSent() [member function]
+    cls.add_method('ClearSent', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::RttEstimator> ns3::ndn::RttEstimator::Copy() const [member function]
+    cls.add_method('Copy', 
+                   'ns3::Ptr< ns3::ndn::RttEstimator >', 
+                   [], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Time ns3::ndn::RttEstimator::GetCurrentEstimate() const [member function]
+    cls.add_method('GetCurrentEstimate', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Time ns3::ndn::RttEstimator::GetMaxRto() const [member function]
+    cls.add_method('GetMaxRto', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Time ns3::ndn::RttEstimator::GetMinRto() const [member function]
+    cls.add_method('GetMinRto', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::RttEstimator::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::IncreaseMultiplier() [member function]
+    cls.add_method('IncreaseMultiplier', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::Measurement(ns3::Time t) [member function]
+    cls.add_method('Measurement', 
+                   'void', 
+                   [param('ns3::Time', 't')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::Reset() [member function]
+    cls.add_method('Reset', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::ResetMultiplier() [member function]
+    cls.add_method('ResetMultiplier', 
+                   'void', 
+                   [], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::Time ns3::ndn::RttEstimator::RetransmitTimeout() [member function]
+    cls.add_method('RetransmitTimeout', 
+                   'ns3::Time', 
+                   [], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::SentSeq(ns3::SequenceNumber32 seq, uint32_t size) [member function]
+    cls.add_method('SentSeq', 
+                   'void', 
+                   [param('ns3::SequenceNumber32', 'seq'), param('uint32_t', 'size')], 
+                   is_virtual=True)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::SetCurrentEstimate(ns3::Time estimate) [member function]
+    cls.add_method('SetCurrentEstimate', 
+                   'void', 
+                   [param('ns3::Time', 'estimate')])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::SetMaxRto(ns3::Time maxRto) [member function]
+    cls.add_method('SetMaxRto', 
+                   'void', 
+                   [param('ns3::Time', 'maxRto')])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): void ns3::ndn::RttEstimator::SetMinRto(ns3::Time minRto) [member function]
+    cls.add_method('SetMinRto', 
+                   'void', 
+                   [param('ns3::Time', 'minRto')])
+    return
+
+def register_Ns3NdnRttHistory_methods(root_module, cls):
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::RttHistory(ns3::SequenceNumber32 s, uint32_t c, ns3::Time t) [constructor]
+    cls.add_constructor([param('ns3::SequenceNumber32', 's'), param('uint32_t', 'c'), param('ns3::Time', 't')])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::RttHistory(ns3::ndn::RttHistory const & h) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::RttHistory const &', 'h')])
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::count [variable]
+    cls.add_instance_attribute('count', 'uint32_t', is_const=False)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::retx [variable]
+    cls.add_instance_attribute('retx', 'bool', is_const=False)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::seq [variable]
+    cls.add_instance_attribute('seq', 'ns3::SequenceNumber32', is_const=False)
+    ## ndn-rtt-estimator.h (module 'ndnSIM'): ns3::ndn::RttHistory::time [variable]
+    cls.add_instance_attribute('time', 'ns3::Time', is_const=False)
+    return
+
 def register_Ns3NdnStackHelper_methods(root_module, cls):
     ## ndn-stack-helper.h (module 'ndnSIM'): ns3::ndn::StackHelper::StackHelper() [constructor]
     cls.add_constructor([])
@@ -5881,8 +6066,12 @@ def register_Ns3NdnAppFace_methods(root_module, cls):
 def register_Ns3NdnCsEntry_methods(root_module, cls):
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::cs::Entry::Entry(ns3::ndn::cs::Entry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::cs::Entry const &', 'arg0')])
-    ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::cs::Entry::Entry(ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> packet) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'packet')])
+    ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::cs::Entry::Entry(ns3::Ptr<ns3::ndn::ContentStore> cs, ns3::Ptr<ns3::ndn::ContentObjectHeader const> header, ns3::Ptr<const ns3::Packet> packet) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::ContentStore >', 'cs'), param('ns3::Ptr< ns3::ndn::ContentObjectHeader const >', 'header'), param('ns3::Ptr< ns3::Packet const >', 'packet')])
+    ## ndn-content-store.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::ContentStore> ns3::ndn::cs::Entry::GetContentStore() [member function]
+    cls.add_method('GetContentStore', 
+                   'ns3::Ptr< ns3::ndn::ContentStore >', 
+                   [])
     ## ndn-content-store.h (module 'ndnSIM'): ns3::Ptr<ns3::Packet> ns3::ndn::cs::Entry::GetFullyFormedNdnPacket() const [member function]
     cls.add_method('GetFullyFormedNdnPacket', 
                    'ns3::Ptr< ns3::Packet >', 
@@ -5987,6 +6176,10 @@ def register_Ns3NdnFibFaceMetric_methods(root_module, cls):
                    'ns3::ndn::fib::FaceMetric::Status', 
                    [], 
                    is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::TracedValue<ns3::ndn::fib::FaceMetric::Status> & ns3::ndn::fib::FaceMetric::GetStatusTrace() [member function]
+    cls.add_method('GetStatusTrace', 
+                   'ns3::TracedValue< ns3::ndn::fib::FaceMetric::Status > &', 
+                   [])
     ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::FaceMetric::SetRealDelay(ns3::Time realDelay) [member function]
     cls.add_method('SetRealDelay', 
                    'void', 

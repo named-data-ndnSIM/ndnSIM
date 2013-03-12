@@ -60,8 +60,9 @@ namespace cs {
 
 //////////////////////////////////////////////////////////////////////
 
-Entry::Entry (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
-  : m_header (header)
+Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+  : m_cs (cs)
+  , m_header (header)
   , m_packet (packet->Copy ())
 {
 }
@@ -94,6 +95,13 @@ Entry::GetPacket () const
 {
   return m_packet;
 }
+
+Ptr<ContentStore>
+Entry::GetContentStore ()
+{
+  return m_cs;
+}
+
 
 } // namespace cs
 } // namespace ndn

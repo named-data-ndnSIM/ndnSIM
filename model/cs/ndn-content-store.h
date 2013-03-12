@@ -38,6 +38,8 @@ class ContentObjectHeader;
 class InterestHeader;
 class NameComponents;
 
+class ContentStore;
+
 namespace cs {
 
 /**
@@ -63,7 +65,7 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  Entry (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
+  Entry (Ptr<ContentStore> cs, Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
 
   /**
    * \brief Get prefix of the stored entry
@@ -93,7 +95,14 @@ public:
   Ptr<Packet>
   GetFullyFormedNdnPacket () const;
 
+  /**
+   * @brief Get pointer to access store, to which this entry is added
+   */
+  Ptr<ContentStore>
+  GetContentStore ();
+
 private:
+  Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
   Ptr<const ContentObjectHeader> m_header; ///< \brief non-modifiable ContentObjectHeader
   Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
 };
@@ -123,7 +132,7 @@ public:
    */
   virtual
   ~ContentStore ();
-            
+
   /**
    * \brief Find corresponding CS entry for the given interest
    *
@@ -135,7 +144,7 @@ public:
    */
   virtual boost::tuple<Ptr<Packet>, Ptr<const ContentObjectHeader>, Ptr<const Packet> >
   Lookup (Ptr<const InterestHeader> interest) = 0;
-            
+
   /**
    * \brief Add a new content to the content store.
    *
@@ -155,7 +164,7 @@ public:
   //  */
   // virtual bool
   // Remove (Ptr<InterestHeader> header) = 0;
-  
+
   /**
    * \brief Print out content store entries
    */
@@ -190,17 +199,17 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
-  
+
   /**
    * @brief Static call to cheat python bindings
    */
   static inline Ptr<ContentStore>
   GetContentStore (Ptr<Object> node);
-  
+
 protected:
   TracedCallback<Ptr<const InterestHeader>,
                  Ptr<const ContentObjectHeader> > m_cacheHitsTrace; ///< @brief trace of cache hits
-    
+
   TracedCallback<Ptr<const InterestHeader> > m_cacheMissesTrace; ///< @brief trace of cache misses
 };
 

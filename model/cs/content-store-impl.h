@@ -44,8 +44,8 @@ public:
   typedef Entry base_type;
 
 public:
-  EntryImpl (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
-    : Entry (header, packet)
+  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+    : Entry (cs, header, packet)
     , item_ (0)
   {
   }
@@ -187,7 +187,7 @@ ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const 
 {
   NS_LOG_FUNCTION (this << header->GetName ());
 
-  Ptr< entry > newEntry = Create< entry > (header, packet);
+  Ptr< entry > newEntry = Create< entry > (this, header, packet);
   std::pair< typename super::iterator, bool > result = super::insert (header->GetName (), newEntry);
 
   if (result.first != super::end ())
