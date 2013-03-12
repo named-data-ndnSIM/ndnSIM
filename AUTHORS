@@ -1,6 +1,13 @@
-Alex Afanasyev <alexander.afanasyev@ucla.edu>
-Ilya Moiseenko <iliamo@ucla.edu>
-Lucas <lucas@cs.ucla.edu>
-Cheng Yi <yic@email.arizona.edu>
-Xiaoke Jiang <shock.jiang@gmail.com>
-Saran Tarnoi <sarantarnoi@gmail.com>
+The PRIMARY AUTHORS are (and/or have been):
+
+  Alex Afanasyev <alexander.afanasyev@ucla.edu>
+  Ilya Moiseenko <iliamo@ucla.edu>
+
+The following is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS,
+people who have reported bugs, submitted patches,and  implemented new features of ndnSIM:
+
+  Jiangzhe Wang (Lucas) <lucas@cs.ucla.edu>
+  Cheng Yi <yic@email.arizona.edu>
+  Xiaoke Jiang <shock.jiang@gmail.com>
+  Saran Tarnoi <sarantarnoi@gmail.com>
+  Hovaidi Ardestani Mohammad <mohammad.hovaidi.ardestani@aalto.fi>
