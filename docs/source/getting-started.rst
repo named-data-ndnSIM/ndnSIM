@@ -77,7 +77,7 @@ order to run `visualizer`_ module, the following should be installed:
 Downloading ndnSIM source
 -------------------------
 
-Download a custom branch of NS-3 that contains all necessary patches and more:
+Download a custom branch of NS-3 that contains all necessary patches, python binding generation library (optional), and clone actual ndnSIM code and place it in src/ folder:
 
 .. code-block:: bash
 
@@ -85,16 +85,19 @@ Download a custom branch of NS-3 that contains all necessary patches and more:
 	cd ndnSIM
 	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
 	git clone git://github.com/cawka/pybindgen.git pybindgen
-
-The first command is to create a directory, which will contain everything NS-3 related.  The bare minimum is just base NS-3 (the first clone above). The second clone gets a module necessary to build python bindings, which are necessary for the visualizer module.
-
-Finally, clone actual ndnSIM code and place it in src/ folder::
-
-.. code-block:: bash
-
 	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
 
 There are quite a few modification to the base NS-3 code that are necessary to run ndnSIM, and the code is periodically synchronized with the official developer branch.  Eventually, all the changes will be merged to the official branch, but for the time being, it is necessary to use the customized branch.
+
+If you have problems connecting to github, you can try to clone from google servers:
+
+.. code-block:: bash
+
+        mkdir ndnSIM
+        cd ndnSIM
+        git clone https://code.google.com/p/ndnsim.ns3-base/ ns-3
+        git clone https://code.google.com/p/ndnsim.pybindgen/ pybindgen
+        git clone https://code.google.com/p/ndnsim/ ns-3/src/ndnSIM
 
 Compiling and running ndnSIM
 ----------------------------
@@ -153,3 +156,59 @@ or:
    Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d optimized``) in order to run actual simulations.
 
 
+Simulating using ndnSIM
+-----------------------
+
+While it is possible to write simulations directly inside NS-3 (in ``scratch/`` folder) or ndnSIM (in ``examples/``), the recommended way is to write your simulation scenarios, as well as any custom extensions, separately from the NS-3 or ndnSIM core.
+
+For example, you can you can use the following template to write your extensions, simulation scenarios, and metric processing scripts: `<http://github.com/cawka/ndnSIM-scenario-template>`_:
+
+.. code-block:: bash
+
+	mkdir ndnSIM
+	cd ndnSIM
+	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+	git clone git://github.com/cawka/pybindgen.git pybindgen
+	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+
+        # Build and install NS-3 and ndnSIM
+        cd ns-3
+        ./waf configure -d optimized
+        ./waf
+
+        sudo ./waf install
+        cd ..
+
+        git clone git://github.com/cawka/ndnSIM-scenario-template.git scenario
+        cd scenario
+        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig 
+        export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+        ./waf configure
+
+        ./waf --run <scenario>
+
+For more detailed information, refer to `README file <https://github.com/cawka/ndnSIM-scenario-template/blob/master/README.md>`_.
+
+Examples of template-based simulations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. ndnSIM examples from `<http://ndnsim.net>`_ website and more: 
+
+- `<http://github.com/cawka/ndnSIM-examples>`_, or
+- `<http://code.google.com/p/ndnsim.ndnsim-examples/>`_
+
+2. Script scenarios and graph processing scripts for simulations used in "A Case for Stateful Forwarding Plane" paper by Yi et al. (`<http://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):  
+
+- `<http://github.com/cawka/ndnSIM-comcom-stateful-fw>`_, or
+- `<http://code.google.com/p/ndnsim.ndnsim-comcom/>`_
+
+3. Script scenarios and graph processing scripts for simulations used in "Rapid Traffic Information Dissemination Using Named Data" paper by Wang et al. (`<http://dx.doi.org/10.1145/2248361.2248365>`_): 
+
+- `<http://github.com/cawka/ndnSIM-nom-rapid-car2car>`_, or
+- `<http://code.google.com/p/ndnsim.ndnsim-nom-rapid/>`_
+
+- Rocketfuel-based topology generator for ndnSIM preferred format (randomly assigned link delays and bandwidth, based on estimated types of connections between nodes): 
+
+- `<http://github.com/cawka/ndnSIM-sample-topologies>`_, or
+- `<http://code.google.com/p/ndnsim.ndnsim-sample-topo/>`_
