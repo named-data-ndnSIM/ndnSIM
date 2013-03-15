@@ -31,9 +31,13 @@ class Packet;
 
 namespace ndn {
 
-class Interest;
 class Face;
+
+class Interest;
 class ContentObject;
+
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
 
 /**
  * @brief Base class for network-layer (incoming/outgoing Interests and Data) tracing of NDN stack

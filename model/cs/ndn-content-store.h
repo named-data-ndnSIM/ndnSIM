@@ -36,7 +36,12 @@ namespace ndn {
 
 class ContentObject;
 class Interest;
+
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
+
 class Name;
+typedef Name NameComponents;
 
 class ContentStore;
 

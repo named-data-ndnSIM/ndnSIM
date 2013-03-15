@@ -42,6 +42,9 @@ namespace ndn {
 class Interest;
 class ContentObject;
 
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
+
 namespace cs {
 
 struct Stats

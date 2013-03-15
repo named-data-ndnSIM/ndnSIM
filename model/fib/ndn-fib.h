@@ -30,6 +30,7 @@ namespace ns3 {
 namespace ndn {
 
 class Interest;
+typedef Interest InterestHeader;
 
 /**
  * \ingroup ndn

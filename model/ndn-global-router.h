@@ -37,6 +37,8 @@ class L3Protocol;
 class Face;
 class Name;
 
+typedef Name NameComponents;
+
 /**
  * @brief Class representing global router interface for ndnSIM
  */

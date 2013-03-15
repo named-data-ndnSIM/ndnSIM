@@ -30,6 +30,9 @@ namespace ndn {
 class Interest;
 class ContentObject;
 
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
+
 /**
  * \brief Helper class to decode ccnb formatted Ndn message
  */

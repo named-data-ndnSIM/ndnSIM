@@ -31,6 +31,7 @@ class Packet;
 namespace ndn {
 
 class Name;
+typedef Name NameComponents;
 
 /**
  * \ingroup ndn-helpers

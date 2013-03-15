@@ -42,6 +42,9 @@ class ForwardingStrategy;
 class Interest;
 class ContentObject;
 
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
+
 /**
  * \defgroup ndn ndnSIM: NDN simulation module
  *

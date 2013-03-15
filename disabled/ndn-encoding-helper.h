@@ -32,10 +32,14 @@ namespace ns3 {
 namespace ndn {
 
 class Name;
+typedef Name NameComponents;
 
 class Interest;
 class ContentObject;
-  
+
+typedef Interest InterestHeader;
+typedef ContentObject ContentObjectHeader;
+
 /**
  * \brief Helper to encode/decode ccnb formatted Ndn message
  */

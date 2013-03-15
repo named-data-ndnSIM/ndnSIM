@@ -39,13 +39,13 @@ namespace ndn {
 
 /**
  * ContentObject header
- * 
+ *
  * Only few important fields are actually implemented in the simulation
  *
  * ContentObject serializes/deserializes header up-to and including <Content> tags
  * Necessary closing tags should be added using ContentObjectTail
  *
- * Optimized and simplified formatting of Interest packets 
+ * Optimized and simplified formatting of Interest packets
  *
  *	ContentObject ::= Signature
  *                	  Name
@@ -54,7 +54,7 @@ namespace ndn {
  * This hacks are necessary to optimize memory use (i.e., virtual payload)
  *
  * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
- * 
+ *
  */
 class ContentObject : public SimpleRefCount<ContentObject,Header>
 {
@@ -98,7 +98,7 @@ public:
    */
   Time
   GetTimestamp () const;
-    
+
   /**
    * @brief Set freshness of the content object
    * @param freshness Freshness, 0s means infinity
@@ -111,23 +111,23 @@ public:
    */
   Time
   GetFreshness () const;
-  
+
   //////////////////////////////////////////////////////////////////
-  
+
   static TypeId GetTypeId (void); ///< @brief Get TypeId
   virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
   virtual void Print (std::ostream &os) const; ///< @brief Print out information about the Header into the stream
   virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Header
   virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Header
   virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
-  
+
 private:
   Ptr<Name> m_name;
   Time m_freshness;
   Time m_timestamp;
 };
 
-typedef ContentObject ContentObjectHeader; 
+typedef ContentObject ContentObjectHeader;
 
 /**
  * ContentObjectTail for compatibility with other packet formats
@@ -137,7 +137,7 @@ class ContentObjectTail : public Trailer
 public:
   ContentObjectTail ();
   //////////////////////////////////////////////////////////////////
-  
+
   static TypeId GetTypeId (void); ///< @brief Get TypeId
   virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
   virtual void Print (std::ostream &os) const; ///< @brief Print out information about Tail into the stream
@@ -149,7 +149,7 @@ public:
 
 /**
  * @ingroup ndn-exceptions
- * @brief Class for ContentObject parsing exception 
+ * @brief Class for ContentObject parsing exception
  */
 class ContentObjectException {};
 

@@ -41,6 +41,7 @@ namespace ns3 {
 namespace ndn {
 
 class Name;
+typedef Name NameComponents;
 
 namespace fib {
 
