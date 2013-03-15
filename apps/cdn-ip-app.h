@@ -73,7 +73,7 @@ public:
   SetProducers(std::string prefixes);
 
 
-  void
+  vector<NameComponents>::size_type
   ChangeProducer();
 
   std::string

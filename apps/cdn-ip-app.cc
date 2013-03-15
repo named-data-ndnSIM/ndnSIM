@@ -100,6 +100,7 @@ CDNIPApp::AddProducers(NameComponents producer){
 		}
 		if (ix == m_Producers.size()) {
 			m_Producers.push_back(producer);
+			m_interestName = producer;
 			sent.push_back(0);
 			received.push_back(0);
             NS_LOG_LOGIC("add Data provider "<<producer);
@@ -172,7 +173,7 @@ CDNIPApp::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
 	Consumer::OnContentObject (contentObject, payload);
 }
 
-void
+vector<NameComponents>::size_type
 CDNIPApp::ChangeProducer(){
 	vector<NameComponents>::size_type ix = 0;
 	vector<NameComponents>::size_type cur = 0;
@@ -202,13 +203,12 @@ CDNIPApp::ChangeProducer(){
 
 	if (m_interestName == m_Producers[cur]) {
 		NS_LOG_INFO("= Hold Data Producer. datasource.size= "<<m_Producers.size());
-		return;
-	}
-	else {
+	}else {
 		NS_LOG_INFO("! Change Data Producer to "<<cur);
 		m_interestName = m_Producers[cur];
 	}
 
+	return cur;
 }
 
 vector<NameComponents>::size_type
@@ -222,11 +222,12 @@ CDNIPApp::pickIndex(NameComponents name) {
 		}
 
 		if (ix == m_Producers.size()) {
-			NS_LOG_ERROR("can not find the data producer: name="<<name);
-			return -1;
+			ix = ChangeProducer();
+			NS_LOG_ERROR("index for producer: "<<name<<" can not find in Providers. change it to "<<ix);
+			return ix;
 
 		} else{
-			NS_LOG_LOGIC("index for producer"<<name<<" is "<<ix);
+			NS_LOG_LOGIC("index for producer: "<<name<<" is "<<ix);
 			return ix;
 		}
 
@@ -238,6 +239,13 @@ CDNIPApp::SendPacket() {
 	  if (!m_active) return;
 
 	  NS_LOG_FUNCTION_NOARGS ();
+
+
+	  // add by Shock
+	  vector<NameComponents>::size_type t =   CDNIPApp::pickIndex(m_interestName); //if not in, will change to in
+	  sent[t] += 1;
+	  NS_LOG_LOGIC("additon after: sent["<<t<<"]="<<sent[t]);
+
 
 	  uint32_t seq=std::numeric_limits<uint32_t>::max (); //invalid
 
@@ -281,7 +289,9 @@ CDNIPApp::SendPacket() {
 
 	  // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
 
-	  //
+
+
+
 	  Ptr<NameComponents> nameWithSequence = Create<NameComponents> (m_interestName);
 	  (*nameWithSequence) (seq);
 	  //
@@ -300,10 +310,6 @@ CDNIPApp::SendPacket() {
 
 
 
-	  // add by Shock
-	  vector<NameComponents>::size_type t =   CDNIPApp::pickIndex(m_interestName);
-	  sent[t] += 1;
-	  NS_LOG_LOGIC("additon after: sent["<<t<<"]="<<sent[t]);
 
 
 
