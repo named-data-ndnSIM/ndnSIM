@@ -125,7 +125,7 @@ CcnxAggregateL3Tracer::Print (std::ostream &os) const
 
 void
 CcnxAggregateL3Tracer::OutInterests  (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace>)
+                                      Ptr<const CcnxInterest> header, Ptr<const CcnxFace>)
 {
   m_packets.m_outInterests++;
   m_bytes.m_outInterests += header->GetSerializedSize ();
@@ -133,7 +133,7 @@ CcnxAggregateL3Tracer::OutInterests  (std::string context,
 
 void
 CcnxAggregateL3Tracer::InInterests   (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace>)
+                                      Ptr<const CcnxInterest> header, Ptr<const CcnxFace>)
 {
   m_packets.m_inInterests++;
   m_bytes.m_inInterests += header->GetSerializedSize ();
@@ -141,7 +141,7 @@ CcnxAggregateL3Tracer::InInterests   (std::string context,
 
 void
 CcnxAggregateL3Tracer::DropInterests (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ccnx::DropReason, Ptr<const CcnxFace>)
+                                      Ptr<const CcnxInterest> header, Ccnx::DropReason, Ptr<const CcnxFace>)
 {
   m_packets.m_dropInterests++;
   m_bytes.m_dropInterests += header->GetSerializedSize ();
@@ -149,7 +149,7 @@ CcnxAggregateL3Tracer::DropInterests (std::string context,
 
 void
 CcnxAggregateL3Tracer::OutNacks  (std::string context,
-                                  Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace>)
+                                  Ptr<const CcnxInterest> header, Ptr<const CcnxFace>)
 {
   m_packets.m_outNacks++;
   m_bytes.m_outNacks += header->GetSerializedSize ();
@@ -157,7 +157,7 @@ CcnxAggregateL3Tracer::OutNacks  (std::string context,
 
 void
 CcnxAggregateL3Tracer::InNacks   (std::string context,
-                                  Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace>)
+                                  Ptr<const CcnxInterest> header, Ptr<const CcnxFace>)
 {
   m_packets.m_inNacks++;
   m_bytes.m_inNacks += header->GetSerializedSize ();
@@ -165,7 +165,7 @@ CcnxAggregateL3Tracer::InNacks   (std::string context,
 
 void
 CcnxAggregateL3Tracer::DropNacks (std::string context,
-                                  Ptr<const CcnxInterestHeader> header, Ccnx::DropReason, Ptr<const CcnxFace>)
+                                  Ptr<const CcnxInterest> header, Ccnx::DropReason, Ptr<const CcnxFace>)
 {
   m_packets.m_dropNacks++;
   m_bytes.m_dropNacks += header->GetSerializedSize ();
@@ -173,7 +173,7 @@ CcnxAggregateL3Tracer::DropNacks (std::string context,
 
 void
 CcnxAggregateL3Tracer::OutData  (std::string context,
-                                 Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                                  bool fromCache, Ptr<const CcnxFace>)
 {
   m_packets.m_outData++;
@@ -182,7 +182,7 @@ CcnxAggregateL3Tracer::OutData  (std::string context,
 
 void
 CcnxAggregateL3Tracer::InData   (std::string context,
-                                 Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                                  Ptr<const CcnxFace>)
 {
   m_packets.m_inData++;
@@ -191,7 +191,7 @@ CcnxAggregateL3Tracer::InData   (std::string context,
 
 void
 CcnxAggregateL3Tracer::DropData (std::string context,
-                                 Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                                  Ccnx::DropReason, Ptr<const CcnxFace>)
 {
   m_packets.m_dropData++;

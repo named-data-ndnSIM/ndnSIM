@@ -185,7 +185,7 @@ L3RateTracer::Print (std::ostream &os) const
 
 void
 L3RateTracer::OutInterests  (std::string context,
-                             Ptr<const InterestHeader> header, Ptr<const Face> face)
+                             Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outInterests ++;
   m_stats[face].get<1> ().m_outInterests += header->GetSerializedSize ();
@@ -193,7 +193,7 @@ L3RateTracer::OutInterests  (std::string context,
 
 void
 L3RateTracer::InInterests   (std::string context,
-                             Ptr<const InterestHeader> header, Ptr<const Face> face)
+                             Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inInterests ++;
   m_stats[face].get<1> ().m_inInterests += header->GetSerializedSize ();
@@ -201,7 +201,7 @@ L3RateTracer::InInterests   (std::string context,
 
 void
 L3RateTracer::DropInterests (std::string context,
-                             Ptr<const InterestHeader> header, Ptr<const Face> face)
+                             Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropInterests ++;
   m_stats[face].get<1> ().m_dropInterests += header->GetSerializedSize ();
@@ -209,7 +209,7 @@ L3RateTracer::DropInterests (std::string context,
 
 void
 L3RateTracer::OutNacks  (std::string context,
-                         Ptr<const InterestHeader> header, Ptr<const Face> face)
+                         Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outNacks ++;
   m_stats[face].get<1> ().m_outNacks += header->GetSerializedSize ();
@@ -217,7 +217,7 @@ L3RateTracer::OutNacks  (std::string context,
 
 void
 L3RateTracer::InNacks   (std::string context,
-                         Ptr<const InterestHeader> header, Ptr<const Face> face)
+                         Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inNacks ++;
   m_stats[face].get<1> ().m_inNacks += header->GetSerializedSize ();
@@ -225,7 +225,7 @@ L3RateTracer::InNacks   (std::string context,
 
 void
 L3RateTracer::DropNacks (std::string context,
-                         Ptr<const InterestHeader> header, Ptr<const Face> face)
+                         Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropNacks ++;
   m_stats[face].get<1> ().m_dropNacks += header->GetSerializedSize ();
@@ -233,7 +233,7 @@ L3RateTracer::DropNacks (std::string context,
 
 void
 L3RateTracer::OutData  (std::string context,
-                        Ptr<const ContentObjectHeader> header, Ptr<const Packet> payload,
+                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -242,7 +242,7 @@ L3RateTracer::OutData  (std::string context,
 
 void
 L3RateTracer::InData   (std::string context,
-                        Ptr<const ContentObjectHeader> header, Ptr<const Packet> payload,
+                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -251,7 +251,7 @@ L3RateTracer::InData   (std::string context,
 
 void
 L3RateTracer::DropData (std::string context,
-                        Ptr<const ContentObjectHeader> header, Ptr<const Packet> payload,
+                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

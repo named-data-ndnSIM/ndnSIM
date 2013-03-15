@@ -137,14 +137,14 @@ ConsumerCbr::GetRandomize () const
 ///////////////////////////////////////////////////
 
 // void
-// Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+// Consumer::OnContentObject (const Ptr<const ContentObject> &contentObject,
 //                                const Ptr<const Packet> &payload)
 // {
 //   Consumer::OnContentObject (contentObject, payload); // tracing inside
 // }
 
 // void
-// Consumer::OnNack (const Ptr<const InterestHeader> &interest)
+// Consumer::OnNack (const Ptr<const Interest> &interest)
 // {
 //   Consumer::OnNack (interest); // tracing inside
 // }

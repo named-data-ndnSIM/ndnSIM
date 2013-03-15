@@ -44,7 +44,7 @@ public:
   typedef Entry base_type;
 
 public:
-  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObject> header, Ptr<const Packet> packet)
     : Entry (cs, header, packet)
     , item_ (0)
   {
@@ -86,14 +86,14 @@ public:
 
   // from ContentStore
 
-  virtual inline boost::tuple<Ptr<Packet>, Ptr<const ContentObjectHeader>, Ptr<const Packet> >
-  Lookup (Ptr<const InterestHeader> interest);
+  virtual inline boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+  Lookup (Ptr<const Interest> interest);
 
   virtual inline bool
-  Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
+  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
 
   // virtual bool
-  // Remove (Ptr<InterestHeader> header);
+  // Remove (Ptr<Interest> header);
 
   virtual inline void
   Print (std::ostream &os) const;
@@ -156,8 +156,8 @@ ContentStoreImpl< Policy >::GetTypeId ()
 }
 
 template<class Policy>
-boost::tuple<Ptr<Packet>, Ptr<const ContentObjectHeader>, Ptr<const Packet> >
-ContentStoreImpl<Policy>::Lookup (Ptr<const InterestHeader> interest)
+boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
 
@@ -177,13 +177,13 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const InterestHeader> interest)
     {
       // NS_LOG_DEBUG ("cache miss for " << interest->GetName ());
       this->m_cacheMissesTrace (interest);
-      return boost::tuple<Ptr<Packet>, Ptr<ContentObjectHeader>, Ptr<Packet> > (0, 0, 0);
+      return boost::tuple<Ptr<Packet>, Ptr<ContentObject>, Ptr<Packet> > (0, 0, 0);
     }
 }
 
 template<class Policy>
 bool
-ContentStoreImpl<Policy>::Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+ContentStoreImpl<Policy>::Add (Ptr<const ContentObject> header, Ptr<const Packet> packet)
 {
   NS_LOG_FUNCTION (this << header->GetName ());
 

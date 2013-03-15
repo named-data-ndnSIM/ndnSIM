@@ -54,11 +54,11 @@ public:
 
   // (overridden from ndn::App) Callback that will be called when Interest arrives
   virtual void
-  OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packet> origPacket);
+  OnInterest (const Ptr<const ndn::Interest> &interest, Ptr<Packet> origPacket);
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnContentObject (const Ptr<const ndn::ContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ndn::ContentObject> &contentObject,
                    Ptr<Packet> payload);
 
 private:

@@ -261,7 +261,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
         case HeaderHelper::INTEREST_NDNSIM:
           {
             s_interestCounter ++;
-            Ptr<InterestHeader> header = Create<InterestHeader> ();
+            Ptr<Interest> header = Create<Interest> ();
 
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);
@@ -277,7 +277,7 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
         case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
             s_dataCounter ++;
-            Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+            Ptr<ContentObject> header = Create<ContentObject> ();
 
             static ContentObjectTail contentObjectTrailer; //there is no data in this object
 

@@ -108,7 +108,7 @@ Producer::StopApplication ()
 
 
 void
-Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPacket)
+Producer::OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> origPacket)
 {
   App::OnInterest (interest, origPacket); // tracing inside
 
@@ -117,7 +117,7 @@ Producer::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> ori
   if (!m_active) return;
     
   static ContentObjectTail tail;
-  Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+  Ptr<ContentObject> header = Create<ContentObject> ();
   header->SetName (Create<Name> (interest->GetName ()));
   header->SetFreshness (m_freshness);
 

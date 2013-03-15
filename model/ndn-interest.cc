@@ -24,26 +24,26 @@
 #include "ns3/unused.h"
 #include "ns3/packet.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.InterestHeader");
+NS_LOG_COMPONENT_DEFINE ("ndn.Interest");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (InterestHeader);
+NS_OBJECT_ENSURE_REGISTERED (Interest);
 
 TypeId
-InterestHeader::GetTypeId (void)
+Interest::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::InterestHeader")
+  static TypeId tid = TypeId ("ns3::ndn::Interest")
     .SetGroupName ("Ndn")
     .SetParent<Header> ()
-    .AddConstructor<InterestHeader> ()
+    .AddConstructor<Interest> ()
     ;
   return tid;
 }
   
 
-InterestHeader::InterestHeader ()
+Interest::Interest ()
   : m_name ()
   , m_scope (0xFF)
   , m_interestLifetime (Seconds (0))
@@ -52,7 +52,7 @@ InterestHeader::InterestHeader ()
 {
 }
 
-InterestHeader::InterestHeader (const InterestHeader &interest)
+Interest::Interest (const Interest &interest)
   : m_name                (Create<Name> (interest.GetName ()))
   , m_scope               (interest.m_scope)
   , m_interestLifetime    (interest.m_interestLifetime)
@@ -61,84 +61,84 @@ InterestHeader::InterestHeader (const InterestHeader &interest)
 {
 }
 
-Ptr<InterestHeader>
-InterestHeader::GetInterest (Ptr<Packet> packet)
+Ptr<Interest>
+Interest::GetInterest (Ptr<Packet> packet)
 {
-  Ptr<InterestHeader> interest = Create<InterestHeader> ();
+  Ptr<Interest> interest = Create<Interest> ();
   packet->RemoveHeader (*interest);
 
   return interest;
 }
 
 void
-InterestHeader::SetName (Ptr<Name> name)
+Interest::SetName (Ptr<Name> name)
 {
   m_name = name;
 }
 
 const Name&
-InterestHeader::GetName () const
+Interest::GetName () const
 {
-  if (m_name==0) throw InterestHeaderException();
+  if (m_name==0) throw InterestException();
   return *m_name;
 }
 
 Ptr<const Name>
-InterestHeader::GetNamePtr () const
+Interest::GetNamePtr () const
 {
   return m_name;
 }
 
 void
-InterestHeader::SetScope (int8_t scope)
+Interest::SetScope (int8_t scope)
 {
   m_scope = scope;
 }
 
 int8_t
-InterestHeader::GetScope () const
+Interest::GetScope () const
 {
   return m_scope;
 }
 
 void
-InterestHeader::SetInterestLifetime (Time lifetime)
+Interest::SetInterestLifetime (Time lifetime)
 {
   m_interestLifetime = lifetime;
 }
 
 Time
-InterestHeader::GetInterestLifetime () const
+Interest::GetInterestLifetime () const
 {
   return m_interestLifetime;
 }
 
 void
-InterestHeader::SetNonce (uint32_t nonce)
+Interest::SetNonce (uint32_t nonce)
 {
   m_nonce = nonce;
 }
 
 uint32_t
-InterestHeader::GetNonce () const
+Interest::GetNonce () const
 {
   return m_nonce;
 }
 
 void
-InterestHeader::SetNack (uint8_t nackType)
+Interest::SetNack (uint8_t nackType)
 {
   m_nackType = nackType;
 }
 
 uint8_t
-InterestHeader::GetNack () const
+Interest::GetNack () const
 {
   return m_nackType;
 }
 
 uint32_t
-InterestHeader::GetSerializedSize (void) const
+Interest::GetSerializedSize (void) const
 {
   size_t size = 2 + (1 + 4 + 2 + 1 + (m_name->GetSerializedSize ()) + (2 + 0) + (2 + 0));
   NS_LOG_INFO ("Serialize size = " << size);
@@ -147,7 +147,7 @@ InterestHeader::GetSerializedSize (void) const
 }
     
 void
-InterestHeader::Serialize (Buffer::Iterator start) const
+Interest::Serialize (Buffer::Iterator start) const
 {
   start.WriteU8 (0x80); // version
   start.WriteU8 (0x00); // packet type
@@ -170,15 +170,15 @@ InterestHeader::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-InterestHeader::Deserialize (Buffer::Iterator start)
+Interest::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   
   if (i.ReadU8 () != 0x80)
-    throw new InterestHeaderException ();
+    throw new InterestException ();
 
   if (i.ReadU8 () != 0x00)
-    throw new InterestHeaderException ();
+    throw new InterestException ();
 
   m_nonce = i.ReadU32 ();
   m_scope = i.ReadU8 ();
@@ -199,13 +199,13 @@ InterestHeader::Deserialize (Buffer::Iterator start)
 }
 
 TypeId
-InterestHeader::GetInstanceTypeId (void) const
+Interest::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
   
 void
-InterestHeader::Print (std::ostream &os) const
+Interest::Print (std::ostream &os) const
 {
   os << "I: " << GetName ();
   

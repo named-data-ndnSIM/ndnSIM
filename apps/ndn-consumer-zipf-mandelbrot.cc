@@ -178,7 +178,7 @@ ConsumerZipfMandelbrot::SendPacket() {
   (*nameWithSequence) (seq);
   //
 
-  InterestHeader interestHeader;
+  Interest interestHeader;
   interestHeader.SetNonce (m_rand.GetValue ());
   interestHeader.SetName  (nameWithSequence);
 

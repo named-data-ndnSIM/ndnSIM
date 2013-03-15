@@ -47,23 +47,23 @@ public:
 
   virtual void
   OutInterests (std::string context,
-                Ptr<const CcnxInterestHeader>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
+                Ptr<const CcnxInterest>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
 
   virtual void
   InInterests  (std::string context,
-                Ptr<const CcnxInterestHeader>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
+                Ptr<const CcnxInterest>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
 
   virtual void
   InNacks (std::string context,
-           Ptr<const CcnxInterestHeader>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
+           Ptr<const CcnxInterest>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
 
   virtual void
   OutData (std::string context,
-           Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
+           Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
   
   virtual void
   InData  (std::string context,
-           Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
+           Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>) = 0;
 
 protected:
   std::string m_app;

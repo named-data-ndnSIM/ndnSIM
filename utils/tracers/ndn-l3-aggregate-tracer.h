@@ -83,39 +83,39 @@ protected:
 
   virtual void
   OutInterests  (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>);
+                 Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
   InInterests   (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>);
+                 Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
   DropInterests (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>);
+                 Ptr<const Interest>, Ptr<const Face>);
   
   virtual void
   OutNacks  (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>);
+             Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
   InNacks   (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>);
+             Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
   DropNacks (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>);
+             Ptr<const Interest>, Ptr<const Face>);
   
   virtual void
   OutData  (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
+            Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
 
   virtual void
   InData   (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, Ptr<const Face>);
+            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
   virtual void
   DropData (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, Ptr<const Face>);
+            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
 protected:
   void

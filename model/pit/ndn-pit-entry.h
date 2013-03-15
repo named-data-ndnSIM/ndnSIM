@@ -106,7 +106,7 @@ public:
    * \param offsetTime Relative time to the current moment, representing PIT entry lifetime
    * \param fibEntry A FIB entry associated with the PIT entry
    */
-  Entry (Pit &container, Ptr<const InterestHeader> header, Ptr<fib::Entry> fibEntry);
+  Entry (Pit &container, Ptr<const Interest> header, Ptr<fib::Entry> fibEntry);
 
   /**
    * @brief Virtual destructor
@@ -289,9 +289,9 @@ public:
   RemoveFwTag ();
 
   /**
-   * @brief Get InterestHeader (if several interests are received, then nonce is from the first Interest)
+   * @brief Get Interest (if several interests are received, then nonce is from the first Interest)
    */
-  Ptr<const InterestHeader>
+  Ptr<const Interest>
   GetInterest () const;
 
 private:
@@ -300,7 +300,7 @@ private:
 protected:
   Pit &m_container; ///< @brief Reference to the container (to rearrange indexes, if necessary)
 
-  Ptr<const InterestHeader> m_interest; ///< \brief Interest of the PIT entry (if several interests are received, then nonce is from the first Interest)
+  Ptr<const Interest> m_interest; ///< \brief Interest of the PIT entry (if several interests are received, then nonce is from the first Interest)
   Ptr<fib::Entry> m_fibEntry;     ///< \brief FIB entry related to this prefix
 
   nonce_container m_seenNonces;  ///< \brief map of nonces that were seen for this prefix

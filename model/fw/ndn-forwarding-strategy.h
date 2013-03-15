@@ -30,8 +30,8 @@ namespace ns3 {
 namespace ndn {
 
 class Face;
-class InterestHeader;
-class ContentObjectHeader;
+class Interest;
+class ContentObject;
 class Pit;
 namespace pit { class Entry; }
 class FibFaceMetric;
@@ -70,7 +70,7 @@ public:
    */
   virtual void
   OnInterest (Ptr<Face> face,
-              Ptr<const InterestHeader> header,
+              Ptr<const Interest> header,
               Ptr<const Packet> origPacket);
 
   /**
@@ -84,7 +84,7 @@ public:
    */
   virtual void
   OnData (Ptr<Face> face,
-          Ptr<const ContentObjectHeader> header,
+          Ptr<const ContentObject> header,
           Ptr<Packet> payload,
           Ptr<const Packet> origPacket);
 
@@ -144,7 +144,7 @@ protected:
    */
   virtual void
   DidCreatePitEntry (Ptr<Face> inFace,
-                     Ptr<const InterestHeader> header,
+                     Ptr<const Interest> header,
                      Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
 
@@ -160,7 +160,7 @@ protected:
    */
   virtual void
   FailedToCreatePitEntry (Ptr<Face> inFace,
-                          Ptr<const InterestHeader> header,
+                          Ptr<const Interest> header,
                           Ptr<const Packet> origPacket);
 
   /**
@@ -177,7 +177,7 @@ protected:
    */
   virtual void
   DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                               Ptr<const InterestHeader> header,
+                               Ptr<const Interest> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
@@ -195,7 +195,7 @@ protected:
    */
   virtual void
   DidSuppressSimilarInterest (Ptr<Face> inFace,
-                              Ptr<const InterestHeader> header,
+                              Ptr<const Interest> header,
                               Ptr<const Packet> origPacket,
                               Ptr<pit::Entry> pitEntry);
 
@@ -213,7 +213,7 @@ protected:
    */
   virtual void
   DidForwardSimilarInterest (Ptr<Face> inFace,
-                             Ptr<const InterestHeader> header,
+                             Ptr<const Interest> header,
                              Ptr<const Packet> origPacket,
                              Ptr<pit::Entry> pitEntry);
 
@@ -232,7 +232,7 @@ protected:
    */
   virtual void
   DidExhaustForwardingOptions (Ptr<Face> inFace,
-                               Ptr<const InterestHeader> header,
+                               Ptr<const Interest> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
@@ -252,7 +252,7 @@ protected:
    */
   virtual bool
   DetectRetransmittedInterest (Ptr<Face> inFace,
-                               Ptr<const InterestHeader> header,
+                               Ptr<const Interest> header,
                                Ptr<const Packet> origPacket,
                                Ptr<pit::Entry> pitEntry);
 
@@ -281,7 +281,7 @@ protected:
    */
   virtual void
   SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
-                          Ptr<const ContentObjectHeader> header,
+                          Ptr<const ContentObject> header,
                           Ptr<const Packet> payload,
                           Ptr<const Packet> origPacket,
                           Ptr<pit::Entry> pitEntry);
@@ -299,7 +299,7 @@ protected:
   virtual void
   DidSendOutData (Ptr<Face> inFace,
                   Ptr<Face> outFace,
-                  Ptr<const ContentObjectHeader> header,
+                  Ptr<const ContentObject> header,
                   Ptr<const Packet> payload,
                   Ptr<const Packet> origPacket,
                   Ptr<pit::Entry> pitEntry);
@@ -315,7 +315,7 @@ protected:
    */
   virtual void
   DidReceiveSolicitedData (Ptr<Face> inFace,
-                           Ptr<const ContentObjectHeader> header,
+                           Ptr<const ContentObject> header,
                            Ptr<const Packet> payload,
                            Ptr<const Packet> origPacket,
                            bool didCreateCacheEntry);
@@ -334,7 +334,7 @@ protected:
    */
   virtual void
   DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                             Ptr<const ContentObjectHeader> header,
+                             Ptr<const ContentObject> header,
                              Ptr<const Packet> payload,
                              Ptr<const Packet> origPacket,
                              bool didCreateCacheEntry);
@@ -354,7 +354,7 @@ protected:
    */
   virtual bool
   ShouldSuppressIncomingInterest (Ptr<Face> inFace,
-                                  Ptr<const InterestHeader> header,
+                                  Ptr<const Interest> header,
                                   Ptr<const Packet> origPacket,
                                   Ptr<pit::Entry> pitEntry);
 
@@ -377,7 +377,7 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
+                      Ptr<const Interest> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
@@ -397,7 +397,7 @@ protected:
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
+                      Ptr<const Interest> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
@@ -413,7 +413,7 @@ protected:
   virtual void
   DidSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
+                      Ptr<const Interest> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 
@@ -432,7 +432,7 @@ protected:
    */
   virtual void
   PropagateInterest (Ptr<Face> inFace,
-                     Ptr<const InterestHeader> header,
+                     Ptr<const Interest> header,
                      Ptr<const Packet> origPacket,
                      Ptr<pit::Entry> pitEntry);
 
@@ -457,7 +457,7 @@ protected:
    */
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<const InterestHeader> header,
+                       Ptr<const Interest> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry) = 0;
 
@@ -474,27 +474,27 @@ protected:
   bool m_cacheUnsolicitedData;
   bool m_detectRetransmissions;
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_outInterests; ///< @brief Transmitted interests trace
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_inInterests; ///< @brief trace of incoming Interests
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_dropInterests; ///< @brief trace of dropped Interests
 
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 
-  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                  bool /*from cache*/,
                  Ptr<const Face> > m_outData; ///< @brief trace of outgoing Data
 
-  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                  Ptr<const Face> > m_inData; ///< @brief trace of incoming Data
 
-  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                   Ptr<const Face> > m_dropData;  ///< @brief trace of dropped Data
 };
 

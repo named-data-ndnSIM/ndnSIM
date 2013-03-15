@@ -33,8 +33,8 @@ namespace ndn {
 
 class Name;
 
-class InterestHeader;
-class ContentObjectHeader;
+class Interest;
+class ContentObject;
   
 /**
  * \brief Helper to encode/decode ccnb formatted Ndn message
@@ -43,26 +43,26 @@ class EncodingHelper
 {
 public:
   /**
-   * \brief Serialize NdnInterestHeader to Buffer::Iterator
-   * @param start Buffer to store serialized NdnInterestHeader
-   * @param interest Pointer to NdnInterestHeader to be serialized 
-   * @return length of serialized NdnInterestHeader
+   * \brief Serialize NdnInterest to Buffer::Iterator
+   * @param start Buffer to store serialized NdnInterest
+   * @param interest Pointer to NdnInterest to be serialized 
+   * @return length of serialized NdnInterest
    */
   static size_t
-  Serialize (Buffer::Iterator start, const InterestHeader &interest);
+  Serialize (Buffer::Iterator start, const Interest &interest);
 
   /**
-   * \brief Compute the size of serialized NdnInterestHeader
-   * @param interest Pointer to NdnInterestHeader
+   * \brief Compute the size of serialized NdnInterest
+   * @param interest Pointer to NdnInterest
    * @return length 
    */
   static size_t
-  GetSerializedSize (const InterestHeader &interest);
+  GetSerializedSize (const Interest &interest);
   
 public:
   /**
    * @brief Append CCNB block header
-   * @param start Buffer to store serialized NdnInterestHeader
+   * @param start Buffer to store serialized NdnInterest
    * @param value dictionary id of the block header
    * @param block_type Type of CCNB block
    *
@@ -81,7 +81,7 @@ public:
 
   /**
    * @brief Add number in CCNB encoding
-   * @param start Buffer to store serialized NdnInterestHeader
+   * @param start Buffer to store serialized NdnInterest
    * @param number Number to be written
    *
    * @returns written length
@@ -99,7 +99,7 @@ public:
 
   /**
    * @brief Append CCNB closer tag (estimated size is 1)
-   * @param start Buffer to store serialized InterestHeader
+   * @param start Buffer to store serialized Interest
    *
    * @returns written length
    */
@@ -108,7 +108,7 @@ public:
 
   /**
    * @brief Append Name in CCNB encoding
-   * @param start Buffer to store serialized InterestHeader
+   * @param start Buffer to store serialized Interest
    * @param name constant reference to Name object
    *
    * @returns written length

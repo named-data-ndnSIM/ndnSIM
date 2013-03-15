@@ -118,7 +118,7 @@ namespace ndn {
  **/
 
 /**
-  * @brief NDN InterestHeader and routines to serialize/deserialize
+  * @brief NDN Interest and routines to serialize/deserialize
   *
   * Simplifications:
   * - Name:  binary name components are not supported
@@ -129,7 +129,7 @@ namespace ndn {
   * - InterestLifetime: ?
   * - Nonce: 32 bit random integer.  If value is 0, will not be serialized
   **/
-class InterestHeader : public SimpleRefCount<InterestHeader, Header>
+class Interest : public SimpleRefCount<Interest, Header>
 {
 public:
   /**
@@ -137,12 +137,12 @@ public:
    *
    * Creates a null header
    **/
-  InterestHeader ();
+  Interest ();
 
   /**
    * @brief Copy constructor
    */
-  InterestHeader (const InterestHeader &interest);
+  Interest (const Interest &interest);
 
   /**
    * \brief Set interest name
@@ -391,7 +391,7 @@ public:
   /**
    * @brief Cheat for python bindings
    */
-  static Ptr<InterestHeader>
+  static Ptr<Interest>
   GetInterest (Ptr<Packet> packet);
   
 private:
@@ -411,7 +411,7 @@ private:
  * @ingroup ndn-exceptions
  * @brief Class for Interest parsing exception 
  */
-class InterestHeaderException {};
+class InterestException {};
 
 } // namespace ndn
 } // namespace ns3

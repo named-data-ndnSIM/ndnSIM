@@ -43,46 +43,46 @@ public:
   // from super
   virtual void
   OnInterest (Ptr<Face> face,
-              Ptr<const InterestHeader> header,
+              Ptr<const Interest> header,
               Ptr<const Packet> origPacket);
 
 protected:
   // from super
   virtual void
   DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                               Ptr<const InterestHeader> header,
+                               Ptr<const Interest> header,
                                Ptr<const Packet> packet,
                                Ptr<pit::Entry> pitEntry);
 
   // from super
   virtual void
   DidExhaustForwardingOptions (Ptr<Face> inFace,
-                               Ptr<const InterestHeader> header,
+                               Ptr<const Interest> header,
                                Ptr<const Packet> packet,
                                Ptr<pit::Entry> pitEntry);
 
   virtual void
   OnNack (Ptr<Face> inFace,
-          Ptr<const InterestHeader> header,
+          Ptr<const Interest> header,
           Ptr<const Packet> origPacket);
 
   virtual void
   DidReceiveValidNack (Ptr<Face> inFace,
                        uint32_t nackCode,
-                       Ptr<const InterestHeader> header,
+                       Ptr<const Interest> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
   
 protected:  
   bool m_nacksEnabled;
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_outNacks; ///< @brief trace of outgoing NACKs
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_inNacks; ///< @brief trace of incoming NACKs
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<const Face> > m_dropNacks; ///< @brief trace of dropped NACKs
 };
 

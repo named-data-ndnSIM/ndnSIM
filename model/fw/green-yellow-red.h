@@ -44,7 +44,7 @@ protected:
 
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<const InterestHeader> header,
+                       Ptr<const Interest> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 
@@ -54,7 +54,7 @@ protected:
   virtual void
   DidReceiveValidNack (Ptr<Face> incomingFace,
                        uint32_t nackCode,
-                       Ptr<const InterestHeader> header,
+                       Ptr<const Interest> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 private:

@@ -81,7 +81,7 @@ HeaderHelper::GetName (Ptr<const Packet> p)
         {
         case HeaderHelper::INTEREST_NDNSIM:
           {
-            Ptr<InterestHeader> header = Create<InterestHeader> ();
+            Ptr<Interest> header = Create<Interest> ();
 
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);
@@ -92,7 +92,7 @@ HeaderHelper::GetName (Ptr<const Packet> p)
           }
         case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
-            Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+            Ptr<ContentObject> header = Create<ContentObject> ();
 
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);

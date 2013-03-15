@@ -202,7 +202,7 @@ Consumer::SendPacket ()
   (*nameWithSequence) (seq);
   //
 
-  InterestHeader interestHeader;
+  Interest interestHeader;
   interestHeader.SetNonce               (m_rand.GetValue ());
   interestHeader.SetName                (nameWithSequence);
   interestHeader.SetInterestLifetime    (m_interestLifeTime);
@@ -242,7 +242,7 @@ Consumer::SendPacket ()
 
 
 void
-Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+Consumer::OnContentObject (const Ptr<const ContentObject> &contentObject,
                                Ptr<Packet> payload)
 {
   if (!m_active) return;
@@ -286,7 +286,7 @@ Consumer::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
 }
 
 void
-Consumer::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPacket)
+Consumer::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> origPacket)
 {
   if (!m_active) return;
 

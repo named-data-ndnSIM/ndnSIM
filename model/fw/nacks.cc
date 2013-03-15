@@ -75,7 +75,7 @@ Nacks::GetTypeId (void)
 
 void
 Nacks::OnInterest (Ptr<Face> inFace,
-                   Ptr<const InterestHeader> header,
+                   Ptr<const Interest> header,
                    Ptr<const Packet> origPacket)
 {
   if (header->GetNack () > 0)
@@ -86,7 +86,7 @@ Nacks::OnInterest (Ptr<Face> inFace,
 
 void
 Nacks::OnNack (Ptr<Face> inFace,
-               Ptr<const InterestHeader> header,
+               Ptr<const Interest> header,
                Ptr<const Packet> origPacket)
 {
   // NS_LOG_FUNCTION (inFace << header->GetName ());
@@ -105,7 +105,7 @@ Nacks::OnNack (Ptr<Face> inFace,
 
 void
 Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Interest> header,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
@@ -114,8 +114,8 @@ Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
   if (m_nacksEnabled)
     {
       NS_LOG_DEBUG ("Sending NACK_LOOP");
-      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*header);
-      nackHeader->SetNack (InterestHeader::NACK_LOOP);
+      Ptr<Interest> nackHeader = Create<Interest> (*header);
+      nackHeader->SetNack (Interest::NACK_LOOP);
       Ptr<Packet> nack = Create<Packet> ();
       nack->AddHeader (*nackHeader);
 
@@ -136,15 +136,15 @@ Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
 
 void
 Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
-                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Interest> header,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
   if (m_nacksEnabled)
     {
       Ptr<Packet> packet = Create<Packet> ();
-      Ptr<InterestHeader> nackHeader = Create<InterestHeader> (*header);
-      nackHeader->SetNack (InterestHeader::NACK_GIVEUP_PIT);
+      Ptr<Interest> nackHeader = Create<Interest> (*header);
+      nackHeader->SetNack (Interest::NACK_GIVEUP_PIT);
       packet->AddHeader (*nackHeader);
 
       FwHopCountTag hopCountTag;
@@ -174,7 +174,7 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 void
 Nacks::DidReceiveValidNack (Ptr<Face> inFace,
                             uint32_t nackCode,
-                            Ptr<const InterestHeader> header,
+                            Ptr<const Interest> header,
                             Ptr<const Packet> origPacket,
                             Ptr<pit::Entry> pitEntry)
 {
@@ -182,14 +182,14 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
 
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
-  if (nackCode == InterestHeader::NACK_GIVEUP_PIT)
+  if (nackCode == Interest::NACK_GIVEUP_PIT)
     {
       pitEntry->RemoveIncoming (inFace);
     }
 
-  if (nackCode == InterestHeader::NACK_LOOP ||
-      nackCode == InterestHeader::NACK_CONGESTION ||
-      nackCode == InterestHeader::NACK_GIVEUP_PIT)
+  if (nackCode == Interest::NACK_LOOP ||
+      nackCode == Interest::NACK_CONGESTION ||
+      nackCode == Interest::NACK_GIVEUP_PIT)
     {
       pitEntry->SetWaitingInVain (inFace);
 
@@ -203,8 +203,8 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
         }
 
       Ptr<Packet> nonNackInterest = Create<Packet> ();
-      Ptr<InterestHeader> nonNackHeader = Create<InterestHeader> (*header);
-      nonNackHeader->SetNack (InterestHeader::NORMAL_INTEREST);
+      Ptr<Interest> nonNackHeader = Create<Interest> (*header);
+      nonNackHeader->SetNack (Interest::NORMAL_INTEREST);
       nonNackInterest->AddHeader (*nonNackHeader);
 
       FwHopCountTag hopCountTag;

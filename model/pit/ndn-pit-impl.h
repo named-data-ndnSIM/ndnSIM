@@ -75,13 +75,13 @@ public:
 
   // inherited from Pit
   virtual Ptr<Entry>
-  Lookup (const ContentObjectHeader &header);
+  Lookup (const ContentObject &header);
 
   virtual Ptr<Entry>
-  Lookup (const InterestHeader &header);
+  Lookup (const Interest &header);
 
   virtual Ptr<Entry>
-  Create (Ptr<const InterestHeader> header);
+  Create (Ptr<const Interest> header);
 
   virtual void
   MarkErased (Ptr<Entry> entry);

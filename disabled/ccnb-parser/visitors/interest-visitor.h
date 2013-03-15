@@ -29,11 +29,11 @@ namespace CcnbParser {
 
 /**
  * \ingroup ccnx-ccnb
- * \brief Visitor that fills fields in CcnxInterestHeader
+ * \brief Visitor that fills fields in CcnxInterest
  *
  * Usage example:
  * \code
- *   Ptr<CcnxInterestHeader> header = Create<CcnxInterestHeader> ();
+ *   Ptr<CcnxInterest> header = Create<CcnxInterest> ();
  *   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
  *   InterestVisitor visitor;
  *   root->accept (visitor, *header); 
@@ -42,7 +42,7 @@ namespace CcnbParser {
 class InterestVisitor : public VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterestHeader* */);
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxInterest* */);
 };
 
 } // namespace CcnbParser

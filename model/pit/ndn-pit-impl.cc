@@ -182,7 +182,7 @@ PitImpl<Policy>::CleanExpired ()
 
 template<class Policy>
 Ptr<Entry>
-PitImpl<Policy>::Lookup (const ContentObjectHeader &header)
+PitImpl<Policy>::Lookup (const ContentObject &header)
 {
   /// @todo use predicate to search with exclude filters
   typename super::iterator item = super::longest_prefix_match_if (header.GetName (), EntryIsNotEmpty ());
@@ -195,7 +195,7 @@ PitImpl<Policy>::Lookup (const ContentObjectHeader &header)
 
 template<class Policy>
 Ptr<Entry>
-PitImpl<Policy>::Lookup (const InterestHeader &header)
+PitImpl<Policy>::Lookup (const Interest &header)
 {
   // NS_LOG_FUNCTION (header.GetName ());
   NS_ASSERT_MSG (m_fib != 0, "FIB should be set");
@@ -213,7 +213,7 @@ PitImpl<Policy>::Lookup (const InterestHeader &header)
 
 template<class Policy>
 Ptr<Entry>
-PitImpl<Policy>::Create (Ptr<const InterestHeader> header)
+PitImpl<Policy>::Create (Ptr<const Interest> header)
 {
   NS_LOG_DEBUG (header->GetName ());
   Ptr<fib::Entry> fibEntry = m_fib->LongestPrefixMatch (*header);

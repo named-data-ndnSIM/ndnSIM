@@ -40,7 +40,7 @@ class Packet;
 namespace ndn {
 
 /**
-  * @brief NDN InterestHeader and routines to serialize/deserialize
+  * @brief NDN Interest and routines to serialize/deserialize
   *
   * Optimized and simplified formatting of Interest packets 
   *
@@ -256,13 +256,13 @@ private:
   uint8_t  m_nackType;           ///< Negative Acknowledgement type
 };
 
-class InterestHeader : public Interest { };
+typedef Interest InterestHeader;
 
 /**
  * @ingroup ndn-exceptions
  * @brief Class for Interest parsing exception 
  */
-class InterestHeaderException {};
+class InterestException {};
 
 } // namespace ndn
 } // namespace ns3

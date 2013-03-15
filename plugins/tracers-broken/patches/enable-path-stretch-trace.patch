@@ -11,7 +11,7 @@ index 1ddc0b1..ac60412 100644
  
  #include <boost/ref.hpp>
  #include <boost/lexical_cast.hpp>
-@@ -288,14 +288,14 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObjectHeader> &content
+@@ -288,14 +288,14 @@ CcnxConsumer::OnContentObject (const Ptr<const CcnxContentObject> &content
  
    m_rtt->AckSeq (SequenceNumber32 (seq));
  

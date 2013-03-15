@@ -44,13 +44,13 @@ public:
 
   // From App
   // virtual void
-  // OnInterest (const Ptr<const InterestHeader> &interest);
+  // OnInterest (const Ptr<const Interest> &interest);
 
   // virtual void
-  // OnNack (const Ptr<const InterestHeader> &interest);
+  // OnNack (const Ptr<const Interest> &interest);
 
   // virtual void
-  // OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+  // OnContentObject (const Ptr<const ContentObject> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
   // virtual void

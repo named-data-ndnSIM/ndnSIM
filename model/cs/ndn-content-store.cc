@@ -60,7 +60,7 @@ namespace cs {
 
 //////////////////////////////////////////////////////////////////////
 
-Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> header, Ptr<const Packet> packet)
   : m_cs (cs)
   , m_header (header)
   , m_packet (packet->Copy ())
@@ -84,7 +84,7 @@ Entry::GetName () const
   return m_header->GetName ();
 }
 
-Ptr<const ContentObjectHeader>
+Ptr<const ContentObject>
 Entry::GetHeader () const
 {
   return m_header;

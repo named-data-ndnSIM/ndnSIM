@@ -137,7 +137,7 @@ CcnxRateL3Tracer::Print (std::ostream &os) const
 
 void
 CcnxRateL3Tracer::OutInterests  (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace> face)
+                                      Ptr<const CcnxInterest> header, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_outInterests ++;
   m_stats[face].get<1> ().m_outInterests += header->GetSerializedSize ();
@@ -145,7 +145,7 @@ CcnxRateL3Tracer::OutInterests  (std::string context,
 
 void
 CcnxRateL3Tracer::InInterests   (std::string context,
-                                 Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace> face)
+                                 Ptr<const CcnxInterest> header, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_inInterests ++;
   m_stats[face].get<1> ().m_inInterests += header->GetSerializedSize ();
@@ -153,7 +153,7 @@ CcnxRateL3Tracer::InInterests   (std::string context,
 
 void
 CcnxRateL3Tracer::DropInterests (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ccnx::DropReason, Ptr<const CcnxFace> face)
+                                      Ptr<const CcnxInterest> header, Ccnx::DropReason, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_dropInterests ++;
   m_stats[face].get<1> ().m_dropInterests += header->GetSerializedSize ();
@@ -161,7 +161,7 @@ CcnxRateL3Tracer::DropInterests (std::string context,
 
 void
 CcnxRateL3Tracer::OutNacks  (std::string context,
-                                  Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace> face)
+                                  Ptr<const CcnxInterest> header, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_outNacks ++;
   m_stats[face].get<1> ().m_outNacks += header->GetSerializedSize ();
@@ -169,7 +169,7 @@ CcnxRateL3Tracer::OutNacks  (std::string context,
 
 void
 CcnxRateL3Tracer::InNacks   (std::string context,
-                                  Ptr<const CcnxInterestHeader> header, Ptr<const CcnxFace> face)
+                                  Ptr<const CcnxInterest> header, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_inNacks ++;
   m_stats[face].get<1> ().m_inNacks += header->GetSerializedSize ();
@@ -177,7 +177,7 @@ CcnxRateL3Tracer::InNacks   (std::string context,
 
 void
 CcnxRateL3Tracer::DropNacks (std::string context,
-                             Ptr<const CcnxInterestHeader> header, Ccnx::DropReason, Ptr<const CcnxFace> face)
+                             Ptr<const CcnxInterest> header, Ccnx::DropReason, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_dropNacks ++;
   m_stats[face].get<1> ().m_dropNacks += header->GetSerializedSize ();
@@ -185,7 +185,7 @@ CcnxRateL3Tracer::DropNacks (std::string context,
 
 void
 CcnxRateL3Tracer::OutData  (std::string context,
-                            Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                             bool fromCache, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -194,7 +194,7 @@ CcnxRateL3Tracer::OutData  (std::string context,
 
 void
 CcnxRateL3Tracer::InData   (std::string context,
-                            Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                             Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -203,7 +203,7 @@ CcnxRateL3Tracer::InData   (std::string context,
 
 void
 CcnxRateL3Tracer::DropData (std::string context,
-                            Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                             Ccnx::DropReason, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

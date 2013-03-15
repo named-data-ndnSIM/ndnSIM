@@ -101,21 +101,21 @@ App::GetId () const
 }
 
 void
-App::OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet)
+App::OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedInterests (interest, this, m_face);
 }
 
 void
-App::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet)
+App::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedNacks (interest, this, m_face);
 }
 
 void
-App::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+App::OnContentObject (const Ptr<const ContentObject> &contentObject,
                           Ptr<Packet> payload)
 {
   NS_LOG_FUNCTION (this << contentObject << payload);

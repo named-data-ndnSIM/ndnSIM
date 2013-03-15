@@ -47,40 +47,40 @@ public:
   
   virtual void
   OutInterests  (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>) = 0;
+                 Ptr<const CcnxInterest>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InInterests   (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>) = 0;
+                 Ptr<const CcnxInterest>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   DropInterests (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
+                 Ptr<const CcnxInterest>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
   
   virtual void
   OutNacks  (std::string context,
-             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>) = 0;
+             Ptr<const CcnxInterest>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InNacks   (std::string context,
-             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>) = 0;
+             Ptr<const CcnxInterest>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   DropNacks (std::string context,
-             Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
+             Ptr<const CcnxInterest>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
 
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
 
 protected:
   std::string m_node;

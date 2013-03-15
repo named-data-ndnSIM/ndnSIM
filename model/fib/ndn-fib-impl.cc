@@ -72,7 +72,7 @@ FibImpl::DoDispose (void)
 
 
 Ptr<Entry>
-FibImpl::LongestPrefixMatch (const InterestHeader &interest)
+FibImpl::LongestPrefixMatch (const Interest &interest)
 {
   super::iterator item = super::longest_prefix_match (interest.GetName ());
   // @todo use predicate to search with exclude filters

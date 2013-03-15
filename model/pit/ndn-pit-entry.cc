@@ -39,7 +39,7 @@ namespace ndn {
 namespace pit {
 
 Entry::Entry (Pit &container,
-              Ptr<const InterestHeader> header,
+              Ptr<const Interest> header,
               Ptr<fib::Entry> fibEntry)
   : m_container (container)
   , m_interest (header)
@@ -260,7 +260,7 @@ Entry::GetMaxRetxCount () const
   return m_maxRetxCount;
 }
 
-Ptr<const InterestHeader>
+Ptr<const Interest>
 Entry::GetInterest () const
 {
   return m_interest;

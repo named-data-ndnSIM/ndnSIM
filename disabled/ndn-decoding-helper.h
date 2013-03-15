@@ -27,8 +27,8 @@
 namespace ns3 {
 namespace ndn {
 
-class InterestHeader;
-class ContentObjectHeader;
+class Interest;
+class ContentObject;
 
 /**
  * \brief Helper class to decode ccnb formatted Ndn message
@@ -37,22 +37,22 @@ class DecodingHelper
 {
 public:
   /**
-   * \brief Deserialize Buffer::Iterator to NdnInterestHeader
+   * \brief Deserialize Buffer::Iterator to NdnInterest
    * @param start Buffer containing serialized Ndn message
-   * @param interest Pointer to the NdnInterestHeader to hold deserialized value
+   * @param interest Pointer to the NdnInterest to hold deserialized value
    * @return Number of bytes used for deserialization
    */
   static size_t
-  Deserialize (Buffer::Iterator start, InterestHeader &interest);
+  Deserialize (Buffer::Iterator start, Interest &interest);
 
   /**
-   * \brief Deserialize Buffer::Iterator to NdnContentObjectHeader
+   * \brief Deserialize Buffer::Iterator to NdnContentObject
    * @param start Buffer containing serialized Ndn message
-   * @param contentObject Pointer to the NdnContentObjectHeader to hold deserialized value
+   * @param contentObject Pointer to the NdnContentObject to hold deserialized value
    * @return Number of bytes used for deserialization
    */
   // static size_t
-  // Deserialize (Buffer::Iterator start, ContentObjectHeader &contentObject);
+  // Deserialize (Buffer::Iterator start, ContentObject &contentObject);
 };
 
 } // namespace ndn

@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.Serialization");
 void
 InterestSerializationTest::DoRun ()
 {
-  InterestHeader source;
+  Interest source;
   
   source.SetName (Create<Name> (boost::lexical_cast<Name> ("/test/test2")));
   NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<Name> ("/test/test2"), "set/get name failed");
@@ -58,7 +58,7 @@ InterestSerializationTest::DoRun ()
   packet.AddHeader (source);
 	
   //deserialization
-  InterestHeader target;
+  Interest target;
   packet.RemoveHeader (target);
   
   NS_TEST_ASSERT_MSG_EQ (source.GetName ()            , target.GetName ()            , "source/target name failed");
@@ -71,7 +71,7 @@ InterestSerializationTest::DoRun ()
 void
 ContentObjectSerializationTest::DoRun ()
 {
-  ContentObjectHeader source;
+  ContentObject source;
   
   source.SetName (Create<Name> (boost::lexical_cast<Name> ("/test/test2/1")));
   NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<Name> ("/test/test2/1"), "set/get name failed");
@@ -87,7 +87,7 @@ ContentObjectSerializationTest::DoRun ()
   packet.AddHeader (source);
 	
   //deserialization
-  ContentObjectHeader target;
+  ContentObject target;
   packet.RemoveHeader (target);
   
   NS_TEST_ASSERT_MSG_EQ (source.GetName ()     , target.GetName ()     , "source/target name failed");

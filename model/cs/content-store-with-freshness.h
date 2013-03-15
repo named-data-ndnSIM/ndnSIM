@@ -43,7 +43,7 @@ public:
   GetTypeId ();
 
   virtual inline bool
-  Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet);
+  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
 
 private:
   inline void
@@ -87,7 +87,7 @@ ContentStoreWithFreshness< Policy >::GetTypeId ()
 
 template<class Policy>
 inline bool
-ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObjectHeader> header, Ptr<const Packet> packet)
+ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObject> header, Ptr<const Packet> packet)
 {
   bool ok = super::Add (header, packet);
   if (!ok) return false;

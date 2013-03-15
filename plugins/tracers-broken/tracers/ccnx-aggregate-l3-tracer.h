@@ -40,39 +40,39 @@ public:
 
   virtual void
   OutInterests  (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+                 Ptr<const CcnxInterest>, Ptr<const CcnxFace>);
 
   virtual void
   InInterests   (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+                 Ptr<const CcnxInterest>, Ptr<const CcnxFace>);
 
   virtual void
   DropInterests (std::string context,
-                 Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>);
+                 Ptr<const CcnxInterest>, Ccnx::DropReason, Ptr<const CcnxFace>);
   
   virtual void
   OutNacks  (std::string context,
-             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+             Ptr<const CcnxInterest>, Ptr<const CcnxFace>);
 
   virtual void
   InNacks   (std::string context,
-             Ptr<const CcnxInterestHeader>, Ptr<const CcnxFace>);
+             Ptr<const CcnxInterest>, Ptr<const CcnxFace>);
 
   virtual void
   DropNacks (std::string context,
-             Ptr<const CcnxInterestHeader>, Ccnx::DropReason, Ptr<const CcnxFace>);
+             Ptr<const CcnxInterest>, Ccnx::DropReason, Ptr<const CcnxFace>);
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<const CcnxFace>);
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObjectHeader>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
+            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
 
 protected:
   void

@@ -40,7 +40,7 @@ class Name;
  *
  * Ndn doesn't really have a header, so we need this class to
  * determine type of Ndn packet and return corresponent header class,
- * InterestHeader or ContentObjectHeader
+ * Interest or ContentObject
  *
  * Throws UnknownHeaderException if header type couldn't be determined
  */

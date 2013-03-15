@@ -42,7 +42,7 @@ namespace ndn {
  * 
  * Only few important fields are actually implemented in the simulation
  *
- * ContentObjectHeader serializes/deserializes header up-to and including <Content> tags
+ * ContentObject serializes/deserializes header up-to and including <Content> tags
  * Necessary closing tags should be added using ContentObjectTail
  *
  * Optimized and simplified formatting of Interest packets 
@@ -127,7 +127,7 @@ private:
   Time m_timestamp;
 };
 
-class ContentObjectHeader : public ContentObject { };
+typedef ContentObject ContentObjectHeader; 
 
 /**
  * ContentObjectTail for compatibility with other packet formats
@@ -151,7 +151,7 @@ public:
  * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception 
  */
-class ContentObjectHeaderException {};
+class ContentObjectException {};
 
 } // namespace ndn
 } // namespace ns3

@@ -52,7 +52,7 @@ public:
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnContentObject (const Ptr<const ndn::ContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ndn::ContentObject> &contentObject,
                    Ptr<Packet> payload);
   
 private:

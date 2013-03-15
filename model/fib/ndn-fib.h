@@ -29,7 +29,7 @@
 namespace ns3 {
 namespace ndn {
 
-class InterestHeader;
+class Interest;
 
 /**
  * \ingroup ndn
@@ -63,7 +63,7 @@ public:
    * \returns If entry found a valid iterator (Ptr<fib::Entry>) will be returned, otherwise End () (==0)
    */
   virtual Ptr<fib::Entry>
-  LongestPrefixMatch (const InterestHeader &interest) = 0;
+  LongestPrefixMatch (const Interest &interest) = 0;
   
   /**
    * \brief Add or update FIB entry

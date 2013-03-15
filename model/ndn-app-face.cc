@@ -103,7 +103,7 @@ AppFace::SendImpl (Ptr<Packet> p)
         {
         case HeaderHelper::INTEREST_NDNSIM:
           {
-            Ptr<InterestHeader> header = Create<InterestHeader> ();
+            Ptr<Interest> header = Create<Interest> ();
             p->RemoveHeader (*header);
 
             if (header->GetNack () > 0)
@@ -116,7 +116,7 @@ AppFace::SendImpl (Ptr<Packet> p)
         case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
             static ContentObjectTail tail;
-            Ptr<ContentObjectHeader> header = Create<ContentObjectHeader> ();
+            Ptr<ContentObject> header = Create<ContentObject> ();
             p->RemoveHeader (*header);
             p->RemoveTrailer (tail);
             m_app->OnContentObject (header, p/*payload*/);

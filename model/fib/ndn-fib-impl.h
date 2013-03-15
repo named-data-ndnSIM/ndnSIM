@@ -86,7 +86,7 @@ public:
   FibImpl ();
 
   virtual Ptr<Entry>
-  LongestPrefixMatch (const InterestHeader &interest);
+  LongestPrefixMatch (const Interest &interest);
   
   virtual Ptr<Entry>
   Add (const Name &prefix, Ptr<Face> face, int32_t metric);

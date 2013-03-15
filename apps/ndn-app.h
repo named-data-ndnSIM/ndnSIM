@@ -32,8 +32,8 @@ class Packet;
 
 namespace ndn {
 
-class InterestHeader;
-class ContentObjectHeader;
+class Interest;
+class ContentObject;
 class Face;
 
 /**
@@ -77,14 +77,14 @@ public:
    *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
+  OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet);
 
   /**
    * @brief Method that will be called every time new NACK arrives
    * @param interest Interest header
    */
   virtual void
-  OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
+  OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet);
   
   /**
    * @brief Method that will be called every time new ContentObject arrives
@@ -92,7 +92,7 @@ public:
    * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
    */
   virtual void
-  OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+  OnContentObject (const Ptr<const ContentObject> &contentObject,
                    Ptr<Packet> payload);
   
 protected:
@@ -114,20 +114,20 @@ protected:
   bool m_active;  ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
   Ptr<Face> m_face;   ///< @brief automatically created application face through which application communicates
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_receivedInterests; ///< @brief App-level trace of received Interests
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
-  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                  Ptr<App>, Ptr<Face> > m_receivedContentObjects; ///< @brief App-level trace of received Data
 
 
-  TracedCallback<Ptr<const InterestHeader>,
+  TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const ContentObjectHeader>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                  Ptr<App>, Ptr<Face> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
 };
 

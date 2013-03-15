@@ -45,7 +45,7 @@ Hijacker::Hijacker ()
 }
 
 void
-Hijacker::OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packet> packet)
+Hijacker::OnInterest (const Ptr<const ndn::Interest> &interest, Ptr<Packet> packet)
 {
   ndn::App::OnInterest (interest, packet); // forward call to perform app-level tracing
   // do nothing else (hijack interest)

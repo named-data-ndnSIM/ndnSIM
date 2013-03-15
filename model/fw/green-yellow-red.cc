@@ -64,7 +64,7 @@ GreenYellowRed::GetTypeId (void)
 
 bool
 GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
-                                     Ptr<const InterestHeader> header,
+                                     Ptr<const Interest> header,
                                      Ptr<const Packet> origPacket,
                                      Ptr<pit::Entry> pitEntry)
 {
@@ -123,15 +123,15 @@ GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 void
 GreenYellowRed::DidReceiveValidNack (Ptr<Face> inFace,
                                      uint32_t nackCode,
-                                     Ptr<const InterestHeader> header,
+                                     Ptr<const Interest> header,
                                      Ptr<const Packet> origPacket,
                                      Ptr<pit::Entry> pitEntry)
 {
   super::DidReceiveValidNack (inFace, nackCode, header, origPacket, pitEntry);
 
   if (inFace != 0 &&
-      (nackCode == InterestHeader::NACK_CONGESTION ||
-       nackCode == InterestHeader::NACK_GIVEUP_PIT))
+      (nackCode == Interest::NACK_CONGESTION ||
+       nackCode == Interest::NACK_GIVEUP_PIT))
     {
       pitEntry->GetFibEntry ()->UpdateStatus (inFace, fib::FaceMetric::NDN_FIB_YELLOW);
     }

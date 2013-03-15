@@ -31,26 +31,26 @@
 #include "../helper/ndn-encoding-helper.h"
 #include "../helper/ndn-decoding-helper.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.InterestHeader");
+NS_LOG_COMPONENT_DEFINE ("ndn.Interest");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (InterestHeader);
+NS_OBJECT_ENSURE_REGISTERED (Interest);
 
 TypeId
-InterestHeader::GetTypeId (void)
+Interest::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::InterestHeader")
+  static TypeId tid = TypeId ("ns3::ndn::Interest")
     .SetGroupName ("Ndn")
     .SetParent<Header> ()
-    .AddConstructor<InterestHeader> ()
+    .AddConstructor<Interest> ()
     ;
   return tid;
 }
   
 
-InterestHeader::InterestHeader ()
+Interest::Interest ()
   : m_name ()
   , m_minSuffixComponents (-1)
   , m_maxSuffixComponents (-1)
@@ -64,7 +64,7 @@ InterestHeader::InterestHeader ()
 {
 }
 
-InterestHeader::InterestHeader (const InterestHeader &interest)
+Interest::Interest (const Interest &interest)
   : m_name                (Create<Name> (interest.GetName ()))
   , m_minSuffixComponents (interest.m_minSuffixComponents)
   , m_maxSuffixComponents (interest.m_maxSuffixComponents)
@@ -78,158 +78,158 @@ InterestHeader::InterestHeader (const InterestHeader &interest)
 {
 }
 
-Ptr<InterestHeader>
-InterestHeader::GetInterest (Ptr<Packet> packet)
+Ptr<Interest>
+Interest::GetInterest (Ptr<Packet> packet)
 {
-  Ptr<InterestHeader> interest = Create<InterestHeader> ();
+  Ptr<Interest> interest = Create<Interest> ();
   packet->RemoveHeader (*interest);
 
   return interest;
 }
 
 void
-InterestHeader::SetName (Ptr<Name> name)
+Interest::SetName (Ptr<Name> name)
 {
   m_name = name;
 }
 
 const Name&
-InterestHeader::GetName () const
+Interest::GetName () const
 {
-  if (m_name==0) throw InterestHeaderException();
+  if (m_name==0) throw InterestException();
   return *m_name;
 }
 
 Ptr<const Name>
-InterestHeader::GetNamePtr () const
+Interest::GetNamePtr () const
 {
   return m_name;
 }
 
 void
-InterestHeader::SetMinSuffixComponents (int32_t value)
+Interest::SetMinSuffixComponents (int32_t value)
 {
   m_minSuffixComponents = value;
 }
 
 int32_t
-InterestHeader::GetMinSuffixComponents () const
+Interest::GetMinSuffixComponents () const
 {
   return m_minSuffixComponents;
 }
 
 void
-InterestHeader::SetMaxSuffixComponents (int32_t value)
+Interest::SetMaxSuffixComponents (int32_t value)
 {
   m_maxSuffixComponents = value;
 }
 
 int32_t
-InterestHeader::GetMaxSuffixComponents () const
+Interest::GetMaxSuffixComponents () const
 {
   return m_maxSuffixComponents;
 }
 
 void
-InterestHeader::SetExclude (Ptr<Name> exclude)
+Interest::SetExclude (Ptr<Name> exclude)
 {
   m_exclude = exclude;
 }
 
 bool
-InterestHeader::IsEnabledExclude () const
+Interest::IsEnabledExclude () const
 {
   return m_exclude!=0;
 }
 
 const Name&
-InterestHeader::GetExclude () const
+Interest::GetExclude () const
 {
-  if (m_exclude==0) throw InterestHeaderException();
+  if (m_exclude==0) throw InterestException();
   return *m_exclude;
 }
 
 void
-InterestHeader::SetChildSelector (bool value)
+Interest::SetChildSelector (bool value)
 {
   m_childSelector = value;
 }
 
 bool
-InterestHeader::IsEnabledChildSelector () const
+Interest::IsEnabledChildSelector () const
 {
   return m_childSelector;
 }
 
 void
-InterestHeader::SetAnswerOriginKind (bool value)
+Interest::SetAnswerOriginKind (bool value)
 {
   m_answerOriginKind = value;
 }
 
 bool
-InterestHeader::IsEnabledAnswerOriginKind () const
+Interest::IsEnabledAnswerOriginKind () const
 {
   return m_answerOriginKind;
 }
 
 void
-InterestHeader::SetScope (int8_t scope)
+Interest::SetScope (int8_t scope)
 {
   m_scope = scope;
 }
 
 int8_t
-InterestHeader::GetScope () const
+Interest::GetScope () const
 {
   return m_scope;
 }
 
 void
-InterestHeader::SetInterestLifetime (Time lifetime)
+Interest::SetInterestLifetime (Time lifetime)
 {
   m_interestLifetime = lifetime;
 }
 
 Time
-InterestHeader::GetInterestLifetime () const
+Interest::GetInterestLifetime () const
 {
   return m_interestLifetime;
 }
 
 void
-InterestHeader::SetNonce (uint32_t nonce)
+Interest::SetNonce (uint32_t nonce)
 {
   m_nonce = nonce;
 }
 
 uint32_t
-InterestHeader::GetNonce () const
+Interest::GetNonce () const
 {
   return m_nonce;
 }
 
 void
-InterestHeader::SetNack (uint32_t nackType)
+Interest::SetNack (uint32_t nackType)
 {
   m_nackType = nackType;
 }
 
 uint32_t
-InterestHeader::GetNack () const
+Interest::GetNack () const
 {
   return m_nackType;
 }
 
 uint32_t
-InterestHeader::GetSerializedSize (void) const
+Interest::GetSerializedSize (void) const
 {
   // unfortunately, we don't know exact header size in advance
   return EncodingHelper::GetSerializedSize (*this);
 }
     
 void
-InterestHeader::Serialize (Buffer::Iterator start) const
+Interest::Serialize (Buffer::Iterator start) const
 {
   size_t size = EncodingHelper::Serialize (start, *this);
   NS_UNUSED (size);
@@ -237,19 +237,19 @@ InterestHeader::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-InterestHeader::Deserialize (Buffer::Iterator start)
+Interest::Deserialize (Buffer::Iterator start)
 {
   return DecodingHelper::Deserialize (start, *this); // \todo Debugging is necessary
 }
 
 TypeId
-InterestHeader::GetInstanceTypeId (void) const
+Interest::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
   
 void
-InterestHeader::Print (std::ostream &os) const
+Interest::Print (std::ostream &os) const
 {
   os << "I: " << GetName ();
   

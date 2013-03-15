@@ -127,7 +127,7 @@ CcnxAggregateAppTracer::Print (std::ostream &os) const
 
 void
 CcnxAggregateAppTracer::OutInterests (std::string context,
-                                      Ptr<const CcnxInterestHeader> header, Ptr<CcnxApp>, Ptr<CcnxFace>)
+                                      Ptr<const CcnxInterest> header, Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_outInterests++;
   m_outInterestsBytes += header->GetSerializedSize ();
@@ -135,7 +135,7 @@ CcnxAggregateAppTracer::OutInterests (std::string context,
 
 void
 CcnxAggregateAppTracer::OutData (std::string context,
-                                 Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                                  Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_outData++;
@@ -144,7 +144,7 @@ CcnxAggregateAppTracer::OutData (std::string context,
 
 void
 CcnxAggregateAppTracer::InInterests (std::string context,
-                                     Ptr<const CcnxInterestHeader> header,
+                                     Ptr<const CcnxInterest> header,
                                      Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_inInterests++;
@@ -153,7 +153,7 @@ CcnxAggregateAppTracer::InInterests (std::string context,
 
 void
 CcnxAggregateAppTracer::InNacks (std::string context,
-                                 Ptr<const CcnxInterestHeader> header,
+                                 Ptr<const CcnxInterest> header,
                                  Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_inNacks++;
@@ -162,7 +162,7 @@ CcnxAggregateAppTracer::InNacks (std::string context,
   
 void
 CcnxAggregateAppTracer::InData (std::string context,
-                                Ptr<const CcnxContentObjectHeader> header, Ptr<const Packet> payload,
+                                Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
                                 Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_inData++;

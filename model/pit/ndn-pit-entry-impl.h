@@ -39,7 +39,7 @@ public:
   
 public:
   EntryImpl (Pit &pit,
-                Ptr<const InterestHeader> header,
+                Ptr<const Interest> header,
                 Ptr<fib::Entry> fibEntry)
   : Entry (pit, header, fibEntry)
   , item_ (0)

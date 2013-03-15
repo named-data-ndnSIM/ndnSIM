@@ -44,7 +44,7 @@ CustomStrategy::CustomStrategy ()
 
 bool
 CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
-                                     Ptr<const InterestHeader> header,
+                                     Ptr<const Interest> header,
                                      Ptr<const Packet> origPacket,
                                      Ptr<pit::Entry> pitEntry)
 {
@@ -76,7 +76,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
 
 void
 CustomStrategy::DidSendOutInterest (Ptr<Face> inFace, Ptr<Face> outFace,
-                                    Ptr<const InterestHeader> header,
+                                    Ptr<const Interest> header,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {

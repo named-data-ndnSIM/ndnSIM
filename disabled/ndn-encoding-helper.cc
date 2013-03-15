@@ -31,7 +31,7 @@ namespace ns3 {
 namespace ndn {
 
 size_t
-EncodingHelper::Serialize (Buffer::Iterator start, const InterestHeader &interest)
+EncodingHelper::Serialize (Buffer::Iterator start, const Interest &interest)
 {
   size_t written = 0;
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
@@ -100,7 +100,7 @@ EncodingHelper::Serialize (Buffer::Iterator start, const InterestHeader &interes
 }
 
 size_t
-EncodingHelper::GetSerializedSize (const InterestHeader &interest)
+EncodingHelper::GetSerializedSize (const Interest &interest)
 {
   size_t written = 0;
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>

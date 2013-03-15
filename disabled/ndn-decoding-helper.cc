@@ -35,7 +35,7 @@ namespace ns3 {
 namespace ndn {
 
 size_t
-DecodingHelper::Deserialize (Buffer::Iterator start, InterestHeader &interest)
+DecodingHelper::Deserialize (Buffer::Iterator start, Interest &interest)
 {
   static CcnbParser::InterestVisitor interestVisitor;
 
@@ -47,7 +47,7 @@ DecodingHelper::Deserialize (Buffer::Iterator start, InterestHeader &interest)
 }
 
 // size_t
-// NdnDecodingHelper::Deserialize (Buffer::Iterator start, NdnContentObjectHeader &contentObject)
+// NdnDecodingHelper::Deserialize (Buffer::Iterator start, NdnContentObject &contentObject)
 // {
 //   static CcnbParser::ContentObjectVisitor contentObjectVisitor;
 

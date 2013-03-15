@@ -30,14 +30,14 @@ public:
 protected:
   virtual bool
   DoPropagateInterest (Ptr<Face> incomingFace,
-                       Ptr<const InterestHeader> header,
+                       Ptr<const Interest> header,
                        Ptr<const Packet> origPacket,
                        Ptr<pit::Entry> pitEntry);
 
 public:
   virtual void
   DidSendOutInterest (Ptr<Face> inFace, Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
+                      Ptr<const Interest> header,
                       Ptr<const Packet> origPacket,
                       Ptr<pit::Entry> pitEntry);
 

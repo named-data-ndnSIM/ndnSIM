@@ -43,7 +43,7 @@ namespace ndn {
  * Only few important fields are actually implemented in the simulation
  *
  *
- * ContentObjectHeader serializes/deserializes header up-to and including <Content> tags
+ * ContentObject serializes/deserializes header up-to and including <Content> tags
  * Necessary closing tags should be added using ContentObjectTail
  *
  * This hacks are necessary to optimize memory use (i.e., virtual payload)
@@ -51,7 +51,7 @@ namespace ndn {
  * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
  * 
  */
-class ContentObjectHeader : public SimpleRefCount<ContentObjectHeader,Header>
+class ContentObject : public SimpleRefCount<ContentObject,Header>
 {
 public:
   ////////////////////////////////////////////////////////////////////////////  
@@ -226,7 +226,7 @@ public:
    *
    * Creates a null header
    **/
-  ContentObjectHeader ();
+  ContentObject ();
 
   /**
    * \brief Set content object name
@@ -306,57 +306,57 @@ public:
 };
 
 
-ContentObjectHeader::Signature::Signature ()
+ContentObject::Signature::Signature ()
   : m_digestAlgorithm ("99.0")
   , m_signatureBits (0)
 {
 }
 
 const std::string &
-ContentObjectHeader::Signature::GetDigestAlgorithm () const
+ContentObject::Signature::GetDigestAlgorithm () const
 {
   return m_digestAlgorithm;
 }
 
 void
-ContentObjectHeader::Signature::SetDigestAlgorithm (const std::string &digestAlgorithm)
+ContentObject::Signature::SetDigestAlgorithm (const std::string &digestAlgorithm)
 {
   m_digestAlgorithm = digestAlgorithm;
 }
 
 uint32_t
-ContentObjectHeader::Signature::GetSignatureBits () const
+ContentObject::Signature::GetSignatureBits () const
 {
   return m_signatureBits;
 }
 
 inline void
-ContentObjectHeader::Signature::SetSignatureBits (uint32_t signature)
+ContentObject::Signature::SetSignatureBits (uint32_t signature)
 {
   m_signatureBits = signature;
 }
 
 
-ContentObjectHeader::Signature &
-ContentObjectHeader::GetSignature ()
+ContentObject::Signature &
+ContentObject::GetSignature ()
 {
   return m_signature;
 }
 
-const ContentObjectHeader::Signature &
-ContentObjectHeader::GetSignature () const
+const ContentObject::Signature &
+ContentObject::GetSignature () const
 {
   return m_signature;
 }
 
-ContentObjectHeader::SignedInfo &
-ContentObjectHeader::GetSignedInfo ()
+ContentObject::SignedInfo &
+ContentObject::GetSignedInfo ()
 {
   return m_signedInfo;
 }
 
-const ContentObjectHeader::SignedInfo &
-ContentObjectHeader::GetSignedInfo () const
+const ContentObject::SignedInfo &
+ContentObject::GetSignedInfo () const
 {
   return m_signedInfo;
 }
@@ -365,7 +365,7 @@ ContentObjectHeader::GetSignedInfo () const
  * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception 
  */
-class ContentObjectHeaderException {};
+class ContentObjectException {};
 
 } // namespace ndn
 } // namespace ns3

@@ -132,7 +132,7 @@ ForwardingStrategy::DoDispose ()
 
 void
 ForwardingStrategy::OnInterest (Ptr<Face> inFace,
-                                Ptr<const InterestHeader> header,
+                                Ptr<const Interest> header,
                                 Ptr<const Packet> origPacket)
 {
   m_inInterests (header, inFace);
@@ -168,7 +168,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
     }
 
   Ptr<Packet> contentObject;
-  Ptr<const ContentObjectHeader> contentObjectHeader; // used for tracing
+  Ptr<const ContentObject> contentObjectHeader; // used for tracing
   Ptr<const Packet> payload; // used for tracing
   boost::tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
   if (contentObject != 0)
@@ -215,7 +215,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::OnData (Ptr<Face> inFace,
-                            Ptr<const ContentObjectHeader> header,
+                            Ptr<const ContentObject> header,
                             Ptr<Packet> payload,
                             Ptr<const Packet> origPacket)
 {
@@ -287,7 +287,7 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidCreatePitEntry (Ptr<Face> inFace,
-                                       Ptr<const InterestHeader> header,
+                                       Ptr<const Interest> header,
                                        Ptr<const Packet> origPacket,
                                        Ptr<pit::Entry> pitEntrypitEntry)
 {
@@ -295,7 +295,7 @@ ForwardingStrategy::DidCreatePitEntry (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::FailedToCreatePitEntry (Ptr<Face> inFace,
-                                            Ptr<const InterestHeader> header,
+                                            Ptr<const Interest> header,
                                             Ptr<const Packet> origPacket)
 {
   m_dropInterests (header, inFace);
@@ -303,7 +303,7 @@ ForwardingStrategy::FailedToCreatePitEntry (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                                                 Ptr<const InterestHeader> header,
+                                                 Ptr<const Interest> header,
                                                  Ptr<const Packet> origPacket,
                                                  Ptr<pit::Entry> pitEntry)
 {
@@ -318,7 +318,7 @@ ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidSuppressSimilarInterest (Ptr<Face> face,
-                                                Ptr<const InterestHeader> header,
+                                                Ptr<const Interest> header,
                                                 Ptr<const Packet> origPacket,
                                                 Ptr<pit::Entry> pitEntry)
 {
@@ -326,7 +326,7 @@ ForwardingStrategy::DidSuppressSimilarInterest (Ptr<Face> face,
 
 void
 ForwardingStrategy::DidForwardSimilarInterest (Ptr<Face> inFace,
-                                               Ptr<const InterestHeader> header,
+                                               Ptr<const Interest> header,
                                                Ptr<const Packet> origPacket,
                                                Ptr<pit::Entry> pitEntry)
 {
@@ -334,7 +334,7 @@ ForwardingStrategy::DidForwardSimilarInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
-                                                 Ptr<const InterestHeader> header,
+                                                 Ptr<const Interest> header,
                                                  Ptr<const Packet> origPacket,
                                                  Ptr<pit::Entry> pitEntry)
 {
@@ -358,7 +358,7 @@ ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
 
 bool
 ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
-                                                 Ptr<const InterestHeader> header,
+                                                 Ptr<const Interest> header,
                                                  Ptr<const Packet> packet,
                                                  Ptr<pit::Entry> pitEntry)
 {
@@ -377,7 +377,7 @@ ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
-                                            Ptr<const ContentObjectHeader> header,
+                                            Ptr<const ContentObject> header,
                                             Ptr<const Packet> payload,
                                             Ptr<const Packet> origPacket,
                                             Ptr<pit::Entry> pitEntry)
@@ -417,7 +417,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
-                                             Ptr<const ContentObjectHeader> header,
+                                             Ptr<const ContentObject> header,
                                              Ptr<const Packet> payload,
                                              Ptr<const Packet> origPacket,
                                              bool didCreateCacheEntry)
@@ -427,7 +427,7 @@ ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                                               Ptr<const ContentObjectHeader> header,
+                                               Ptr<const ContentObject> header,
                                                Ptr<const Packet> payload,
                                                Ptr<const Packet> origPacket,
                                                bool didCreateCacheEntry)
@@ -450,7 +450,7 @@ ForwardingStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
 
 bool
 ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
-                                                    Ptr<const InterestHeader> header,
+                                                    Ptr<const Interest> header,
                                                     Ptr<const Packet> origPacket,
                                                     Ptr<pit::Entry> pitEntry)
 {
@@ -485,7 +485,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
-                                       Ptr<const InterestHeader> header,
+                                       Ptr<const Interest> header,
                                        Ptr<const Packet> origPacket,
                                        Ptr<pit::Entry> pitEntry)
 {
@@ -526,7 +526,7 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const InterestHeader> header,
+                                        Ptr<const Interest> header,
                                         Ptr<const Packet> origPacket,
                                         Ptr<pit::Entry> pitEntry)
 {
@@ -557,7 +557,7 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const InterestHeader> header,
+                                        Ptr<const Interest> header,
                                         Ptr<const Packet> origPacket,
                                         Ptr<pit::Entry> pitEntry)
 {
@@ -580,7 +580,7 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 void
 ForwardingStrategy::DidSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const InterestHeader> header,
+                                        Ptr<const Interest> header,
                                         Ptr<const Packet> origPacket,
                                         Ptr<pit::Entry> pitEntry)
 {
@@ -590,7 +590,7 @@ ForwardingStrategy::DidSendOutInterest (Ptr<Face> inFace,
 void
 ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
                                     Ptr<Face> outFace,
-                                    Ptr<const ContentObjectHeader> header,
+                                    Ptr<const ContentObject> header,
                                     Ptr<const Packet> payload,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)

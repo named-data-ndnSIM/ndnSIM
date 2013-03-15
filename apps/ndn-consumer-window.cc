@@ -162,7 +162,7 @@ ConsumerWindow::ScheduleNextPacket ()
 ///////////////////////////////////////////////////
 
 void
-ConsumerWindow::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
+ConsumerWindow::OnContentObject (const Ptr<const ContentObject> &contentObject,
                                      Ptr<Packet> payload)
 {
   Consumer::OnContentObject (contentObject, payload);
@@ -176,7 +176,7 @@ ConsumerWindow::OnContentObject (const Ptr<const ContentObjectHeader> &contentOb
 }
 
 void
-ConsumerWindow::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> payload)
+ConsumerWindow::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> payload)
 {
   Consumer::OnNack (interest, payload);
 

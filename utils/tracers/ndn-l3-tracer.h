@@ -31,9 +31,9 @@ class Packet;
 
 namespace ndn {
 
-class InterestHeader;
+class Interest;
 class Face;
-class ContentObjectHeader;
+class ContentObject;
 
 /**
  * @brief Base class for network-layer (incoming/outgoing Interests and Data) tracing of NDN stack
@@ -80,40 +80,40 @@ protected:
   
   virtual void
   OutInterests  (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+                 Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
   InInterests   (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+                 Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
   DropInterests (std::string context,
-                 Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+                 Ptr<const Interest>, Ptr<const Face>) = 0;
   
   virtual void
   OutNacks  (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+             Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
   InNacks   (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+             Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
   DropNacks (std::string context,
-             Ptr<const InterestHeader>, Ptr<const Face>) = 0;
+             Ptr<const Interest>, Ptr<const Face>) = 0;
 
   
   virtual void
   OutData  (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
+            Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
 
   virtual void
   InData   (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, Ptr<const Face>) = 0;
+            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
 
   virtual void
   DropData (std::string context,
-            Ptr<const ContentObjectHeader>, Ptr<const Packet>, Ptr<const Face>) = 0;
+            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
 
 protected:
   std::string m_node;

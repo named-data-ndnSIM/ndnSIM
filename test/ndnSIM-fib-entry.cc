@@ -63,7 +63,7 @@ private:
   SendPacket (const std::string &prefix, uint32_t nonce)
   {
     Ptr<Packet> pkt = Create<Packet> (0);
-    ndn::InterestHeader i;
+    ndn::Interest i;
     i.SetName (Create<ndn::Name> (prefix));
     i.SetNonce (nonce);
     i.SetInterestLifetime (Seconds (0.5));
