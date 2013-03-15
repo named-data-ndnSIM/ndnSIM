@@ -36,7 +36,7 @@ namespace ndn {
 
 class ContentObjectHeader;
 class InterestHeader;
-class NameComponents;
+class Name;
 
 class ContentStore;
 
@@ -71,7 +71,7 @@ public:
    * \brief Get prefix of the stored entry
    * \returns prefix of the stored entry
    */
-  const NameComponents&
+  const Name&
   GetName () const;
 
   /**

@@ -24,7 +24,7 @@
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/ndn-face.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-limits.h"
 #include "ns3/traced-value.h"
 
@@ -40,7 +40,7 @@
 namespace ns3 {
 namespace ndn {
 
-class NameComponents;
+class Name;
 
 namespace fib {
 
@@ -245,7 +245,7 @@ public:
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
    */
-  Entry (const Ptr<const NameComponents> &prefix)
+  Entry (const Ptr<const Name> &prefix)
   : m_prefix (prefix)
   , m_needsProbing (false)
   {
@@ -287,7 +287,7 @@ public:
   /**
    * \brief Get prefix for the FIB entry
    */
-  const NameComponents&
+  const Name&
   GetPrefix () const { return *m_prefix; }
 
   /**
@@ -311,7 +311,7 @@ private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
 public:
-  Ptr<const NameComponents> m_prefix; ///< \brief Prefix of the FIB entry
+  Ptr<const Name> m_prefix; ///< \brief Prefix of the FIB entry
   FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 
   bool m_needsProbing;      ///< \brief flag indicating that probing should be performed

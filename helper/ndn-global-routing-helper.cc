@@ -23,7 +23,7 @@
 #include "ns3/ndn-l3-protocol.h"
 #include "../model/ndn-net-device-face.h"
 #include "../model/ndn-global-router.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-fib.h"
 
 #include "ns3/node.h"
@@ -188,7 +188,7 @@ GlobalRoutingHelper::AddOrigin (const std::string &prefix, Ptr<Node> node)
   NS_ASSERT_MSG (gr != 0,
 		 "GlobalRouter is not installed on the node");
 
-  Ptr<NameComponents> name = Create<NameComponents> (boost::lexical_cast<NameComponents> (prefix));
+  Ptr<Name> name = Create<Name> (boost::lexical_cast<Name> (prefix));
   gr->AddLocalPrefix (name);
 }
 
@@ -291,7 +291,7 @@ GlobalRoutingHelper::CalculateRoutes ()
 		}
 	      else
 		{
-                  BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
+                  BOOST_FOREACH (const Ptr<const Name> &prefix, i->first->GetLocalPrefixes ())
                     {
                       NS_LOG_DEBUG (" prefix " << prefix << " reachable via face " << *i->second.get<0> ()
                                     << " with distance " << i->second.get<1> ()
@@ -404,7 +404,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes ()
                     }
                   else
                     {
-                      BOOST_FOREACH (const Ptr<const NameComponents> &prefix, i->first->GetLocalPrefixes ())
+                      BOOST_FOREACH (const Ptr<const Name> &prefix, i->first->GetLocalPrefixes ())
                         {
                           NS_LOG_DEBUG (" prefix " << *prefix << " reachable via face " << *i->second.get<0> ()
                                         << " with distance " << i->second.get<1> ()

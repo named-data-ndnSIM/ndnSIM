@@ -67,19 +67,19 @@ ContentObjectHeader::ContentObjectHeader ()
 }
 
 void
-ContentObjectHeader::SetName (const Ptr<NameComponents> &name)
+ContentObjectHeader::SetName (const Ptr<Name> &name)
 {
   m_name = name;
 }
 
-const NameComponents&
+const Name&
 ContentObjectHeader::GetName () const
 {
   if (m_name==0) throw ContentObjectHeaderException();
   return *m_name;
 }
 
-Ptr<const NameComponents>
+Ptr<const Name>
 ContentObjectHeader::GetNamePtr () const
 {
   return m_name;
@@ -106,7 +106,7 @@ ContentObjectHeader::Serialize (Buffer::Iterator start) const
   written += CCNB::AppendCloser (start);                                    // </Signature>  
 
   written += CCNB::AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);    // <Name>
-  written += CCNB::AppendNameComponents (start, GetName()); //   <Component>...</Component>...
+  written += CCNB::AppendName (start, GetName()); //   <Component>...</Component>...
   written += CCNB::AppendCloser (start);                                  // </Name>  
 
   // fake signature
@@ -146,7 +146,7 @@ ContentObjectHeader::Serialize (Buffer::Iterator start) const
         written += CCNB::AppendBlockHeader (start, CCN_DTAG_KeyName, CCN_DTAG);    // <KeyName>
         {
           written += CCNB::AppendBlockHeader (start, CCN_DTAG_Name, CCN_DTAG);       // <Name>
-          written += CCNB::AppendNameComponents (start, GetName());                  //   <Component>...</Component>...
+          written += CCNB::AppendName (start, GetName());                  //   <Component>...</Component>...
           written += CCNB::AppendCloser (start);                                     // </Name>
         }
         written += CCNB::AppendCloser (start);                                     // </KeyName>
@@ -182,7 +182,7 @@ ContentObjectHeader::GetSerializedSize () const
   written += 1;                                    // </Signature>  
 
   written += CCNB::EstimateBlockHeader (CCN_DTAG_Name);    // <Name>
-  written += CCNB::EstimateNameComponents (GetName()); //   <Component>...</Component>...
+  written += CCNB::EstimateName (GetName()); //   <Component>...</Component>...
   written += 1;                                  // </Name>  
 
   // fake signature
@@ -219,7 +219,7 @@ ContentObjectHeader::GetSerializedSize () const
         written += CCNB::EstimateBlockHeader (CCN_DTAG_KeyName);    // <KeyName>
         {
           written += CCNB::EstimateBlockHeader (CCN_DTAG_Name);       // <Name>
-          written += CCNB::EstimateNameComponents (GetName());        //   <Component>...</Component>...
+          written += CCNB::EstimateName (GetName());        //   <Component>...</Component>...
           written += 1;                                               // </Name>
         }
         written += 1;                                               // </KeyName>
@@ -244,7 +244,7 @@ public:
   {
     // uint32_t n.m_dtag;
     // std::list<Ptr<Block> > n.m_nestedBlocks;
-    static NameComponentsVisitor nameComponentsVisitor;
+    static NameVisitor nameComponentsVisitor;
     static NonNegativeIntegerVisitor nonNegativeIntegerVisitor;
     static TimestampVisitor          timestampVisitor;
     static StringVisitor     stringVisitor;
@@ -265,7 +265,7 @@ public:
       case CCN_DTAG_Name:
         {
           // process name components
-          Ptr<NameComponents> name = Create<NameComponents> ();
+          Ptr<Name> name = Create<Name> ();
         
           BOOST_FOREACH (Ptr<Block> block, n.m_nestedTags)
             {
@@ -372,7 +372,7 @@ public:
             throw CcnbDecodingException ();
 
           // process name components
-          Ptr<NameComponents> name = Create<NameComponents> ();
+          Ptr<Name> name = Create<Name> ();
         
           BOOST_FOREACH (Ptr<Block> block, nameTag->m_nestedTags)
             {
@@ -540,12 +540,12 @@ ContentObjectHeader::SignedInfo::GetFreshness () const
 }
 
 void
-ContentObjectHeader::SignedInfo::SetKeyLocator (Ptr<const NameComponents> keyLocator)
+ContentObjectHeader::SignedInfo::SetKeyLocator (Ptr<const Name> keyLocator)
 {
   m_keyLocator = keyLocator;
 }
 
-Ptr<const NameComponents>
+Ptr<const Name>
 ContentObjectHeader::SignedInfo::GetKeyLocator () const
 {
   return m_keyLocator;

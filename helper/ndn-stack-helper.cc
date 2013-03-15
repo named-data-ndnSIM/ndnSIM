@@ -42,7 +42,7 @@
 #include "ns3/ndn-forwarding-strategy.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-pit.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-content-store.h"
 
 #include "ns3/node-list.h"
@@ -360,8 +360,8 @@ StackHelper::AddRoute (Ptr<Node> node, const std::string &prefix, Ptr<Face> face
 
   Ptr<Fib>  fib  = node->GetObject<Fib> ();
 
-  NameComponentsValue prefixValue;
-  prefixValue.DeserializeFromString (prefix, MakeNameComponentsChecker ());
+  NameValue prefixValue;
+  prefixValue.DeserializeFromString (prefix, MakeNameChecker ());
   fib->Add (prefixValue.Get (), face, metric);
 }
 

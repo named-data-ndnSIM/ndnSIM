@@ -23,7 +23,7 @@
 #include "ndn-content-store.h"
 #include "ns3/log.h"
 #include "ns3/packet.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
 
@@ -78,7 +78,7 @@ Entry::GetFullyFormedNdnPacket () const
   return packet;
 }
 
-const NameComponents&
+const Name&
 Entry::GetName () const
 {
   return m_header->GetName ();

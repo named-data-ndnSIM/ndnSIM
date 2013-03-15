@@ -27,7 +27,7 @@
 
 #include "ndn-pit-entry-impl.h"
 
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 
 namespace ns3 {
 namespace ndn {
@@ -42,14 +42,14 @@ namespace pit {
  */
 template<class Policy>
 class PitImpl : public Pit
-              , protected ndnSIM::trie_with_policy<NameComponents,
+              , protected ndnSIM::trie_with_policy<Name,
                                                    ndnSIM::smart_pointer_payload_traits< EntryImpl< PitImpl< Policy > > >,
                                                    // ndnSIM::persistent_policy_traits
                                                    Policy
                                                    >
 {
 public:
-  typedef ndnSIM::trie_with_policy<NameComponents,
+  typedef ndnSIM::trie_with_policy<Name,
                                    ndnSIM::smart_pointer_payload_traits< EntryImpl< PitImpl< Policy > > >,
                                    // ndnSIM::persistent_policy_traits
                                    Policy

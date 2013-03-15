@@ -174,7 +174,7 @@ ConsumerZipfMandelbrot::SendPacket() {
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
 
   //
-  Ptr<NameComponents> nameWithSequence = Create<NameComponents> (m_interestName);
+  Ptr<Name> nameWithSequence = Create<Name> (m_interestName);
   (*nameWithSequence) (seq);
   //
 

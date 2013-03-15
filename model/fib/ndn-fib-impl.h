@@ -22,7 +22,7 @@
 #define	_NDN_FIB_IMPL_H_
 
 #include "ns3/ndn-fib.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 
 #include "../../utils/trie/trie-with-policy.h"
 #include "../../utils/trie/counting-policy.h"
@@ -35,12 +35,12 @@ class EntryImpl : public Entry
 {
 public:
   typedef ndnSIM::trie_with_policy<
-    NameComponents,
+    Name,
     ndnSIM::smart_pointer_payload_traits<EntryImpl>,
     ndnSIM::counting_policy_traits
     > trie;
 
-  EntryImpl (const Ptr<const NameComponents> &prefix)
+  EntryImpl (const Ptr<const Name> &prefix)
     : Entry (prefix)
     , item_ (0)
   {
@@ -64,12 +64,12 @@ private:
  * \brief Class implementing FIB functionality
  */
 class FibImpl : public Fib,
-                protected ndnSIM::trie_with_policy< NameComponents,
+                protected ndnSIM::trie_with_policy< Name,
                                                     ndnSIM::smart_pointer_payload_traits< EntryImpl >,
                                                     ndnSIM::counting_policy_traits >
 {
 public:
-  typedef ndnSIM::trie_with_policy< NameComponents,
+  typedef ndnSIM::trie_with_policy< Name,
                                     ndnSIM::smart_pointer_payload_traits<EntryImpl>,
                                     ndnSIM::counting_policy_traits > super;
   
@@ -89,13 +89,13 @@ public:
   LongestPrefixMatch (const InterestHeader &interest);
   
   virtual Ptr<Entry>
-  Add (const NameComponents &prefix, Ptr<Face> face, int32_t metric);
+  Add (const Name &prefix, Ptr<Face> face, int32_t metric);
 
   virtual Ptr<Entry>
-  Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t metric);
+  Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric);
 
   virtual void
-  Remove (const Ptr<const NameComponents> &prefix);
+  Remove (const Ptr<const Name> &prefix);
 
   virtual void
   InvalidateAll ();

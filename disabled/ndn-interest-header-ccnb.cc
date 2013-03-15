@@ -65,10 +65,10 @@ InterestHeader::InterestHeader ()
 }
 
 InterestHeader::InterestHeader (const InterestHeader &interest)
-  : m_name                (Create<NameComponents> (interest.GetName ()))
+  : m_name                (Create<Name> (interest.GetName ()))
   , m_minSuffixComponents (interest.m_minSuffixComponents)
   , m_maxSuffixComponents (interest.m_maxSuffixComponents)
-  , m_exclude             (interest.IsEnabledExclude () ? Create<NameComponents> (interest.GetExclude ()) : 0)
+  , m_exclude             (interest.IsEnabledExclude () ? Create<Name> (interest.GetExclude ()) : 0)
   , m_childSelector       (interest.m_childSelector)
   , m_answerOriginKind    (interest.m_answerOriginKind)
   , m_scope               (interest.m_scope)
@@ -88,19 +88,19 @@ InterestHeader::GetInterest (Ptr<Packet> packet)
 }
 
 void
-InterestHeader::SetName (Ptr<NameComponents> name)
+InterestHeader::SetName (Ptr<Name> name)
 {
   m_name = name;
 }
 
-const NameComponents&
+const Name&
 InterestHeader::GetName () const
 {
   if (m_name==0) throw InterestHeaderException();
   return *m_name;
 }
 
-Ptr<const NameComponents>
+Ptr<const Name>
 InterestHeader::GetNamePtr () const
 {
   return m_name;
@@ -131,7 +131,7 @@ InterestHeader::GetMaxSuffixComponents () const
 }
 
 void
-InterestHeader::SetExclude (Ptr<NameComponents> exclude)
+InterestHeader::SetExclude (Ptr<Name> exclude)
 {
   m_exclude = exclude;
 }
@@ -142,7 +142,7 @@ InterestHeader::IsEnabledExclude () const
   return m_exclude!=0;
 }
 
-const NameComponents&
+const Name&
 InterestHeader::GetExclude () const
 {
   if (m_exclude==0) throw InterestHeaderException();

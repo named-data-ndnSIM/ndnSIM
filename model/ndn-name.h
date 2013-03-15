@@ -302,23 +302,8 @@ Name::operator< (const Name &prefix) const
 
 ATTRIBUTE_HELPER_HEADER (Name);
 
-/**
- * @ingroup Ndn
- * @brief For backwards compatibility
- */
-class NameComponents : public Name
-{
-public:
-  NameComponents () : Name () { }
-
-  NameComponents (const std::list<boost::reference_wrapper<const std::string> > &components) : Name (components) { }
-
-  NameComponents (const std::string &prefix) : Name (prefix) { }
-
-  NameComponents (const char *prefix) : Name (prefix) { }
-};
-
-ATTRIBUTE_HELPER_HEADER (NameComponents);
+// for backwards compatibility
+typedef Name NameComponents;
 
 } // namespace ndn
 } // namespace ns3

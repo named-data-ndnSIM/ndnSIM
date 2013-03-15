@@ -32,7 +32,7 @@
 #include <vector>
 #include <list>
 
-#include "ndn-name-components.h"
+#include "ndn-name.h"
 
 namespace ns3 {
 namespace ndn {
@@ -195,14 +195,14 @@ public:
      * Note that only <KeyName> option for the key locator is supported
      */
     void
-    SetKeyLocator (Ptr<const NameComponents> keyLocator);
+    SetKeyLocator (Ptr<const Name> keyLocator);
 
     /**
      * @brief Get key locator
      *
      * Note that only <KeyName> option for the key locator is supported
      */
-    Ptr<const NameComponents>
+    Ptr<const Name>
     GetKeyLocator () const;
     
   private:
@@ -211,7 +211,7 @@ public:
     ContentType m_type;
     Time m_freshness;
     // FinalBlockID
-    Ptr<const NameComponents> m_keyLocator; // support only <KeyName> option for KeyLocator
+    Ptr<const Name> m_keyLocator; // support only <KeyName> option for KeyLocator
   };
 
   ////////////////////////////////////////////////////////////////////////////  
@@ -231,21 +231,21 @@ public:
   /**
    * \brief Set content object name
    *
-   * Sets name of the content object. For example, SetName( NameComponents("prefix")("postfix") );
+   * Sets name of the content object. For example, SetName( Name("prefix")("postfix") );
    **/
   void
-  SetName (const Ptr<NameComponents> &name);
+  SetName (const Ptr<Name> &name);
 
   /**
    * @brief Get name of the content object
    */
-  const NameComponents&
+  const Name&
   GetName () const;
 
   /**
    * @brief Get smart pointer to the interest name (to avoid extra memory usage)
    */
-  Ptr<const NameComponents>
+  Ptr<const Name>
   GetNamePtr () const;
 
   /**
@@ -283,7 +283,7 @@ public:
   
 private:
   Signature  m_signature;
-  Ptr<NameComponents> m_name;
+  Ptr<Name> m_name;
   SignedInfo m_signedInfo;
 };
 

@@ -20,7 +20,7 @@
 
 #include "ndn-encoding-helper.h"
 
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-interest-header.h"
 #include "ns3/ndn-content-object-header.h"
 
@@ -37,7 +37,7 @@ EncodingHelper::Serialize (Buffer::Iterator start, const InterestHeader &interes
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
   
   written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG); // <Name>
-  written += AppendNameComponents (start, interest.GetName());                // <Component>...</Component>...
+  written += AppendName (start, interest.GetName());                // <Component>...</Component>...
   written += AppendCloser (start);                               // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
@@ -55,7 +55,7 @@ EncodingHelper::Serialize (Buffer::Iterator start, const InterestHeader &interes
   if (interest.IsEnabledExclude() && interest.GetExclude().size() > 0)
     {
       written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Exclude, CcnbParser::CCN_DTAG); // <Exclude>
-      written += AppendNameComponents (start, interest.GetExclude());                // <Component>...</Component>...
+      written += AppendName (start, interest.GetExclude());                // <Component>...</Component>...
       written += AppendCloser (start);                                  // </Exclude>
     }
   if (interest.IsEnabledChildSelector())
@@ -106,7 +106,7 @@ EncodingHelper::GetSerializedSize (const InterestHeader &interest)
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>
   
   written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Name); // <Name>
-  written += EstimateNameComponents (interest.GetName()); // <Component>...</Component>...
+  written += EstimateName (interest.GetName()); // <Component>...</Component>...
   written += 1; // </Name>
 
   if (interest.GetMinSuffixComponents() >= 0)
@@ -124,7 +124,7 @@ EncodingHelper::GetSerializedSize (const InterestHeader &interest)
   if (interest.IsEnabledExclude() && interest.GetExclude().size() > 0)
     {
       written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Exclude);
-      written += EstimateNameComponents (interest.GetExclude());                // <Component>...</Component>...
+      written += EstimateName (interest.GetExclude());                // <Component>...</Component>...
       written += 1;                                  // </Exclude>
     }
   if (interest.IsEnabledChildSelector())
@@ -238,7 +238,7 @@ EncodingHelper::AppendCloser (Buffer::Iterator &start)
 }
 
 size_t
-EncodingHelper::AppendNameComponents (Buffer::Iterator &start, const NameComponents &name)
+EncodingHelper::AppendName (Buffer::Iterator &start, const Name &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())
@@ -250,7 +250,7 @@ EncodingHelper::AppendNameComponents (Buffer::Iterator &start, const NameCompone
 }
 
 size_t
-EncodingHelper::EstimateNameComponents (const NameComponents &name)
+EncodingHelper::EstimateName (const Name &name)
 {
   size_t written = 0;
   BOOST_FOREACH (const std::string &component, name.GetComponents())

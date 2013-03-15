@@ -1,6 +1,6 @@
 /* -*- Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2011-2013 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -25,76 +25,76 @@
 
 #include <boost/foreach.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("ndn.ContentObjectHeader");
+NS_LOG_COMPONENT_DEFINE ("ndn.ContentObject");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (ContentObjectHeader);
+NS_OBJECT_ENSURE_REGISTERED (ContentObject);
 NS_OBJECT_ENSURE_REGISTERED (ContentObjectTail);
 
 TypeId
-ContentObjectHeader::GetTypeId (void)
+ContentObject::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::ContentObjectHeader")
+  static TypeId tid = TypeId ("ns3::ndn::ContentObject")
     .SetGroupName ("Ndn")
     .SetParent<Header> ()
-    .AddConstructor<ContentObjectHeader> ()
+    .AddConstructor<ContentObject> ()
     ;
   return tid;
 }
 
-ContentObjectHeader::ContentObjectHeader ()
+ContentObject::ContentObject ()
 {
 }
 
 void
-ContentObjectHeader::SetName (const Ptr<NameComponents> &name)
+ContentObject::SetName (const Ptr<Name> &name)
 {
   m_name = name;
 }
 
-const NameComponents&
-ContentObjectHeader::GetName () const
+const Name&
+ContentObject::GetName () const
 {
-  if (m_name==0) throw ContentObjectHeaderException();
+  if (m_name==0) throw ContentObjectException();
   return *m_name;
 }
 
-Ptr<const NameComponents>
-ContentObjectHeader::GetNamePtr () const
+Ptr<const Name>
+ContentObject::GetNamePtr () const
 {
   return m_name;
 }
 
 
 void
-ContentObjectHeader::SetTimestamp (const Time &timestamp)
+ContentObject::SetTimestamp (const Time &timestamp)
 {
   m_timestamp = timestamp;
 }
 
 Time
-ContentObjectHeader::GetTimestamp () const
+ContentObject::GetTimestamp () const
 {
   return m_timestamp;
 }
     
 void
-ContentObjectHeader::SetFreshness (const Time &freshness)
+ContentObject::SetFreshness (const Time &freshness)
 {
   m_freshness = freshness;
 }
 
 Time
-ContentObjectHeader::GetFreshness () const
+ContentObject::GetFreshness () const
 {
   return m_freshness;
 }
 
 
 uint32_t
-ContentObjectHeader::GetSerializedSize () const
+ContentObject::GetSerializedSize () const
 {
   uint32_t size = 2 + ((2 + 2) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
   NS_LOG_INFO ("Serialize size = " << size);
@@ -102,7 +102,7 @@ ContentObjectHeader::GetSerializedSize () const
 }
 
 void
-ContentObjectHeader::Serialize (Buffer::Iterator start) const
+ContentObject::Serialize (Buffer::Iterator start) const
 {
   start.WriteU8 (0x80); // version
   start.WriteU8 (0x01); // packet type
@@ -129,54 +129,54 @@ ContentObjectHeader::Serialize (Buffer::Iterator start) const
 
 
 uint32_t
-ContentObjectHeader::Deserialize (Buffer::Iterator start)
+ContentObject::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
   if (i.ReadU8 () != 0x80)
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
   if (i.ReadU8 () != 0x01)
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
   if (i.ReadU16 () != 2) // signature length
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
   
   if (i.ReadU16 () != 0) // signature type
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
-  m_name = Create<NameComponents> ();
+  m_name = Create<Name> ();
   uint32_t offset = m_name->Deserialize (i);
   i.Next (offset);
 
   if (i.ReadU16 () != (2 + 4 + 2 + 2 + (2 + 0))) // content length
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
   if (i.ReadU16 () != (4 + 2 + 2 + (2 + 0))) // Length (content Info)
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
   m_timestamp = Seconds (i.ReadU32 ());
   m_freshness = Seconds (i.ReadU16 ());
 
   if (i.ReadU16 () != 0) // Reserved
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
   if (i.ReadU16 () != 0) // Length (ContentInfoOptions)
-    throw new ContentObjectHeaderException ();
+    throw new ContentObjectException ();
 
   NS_ASSERT_MSG (i.GetDistanceFrom (start) == GetSerializedSize (),
-                 "Something wrong with ContentObjectHeader::Deserialize");
+                 "Something wrong with ContentObject::Deserialize");
   
   return i.GetDistanceFrom (start);
 }
   
 TypeId
-ContentObjectHeader::GetInstanceTypeId (void) const
+ContentObject::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
   
 void
-ContentObjectHeader::Print (std::ostream &os) const
+ContentObject::Print (std::ostream &os) const
 {
   os << "D: " << GetName ();
   // os << "<ContentObject><Name>" << GetName () << "</Name><Content>";

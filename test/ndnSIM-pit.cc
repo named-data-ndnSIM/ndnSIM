@@ -39,7 +39,7 @@ protected:
     ndn::App::StartApplication ();
 
     // add default route
-    Ptr<ndn::fib::Entry> fibEntry = GetNode ()->GetObject<ndn::Fib> ()->Add (ndn::NameComponents ("/"), m_face, 0);
+    Ptr<ndn::fib::Entry> fibEntry = GetNode ()->GetObject<ndn::Fib> ()->Add (ndn::Name ("/"), m_face, 0);
     fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
     
     Simulator::Schedule (Seconds (0.1), &Client::SendPacket, this, std::string("/1"), 1);
@@ -60,7 +60,7 @@ private:
   {
     Ptr<Packet> pkt = Create<Packet> (0);
     ndn::InterestHeader i;
-    i.SetName (Create<ndn::NameComponents> (prefix));
+    i.SetName (Create<ndn::Name> (prefix));
     i.SetNonce (nonce);
     i.SetInterestLifetime (Seconds (0.5));
 
@@ -75,7 +75,7 @@ PitTest::Test (Ptr<ndn::Fib> fib)
   NS_TEST_ASSERT_MSG_EQ (fib->GetSize (), 1, "There should be only one entry");
 
   Ptr<const ndn::fib::Entry> fibEntry = fib->Begin ();
-  NS_TEST_ASSERT_MSG_EQ (fibEntry->GetPrefix (), ndn::NameComponents ("/"), "prefix should be /");
+  NS_TEST_ASSERT_MSG_EQ (fibEntry->GetPrefix (), ndn::Name ("/"), "prefix should be /");
 }
 
 void

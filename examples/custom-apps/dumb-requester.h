@@ -24,7 +24,7 @@
 #define DUMB_REQUESTER_H_
 
 #include "ns3/ndn-app.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 
 namespace ns3 {
 
@@ -61,7 +61,7 @@ private:
 
 private:
   bool m_isRunning;
-  ndn::NameComponents m_name;
+  ndn::Name m_name;
 };
 
 } // namespace ns3

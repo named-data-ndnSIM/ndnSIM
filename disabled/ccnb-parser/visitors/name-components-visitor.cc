@@ -23,20 +23,20 @@
 #include "string-visitor.h"
 #include "../syntax-tree/dtag.h"
 
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 
 namespace ns3 {
 namespace ndn {
 namespace CcnbParser {
 
 void
-NameComponentsVisitor::visit (Dtag &n, boost::any param/*should be NameComponents* */)
+NameVisitor::visit (Dtag &n, boost::any param/*should be Name* */)
 {
   // uint32_t n.m_dtag;
   // std::list<Ptr<Block> > n.m_nestedBlocks;
   static StringVisitor stringVisitor; 
  
-  NameComponents &components = *(boost::any_cast<NameComponents*> (param));
+  Name &components = *(boost::any_cast<Name*> (param));
 
   switch (n.m_dtag)
     {

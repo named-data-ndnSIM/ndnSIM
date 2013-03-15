@@ -67,12 +67,12 @@ private:
 
 template<class Policy>
 class ContentStoreImpl : public ContentStore,
-                         protected ndnSIM::trie_with_policy< NameComponents,
+                         protected ndnSIM::trie_with_policy< Name,
                                                              ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > >, Entry >,
                                                              Policy >
 {
 public:
-  typedef ndnSIM::trie_with_policy< NameComponents,
+  typedef ndnSIM::trie_with_policy< Name,
                                     ndnSIM::smart_pointer_payload_traits< EntryImpl< ContentStoreImpl< Policy > >, Entry >,
                                     Policy > super;
 

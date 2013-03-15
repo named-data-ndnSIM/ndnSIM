@@ -22,7 +22,7 @@
 
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-face.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 
 #include "ns3/channel.h"
 
@@ -74,7 +74,7 @@ GlobalRouter::GetL3Protocol () const
 }
 
 void
-GlobalRouter::AddLocalPrefix (Ptr< NameComponents > prefix)
+GlobalRouter::AddLocalPrefix (Ptr< Name > prefix)
 {
   m_localPrefixes.push_back (prefix);
 }

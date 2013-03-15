@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2011-2013 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -32,7 +32,7 @@
 #include <vector>
 #include <list>
 
-#include "ndn-name-components.h"
+#include "ndn-name.h"
 
 namespace ns3 {
 namespace ndn {
@@ -56,7 +56,7 @@ namespace ndn {
  * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
  * 
  */
-class ContentObjectHeader : public SimpleRefCount<ContentObjectHeader,Header>
+class ContentObject : public SimpleRefCount<ContentObject,Header>
 {
 public:
   /**
@@ -64,26 +64,26 @@ public:
    *
    * Creates a null header
    **/
-  ContentObjectHeader ();
+  ContentObject ();
 
   /**
    * \brief Set content object name
    *
-   * Sets name of the content object. For example, SetName( NameComponents("prefix")("postfix") );
+   * Sets name of the content object. For example, SetName( Name("prefix")("postfix") );
    **/
   void
-  SetName (const Ptr<NameComponents> &name);
+  SetName (const Ptr<Name> &name);
 
   /**
    * @brief Get name of the content object
    */
-  const NameComponents&
+  const Name&
   GetName () const;
 
   /**
    * @brief Get smart pointer to the interest name (to avoid extra memory usage)
    */
-  Ptr<const NameComponents>
+  Ptr<const Name>
   GetNamePtr () const;
 
   /**
@@ -122,10 +122,12 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
   
 private:
-  Ptr<NameComponents> m_name;
+  Ptr<Name> m_name;
   Time m_freshness;
   Time m_timestamp;
 };
+
+class ContentObjectHeader : public ContentObject { };
 
 /**
  * ContentObjectTail for compatibility with other packet formats

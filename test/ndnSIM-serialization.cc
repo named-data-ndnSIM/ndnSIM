@@ -38,8 +38,8 @@ InterestSerializationTest::DoRun ()
 {
   InterestHeader source;
   
-  source.SetName (Create<NameComponents> (boost::lexical_cast<NameComponents> ("/test/test2")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NameComponents> ("/test/test2"), "set/get name failed");
+  source.SetName (Create<Name> (boost::lexical_cast<Name> ("/test/test2")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<Name> ("/test/test2"), "set/get name failed");
   
   source.SetScope (2);
   NS_TEST_ASSERT_MSG_EQ (source.GetScope (), 2, "set/get scope failed");
@@ -73,8 +73,8 @@ ContentObjectSerializationTest::DoRun ()
 {
   ContentObjectHeader source;
   
-  source.SetName (Create<NameComponents> (boost::lexical_cast<NameComponents> ("/test/test2/1")));
-  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<NameComponents> ("/test/test2/1"), "set/get name failed");
+  source.SetName (Create<Name> (boost::lexical_cast<Name> ("/test/test2/1")));
+  NS_TEST_ASSERT_MSG_EQ (source.GetName (), boost::lexical_cast<Name> ("/test/test2/1"), "set/get name failed");
   
   source.SetFreshness (Seconds (10));
   NS_TEST_ASSERT_MSG_EQ (source.GetFreshness (), Seconds (10), "set/get freshness failed");

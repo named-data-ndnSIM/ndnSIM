@@ -53,7 +53,7 @@ InterestHeader::InterestHeader ()
 }
 
 InterestHeader::InterestHeader (const InterestHeader &interest)
-  : m_name                (Create<NameComponents> (interest.GetName ()))
+  : m_name                (Create<Name> (interest.GetName ()))
   , m_scope               (interest.m_scope)
   , m_interestLifetime    (interest.m_interestLifetime)
   , m_nonce               (interest.m_nonce)
@@ -71,19 +71,19 @@ InterestHeader::GetInterest (Ptr<Packet> packet)
 }
 
 void
-InterestHeader::SetName (Ptr<NameComponents> name)
+InterestHeader::SetName (Ptr<Name> name)
 {
   m_name = name;
 }
 
-const NameComponents&
+const Name&
 InterestHeader::GetName () const
 {
   if (m_name==0) throw InterestHeaderException();
   return *m_name;
 }
 
-Ptr<const NameComponents>
+Ptr<const Name>
 InterestHeader::GetNamePtr () const
 {
   return m_name;
@@ -186,7 +186,7 @@ InterestHeader::Deserialize (Buffer::Iterator start)
   
   m_interestLifetime = Seconds (i.ReadU16 ());
 
-  m_name = Create<NameComponents> ();
+  m_name = Create<Name> ();
   uint32_t offset = m_name->Deserialize (i);
   i.Next (offset);
   

@@ -20,7 +20,7 @@
 
 #include "ndn-fib-entry.h"
 
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 

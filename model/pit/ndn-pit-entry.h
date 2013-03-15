@@ -137,7 +137,7 @@ public:
   /**
    * @brief Get prefix of the PIT entry
    */
-  const NameComponents &
+  const Name &
   GetPrefix () const;
 
   /**

@@ -29,12 +29,12 @@ namespace CcnbParser {
 
 /**
  * \ingroup ccnx-ccnb
- * \brief Visitor to obtain fill CcnxNameComponents object with name components
+ * \brief Visitor to obtain fill CcnxName object with name components
  */
-class NameComponentsVisitor : public VoidDepthFirstVisitor
+class NameVisitor : public VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (Dtag &n, boost::any param/*should be CcnxNameComponents* */);
+  virtual void visit (Dtag &n, boost::any param/*should be CcnxName* */);
 };
 
 }

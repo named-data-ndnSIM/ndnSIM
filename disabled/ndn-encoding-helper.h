@@ -31,7 +31,7 @@
 namespace ns3 {
 namespace ndn {
 
-class NameComponents;
+class Name;
 
 class InterestHeader;
 class ContentObjectHeader;
@@ -107,22 +107,22 @@ public:
   AppendCloser (Buffer::Iterator &start);
 
   /**
-   * @brief Append NameComponents in CCNB encoding
+   * @brief Append Name in CCNB encoding
    * @param start Buffer to store serialized InterestHeader
-   * @param name constant reference to NameComponents object
+   * @param name constant reference to Name object
    *
    * @returns written length
    */
   static size_t
-  AppendNameComponents (Buffer::Iterator &start, const NameComponents &name);
+  AppendName (Buffer::Iterator &start, const Name &name);
 
   /**
-   * @brief Estimate size of NameComponents in CCNB encoding
-   * @param name constant reference to NameComponents object
+   * @brief Estimate size of Name in CCNB encoding
+   * @param name constant reference to Name object
    * @returns estimated length
    */
   static size_t
-  EstimateNameComponents (const NameComponents &name);
+  EstimateName (const Name &name);
 
   /**
    * Append a binary timestamp as a BLOB using the ccn binary

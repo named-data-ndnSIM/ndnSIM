@@ -25,7 +25,7 @@
 #include "ndn-app.h"
 
 #include "ns3/ptr.h"
-#include "ns3/ndn-name-components.h"
+#include "ns3/ndn-name.h"
 #include "ns3/ndn-content-object.h"
 
 namespace ns3 {
@@ -59,7 +59,7 @@ protected:
   StopApplication ();     // Called at time specified by Stop
 
 private:
-  NameComponents m_prefix;
+  Name m_prefix;
   uint32_t m_virtualPayloadSize;
   Time m_freshness;
 };

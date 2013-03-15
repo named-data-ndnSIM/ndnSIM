@@ -58,7 +58,7 @@ CustomApp::StartApplication ()
   ndn::App::StartApplication ();
 
   // Create a name components object for name ``/prefix/sub``
-  Ptr<ndn::NameComponents> prefix = Create<ndn::NameComponents> (); // now prefix contains ``/``
+  Ptr<ndn::Name> prefix = Create<ndn::Name> (); // now prefix contains ``/``
   prefix->Add ("prefix"); // now prefix contains ``/prefix``
   prefix->Add ("sub"); // now prefix contains ``/prefix/sub``
 
@@ -91,7 +91,7 @@ CustomApp::SendInterest ()
   // Sending one Interest packet out //
   /////////////////////////////////////
   
-  Ptr<ndn::NameComponents> prefix = Create<ndn::NameComponents> ("/prefix/sub"); // another way to create name
+  Ptr<ndn::Name> prefix = Create<ndn::Name> ("/prefix/sub"); // another way to create name
 
   // Create and configure ndn::InterestHeader
   ndn::InterestHeader interestHeader;
@@ -125,7 +125,7 @@ CustomApp::OnInterest (const Ptr<const ndn::InterestHeader> &interest, Ptr<Packe
   // Note that Interests send out by the app will not be sent back to the app !
   
   ndn::ContentObjectHeader data;
-  data.SetName (Create<ndn::NameComponents> (interest->GetName ())); // data will have the same name as Interests
+  data.SetName (Create<ndn::Name> (interest->GetName ())); // data will have the same name as Interests
 
   ndn::ContentObjectTail trailer; // doesn't require any configuration
 

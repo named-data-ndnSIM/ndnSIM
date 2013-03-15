@@ -85,13 +85,13 @@ FibImpl::LongestPrefixMatch (const InterestHeader &interest)
 
 
 Ptr<Entry>
-FibImpl::Add (const NameComponents &prefix, Ptr<Face> face, int32_t metric)
+FibImpl::Add (const Name &prefix, Ptr<Face> face, int32_t metric)
 {
-  return Add (Create<NameComponents> (prefix), face, metric);
+  return Add (Create<Name> (prefix), face, metric);
 }
   
 Ptr<Entry>
-FibImpl::Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t metric)
+FibImpl::Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix) << boost::cref(*face) << metric);
 
@@ -123,7 +123,7 @@ FibImpl::Add (const Ptr<const NameComponents> &prefix, Ptr<Face> face, int32_t m
 }
 
 void
-FibImpl::Remove (const Ptr<const NameComponents> &prefix)
+FibImpl::Remove (const Ptr<const Name> &prefix)
 {
   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 
@@ -140,7 +140,7 @@ FibImpl::Remove (const Ptr<const NameComponents> &prefix)
 }
 
 // void
-// FibImpl::Invalidate (const Ptr<const NameComponents> &prefix)
+// FibImpl::Invalidate (const Ptr<const Name> &prefix)
 // {
 //   NS_LOG_FUNCTION (this->GetObject<Node> ()->GetId () << boost::cref(*prefix));
 

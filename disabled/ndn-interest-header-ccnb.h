@@ -31,7 +31,7 @@
 #include <vector>
 #include <list>
 
-#include "ndn-name-components.h"
+#include "ndn-name.h"
 
 namespace ns3 {
 
@@ -147,11 +147,11 @@ public:
   /**
    * \brief Set interest name
    *
-   * Sets name of the interest. For example, SetName( ndnNameComponents("prefix")("postfix") );
-   * @param[in] name const pointer to ndnNameComponents object that contains an interest name
+   * Sets name of the interest. For example, SetName( ndnName("prefix")("postfix") );
+   * @param[in] name const pointer to ndnName object that contains an interest name
    **/
   void
-  SetName (Ptr<NameComponents> name);
+  SetName (Ptr<Name> name);
 
 
   /**
@@ -159,13 +159,13 @@ public:
    *
    * Gets name of the interest.
    **/
-  const NameComponents&
+  const Name&
   GetName () const;
 
   /**
    * @brief Get smart pointer to the interest name (to avoid extra memory usage)
    */
-  Ptr<const NameComponents>
+  Ptr<const Name>
   GetNamePtr () const;
 
   /**
@@ -214,11 +214,11 @@ public:
   /**
    * \brief Set exclude filer
    *
-   * For example, SetExclude (ndnNameComponents("exclude1")("exclude2")("exclude3"))
-   * @param[in] exclude const pointer to ndnNameComponents to be excluded 
+   * For example, SetExclude (ndnName("exclude1")("exclude2")("exclude3"))
+   * @param[in] exclude const pointer to ndnName to be excluded 
    **/
   void
-  SetExclude (Ptr<NameComponents> exclude);
+  SetExclude (Ptr<Name> exclude);
 
   /**
    * \brief Check if interest conatins exclude filter
@@ -230,7 +230,7 @@ public:
   /**
    * \brief Get exclude filter 
    */
-  const NameComponents&
+  const Name&
   GetExclude () const;
 
   /**
@@ -395,10 +395,10 @@ public:
   GetInterest (Ptr<Packet> packet);
   
 private:
-  Ptr<NameComponents> m_name;    ///< Interest name
+  Ptr<Name> m_name;    ///< Interest name
   int32_t m_minSuffixComponents; ///< Minimum suffix components. not used if negative
   int32_t m_maxSuffixComponents; ///< Maximum suffix components. not used if negative
-  Ptr<NameComponents> m_exclude; ///< Exclude filter
+  Ptr<Name> m_exclude; ///< Exclude filter
   bool m_childSelector;          ///< Default value for ChildSelector is false
   bool m_answerOriginKind;       ///< Default value for AnswerOriginKind is false
   int8_t m_scope;                ///< -1 not set, 0 local scope, 1 this host, 2 immediate neighborhood

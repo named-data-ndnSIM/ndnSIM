@@ -64,8 +64,8 @@ Consumer::GetTypeId (void)
 
     .AddAttribute ("Prefix","Name of the Interest",
                    StringValue ("/"),
-                   MakeNameComponentsAccessor (&Consumer::m_interestName),
-                   MakeNameComponentsChecker ())
+                   MakeNameAccessor (&Consumer::m_interestName),
+                   MakeNameChecker ())
     .AddAttribute ("LifeTime", "LifeTime for interest packet",
                    StringValue ("2s"),
                    MakeTimeAccessor (&Consumer::m_interestLifeTime),
@@ -198,7 +198,7 @@ Consumer::SendPacket ()
     }
 
   //
-  Ptr<NameComponents> nameWithSequence = Create<NameComponents> (m_interestName);
+  Ptr<Name> nameWithSequence = Create<Name> (m_interestName);
   (*nameWithSequence) (seq);
   //
 

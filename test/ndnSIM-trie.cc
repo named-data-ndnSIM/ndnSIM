@@ -60,7 +60,7 @@ TrieTest::DoRun ()
 {
   cerr << "TrieTest is temporarily broken" << endl;
   // typedef trie_with_policy<
-  //   ns3::NdnNameComponents,
+  //   ns3::NdnName,
   //   smart_pointer_payload_traits<Integer>,
   //   multi_policy_traits<
   //     mpl::vector2<lru_policy_traits,random_policy_traits>
@@ -75,7 +75,7 @@ TrieTest::DoRun ()
   
   // // // // x.getTrie ().PrintStat (std::cout);
   
-  // ns3::NdnNameComponents n1,n2,n3,n4;
+  // ns3::NdnName n1,n2,n3,n4;
   // // // // n1("a")("b")("c");
   // // // // n2("a")("b")("d");
   // // // // n3("a")("b")("f");
@@ -108,12 +108,12 @@ TrieTest::DoRun ()
   // node->AggregateObject (fib);
   // Ptr<ndn::Face> face = CreateObject<ndn::AppFace> (app);
 
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla"), face, 1);
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1"), face, 1);
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/2"), face, 1);
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/3"), face, 1);
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/1"), face, 1);
-  // fib->Add (lexical_cast<ndn::NameComponents> ("/bla/1/2"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla/1"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla/2"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla/3"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla/1/1"), face, 1);
+  // fib->Add (lexical_cast<ndn::Name> ("/bla/1/2"), face, 1);
   
   // cout << *fib << endl;
 
@@ -125,7 +125,7 @@ TrieTest::DoRun ()
   //     std::cout << *item.payload () << " " << std::endl;
   //   }
 
-  // ns3::NdnNameComponents n4;
+  // ns3::NdnName n4;
   // n4("a")("c");
     
   // // std::cout << *x->find (n4).get<0> ();
