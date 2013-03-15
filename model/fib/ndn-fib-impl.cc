@@ -83,6 +83,17 @@ FibImpl::LongestPrefixMatch (const Interest &interest)
     return item->payload ();
 }
 
+Ptr<fib::Entry>
+FibImpl::Find (const Name &prefix)
+{
+  super::iterator item = super::find_exact (prefix);
+
+  if (item == super::end ())
+    return 0;
+  else
+    return item->payload ();
+}
+
 
 Ptr<Entry>
 FibImpl::Add (const Name &prefix, Ptr<Face> face, int32_t metric)

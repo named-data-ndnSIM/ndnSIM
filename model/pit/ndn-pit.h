@@ -89,6 +89,15 @@ public:
   Lookup (const Interest &header) = 0;
 
   /**
+   * @brief Get PIT entry for the prefix (exact match)
+   *
+   * @param prefix Name for PIT entry
+   * @returns If entry is found, a valid iterator (Ptr<pit::Entry>) will be returned. Otherwise End () (==0)
+   */
+  virtual Ptr<pit::Entry>
+  Find (const Name &prefix) = 0;
+
+  /**
    * @brief Creates a PIT entry for the given interest
    * @param header parsed interest header
    * @returns iterator to Pit entry. If record could not be created (e.g., limit reached),

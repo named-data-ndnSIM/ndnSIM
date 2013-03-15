@@ -213,6 +213,19 @@ PitImpl<Policy>::Lookup (const Interest &header)
 
 template<class Policy>
 Ptr<Entry>
+PitImpl<Policy>::Find (const Name &prefix)
+{
+  typename super::iterator item = super::find_exact (prefix);
+
+  if (item == super::end ())
+    return 0;
+  else
+    return item->payload ();
+}
+
+
+template<class Policy>
+Ptr<Entry>
 PitImpl<Policy>::Create (Ptr<const Interest> header)
 {
   NS_LOG_DEBUG (header->GetName ());

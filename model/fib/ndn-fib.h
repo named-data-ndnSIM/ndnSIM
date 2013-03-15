@@ -65,6 +65,15 @@ public:
    */
   virtual Ptr<fib::Entry>
   LongestPrefixMatch (const Interest &interest) = 0;
+
+  /**
+   * @brief Get FIB entry for the prefix (exact match)
+   *
+   * @param prefix Name for FIB entry
+   * @returns If entry is found, a valid iterator (Ptr<fib::Entry>) will be returned. Otherwise End () (==0)
+   */
+  virtual Ptr<fib::Entry>
+  Find (const Name &prefix) = 0;
   
   /**
    * \brief Add or update FIB entry

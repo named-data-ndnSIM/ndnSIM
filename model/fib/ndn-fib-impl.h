@@ -87,6 +87,9 @@ public:
 
   virtual Ptr<Entry>
   LongestPrefixMatch (const Interest &interest);
+
+  virtual Ptr<fib::Entry>
+  Find (const Name &prefix);
   
   virtual Ptr<Entry>
   Add (const Name &prefix, Ptr<Face> face, int32_t metric);

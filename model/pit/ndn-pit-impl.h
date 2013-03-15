@@ -81,6 +81,9 @@ public:
   Lookup (const Interest &header);
 
   virtual Ptr<Entry>
+  Find (const Name &prefix);
+  
+  virtual Ptr<Entry>
   Create (Ptr<const Interest> header);
 
   virtual void
