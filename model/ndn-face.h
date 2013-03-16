@@ -50,7 +50,7 @@ namespace ndn {
  * component responsible for actual delivery of data packet to and
  * from NDN stack
  *
- * \see ndn::LocalFace, ndn::NetDeviceFace, ndn::Ipv4Face, ndn::UdpFace
+ * \see ndn::AppFace, ndn::NetDeviceFace
  */
 class Face :
     public Object
@@ -60,7 +60,7 @@ public:
   GetTypeId ();
   
   /**
-   * \brief Ndn protocol handler
+   * \brief NDN protocol handler
    *
    * \param face Face from which packet has been received
    * \param packet Original packet
@@ -150,7 +150,7 @@ public:
   Print (std::ostream &os) const;
 
   /**
-   * \brief Set node Id
+   * \brief Set face Id
    *
    * Id is purely informative and should not be used for any other purpose
    *
@@ -160,7 +160,7 @@ public:
   SetId (uint32_t id);
 
   /**
-   * \brief Get node Id
+   * \brief Get face Id
    *
    * Id is purely informative and should not be used for any other purpose
    *
@@ -212,7 +212,7 @@ protected:
 private:
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to Ndn stack
   bool m_ifup; ///< \brief flag indicating that the interface is UP 
-  uint32_t m_id; ///< \brief id of the interface in Ndn stack (per-node uniqueness)
+  uint32_t m_id; ///< \brief id of the interface in NDN stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
 
   TracedCallback<Ptr<const Packet> > m_txTrace;
