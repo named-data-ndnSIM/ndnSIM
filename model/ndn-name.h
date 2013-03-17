@@ -66,6 +66,13 @@ public:
   Name (const std::list<boost::reference_wrapper<const std::string> > &components);
 
   /**
+   * \brief Constructor
+   * Creates a prefix from a list of strings where every string represents a prefix component
+   * @param[in] components A list of strings
+   */
+  Name (const std::list<std::string> &components);
+  
+  /**
    * @brief Constructor
    * Creates a prefix from the string (string is parsed using operator>>)
    * @param[in] prefix A string representation of a prefix
@@ -85,7 +92,7 @@ public:
    * @param[in] value The object to be appended
    */
   template<class T>
-  inline void
+  inline Name&
   Add (const T &value);
 
   /**
@@ -260,8 +267,7 @@ template<class T>
 Name&
 Name::operator () (const T &value)
 {
-  Add (value);
-  return *this;
+  return Add (value);
 }
 
 /**
@@ -270,12 +276,14 @@ Name::operator () (const T &value)
  * @param[in] value The object to be appended
  */
 template<class T>
-void
+Name&
 Name::Add (const T &value)
 {
   std::ostringstream os;
   os << value;
   m_prefix.push_back (os.str ());
+
+  return *this;
 }
 
 /**

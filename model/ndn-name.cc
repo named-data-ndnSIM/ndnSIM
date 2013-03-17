@@ -46,6 +46,14 @@ Name::Name (const std::list<boost::reference_wrapper<const std::string> > &compo
     }
 }
 
+Name::Name (const std::list<std::string> &components)
+{
+  BOOST_FOREACH (const std::string &component, components)
+    {
+      Add (component);
+    }
+}
+
 Name::Name (const std::string &prefix)
 {
   istringstream is (prefix);
