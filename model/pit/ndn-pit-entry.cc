@@ -219,7 +219,6 @@ Entry::AreTherePromisingOutgoingFacesExcept (Ptr<Face> face) const
 void
 Entry::IncreaseAllowedRetxCount ()
 {
-  NS_LOG_ERROR (this);
   if (Simulator::Now () - m_lastRetransmission >= MilliSeconds (100))
     {
       // cheat:

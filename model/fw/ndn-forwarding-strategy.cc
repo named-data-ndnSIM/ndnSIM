@@ -389,20 +389,15 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
   BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
     {
       bool ok = incoming.m_face->Send (origPacket->Copy ());
-      if (ok)
-        {
-          m_outData (header, payload, inFace == 0, incoming.m_face);
-          DidSendOutData (inFace, incoming.m_face, header, payload, origPacket, pitEntry);
 
-          NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
-        }
-      else
+      DidSendOutData (inFace, incoming.m_face, header, payload, origPacket, pitEntry);
+      NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
+
+      if (!ok)
         {
           m_dropData (header, payload, incoming.m_face);
           NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
         }
-
-      // successfull forwarded data trace
     }
 
   // All incoming interests are satisfied. Remove them
@@ -570,7 +565,11 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 
   //transmission
   Ptr<Packet> packetToSend = origPacket->Copy ();
-  outFace->Send (packetToSend);
+  bool successSend = outFace->Send (packetToSend);
+  if (!successSend)
+    {
+      m_dropInterests (header, outFace);
+    }
 
   DidSendOutInterest (inFace, outFace, header, origPacket, pitEntry);
 
@@ -595,6 +594,7 @@ ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
                                     Ptr<const Packet> origPacket,
                                     Ptr<pit::Entry> pitEntry)
 {
+  m_outData (header, payload, inFace == 0, outFace);
 }
 
 void
