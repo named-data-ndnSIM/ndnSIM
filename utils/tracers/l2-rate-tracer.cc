@@ -109,7 +109,9 @@ L2RateTracer::PrintHeader (std::ostream &os) const
 
      << "Type" << "\t"
      << "Packets" << "\t"
-     << "Kilobytes";
+     << "Kilobytes" << "\t"
+     << "PacketsRaw" << "\t"
+     << "KilobytesRaw";
 }
 
 void
@@ -133,7 +135,9 @@ STATS(3).fieldName = /*new value*/alpha * RATE(1, fieldName) / 1024.0 + /*old va
  << interface << "\t"                                                  \
  << printName << "\t"                                                   \
  << STATS(2).fieldName  << "\t"                                         \
- << STATS(3).fieldName << "\n";
+ << STATS(3).fieldName << "\t"                                         \
+ << STATS(0).fieldName << "\t"                                         \
+ << STATS(1).fieldName / 1024.0 << "\n";
 
 void
 L2RateTracer::Print (std::ostream &os) const
