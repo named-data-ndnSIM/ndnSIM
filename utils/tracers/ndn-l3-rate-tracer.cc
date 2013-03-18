@@ -170,15 +170,15 @@ L3RateTracer::Print (std::ostream &os) const
 
       PRINTER ("InInterests",   m_inInterests);
       PRINTER ("OutInterests",  m_outInterests);
-      // PRINTER ("DropInterests", m_dropInterests);
+      PRINTER ("DropInterests", m_dropInterests);
       
       PRINTER ("InNacks",   m_inNacks);
       PRINTER ("OutNacks",  m_outNacks);
-      // PRINTER ("DropNacks", m_dropNacks);
+      PRINTER ("DropNacks", m_dropNacks);
 
       PRINTER ("InData",   m_inData);
       PRINTER ("OutData",  m_outData);
-      // PRINTER ("DropData", m_dropData);
+      PRINTER ("DropData", m_dropData);
     }
 }
 
