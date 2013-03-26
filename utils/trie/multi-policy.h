@@ -163,6 +163,8 @@ struct multi_policy_traits
     
     template< typename U > void operator() (U index)
     {
+      if (!m_name.empty ())
+        m_name += "::";
       m_name += boost::mpl::at_c< policy_traits, U::value >::type::GetName ();
     }
 
