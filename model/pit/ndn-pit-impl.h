@@ -88,7 +88,7 @@ public:
 
   virtual Ptr<Entry>
   Find (const Name &prefix);
-  
+
   virtual Ptr<Entry>
   Create (Ptr<const Interest> header);
 
@@ -112,6 +112,9 @@ public:
 
   const typename super::policy_container &
   GetPolicy () const { return super::getPolicy (); }
+
+  typename super::policy_container &
+  GetPolicy () { return super::getPolicy (); }
 
 protected:
   void RescheduleCleaning ();
@@ -137,7 +140,7 @@ private:
   Ptr<ForwardingStrategy> m_forwardingStrategy;
 
   static LogComponent g_log; ///< @brief Logging variable
-  
+
   // indexes
   typedef
   boost::intrusive::multiset<entry,

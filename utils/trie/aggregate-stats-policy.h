@@ -105,7 +105,7 @@ struct aggregate_stats_policy_traits
       }
 
       inline void
-      resetStats ()
+      ResetStats ()
       {
         m_updates = 0;
         m_inserts = 0;
