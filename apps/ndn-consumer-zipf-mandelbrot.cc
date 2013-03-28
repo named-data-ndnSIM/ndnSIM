@@ -44,20 +44,20 @@ ConsumerZipfMandelbrot::GetTypeId (void)
     .SetParent<ConsumerCbr> ()
     .AddConstructor<ConsumerZipfMandelbrot> ()
 
-    .AddAttribute ("q", "parameter of improve rank",
-                   StringValue ("0.7"),
-                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetQ, &ConsumerZipfMandelbrot::GetQ),
-                   MakeDoubleChecker<double> ())
-    .AddAttribute ("s", "parameter of power",
-                   StringValue ("0.7"),
-                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetS, &ConsumerZipfMandelbrot::GetS),
-                   MakeDoubleChecker<double> ())
-
     .AddAttribute ("NumberOfContents", "Number of the Contents in total",
                    StringValue ("100"),
                    MakeUintegerAccessor (&ConsumerZipfMandelbrot::SetNumberOfContents, &ConsumerZipfMandelbrot::GetNumberOfContents),
                    MakeUintegerChecker<uint32_t> ())
 
+    .AddAttribute ("q", "parameter of improve rank",
+                   StringValue ("0.7"),
+                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetQ, &ConsumerZipfMandelbrot::GetQ),
+                   MakeDoubleChecker<double> ())
+    
+    .AddAttribute ("s", "parameter of power",
+                   StringValue ("0.7"),
+                   MakeDoubleAccessor (&ConsumerZipfMandelbrot::SetS, &ConsumerZipfMandelbrot::GetS),
+                   MakeDoubleChecker<double> ())
     ;
 
   return tid;
@@ -65,7 +65,8 @@ ConsumerZipfMandelbrot::GetTypeId (void)
 
 
 ConsumerZipfMandelbrot::ConsumerZipfMandelbrot()
-  : m_q (0.7)
+  : m_N (100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
+  , m_q (0.7)
   , m_s (0.7)
   , m_SeqRng (0.0, 1.0)
 {
@@ -81,7 +82,7 @@ ConsumerZipfMandelbrot::SetNumberOfContents (uint32_t numOfContents)
 {
   m_N = numOfContents;
 
-  // NS_LOG_DEBUG (m_q << " and " << m_s << " and " << m_N);
+  NS_LOG_DEBUG (m_q << " and " << m_s << " and " << m_N);
 
   m_Pcum = std::vector<double> (m_N + 1);
 
