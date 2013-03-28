@@ -21,11 +21,13 @@
 #ifndef MEM_USAGE_H
 #define MEM_USAGE_H
 
-// #ifdef __linux__
+#ifdef __linux__
 // #include <proc/readproc.h>
 // #include <unistd.h>
 // // #include <sys/resource.h>
-// #endif
+#include <sys/sysinfo.h>
+#endif
+
 #ifdef __APPLE__
 #include <mach/task.h>
 #include <mach/mach_traps.h>
@@ -49,23 +51,40 @@ public:
   int64_t
   Get ()
   {
-// #ifdef __linux__
-//     struct proc_t usage;
-//     look_up_our_self(&usage);
-//     return usage.rss * getpagesize ();
-//     //  struct rusage usage;
-//     //
-//     //  int ret = getrusage (RUSAGE_SELF, &usage);
-//     //  if (ret < 0)
-//     //    {
-//     //      os << "NA";
-//     //      return os;
-//     //    }
-//     //
-//     //  os << (usage.ru_ixrss + usage.ru_idrss + usage.ru_isrss);
-//     //  return os;
-// #endif
-#ifdef __APPLE__
+#if defined(__linux__)
+/*
+/proc/[pid]/statm
+              Provides information about memory usage, measured in pages.  The
+              columns are:
+
+                  size       (1) total program size
+                             (same as VmSize in /proc/[pid]/status)
+                  resident   (2) resident set size
+                             (same as VmRSS in /proc/[pid]/status)
+                  share      (3) shared pages (i.e., backed by a file)
+                  text       (4) text (code)
+                  lib        (5) library (unused in Linux 2.6)
+                  data       (6) data + stack
+                  dt         (7) dirty pages (unused in Linux 2.6)
+
+Reference: http://man7.org/linux/man-pages/man5/proc.5.html
+*/
+    std::ifstream is ("/proc/self/statm");
+    if (!is.bad () && !is.eof ())
+      {
+        unsigned long vm;
+	unsigned long rss;
+        is >> vm   // the first number: virtual memory
+           >> rss; // the second number: resident set size
+        
+        return rss * getpagesize ();
+      }
+    else
+      {
+        return -1;
+      }
+
+#elif defined(__APPLE__)
     struct task_basic_info t_info;
     mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
