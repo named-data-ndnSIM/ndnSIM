@@ -92,7 +92,7 @@ struct lfu_policy_traits
       inline void
       update (typename parent_trie::iterator item)
       {
-        policy_container::erase (*item);
+        policy_container::erase (policy_container::s_iterator_to (*item));
         get_order (item) += 1;
         policy_container::insert (*item);
       }
@@ -115,7 +115,7 @@ struct lfu_policy_traits
       inline void
       lookup (typename parent_trie::iterator item)
       {
-        policy_container::erase (*item);
+        policy_container::erase (policy_container::s_iterator_to (*item));
         get_order (item) += 1;
         policy_container::insert (*item);
       }
