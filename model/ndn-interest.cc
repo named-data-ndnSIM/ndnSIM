@@ -76,6 +76,12 @@ Interest::SetName (Ptr<Name> name)
   m_name = name;
 }
 
+void
+Interest::SetName (const Name &name)
+{
+  m_name = Create<Name> (name);
+}
+
 const Name&
 Interest::GetName () const
 {

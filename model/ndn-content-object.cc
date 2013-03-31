@@ -49,9 +49,15 @@ ContentObject::ContentObject ()
 }
 
 void
-ContentObject::SetName (const Ptr<Name> &name)
+ContentObject::SetName (Ptr<Name> name)
 {
   m_name = name;
+}
+
+void
+ContentObject::SetName (const Name &name)
+{
+  m_name = Create<Name> (name);
 }
 
 const Name&

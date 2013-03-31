@@ -101,12 +101,21 @@ public:
   /**
    * \brief Set interest name
    *
-   * Sets name of the interest. For example, SetName( ndnName("prefix")("postfix") );
-   * @param[in] name const pointer to ndnName object that contains an interest name
+   * @param name smart pointer to Name
+   *
    **/
   void
   SetName (Ptr<Name> name);
 
+  /**
+   * \brief Another variant to set interest name
+   *
+   * @param name const reference to Name object
+   *
+   **/
+  void
+  SetName (const Name &name);
+  
   /**
    * \brief Get interest name
    *

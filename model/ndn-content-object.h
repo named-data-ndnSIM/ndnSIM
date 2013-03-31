@@ -42,8 +42,7 @@ namespace ndn {
  *
  * Only few important fields are actually implemented in the simulation
  *
- * ContentObject serializes/deserializes header up-to and including <Content> tags
- * Necessary closing tags should be added using ContentObjectTail
+ * @see http://ndnsim.net/new-packet-formats.html
  *
  * Optimized and simplified formatting of Interest packets
  *
@@ -51,9 +50,27 @@ namespace ndn {
  *                	  Name
  *                   	  Content
  *
- * This hacks are necessary to optimize memory use (i.e., virtual payload)
- *
- * "<ContentObject><Signature>..</Signature><Name>...</Name><SignedInfo>...</SignedInfo><Content>"
+ *      0                   1                   2                   3
+ *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+ *      ~                                                               ~
+ *      ~                           Signature                           ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+ *      ~                                                               ~
+ *      ~                             Name                              ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+ *      ~                                                               ~
+ *      ~                           Content                             ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
 class ContentObject : public SimpleRefCount<ContentObject,Header>
@@ -69,11 +86,19 @@ public:
   /**
    * \brief Set content object name
    *
-   * Sets name of the content object. For example, SetName( Name("prefix")("postfix") );
+   * Sets name of the content object
    **/
   void
-  SetName (const Ptr<Name> &name);
+  SetName (Ptr<Name> name);
 
+  /**
+   * @brief Another, less efficient, variant of setting content object name
+   *
+   * Sets name of the content object
+   */
+  void
+  SetName (const Name &name);
+  
   /**
    * @brief Get name of the content object
    */
