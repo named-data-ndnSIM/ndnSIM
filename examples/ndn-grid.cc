@@ -67,21 +67,21 @@ main (int argc, char *argv[])
   PointToPointGridHelper grid (3, 3, p2p);
   grid.BoundingBox(100,100,200,200);
 
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-  ccnxHelper.InstallAll ();
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
+  ndnHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll ();
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll ();
 
   // Getting containers for the consumer/producer
   Ptr<Node> producer = grid.GetNode (2, 2);
   NodeContainer consumerNodes;
   consumerNodes.Add (grid.GetNode (0,0));
 
-  // Install CCNx applications
+  // Install NDN applications
   std::string prefix = "/prefix";
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
@@ -95,10 +95,10 @@ main (int argc, char *argv[])
   producerHelper.Install (producer);
 
   // Add /prefix origins to ndn::GlobalRouter
-  ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+  ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes ();
+  ndn::GlobalRoutingHelper::CalculateRoutes ();
 
   Simulator::Stop (Seconds (20.0));
 

@@ -68,12 +68,12 @@ main (int argc, char *argv[])
   topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-11-node-two-bottlenecks.txt");
   topologyReader.Read ();
 
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::CustomStrategy");
-  ccnxHelper.SetContentStore ("ns3::ndn::cs::Lru",
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::CustomStrategy");
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru",
                               "MaxSize", "1"); // ! Attention ! If set to 0, then MaxSize is infinite
-  ccnxHelper.InstallAll ();
+  ndnHelper.InstallAll ();
 
   // Getting containers for the consumer/producer
   Ptr<Node> consumers[4] = { Names::Find<Node> ("c1"), Names::Find<Node> ("c2"), Names::Find<Node> ("c3"), Names::Find<Node> ("c4") };

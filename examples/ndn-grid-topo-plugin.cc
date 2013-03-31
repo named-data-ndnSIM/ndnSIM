@@ -58,21 +58,21 @@ main (int argc, char *argv[])
   topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-grid-3x3.txt");
   topologyReader.Read ();
 
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-  ccnxHelper.InstallAll ();
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
+  ndnHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll ();
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll ();
 
   // Getting containers for the consumer/producer
   Ptr<Node> producer = Names::Find<Node> ("Node8");
   NodeContainer consumerNodes;
   consumerNodes.Add (Names::Find<Node> ("Node0"));
 
-  // Install CCNx applications
+  // Install NDN applications
   std::string prefix = "/prefix";
 
   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
@@ -86,10 +86,10 @@ main (int argc, char *argv[])
   producerHelper.Install (producer);
 
   // Add /prefix origins to ndn::GlobalRouter
-  ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+  ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes ();
+  ndn::GlobalRoutingHelper::CalculateRoutes ();
 
   Simulator::Stop (Seconds (20.0));
 

@@ -19,4 +19,7 @@ Contents:
    applications
    examples
    metric
+   ndnsim-packet-formats
    faq
+
+* :ref:`search`

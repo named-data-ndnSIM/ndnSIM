@@ -58,10 +58,8 @@ In addition, the simulator provides an extensive collection of interfaces and he
     ...............................................................................
 
 
-The wire format of Interest and Data packets follows the format of the existing `CCNx Project's NDN implementation`_ (CCNx Binary Encoding), allowing reuse of the existing traffic analysis tools, as well as driving simulations using real NDN traffic traces.
-
-.. _CCNx Project's NDN implementation: http://www.ccnx.org/
-
+The current wire format for the Interest and Data packets used by ndnSIM is defined in :ref:`ndnSIM packet format`.
+ndnSIM also has an option to be compatible to wire format used by `CCNx Project's NDN implementation <http://www.ccnx.org/>`_ (CCNx Binary Encoding).  However currently, this option is deprecated, but can be reintroduced in the future as an optional wire format.
 
 More documentation
 ------------------
@@ -133,5 +131,3 @@ Refer to the source code and NS-3 documentation to see what logging interfaces a
 
 .. * :ref:`genindex`
 .. * :ref:`modindex`
-.. * :ref:`search`
-

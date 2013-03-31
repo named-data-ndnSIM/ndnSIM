@@ -54,16 +54,16 @@ main (int argc, char *argv[])
   topologyReader.SetFileName ("src/ndnSIM/examples/topologies/topo-6-node.txt");
   topologyReader.Read ();
 
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-  ccnxHelper.SetContentStore ("ns3::ndn::cs::Lru",
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
+  ndnHelper.SetContentStore ("ns3::ndn::cs::Lru",
                               "MaxSize", "10000");
-  ccnxHelper.InstallAll ();
+  ndnHelper.InstallAll ();
 
   // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll ();
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll ();
 
   // Getting containers for the consumer/producer
   Ptr<Node> consumer1 = Names::Find<Node> ("Src1");
@@ -90,18 +90,18 @@ main (int argc, char *argv[])
 
   // Register /dst1 prefix with global routing controller and
   // install producer that will satisfy Interests in /dst1 namespace
-  ccnxGlobalRoutingHelper.AddOrigins ("/dst1", producer1);
+  ndnGlobalRoutingHelper.AddOrigins ("/dst1", producer1);
   producerHelper.SetPrefix ("/dst1");
   producerHelper.Install (producer1);
 
   // Register /dst2 prefix with global routing controller and
   // install producer that will satisfy Interests in /dst2 namespace
-  ccnxGlobalRoutingHelper.AddOrigins ("/dst2", producer2);
+  ndnGlobalRoutingHelper.AddOrigins ("/dst2", producer2);
   producerHelper.SetPrefix ("/dst2");
   producerHelper.Install (producer2);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes ();
+  ndn::GlobalRoutingHelper::CalculateRoutes ();
 
   Simulator::Stop (Seconds (20.0));
 
