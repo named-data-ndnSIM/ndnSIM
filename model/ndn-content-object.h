@@ -137,6 +137,23 @@ public:
   Time
   GetFreshness () const;
 
+  /**
+   * @brief Set "fake" signature on the content object
+   * @param signature  uint32_t number, simulating content object signature
+   *
+   * Values for the signature totally depend on the application
+   */
+  void
+  SetSignature (uint32_t signature);
+
+  /**
+   * @brief Get "fake" signature of the content object
+   *
+   * Values for the signature totally depend on the application
+   */
+  uint32_t
+  GetSignature () const;
+
   //////////////////////////////////////////////////////////////////
 
   static TypeId GetTypeId (void); ///< @brief Get TypeId
@@ -150,6 +167,7 @@ private:
   Ptr<Name> m_name;
   Time m_freshness;
   Time m_timestamp;
+  uint32_t m_signature; // 0, means no signature, any other value application dependent (not a real signature)
 };
 
 typedef ContentObject ContentObjectHeader;

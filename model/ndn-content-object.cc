@@ -45,6 +45,7 @@ ContentObject::GetTypeId (void)
 }
 
 ContentObject::ContentObject ()
+  : m_signature (0)
 {
 }
 
@@ -98,11 +99,25 @@ ContentObject::GetFreshness () const
   return m_freshness;
 }
 
+void
+ContentObject::SetSignature (uint32_t signature)
+{
+  m_signature = signature;
+}
+
+uint32_t
+ContentObject::GetSignature () const
+{
+  return m_signature;
+}
 
 uint32_t
 ContentObject::GetSerializedSize () const
 {
   uint32_t size = 2 + ((2 + 2) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
+  if (m_signature != 0)
+    size += 4;
+  
   NS_LOG_INFO ("Serialize size = " << size);
   return size;
 }
@@ -113,8 +128,17 @@ ContentObject::Serialize (Buffer::Iterator start) const
   start.WriteU8 (0x80); // version
   start.WriteU8 (0x01); // packet type
 
-  start.WriteU16 (2); // signature length
-  start.WriteU16 (0); // empty signature
+  if (m_signature != 0)
+    {
+      start.WriteU16 (6); // signature length
+      start.WriteU16 (0xFF00); // "fake" simulator signature
+      start.WriteU32 (m_signature);
+    }
+  else
+    {
+      start.WriteU16 (2); // signature length
+      start.WriteU16 (0); // empty signature
+    }
 
   // name
   uint32_t offset = m_name->Serialize (start);
@@ -145,10 +169,20 @@ ContentObject::Deserialize (Buffer::Iterator start)
   if (i.ReadU8 () != 0x01)
     throw new ContentObjectException ();
 
-  if (i.ReadU16 () != 2) // signature length
-    throw new ContentObjectException ();
-  
-  if (i.ReadU16 () != 0) // signature type
+  uint32_t signatureLength = i.ReadU16 ();
+  if (signatureLength == 6)
+    {
+      if (i.ReadU16 () != 0xFF00) // signature type
+        throw new ContentObjectException ();
+      m_signature = i.ReadU32 ();
+    }
+  else if (signatureLength == 2)
+    {
+      if (i.ReadU16 () != 0) // signature type
+        throw new ContentObjectException ();
+      m_signature = 0;
+    }
+  else
     throw new ContentObjectException ();
 
   m_name = Create<Name> ();
