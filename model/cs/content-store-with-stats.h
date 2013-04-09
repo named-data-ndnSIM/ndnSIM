@@ -37,6 +37,8 @@ class ContentStoreWithStats :
 public:
   typedef ContentStoreImpl< ndnSIM::multi_policy_traits< boost::mpl::vector2< Policy, ndnSIM::lifetime_stats_policy_traits > > > super;
 
+  typedef typename super::policy_container::template index<1>::type lifetime_stats_container;
+
   ContentStoreWithStats ()
   {
     // connect traceback to the policy
@@ -45,6 +47,9 @@ public:
 
   static TypeId
   GetTypeId ();
+
+  virtual inline void
+  Print (std::ostream &os) const;
 
 private:
   static LogComponent g_log; ///< @brief Logging variable
@@ -80,6 +85,22 @@ ContentStoreWithStats< Policy >::GetTypeId ()
 
   return tid;
 }
+
+template<class Policy>
+void
+ContentStoreWithStats< Policy >::Print (std::ostream &os) const
+{
+  // const freshness_policy_container &freshness = this->getPolicy ().template get<freshness_policy_container> ();
+
+  for (typename super::policy_container::const_iterator item = this->getPolicy ().begin ();
+       item != this->getPolicy ().end ();
+       item++)
+    {
+      Time alive = lifetime_stats_container::policy_base::get_time (&(*item)) - Simulator::Now ();
+      os << item->payload ()->GetName () << "(alive: " << alive.ToDouble (Time::S) << "s)" << std::endl;
+    }
+}
+
 
 
 } // namespace cs

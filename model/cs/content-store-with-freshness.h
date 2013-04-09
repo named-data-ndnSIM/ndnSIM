@@ -42,6 +42,9 @@ public:
   static TypeId
   GetTypeId ();
 
+  virtual inline void
+  Print (std::ostream &os) const;
+
   virtual inline bool
   Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
 
@@ -155,6 +158,22 @@ ContentStoreWithFreshness< Policy >::CleanExpired ()
   m_scheduledCleaningTime = Time ();
   RescheduleCleaning ();
 }
+
+template<class Policy>
+void
+ContentStoreWithFreshness< Policy >::Print (std::ostream &os) const
+{
+  // const freshness_policy_container &freshness = this->getPolicy ().template get<freshness_policy_container> ();
+
+  for (typename super::policy_container::const_iterator item = this->getPolicy ().begin ();
+       item != this->getPolicy ().end ();
+       item++)
+    {
+      Time ttl = freshness_policy_container::policy_base::get_freshness (&(*item)) - Simulator::Now ();
+      os << item->payload ()->GetName () << "(left: " << ttl.ToDouble (Time::S) << "s)" << std::endl;
+    }
+}
+
 
 
 } // namespace cs
