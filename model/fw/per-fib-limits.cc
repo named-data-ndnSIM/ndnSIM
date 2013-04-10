@@ -33,6 +33,10 @@ namespace ns3 {
 namespace ndn {
 namespace fw {
 
+extern template class PerOutFaceLimits<BestRoute>;
+extern template class PerOutFaceLimits<Flooding>;
+extern template class PerOutFaceLimits<SmartFlooding>;
+
 template class PerFibLimits< PerOutFaceLimits<BestRoute> >;
 typedef PerFibLimits< PerOutFaceLimits<BestRoute> > PerFibLimitsPerOutFaceLimitsBestRoute;
 NS_OBJECT_ENSURE_REGISTERED (PerFibLimitsPerOutFaceLimitsBestRoute);
