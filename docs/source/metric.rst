@@ -348,3 +348,23 @@ To run this scenario, use the following command::
 The successful run will create ``app-delays-trace.txt``, which similarly to trace file from the :ref:`packet trace helper example <packet trace helper example>` can be analyzed manually or used as input to some graph/stats packages.
 
 
+Other types of stats
+--------------------
+
+.. _periodic tracing of Pending Interest Table (PIT) size:
+
+Periodic tracing of Pending Interest Table (PIT) size
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This example (``ndn-simple-with-pit-count-stats.cc``) shows how you can periodically print out current size of PIT on the selected nodes.
+
+.. literalinclude:: ../../examples/ndn-simple-with-pit-count-stats.cc
+    :language: c++
+    :linenos:
+    :lines: 20-26,47-
+    :emphasize-lines: 9-20,43-46,61-63
+
+To run this scenario, use the following command::
+
+        ./waf --run=ndn-simple-with-pit-count-stats
+

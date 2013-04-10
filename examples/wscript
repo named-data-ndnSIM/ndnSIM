@@ -59,3 +59,6 @@ def build(bld):
 
     obj = bld.create_ns3_program('ndn-simple-with-pit-operation-stats', ['ndnSIM'])
     obj.source = 'ndn-simple-with-pit-operation-stats.cc'
+
+    obj = bld.create_ns3_program('ndn-simple-with-pit-count-stats', ['ndnSIM'])
+    obj.source = 'ndn-simple-with-pit-count-stats.cc'

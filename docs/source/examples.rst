@@ -313,3 +313,8 @@ This will generate ``ndn-simple-trace.pcap``, which can be fed to tcpdump::
 -----------------------------------
 
 :ref:`Example of packet drop tracer (L2Tracer)`
+
+3-node topology with periodic tracing of PIT
+--------------------------------------------
+
+:ref:`periodic tracing of Pending Interest Table (PIT) size`
