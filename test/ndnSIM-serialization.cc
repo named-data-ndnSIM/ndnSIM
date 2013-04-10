@@ -87,7 +87,7 @@ ContentObjectSerializationTest::DoRun ()
   source.SetSignature (10);
   NS_TEST_ASSERT_MSG_EQ (source.GetSignature (), 10, "set/get signature failed");
 
-  NS_TEST_ASSERT_MSG_EQ (source.GetSerializedSize (), size + 4, "Signature size should have increased by 4");
+  NS_TEST_ASSERT_MSG_EQ (source.GetSerializedSize (), static_cast<unsigned int> (size + 4), "Signature size should have increased by 4");
   
   Packet packet (0);
   //serialization
