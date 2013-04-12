@@ -214,23 +214,12 @@ Consumer::SendPacket ()
   packet->AddHeader (interestHeader);
   NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
 
-  NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");
-
-  m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
-  m_seqFullDelay.insert (SeqTimeout (seq, Simulator::Now ()));
-
-  m_seqLastDelay.erase (seq);
-  m_seqLastDelay.insert (SeqTimeout (seq, Simulator::Now ()));
-
-  m_seqRetxCounts[seq] ++;
-
-  m_transmittedInterests (&interestHeader, this, m_face);
-
-  m_rtt->SentSeq (SequenceNumber32 (seq), 1);
+  WillSendOutInterest (seq);  
 
   FwHopCountTag hopCountTag;
   packet->AddPacketTag (hopCountTag);
 
+  m_transmittedInterests (&interestHeader, this, m_face);
   m_protocolHandler (packet);
 
   ScheduleNextPacket ();
@@ -323,6 +312,23 @@ Consumer::OnTimeout (uint32_t sequenceNumber)
   m_retxSeqs.insert (sequenceNumber);
   ScheduleNextPacket ();
 }
+
+void
+Consumer::WillSendOutInterest (uint32_t sequenceNumber)
+{
+  NS_LOG_DEBUG ("Trying to add " << sequenceNumber << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");
+
+  m_seqTimeouts.insert (SeqTimeout (sequenceNumber, Simulator::Now ()));
+  m_seqFullDelay.insert (SeqTimeout (sequenceNumber, Simulator::Now ()));
+
+  m_seqLastDelay.erase (sequenceNumber);
+  m_seqLastDelay.insert (SeqTimeout (sequenceNumber, Simulator::Now ()));
+
+  m_seqRetxCounts[sequenceNumber] ++;
+
+  m_rtt->SentSeq (SequenceNumber32 (sequenceNumber), 1);
+}
+
 
 } // namespace ndn
 } // namespace ns3

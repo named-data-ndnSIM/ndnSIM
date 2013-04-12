@@ -80,6 +80,16 @@ public:
   void
   SendPacket ();
 
+  /**
+   * @brief An event that is fired just before an Interest packet is actually send out (send is inevitable)
+   *
+   * The reason for "before" even is that in certain cases (when it is possible to satisfy from the local cache),
+   * the send call will immediately return data, and if "after" even was used, this after would be called after
+   * all processing of incoming data, potentially producing unexpected results.
+   */
+  virtual void
+  WillSendOutInterest (uint32_t sequenceNumber);
+  
 protected:
   // from App
   virtual void

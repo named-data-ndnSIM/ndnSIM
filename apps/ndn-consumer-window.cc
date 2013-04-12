@@ -151,8 +151,6 @@ ConsumerWindow::ScheduleNextPacket ()
           Simulator::Remove (m_sendEvent);
         }
 
-      // NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
-      m_inFlight++;
       m_sendEvent = Simulator::ScheduleNow (&Consumer::SendPacket, this);
     }
 }
@@ -207,6 +205,14 @@ ConsumerWindow::OnTimeout (uint32_t sequenceNumber)
   NS_LOG_DEBUG ("Window: " << m_window << ", InFlight: " << m_inFlight);
   Consumer::OnTimeout (sequenceNumber);
 }
+
+void
+ConsumerWindow::WillSendOutInterest (uint32_t sequenceNumber)
+{
+  m_inFlight ++;
+  Consumer::WillSendOutInterest (sequenceNumber);
+}
+
 
 } // namespace ndn
 } // namespace ns3

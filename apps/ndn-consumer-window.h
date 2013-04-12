@@ -59,6 +59,9 @@ public:
   virtual void
   OnTimeout (uint32_t sequenceNumber);
 
+  virtual void
+  WillSendOutInterest (uint32_t sequenceNumber);
+
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
