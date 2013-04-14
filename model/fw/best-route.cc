@@ -71,10 +71,13 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
 {
   NS_LOG_FUNCTION (this << header->GetName ());
 
-  // Try to work out with just green faces
-  bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
-  if (greenOk)
-    return true;
+  // No real need to call parent's (green-yellow-red's strategy) method, since it is incorporated
+  // in the logic of the BestRoute strategy
+  //
+  // // Try to work out with just green faces
+  // bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
+  // if (greenOk)
+  //   return true;
 
   int propagatedCount = 0;
 
