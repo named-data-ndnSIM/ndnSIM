@@ -112,9 +112,9 @@ FibImpl::Add (const Ptr<const Name> &prefix, Ptr<Face> face, int32_t metric)
     {
       if (result.second)
         {
-            Ptr<EntryImpl> newEntry = Create<EntryImpl> (prefix);
-            newEntry->SetTrie (result.first);
-            result.first->set_payload (newEntry);
+          Ptr<EntryImpl> newEntry = Create<EntryImpl> (this, prefix);
+          newEntry->SetTrie (result.first);
+          result.first->set_payload (newEntry);
         }
   
       super::modify (result.first,

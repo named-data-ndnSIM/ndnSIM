@@ -43,6 +43,8 @@ namespace ndn {
 class Name;
 typedef Name NameComponents;
 
+class Fib;
+
 namespace fib {
 
 /**
@@ -246,8 +248,9 @@ public:
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
    */
-  Entry (const Ptr<const Name> &prefix)
-  : m_prefix (prefix)
+  Entry (Ptr<Fib> fib, const Ptr<const Name> &prefix)
+  : m_fib (fib)
+  , m_prefix (prefix)
   , m_needsProbing (false)
   {
   }
@@ -308,10 +311,18 @@ public:
     m_faces.erase (face);
   }
 
+  /**
+   * @brief Get pointer to access FIB, to which this entry is added
+   */
+  Ptr<Fib>
+  GetFib ();
+  
 private:
   friend std::ostream& operator<< (std::ostream& os, const Entry &entry);
 
 public:
+  Ptr<Fib> m_fib; ///< \brief FIB to which entry is added
+
   Ptr<const Name> m_prefix; ///< \brief Prefix of the FIB entry
   FaceMetricContainer::type m_faces; ///< \brief Indexed list of faces
 

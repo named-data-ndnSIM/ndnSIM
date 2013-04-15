@@ -40,8 +40,8 @@ public:
     ndnSIM::counting_policy_traits
     > trie;
 
-  EntryImpl (const Ptr<const Name> &prefix)
-    : Entry (prefix)
+  EntryImpl (Ptr<Fib> fib, const Ptr<const Name> &prefix)
+    : Entry (fib, prefix)
     , item_ (0)
   {
   }

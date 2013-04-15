@@ -19,6 +19,7 @@
  */
 
 #include "ndn-fib-entry.h"
+#include "ndn-fib.h"
 
 #include "ns3/ndn-name.h"
 #include "ns3/log.h"
@@ -168,6 +169,13 @@ Entry::FindBestCandidate (uint32_t skip/* = 0*/) const
   skip = skip % m_faces.size();
   return m_faces.get<i_nth> () [skip];
 }
+
+Ptr<Fib>
+Entry::GetFib ()
+{
+  return m_fib;
+}
+
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry)
 {
