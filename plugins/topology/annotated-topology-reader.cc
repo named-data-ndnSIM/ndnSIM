@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+ *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
 #include "annotated-topology-reader.h"
@@ -40,11 +41,13 @@
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-face.h"
 #include "ns3/random-variable.h"
+#include "ns3/error-model.h"
 
 #include "ns3/constant-position-mobility-model.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <set>
 
@@ -54,10 +57,10 @@
 
 using namespace std;
 
-namespace ns3 {    
+namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("AnnotatedTopologyReader");
-    
+
 AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path, double scale/*=1.0*/)
   : m_path (path)
   , m_randX (0, 100.0)
@@ -69,12 +72,12 @@ AnnotatedTopologyReader::AnnotatedTopologyReader (const std::string &path, doubl
 
   SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 }
-    
+
 void
 AnnotatedTopologyReader::SetBoundingBox (double ulx, double uly, double lrx, double lry)
 {
   NS_LOG_FUNCTION (this << ulx << uly << lrx << lry);
-  
+
   m_randX = UniformVariable (ulx, lrx);
   m_randY = UniformVariable (uly, lry);
 }
@@ -96,7 +99,7 @@ AnnotatedTopologyReader::CreateNode (const std::string name, uint32_t systemId)
 {
   NS_LOG_FUNCTION (this << name);
   m_requiredPartitions = std::max (m_requiredPartitions, systemId + 1);
-  
+
   Ptr<Node> node = CreateObject<Node> (systemId);
 
   Names::Add (m_path, name, node);
@@ -110,7 +113,7 @@ AnnotatedTopologyReader::CreateNode (const std::string name, double posX, double
 {
   NS_LOG_FUNCTION (this << name << posX << posY);
   m_requiredPartitions = std::max (m_requiredPartitions, systemId + 1);
-  
+
   Ptr<Node> node = CreateObject<Node> (systemId);
   Ptr<MobilityModel> loc = DynamicCast<MobilityModel> (m_mobilityFactory.Create ());
   node->AggregateObject (loc);
@@ -140,7 +143,7 @@ AnnotatedTopologyReader::Read (void)
 {
   ifstream topgen;
   topgen.open (GetFileName ().c_str ());
-        
+
   if ( !topgen.is_open () || !topgen.good () )
     {
       NS_FATAL_ERROR ("Cannot open file " << GetFileName () << " for reading");
@@ -167,7 +170,7 @@ AnnotatedTopologyReader::Read (void)
       getline (topgen,line);
       if (line[0] == '#') continue; // comments
       if (line=="link") break; // stop reading nodes
-      
+
       istringstream lineBuffer (line);
       string name, city;
       double latitude = 0, longitude = 0;
@@ -177,7 +180,7 @@ AnnotatedTopologyReader::Read (void)
       if (name.empty ()) continue;
 
       Ptr<Node> node;
-      
+
       if (abs(latitude) > 0.001 && abs(latitude) > 0.001)
         node = CreateNode (name, m_scale*longitude, -m_scale*latitude, systemId);
       else
@@ -189,14 +192,14 @@ AnnotatedTopologyReader::Read (void)
     }
 
   map<string, set<string> > processedLinks; // to eliminate duplications
-  
+
   if (topgen.eof ())
     {
       NS_FATAL_ERROR ("Topology file " << GetFileName () << " does not have \"link\" section");
       return m_nodes;
     }
 
-  // SeekToSection ("link"); 
+  // SeekToSection ("link");
   while (!topgen.eof ())
     {
       string line;
@@ -205,11 +208,11 @@ AnnotatedTopologyReader::Read (void)
       if (line[0] == '#') continue; // comments
 
       // NS_LOG_DEBUG ("Input: [" << line << "]");
-      
-      istringstream lineBuffer (line);
-      string from, to, capacity, metric, delay, maxPackets;
 
-      lineBuffer >> from >> to >> capacity >> metric >> delay >> maxPackets;
+      istringstream lineBuffer (line);
+      string from, to, capacity, metric, delay, maxPackets, lossRate;
+
+      lineBuffer >> from >> to >> capacity >> metric >> delay >> maxPackets >> lossRate;
 
       if (processedLinks[to].size () != 0 &&
           processedLinks[to].find (from) != processedLinks[to].end ())
@@ -217,14 +220,14 @@ AnnotatedTopologyReader::Read (void)
           continue; // duplicated link
         }
       processedLinks[from].insert (to);
-      
+
       Ptr<Node> fromNode = Names::Find<Node> (m_path, from);
       NS_ASSERT_MSG (fromNode != 0, from << " node not found");
       Ptr<Node> toNode   = Names::Find<Node> (m_path, to);
       NS_ASSERT_MSG (toNode != 0, to << " node not found");
 
       Link link (fromNode, from, toNode, to);
-      
+
       link.SetAttribute ("DataRate", capacity);
       link.SetAttribute ("OSPF", metric);
 
@@ -232,34 +235,38 @@ AnnotatedTopologyReader::Read (void)
           link.SetAttribute ("Delay", delay);
       if (!maxPackets.empty ())
         link.SetAttribute ("MaxPackets", maxPackets);
-      
+
+      // Saran Added lossRate
+      if (!lossRate.empty ())
+        link.SetAttribute ("LossRate", lossRate);
+
       AddLink (link);
-      NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << " with " << metric << " metric (" << delay << ", " << maxPackets << ")");
+      NS_LOG_DEBUG ("New link " << from << " <==> " << to << " / " << capacity << " with " << metric << " metric (" << delay << ", " << maxPackets << ", " << lossRate << ")");
     }
-        
+
   NS_LOG_INFO ("Annotated topology created with " << m_nodes.GetN () << " nodes and " << LinksSize () << " links");
   topgen.close ();
-        
+
   ApplySettings ();
-  
+
   return m_nodes;
 }
-    
+
 void
 AnnotatedTopologyReader::AssignIpv4Addresses (Ipv4Address base)
 {
   Ipv4AddressHelper address (base, Ipv4Mask ("/24"));
-    
+
   BOOST_FOREACH (const Link &link, m_linksList)
     {
       address.Assign (NetDeviceContainer (link.GetFromNetDevice (),
                                           link.GetToNetDevice ()));
-        
+
       base = Ipv4Address (base.Get () + 256);
       address.SetBase (base, Ipv4Mask ("/24"));
     }
 }
-        
+
 void
 AnnotatedTopologyReader::ApplyOspfMetric ()
 {
@@ -267,14 +274,14 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
     {
       NS_LOG_DEBUG ("OSPF: " << link.GetAttribute ("OSPF"));
       uint16_t metric = boost::lexical_cast<uint16_t> (link.GetAttribute ("OSPF"));
-        
+
       {
         Ptr<Ipv4> ipv4 = link.GetFromNode ()->GetObject<Ipv4> ();
         if (ipv4 != 0)
           {
             int32_t interfaceId = ipv4->GetInterfaceForDevice (link.GetFromNetDevice ());
             NS_ASSERT (interfaceId >= 0);
-        
+
             ipv4->SetMetric (interfaceId,metric);
           }
 
@@ -283,11 +290,11 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
           {
             Ptr<ndn::Face> face = ndn->GetFaceByNetDevice (link.GetFromNetDevice ());
             NS_ASSERT (face != 0);
-            
+
             face->SetMetric (metric);
           }
       }
-        
+
       {
         Ptr<Ipv4> ipv4 = link.GetToNode ()->GetObject<Ipv4> ();
         if (ipv4 != 0)
@@ -297,13 +304,13 @@ AnnotatedTopologyReader::ApplyOspfMetric ()
 
             ipv4->SetMetric (interfaceId,metric);
           }
-        
+
         Ptr<ndn::L3Protocol> ndn = link.GetToNode ()->GetObject<ndn::L3Protocol> ();
         if (ndn != 0)
           {
             Ptr<ndn::Face> face = ndn->GetFaceByNetDevice (link.GetToNetDevice ());
             NS_ASSERT (face != 0);
-            
+
             face->SetMetric (metric);
           }
       }
@@ -322,7 +329,7 @@ AnnotatedTopologyReader::ApplySettings ()
       exit (-1);
     }
 #endif
-  
+
   PointToPointHelper p2p;
 
   BOOST_FOREACH (Link &link, m_linksList)
@@ -345,6 +352,43 @@ AnnotatedTopologyReader::ApplySettings ()
       NetDeviceContainer nd = p2p.Install(link.GetFromNode (), link.GetToNode ());
       link.SetNetDevices (nd.Get (0), nd.Get (1));
 
+      ////////////////////////////////////////////////
+      if (link.GetAttributeFailSafe ("LossRate", tmp))
+        {
+          NS_LOG_INFO ("LinkError = " + link.GetAttribute("LossRate"));
+
+          typedef boost::tokenizer<boost::escaped_list_separator<char> > tokenizer;
+          tokenizer tok (link.GetAttribute("LossRate"));
+
+          tokenizer::iterator token = tok.begin ();
+          ObjectFactory factory (*token);
+          
+          for (token ++; token != tok.end (); token ++)
+            {
+              boost::escaped_list_separator<char> separator ('\\', '=', '\"');
+              tokenizer attributeTok (*token, separator);
+
+              tokenizer::iterator attributeToken = attributeTok.begin ();
+              
+              string attribute = *attributeToken;
+              attributeToken++;
+
+              if (attributeToken == attributeTok.end ())
+                {
+                  NS_LOG_ERROR ("ErrorModel attribute [" << *token << "] should be in form <Attribute>=<Value>");
+                  continue;
+                }
+              
+              string value = *attributeToken;
+
+              factory.Set (attribute, StringValue (value));
+            }
+
+          nd.Get (0)->SetAttribute ("ReceiveErrorModel", PointerValue (factory.Create<ErrorModel> ()));
+          nd.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (factory.Create<ErrorModel> ()));
+        }
+
+      ////////////////////////////////////////////////
       if (link.GetAttributeFailSafe ("MaxPackets", tmp))
         {
           NS_LOG_INFO ("MaxPackets = " + link.GetAttribute ("MaxPackets"));
@@ -352,14 +396,14 @@ AnnotatedTopologyReader::ApplySettings ()
           PointerValue txQueue;
 
           link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueue);
-          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);       
+          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);
           txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
 
           link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueue);
           NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);
           txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
         }
-        
+
     }
 }
 
@@ -370,13 +414,13 @@ AnnotatedTopologyReader::SaveTopology (const std::string &file) const
   os << "# any empty lines and lines starting with '#' symbol is ignored\n"
      << "\n"
      << "# The file should contain exactly two sections: router and link, each starting with the corresponding keyword\n"
-     << "\n" 
+     << "\n"
      << "# router section defines topology nodes and their relative positions (e.g., to use in visualizer)\n"
      << "router\n"
      << "\n"
      << "# each line in this section represents one router and should have the following data\n"
      << "# node  comment     yPos    xPos\n";
-  
+
   for (NodeContainer::Iterator node = m_nodes.Begin ();
        node != m_nodes.End ();
        node++)
@@ -397,7 +441,8 @@ AnnotatedTopologyReader::SaveTopology (const std::string &file) const
      << "# bandwidth: link bandwidth\n"
      << "# metric: routing metric\n"
      << "# delay:  link delay\n"
-     << "# queue:  MaxPackets for transmission queue on the link (both directions)\n";
+     << "# queue:  MaxPackets for transmission queue on the link (both directions)\n"
+     << "# error:  comma-separated list, specifying class for ErrorModel and necessary attributes\n";
 
   for (std::list<Link>::const_iterator link = m_linksList.begin ();
        link != m_linksList.end ();
@@ -424,10 +469,15 @@ AnnotatedTopologyReader::SaveTopology (const std::string &file) const
           if (link->GetAttributeFailSafe ("MaxPackets", tmp))
             {
               os << link->GetAttribute("MaxPackets") << "\t";
+
+              if (link->GetAttributeFailSafe ("LossRate", tmp))
+                {
+                  os << link->GetAttribute ("LossRate") << "\t";
+                }
             }
         }
       os << "\n";
-    }  
+    }
 }
 
 }
