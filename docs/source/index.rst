@@ -21,5 +21,11 @@ Contents:
    metric
    ndnsim-packet-formats
    faq
+   ndnsim-research-papers
 
-* :ref:`search`
+-------
+
+If you refer to ndnSIM in a published work, please cite the following paper, not just the ndnSIM website. Thank you! 
+    **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`_)
+
+.. * :ref:`search`
