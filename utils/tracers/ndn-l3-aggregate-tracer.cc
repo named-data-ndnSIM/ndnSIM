@@ -28,6 +28,8 @@
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
+#include "ns3/ndn-pit-entry.h"
+
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"
@@ -44,7 +46,7 @@ L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* =
 {
   using namespace boost;
   using namespace std;
-  
+
   std::list<Ptr<L3AggregateTracer> > tracers;
   boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
   outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
@@ -106,7 +108,7 @@ L3AggregateTracer::PeriodicPrinter ()
 {
   Print (*m_os);
   Reset ();
-  
+
   m_printEvent = Simulator::Schedule (m_period, &L3AggregateTracer::PeriodicPrinter, this);
 }
 
@@ -141,9 +143,18 @@ L3AggregateTracer::Reset ()
 
 #define PRINTER(printName, fieldName) \
   os << time.ToDouble (Time::S) << "\t"                                 \
-  << m_node << "\t"                                                     \
-  << stats->first->GetId () << "\t"                                     \
-  << *stats->first << "\t"                                              \
+  << m_node << "\t";                                                    \
+  if (stats->first)                                                     \
+    {                                                                   \
+      os                                                                \
+        << stats->first->GetId () << "\t"                               \
+        << *stats->first << "\t";                                       \
+    }                                                                   \
+  else                                                                  \
+    {                                                                   \
+      os << "-1\tall\t";                                                \
+    }                                                                   \
+  os                                                                    \
   << printName << "\t"                                                  \
   << STATS(0).fieldName << "\t"                                         \
   << STATS(1).fieldName / 1024.0 << "\n";
@@ -152,16 +163,19 @@ L3AggregateTracer::Reset ()
 void
 L3AggregateTracer::Print (std::ostream &os) const
 {
+  Time time = Simulator::Now ();
+
   for (std::map<Ptr<const Face>, boost::tuple<Stats, Stats> >::iterator stats = m_stats.begin ();
        stats != m_stats.end ();
        stats++)
     {
-      Time time = Simulator::Now ();
+      if (!stats->first)
+        continue;
 
       PRINTER ("InInterests",   m_inInterests);
       PRINTER ("OutInterests",  m_outInterests);
       PRINTER ("DropInterests", m_dropInterests);
-      
+
       PRINTER ("InNacks",   m_inNacks);
       PRINTER ("OutNacks",  m_outNacks);
       PRINTER ("DropNacks", m_dropNacks);
@@ -170,6 +184,12 @@ L3AggregateTracer::Print (std::ostream &os) const
       PRINTER ("OutData",  m_outData);
       PRINTER ("DropData", m_dropData);
     }
+
+  {
+    std::map<Ptr<const Face>, boost::tuple<Stats, Stats> >::iterator stats = m_stats.find (Ptr<const Face> (0));
+    PRINTER ("SatisfiedInterests", m_satisfiedInterests);
+    PRINTER ("TimedOutInterests", m_timedOutInterests);
+  }
 }
 
 void
@@ -245,6 +265,20 @@ L3AggregateTracer::DropData (std::string context,
 {
   m_stats[face].get<0> ().m_dropData ++;
   m_stats[face].get<1> ().m_dropData += header->GetSerializedSize () + payload->GetSize ();
+}
+
+void
+L3AggregateTracer::SatisfiedInterests (Ptr<const pit::Entry>)
+{
+  m_stats[0].get<0> ().m_satisfiedInterests ++;
+  // no "size" stats
+}
+
+void
+L3AggregateTracer::TimedOutInterests (Ptr<const pit::Entry>)
+{
+  m_stats[0].get<0> ().m_timedOutInterests ++;
+  // no "size" stats
 }
 
 } // namespace ndn

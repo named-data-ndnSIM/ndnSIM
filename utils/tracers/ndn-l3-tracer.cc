@@ -30,12 +30,13 @@
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
+#include "ns3/ndn-pit-entry.h"
 
 using namespace std;
 
 namespace ns3 {
 namespace ndn {
-    
+
 L3Tracer::L3Tracer (Ptr<Node> node)
 : m_nodePtr (node)
 {
@@ -85,6 +86,12 @@ L3Tracer::Connect ()
                    MakeCallback (&L3Tracer::InNacks, this));
   Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/DropNacks",
                    MakeCallback (&L3Tracer::DropNacks, this));
+
+  // satisfied/timed out PIs
+  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/SatisfiedInterests",
+                                 MakeCallback (&L3Tracer::SatisfiedInterests, this));
+  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/TimedOutInterests",
+                                 MakeCallback (&L3Tracer::TimedOutInterests, this));
 }
 
 } // namespace ndn

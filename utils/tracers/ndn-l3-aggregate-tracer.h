@@ -47,7 +47,7 @@ public:
    * @param node  pointer to the node
    */
   L3AggregateTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
-  
+
   /**
    * @brief Trace constructor that attaches to the node using node name
    * @param os        reference to the output stream
@@ -68,12 +68,12 @@ public:
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   * 
+   *
    */
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
 
-protected: 
+protected:
   // from L3Tracer
   virtual void
   PrintHeader (std::ostream &os) const;
@@ -92,7 +92,7 @@ protected:
   virtual void
   DropInterests (std::string context,
                  Ptr<const Interest>, Ptr<const Face>);
-  
+
   virtual void
   OutNacks  (std::string context,
              Ptr<const Interest>, Ptr<const Face>);
@@ -104,7 +104,7 @@ protected:
   virtual void
   DropNacks (std::string context,
              Ptr<const Interest>, Ptr<const Face>);
-  
+
   virtual void
   OutData  (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
@@ -117,6 +117,13 @@ protected:
   DropData (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
+
+  virtual void
+  SatisfiedInterests (Ptr<const pit::Entry>);
+
+  virtual void
+  TimedOutInterests (Ptr<const pit::Entry>);
+
 protected:
   void
   SetAveragingPeriod (const Time &period);
@@ -126,13 +133,13 @@ protected:
 
   void
   PeriodicPrinter ();
-  
+
 protected:
   boost::shared_ptr<std::ostream> m_os;
 
   Time m_period;
   EventId m_printEvent;
-  
+
   mutable std::map<Ptr<const Face>, boost::tuple<Stats, Stats> > m_stats;
 };
 

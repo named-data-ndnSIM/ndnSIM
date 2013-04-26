@@ -79,6 +79,12 @@ TypeId ForwardingStrategy::GetTypeId (void)
     .AddTraceSource ("InData",   "InData",   MakeTraceSourceAccessor (&ForwardingStrategy::m_inData))
     .AddTraceSource ("DropData", "DropData", MakeTraceSourceAccessor (&ForwardingStrategy::m_dropData))
 
+    ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+
+    .AddTraceSource ("SatisfiedInterests",  "SatisfiedInterests",  MakeTraceSourceAccessor (&ForwardingStrategy::m_satisfiedInterests))
+    .AddTraceSource ("TimedOutInterests",   "TimedOutInterests",   MakeTraceSourceAccessor (&ForwardingStrategy::m_timedOutInterests))
+    
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
                    BooleanValue (false),
                    MakeBooleanAccessor (&ForwardingStrategy::m_cacheUnsolicitedData),
@@ -441,6 +447,8 @@ ForwardingStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
     {
       pitEntry->GetFibEntry ()->UpdateFaceRtt (inFace, Simulator::Now () - out->m_sendTime);
     }
+
+  m_satisfiedInterests (pitEntry);
 }
 
 bool
@@ -600,7 +608,7 @@ ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
 void
 ForwardingStrategy::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
-  // do nothing for now. may be need to do some logging
+  m_timedOutInterests (pitEntry);
 }
 
 void

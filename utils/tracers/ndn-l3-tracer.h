@@ -31,6 +31,10 @@ class Packet;
 
 namespace ndn {
 
+namespace pit {
+class Entry;
+}
+
 class Face;
 
 class Interest;
@@ -77,11 +81,11 @@ public:
    */
   virtual void
   Print (std::ostream &os) const = 0;
-  
+
 protected:
   void
   Connect ();
-  
+
   virtual void
   OutInterests  (std::string context,
                  Ptr<const Interest>, Ptr<const Face>) = 0;
@@ -93,7 +97,7 @@ protected:
   virtual void
   DropInterests (std::string context,
                  Ptr<const Interest>, Ptr<const Face>) = 0;
-  
+
   virtual void
   OutNacks  (std::string context,
              Ptr<const Interest>, Ptr<const Face>) = 0;
@@ -106,7 +110,7 @@ protected:
   DropNacks (std::string context,
              Ptr<const Interest>, Ptr<const Face>) = 0;
 
-  
+
   virtual void
   OutData  (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
@@ -118,6 +122,12 @@ protected:
   virtual void
   DropData (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
+
+  virtual void
+  SatisfiedInterests (Ptr<const pit::Entry>) = 0;
+
+  virtual void
+  TimedOutInterests (Ptr<const pit::Entry>) = 0;
 
 protected:
   std::string m_node;
@@ -136,8 +146,10 @@ protected:
       m_inData        = 0;
       m_outData       = 0;
       m_dropData      = 0;
+      m_satisfiedInterests = 0;
+      m_timedOutInterests = 0;
     }
-    
+
     double m_inInterests;
     double m_outInterests;
     double m_dropInterests;
@@ -147,6 +159,8 @@ protected:
     double m_inData;
     double m_outData;
     double m_dropData;
+    double m_satisfiedInterests;
+    double m_timedOutInterests;
   };
 };
 

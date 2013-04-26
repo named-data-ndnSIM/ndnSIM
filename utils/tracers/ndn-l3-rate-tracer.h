@@ -69,7 +69,7 @@ public:
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   * 
+   *
    */
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
@@ -94,7 +94,7 @@ protected:
   virtual void
   DropInterests (std::string context,
                  Ptr<const Interest>, Ptr<const Face>);
-  
+
   virtual void
   OutNacks  (std::string context,
              Ptr<const Interest>, Ptr<const Face>);
@@ -106,7 +106,7 @@ protected:
   virtual void
   DropNacks (std::string context,
              Ptr<const Interest>, Ptr<const Face>);
-  
+
   virtual void
   OutData  (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
@@ -119,13 +119,19 @@ protected:
   DropData (std::string context,
             Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
+  virtual void
+  SatisfiedInterests (Ptr<const pit::Entry>);
+
+  virtual void
+  TimedOutInterests (Ptr<const pit::Entry>);
+
 private:
   void
   SetAveragingPeriod (const Time &period);
 
   void
   PeriodicPrinter ();
-  
+
   void
   Reset ();
 

@@ -501,6 +501,13 @@ protected:
 
   TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
                   Ptr<const Face> > m_dropData;  ///< @brief trace of dropped Data
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+
+  TracedCallback< Ptr<const pit::Entry> > m_satisfiedInterests;
+  TracedCallback< Ptr<const pit::Entry> > m_timedOutInterests;
 };
 
 } // namespace ndn

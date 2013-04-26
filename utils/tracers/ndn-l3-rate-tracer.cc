@@ -31,6 +31,7 @@
 #include "ns3/ndn-face.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
+#include "ns3/ndn-pit-entry.h"
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>
@@ -108,7 +109,7 @@ L3RateTracer::PeriodicPrinter ()
 {
   Print (*m_os);
   Reset ();
-  
+
   m_printEvent = Simulator::Schedule (m_period, &L3RateTracer::PeriodicPrinter, this);
 }
 
@@ -150,9 +151,18 @@ const double alpha = 0.8;
   STATS(3).fieldName = /*new value*/alpha * RATE(1, fieldName) / 1024.0 + /*old value*/(1-alpha) * STATS(3).fieldName; \
                                                                         \
   os << time.ToDouble (Time::S) << "\t"                                 \
-  << m_node << "\t"                                                     \
-  << stats->first->GetId () << "\t"                                     \
-  << *stats->first << "\t"                                              \
+  << m_node << "\t";                                                    \
+  if (stats->first)                                                     \
+    {                                                                   \
+      os                                                                \
+        << stats->first->GetId () << "\t"                               \
+        << *stats->first << "\t";                                       \
+    }                                                                   \
+  else                                                                  \
+    {                                                                   \
+      os << "-1\tall\t";                                                \
+    }                                                                   \
+  os                                                                    \
   << printName << "\t"                                                  \
   << STATS(2).fieldName << "\t"                                         \
   << STATS(3).fieldName << "\t"                                         \
@@ -162,16 +172,19 @@ const double alpha = 0.8;
 void
 L3RateTracer::Print (std::ostream &os) const
 {
+  Time time = Simulator::Now ();
+
   for (std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats> >::iterator stats = m_stats.begin ();
        stats != m_stats.end ();
        stats++)
     {
-      Time time = Simulator::Now ();
+      if (!stats->first)
+        continue;
 
       PRINTER ("InInterests",   m_inInterests);
       PRINTER ("OutInterests",  m_outInterests);
       PRINTER ("DropInterests", m_dropInterests);
-      
+
       PRINTER ("InNacks",   m_inNacks);
       PRINTER ("OutNacks",  m_outNacks);
       PRINTER ("DropNacks", m_dropNacks);
@@ -180,6 +193,12 @@ L3RateTracer::Print (std::ostream &os) const
       PRINTER ("OutData",  m_outData);
       PRINTER ("DropData", m_dropData);
     }
+
+  {
+    std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats> >::iterator stats = m_stats.find (Ptr<const Face> (0));
+    PRINTER ("SatisfiedInterests", m_satisfiedInterests);
+    PRINTER ("TimedOutInterests", m_timedOutInterests);
+  }
 }
 
 
@@ -257,6 +276,21 @@ L3RateTracer::DropData (std::string context,
   m_stats[face].get<0> ().m_dropData ++;
   m_stats[face].get<1> ().m_dropData += header->GetSerializedSize () + payload->GetSize ();
 }
+
+void
+L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry>)
+{
+  m_stats[0].get<0> ().m_satisfiedInterests ++;
+  // no "size" stats
+}
+
+void
+L3RateTracer::TimedOutInterests (Ptr<const pit::Entry>)
+{
+  m_stats[0].get<0> ().m_timedOutInterests ++;
+  // no "size" stats
+}
+
 
 } // namespace ndn
 } // namespace ns3
