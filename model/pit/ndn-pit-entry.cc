@@ -20,6 +20,7 @@
 
 #include "ndn-pit-entry.h"
 
+#include "ns3/ndn-pit.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-name.h"
 #include "ns3/ndn-interest.h"
@@ -44,13 +45,15 @@ Entry::Entry (Pit &container,
   : m_container (container)
   , m_interest (header)
   , m_fibEntry (fibEntry)
-  , m_expireTime (Simulator::Now () + (!header->GetInterestLifetime ().IsZero ()?
-                                       header->GetInterestLifetime ():
-                                       Seconds (1.0)))
   , m_maxRetxCount (0)
 {
-  NS_LOG_FUNCTION (GetPrefix () << m_expireTime);
-  // note that if interest lifetime is not set, the behavior is undefined
+  NS_LOG_FUNCTION (this);
+
+  // UpdateLifetime is (and should) be called from the forwarding strategy
+
+  // UpdateLifetime ((!header->GetInterestLifetime ().IsZero ()?
+  //                  header->GetInterestLifetime ():
+  //                  Seconds (1.0)));
 }
 
 Entry::~Entry ()
@@ -61,9 +64,11 @@ Entry::~Entry ()
 void
 Entry::UpdateLifetime (const Time &offsetTime)
 {
-  NS_LOG_FUNCTION (offsetTime.ToDouble (Time::S));
+  NS_LOG_FUNCTION (this);
 
-  Time newExpireTime = Simulator::Now () + offsetTime;
+  Time newExpireTime = Simulator::Now () + (m_container.GetMaxPitEntryLifetime ().IsZero () ?
+                                            offsetTime :
+                                            std::min (m_container.GetMaxPitEntryLifetime (), offsetTime));
   if (newExpireTime > m_expireTime)
     m_expireTime = newExpireTime;
 

@@ -50,6 +50,13 @@ Pit::GetTypeId ()
                    TimeValue (), // by default, PIT entries are removed instantly
                    MakeTimeAccessor (&Pit::m_PitEntryPruningTimout),
                    MakeTimeChecker ())
+
+    .AddAttribute ("MaxPitEntryLifetime",
+                   "Maximum amount of time for which a router is willing to maintain a PIT entry. "
+                   "Actual PIT lifetime should be minimum of MaxPitEntryLifetime and InterestLifetime specified in the Interest packet",
+                   TimeValue (), // by default, PIT entries are kept for the time, specified by the InterestLifetime
+                   MakeTimeAccessor (&Pit::GetMaxPitEntryLifetime, &Pit::SetMaxPitEntryLifetime),
+                   MakeTimeChecker ())
     ;
 
   return tid;

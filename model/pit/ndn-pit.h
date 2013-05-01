@@ -107,7 +107,7 @@ public:
    */
   virtual Ptr<pit::Entry>
   Create (Ptr<const Interest> header) = 0;
-  
+
   /**
    * @brief Mark PIT entry deleted
    * @param entry PIT entry
@@ -153,16 +153,30 @@ public:
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
-  
+
   /**
    * @brief Static call to cheat python bindings
    */
   static inline Ptr<Pit>
   GetPit (Ptr<Object> node);
 
+  /**
+   * @brief Get maximum PIT entry lifetime
+   */
+  inline const Time&
+  GetMaxPitEntryLifetime () const;
+
+  /**
+   * @brief Set maximum PIT entry lifetime
+   */
+  inline void
+  SetMaxPitEntryLifetime (const Time &maxLifetime);
+
 protected:
   // configuration variables. Check implementation of GetTypeId for more details
-  Time    m_PitEntryPruningTimout;
+  Time m_PitEntryPruningTimout;
+
+  Time m_maxPitEntryLifetime;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,6 +194,19 @@ Pit::GetPit (Ptr<Object> node)
 {
   return node->GetObject<Pit> ();
 }
+
+inline const Time&
+Pit::GetMaxPitEntryLifetime () const
+{
+  return m_maxPitEntryLifetime;
+}
+
+inline void
+Pit::SetMaxPitEntryLifetime (const Time &maxLifetime)
+{
+  m_maxPitEntryLifetime = maxLifetime;
+}
+
 
 } // namespace ndn
 } // namespace ns3
