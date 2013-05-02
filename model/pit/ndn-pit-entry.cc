@@ -51,9 +51,9 @@ Entry::Entry (Pit &container,
 
   // UpdateLifetime is (and should) be called from the forwarding strategy
 
-  // UpdateLifetime ((!header->GetInterestLifetime ().IsZero ()?
-  //                  header->GetInterestLifetime ():
-  //                  Seconds (1.0)));
+  UpdateLifetime ((!header->GetInterestLifetime ().IsZero ()?
+                   header->GetInterestLifetime ():
+                   Seconds (1.0)));
 }
 
 Entry::~Entry ()
