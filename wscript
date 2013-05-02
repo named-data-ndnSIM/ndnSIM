@@ -180,7 +180,7 @@ def build(bld):
 @TaskGen.after_method('process_rule')
 def apply_ns3fullmoduleheaders(self):
     # ## get all of the ns3 headers
-    ns3_dir_node = self.bld.path.find_dir("ns3")
+    ns3_dir_node = self.bld.path.find_or_declare("ns3")
 
     mode = getattr(self, "mode", "install")
 
