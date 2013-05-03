@@ -2802,8 +2802,8 @@ def register_Ns3Object_methods(root_module, cls):
                    'ns3::TypeId', 
                    [], 
                    is_static=True)
-    ## object.h (module 'core'): void ns3::Object::Start() [member function]
-    cls.add_method('Start', 
+    ## object.h (module 'core'): void ns3::Object::Initialize() [member function]
+    cls.add_method('Initialize', 
                    'void', 
                    [])
     ## object.h (module 'core'): ns3::Object::Object(ns3::Object const & o) [copy constructor]
@@ -2814,8 +2814,8 @@ def register_Ns3Object_methods(root_module, cls):
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
-    ## object.h (module 'core'): void ns3::Object::DoStart() [member function]
-    cls.add_method('DoStart', 
+    ## object.h (module 'core'): void ns3::Object::DoInitialize() [member function]
+    cls.add_method('DoInitialize', 
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
@@ -3451,8 +3451,8 @@ def register_Ns3Application_methods(root_module, cls):
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
-    ## application.h (module 'network'): void ns3::Application::DoStart() [member function]
-    cls.add_method('DoStart', 
+    ## application.h (module 'network'): void ns3::Application::DoInitialize() [member function]
+    cls.add_method('DoInitialize', 
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
@@ -4249,8 +4249,8 @@ def register_Ns3Node_methods(root_module, cls):
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
-    ## node.h (module 'network'): void ns3::Node::DoStart() [member function]
-    cls.add_method('DoStart', 
+    ## node.h (module 'network'): void ns3::Node::DoInitialize() [member function]
+    cls.add_method('DoInitialize', 
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
@@ -5787,6 +5787,11 @@ def register_Ns3NdnPit_methods(root_module, cls):
                    'ns3::Ptr< ns3::ndn::pit::Entry >', 
                    [param('ns3::ndn::Name const &', 'prefix')], 
                    is_pure_virtual=True, is_virtual=True)
+    ## ndn-pit.h (module 'ndnSIM'): ns3::Time const & ns3::ndn::Pit::GetMaxPitEntryLifetime() const [member function]
+    cls.add_method('GetMaxPitEntryLifetime', 
+                   'ns3::Time const &', 
+                   [], 
+                   is_const=True)
     ## ndn-pit.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::Pit> ns3::ndn::Pit::GetPit(ns3::Ptr<ns3::Object> node) [member function]
     cls.add_method('GetPit', 
                    'ns3::Ptr< ns3::ndn::Pit >', 
@@ -5827,6 +5832,10 @@ def register_Ns3NdnPit_methods(root_module, cls):
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-pit.h (module 'ndnSIM'): void ns3::ndn::Pit::SetMaxPitEntryLifetime(ns3::Time const & maxLifetime) [member function]
+    cls.add_method('SetMaxPitEntryLifetime', 
+                   'void', 
+                   [param('ns3::Time const &', 'maxLifetime')])
     return
 
 def register_Ns3NdnRttEstimator_methods(root_module, cls):
@@ -6077,8 +6086,8 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::Entry(ns3::ndn::fib::Entry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::fib::Entry const &', 'arg0')])
-    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::Entry(ns3::Ptr<ns3::ndn::Name const> const & prefix) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::ndn::Name const > const &', 'prefix')])
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::Entry(ns3::Ptr<ns3::ndn::Fib> fib, ns3::Ptr<ns3::ndn::Name const> const & prefix) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::Fib >', 'fib'), param('ns3::Ptr< ns3::ndn::Name const > const &', 'prefix')])
     ## ndn-fib-entry.h (module 'ndnSIM'): void ns3::ndn::fib::Entry::AddOrUpdateRoutingMetric(ns3::Ptr<ns3::ndn::Face> face, int32_t metric) [member function]
     cls.add_method('AddOrUpdateRoutingMetric', 
                    'void', 
@@ -6088,6 +6097,10 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    'ns3::ndn::fib::FaceMetric const &', 
                    [param('uint32_t', 'skip', default_value='0')], 
                    is_const=True)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Fib> ns3::ndn::fib::Entry::GetFib() [member function]
+    cls.add_method('GetFib', 
+                   'ns3::Ptr< ns3::ndn::Fib >', 
+                   [])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::Name const & ns3::ndn::fib::Entry::GetPrefix() const [member function]
     cls.add_method('GetPrefix', 
                    'ns3::ndn::Name const &', 
@@ -6115,6 +6128,8 @@ def register_Ns3NdnFibEntry_methods(root_module, cls):
                    [param('ns3::Ptr< ns3::ndn::Face >', 'face'), param('ns3::ndn::fib::FaceMetric::Status', 'status')])
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_faces [variable]
     cls.add_instance_attribute('m_faces', 'boost::multi_index::multi_index_container< ns3::ndn::fib::FaceMetric, boost::multi_index::indexed_by< boost::multi_index::ordered_unique< boost::multi_index::tag< ns3::ndn::fib::i_face, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, ns3::Ptr< ns3::ndn::Face >, & ( ns3::ndn::fib::FaceMetric::GetFace (  ) const ) >, mpl_::na >, boost::multi_index::ordered_non_unique< boost::multi_index::tag< ns3::ndn::fib::i_metric, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, boost::multi_index::composite_key< ns3::ndn::fib::FaceMetric, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, ns3::ndn::fib::FaceMetric::Status, & ( ns3::ndn::fib::FaceMetric::GetStatus (  ) const ) >, boost::multi_index::const_mem_fun< ns3::ndn::fib::FaceMetric, int, & ( ns3::ndn::fib::FaceMetric::GetRoutingCost (  ) const ) >, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type >, mpl_::na >, boost::multi_index::random_access< boost::multi_index::tag< ns3::ndn::fib::i_nth, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na > >, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na, mpl_::na >, std::allocator< ns3::ndn::fib::FaceMetric > >', is_const=False)
+    ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_fib [variable]
+    cls.add_instance_attribute('m_fib', 'ns3::Ptr< ns3::ndn::Fib >', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_needsProbing [variable]
     cls.add_instance_attribute('m_needsProbing', 'bool', is_const=False)
     ## ndn-fib-entry.h (module 'ndnSIM'): ns3::ndn::fib::Entry::m_prefix [variable]
