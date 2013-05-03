@@ -67,7 +67,7 @@ ConsumerWindow::GetTypeId (void)
                      MakeTraceSourceAccessor (&ConsumerWindow::m_window))
     .AddTraceSource ("InFlight",
                      "Current number of outstanding interests",
-                     MakeTraceSourceAccessor (&ConsumerWindow::m_window))
+                     MakeTraceSourceAccessor (&ConsumerWindow::m_inFlight))
     ;
 
   return tid;
