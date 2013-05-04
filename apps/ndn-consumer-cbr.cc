@@ -111,7 +111,7 @@ ConsumerCbr::SetRandomize (const std::string &value)
   if (m_random)
     delete m_random;
 
-  else if (value == "uniform")
+  if (value == "uniform")
     {
       m_random = new UniformVariable (0.0, 2 * 1.0 / m_frequency);
     }
