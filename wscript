@@ -36,7 +36,7 @@ def configure(conf):
                 boost_lib_name = boost_lib_name[6:]
             if boost_lib_name.endswith("-mt"):
                 boost_lib_name = boost_lib_name[:-3]
-                present_boost_libs.append(boost_lib_name)
+            present_boost_libs.append(boost_lib_name)
 
         missing_boost_libs = [lib for lib in REQUIRED_BOOST_LIBS if lib not in present_boost_libs]
         
