@@ -1,67 +1,70 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def build(bld):
-    obj = bld.create_ns3_program('ndn-simple', ['ndnSIM'])
+    # This may be necessary for visualizer to work
+    all_modules = [mod[len("ns3-"):] for mod in bld.env['NS3_ENABLED_MODULES']]
+
+    obj = bld.create_ns3_program('ndn-simple', all_modules)
     obj.source = 'ndn-simple.cc'
 
-    obj = bld.create_ns3_program('ndn-grid', ['ndnSIM', 'point-to-point-layout'])
+    obj = bld.create_ns3_program('ndn-grid', all_modules)
     obj.source = 'ndn-grid.cc'
 
-    obj = bld.create_ns3_program('ndn-zipf-mandelbrot', ['ndnSIM', 'point-to-point-layout'])
+    obj = bld.create_ns3_program('ndn-zipf-mandelbrot', all_modules)
     obj.source = 'ndn-zipf-mandelbrot.cc'
 
 
-    obj = bld.create_ns3_program('ndn-simple-with-content-freshness', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-content-freshness', all_modules)
     obj.source = ['ndn-simple-with-content-freshness.cc',
                   'custom-apps/dumb-requester.cc']
 
-    obj = bld.create_ns3_program('ndn-simple-with-custom-app', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-custom-app', all_modules)
     obj.source = ['ndn-simple-with-custom-app.cc',
                   'custom-apps/custom-app.cc',
                   'custom-apps/hijacker.cc']
 
     if 'topology' in bld.env['NDN_plugins']:
-        obj = bld.create_ns3_program('ndn-grid-topo-plugin', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-grid-topo-plugin', all_modules)
         obj.source = 'ndn-grid-topo-plugin.cc'
 
-        obj = bld.create_ns3_program('ndn-grid-topo-plugin-loss', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-grid-topo-plugin-loss', all_modules)
         obj.source = 'ndn-grid-topo-plugin-loss.cc'
 
-        obj = bld.create_ns3_program('ndn-congestion-topo-plugin', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-congestion-topo-plugin', all_modules)
         obj.source = 'ndn-congestion-topo-plugin.cc'
 
-        obj = bld.create_ns3_program('ndn-congestion-alt-topo-plugin', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-congestion-alt-topo-plugin', all_modules)
         obj.source = [
             'custom-strategies/custom-strategy.cc',
             'ndn-congestion-alt-topo-plugin.cc'
             ]
 
-        obj = bld.create_ns3_program('ndn-tree-tracers', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-tree-tracers', all_modules)
         obj.source = 'ndn-tree-tracers.cc'
 
-        obj = bld.create_ns3_program('ndn-tree-cs-tracers', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-tree-cs-tracers', all_modules)
         obj.source = 'ndn-tree-cs-tracers.cc'
 
-        obj = bld.create_ns3_program('ndn-tree-app-delay-tracer', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-tree-app-delay-tracer', all_modules)
         obj.source = 'ndn-tree-app-delay-tracer.cc'
 
-        obj = bld.create_ns3_program('ndn-tree-with-l2tracer', ['ndnSIM'])
+        obj = bld.create_ns3_program('ndn-tree-with-l2tracer', all_modules)
         obj.source = 'ndn-tree-with-l2tracer.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-pit-policies', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-pit-policies', all_modules)
     obj.source = 'ndn-simple-pit-policies.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-with-different-sizes-content-store', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-different-sizes-content-store', all_modules)
     obj.source = 'ndn-simple-with-different-sizes-content-store.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-with-cs-lfu', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-cs-lfu', all_modules)
     obj.source = 'ndn-simple-with-cs-lfu.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-with-pcap', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-pcap', all_modules)
     obj.source = 'ndn-simple-with-pcap.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-with-pit-operation-stats', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-pit-operation-stats', all_modules)
     obj.source = 'ndn-simple-with-pit-operation-stats.cc'
 
-    obj = bld.create_ns3_program('ndn-simple-with-pit-count-stats', ['ndnSIM'])
+    obj = bld.create_ns3_program('ndn-simple-with-pit-count-stats', all_modules)
     obj.source = 'ndn-simple-with-pit-count-stats.cc'
