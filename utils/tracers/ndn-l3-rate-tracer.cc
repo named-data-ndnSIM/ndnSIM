@@ -196,8 +196,11 @@ L3RateTracer::Print (std::ostream &os) const
 
   {
     std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats> >::iterator stats = m_stats.find (Ptr<const Face> (0));
-    PRINTER ("SatisfiedInterests", m_satisfiedInterests);
-    PRINTER ("TimedOutInterests", m_timedOutInterests);
+    if (stats != m_stats.end ())
+      {
+        PRINTER ("SatisfiedInterests", m_satisfiedInterests);
+        PRINTER ("TimedOutInterests", m_timedOutInterests);
+      }
   }
 }
 
