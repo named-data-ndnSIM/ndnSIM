@@ -52,10 +52,17 @@ ConsumerWindow::GetTypeId (void)
                    UintegerValue (1040),
                    MakeUintegerAccessor (&ConsumerWindow::GetPayloadSize, &ConsumerWindow::SetPayloadSize),
                    MakeUintegerChecker<uint32_t>())
-    .AddAttribute ("Size", "Amount of data in megabytes to request (relies on PayloadSize parameter)",
+
+    .AddAttribute ("Size", "Amount of data in megabytes to request, relying on PayloadSize parameter (alternative to MaxSeq attribute)",
                    DoubleValue (-1), // don't impose limit by default
                    MakeDoubleAccessor (&ConsumerWindow::GetMaxSize, &ConsumerWindow::SetMaxSize),
                    MakeDoubleChecker<double> ())
+
+    .AddAttribute ("MaxSeq",
+                   "Maximum sequence number to request (alternative to Size attribute)",
+                   IntegerValue (std::numeric_limits<uint32_t>::max ()),
+                   MakeIntegerAccessor (&ConsumerWindow::m_seqMax),
+                   MakeIntegerChecker<uint32_t> ())
 
     .AddAttribute ("InitialWindowOnTimeout", "Set window to initial value when timeout occurs",
                    BooleanValue (true),
