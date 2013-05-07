@@ -94,8 +94,6 @@ main (int argc, char *argv[])
   std::cout << "Time" << "\t"
             << "NodeId" << "\t"
             << "NodeName" << "\t"
-            << "Inserts" << "\t"
-            << "Lookups" << "\t"
             << "NumberOfPitEntries" << "\n";
   Simulator::Schedule (Seconds (1), PeriodicStatsPrinter, nodes.Get (0), Seconds (1));
   Simulator::Schedule (Seconds (1), PeriodicStatsPrinter, nodes.Get (1), Seconds (1));
