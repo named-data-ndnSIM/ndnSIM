@@ -59,6 +59,16 @@ def configure(conf):
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 
+    if not conf.check_cfg(package='openssl', args=['--cflags', '--libs'], uselib_store='SSL', mandatory=False):
+        libcrypto = conf.check_cc(lib='crypto',
+                                  header_name='openssl/crypto.h',
+                                  define_name='HAVE_SSL',
+                                  uselib_store='SSL')
+    else:
+        conf.define ("HAVE_SSL", 1)
+    if not conf.get_define ("HAVE_SSL"):
+        conf.fatal ("Cannot find SSL libraries")
+
     conf.env['NDN_plugins'] = ['topology']
     if Options.options.enable_ndn_plugins:
         conf.env['NDN_plugins'] = conf.env['NDN_plugins'] + Options.options.enable_ndn_plugins.split(',')
@@ -87,7 +97,7 @@ def build(bld):
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders'
-    module.uselib = 'BOOST BOOST_IOSTREAMS'
+    module.uselib = 'BOOST BOOST_IOSTREAMS SSL'
 
     headers = bld (features='ns3header')
     headers.module = 'ndnSIM'
