@@ -68,6 +68,18 @@ public:
       LATENCIES,
       POSITIONS
     };
+
+  inline void
+  SetDefaultBandwidth (const std::string &bw);
+
+  inline std::string
+  GetDefaultBandwidth () const;
+
+  inline void
+  SetDefaultQueue (const std::string &queue);
+
+  inline std::string
+  GetDefaultQueue () const;
   
 private:
   RocketfuelWeightsReader (const RocketfuelWeightsReader&);
@@ -75,8 +87,35 @@ private:
   
 private:
   uint8_t m_inputType;
+  std::string m_defaultBandwidth; // since the topology files don't provide bandwidth parameter
+  std::string m_queue;
   
 }; // end class RocketfuelWeightsReader
+
+inline void
+RocketfuelWeightsReader::SetDefaultBandwidth (const std::string &bw)
+{
+  m_defaultBandwidth = bw;
+}
+
+inline std::string
+RocketfuelWeightsReader::GetDefaultBandwidth () const
+{
+  return m_defaultBandwidth;
+}
+
+inline void
+RocketfuelWeightsReader::SetDefaultQueue (const std::string &queue)
+{
+  m_queue = queue;
+}
+
+inline std::string
+RocketfuelWeightsReader::GetDefaultQueue () const
+{
+  return m_queue;
+}
+
 
 }; // end namespace ns3
 

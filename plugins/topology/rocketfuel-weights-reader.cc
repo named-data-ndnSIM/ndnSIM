@@ -57,6 +57,7 @@ namespace ns3 {
     
 RocketfuelWeightsReader::RocketfuelWeightsReader (const std::string &path/*=""*/, double scale/*=1.0*/)
   : AnnotatedTopologyReader (path, scale)
+  , m_defaultBandwidth ("100Mbps")
 {
   NS_LOG_FUNCTION (this);
 
@@ -162,7 +163,12 @@ RocketfuelWeightsReader::Read ()
           if (attribute == "")
             attribute = "1";
             
+          link->SetAttribute ("DataRate", m_defaultBandwidth);
           link->SetAttribute ("Delay", attribute+"ms");
+          if (!m_queue.empty ())
+            {
+              link->SetAttribute ("MaxPackets", m_queue);
+            }
           break;
         default:
           ; //

@@ -116,10 +116,10 @@ public:
   const NodeContainer&
   GetCustomerRouters() const;
 
-  void
+  virtual void
   SaveTopology (const std::string &file);
 
-  void
+  virtual void
   SaveGraphviz (const std::string &file);
 
 private:

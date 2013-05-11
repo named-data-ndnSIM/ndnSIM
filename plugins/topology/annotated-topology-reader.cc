@@ -49,6 +49,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
+
 #include <set>
 
 #ifdef NS3_MPI
@@ -195,7 +198,7 @@ AnnotatedTopologyReader::Read (void)
 
   if (topgen.eof ())
     {
-      NS_FATAL_ERROR ("Topology file " << GetFileName () << " does not have \"link\" section");
+      NS_LOG_ERROR ("Topology file " << GetFileName () << " does not have \"link\" section");
       return m_nodes;
     }
 
@@ -408,7 +411,7 @@ AnnotatedTopologyReader::ApplySettings ()
 }
 
 void
-AnnotatedTopologyReader::SaveTopology (const std::string &file) const
+AnnotatedTopologyReader::SaveTopology (const std::string &file)
 {
   ofstream os (file.c_str (), ios::trunc);
   os << "# any empty lines and lines starting with '#' symbol is ignored\n"
@@ -479,5 +482,73 @@ AnnotatedTopologyReader::SaveTopology (const std::string &file) const
       os << "\n";
     }
 }
+
+
+template <class Names>
+class name_writer {
+public:
+  name_writer(Names _names) : names(_names) {}
+
+  template <class VertexOrEdge>
+  void operator()(std::ostream& out, const VertexOrEdge& v) const {
+    // out << "[label=\"" << names[v] << "\",style=filled,fillcolor=\"" << colors[v] << "\"]";
+    out << "[shape=\"circle\",width=0.1,label=\"\",style=filled,fillcolor=\"green\"]";
+  }
+private:
+  Names names;
+};
+
+template <class Names>
+inline name_writer<Names>
+make_name_writer(Names n) {
+  return name_writer<Names>(n);
+}
+
+
+void
+AnnotatedTopologyReader::SaveGraphviz (const std::string &file)
+{
+  typedef boost::adjacency_list_traits<boost::setS, boost::setS, boost::undirectedS> Traits;
+
+  typedef boost::property< boost::vertex_name_t, std::string, boost::property
+                           < boost::vertex_index_t, uint32_t > > nodeProperty;
+
+  typedef boost::no_property edgeProperty;
+
+  typedef boost::adjacency_list< boost::setS, boost::setS, boost::undirectedS,
+                                 nodeProperty, edgeProperty > Graph;
+
+  typedef map<string, Traits::vertex_descriptor> node_map_t;
+  node_map_t graphNodes;
+  Graph      graph;
+
+  for (NodeContainer::Iterator node = m_nodes.Begin ();
+       node != m_nodes.End ();
+       node++)
+    {
+       std::pair<node_map_t::iterator, bool>
+         retval = graphNodes.insert (make_pair (Names::FindName (*node),
+                                                add_vertex (nodeProperty (Names::FindName (*node)), graph)));
+       // NS_ASSERT (ok == true);
+
+       put (boost::vertex_index, graph, retval.first->second, (*node)->GetId ());
+    }
+
+  for (std::list<Link>::const_iterator link = m_linksList.begin ();
+       link != m_linksList.end ();
+       link ++)
+    {
+      node_map_t::iterator from = graphNodes.find (Names::FindName (link->GetFromNode ()));
+      node_map_t::iterator to   = graphNodes.find (Names::FindName (link->GetToNode ()));
+
+      // add_edge (node->second, otherNode->second, m_graph);
+      boost::add_edge (from->second, to->second, graph);
+    }
+  
+  ofstream of (file.c_str ());
+  boost::property_map<Graph, boost::vertex_name_t>::type names = get (boost::vertex_name, graph);
+  write_graphviz (of, graph, make_name_writer (names));
+}
+
 
 }

@@ -59,13 +59,13 @@ public:
   /**
    * \brief Get nodes read by the reader
    */
-  NodeContainer
+  virtual NodeContainer
   GetNodes () const;
     
   /**
    * \brief Get links read by the reader
    */  
-  const std::list<Link>&
+  virtual const std::list<Link>&
   GetLinks () const;
   
   /**
@@ -77,7 +77,7 @@ public:
    *
    * \param base Starting IPv4 address (second link will have base+256)
    */
-  void
+  virtual void
   AssignIpv4Addresses (Ipv4Address base);
 
   /**
@@ -87,27 +87,34 @@ public:
    * \param lrx Lower right x coordinate
    * \param lry Lower right y coordinate
    */
-  void
+  virtual void
   SetBoundingBox (double ulx, double uly, double lrx, double lry);
 
   /**
    * \brief Set mobility model to be used on nodes
    * \param model class name of the model
    */
-  void
+  virtual void
   SetMobilityModel (const std::string &model);
 
   /**
    * \brief Apply OSPF metric on Ipv4 (if exists) and Ccnx (if exists) stacks
    */
-  void ApplyOspfMetric ();
+  virtual void
+  ApplyOspfMetric ();
 
   /**
    * \brief Save positions (e.g., after manual modification using visualizer)
    */
-  void
-  SaveTopology (const std::string &file) const;
+  virtual void
+  SaveTopology (const std::string &file);
 
+  /**
+   * \brief Save topology in graphviz format (.dot file)
+   */
+  virtual void
+  SaveGraphviz (const std::string &file);
+  
 protected:
   Ptr<Node>
   CreateNode (const std::string name, uint32_t systemId);
