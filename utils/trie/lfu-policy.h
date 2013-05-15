@@ -53,13 +53,13 @@ struct lfu_policy_traits
   {
     static double& get_order (typename Container::iterator item)
     {
-      return static_cast<typename policy_container::value_traits::hook_type*>
+      return static_cast<policy_hook_type*>
         (policy_container::value_traits::to_node_ptr(*item))->frequency;
     }
 
     static const double& get_order (typename Container::const_iterator item)
     {
-      return static_cast<const typename policy_container::value_traits::hook_type*>
+      return static_cast<const policy_hook_type*>
         (policy_container::value_traits::to_node_ptr(*item))->frequency;
     }
 
