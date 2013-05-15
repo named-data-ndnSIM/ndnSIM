@@ -76,6 +76,7 @@ Face::Face (Ptr<Node> node)
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
+  , m_flags (0)
 {
   NS_LOG_FUNCTION (this);
 
@@ -193,6 +194,13 @@ Face::SetUp (bool up/* = true*/)
   NS_LOG_FUNCTION_NOARGS ();
   m_ifup = up;
 }
+
+void
+Face::SetFlags (uint32_t flags)
+{
+  m_flags = flags;
+}
+
 
 bool
 Face::operator== (const Face &face) const

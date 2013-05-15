@@ -58,6 +58,7 @@ AppFace::AppFace (Ptr<App> app)
   NS_LOG_FUNCTION (this << app);
   
   NS_ASSERT (m_app != 0);
+  SetFlags (Face::APPLICATION);
 }
 
 AppFace::~AppFace ()

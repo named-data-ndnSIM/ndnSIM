@@ -58,7 +58,7 @@ class Face :
 public:
   static TypeId
   GetTypeId ();
-  
+
   /**
    * \brief NDN protocol handler
    *
@@ -80,7 +80,7 @@ public:
   GetNode () const;
 
   ////////////////////////////////////////////////////////////////////
-  
+
   /**
    * \brief Register callback to call when new packet arrives on the face
    *
@@ -97,7 +97,7 @@ public:
    * \param p smart pointer to a packet to send
    *
    * @return false if either limit is reached
-   */ 
+   */
   bool
   Send (Ptr<Packet> p);
 
@@ -115,21 +115,23 @@ public:
    *
    * \param metric configured routing metric (cost) of this face
    */
-  virtual void SetMetric (uint16_t metric);
+  virtual void
+  SetMetric (uint16_t metric);
 
   /**
    * \brief Get routing/forwarding metric assigned to the face
    *
    * \returns configured routing/forwarding metric (cost) of this face
    */
-  virtual uint16_t GetMetric (void) const;
+  virtual uint16_t
+  GetMetric (void) const;
 
   /**
    * These are face states and may be distinct from actual lower-layer
    * device states, such as found in real implementations (where the
    * device may be down but ndn face state is still up).
    */
-  
+
   /**
    * \brief Enable or disable this face
    */
@@ -142,6 +144,25 @@ public:
   virtual bool
   IsUp () const;
 
+  /**
+   * @brief Get face flags
+   *
+   * Face flags may indicate various properties of the face.  For example, if the face is an application face,
+   * than the returned flags have Face::APPLICATION bit set.
+   *
+   * @see ndn::Face::Flags for the list of currently defined face flags
+   */
+  inline uint32_t
+  GetFlags () const;
+
+  /**
+   * @brief List of currently defined face flags
+   */
+  enum Flags
+    {
+      APPLICATION = 1 ///< @brief An application face
+    };
+  
   /**
    * @brief Print information about the face into the stream
    * @param os stream to write information to
@@ -184,7 +205,7 @@ public:
    */
   inline bool
   operator!= (const Face &face) const;
-  
+
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
    *
@@ -200,27 +221,38 @@ protected:
    * \param p smart pointer to a packet to send
    */
   virtual bool
-  SendImpl (Ptr<Packet> p) = 0;  
+  SendImpl (Ptr<Packet> p) = 0;
+
+  void
+  SetFlags (uint32_t flags);
 
 private:
   Face (const Face &); ///< \brief Disabled copy constructor
   Face& operator= (const Face &); ///< \brief Disabled copy operator
-  
+
 protected:
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
-  
+
 private:
   ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to Ndn stack
-  bool m_ifup; ///< \brief flag indicating that the interface is UP 
+  bool m_ifup; ///< \brief flag indicating that the interface is UP
   uint32_t m_id; ///< \brief id of the interface in NDN stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
+  uint32_t m_flags;
 
   TracedCallback<Ptr<const Packet> > m_txTrace;
   TracedCallback<Ptr<const Packet> > m_rxTrace;
   TracedCallback<Ptr<const Packet> > m_dropTrace;
 };
 
-std::ostream& operator<< (std::ostream& os, const Face &face);
+std::ostream&
+operator<< (std::ostream& os, const Face &face);
+
+inline uint32_t
+Face::GetFlags () const
+{
+  return m_flags;
+}
 
 inline bool
 operator < (const Ptr<Face> &lhs, const Ptr<Face> &rhs)

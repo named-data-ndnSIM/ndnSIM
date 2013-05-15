@@ -84,6 +84,11 @@ TypeId ForwardingStrategy::GetTypeId (void)
 
     .AddTraceSource ("SatisfiedInterests",  "SatisfiedInterests",  MakeTraceSourceAccessor (&ForwardingStrategy::m_satisfiedInterests))
     .AddTraceSource ("TimedOutInterests",   "TimedOutInterests",   MakeTraceSourceAccessor (&ForwardingStrategy::m_timedOutInterests))
+
+    .AddAttribute ("CacheUnsolicitedDataFromApps", "Cache unsolicited data that has been pushed from applications",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&ForwardingStrategy::m_cacheUnsolicitedDataFromApps),
+                   MakeBooleanChecker ())
     
     .AddAttribute ("CacheUnsolicitedData", "Cache overheard data that have not been requested",
                    BooleanValue (false),
@@ -234,7 +239,7 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
     {
       bool cached = false;
 
-      if (m_cacheUnsolicitedData)
+      if (m_cacheUnsolicitedData || (m_cacheUnsolicitedDataFromApps && (inFace->GetFlags () | Face::APPLICATION)))
         {
           FwHopCountTag hopCountTag;
 

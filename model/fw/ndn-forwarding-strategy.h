@@ -476,6 +476,7 @@ protected:
   Ptr<Fib> m_fib; ///< \brief FIB
   Ptr<ContentStore> m_contentStore; ///< \brief Content store (for caching purposes only)
 
+  bool m_cacheUnsolicitedDataFromApps;
   bool m_cacheUnsolicitedData;
   bool m_detectRetransmissions;
 
