@@ -164,7 +164,8 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
        face ++)
     {
       Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
-      faceLimits->ReturnLimit ();
+      for (uint32_t i = 0; i <= face->m_retxCount; i++)
+        faceLimits->ReturnLimit ();
     }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
@@ -183,7 +184,8 @@ PerOutFaceLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
        face ++)
     {
       Ptr<Limits> faceLimits = face->m_face->GetObject<Limits> ();
-      faceLimits->ReturnLimit ();
+      for (uint32_t i = 0; i <= face->m_retxCount; i++)
+        faceLimits->ReturnLimit ();
     }
   
   super::WillSatisfyPendingInterest (inFace, pitEntry);

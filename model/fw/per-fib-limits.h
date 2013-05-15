@@ -169,7 +169,14 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  fibLimits->ReturnLimit ();
+
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      for (uint32_t i = 0; i <= face->m_retxCount; i++)
+        fibLimits->ReturnLimit ();
+    }
 
   super::WillEraseTimedOutPendingInterest (pitEntry);
 }
@@ -183,7 +190,14 @@ PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
   Ptr<Limits> fibLimits = pitEntry->GetFibEntry ()->template GetObject<Limits> ();
-  fibLimits->ReturnLimit ();
+
+  for (pit::Entry::out_container::iterator face = pitEntry->GetOutgoing ().begin ();
+       face != pitEntry->GetOutgoing ().end ();
+       face ++)
+    {
+      for (uint32_t i = 0; i <= face->m_retxCount; i++)
+        fibLimits->ReturnLimit ();
+    }
 
   super::WillSatisfyPendingInterest (inFace, pitEntry);
 }
