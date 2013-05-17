@@ -88,6 +88,12 @@ private:
   void
   SetMaxSize (double size);
 
+  uint32_t
+  GetSeqMax () const;
+
+  void
+  SetSeqMax (uint32_t seqMax);
+
 private:
   uint32_t m_payloadSize; // expected payload size
   double   m_maxSize; // max size to request

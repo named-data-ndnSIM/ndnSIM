@@ -53,16 +53,18 @@ ConsumerWindow::GetTypeId (void)
                    MakeUintegerAccessor (&ConsumerWindow::GetPayloadSize, &ConsumerWindow::SetPayloadSize),
                    MakeUintegerChecker<uint32_t>())
 
-    .AddAttribute ("Size", "Amount of data in megabytes to request, relying on PayloadSize parameter (alternative to MaxSeq attribute)",
+    .AddAttribute ("Size",
+                   "Amount of data in megabytes to request, relying on PayloadSize parameter (alternative to MaxSeq attribute)",
                    DoubleValue (-1), // don't impose limit by default
                    MakeDoubleAccessor (&ConsumerWindow::GetMaxSize, &ConsumerWindow::SetMaxSize),
                    MakeDoubleChecker<double> ())
 
     .AddAttribute ("MaxSeq",
-                   "Maximum sequence number to request (alternative to Size attribute)",
+                   "Maximum sequence number to request (alternative to Size attribute, would activate only if Size is -1). "
+                   "The parameter is activated only if Size negative (not set)",
                    IntegerValue (std::numeric_limits<uint32_t>::max ()),
-                   MakeIntegerAccessor (&ConsumerWindow::m_seqMax),
-                   MakeIntegerChecker<uint32_t> ())
+                   MakeUintegerAccessor (&ConsumerWindow::GetSeqMax, &ConsumerWindow::SetSeqMax),
+                   MakeUintegerChecker<uint32_t> ())
 
     .AddAttribute ("InitialWindowOnTimeout", "Set window to initial value when timeout occurs",
                    BooleanValue (true),
@@ -133,6 +135,21 @@ ConsumerWindow::SetMaxSize (double size)
   m_seqMax = floor(1.0 + m_maxSize * 1024.0 * 1024.0 / m_payloadSize);
   NS_LOG_DEBUG ("MaxSeqNo: " << m_seqMax);
   // std::cout << "MaxSeqNo: " << m_seqMax << "\n";
+}
+
+uint32_t
+ConsumerWindow::GetSeqMax () const
+{
+  return m_seqMax;
+}
+
+void
+ConsumerWindow::SetSeqMax (uint32_t seqMax)
+{
+  if (m_maxSize < 0)
+    m_seqMax = seqMax;
+
+  // ignore otherwise
 }
 
 
