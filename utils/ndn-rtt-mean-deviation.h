@@ -51,6 +51,8 @@ public:
   RttMeanDeviation ();
   RttMeanDeviation (const RttMeanDeviation&);
 
+  virtual TypeId GetInstanceTypeId (void) const;
+
   void SentSeq (SequenceNumber32 seq, uint32_t size);
   Time AckSeq (SequenceNumber32 ackSeq);
   void Measurement (Time measure);

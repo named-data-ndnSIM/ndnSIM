@@ -74,6 +74,12 @@ RttMeanDeviation::RttMeanDeviation (const RttMeanDeviation& c)
   NS_LOG_FUNCTION (this);
 }
 
+TypeId
+RttMeanDeviation::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
 void RttMeanDeviation::Measurement (Time m)
 {
   NS_LOG_FUNCTION (this << m);
