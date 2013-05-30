@@ -265,7 +265,14 @@ L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
 
             // Deserialization. Exception may be thrown
             packet->RemoveHeader (*header);
-            NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
+
+            // this assert is legitimately failing with CSMA-style devices, when interest size is less then
+            // minimally required 46 bytes.  At the same time, it is safe to ignore the fact
+            if (packet->GetSize () != 0)
+              {
+                NS_LOG_WARN ("Payload size is not zero. Valid only for CSMA (Ethernet) devices");
+              }
+            // NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
 
             m_forwardingStrategy->OnInterest (face, header, p/*original packet*/);
             // if (header->GetNack () > 0)
