@@ -197,24 +197,24 @@ FibImpl::RemoveFromAll (Ptr<Face> face)
 {
   NS_LOG_FUNCTION (this);
 
-  std::for_each (super::parent_trie::recursive_iterator (super::getTrie ()),
-                 super::parent_trie::recursive_iterator (0), 
-                 ll::bind (&FibImpl::RemoveFace,
-                           this, ll::_1, face));
-
-  super::parent_trie::recursive_iterator trieNode (super::getTrie ());
-  super::parent_trie::recursive_iterator end (0);
-  for (; trieNode != end; trieNode++)
+  Ptr<Entry> entry = Begin ();
+  while (entry != End ())
     {
-      if (trieNode->payload () == 0) continue;
-      
-      if (trieNode->payload ()->m_faces.size () == 0)
+      entry->RemoveFace (face);
+      if (entry->m_faces.size () == 0)
         {
+          Ptr<Entry> nextEntry = Next (entry);
+
           // notify forwarding strategy about soon be removed FIB entry
           NS_ASSERT (this->GetObject<ForwardingStrategy> () != 0);
-          this->GetObject<ForwardingStrategy> ()->WillRemoveFibEntry (trieNode->payload ());
-          
-          trieNode = super::parent_trie::recursive_iterator (trieNode->erase ());
+          this->GetObject<ForwardingStrategy> ()->WillRemoveFibEntry (entry);
+
+          super::erase (StaticCast<EntryImpl> (entry)->to_iterator ());
+          entry = nextEntry;
+        }
+      else
+        {
+          entry = Next (entry);
         }
     }
 }
