@@ -114,12 +114,18 @@ main (int argc, char *argv[])
   // Install CCNx stack on all nodes
   ndn::StackHelper ccnxHelper;
   ccnxHelper.SetDefaultRoutes (true);
-  ccnxHelper.SetContentStore ("ns3::ndn::cs::Freshness::Lfu"); // don't set up max size here, will use default value = 100
-  ccnxHelper.InstallAll ();
 
-  // set up max sizes, after NDN stack is installed
-  Config::Set ("/NodeList/0/$ns3::ndn::ContentStore/MaxSize", UintegerValue (1)); // number after nodeList is global ID of the node (= node->GetId ())
-  Config::Set ("/NodeList/1/$ns3::ndn::ContentStore/MaxSize", UintegerValue (2));
+  // node 0: disable cache completely
+  ccnxHelper.SetContentStore ("ns3::ndn::cs::Nocache"); // disable cache
+  ccnxHelper.Install (nodes.Get (0));
+
+  // node 1 and 2: set cache with Lfu policy
+  ccnxHelper.SetContentStore ("ns3::ndn::cs::Freshness::Lfu", "MaxSize", "2"); // can set cache size this way
+  ccnxHelper.Install (nodes.Get (1));
+  ccnxHelper.Install (nodes.Get (2));
+
+  // alternative way to configure cache size
+  // [number after nodeList is global ID of the node (= node->GetId ())]
   Config::Set ("/NodeList/2/$ns3::ndn::ContentStore/MaxSize", UintegerValue (100000));
 
   // Installing applications
