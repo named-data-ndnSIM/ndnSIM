@@ -72,7 +72,8 @@ The objective of the new format is to optimize encoding/decoding operations.
 ::
 
 	Interest ::= Nonce 
-	     	     Scope 
+	     	     Scope
+                     NackType
 		     InterestLifetime 
 	     	     Name 
 	     	     Selectors 
@@ -89,7 +90,7 @@ Maximum size of the Interest packet: 1 + 4 + 2 + 1 + (2 + 65535) + (2 + 65535) +
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         |                          Nonce                                |
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |     Scope     |   Reserved    |      InterestLifetime         |
+        |     Scope     |   NackType    |      InterestLifetime         |
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         |            Length             |                               |
 	|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
@@ -118,14 +119,22 @@ Nonce
 
 	Nonce ::= uint32_t
 
-Reserved
+NackType
 ~~~~~~~~
 
 ::
 
-	Reserved := uint8_t
+	NackType := uint8_t
 
-Currently does not have meaning and should be zero
+Currently, ndnSIM defines following NackTypes:
+
+- 0: NORMAL_INTEREST
+- 10: NACK_LOOP
+- 11: NACK_CONGESTION
+- 12: NACK_GIVEUP_PIT
+
+Values 128-255 are reserved for any application-specific and experimental purposes.
+
 
 InterestLifetime
 ~~~~~~~~~~~~~~~~
@@ -185,20 +194,14 @@ ContentObject
 
 ::
 
-	ContentObject ::= Signature
-                	  Name
+	ContentObject ::= Name
                    	  Content
+                          Signature
 
 ::
 
         0                   1                   2                   3
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |            Length             |                               |
-	|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
-        ~                                                               ~
-        ~                           Signature                           ~
-        |							        |	
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         |            Length             |                               |
 	|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
@@ -210,6 +213,12 @@ ContentObject
 	|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
         ~                                                               ~
         ~                           Content                             ~
+        |							        |	
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |            Length             |                               |
+	|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+        ~                                                               ~
+        ~                           Signature                           ~
         |							        |	
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -273,14 +282,9 @@ KeyLocator
 
 ::
 
-	KeyLocator ::= KeyLocatorType
-		       (Key | Certificate | KeyName)
+	KeyLocator ::= CertName
 		       
-	Key ::= Blob
-	
-	Certificate ::= Blob
-	
-	KeyName ::= Name
+	CertName ::= Name
 
 
 Content
