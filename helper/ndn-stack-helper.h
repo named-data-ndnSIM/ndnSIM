@@ -146,6 +146,22 @@ public:
   AddNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
 
   /**
+   * @brief Update callback to create and configure instance of the face, based on supplied Ptr<Node> and Ptr<NetDevice>
+   *
+   * It is possible to set up several callbacks for different NetDevice types.
+   *
+   * Using this method, it is possible to override Face creation for PointToPointNetDevices
+   */
+  void
+  UpdateNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+
+  /**
+   * @brief Remove callback to create and configure instance of the face, based on supplied Ptr<Node> and Ptr<NetDevice>
+   */
+  void
+  RemoveNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+
+  /**
    * @brief Enable Interest limits (disabled by default)
    *
    * @param enable           Enable or disable limits
@@ -293,7 +309,8 @@ private:
   uint32_t m_avgInterestSize;
   bool     m_needSetDefaultRoutes;
 
-  std::list< std::pair<TypeId, NetDeviceFaceCreateCallback> > m_netDeviceCallbacks;
+  typedef std::list< std::pair<TypeId, NetDeviceFaceCreateCallback> > NetDeviceCallbackList;
+  NetDeviceCallbackList m_netDeviceCallbacks;
 };
 
 } // namespace ndn

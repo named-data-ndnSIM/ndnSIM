@@ -284,6 +284,31 @@ StackHelper::AddNetDeviceFaceCreateCallback (TypeId netDeviceType, StackHelper::
   m_netDeviceCallbacks.push_back (std::make_pair (netDeviceType, callback));
 }
 
+void
+StackHelper::UpdateNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback)
+{
+  for (NetDeviceCallbackList::iterator i = m_netDeviceCallbacks.begin (); i != m_netDeviceCallbacks.end (); i++)
+    {
+      if (i->first == netDeviceType)
+        {
+          i->second = callback;
+          return;
+        }
+    }
+}
+
+void
+StackHelper::RemoveNetDeviceFaceCreateCallback (TypeId netDeviceType, NetDeviceFaceCreateCallback callback)
+{
+  for (NetDeviceCallbackList::iterator i = m_netDeviceCallbacks.begin (); i != m_netDeviceCallbacks.end (); i++)
+    {
+      if (i->first == netDeviceType)
+        {
+          m_netDeviceCallbacks.erase (i);
+          return;
+        }
+    }
+}
 
 Ptr<NetDeviceFace>
 StackHelper::DefaultNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const
