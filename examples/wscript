@@ -54,6 +54,9 @@ def build(bld):
         obj = bld.create_ns3_program('ndn-tree-with-l2tracer', all_modules)
         obj.source = 'ndn-tree-with-l2tracer.cc'
 
+        obj = bld.create_ns3_program('ndn-triangle-calculate-routes', all_modules)
+        obj.source = 'ndn-triangle-calculate-routes.cc'
+
     obj = bld.create_ns3_program('ndn-simple-pit-policies', all_modules)
     obj.source = 'ndn-simple-pit-policies.cc'
 
