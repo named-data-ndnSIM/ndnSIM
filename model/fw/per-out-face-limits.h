@@ -122,10 +122,10 @@ PerOutFaceLimits<Parent>::GetTypeId (void)
     .template SetParent <super> ()
     .template AddConstructor <PerOutFaceLimits> ()
 
-    .template AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
-                            StringValue ("ns3::ndn::Limits::Window"),
-                            MakeStringAccessor (&PerOutFaceLimits<Parent>::m_limitType),
-                            MakeStringChecker ())    
+    .AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
+                   StringValue ("ns3::ndn::Limits::Window"),
+                   MakeStringAccessor (&PerOutFaceLimits<Parent>::m_limitType),
+                   MakeStringChecker ())    
     ;
   return tid;
 }
