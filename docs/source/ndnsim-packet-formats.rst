@@ -27,13 +27,14 @@ NDN Packet Type
 
 	Packet ::= Version 
 		   PacketType
+                   Length
 		   (Interest | ContentObject)
 
-        0                   1             
-        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        |    Version    |   PacketType  |
-        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |    Version    |   PacketType  |            Length             |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 For ccnb-encoding compatibility, ``Version`` / ``PacketType`` has two reserved values to denote ccnb-encoded packet:
 

@@ -146,7 +146,12 @@ Interest::GetNack () const
 uint32_t
 Interest::GetSerializedSize (void) const
 {
-  size_t size = 2 + (1 + 4 + 2 + 1 + (m_name->GetSerializedSize ()) + (2 + 0) + (2 + 0));
+  size_t size =
+    1/*version*/ + 1 /*type*/ + 2/*length*/ +
+    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
+     (m_name->GetSerializedSize ()) +
+     (2 + 0)/* selectors */ +
+     (2 + 0)/* options */);
   NS_LOG_INFO ("Serialize size = " << size);
 
   return size;
@@ -157,6 +162,8 @@ Interest::Serialize (Buffer::Iterator start) const
 {
   start.WriteU8 (0x80); // version
   start.WriteU8 (0x00); // packet type
+
+  start.WriteU16 (GetSerializedSize () - 4);
 
   start.WriteU32 (m_nonce);
   start.WriteU8 (m_scope);
@@ -186,6 +193,8 @@ Interest::Deserialize (Buffer::Iterator start)
   if (i.ReadU8 () != 0x00)
     throw new InterestException ();
 
+  i.ReadU16 (); // length, don't need it right now
+  
   m_nonce = i.ReadU32 ();
   m_scope = i.ReadU8 ();
   m_nackType = i.ReadU8 ();

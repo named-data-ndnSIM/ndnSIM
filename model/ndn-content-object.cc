@@ -114,7 +114,8 @@ ContentObject::GetSignature () const
 uint32_t
 ContentObject::GetSerializedSize () const
 {
-  uint32_t size = 2 + ((2 + 2) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
+  uint32_t size = 1 + 1 + 2 +
+    ((2 + 2) + (m_name->GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
   if (m_signature != 0)
     size += 4;
   
@@ -127,7 +128,8 @@ ContentObject::Serialize (Buffer::Iterator start) const
 {
   start.WriteU8 (0x80); // version
   start.WriteU8 (0x01); // packet type
-
+  start.WriteU16 (GetSerializedSize () - 4); // length
+  
   if (m_signature != 0)
     {
       start.WriteU16 (6); // signature length
@@ -168,6 +170,8 @@ ContentObject::Deserialize (Buffer::Iterator start)
 
   if (i.ReadU8 () != 0x01)
     throw new ContentObjectException ();
+
+  i.ReadU16 (); // length
 
   uint32_t signatureLength = i.ReadU16 ();
   if (signatureLength == 6)
