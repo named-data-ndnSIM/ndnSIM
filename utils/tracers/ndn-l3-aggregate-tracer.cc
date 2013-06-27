@@ -58,10 +58,7 @@ L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* =
        node != NodeList::End ();
        node++)
     {
-      NS_LOG_DEBUG ("Node: " << (*node)->GetId ());
-
-      Ptr<L3AggregateTracer> trace = Create<L3AggregateTracer> (outputStream, *node);
-      trace->SetAveragingPeriod (averagingPeriod);
+      Ptr<L3AggregateTracer> trace = Install (*node, outputStream, averagingPeriod);
       tracers.push_back (trace);
     }
 
@@ -75,7 +72,76 @@ L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* =
   return boost::make_tuple (outputStream, tracers);
 }
 
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
+L3AggregateTracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
 
+  std::list<Ptr<L3AggregateTracer> > tracers;
+  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
+  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+  if (!outputStream->is_open ())
+    return boost::make_tuple (outputStream, tracers);
+
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      Ptr<L3AggregateTracer> trace = Install (*node, outputStream, averagingPeriod);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
+L3AggregateTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<L3AggregateTracer> > tracers;
+  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
+  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+  if (!outputStream->is_open ())
+    return boost::make_tuple (outputStream, tracers);
+
+  Ptr<L3AggregateTracer> trace = Install (node, outputStream, averagingPeriod);
+  tracers.push_back (trace);
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ptr<L3AggregateTracer>
+L3AggregateTracer::Install (Ptr<Node> node,
+                            boost::shared_ptr<std::ostream> outputStream,
+                            Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  NS_LOG_DEBUG ("Node: " << node->GetId ());
+
+  Ptr<L3AggregateTracer> trace = Create<L3AggregateTracer> (outputStream, node);
+  trace->SetAveragingPeriod (averagingPeriod);
+
+  return trace;
+}
 
 L3AggregateTracer::L3AggregateTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node)
   : L3Tracer (node)

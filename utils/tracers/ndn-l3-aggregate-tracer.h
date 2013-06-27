@@ -25,6 +25,7 @@
 
 #include <ns3/nstime.h>
 #include <ns3/event-id.h>
+#include <ns3/node-container.h>
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -72,6 +73,38 @@ public:
    */
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on the selected simulation nodes
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
+  Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
+  Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+private:
+  static Ptr<L3AggregateTracer>
+  Install (Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream, Time averagingPeriod = Seconds (0.5));
 
 protected:
   // from L3Tracer
