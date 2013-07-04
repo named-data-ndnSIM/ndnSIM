@@ -110,7 +110,7 @@ struct freshness_policy_traits
 
             // push item only if freshness is non zero. otherwise, this payload is not controlled by the policy
             // note that .size() on this policy would return only number of items with non-infinite freshness policy
-            policy_container::push_back (*item);
+            policy_container::insert (*item);
           }
 
         return true;
