@@ -38,6 +38,9 @@ class Node;
 
 namespace ndn {
 
+class Interest;
+class ContentObject;
+
 /**
  * \ingroup ndn
  * \defgroup ndn-face Faces
@@ -60,12 +63,13 @@ public:
   GetTypeId ();
 
   /**
-   * \brief NDN protocol handler
+   * \brief NDN protocol handlers
    *
    * \param face Face from which packet has been received
    * \param packet Original packet
    */
-  typedef Callback<void,const Ptr<Face>&,const Ptr<const Packet>& > ProtocolHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<Interest>, Ptr<Packet> > InterestHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<ContentObject>, Ptr<Packet> > DataHandler;
 
   /**
    * \brief Default constructor
@@ -87,27 +91,51 @@ public:
    * This method should call protocol-dependent registration function
    */
   virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
+  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
 
   /**
-   * \brief Send packet on a face
+   * \brief Un-Register callback to call when new packet arrives on the face
    *
-   * This method will be called by lower layers to send data to device or application
-   *
-   * \param p smart pointer to a packet to send
-   *
-   * @return false if either limit is reached
+   * This method should call protocol-dependent registration function
    */
-  bool
-  Send (Ptr<Packet> p);
+  virtual void
+  UnRegisterProtocolHandlers ();
 
   /**
-   * \brief Receive packet from application or another node and forward it to the Ndn stack
+   * @brief Send out interest through the face
+   * @param interest Interest to send out
+   * @param packet "payload" that is attached to the interest (can carry some packet tags)
    *
-   * \todo The only reason for this call is to handle tracing, if requested
+   * @returns true if interest is considered to be send out (enqueued)
    */
-  bool
-  Receive (const Ptr<const Packet> &p);
+  virtual bool
+  SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet);
+
+  /**
+   * @brief Send out Dat packet through the face
+   * @param data Data packet to send out
+   * @param packet Data packet payload, can also carry packet tags
+   *
+   * @returns true if Data packet is considered to be send out (enqueued)
+   */
+  virtual bool
+  SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet);
+
+  /**
+   * \brief Receive interest from application or another node and forward it up to the NDN stack
+   *
+   * By default it is called from inside Receive method, but can be used directly, if appropriate
+   */
+  virtual bool
+  ReceiveInterest (Ptr<Interest> interest, Ptr<Packet> payload);
+
+  /**
+   * \brief Receive Data packet from application or another node and forward it up to the NDN stack
+   *
+   * By default it is called from inside Receive method, but can be used directly, if appropriate
+   */
+  virtual bool
+  ReceiveData (Ptr<ContentObject> data, Ptr<Packet> payload);
   ////////////////////////////////////////////////////////////////////
 
   /**
@@ -135,13 +163,13 @@ public:
   /**
    * \brief Enable or disable this face
    */
-  virtual void
+  inline void
   SetUp (bool up = true);
 
   /**
    * \brief Returns true if this face is enabled, false otherwise.
    */
-  virtual bool
+  inline bool
   IsUp () const;
 
   /**
@@ -216,13 +244,20 @@ public:
 
 protected:
   /**
-   * \brief Send packet on a face (actual implementation)
-   *
-   * \param p smart pointer to a packet to send
+   * @brief Send packet down to the stack (towards app or network)
    */
   virtual bool
-  SendImpl (Ptr<Packet> p) = 0;
+  Send (Ptr<Packet> packet);
+  
+  /**
+   * @brief Send packet up to the stack (towards forwarding strategy)
+   */
+  virtual bool
+  Receive (Ptr<const Packet> p);
 
+  /**
+   * @brief Set face flags
+   */
   void
   SetFlags (uint32_t flags);
 
@@ -234,19 +269,28 @@ protected:
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
 
 private:
-  ProtocolHandler m_protocolHandler; ///< Callback via which packets are getting send to Ndn stack
-  bool m_ifup; ///< \brief flag indicating that the interface is UP
+  InterestHandler m_upstreamInterestHandler;
+  DataHandler m_upstreamDataHandler;
+  bool m_ifup;
   uint32_t m_id; ///< \brief id of the interface in NDN stack (per-node uniqueness)
   uint32_t m_metric; ///< \brief metric of the face
-  uint32_t m_flags;
-
-  TracedCallback<Ptr<const Packet> > m_txTrace;
-  TracedCallback<Ptr<const Packet> > m_rxTrace;
-  TracedCallback<Ptr<const Packet> > m_dropTrace;
+  uint32_t m_flags; ///< @brief faces flags (e.g., APPLICATION)
 };
 
 std::ostream&
 operator<< (std::ostream& os, const Face &face);
+
+inline bool
+Face::IsUp (void) const
+{
+  return m_ifup;
+}
+
+inline void
+Face::SetUp (bool up/* = true*/)
+{
+  m_ifup = up;
+}
 
 inline uint32_t
 Face::GetFlags () const

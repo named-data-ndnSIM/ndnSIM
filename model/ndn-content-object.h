@@ -170,26 +170,6 @@ private:
   uint32_t m_signature; // 0, means no signature, any other value application dependent (not a real signature)
 };
 
-typedef ContentObject ContentObjectHeader;
-
-/**
- * ContentObjectTail for compatibility with other packet formats
- */
-class ContentObjectTail : public Trailer
-{
-public:
-  ContentObjectTail ();
-  //////////////////////////////////////////////////////////////////
-
-  static TypeId GetTypeId (void); ///< @brief Get TypeId
-  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
-  virtual void Print (std::ostream &os) const; ///< @brief Print out information about Tail into the stream
-  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Tail
-  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Tail
-  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Tail
-};
-
-
 /**
  * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception

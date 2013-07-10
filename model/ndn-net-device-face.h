@@ -60,12 +60,14 @@ public:
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from NdnFace
   virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
+  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
+
+  virtual void
+  UnRegisterProtocolHandlers ();
   
 protected:
-  // also from NdnFace
   virtual bool
-  SendImpl (Ptr<Packet> p);
+  Send (Ptr<Packet> p);
 
 public:
   /**

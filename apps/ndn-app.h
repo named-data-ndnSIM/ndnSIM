@@ -35,9 +35,6 @@ namespace ndn {
 class Interest;
 class ContentObject;
 
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
-
 class Face;
 
 /**
@@ -52,7 +49,8 @@ public:
   /**
    * @brief A callback to pass packets to underlying NDN protocol
    */
-  typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
+  typedef Callback<bool, Ptr<const Interest>, Ptr<const Packet> > InterestHandler;
+  typedef Callback<bool, Ptr<const ContentObject>, Ptr<const Packet> > DataHandler;
   
   static TypeId GetTypeId ();
 
@@ -61,12 +59,6 @@ public:
    */
   App ();
   virtual ~App ();
-
-  /**
-   * @brief Register lower layer callback (to send interests from the application)
-   */
-  void
-  RegisterProtocolHandler (ProtocolHandler handler);
 
   /**
    * @brief Get application ID (ID of applications face)
@@ -114,7 +106,6 @@ protected:
   StopApplication ();     ///< @brief Called at time specified by Stop
 
 protected:
-  ProtocolHandler m_protocolHandler; ///< @brief A callback to pass packets to underlying NDN protocol
   bool m_active;  ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
   Ptr<Face> m_face;   ///< @brief automatically created application face through which application communicates
 

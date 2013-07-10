@@ -108,28 +108,14 @@ L3Protocol::NotifyNewAggregate ()
       m_node = GetObject<Node> ();
       if (m_node != 0)
         {
-          // NS_ASSERT_MSG (m_pit != 0 && m_fib != 0 && m_contentStore != 0 && m_forwardingStrategy != 0,
-          //                "PIT, FIB, and ContentStore should be aggregated before L3Protocol");
           NS_ASSERT_MSG (m_forwardingStrategy != 0,
                          "Forwarding strategy should be aggregated before L3Protocol");
         }
     }
-  // if (m_pit == 0)
-  //   {
-  //     m_pit = GetObject<Pit> ();
-  //   }
-  // if (m_fib == 0)
-  //   {
-  //     m_fib = GetObject<Fib> ();
-  //   }
   if (m_forwardingStrategy == 0)
     {
       m_forwardingStrategy = GetObject<ForwardingStrategy> ();
     }
-  // if (m_contentStore == 0)
-  //   {
-  //     m_contentStore = GetObject<ContentStore> ();
-  //   }
 
   Object::NotifyNewAggregate ();
 }
@@ -160,7 +146,8 @@ L3Protocol::AddFace (const Ptr<Face> &face)
   face->SetId (m_faceCounter); // sets a unique ID of the face. This ID serves only informational purposes
 
   // ask face to register in lower-layer stack
-  face->RegisterProtocolHandler (MakeCallback (&L3Protocol::Receive, this));
+  face->RegisterProtocolHandlers (MakeCallback (&ForwardingStrategy::OnInterest, m_forwardingStrategy),
+                                  MakeCallback (&ForwardingStrategy::OnData, m_forwardingStrategy));
 
   m_faces.push_back (face);
   m_faceCounter++;
@@ -173,7 +160,7 @@ void
 L3Protocol::RemoveFace (Ptr<Face> face)
 {
   // ask face to register in lower-layer stack
-  face->RegisterProtocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ());
+  face->UnRegisterProtocolHandlers ();
   Ptr<Pit> pit = GetObject<Pit> ();
 
   // just to be on a safe side. Do the process in two steps
@@ -240,77 +227,6 @@ L3Protocol::GetNFaces (void) const
 {
   return m_faces.size ();
 }
-
-// Callback from lower layer
-void
-L3Protocol::Receive (const Ptr<Face> &face, const Ptr<const Packet> &p)
-{
-  if (!face->IsUp ())
-    return;
-
-  NS_LOG_DEBUG (*p);
-
-  NS_LOG_LOGIC ("Packet from face " << *face << " received on node " <<  m_node->GetId ());
-
-  Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
-  try
-    {
-      HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
-      switch (type)
-        {
-        case HeaderHelper::INTEREST_NDNSIM:
-          {
-            s_interestCounter ++;
-            Ptr<Interest> header = Create<Interest> ();
-
-            // Deserialization. Exception may be thrown
-            packet->RemoveHeader (*header);
-
-            // this assert is legitimately failing with CSMA-style devices, when interest size is less then
-            // minimally required 46 bytes.  At the same time, it is safe to ignore the fact
-            if (packet->GetSize () != 0)
-              {
-                NS_LOG_WARN ("Payload size is not zero. Valid only for CSMA (Ethernet) devices");
-              }
-            // NS_ASSERT_MSG (packet->GetSize () == 0, "Payload of Interests should be zero");
-
-            m_forwardingStrategy->OnInterest (face, header, p/*original packet*/);
-            // if (header->GetNack () > 0)
-            //   OnNack (face, header, p/*original packet*/);
-            // else
-            //   OnInterest (face, header, p/*original packet*/);
-            break;
-          }
-        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
-          {
-            s_dataCounter ++;
-            Ptr<ContentObject> header = Create<ContentObject> ();
-
-            static ContentObjectTail contentObjectTrailer; //there is no data in this object
-
-            // Deserialization. Exception may be thrown
-            packet->RemoveHeader (*header);
-            packet->RemoveTrailer (contentObjectTrailer);
-
-            m_forwardingStrategy->OnData (face, header, packet/*payload*/, p/*original packet*/);
-            break;
-          }
-        case HeaderHelper::INTEREST_CCNB:
-        case HeaderHelper::CONTENT_OBJECT_CCNB:
-          NS_FATAL_ERROR ("ccnb support is broken in this implementation");
-          break;
-        }
-
-      // exception will be thrown if packet is not recognized
-    }
-  catch (UnknownHeaderException)
-    {
-      NS_ASSERT_MSG (false, "Unknown NDN header. Should not happen");
-      NS_LOG_ERROR ("Unknown NDN header. Should not happen");
-      return;
-    }
-}
-
 
 } //namespace ndn
 } //namespace ns3

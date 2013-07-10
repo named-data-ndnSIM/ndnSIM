@@ -265,8 +265,6 @@ private:
   uint8_t  m_nackType;           ///< Negative Acknowledgement type
 };
 
-typedef Interest InterestHeader;
-
 /**
  * @ingroup ndn-exceptions
  * @brief Class for Interest parsing exception 

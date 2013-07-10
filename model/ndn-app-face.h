@@ -63,12 +63,11 @@ public:
   
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from Face
-  virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
-
-protected:
   virtual bool
-  SendImpl (Ptr<Packet> p);
+  SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet);
+
+  virtual bool
+  SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet);
 
 public:
   virtual std::ostream&

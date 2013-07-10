@@ -94,23 +94,20 @@ CustomApp::SendInterest ()
   Ptr<ndn::Name> prefix = Create<ndn::Name> ("/prefix/sub"); // another way to create name
 
   // Create and configure ndn::Interest
-  ndn::Interest interestHeader;
+  Ptr<ndn::Interest> interestHeader = Create<ndn::Interest> ();
   UniformVariable rand (0,std::numeric_limits<uint32_t>::max ());
-  interestHeader.SetNonce            (rand.GetValue ());
-  interestHeader.SetName             (prefix);
-  interestHeader.SetInterestLifetime (Seconds (1.0));
-
-  // Create packet and add ndn::Interest
-  Ptr<Packet> packet = Create<Packet> ();
-  packet->AddHeader (interestHeader);
+  interestHeader->SetNonce            (rand.GetValue ());
+  interestHeader->SetName             (prefix);
+  interestHeader->SetInterestLifetime (Seconds (1.0));
 
   NS_LOG_DEBUG ("Sending Interest packet for " << *prefix);
   
   // Forward packet to lower (network) layer
-  m_protocolHandler (packet);
+  Ptr<Packet> payload = Create<Packet> ();
+  m_face->ReceiveInterest (interestHeader, payload);
 
   // Call trace (for logging purposes)
-  m_transmittedInterests (&interestHeader, this, m_face);
+  m_transmittedInterests (interestHeader, this, m_face);
 }
 
 // Callback that will be called when Interest arrives
@@ -124,23 +121,18 @@ CustomApp::OnInterest (const Ptr<const ndn::Interest> &interest, Ptr<Packet> ori
 
   // Note that Interests send out by the app will not be sent back to the app !
   
-  ndn::ContentObject data;
-  data.SetName (Create<ndn::Name> (interest->GetName ())); // data will have the same name as Interests
-
-  ndn::ContentObjectTail trailer; // doesn't require any configuration
+  Ptr<ndn::ContentObject> data = Create<ndn::ContentObject> ();
+  data->SetName (Create<ndn::Name> (interest->GetName ())); // data will have the same name as Interests
 
   // Create packet and add header and trailer
-  Ptr<Packet> packet = Create<Packet> (1024);
-  packet->AddHeader (data);
-  packet->AddTrailer (trailer);
-
-  NS_LOG_DEBUG ("Sending ContentObject packet for " << data.GetName ());
+  NS_LOG_DEBUG ("Sending ContentObject packet for " << data->GetName ());
 
   // Forward packet to lower (network) layer
-  m_protocolHandler (packet);
+  Ptr<Packet> payload = Create<Packet> (1024);
+  m_face->ReceiveData (data, payload); 
 
   // Call trace (for logging purposes)
-  m_transmittedContentObjects (&data, packet, this, m_face);
+  m_transmittedContentObjects (data, payload, this, m_face);
 }
 
 // Callback that will be called when Data arrives

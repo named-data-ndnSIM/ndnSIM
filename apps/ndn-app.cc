@@ -64,8 +64,7 @@ App::GetTypeId (void)
 }
     
 App::App ()
-  : m_protocolHandler (0)
-  , m_active (false)
+  : m_active (false)
   , m_face (0)
 {
 }
@@ -83,12 +82,6 @@ App::DoDispose (void)
   // The best reason I see is that apps are freed after ndn stack is removed
   // StopApplication ();  
   Application::DoDispose ();
-}
-
-void
-App::RegisterProtocolHandler (ProtocolHandler handler)
-{
-  m_protocolHandler = handler;
 }
 
 uint32_t
@@ -164,7 +157,7 @@ App::StopApplication () // Called at time specified by Stop
   // step 3. Destroy face
   if (m_face->GetReferenceCount () != 1)
     {
-      NS_LOG_ERROR ("Please a bug report on https://github.com/NDN-Routing/ndnSIM/issues:");
+      NS_LOG_ERROR ("Please a bug report on https://github.com/NDN-Routing/ndnSIM/issues");
       NS_LOG_ERROR ("At this point, nobody else should have referenced this face, but we have "
                     << m_face->GetReferenceCount () << " references");
 

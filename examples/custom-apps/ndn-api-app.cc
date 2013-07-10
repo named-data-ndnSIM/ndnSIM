@@ -41,28 +41,28 @@ ApiApp::GetTypeId ()
 
 ApiApp::ApiApp ()
 {
-  m_handler = CreateObject<Handler> ();
+  // m_handler = CreateObject<Handler> ();
 }
 
 void
 ApiApp::RequestData ()
 {
-  m_handler->sendInterest ("/test/prefix", boost::bind (&ApiApp::OnData
+  // m_handler->sendInterest ("/test/prefix", boost::bind (&ApiApp::OnData
 }
 
 void
 ApiApp::StartApplication ()
 {
-  m_handler->SetNode (GetNode ());
-  m_handler->StartApplication ();
+  // m_handler->SetNode (GetNode ());
+  // m_handler->StartApplication ();
   
-  Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
+  // Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
 }
 
 void
 ApiApp::StopApplication ()
 {
-  m_handler->StopApplication ();
+  // m_handler->StopApplication ();
 }
 
 } // namespace ndn
