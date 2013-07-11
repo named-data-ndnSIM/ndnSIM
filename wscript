@@ -108,14 +108,14 @@ def build(bld):
                                        'apps/*.cc',
                                        'utils/**/*.cc',
                                        'helper/**/*.cc',
-                                       'ndn.cxx/**/*.cc',
+                                       # 'ndn.cxx/**/*.cc',
                                        ])
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
                            'utils/**/*.h',
                            'model/**/*.h',
                            'apps/**/*.h',
                            'helper/**/*.h',
-                           'ndn.cxx/**/*.h',
+                           # 'ndn.cxx/**/*.h',
                            ])]
 
     headers.source = [

@@ -25,7 +25,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-#include "ns3/ndnSIM/ndn.cxx/ndn-handler.h"
+// #include "ns3/ndnSIM/ndn.cxx/ndn-handler.h"
 
 namespace ns3 {
 namespace ndn {
@@ -51,7 +51,7 @@ protected:
   StopApplication ();
 
 private:
-  Ptr<Handler> m_handler;
+  // Ptr<Handler> m_handler;
 };
 
 } // namespace ndn

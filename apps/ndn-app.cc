@@ -94,25 +94,24 @@ App::GetId () const
 }
 
 void
-App::OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet)
+App::OnInterest (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedInterests (interest, this, m_face);
 }
 
 void
-App::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet)
+App::OnNack (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedNacks (interest, this, m_face);
 }
 
 void
-App::OnContentObject (const Ptr<const ContentObject> &contentObject,
-                          Ptr<Packet> payload)
+App::OnContentObject (Ptr<const ContentObject> contentObject)
 {
-  NS_LOG_FUNCTION (this << contentObject << payload);
-  m_receivedContentObjects (contentObject, payload, this, m_face);
+  NS_LOG_FUNCTION (this << contentObject);
+  m_receivedContentObjects (contentObject, this, m_face);
 }
 
 // Application Methods

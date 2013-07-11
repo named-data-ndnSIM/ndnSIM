@@ -46,12 +46,6 @@ class Face;
 class App: public Application
 {
 public:
-  /**
-   * @brief A callback to pass packets to underlying NDN protocol
-   */
-  typedef Callback<bool, Ptr<const Interest>, Ptr<const Packet> > InterestHandler;
-  typedef Callback<bool, Ptr<const ContentObject>, Ptr<const Packet> > DataHandler;
-  
   static TypeId GetTypeId ();
 
   /**
@@ -73,14 +67,14 @@ public:
    *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  OnInterest (Ptr<const Interest> interest);
 
   /**
    * @brief Method that will be called every time new NACK arrives
    * @param interest Interest header
    */
   virtual void
-  OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  OnNack (Ptr<const Interest> interest);
   
   /**
    * @brief Method that will be called every time new ContentObject arrives
@@ -88,8 +82,7 @@ public:
    * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
    */
   virtual void
-  OnContentObject (const Ptr<const ContentObject> &contentObject,
-                   Ptr<Packet> payload);
+  OnContentObject (Ptr<const ContentObject> contentObject);
   
 protected:
   /**
@@ -115,14 +108,14 @@ protected:
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  Ptr<App>, Ptr<Face> > m_receivedContentObjects; ///< @brief App-level trace of received Data
 
 
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  Ptr<App>, Ptr<Face> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
 };
 

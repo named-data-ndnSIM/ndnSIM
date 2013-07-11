@@ -46,7 +46,7 @@ public:
   Print (std::ostream &os) const;
 
   virtual inline bool
-  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
+  Add (Ptr<const ContentObject> data);
 
 private:
   inline void
@@ -95,7 +95,7 @@ ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObject> data)
   bool ok = super::Add (data);
   if (!ok) return false;
 
-  NS_LOG_DEBUG (header->GetName () << " added to cache");
+  NS_LOG_DEBUG (data->GetName () << " added to cache");
   RescheduleCleaning ();
   return true;
 }

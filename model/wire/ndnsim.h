@@ -11,7 +11,7 @@
 #ifndef NDN_WIRE_NDNSIM_H
 #define NDN_WIRE_NDNSIM_H
 
-#include "ns3/ndn-common.h"
+#include "../ndn-common.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
 
@@ -91,7 +91,7 @@ private:
   Ptr<ndn::Interest> m_interest;
 };
 
-class Data : Header
+class Data : public Header
 {
 public:
   Data ();

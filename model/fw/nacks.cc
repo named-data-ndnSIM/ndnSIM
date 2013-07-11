@@ -78,7 +78,7 @@ Nacks::OnInterest (Ptr<Face> inFace,
                    Ptr<Interest> interest)
 {
   if (interest->GetNack () > 0)
-    OnNack (inFace, header);
+    OnNack (inFace, interest);
   else
     super::OnInterest (inFace, interest);
 }
@@ -87,10 +87,10 @@ void
 Nacks::OnNack (Ptr<Face> inFace,
                Ptr<Interest> nack)
 {
-  // NS_LOG_FUNCTION (inFace << header->GetName ());
+  // NS_LOG_FUNCTION (inFace << nack->GetName ());
   m_inNacks (nack, inFace);
 
-  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
+  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*nack);
   if (pitEntry == 0)
     {
       // somebody is doing something bad
@@ -98,7 +98,7 @@ Nacks::OnNack (Ptr<Face> inFace,
       return;
     }
 
-  DidReceiveValidNack (inFace, header->GetNack (), nack, pitEntry);
+  DidReceiveValidNack (inFace, nack->GetNack (), nack, pitEntry);
 }
 
 void
@@ -136,7 +136,7 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 {
   if (m_nacksEnabled)
     {
-      Ptr<Interest> nack = Create<Interest> (*header);
+      Ptr<Interest> nack = Create<Interest> (*interest);
       nack->SetNack (Interest::NACK_GIVEUP_PIT);
 
       FwHopCountTag hopCountTag;
@@ -159,7 +159,7 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
       pitEntry->ClearOutgoing (); // to force erasure of the record
     }
 
-  super::DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
+  super::DidExhaustForwardingOptions (inFace, interest, pitEntry);
 }
 
 void

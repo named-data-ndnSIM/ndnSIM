@@ -64,10 +64,10 @@ public:
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from Face
   virtual bool
-  SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet);
+  SendInterest (Ptr<const Interest> interest);
 
   virtual bool
-  SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet);
+  SendData (Ptr<const ContentObject> data);
 
 public:
   virtual std::ostream&

@@ -30,20 +30,19 @@ NS_LOG_COMPONENT_DEFINE ("ndn.ContentObject");
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (ContentObject);
-NS_OBJECT_ENSURE_REGISTERED (ContentObjectTail);
-
-ContentObject::ContentObject ()
+ContentObject::ContentObject (Ptr<Packet> payload/* = Create<Packet> ()*/)
   : m_signature (0)
+  , m_payload (payload)
+  , m_wire (0)
 {
 }
 
 ContentObject::ContentObject (const ContentObject &other)
   : m_name (Create<Name> (other.GetName ()))
-  , m_freshness (other->GetFreshness ())
-  , m_timestamp (other->GetTimestamp ())
-  , m_signature (other->GetSignature ())
-  , m_payload (other->GetPayload ()->Copy ())
+  , m_freshness (other.GetFreshness ())
+  , m_timestamp (other.GetTimestamp ())
+  , m_signature (other.GetSignature ())
+  , m_payload (other.GetPayload ()->Copy ())
   , m_wire (0)
 {
 }
@@ -115,6 +114,18 @@ ContentObject::Print (std::ostream &os) const
 {
   os << "D: " << GetName ();
   // os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
+}
+
+void
+ContentObject::SetPayload (Ptr<Packet> payload)
+{
+  m_payload = payload;
+}
+
+Ptr<const Packet>
+ContentObject::GetPayload () const
+{
+  return m_payload;
 }
 
 } // namespace ndn

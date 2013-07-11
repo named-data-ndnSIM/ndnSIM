@@ -50,11 +50,10 @@ public:
   // OnInterest (const Ptr<const Interest> &interest);
 
   virtual void
-  OnNack (const Ptr<const Interest> &interest, Ptr<Packet> payload);
+  OnNack (Ptr<const Interest> interest);
 
   virtual void
-  OnContentObject (const Ptr<const ContentObject> &contentObject,
-                   Ptr<Packet> payload);
+  OnContentObject (Ptr<const ContentObject> contentObject);
 
   virtual void
   OnTimeout (uint32_t sequenceNumber);

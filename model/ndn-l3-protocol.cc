@@ -32,7 +32,6 @@
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 
-#include "ns3/ndn-header-helper.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
@@ -51,22 +50,7 @@ namespace ndn {
 
 const uint16_t L3Protocol::ETHERNET_FRAME_TYPE = 0x7777;
 
-uint64_t L3Protocol::s_interestCounter = 0;
-uint64_t L3Protocol::s_dataCounter = 0;
-
 NS_OBJECT_ENSURE_REGISTERED (L3Protocol);
-
-uint64_t
-L3Protocol::GetInterestCounter ()
-{
-  return s_interestCounter;
-}
-
-uint64_t
-L3Protocol::GetDataCounter ()
-{
-  return s_dataCounter;
-}
 
 TypeId
 L3Protocol::GetTypeId (void)

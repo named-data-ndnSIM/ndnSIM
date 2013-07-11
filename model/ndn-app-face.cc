@@ -76,15 +76,16 @@ AppFace::AppFace (const AppFace &)
 {
 }
 
-AppFace& AppFace::operator= (const AppFace &)
+AppFace&
+AppFace::operator= (const AppFace &)
 {
   return *((AppFace*)0);
 }
 
 bool
-Face::SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet)
+AppFace::SendInterest (Ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION (this << interest << packet);
+  NS_LOG_FUNCTION (this << interest);
 
   if (!IsUp ())
     {
@@ -92,24 +93,24 @@ Face::SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet)
     }
 
   if (interest->GetNack () > 0)
-    m_app->OnNack (interest, packet);
+    m_app->OnNack (interest);
   else
-    m_app->OnInterest (interest, packet);
+    m_app->OnInterest (interest);
   
   return true;
 }
 
 bool
-Face::SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet)
+AppFace::SendData (Ptr<const ContentObject> data)
 {
-  NS_LOG_FUNCTION (this << data << packet);
+  NS_LOG_FUNCTION (this << data);
 
   if (!IsUp ())
     {
       return false;
     }
 
-  m_app->OnContentObject (data, packet);
+  m_app->OnContentObject (data);
   return true;
 }
 

@@ -27,6 +27,8 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
+#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-interest.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerWindow");
 
@@ -184,10 +186,9 @@ ConsumerWindow::ScheduleNextPacket ()
 ///////////////////////////////////////////////////
 
 void
-ConsumerWindow::OnContentObject (const Ptr<const ContentObject> &contentObject,
-                                     Ptr<Packet> payload)
+ConsumerWindow::OnContentObject (Ptr<const ContentObject> contentObject)
 {
-  Consumer::OnContentObject (contentObject, payload);
+  Consumer::OnContentObject (contentObject);
 
   m_window = m_window + 1;
 
@@ -198,9 +199,9 @@ ConsumerWindow::OnContentObject (const Ptr<const ContentObject> &contentObject,
 }
 
 void
-ConsumerWindow::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> payload)
+ConsumerWindow::OnNack (Ptr<const Interest> interest)
 {
-  Consumer::OnNack (interest, payload);
+  Consumer::OnNack (interest);
 
   if (m_inFlight > static_cast<uint32_t> (0)) m_inFlight--;
 

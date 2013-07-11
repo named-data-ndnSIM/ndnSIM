@@ -261,10 +261,10 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
       WillSatisfyPendingInterest (inFace, pitEntry);
 
       // Actually satisfy pending interest
-      SatisfyPendingInterest (inFace, header, payload, pitEntry);
+      SatisfyPendingInterest (inFace, data, pitEntry);
 
       // Lookup another PIT entry
-      pitEntry = m_pit->Lookup (*header);
+      pitEntry = m_pit->Lookup (*data);
     }
 }
 

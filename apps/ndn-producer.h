@@ -48,7 +48,7 @@ public:
   Producer ();
 
   // inherited from NdnApp
-  void OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  void OnInterest (Ptr<const Interest> interest);
 
 protected:
   // inherited from Application base class.

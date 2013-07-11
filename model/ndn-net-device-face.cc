@@ -95,14 +95,14 @@ NetDeviceFace::RegisterProtocolHandlers (const InterestHandler &interestHandler,
 void
 NetDeviceFace:: UnRegisterProtocolHandlers ()
 {
-  m_node->UnRegisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this));
+  m_node->UnregisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this));
   Face::UnRegisterProtocolHandlers ();
 }
 
 bool
 NetDeviceFace::Send (Ptr<Packet> packet)
 {
-  if (!Face::Send ())
+  if (!Face::Send (packet))
     {
       return false;
     }

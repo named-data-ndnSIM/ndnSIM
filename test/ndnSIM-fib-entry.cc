@@ -62,14 +62,12 @@ private:
   void
   SendPacket (const std::string &prefix, uint32_t nonce)
   {
-    Ptr<Packet> pkt = Create<Packet> (0);
-    ndn::Interest i;
-    i.SetName (Create<ndn::Name> (prefix));
-    i.SetNonce (nonce);
-    i.SetInterestLifetime (Seconds (0.5));
+    Ptr<ndn::Interest> interest;
+    interest->SetName (Create<ndn::Name> (prefix));
+    interest->SetNonce (nonce);
+    interest->SetInterestLifetime (Seconds (0.5));
 
-    pkt->AddHeader (i);
-    m_protocolHandler (pkt);
+    m_face->ReceiveInterest (interest);
   }
 };
 

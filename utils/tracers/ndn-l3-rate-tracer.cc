@@ -61,7 +61,7 @@ L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seco
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+    return boost::make_tuple (outputStream, tracers);
 
       outputStream = os;
     }
@@ -315,69 +315,96 @@ L3RateTracer::Print (std::ostream &os) const
 
 
 void
-L3RateTracer::OutInterests  (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::OutInterests  (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outInterests ++;
-  m_stats[face].get<1> ().m_outInterests += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_outInterests += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::InInterests   (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::InInterests   (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inInterests ++;
-  m_stats[face].get<1> ().m_inInterests += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_inInterests += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::DropInterests (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::DropInterests (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropInterests ++;
-  m_stats[face].get<1> ().m_dropInterests += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_dropInterests += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::OutNacks  (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::OutNacks  (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outNacks ++;
-  m_stats[face].get<1> ().m_outNacks += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_outNacks += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::InNacks   (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::InNacks   (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inNacks ++;
-  m_stats[face].get<1> ().m_inNacks += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_inNacks += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::DropNacks (Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::DropNacks (Ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropNacks ++;
-  m_stats[face].get<1> ().m_dropNacks += header->GetSerializedSize ();
+  if (interest->GetWire ())
+    {
+      m_stats[face].get<1> ().m_dropNacks += interest->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::OutData  (Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::OutData  (Ptr<const ContentObject> data,
                         bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
-  m_stats[face].get<1> ().m_outData += header->GetSerializedSize () + payload->GetSize ();
+  if (data->GetWire ())
+    {
+      m_stats[face].get<1> ().m_outData += data->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::InData   (Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::InData   (Ptr<const ContentObject> data,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
-  m_stats[face].get<1> ().m_inData += header->GetSerializedSize () + payload->GetSize ();
+  if (data->GetWire ())
+    {
+      m_stats[face].get<1> ().m_inData += data->GetWire ()->GetSize ();
+    }
 }
 
 void
-L3RateTracer::DropData (Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::DropData (Ptr<const ContentObject> data,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;
-  m_stats[face].get<1> ().m_dropData += header->GetSerializedSize () + payload->GetSize ();
+  if (data->GetWire ())
+    {
+      m_stats[face].get<1> ().m_dropData += data->GetWire ()->GetSize ();
+    }
 }
 
 void
@@ -391,7 +418,7 @@ L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry> entry)
        i++)
     {
       m_stats[i->m_face].get<0> ().m_satisfiedInterests ++;
-    }
+}
 
   for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
        i != entry->GetOutgoing ().end ();
@@ -412,7 +439,7 @@ L3RateTracer::TimedOutInterests (Ptr<const pit::Entry> entry)
        i++)
     {
       m_stats[i->m_face].get<0> ().m_timedOutInterests ++;
-    }
+}
 
   for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
        i != entry->GetOutgoing ().end ();

@@ -156,7 +156,7 @@ ContentStoreImpl< Policy >::GetTypeId ()
 }
 
 template<class Policy>
-Ptr<const ContentObject>
+Ptr<ContentObject>
 ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
@@ -168,7 +168,7 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
     {
       this->m_cacheHitsTrace (interest, node->payload ()->GetData ());
 
-      Ptr<ContentObject> copy = Create<ContentObject> (node->payload ()->GetData ());
+      Ptr<ContentObject> copy = Create<ContentObject> (*node->payload ()->GetData ());
       ConstCast<Packet> (copy->GetPayload ())->RemoveAllPacketTags ();
       return copy;
     }

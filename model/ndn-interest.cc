@@ -29,27 +29,25 @@ NS_LOG_COMPONENT_DEFINE ("ndn.Interest");
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (Interest);
-
-Interest::Interest ()
+Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   : m_name ()
   , m_scope (0xFF)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
   , m_nackType (NORMAL_INTEREST)
-  , m_payload (0)
+  , m_payload (payload)
   , m_wire (0)
 {
 }
 
 Interest::Interest (const Interest &interest)
-  : m_name                (Create<Name> (interest.GetName ()))
-  , m_scope               (interest.m_scope)
-  , m_interestLifetime    (interest.m_interestLifetime)
-  , m_nonce               (interest.m_nonce)
-  , m_nackType            (interest.m_nackType)
-  , m_payload (interest.GetPayload ()->Copy ())
-  , m_wire (0)
+  : m_name             (Create<Name> (interest.GetName ()))
+  , m_scope            (interest.m_scope)
+  , m_interestLifetime (interest.m_interestLifetime)
+  , m_nonce            (interest.m_nonce)
+  , m_nackType         (interest.m_nackType)
+  , m_payload          (interest.GetPayload ()->Copy ())
+  , m_wire             (0)
 {
 }
 
@@ -138,7 +136,7 @@ Interest::SetPayload (Ptr<Packet> payload)
   m_payload = payload;
 }
 
-Ptr<const Payload>
+Ptr<const Packet>
 Interest::GetPayload () const
 {
   return m_payload;

@@ -202,25 +202,21 @@ Consumer::SendPacket ()
   (*nameWithSequence) (seq);
   //
 
-  Interest interestHeader;
-  interestHeader.SetNonce               (m_rand.GetValue ());
-  interestHeader.SetName                (nameWithSequence);
-  interestHeader.SetInterestLifetime    (m_interestLifeTime);
+  Ptr<Interest> interest = Create<Interest> ();
+  interest->SetNonce               (m_rand.GetValue ());
+  interest->SetName                (nameWithSequence);
+  interest->SetInterestLifetime    (m_interestLifeTime);
 
-  // NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
+  // NS_LOG_INFO ("Requesting Interest: \n" << *interest);
   NS_LOG_INFO ("> Interest for " << seq);
-
-  Ptr<Packet> packet = Create<Packet> ();
-  packet->AddHeader (interestHeader);
-  NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
 
   WillSendOutInterest (seq);  
 
   FwHopCountTag hopCountTag;
-  packet->AddPacketTag (hopCountTag);
+  interest->GetPayload ()->AddPacketTag (hopCountTag);
 
-  m_transmittedInterests (&interestHeader, this, m_face);
-  m_protocolHandler (packet);
+  m_transmittedInterests (interest, this, m_face);
+  m_face->ReceiveInterest (interest);
 
   ScheduleNextPacket ();
 }
@@ -231,23 +227,22 @@ Consumer::SendPacket ()
 
 
 void
-Consumer::OnContentObject (const Ptr<const ContentObject> &contentObject,
-                               Ptr<Packet> payload)
+Consumer::OnContentObject (Ptr<const ContentObject> data)
 {
   if (!m_active) return;
 
-  App::OnContentObject (contentObject, payload); // tracing inside
+  App::OnContentObject (data); // tracing inside
 
-  NS_LOG_FUNCTION (this << contentObject << payload);
+  NS_LOG_FUNCTION (this << data);
 
-  // NS_LOG_INFO ("Received content object: " << boost::cref(*contentObject));
+  // NS_LOG_INFO ("Received content object: " << boost::cref(*data));
 
-  uint32_t seq = boost::lexical_cast<uint32_t> (contentObject->GetName ().GetComponents ().back ());
+  uint32_t seq = boost::lexical_cast<uint32_t> (data->GetName ().GetComponents ().back ());
   NS_LOG_INFO ("< DATA for " << seq);
 
   int hopCount = -1;
   FwHopCountTag hopCountTag;
-  if (payload->RemovePacketTag (hopCountTag))
+  if (data->GetPayload ()->PeekPacketTag (hopCountTag))
     {
       hopCount = hopCountTag.Get ();
     }
@@ -275,11 +270,11 @@ Consumer::OnContentObject (const Ptr<const ContentObject> &contentObject,
 }
 
 void
-Consumer::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> origPacket)
+Consumer::OnNack (Ptr<const Interest> interest)
 {
   if (!m_active) return;
 
-  App::OnNack (interest, origPacket); // tracing inside
+  App::OnNack (interest); // tracing inside
 
   // NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
 

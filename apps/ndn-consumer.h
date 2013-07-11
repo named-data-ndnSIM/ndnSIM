@@ -61,11 +61,10 @@ public:
   // OnInterest (const Ptr<const Interest> &interest);
 
   virtual void
-  OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  OnNack (Ptr<const Interest> interest);
 
   virtual void
-  OnContentObject (const Ptr<const ContentObject> &contentObject,
-                   Ptr<Packet> payload);
+  OnContentObject (Ptr<const ContentObject> contentObject);
 
   /**
    * @brief Timeout event

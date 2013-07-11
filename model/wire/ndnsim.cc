@@ -10,10 +10,21 @@
 
 #include "ndnsim.h"
 
+using namespace std;
+
+#include <ns3/header.h>
+#include <ns3/packet.h>
+#include <ns3/log.h>
+
+NS_LOG_COMPONENT_DEFINE ("ndn.wire.ndnSIM");
+
 NDN_NAMESPACE_BEGIN
 
 namespace wire {
 namespace ndnSIM {
+
+NS_OBJECT_ENSURE_REGISTERED (Interest);
+NS_OBJECT_ENSURE_REGISTERED (Data);
 
 
 class Name
@@ -29,7 +40,7 @@ public:
   {
   }
 
-  Ptr<Name>
+  Ptr<ndn::Name>
   GetName ()
   {
     return m_name;
@@ -56,7 +67,7 @@ public:
   {
     Buffer::Iterator i = start;
 
-    i.WriteU16 (static_cast<uint16_t> (m_name->GetSerializedSize ()-2));
+    i.WriteU16 (static_cast<uint16_t> (GetSerializedSize ()-2));
 
     for (std::list<std::string>::const_iterator item = m_name->begin ();
          item != m_name->end ();
@@ -119,7 +130,7 @@ Interest::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::Interest::ndnSIM")
     .SetGroupName ("Ndn")
-    .AddParent<Header> ()
+    .SetParent<Header> ()
     .AddConstructor<Interest> ()
     ;
   return tid;
@@ -137,10 +148,12 @@ Interest::ToWire (Ptr<const ndn::Interest> interest)
   Ptr<const Packet> p = interest->GetWire ();
   if (!p)
     {
-      p = Create<Packet> (*interest->GetPayload ());
-      Interest wireEncoding (interest);
-      p->AddHeader (wireEncoding);
-      interest->SetWire (p);
+      Ptr<Packet> packet = Create<Packet> (*interest->GetPayload ());
+      Interest wireEncoding (ConstCast<ndn::Interest> (interest));
+      packet->AddHeader (wireEncoding);
+      interest->SetWire (packet);
+
+      p = packet;
     }
   
   return p->Copy ();
@@ -150,7 +163,7 @@ Ptr<ndn::Interest>
 Interest::FromWire (Ptr<Packet> packet)
 {
   Ptr<ndn::Interest> interest = Create<ndn::Interest> ();
-  // interest->SetWire (packet->Copy ()); /* not sure if this is needed */
+  interest->SetWire (packet->Copy ());
 
   Interest wireEncoding (interest);
   packet->RemoveHeader (wireEncoding);
@@ -166,7 +179,7 @@ Interest::GetSerializedSize (void) const
   size_t size =
     1/*version*/ + 1 /*type*/ + 2/*length*/ +
     (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
-     (Name (ConstCast<ns3::Name> (m_interest->GetNamePtr ())).GetSerializedSize ()) +
+     (Name (ConstCast<ndn::Name> (m_interest->GetNamePtr ())).GetSerializedSize ()) +
      (2 + 0)/* selectors */ +
      (2 + 0)/* options */);
   
@@ -182,17 +195,17 @@ Interest::Serialize (Buffer::Iterator start) const
 
   start.WriteU16 (GetSerializedSize () - 4);
 
-  start.WriteU32 (m_nonce);
-  start.WriteU8 (m_scope);
-  start.WriteU8 (m_nackType);
+  start.WriteU32 (m_interest->GetNonce ());
+  start.WriteU8 (m_interest->GetScope ());
+  start.WriteU8 (m_interest->GetNack ());
 
-  NS_ASSERT_MSG (0 <= m_interest->GetInterestLifetime.ToInteger (Time::S) && m_interest->GetInterestLifetime.ToInteger (Time::S) < 65535,
+  NS_ASSERT_MSG (0 <= m_interest->GetInterestLifetime ().ToInteger (Time::S) && m_interest->GetInterestLifetime ().ToInteger (Time::S) < 65535,
                  "Incorrect InterestLifetime (should not be smaller than 0 and larger than 65535");
   
   // rounding timestamp value to seconds
-  start.WriteU16 (static_cast<uint16_t> (m_interest->GetInterestLifetime.ToInteger (Time::S)));
+  start.WriteU16 (static_cast<uint16_t> (m_interest->GetInterestLifetime ().ToInteger (Time::S)));
 
-  uint32_t offset = Name (ConstCast<ns3::Name> (m_interest->GetNamePtr ())).Serialize (start);
+  uint32_t offset = Name (ConstCast<ndn::Name> (m_interest->GetNamePtr ())).Serialize (start);
   start.Next (offset);
   
   start.WriteU16 (0); // no selectors
@@ -214,13 +227,13 @@ Interest::Deserialize (Buffer::Iterator start)
   
   m_interest->SetNonce (i.ReadU32 ());
   m_interest->SetScope (i.ReadU8 ());
-  m_interest->SetNackType (i.ReadU8 ());
+  m_interest->SetNack (i.ReadU8 ());
 
   m_interest->SetInterestLifetime (Seconds (i.ReadU16 ()));
 
   Name name;
   uint32_t offset = name.Deserialize (i);
-  m_interest->SetName (name->GetName ());
+  m_interest->SetName (name.GetName ());
   i.Next (offset);
   
   i.ReadU16 ();
@@ -229,6 +242,12 @@ Interest::Deserialize (Buffer::Iterator start)
   NS_ASSERT (GetSerializedSize () == (i.GetDistanceFrom (start)));
 
   return i.GetDistanceFrom (start);
+}
+
+void
+Interest::Print (std::ostream &os) const
+{
+  m_interest->Print (os);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +284,7 @@ Data::Data (Ptr<ndn::ContentObject> data)
 }
 
 Ptr<ndn::ContentObject>
-GetData ()
+Data::GetData ()
 {
   return m_data;
 }
@@ -276,10 +295,12 @@ Data::ToWire (Ptr<const ndn::ContentObject> data)
   Ptr<const Packet> p = data->GetWire ();
   if (!p)
     {
-      p = Create<Packet> (*data->GetPayload ());
-      Data wireEncoding (data);
-      p->AddHeader (wireEncoding);
-      data->SetWire (p);
+      Ptr<Packet> packet = Create<Packet> (*data->GetPayload ());
+      Data wireEncoding (ConstCast<ndn::ContentObject> (data));
+      packet->AddHeader (wireEncoding);
+      data->SetWire (packet);
+
+      p = packet;
     }
   
   return p->Copy ();
@@ -289,7 +310,7 @@ Ptr<ndn::ContentObject>
 Data::FromWire (Ptr<Packet> packet)
 {
   Ptr<ndn::ContentObject> data = Create<ndn::ContentObject> ();
-  // data->SetWire (packet->Copy ()); /* not sure if this is needed */
+  data->SetWire (packet->Copy ());
 
   Data wireEncoding (data);
   packet->RemoveHeader (wireEncoding);
@@ -303,7 +324,7 @@ uint32_t
 Data::GetSerializedSize () const
 {
   uint32_t size = 1 + 1 + 2 +
-    ((2 + 2) + (Name (ConstCast<ns3::Name> (m_data->GetNamePtr ())).GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
+    ((2 + 2) + (Name (ConstCast<ndn::Name> (m_data->GetNamePtr ())).GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
   if (m_data->GetSignature () != 0)
     size += 4;
   
@@ -331,15 +352,15 @@ Data::Serialize (Buffer::Iterator start) const
     }
 
   // name
-  uint32_t offset = Name (ConstCast<ns3::Name> (m_data->GetNamePtr ())).Serialize (start);
+  uint32_t offset = Name (ConstCast<ndn::Name> (m_data->GetNamePtr ())).Serialize (start);
   start.Next (offset);
 
   // content
   // for now assume that contentdata length is zero
   start.WriteU16 (2 + 4 + 2 + 2 + (2 + 0));
   start.WriteU16 (4 + 2 + 2 + (2 + 0));
-  start.WriteU32 (static_cast<uint32_t> (m_data->GetTimestamp.ToInteger (Time::S)));
-  start.WriteU16 (static_cast<uint16_t> (m_data->GetFreshness.ToInteger (Time::S)));
+  start.WriteU32 (static_cast<uint32_t> (m_data->GetTimestamp ().ToInteger (Time::S)));
+  start.WriteU16 (static_cast<uint16_t> (m_data->GetFreshness ().ToInteger (Time::S)));
   start.WriteU16 (0); // reserved 
   start.WriteU16 (0); // Length (ContentInfoOptions)
 
@@ -364,20 +385,20 @@ Data::Deserialize (Buffer::Iterator start)
     {
       if (i.ReadU16 () != 0xFF00) // signature type
         throw new ContentObjectException ();
-      m_data.SetSignature (i.ReadU32 ());
+      m_data->SetSignature (i.ReadU32 ());
     }
   else if (signatureLength == 2)
     {
       if (i.ReadU16 () != 0) // signature type
         throw new ContentObjectException ();
-      m_data.SetSignature (0);
+      m_data->SetSignature (0);
     }
   else
     throw new ContentObjectException ();
 
   Name name;
   uint32_t offset = name.Deserialize (i);
-  m_data->SetName (name->GetName ());
+  m_data->SetName (name.GetName ());
   i.Next (offset);
 
   if (i.ReadU16 () != (2 + 4 + 2 + 2 + (2 + 0))) // content length
@@ -400,7 +421,13 @@ Data::Deserialize (Buffer::Iterator start)
   return i.GetDistanceFrom (start);
 }
 
+void
+Data::Print (std::ostream &os) const
+{
+  m_data->Print (os);
 }
-}
+
+} // ndnSIM
+} // wire
 
 NDN_NAMESPACE_END

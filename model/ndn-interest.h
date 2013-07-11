@@ -26,6 +26,7 @@
 #include "ns3/header.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/nstime.h"
+#include "ns3/packet.h"
 
 #include <string>
 #include <vector>
@@ -40,7 +41,7 @@ class Packet;
 namespace ndn {
 
 /**
- * @brief NDN Interest (wire formats are defined in wire/*)
+ * @brief NDN Interest (wire formats are defined in wire)
  *
  **/
 class Interest : public SimpleRefCount<Interest>
@@ -51,7 +52,7 @@ public:
    *
    * Creates a null header
    **/
-  Interest ();
+  Interest (Ptr<Packet> payload = Create<Packet> ());
 
   /**
    * @brief Copy constructor
@@ -194,7 +195,7 @@ public:
    *
    * This payload can carry packet tags
    */
-  Ptr<const Payload>
+  Ptr<const Packet>
   GetPayload () const;
   
   /**
@@ -211,6 +212,12 @@ public:
   inline void
   SetWire (Ptr<const Packet> packet) const;
 
+  /**
+   * @brief Print Interest in plain-text to the specified output stream
+   */
+  void
+  Print (std::ostream &os) const;
+  
 private:
   // NO_ASSIGN
   Interest &
@@ -233,9 +240,6 @@ Interest::GetWire () const
   return m_wire;
 }
 
-/**
- * @brief Set (cache) wire formatted packet
- */
 inline void
 Interest::SetWire (Ptr<const Packet> packet) const
 {

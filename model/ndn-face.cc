@@ -32,6 +32,7 @@
 #include "ns3/random-variable.h"
 #include "ns3/pointer.h"
 
+#include "ns3/ndn-header-helper.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 #include "ns3/ndnSIM/model/wire/ndnsim.h"
 
@@ -66,7 +67,8 @@ Face::GetTypeId ()
  */
 Face::Face (Ptr<Node> node)
   : m_node (node)
-  , m_protocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ())
+  , m_upstreamInterestHandler (MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ())
+  , m_upstreamDataHandler (MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
@@ -111,15 +113,15 @@ Face::UnRegisterProtocolHandlers ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  m_upstreamInterestHandler = MakeNullCallback< void, const Ptr<Face>&, Ptr<Interest>, Ptr<Packet> > ();
-  m_upstreamDataHandler = MakeNullCallback< void, const Ptr<Face>&, Ptr<ContentObject>, Ptr<Packet> > ();
+  m_upstreamInterestHandler = MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ();
+  m_upstreamDataHandler = MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ();
 }
 
 
 bool
 Face::SendInterest (Ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION (this << interest << packet);
+  NS_LOG_FUNCTION (this << interest);
 
   if (!IsUp ())
     {
@@ -133,7 +135,7 @@ Face::SendInterest (Ptr<const Interest> interest)
 bool
 Face::SendData (Ptr<const ContentObject> data)
 {
-  NS_LOG_FUNCTION (this << data << packet);
+  NS_LOG_FUNCTION (this << data);
 
   if (!IsUp ())
     {
@@ -161,7 +163,7 @@ Face::Send (Ptr<Packet> packet)
 bool
 Face::Receive (Ptr<const Packet> p)
 {
-  NS_LOG_FUNCTION (this << packet << packet->GetSize ());
+  NS_LOG_FUNCTION (this << p << p->GetSize ());
 
   if (!IsUp ())
     {

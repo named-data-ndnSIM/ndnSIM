@@ -108,36 +108,29 @@ Producer::StopApplication ()
 
 
 void
-Producer::OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> origPacket)
+Producer::OnInterest (Ptr<const Interest> interest)
 {
-  App::OnInterest (interest, origPacket); // tracing inside
+  App::OnInterest (interest); // tracing inside
 
   NS_LOG_FUNCTION (this << interest);
 
   if (!m_active) return;
     
-  static ContentObjectTail tail;
-  Ptr<ContentObject> header = Create<ContentObject> ();
-  header->SetName (Create<Name> (interest->GetName ()));
-  header->SetFreshness (m_freshness);
+  Ptr<ContentObject> data = Create<ContentObject> (Create<Packet> (m_virtualPayloadSize));
+  data->SetName (Create<Name> (interest->GetName ()));
+  data->SetFreshness (m_freshness);
 
-  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << boost::cref(*header));
-  
-  Ptr<Packet> packet = Create<Packet> (m_virtualPayloadSize);
-  
-  packet->AddHeader (*header);
-  packet->AddTrailer (tail);
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << data->GetName ());
 
   // Echo back FwHopCountTag if exists
   FwHopCountTag hopCountTag;
-  if (origPacket->RemovePacketTag (hopCountTag))
+  if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
     {
-      packet->AddPacketTag (hopCountTag);
+      data->GetPayload ()->AddPacketTag (hopCountTag);
     }
 
-  m_protocolHandler (packet);
-  
-  m_transmittedContentObjects (header, packet, this, m_face);
+  m_face->ReceiveData (data);
+  m_transmittedContentObjects (data, this, m_face);
 }
 
 } // namespace ndn

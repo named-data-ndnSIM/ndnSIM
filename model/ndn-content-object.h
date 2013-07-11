@@ -27,6 +27,7 @@
 #include "ns3/simple-ref-count.h"
 #include "ns3/trailer.h"
 #include "ns3/nstime.h"
+#include "ns3/packet.h"
 
 #include <string>
 #include <vector>
@@ -73,7 +74,7 @@ namespace ndn {
  *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class ContentObject : public SimpleRefCount<ContentObject,Header>
+class ContentObject : public SimpleRefCount<ContentObject>
 {
 public:
   /**
@@ -81,7 +82,7 @@ public:
    *
    * Creates a null header
    **/
-  ContentObject ();
+  ContentObject (Ptr<Packet> payload = Create<Packet> ());
 
   /**
    * @brief Copy constructor
@@ -173,7 +174,7 @@ public:
    *
    * This payload can also carry packet tags
    */
-  Ptr<const Payload>
+  Ptr<const Packet>
   GetPayload () const;
   
   /**
@@ -190,6 +191,12 @@ public:
   inline void
   SetWire (Ptr<const Packet> packet) const;
 
+  /**
+   * @brief Print Interest in plain-text to the specified output stream
+   */
+  void
+  Print (std::ostream &os) const;
+  
 private:
   // NO_ASSIGN
   ContentObject &
@@ -210,6 +217,19 @@ private:
  * @brief Class for ContentObject parsing exception
  */
 class ContentObjectException {};
+
+inline Ptr<const Packet>
+ContentObject::GetWire () const
+{
+  return m_wire;
+}
+
+inline void
+ContentObject::SetWire (Ptr<const Packet> packet) const
+{
+  m_wire = packet;
+}
+
 
 } // namespace ndn
 } // namespace ns3

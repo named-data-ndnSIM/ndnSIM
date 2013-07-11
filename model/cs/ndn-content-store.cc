@@ -69,7 +69,7 @@ Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> data)
 const Name&
 Entry::GetName () const
 {
-  return m_header->GetName ();
+  return m_data->GetName ();
 }
 
 Ptr<const ContentObject>

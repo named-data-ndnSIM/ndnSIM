@@ -96,7 +96,14 @@ struct serialized_size_policy_traits
         current_space_used_ -= get_size (item);
         policy_container::erase (*item);
 
-        get_order (item) = item->payload ()->GetInterest ()->GetSerializedSize ();
+        if (item->payload ()->GetInterest ()->GetWire ())
+          {
+            get_order (item) = item->payload ()->GetInterest ()->GetWire ()->GetSize ();
+          }
+        else
+          {
+            get_order (item) = 0;
+          }
         current_space_used_ += get_size (item); // this operation can violate policy constraint, so in some case
                                                 // it may be necessary to remove some other element
         policy_container::insert (*item);
@@ -105,7 +112,11 @@ struct serialized_size_policy_traits
       inline bool
       insert (typename parent_trie::iterator item)
       {
-        uint32_t interestSize = item->payload ()->GetInterest ()->GetSerializedSize ();
+        uint32_t interestSize = 0;
+        if (item->payload ()->GetInterest ()->GetWire ())
+          {
+            interestSize = item->payload ()->GetInterest ()->GetWire ()->GetSize ();
+          }
 
         // can't use logging here
         NS_LOG_DEBUG ("Number of entries: " << policy_container::size ()
