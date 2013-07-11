@@ -183,7 +183,7 @@ def build(bld):
 
     bld.recurse ('tools')
 
-    # bld.ns3_python_bindings()
+    bld.ns3_python_bindings()
 
 
 @TaskGen.feature('ns3fullmoduleheaders')
