@@ -145,6 +145,7 @@ void
 ForwardingStrategy::OnInterest (Ptr<Face> inFace,
                                 Ptr<Interest> interest)
 {
+  NS_LOG_FUNCTION (inFace << interest->GetName ());
   m_inInterests (interest, inFace);
 
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*interest);

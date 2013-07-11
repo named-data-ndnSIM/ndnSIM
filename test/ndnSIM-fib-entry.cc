@@ -36,7 +36,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.FibEntryTest");
 namespace ns3
 {
 
-class Client : public ndn::App
+class FibEntryTestApp : public ndn::App
 {
 protected:
   void
@@ -48,8 +48,8 @@ protected:
     Ptr<ndn::fib::Entry> fibEntry = GetNode ()->GetObject<ndn::Fib> ()->Add (ndn::Name ("/"), m_face, 0);
     fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
 
-    Simulator::Schedule (Seconds (0.5), &Client::SendPacket, this, std::string("/1"), 1);
-    Simulator::Schedule (Seconds (4.0), &Client::SendPacket, this, std::string("/2"), 1);
+    Simulator::Schedule (Seconds (0.5), &FibEntryTestApp::SendPacket, this, std::string("/1"), 1);
+    Simulator::Schedule (Seconds (4.0), &FibEntryTestApp::SendPacket, this, std::string("/2"), 1);
   }
 
   void
@@ -62,7 +62,7 @@ private:
   void
   SendPacket (const std::string &prefix, uint32_t nonce)
   {
-    Ptr<ndn::Interest> interest;
+    Ptr<ndn::Interest> interest = Create<ndn::Interest> ();
     interest->SetName (Create<ndn::Name> (prefix));
     interest->SetNonce (nonce);
     interest->SetInterestLifetime (Seconds (0.5));
@@ -111,7 +111,7 @@ FibEntryTest::DoRun ()
 
   ndn::StackHelper::AddRoute (node, "/", 0, 0);
 
-  Ptr<Client> app1 = CreateObject<Client> ();
+  Ptr<Application> app1 = CreateObject<FibEntryTestApp> ();
   node->AddApplication (app1);
 
   ndn::AppHelper sinkHelper ("ns3::ndn::Producer");

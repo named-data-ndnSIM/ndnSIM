@@ -51,12 +51,14 @@ void
 ContentObject::SetName (Ptr<Name> name)
 {
   m_name = name;
+  m_wire = 0;
 }
 
 void
 ContentObject::SetName (const Name &name)
 {
   m_name = Create<Name> (name);
+  m_wire = 0;
 }
 
 const Name&
@@ -77,6 +79,7 @@ void
 ContentObject::SetTimestamp (const Time &timestamp)
 {
   m_timestamp = timestamp;
+  m_wire = 0;
 }
 
 Time
@@ -89,7 +92,9 @@ void
 ContentObject::SetFreshness (const Time &freshness)
 {
   m_freshness = freshness;
+  m_wire = 0;
 }
+
 
 Time
 ContentObject::GetFreshness () const
@@ -101,6 +106,7 @@ void
 ContentObject::SetSignature (uint32_t signature)
 {
   m_signature = signature;
+  m_wire = 0;
 }
 
 uint32_t
@@ -120,6 +126,7 @@ void
 ContentObject::SetPayload (Ptr<Packet> payload)
 {
   m_payload = payload;
+  m_wire = 0;
 }
 
 Ptr<const Packet>

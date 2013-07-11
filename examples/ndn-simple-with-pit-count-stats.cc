@@ -108,7 +108,7 @@ main (int argc, char *argv[])
   consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
   consumerHelper.Install (nodes.Get (0)); // first node
 
-  // Producer
+  // // Producer
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix ("/prefix");

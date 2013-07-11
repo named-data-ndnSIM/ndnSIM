@@ -134,6 +134,7 @@ void
 Interest::SetPayload (Ptr<Packet> payload)
 {
   m_payload = payload;
+  m_wire = 0;
 }
 
 Ptr<const Packet>
