@@ -56,6 +56,10 @@ Producer::GetTypeId (void)
                    StringValue ("/"),
                    MakeNameAccessor (&Producer::m_prefix),
                    MakeNameChecker ())
+    .AddAttribute ("Postfix", "Postfix that is added to the output data (e.g., for adding producer-uniqueness)",
+                   StringValue ("/"),
+                   MakeNameAccessor (&Producer::m_postfix),
+                   MakeNameChecker ())
     .AddAttribute ("PayloadSize", "Virtual payload size for Content packets",
                    UintegerValue (1024),
                    MakeUintegerAccessor(&Producer::m_virtualPayloadSize),
@@ -65,7 +69,6 @@ Producer::GetTypeId (void)
                    MakeTimeAccessor (&Producer::m_freshness),
                    MakeTimeChecker ())
     ;
-        
   return tid;
 }
     
@@ -117,7 +120,9 @@ Producer::OnInterest (Ptr<const Interest> interest)
   if (!m_active) return;
     
   Ptr<ContentObject> data = Create<ContentObject> (Create<Packet> (m_virtualPayloadSize));
-  data->SetName (Create<Name> (interest->GetName ()));
+  Ptr<Name> dataName = Create<Name> (interest->GetName ());
+  dataName->Append (m_postfix);
+  data->SetName (dataName);
   data->SetFreshness (m_freshness);
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << data->GetName ());

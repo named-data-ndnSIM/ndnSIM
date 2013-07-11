@@ -34,35 +34,57 @@ ApiApp::GetTypeId ()
   static TypeId tid = TypeId ("ns3::ndn::ApiApp")
     .SetParent<Application> ()
     .AddConstructor<ApiApp> ()
+    
+    .AddAttribute ("Prefix","Name of the Interest",
+                   StringValue ("/"),
+                   MakeNameAccessor (&ApiApp::m_name),
+                   MakeNameChecker ())
+    .AddAttribute ("LifeTime", "LifeTime for interest packet",
+                   StringValue ("2s"),
+                   MakeTimeAccessor (&ApiApp::m_interestLifetime),
+                   MakeTimeChecker ())
     ;
 
   return tid;
 }
 
 ApiApp::ApiApp ()
+  : m_face (0)
 {
-  // m_handler = CreateObject<Handler> ();
 }
 
 void
 ApiApp::RequestData ()
 {
-  // m_handler->sendInterest ("/test/prefix", boost::bind (&ApiApp::OnData
+  NS_LOG_FUNCTION (this);
+  
+  Ptr<Interest> interest = Create<Interest> ();
+  interest->SetName (m_name);
+  interest->SetInterestLifetime (m_interestLifetime);
+  
+  m_face->ExpressInterest (interest,
+                           MakeCallback (&ApiApp::GotData, this),
+                           MakeNullCallback< void, Ptr<const Interest> > ());
 }
 
 void
+ApiApp::GotData (Ptr<const Interest> origInterest, Ptr<const ContentObject> data)
+{
+  NS_LOG_FUNCTION (this << origInterest->GetName () << data->GetName ());
+  // do nothing else
+}
+    
+void
 ApiApp::StartApplication ()
 {
-  // m_handler->SetNode (GetNode ());
-  // m_handler->StartApplication ();
+  m_face = Create<ApiFace> (GetNode ());
   
-  // Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
+  Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
 }
 
 void
 ApiApp::StopApplication ()
 {
-  // m_handler->StopApplication ();
 }
 
 } // namespace ndn

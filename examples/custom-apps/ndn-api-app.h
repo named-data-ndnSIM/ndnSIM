@@ -25,7 +25,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// #include "ns3/ndnSIM/ndn.cxx/ndn-handler.h"
+#include "ns3/ndnSIM/ndn.cxx/ndn-api-face.h"
 
 namespace ns3 {
 namespace ndn {
@@ -41,6 +41,9 @@ public:
 private:
   void
   RequestData ();
+
+  void
+  GotData (Ptr<const Interest> origInterest, Ptr<const ContentObject> data);
   
 protected:
   // inherited from Application base class.
@@ -49,9 +52,12 @@ protected:
 
   virtual void
   StopApplication ();
-
+  
 private:
-  // Ptr<Handler> m_handler;
+  Ptr<ApiFace> m_face;
+
+  Name m_name;
+  Time m_interestLifetime;
 };
 
 } // namespace ndn

@@ -96,6 +96,13 @@ public:
   Add (const T &value);
 
   /**
+   * \brief Append components from another name
+   * @param otherName Name to add at the end
+   */
+  inline Name&
+  Append (const Name &otherName);
+  
+  /**
    * \brief Generic constructor operator
    * The object of type T will be appended to the list of components
    */
@@ -265,6 +272,14 @@ Name::Add (const T &value)
 
   return *this;
 }
+
+inline Name&
+Name::Append (const Name &otherName)
+{
+  std::copy (otherName.begin (), otherName.end (), std::back_inserter (m_prefix));
+  return *this;
+}
+
 
 /**
  * \brief Equality operator for Name

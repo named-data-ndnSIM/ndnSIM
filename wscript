@@ -108,14 +108,14 @@ def build(bld):
                                        'apps/*.cc',
                                        'utils/**/*.cc',
                                        'helper/**/*.cc',
-                                       # 'ndn.cxx/**/*.cc',
+                                       'ndn.cxx/**/*.cc',
                                        ])
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
                            'utils/**/*.h',
                            'model/**/*.h',
                            'apps/**/*.h',
                            'helper/**/*.h',
-                           # 'ndn.cxx/**/*.h',
+                           'ndn.cxx/**/*.h',
                            ])]
 
     headers.source = [
@@ -149,11 +149,10 @@ def build(bld):
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
 
-        # "utils/batches.h",
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",
-        # "utils/weights-path-stretch-tag.h",
 
+        "ndn.cxx/ndn-api-face.h",
         ]
 
     if 'topology' in bld.env['NDN_plugins']:

@@ -94,7 +94,7 @@ AppHelper::InstallPriv (Ptr<Node> node)
     }
 #endif
   
-  Ptr<App> app = m_factory.Create<App> ();        
+  Ptr<Application> app = m_factory.Create<Application> ();        
   node->AddApplication (app);
         
   return app;
