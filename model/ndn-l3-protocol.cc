@@ -108,10 +108,10 @@ L3Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
 
-  for (FaceList::iterator i = m_faces.begin (); i != m_faces.end (); ++i)
-    {
-      *i = 0;
-    }
+  // for (FaceList::iterator i = m_faces.begin (); i != m_faces.end (); ++i)
+  //   {
+  //     *i = 0;
+  //   }
   m_faces.clear ();
   m_node = 0;
 
@@ -142,6 +142,7 @@ L3Protocol::AddFace (const Ptr<Face> &face)
 void
 L3Protocol::RemoveFace (Ptr<Face> face)
 {
+  NS_LOG_FUNCTION (this << boost::cref (*face));
   // ask face to register in lower-layer stack
   face->UnRegisterProtocolHandlers ();
   Ptr<Pit> pit = GetObject<Pit> ();
@@ -166,7 +167,10 @@ L3Protocol::RemoveFace (Ptr<Face> face)
     }
 
   FaceList::iterator face_it = find (m_faces.begin(), m_faces.end(), face);
-  NS_ASSERT_MSG (face_it != m_faces.end (), "Attempt to remove face that doesn't exist");
+  if (face_it == m_faces.end ())
+    {
+      return;
+    }
   m_faces.erase (face_it);
 
   GetObject<Fib> ()->RemoveFromAll (face);

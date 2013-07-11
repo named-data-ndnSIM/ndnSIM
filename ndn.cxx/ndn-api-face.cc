@@ -19,7 +19,8 @@
  */
 
 #include "ndn-api-face.h"
-#include "detail/filter-entry.h"
+#include "detail/pending-interests-container.h"
+#include "detail/registered-prefix-container.h"
 
 #include <ns3/random-variable.h>
 
@@ -41,6 +42,8 @@ NS_LOG_COMPONENT_DEFINE ("ndn.ApiFace");
 namespace ns3 {
 namespace ndn {
 
+using namespace detail;
+
 class ApiFacePriv
 {
 public:
@@ -51,8 +54,8 @@ public:
   
   ns3::UniformVariable m_rand; // nonce generator
 
-  FilterEntryContainer<ApiFace::DataCallback, Interest> m_pendingInterests;
-  FilterEntryContainer<ApiFace::InterestCallback, Name> m_expectedInterests;
+  PendingInterestContainer m_pendingInterests;
+  RegisteredPrefixContainer m_expectedInterests;
 };
 
 
@@ -74,6 +77,24 @@ ApiFace::~ApiFace ()
 }
 
 void
+ApiFace::Shutdown ()
+{
+  NS_LOG_FUNCTION (this);
+
+  if (!IsUp ())
+    {
+      return;
+    }
+  
+  this->SetUp (false);
+
+  m_this->m_pendingInterests.clear ();
+  m_this->m_expectedInterests.clear ();
+
+  GetNode ()->GetObject<L3Protocol> ()->RemoveFace (this);
+}
+
+void
 ApiFace::ExpressInterest (Ptr<Interest> interest,
                           DataCallback onData,
                           TimeoutCallback onTimeout/* = MakeNullCallback< void, Ptr<Interest> > ()*/)
@@ -86,16 +107,15 @@ ApiFace::ExpressInterest (Ptr<Interest> interest,
     }
   
   // Record the callback
-  FilterEntryContainer<DataCallback, Interest>::iterator entry =
-    m_this->m_pendingInterests.find_exact (interest->GetName ());
+  PendingInterestContainer::iterator entry = m_this->m_pendingInterests.find_exact (interest->GetName ());
   if (entry == m_this->m_pendingInterests.end ())
     {
-      pair<FilterEntryContainer<DataCallback, Interest>::iterator, bool> status =
-        m_this->m_pendingInterests.insert (interest->GetName (), Create< FilterEntry<DataCallback, Interest> > (interest));
+      pair<PendingInterestContainer::iterator, bool> status =
+        m_this->m_pendingInterests.insert (interest->GetName (), Create <PendingInterestEntry> (interest));
 
       entry = status.first;
     }
-  entry->payload ()->AddCallback (onData);
+  entry->payload ()->AddCallbacks (onData, onTimeout);
 
   ReceiveInterest (interest);
 }
@@ -105,11 +125,11 @@ ApiFace::SetInterestFilter (Ptr<const Name> prefix, InterestCallback onInterest)
 {
   NS_LOG_DEBUG ("== setInterestFilter " << *prefix << " (" << GetNode ()->GetId () << ")");
 
-  FilterEntryContainer<InterestCallback, Name>::iterator entry = m_this->m_expectedInterests.find_exact (*prefix);
+  RegisteredPrefixContainer::iterator entry = m_this->m_expectedInterests.find_exact (*prefix);
   if (entry == m_this->m_expectedInterests.end ())
     {
-      pair<FilterEntryContainer<InterestCallback, Name>::iterator, bool> status =
-        m_this->m_expectedInterests.insert (*prefix, Create < FilterEntry<InterestCallback, Name> > (prefix));
+      pair<RegisteredPrefixContainer::iterator, bool> status =
+        m_this->m_expectedInterests.insert (*prefix, Create < RegisteredPrefixEntry > (prefix));
 
       entry = status.first;
     }
@@ -125,7 +145,7 @@ ApiFace::SetInterestFilter (Ptr<const Name> prefix, InterestCallback onInterest)
 void
 ApiFace::ClearInterestFilter (Ptr<const Name> prefix)
 {
-  FilterEntryContainer<InterestCallback, Name>::iterator entry = m_this->m_expectedInterests.find_exact (*prefix);
+  RegisteredPrefixContainer::iterator entry = m_this->m_expectedInterests.find_exact (*prefix);
   if (entry == m_this->m_expectedInterests.end ())
     return;
 
@@ -161,14 +181,13 @@ ApiFace::SendInterest (Ptr<const Interest> interest)
     }
 
   // the app cannot set several filters for the same prefix
-  FilterEntryContainer<InterestCallback, Name>::iterator entry =
-    m_this->m_expectedInterests.longest_prefix_match (interest->GetName ());
+  RegisteredPrefixContainer::iterator entry = m_this->m_expectedInterests.longest_prefix_match (interest->GetName ());
   if (entry == m_this->m_expectedInterests.end ())
     {
       return false;
     }
   
-  entry->payload ()->m_callback (entry->payload ()->GetPayload (), interest);
+  entry->payload ()->m_callback (entry->payload ()->GetPrefix (), interest);
   return true;
 }
 
@@ -186,8 +205,7 @@ ApiFace::SendData (Ptr<const ContentObject> data)
       return false;
     }
 
-  FilterEntryContainer<DataCallback, Interest>::iterator entry =
-    m_this->m_pendingInterests.longest_prefix_match (data->GetName ());
+  PendingInterestContainer::iterator entry = m_this->m_pendingInterests.longest_prefix_match (data->GetName ());
   if (entry == m_this->m_pendingInterests.end ())
     {
       return false;
@@ -195,7 +213,7 @@ ApiFace::SendData (Ptr<const ContentObject> data)
 
   while (entry != m_this->m_pendingInterests.end ())
     {
-      entry->payload ()->m_callback (entry->payload ()->GetPayload (), data);
+      entry->payload ()->m_dataCallback (entry->payload ()->GetInterest (), data);
       m_this->m_pendingInterests.erase (entry);
 
       entry = m_this->m_pendingInterests.longest_prefix_match (data->GetName ());

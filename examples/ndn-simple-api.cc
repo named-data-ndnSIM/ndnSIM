@@ -76,7 +76,8 @@ main (int argc, char *argv[])
   // Consumer
   ndn::AppHelper consumerHelper ("ns3::ndn::ApiApp");
   consumerHelper.SetPrefix ("/prefix");
-  consumerHelper.Install (nodes.Get (0)); // first node
+  ApplicationContainer app = consumerHelper.Install (nodes.Get (0)); // first node
+  app.Stop (Seconds (10.0));
 
   // Producer
   ndn::AppHelper producerHelper ("ns3::ndn::Producer");

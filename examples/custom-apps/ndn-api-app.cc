@@ -77,7 +77,7 @@ ApiApp::GotData (Ptr<const Interest> origInterest, Ptr<const ContentObject> data
 void
 ApiApp::StartApplication ()
 {
-  m_face = Create<ApiFace> (GetNode ());
+  m_face = CreateObject<ApiFace> (GetNode ());
   
   Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
 }
@@ -85,6 +85,9 @@ ApiApp::StartApplication ()
 void
 ApiApp::StopApplication ()
 {
+  NS_LOG_FUNCTION (this);
+  m_face->Shutdown ();
+  m_face = 0;
 }
 
 } // namespace ndn

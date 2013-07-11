@@ -376,6 +376,8 @@ def register_types_ns3_ndn(module):
     module.add_class('StackHelper')
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::UnknownHeaderException [class]
     module.add_class('UnknownHeaderException')
+    ## ndn-api-face.h (module 'ndnSIM'): ns3::ndn::ApiFace [class]
+    module.add_class('ApiFace', parent=root_module['ns3::ndn::Face'])
     ## ndn-app-face.h (module 'ndnSIM'): ns3::ndn::AppFace [class]
     module.add_class('AppFace', parent=root_module['ns3::ndn::Face'])
     module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
@@ -618,6 +620,7 @@ def register_methods(root_module):
     register_Ns3NdnRttHistory_methods(root_module, root_module['ns3::ndn::RttHistory'])
     register_Ns3NdnStackHelper_methods(root_module, root_module['ns3::ndn::StackHelper'])
     register_Ns3NdnUnknownHeaderException_methods(root_module, root_module['ns3::ndn::UnknownHeaderException'])
+    register_Ns3NdnApiFace_methods(root_module, root_module['ns3::ndn::ApiFace'])
     register_Ns3NdnAppFace_methods(root_module, root_module['ns3::ndn::AppFace'])
     register_Ns3NdnCsEntry_methods(root_module, root_module['ns3::ndn::cs::Entry'])
     register_Ns3NdnFibEntry_methods(root_module, root_module['ns3::ndn::fib::Entry'])
@@ -5634,6 +5637,10 @@ def register_Ns3NdnName_methods(root_module, cls):
     cls.add_constructor([param('std::string const &', 'prefix')])
     ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(char const * prefix) [constructor]
     cls.add_constructor([param('char const *', 'prefix')])
+    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name & ns3::ndn::Name::Append(ns3::ndn::Name const & otherName) [member function]
+    cls.add_method('Append', 
+                   'ns3::ndn::Name &', 
+                   [param('ns3::ndn::Name const &', 'otherName')])
     ## ndn-name.h (module 'ndnSIM'): std::list<std::string, std::allocator<std::string> > const & ns3::ndn::Name::GetComponents() const [member function]
     cls.add_method('GetComponents', 
                    'std::list< std::string > const &', 
@@ -6035,6 +6042,46 @@ def register_Ns3NdnUnknownHeaderException_methods(root_module, cls):
     cls.add_constructor([])
     ## ndn-header-helper.h (module 'ndnSIM'): ns3::ndn::UnknownHeaderException::UnknownHeaderException(ns3::ndn::UnknownHeaderException const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::UnknownHeaderException const &', 'arg0')])
+    return
+
+def register_Ns3NdnApiFace_methods(root_module, cls):
+    ## ndn-api-face.h (module 'ndnSIM'): ns3::ndn::ApiFace::ApiFace(ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::Shutdown() [member function]
+    cls.add_method('Shutdown', 
+                   'void', 
+                   [])
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::ExpressInterest(ns3::Ptr<ns3::ndn::Interest> interest, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Interest>,ns3::Ptr<const ns3::ndn::ContentObject>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onData, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Interest>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onTimeout) [member function]
+    cls.add_method('ExpressInterest', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Interest const >, ns3::Ptr< ns3::ndn::ContentObject const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onData'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Interest const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onTimeout')])
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::SetInterestFilter(ns3::Ptr<ns3::ndn::Name const> prefix, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Name>,ns3::Ptr<const ns3::ndn::Interest>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onInterest) [member function]
+    cls.add_method('SetInterestFilter', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Name const >', 'prefix'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Name const >, ns3::Ptr< ns3::ndn::Interest const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onInterest')])
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::ClearInterestFilter(ns3::Ptr<ns3::ndn::Name const> prefix) [member function]
+    cls.add_method('ClearInterestFilter', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Name const >', 'prefix')])
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::Put(ns3::Ptr<ns3::ndn::ContentObject> data) [member function]
+    cls.add_method('Put', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::ContentObject >', 'data')])
+    ## ndn-api-face.h (module 'ndnSIM'): bool ns3::ndn::ApiFace::SendInterest(ns3::Ptr<ns3::ndn::Interest const> interest) [member function]
+    cls.add_method('SendInterest', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'interest')], 
+                   is_virtual=True)
+    ## ndn-api-face.h (module 'ndnSIM'): bool ns3::ndn::ApiFace::SendData(ns3::Ptr<ns3::ndn::ContentObject const> data) [member function]
+    cls.add_method('SendData', 
+                   'bool', 
+                   [param('ns3::Ptr< ns3::ndn::ContentObject const >', 'data')], 
+                   is_virtual=True)
+    ## ndn-api-face.h (module 'ndnSIM'): std::ostream & ns3::ndn::ApiFace::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'std::ostream &', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
     return
 
 def register_Ns3NdnAppFace_methods(root_module, cls):

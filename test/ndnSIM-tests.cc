@@ -24,6 +24,7 @@
 #include "ndnSIM-serialization.h"
 #include "ndnSIM-pit.h"
 #include "ndnSIM-fib-entry.h"
+#include "ndnSIM-api.h"
 
 namespace ns3
 {
@@ -40,6 +41,7 @@ public:
     AddTestCase (new ContentObjectSerializationTest (), TestCase::QUICK);
     AddTestCase (new FibEntryTest (), TestCase::QUICK);
     AddTestCase (new PitTest (), TestCase::QUICK);
+    AddTestCase (new ApiTest (), TestCase::QUICK);
   }
 };
 

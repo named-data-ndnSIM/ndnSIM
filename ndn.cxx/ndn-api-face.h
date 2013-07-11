@@ -56,6 +56,12 @@ public:
   ~ApiFace ();
 
   /**
+   * @brief Shutdown the API face
+   */
+  void
+  Shutdown ();
+  
+  /**
    * @brief Express Interest
    *
    * @param name the Interest name
