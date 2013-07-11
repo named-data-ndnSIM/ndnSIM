@@ -77,11 +77,16 @@ class ContentObject : public SimpleRefCount<ContentObject,Header>
 {
 public:
   /**
-   * Constructor
+   * @brief Constructor
    *
    * Creates a null header
    **/
   ContentObject ();
+
+  /**
+   * @brief Copy constructor
+   */
+  ContentObject (const ContentObject &other);
 
   /**
    * \brief Set content object name
@@ -155,19 +160,49 @@ public:
   GetSignature () const;
 
   //////////////////////////////////////////////////////////////////
+  /**
+   * @brief Get payload of data packet
+   *
+   * This payload can also carry packet tags
+   */
+  void
+  SetPayload (Ptr<Packet> payload);
 
-  static TypeId GetTypeId (void); ///< @brief Get TypeId
-  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
-  virtual void Print (std::ostream &os) const; ///< @brief Print out information about the Header into the stream
-  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Header
-  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Header
-  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
+  /**
+   * @brief Set payload of data packet
+   *
+   * This payload can also carry packet tags
+   */
+  Ptr<const Payload>
+  GetPayload () const;
+  
+  /**
+   * @brief Get wire formatted packet
+   *
+   * If wire formatted packet has not been set before, 0 will be returned
+   */
+  inline Ptr<const Packet>
+  GetWire () const;
 
+  /**
+   * @brief Set (cache) wire formatted packet
+   */
+  inline void
+  SetWire (Ptr<const Packet> packet) const;
+
+private:
+  // NO_ASSIGN
+  ContentObject &
+  operator = (const ContentObject &other) { return *this; }
+  
 private:
   Ptr<Name> m_name;
   Time m_freshness;
   Time m_timestamp;
   uint32_t m_signature; // 0, means no signature, any other value application dependent (not a real signature)
+  Ptr<Packet> m_payload;
+
+  mutable Ptr<const Packet> m_wire;
 };
 
 /**

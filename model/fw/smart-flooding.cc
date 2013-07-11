@@ -66,14 +66,13 @@ SmartFlooding::SmartFlooding ()
 
 bool
 SmartFlooding::DoPropagateInterest (Ptr<Face> inFace,
-                                    Ptr<const Interest> header,
-                                    Ptr<const Packet> origPacket,
+                                    Ptr<const Interest> interest,
                                     Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
 
   // Try to work out with just green faces
-  bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
+  bool greenOk = super::DoPropagateInterest (inFace, interest, pitEntry);
   if (greenOk)
     return true;
 
@@ -85,7 +84,7 @@ SmartFlooding::DoPropagateInterest (Ptr<Face> inFace,
       if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
 
-      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }

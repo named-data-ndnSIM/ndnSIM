@@ -33,6 +33,7 @@
 #include "ns3/pointer.h"
 
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+#include "ns3/ndnSIM/model/wire/ndnsim.h"
 
 #include <boost/ref.hpp>
 
@@ -116,7 +117,7 @@ Face::UnRegisterProtocolHandlers ()
 
 
 bool
-Face::SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet)
+Face::SendInterest (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest << packet);
 
@@ -125,14 +126,12 @@ Face::SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet)
       return false;
     }
 
-  Ptr<Packet> copy = packet->Copy ();
-  copy->AddHeader (*interest);
-
-  return Send (copy);
+  Ptr<Packet> packet = wire::ndnSIM::Interest::ToWire (interest);
+  return Send (packet);
 }
 
 bool
-Face::SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet)
+Face::SendData (Ptr<const ContentObject> data)
 {
   NS_LOG_FUNCTION (this << data << packet);
 
@@ -141,10 +140,8 @@ Face::SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet)
       return false;
     }
 
-  Ptr<Packet> copy = packet->Copy ();
-  copy->AddHeader (*data);
-  
-  return Send (copy);
+  Ptr<Packet> packet = wire::ndnSIM::Data::ToWire (data);
+  return Send (packet);
 }
 
 bool
@@ -180,17 +177,13 @@ Face::Receive (Ptr<const Packet> p)
         {
         case HeaderHelper::INTEREST_NDNSIM:
           {
-            Ptr<Interest> interest = Create<Interest> ();
-            packet->RemoveHeader (*header);
-
-            return ReceiveInterest (interest, packet/*payload*/);
+            Ptr<Interest> interest = wire::ndnSIM::Interest::FromWire (packet);
+            return ReceiveInterest (interest);
           }
         case HeaderHelper::CONTENT_OBJECT_NDNSIM:
           {
-            Ptr<ContentObject> data = Create<ContentObject> ();
-            packet->RemoveHeader (*header);
-
-            return ReceiveData (data, packet);
+            Ptr<ContentObject> data = wire::ndnSIM::Data::FromWire (packet);
+            return ReceiveData (data);
           }
         case HeaderHelper::INTEREST_CCNB:
         case HeaderHelper::CONTENT_OBJECT_CCNB:
@@ -209,7 +202,7 @@ Face::Receive (Ptr<const Packet> p)
 }
 
 bool
-Face::ReceiveInterest (Ptr<Interest> interest, Ptr<Packet> payload)
+Face::ReceiveInterest (Ptr<Interest> interest)
 {
   if (!IsUp ())
     {
@@ -217,12 +210,12 @@ Face::ReceiveInterest (Ptr<Interest> interest, Ptr<Packet> payload)
       return false;
     }
 
-  m_upstreamInterestHandler (this, interest, payload);
+  m_upstreamInterestHandler (this, interest);
   return true;
 }
 
 bool
-Face::ReceiveData (Ptr<ContentObject> data, Ptr<Packet> payload)
+Face::ReceiveData (Ptr<ContentObject> data)
 {
   if (!IsUp ())
     {
@@ -230,7 +223,7 @@ Face::ReceiveData (Ptr<ContentObject> data, Ptr<Packet> payload)
       return false;
     }
 
-  m_upstreamDataHandler (this, data, payload);
+  m_upstreamDataHandler (this, data);
   return true;
 }
 

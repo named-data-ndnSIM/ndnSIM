@@ -54,11 +54,11 @@ public:
   virtual
   ~Nocache ();
 
-  virtual boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+  virtual Ptr<ContentObject>
   Lookup (Ptr<const Interest> interest);
 
   virtual bool
-  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
+  Add (Ptr<const ContentObject> data);
 
   virtual void
   Print (std::ostream &os) const;

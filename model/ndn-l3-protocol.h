@@ -39,16 +39,11 @@ namespace ndn {
 
 class Face;
 class ForwardingStrategy;
-class Interest;
-class ContentObject;
-
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
 
 /**
  * \defgroup ndn ndnSIM: NDN simulation module
  *
- * This is a simplified modular implementation of NDN protocol
+ * This is a modular implementation of NDN protocol for NS-3
  */
 /**
  * \ingroup ndn

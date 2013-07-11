@@ -68,7 +68,6 @@ L3Protocol::GetDataCounter ()
   return s_dataCounter;
 }
 
-
 TypeId
 L3Protocol::GetTypeId (void)
 {
@@ -84,7 +83,7 @@ L3Protocol::GetTypeId (void)
   return tid;
 }
 
-L3Protocol::L3Protocol()
+L3Protocol::L3Protocol ()
 : m_faceCounter (0)
 {
   NS_LOG_FUNCTION (this);

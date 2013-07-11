@@ -113,60 +113,6 @@ Name::cut (size_t minusComponents) const
   return retval;
 }
 
-size_t
-Name::GetSerializedSize () const
-{
-  size_t nameSerializedSize = 2;
-
-  for (std::list<std::string>::const_iterator i = this->begin ();
-       i != this->end ();
-       i++)
-    {
-      nameSerializedSize += 2 + i->size ();
-    }
-  NS_ASSERT_MSG (nameSerializedSize < 30000, "Name is too long (> 30kbytes)");
-
-  return nameSerializedSize;
-}
-
-uint32_t
-Name::Serialize (Buffer::Iterator start) const
-{
-  Buffer::Iterator i = start;
-
-  i.WriteU16 (static_cast<uint16_t> (this->GetSerializedSize ()-2));
-
-  for (std::list<std::string>::const_iterator item = this->begin ();
-       item != this->end ();
-       item++)
-    {
-      i.WriteU16 (static_cast<uint16_t> (item->size ()));
-      i.Write (reinterpret_cast<const uint8_t*> (item->c_str ()), item->size ());
-    }
-
-  return i.GetDistanceFrom (start);
-}
-
-uint32_t
-Name::Deserialize (Buffer::Iterator start)
-{
-  Buffer::Iterator i = start;
-
-  uint16_t nameLength = i.ReadU16 ();
-  while (nameLength > 0)
-    {
-      uint16_t length = i.ReadU16 ();
-      nameLength = nameLength - 2 - length;
-
-      uint8_t tmp[length];
-      i.Read (tmp, length);
-
-      this->Add (string (reinterpret_cast<const char*> (tmp), length));
-    }
-
-  return i.GetDistanceFrom (start);
-}
-
 void
 Name::Print (std::ostream &os) const
 {

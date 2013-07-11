@@ -90,9 +90,9 @@ ContentStoreWithFreshness< Policy >::GetTypeId ()
 
 template<class Policy>
 inline bool
-ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObject> header, Ptr<const Packet> packet)
+ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObject> data)
 {
-  bool ok = super::Add (header, packet);
+  bool ok = super::Add (data);
   if (!ok) return false;
 
   NS_LOG_DEBUG (header->GetName () << " added to cache");

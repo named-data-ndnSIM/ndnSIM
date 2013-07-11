@@ -68,8 +68,8 @@ public:
    * \param face Face from which packet has been received
    * \param packet Original packet
    */
-  typedef Callback<void, Ptr<Face>, Ptr<Interest>, Ptr<Packet> > InterestHandler;
-  typedef Callback<void, Ptr<Face>, Ptr<ContentObject>, Ptr<Packet> > DataHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<Interest> > InterestHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<ContentObject> > DataHandler;
 
   /**
    * \brief Default constructor
@@ -109,7 +109,7 @@ public:
    * @returns true if interest is considered to be send out (enqueued)
    */
   virtual bool
-  SendInterest (Ptr<const Interest> interest, Ptr<const Packet> packet);
+  SendInterest (Ptr<const Interest> interest);
 
   /**
    * @brief Send out Dat packet through the face
@@ -119,7 +119,7 @@ public:
    * @returns true if Data packet is considered to be send out (enqueued)
    */
   virtual bool
-  SendData (Ptr<const ContentObject> data, Ptr<const Packet> packet);
+  SendData (Ptr<const ContentObject> data);
 
   /**
    * \brief Receive interest from application or another node and forward it up to the NDN stack
@@ -127,7 +127,7 @@ public:
    * By default it is called from inside Receive method, but can be used directly, if appropriate
    */
   virtual bool
-  ReceiveInterest (Ptr<Interest> interest, Ptr<Packet> payload);
+  ReceiveInterest (Ptr<Interest> interest);
 
   /**
    * \brief Receive Data packet from application or another node and forward it up to the NDN stack
@@ -135,7 +135,7 @@ public:
    * By default it is called from inside Receive method, but can be used directly, if appropriate
    */
   virtual bool
-  ReceiveData (Ptr<ContentObject> data, Ptr<Packet> payload);
+  ReceiveData (Ptr<ContentObject> data);
   ////////////////////////////////////////////////////////////////////
 
   /**

@@ -75,82 +75,74 @@ Nacks::GetTypeId (void)
 
 void
 Nacks::OnInterest (Ptr<Face> inFace,
-                   Ptr<const Interest> header,
-                   Ptr<const Packet> origPacket)
+                   Ptr<Interest> interest)
 {
-  if (header->GetNack () > 0)
-    OnNack (inFace, header, origPacket/*original packet*/);
+  if (interest->GetNack () > 0)
+    OnNack (inFace, header);
   else
-    super::OnInterest (inFace, header, origPacket/*original packet*/);
+    super::OnInterest (inFace, interest);
 }
 
 void
 Nacks::OnNack (Ptr<Face> inFace,
-               Ptr<const Interest> header,
-               Ptr<const Packet> origPacket)
+               Ptr<Interest> nack)
 {
   // NS_LOG_FUNCTION (inFace << header->GetName ());
-  m_inNacks (header, inFace);
+  m_inNacks (nack, inFace);
 
   Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
   if (pitEntry == 0)
     {
       // somebody is doing something bad
-      m_dropNacks (header, inFace);
+      m_dropNacks (nack, inFace);
       return;
     }
 
-  DidReceiveValidNack (inFace, header->GetNack (), header, origPacket, pitEntry);
+  DidReceiveValidNack (inFace, header->GetNack (), nack, pitEntry);
 }
 
 void
 Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                                    Ptr<const Interest> header,
-                                    Ptr<const Packet> origPacket,
+                                    Ptr<const Interest> interest,
                                     Ptr<pit::Entry> pitEntry)
 {
-  super::DidReceiveDuplicateInterest (inFace, header, origPacket, pitEntry);
+  super::DidReceiveDuplicateInterest (inFace, interest, pitEntry);
 
   if (m_nacksEnabled)
     {
       NS_LOG_DEBUG ("Sending NACK_LOOP");
-      Ptr<Interest> nackHeader = Create<Interest> (*header);
-      nackHeader->SetNack (Interest::NACK_LOOP);
-      Ptr<Packet> nack = Create<Packet> ();
-      nack->AddHeader (*nackHeader);
+      Ptr<Interest> nack = Create<Interest> (*interest);
+      nack->SetNack (Interest::NACK_LOOP);
 
       FwHopCountTag hopCountTag;
-      if (origPacket->PeekPacketTag (hopCountTag))
+      if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
         {
-     	  nack->AddPacketTag (hopCountTag);
+     	  nack->GetPayload ()->AddPacketTag (hopCountTag);
         }
       else
         {
           NS_LOG_DEBUG ("No FwHopCountTag tag associated with received duplicated Interest");
         }
 
-      inFace->Send (nack);
-      m_outNacks (nackHeader, inFace);
+      inFace->SendInterest (nack);
+      m_outNacks (nack, inFace);
     }
 }
 
 void
 Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
-                                    Ptr<const Interest> header,
-                                    Ptr<const Packet> origPacket,
+                                    Ptr<const Interest> interest,
                                     Ptr<pit::Entry> pitEntry)
 {
   if (m_nacksEnabled)
     {
-      Ptr<Packet> packet = Create<Packet> ();
-      Ptr<Interest> nackHeader = Create<Interest> (*header);
-      nackHeader->SetNack (Interest::NACK_GIVEUP_PIT);
-      packet->AddHeader (*nackHeader);
+      Ptr<Interest> nack = Create<Interest> (*header);
+      nack->SetNack (Interest::NACK_GIVEUP_PIT);
 
       FwHopCountTag hopCountTag;
-      if (origPacket->PeekPacketTag (hopCountTag))
+      if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
         {
-     	  packet->AddPacketTag (hopCountTag);
+     	  nack->GetPayload ()->AddPacketTag (hopCountTag);
         }
       else
         {
@@ -159,10 +151,9 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 
       BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
         {
-          NS_LOG_DEBUG ("Send NACK for " << boost::cref (nackHeader->GetName ()) << " to " << boost::cref (*incoming.m_face));
-          incoming.m_face->Send (packet->Copy ());
-
-          m_outNacks (nackHeader, incoming.m_face);
+          NS_LOG_DEBUG ("Send NACK for " << boost::cref (nack->GetName ()) << " to " << boost::cref (*incoming.m_face));
+          incoming.m_face->SendInterest (nack);
+          m_outNacks (nack, incoming.m_face);
         }
 
       pitEntry->ClearOutgoing (); // to force erasure of the record
@@ -174,11 +165,10 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
 void
 Nacks::DidReceiveValidNack (Ptr<Face> inFace,
                             uint32_t nackCode,
-                            Ptr<const Interest> header,
-                            Ptr<const Packet> origPacket,
+                            Ptr<const Interest> nack,
                             Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_DEBUG ("nackCode: " << nackCode << " for [" << header->GetName () << "]");
+  NS_LOG_DEBUG ("nackCode: " << nackCode << " for [" << nack->GetName () << "]");
 
   // If NACK is NACK_GIVEUP_PIT, then neighbor gave up trying to and removed it's PIT entry.
   // So, if we had an incoming entry to this neighbor, then we can remove it now
@@ -198,29 +188,27 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
           NS_LOG_DEBUG ("Not all outgoing are in vain");
           // suppress
           // Don't do anything, we are still expecting data from some other face
-          m_dropNacks (header, inFace);
+          m_dropNacks (nack, inFace);
           return;
         }
 
-      Ptr<Packet> nonNackInterest = Create<Packet> ();
-      Ptr<Interest> nonNackHeader = Create<Interest> (*header);
-      nonNackHeader->SetNack (Interest::NORMAL_INTEREST);
-      nonNackInterest->AddHeader (*nonNackHeader);
+      Ptr<Interest> interest = Create<Interest> (*nack);
+      interest->SetNack (Interest::NORMAL_INTEREST);
 
       FwHopCountTag hopCountTag;
-      if (origPacket->PeekPacketTag (hopCountTag))
+      if (nack->GetPayload ()->PeekPacketTag (hopCountTag))
         {
-     	  nonNackInterest->AddPacketTag (hopCountTag);
+     	  interest->GetPayload ()->AddPacketTag (hopCountTag);
         }
       else
         {
           NS_LOG_DEBUG ("No FwHopCountTag tag associated with received NACK");
         }
 
-      bool propagated = DoPropagateInterest (inFace, nonNackHeader, nonNackInterest, pitEntry);
+      bool propagated = DoPropagateInterest (inFace, interest, pitEntry);
       if (!propagated)
         {
-          DidExhaustForwardingOptions (inFace, nonNackHeader, nonNackInterest, pitEntry);
+          DidExhaustForwardingOptions (inFace, interest, pitEntry);
         }
     }
 }
