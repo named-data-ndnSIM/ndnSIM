@@ -153,6 +153,7 @@ def build(bld):
         "utils/ndn-rtt-estimator.h",
 
         "ndn.cxx/ndn-api-face.h",
+        "apps/callback-based-app.h",
         ]
 
     if 'topology' in bld.env['NDN_plugins']:

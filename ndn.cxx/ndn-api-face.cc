@@ -186,8 +186,9 @@ ApiFace::SendInterest (Ptr<const Interest> interest)
     {
       return false;
     }
-  
-  entry->payload ()->m_callback (entry->payload ()->GetPrefix (), interest);
+
+  if (!entry->payload ()->m_callback.IsNull ())
+    entry->payload ()->m_callback (entry->payload ()->GetPrefix (), interest);
   return true;
 }
 
@@ -196,7 +197,6 @@ ApiFace::SendData (Ptr<const ContentObject> data)
 {
   // data has been send out from NDN stack towards the application
   NS_LOG_DEBUG ("<< D " << data->GetName ());
-
 
   NS_LOG_FUNCTION (this << data);
 
@@ -213,7 +213,8 @@ ApiFace::SendData (Ptr<const ContentObject> data)
 
   while (entry != m_this->m_pendingInterests.end ())
     {
-      entry->payload ()->m_dataCallback (entry->payload ()->GetInterest (), data);
+      if (!entry->payload ()->m_dataCallback.IsNull ())
+        entry->payload ()->m_dataCallback (entry->payload ()->GetInterest (), data);
       m_this->m_pendingInterests.erase (entry);
 
       entry = m_this->m_pendingInterests.longest_prefix_match (data->GetName ());

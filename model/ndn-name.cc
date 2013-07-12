@@ -38,13 +38,13 @@ Name::Name (/* root */)
 {
 }
 
-Name::Name (const std::list<boost::reference_wrapper<const std::string> > &components)
-{
-  BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)
-    {
-      Add (component.get ());
-    }
-}
+// Name::Name (const std::list<boost::reference_wrapper<const std::string> > &components)
+// {
+//   BOOST_FOREACH (const boost::reference_wrapper<const std::string> &component, components)
+//     {
+//       Add (component.get ());
+//     }
+// }
 
 Name::Name (const std::list<std::string> &components)
 {

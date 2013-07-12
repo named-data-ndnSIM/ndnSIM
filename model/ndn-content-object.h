@@ -22,57 +22,19 @@
 #ifndef _NDN_CONTENT_OBJECT_HEADER_H_
 #define _NDN_CONTENT_OBJECT_HEADER_H_
 
-#include "ns3/integer.h"
-#include "ns3/header.h"
 #include "ns3/simple-ref-count.h"
-#include "ns3/trailer.h"
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
+#include "ns3/ptr.h"
 
-#include <string>
-#include <vector>
-#include <list>
-
-#include "ndn-name.h"
+#include <ns3/ndn-name.h>
 
 namespace ns3 {
 namespace ndn {
 
 /**
- * ContentObject header
- *
- * Only few important fields are actually implemented in the simulation
- *
- * @see http://ndnsim.net/new-packet-formats.html
- *
- * Optimized and simplified formatting of Interest packets
- *
- *	ContentObject ::= Signature
- *                	  Name
- *                   	  Content
- *
- *      0                   1                   2                   3
- *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
- *      ~                                                               ~
- *      ~                           Signature                           ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
- *      ~                                                               ~
- *      ~                             Name                              ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
- *      ~                                                               ~
- *      ~                           Content                             ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
+ * @ingroup Ndn
+ * @brief ContentObject header
  */
 class ContentObject : public SimpleRefCount<ContentObject>
 {

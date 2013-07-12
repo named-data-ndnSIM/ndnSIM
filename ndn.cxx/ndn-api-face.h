@@ -28,6 +28,8 @@
 #include <ns3/callback.h>
 #include <ns3/ndn-face.h>
 #include <ns3/ndn-name.h>
+#include <ns3/ndn-interest.h>
+#include <ns3/ndn-content-object.h>
 
 namespace ns3 {
 namespace ndn {
@@ -58,7 +60,7 @@ public:
   /**
    * @brief Shutdown the API face
    */
-  void
+  virtual void
   Shutdown ();
   
   /**
@@ -114,6 +116,15 @@ private:
 private:
   ApiFacePriv *m_this;
 };
+
+
+/// @cond include_hidden
+#ifdef PYTHON_SCAN
+struct CallbackVoidNameInterest : public Callback<void, Ptr<const Name>, Ptr<const Interest> > { };
+struct CallbackVoidInterestContentObject : public Callback<void, Ptr<const Interest>, Ptr<const ContentObject> > { };
+struct CallbackVoidInterest : public Callback<void, Ptr<const Interest> > { };
+#endif
+/// @endcond
 
 }
 }

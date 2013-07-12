@@ -210,6 +210,8 @@ def register_types(module):
     module.add_class('BooleanChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## boolean.h (module 'core'): ns3::BooleanValue [class]
     module.add_class('BooleanValue', import_from_module='ns.core', parent=root_module['ns3::AttributeValue'])
+    ## callback-based-app.h (module 'ndnSIM'): ns3::CallbackBasedApp [class]
+    module.add_class('CallbackBasedApp', parent=root_module['ns3::Application'])
     ## callback.h (module 'core'): ns3::CallbackChecker [class]
     module.add_class('CallbackChecker', import_from_module='ns.core', parent=root_module['ns3::AttributeChecker'])
     ## callback.h (module 'core'): ns3::CallbackImplBase [class]
@@ -381,8 +383,8 @@ def register_types_ns3_ndn(module):
     ## ndn-app-face.h (module 'ndnSIM'): ns3::ndn::AppFace [class]
     module.add_class('AppFace', parent=root_module['ns3::ndn::Face'])
     module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
-    module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     module.add_container('std::list< std::string >', 'std::string', container_type='list')
+    module.add_container('std::list< boost::reference_wrapper< std::string const > >', 'boost::reference_wrapper< std::basic_string< char, std::char_traits< char >, std::allocator< char > > const >', container_type='list')
     typehandlers.add_type_alias('ns3::ndn::ContentObject', 'ns3::ndn::ContentObjectHeader')
     typehandlers.add_type_alias('ns3::ndn::ContentObject*', 'ns3::ndn::ContentObjectHeader*')
     typehandlers.add_type_alias('ns3::ndn::ContentObject&', 'ns3::ndn::ContentObjectHeader&')
@@ -563,6 +565,7 @@ def register_methods(root_module):
     register_Ns3AttributeValue_methods(root_module, root_module['ns3::AttributeValue'])
     register_Ns3BooleanChecker_methods(root_module, root_module['ns3::BooleanChecker'])
     register_Ns3BooleanValue_methods(root_module, root_module['ns3::BooleanValue'])
+    register_Ns3CallbackBasedApp_methods(root_module, root_module['ns3::CallbackBasedApp'])
     register_Ns3CallbackChecker_methods(root_module, root_module['ns3::CallbackChecker'])
     register_Ns3CallbackImplBase_methods(root_module, root_module['ns3::CallbackImplBase'])
     register_Ns3CallbackValue_methods(root_module, root_module['ns3::CallbackValue'])
@@ -3634,6 +3637,36 @@ def register_Ns3BooleanValue_methods(root_module, cls):
                    [param('bool', 'value')])
     return
 
+def register_Ns3CallbackBasedApp_methods(root_module, cls):
+    ## callback-based-app.h (module 'ndnSIM'): ns3::CallbackBasedApp::CallbackBasedApp(ns3::CallbackBasedApp const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::CallbackBasedApp const &', 'arg0')])
+    ## callback-based-app.h (module 'ndnSIM'): ns3::CallbackBasedApp::CallbackBasedApp() [constructor]
+    cls.add_constructor([])
+    ## callback-based-app.h (module 'ndnSIM'): static ns3::TypeId ns3::CallbackBasedApp::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## callback-based-app.h (module 'ndnSIM'): void ns3::CallbackBasedApp::SetOnStartCallback(ns3::Callback<void, ns3::Ptr<ns3::Application>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onStart) [member function]
+    cls.add_method('SetOnStartCallback', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::Ptr< ns3::Application >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onStart')])
+    ## callback-based-app.h (module 'ndnSIM'): void ns3::CallbackBasedApp::SetOnStopCallback(ns3::Callback<void, ns3::Ptr<ns3::Application>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onStart) [member function]
+    cls.add_method('SetOnStopCallback', 
+                   'void', 
+                   [param('ns3::Callback< void, ns3::Ptr< ns3::Application >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onStart')])
+    ## callback-based-app.h (module 'ndnSIM'): void ns3::CallbackBasedApp::StartApplication() [member function]
+    cls.add_method('StartApplication', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    ## callback-based-app.h (module 'ndnSIM'): void ns3::CallbackBasedApp::StopApplication() [member function]
+    cls.add_method('StopApplication', 
+                   'void', 
+                   [], 
+                   visibility='protected', is_virtual=True)
+    return
+
 def register_Ns3CallbackChecker_methods(root_module, cls):
     ## callback.h (module 'core'): ns3::CallbackChecker::CallbackChecker() [constructor]
     cls.add_constructor([])
@@ -5629,8 +5662,6 @@ def register_Ns3NdnName_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::Name const &', 'arg0')])
     ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name() [constructor]
     cls.add_constructor([])
-    ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::list<boost::reference_wrapper<const std::basic_string<char, std::char_traits<char>, std::allocator<char> > >,std::allocator<boost::reference_wrapper<const std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const & components) [constructor]
-    cls.add_constructor([param('std::list< boost::reference_wrapper< std::string const > > const &', 'components')])
     ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::list<std::string, std::allocator<std::string> > const & components) [constructor]
     cls.add_constructor([param('std::list< std::string > const &', 'components')])
     ## ndn-name.h (module 'ndnSIM'): ns3::ndn::Name::Name(std::string const & prefix) [constructor]
@@ -6050,12 +6081,13 @@ def register_Ns3NdnApiFace_methods(root_module, cls):
     ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::Shutdown() [member function]
     cls.add_method('Shutdown', 
                    'void', 
-                   [])
-    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::ExpressInterest(ns3::Ptr<ns3::ndn::Interest> interest, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Interest>,ns3::Ptr<const ns3::ndn::ContentObject>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onData, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Interest>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onTimeout) [member function]
+                   [], 
+                   is_virtual=True)
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::ExpressInterest(ns3::Ptr<ns3::ndn::Interest> interest, ns3::Callback<void, ns3::Ptr<ns3::ndn::Interest const>, ns3::Ptr<ns3::ndn::ContentObject const>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onData, ns3::Callback<void, ns3::Ptr<ns3::ndn::Interest const>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onTimeout) [member function]
     cls.add_method('ExpressInterest', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Interest >', 'interest'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Interest const >, ns3::Ptr< ns3::ndn::ContentObject const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onData'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Interest const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onTimeout')])
-    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::SetInterestFilter(ns3::Ptr<ns3::ndn::Name const> prefix, ns3::Callback<void,ns3::Ptr<const ns3::ndn::Name>,ns3::Ptr<const ns3::ndn::Interest>,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty,ns3::empty> onInterest) [member function]
+    ## ndn-api-face.h (module 'ndnSIM'): void ns3::ndn::ApiFace::SetInterestFilter(ns3::Ptr<ns3::ndn::Name const> prefix, ns3::Callback<void, ns3::Ptr<ns3::ndn::Name const>, ns3::Ptr<ns3::ndn::Interest const>, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty> onInterest) [member function]
     cls.add_method('SetInterestFilter', 
                    'void', 
                    [param('ns3::Ptr< ns3::ndn::Name const >', 'prefix'), param('ns3::Callback< void, ns3::Ptr< ns3::ndn::Name const >, ns3::Ptr< ns3::ndn::Interest const >, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty, ns3::empty >', 'onInterest')])

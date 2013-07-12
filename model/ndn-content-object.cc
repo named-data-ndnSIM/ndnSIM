@@ -35,6 +35,10 @@ ContentObject::ContentObject (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_payload (payload)
   , m_wire (0)
 {
+  if (m_payload == 0) // just in case
+    {
+      m_payload = Create<Packet> ();
+    }
 }
 
 ContentObject::ContentObject (const ContentObject &other)

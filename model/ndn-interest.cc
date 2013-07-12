@@ -38,6 +38,10 @@ Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_payload (payload)
   , m_wire (0)
 {
+  if (m_payload == 0) // just in case
+    {
+      m_payload = Create<Packet> ();
+    }
 }
 
 Interest::Interest (const Interest &interest)

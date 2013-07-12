@@ -121,7 +121,7 @@ Face::UnRegisterProtocolHandlers ()
 bool
 Face::SendInterest (Ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION (this << interest);
+  NS_LOG_FUNCTION (this << boost::cref (*this) << interest->GetName ());
 
   if (!IsUp ())
     {

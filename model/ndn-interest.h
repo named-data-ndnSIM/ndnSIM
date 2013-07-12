@@ -22,17 +22,12 @@
 #ifndef _NDN_INTEREST_HEADER_H_
 #define _NDN_INTEREST_HEADER_H_
 
-#include "ns3/integer.h"
-#include "ns3/header.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
+#include "ns3/ptr.h"
 
-#include <string>
-#include <vector>
-#include <list>
-
-#include "ndn-name.h"
+#include <ns3/ndn-name.h>
 
 namespace ns3 {
 

@@ -91,6 +91,40 @@ private:
   Ptr<ndn::Interest> m_interest;
 };
 
+/**
+ * @brief Routines to serialize/deserialize Data packet in ndnSIM format
+ *
+ * Only few important fields are actually implemented in the simulation
+ *
+ * @see http://ndnsim.net/new-packet-formats.html
+ *
+ *	ContentObject ::= Signature
+ *                	  Name
+ *                   	  Content
+ *
+ *      0                   1                   2                   3
+ *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+ *      ~                                                               ~
+ *      ~                           Signature                           ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+ *      ~                                                               ~
+ *      ~                             Name                              ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *      |            Length             |                               |
+ *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+ *      ~                                                               ~
+ *      ~                           Content                             ~
+ *      |							        |	
+ *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ */
 class Data : public Header
 {
 public:

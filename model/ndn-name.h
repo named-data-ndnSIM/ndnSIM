@@ -58,12 +58,12 @@ public:
    */
   Name ();
 
-  /**
-   * \brief Constructor
-   * Creates a prefix from a list of strings where every string represents a prefix component
-   * @param[in] components A list of strings
-   */
-  Name (const std::list<boost::reference_wrapper<const std::string> > &components);
+  // /**
+  //  * \brief Constructor
+  //  * Creates a prefix from a list of strings where every string represents a prefix component
+  //  * @param[in] components A list of strings
+  //  */
+  // Name (const std::list<boost::reference_wrapper<const std::string> > &components);
 
   /**
    * \brief Constructor
