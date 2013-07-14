@@ -1,6 +1,6 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2011 University of California, Los Angeles
+ * Copyright (c) 2011-2013 University of California, Los Angeles
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -340,6 +340,50 @@ AnnotatedTopologyReader::ApplySettings ()
       // cout << "Link: " << Findlink.GetFromNode () << ", " << link.GetToNode () << endl;
       string tmp;
 
+      ////////////////////////////////////////////////
+      if (link.GetAttributeFailSafe ("MaxPackets", tmp))
+        {
+          NS_LOG_INFO ("MaxPackets = " + link.GetAttribute ("MaxPackets"));
+
+          try
+            {
+              uint32_t maxPackets = boost::lexical_cast<uint32_t> (link.GetAttribute ("MaxPackets"));
+
+              // compatibility mode. Only DropTailQueue is supported
+              p2p.SetQueue ("ns3::DropTailQueue",
+                            "MaxPackets", UintegerValue (maxPackets));
+            }
+          catch (...)
+            {
+              typedef boost::tokenizer<boost::escaped_list_separator<char> > tokenizer;
+              tokenizer tok (link.GetAttribute ("MaxPackets"));
+
+              tokenizer::iterator token = tok.begin ();
+              p2p.SetQueue (*token);
+
+              for (token ++; token != tok.end (); token ++)
+                {
+                  boost::escaped_list_separator<char> separator ('\\', '=', '\"');
+                  tokenizer attributeTok (*token, separator);
+
+                  tokenizer::iterator attributeToken = attributeTok.begin ();
+
+                  string attribute = *attributeToken;
+                  attributeToken++;
+
+                  if (attributeToken == attributeTok.end ())
+                    {
+                      NS_LOG_ERROR ("Queue attribute [" << *token << "] should be in form <Attribute>=<Value>");
+                      continue;
+                    }
+
+                  string value = *attributeToken;
+
+                  p2p.SetQueueAttribute (attribute, StringValue (value));
+                }
+            }
+        }
+      
       if (link.GetAttributeFailSafe ("DataRate", tmp))
         {
           NS_LOG_INFO ("DataRate = " + link.GetAttribute("DataRate"));
@@ -365,14 +409,14 @@ AnnotatedTopologyReader::ApplySettings ()
 
           tokenizer::iterator token = tok.begin ();
           ObjectFactory factory (*token);
-          
+
           for (token ++; token != tok.end (); token ++)
             {
               boost::escaped_list_separator<char> separator ('\\', '=', '\"');
               tokenizer attributeTok (*token, separator);
 
               tokenizer::iterator attributeToken = attributeTok.begin ();
-              
+
               string attribute = *attributeToken;
               attributeToken++;
 
@@ -381,7 +425,7 @@ AnnotatedTopologyReader::ApplySettings ()
                   NS_LOG_ERROR ("ErrorModel attribute [" << *token << "] should be in form <Attribute>=<Value>");
                   continue;
                 }
-              
+
               string value = *attributeToken;
 
               factory.Set (attribute, StringValue (value));
@@ -390,23 +434,6 @@ AnnotatedTopologyReader::ApplySettings ()
           nd.Get (0)->SetAttribute ("ReceiveErrorModel", PointerValue (factory.Create<ErrorModel> ()));
           nd.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (factory.Create<ErrorModel> ()));
         }
-
-      ////////////////////////////////////////////////
-      if (link.GetAttributeFailSafe ("MaxPackets", tmp))
-        {
-          NS_LOG_INFO ("MaxPackets = " + link.GetAttribute ("MaxPackets"));
-
-          PointerValue txQueue;
-
-          link.GetToNetDevice ()->GetAttribute ("TxQueue", txQueue);
-          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);
-          txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
-
-          link.GetFromNetDevice ()->GetAttribute ("TxQueue", txQueue);
-          NS_ASSERT (txQueue.Get<DropTailQueue> () != 0);
-          txQueue.Get<DropTailQueue> ()->SetAttribute ("MaxPackets", StringValue (link.GetAttribute ("MaxPackets")));
-        }
-
     }
 }
 
@@ -544,7 +571,7 @@ AnnotatedTopologyReader::SaveGraphviz (const std::string &file)
       // add_edge (node->second, otherNode->second, m_graph);
       boost::add_edge (from->second, to->second, graph);
     }
-  
+
   ofstream of (file.c_str ());
   boost::property_map<Graph, boost::vertex_name_t>::type names = get (boost::vertex_name, graph);
   write_graphviz (of, graph, make_name_writer (names));
