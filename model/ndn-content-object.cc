@@ -120,6 +120,18 @@ ContentObject::GetSignature () const
 }
 
 void
+ContentObject::SetKeyLocator (Ptr<Name> keyLocator)
+{
+  m_keyLocator = keyLocator;
+}
+
+Ptr<const Name>
+ContentObject::GetKeyLocator () const
+{
+  return m_keyLocator;
+}
+
+void
 ContentObject::Print (std::ostream &os) const
 {
   os << "D: " << GetName ();

@@ -127,6 +127,7 @@ def build(bld):
 
         "apps/ndn-app.h",
 
+        "model/ndn-common.h",
         "model/ndn-l3-protocol.h",
         "model/ndn-face.h",
         "model/ndn-app-face.h",
@@ -148,6 +149,9 @@ def build(bld):
 
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
+
+        "model/wire/ndnsim.h",
+        "model/wire/ccnb.h",
 
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",

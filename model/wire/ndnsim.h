@@ -11,7 +11,7 @@
 #ifndef NDN_WIRE_NDNSIM_H
 #define NDN_WIRE_NDNSIM_H
 
-#include "../ndn-common.h"
+#include "ns3/ndn-common.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
 

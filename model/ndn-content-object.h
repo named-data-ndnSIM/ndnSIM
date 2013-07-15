@@ -122,6 +122,21 @@ public:
   uint32_t
   GetSignature () const;
 
+  /**
+   * @brief Set key locator
+   * @param keyLocator name of the key
+   */
+  void
+  SetKeyLocator (Ptr<Name> keyLocator);
+
+  /**
+   * @brief Get key locator
+   *
+   * Note that only <KeyName> option for the key locator is supported
+   */
+  Ptr<const Name>
+  GetKeyLocator () const;
+  
   //////////////////////////////////////////////////////////////////
   /**
    * @brief Get payload of data packet
@@ -170,6 +185,7 @@ private:
   Time m_timestamp;
   uint32_t m_signature; // 0, means no signature, any other value application dependent (not a real signature)
   Ptr<Packet> m_payload;
+  Ptr<Name> m_keyLocator;
 
   mutable Ptr<const Packet> m_wire;
 };
