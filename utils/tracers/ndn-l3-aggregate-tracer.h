@@ -64,7 +64,7 @@ public:
   /**
    * @brief Helper method to install tracers on all simulation nodes
    *
-   * @param file File to which traces will be written
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
    * @param averagingPeriod How often data will be written into the trace file (default, every half second)
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
@@ -78,7 +78,7 @@ public:
    * @brief Helper method to install tracers on the selected simulation nodes
    *
    * @param nodes Nodes on which to install tracer
-   * @param file File to which traces will be written
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
    * @param averagingPeriod How often data will be written into the trace file (default, every half second)
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
@@ -92,7 +92,7 @@ public:
    * @brief Helper method to install tracers on a specific simulation node
    *
    * @param nodes Nodes on which to install tracer
-   * @param file File to which traces will be written
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
    * @param averagingPeriod How often data will be written into the trace file (default, every half second)
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
@@ -102,7 +102,16 @@ public:
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
   Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
 
-private:
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param outputStream Smart pointer to a stream
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   */
   static Ptr<L3AggregateTracer>
   Install (Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream, Time averagingPeriod = Seconds (0.5));
 
@@ -115,40 +124,31 @@ protected:
   Print (std::ostream &os) const;
 
   virtual void
-  OutInterests  (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>);
+  OutInterests  (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  InInterests   (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>);
+  InInterests   (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  DropInterests (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>);
+  DropInterests (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  OutNacks  (std::string context,
-             Ptr<const Interest>, Ptr<const Face>);
+  OutNacks  (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  InNacks   (std::string context,
-             Ptr<const Interest>, Ptr<const Face>);
+  InNacks   (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  DropNacks (std::string context,
-             Ptr<const Interest>, Ptr<const Face>);
+  DropNacks (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  OutData  (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
+  OutData  (Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
 
   virtual void
-  InData   (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
+  InData   (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
   virtual void
-  DropData (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
+  DropData (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
 
 
   virtual void

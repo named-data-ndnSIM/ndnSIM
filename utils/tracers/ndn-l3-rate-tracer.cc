@@ -44,25 +44,37 @@ NS_LOG_COMPONENT_DEFINE ("ndn.L3RateTracer");
 namespace ns3 {
 namespace ndn {
 
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
 
 boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
 L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<L3RateTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
        node++)
     {
-      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
-
-      Ptr<L3RateTracer> trace = Create<L3RateTracer> (outputStream, *node);
-      trace->SetAveragingPeriod (averagingPeriod);
+      Ptr<L3RateTracer> trace = Install (*node, outputStream, averagingPeriod);
       tracers.push_back (trace);
     }
 
@@ -74,6 +86,97 @@ L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seco
     }
 
   return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
+L3RateTracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<L3RateTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      Ptr<L3RateTracer> trace = Install (*node, outputStream, averagingPeriod);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
+L3RateTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<L3RateTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  Ptr<L3RateTracer> trace = Install (node, outputStream, averagingPeriod);
+  tracers.push_back (trace);
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ptr<L3RateTracer>
+L3RateTracer::Install (Ptr<Node> node,
+                            boost::shared_ptr<std::ostream> outputStream,
+                            Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  NS_LOG_DEBUG ("Node: " << node->GetId ());
+
+  Ptr<L3RateTracer> trace = Create<L3RateTracer> (outputStream, node);
+  trace->SetAveragingPeriod (averagingPeriod);
+
+  return trace;
 }
 
 
@@ -206,56 +309,49 @@ L3RateTracer::Print (std::ostream &os) const
 
 
 void
-L3RateTracer::OutInterests  (std::string context,
-                             Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::OutInterests  (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outInterests ++;
   m_stats[face].get<1> ().m_outInterests += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::InInterests   (std::string context,
-                             Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::InInterests   (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inInterests ++;
   m_stats[face].get<1> ().m_inInterests += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::DropInterests (std::string context,
-                             Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::DropInterests (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropInterests ++;
   m_stats[face].get<1> ().m_dropInterests += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::OutNacks  (std::string context,
-                         Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::OutNacks  (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outNacks ++;
   m_stats[face].get<1> ().m_outNacks += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::InNacks   (std::string context,
-                         Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::InNacks   (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inNacks ++;
   m_stats[face].get<1> ().m_inNacks += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::DropNacks (std::string context,
-                         Ptr<const Interest> header, Ptr<const Face> face)
+L3RateTracer::DropNacks (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropNacks ++;
   m_stats[face].get<1> ().m_dropNacks += header->GetSerializedSize ();
 }
 
 void
-L3RateTracer::OutData  (std::string context,
-                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::OutData  (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -263,8 +359,7 @@ L3RateTracer::OutData  (std::string context,
 }
 
 void
-L3RateTracer::InData   (std::string context,
-                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::InData   (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -272,8 +367,7 @@ L3RateTracer::InData   (std::string context,
 }
 
 void
-L3RateTracer::DropData (std::string context,
-                        Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3RateTracer::DropData (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

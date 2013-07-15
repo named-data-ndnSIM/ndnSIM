@@ -39,24 +39,37 @@ NS_LOG_COMPONENT_DEFINE ("Ipv4RateL3Tracer");
 
 namespace ns3 {
 
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
+
 boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
 Ipv4RateL3Tracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<Ipv4RateL3Tracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
        node++)
     {
-      NS_LOG_DEBUG ("Node: " << lexical_cast<string> ((*node)->GetId ()));
-
-      Ptr<Ipv4RateL3Tracer> trace = Create<Ipv4RateL3Tracer> (outputStream, *node);
-      trace->SetAveragingPeriod (averagingPeriod);
+      Ptr<Ipv4RateL3Tracer> trace = Install (*node, outputStream, averagingPeriod);
       tracers.push_back (trace);
     }
 
@@ -68,6 +81,97 @@ Ipv4RateL3Tracer::InstallAll (const std::string &file, Time averagingPeriod/* = 
     }
 
   return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
+Ipv4RateL3Tracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<Ipv4RateL3Tracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      Ptr<Ipv4RateL3Tracer> trace = Install (*node, outputStream, averagingPeriod);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
+Ipv4RateL3Tracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<Ipv4RateL3Tracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  Ptr<Ipv4RateL3Tracer> trace = Install (node, outputStream, averagingPeriod);
+  tracers.push_back (trace);
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ptr<Ipv4RateL3Tracer>
+Ipv4RateL3Tracer::Install (Ptr<Node> node,
+                           boost::shared_ptr<std::ostream> outputStream,
+                           Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  NS_LOG_DEBUG ("Node: " << node->GetId ());
+
+  Ptr<Ipv4RateL3Tracer> trace = Create<Ipv4RateL3Tracer> (outputStream, node);
+  trace->SetAveragingPeriod (averagingPeriod);
+
+  return trace;
 }
 
 
@@ -157,24 +261,21 @@ Ipv4RateL3Tracer::Print (std::ostream &os) const
 }
 
 void
-Ipv4RateL3Tracer::Rx  (std::string context,
-                       Ptr<const Packet> packet, Ptr<Ipv4> ipv4,  uint32_t iface)
+Ipv4RateL3Tracer::Rx  (Ptr<const Packet> packet, Ptr<Ipv4> ipv4,  uint32_t iface)
 {
   m_stats[iface].get<0> ().m_in ++;
   m_stats[iface].get<1> ().m_in += packet->GetSize ();
 }
 
 void
-Ipv4RateL3Tracer::Tx   (std::string context,
-                        Ptr<const Packet> packet, Ptr<Ipv4> ipv4,  uint32_t iface)
+Ipv4RateL3Tracer::Tx   (Ptr<const Packet> packet, Ptr<Ipv4> ipv4,  uint32_t iface)
 {
   m_stats[iface].get<0> ().m_out ++;
   m_stats[iface].get<1> ().m_out += packet->GetSize ();
 }
 
 void
-Ipv4RateL3Tracer::Drop (std::string context,
-                        const Ipv4Header &header, Ptr<const Packet> packet, Ipv4L3Protocol::DropReason, Ptr<Ipv4> ipv4, uint32_t iface)
+Ipv4RateL3Tracer::Drop (const Ipv4Header &header, Ptr<const Packet> packet, Ipv4L3Protocol::DropReason, Ptr<Ipv4> ipv4, uint32_t iface)
 {
   m_stats[iface].get<0> ().m_drop ++;
   m_stats[iface].get<1> ().m_drop += packet->GetSize ();

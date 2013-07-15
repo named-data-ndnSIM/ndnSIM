@@ -44,6 +44,11 @@ using namespace std;
 namespace ns3 {
 namespace ndn {
 
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
 
 boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
 CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
@@ -52,20 +57,27 @@ CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds 
   using namespace std;
   
   std::list<Ptr<CsTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
        node++)
     {
-      NS_LOG_DEBUG ("Node: " << (*node)->GetId ());
-
-      Ptr<CsTracer> trace = Create<CsTracer> (outputStream, *node);
-      trace->SetAveragingPeriod (averagingPeriod);
+      Ptr<CsTracer> trace = Install (*node, outputStream, averagingPeriod);
       tracers.push_back (trace);
     }
 
@@ -77,6 +89,97 @@ CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds 
     }
 
   return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+CsTracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<CsTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      Ptr<CsTracer> trace = Install (*node, outputStream, averagingPeriod);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+CsTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<CsTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  Ptr<CsTracer> trace = Install (node, outputStream, averagingPeriod);
+  tracers.push_back (trace);
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ptr<CsTracer>
+CsTracer::Install (Ptr<Node> node,
+                       boost::shared_ptr<std::ostream> outputStream,
+                       Time averagingPeriod/* = Seconds (0.5)*/)
+{
+  NS_LOG_DEBUG ("Node: " << node->GetId ());
+
+  Ptr<CsTracer> trace = Create<CsTracer> (outputStream, node);
+  trace->SetAveragingPeriod (averagingPeriod);
+
+  return trace;
 }
 
 //////////////////////////////////////////////////////////////////////////////

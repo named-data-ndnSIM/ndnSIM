@@ -45,16 +45,13 @@ public:
   Print (std::ostream &os) const = 0;
   
   virtual void
-  Rx  (std::string context,
-       Ptr<const Packet>, Ptr<Ipv4>,  uint32_t) = 0;
+  Rx  (Ptr<const Packet>, Ptr<Ipv4>,  uint32_t) = 0;
 
   virtual void
-  Tx   (std::string context,
-        Ptr<const Packet>, Ptr<Ipv4>,  uint32_t) = 0;
+  Tx   (Ptr<const Packet>, Ptr<Ipv4>,  uint32_t) = 0;
 
   virtual void
-  Drop (std::string context,
-        const Ipv4Header &, Ptr<const Packet>, Ipv4L3Protocol::DropReason, Ptr<Ipv4>, uint32_t) = 0;
+  Drop (const Ipv4Header &, Ptr<const Packet>, Ipv4L3Protocol::DropReason, Ptr<Ipv4>, uint32_t) = 0;
 
 protected:
   std::string m_node;

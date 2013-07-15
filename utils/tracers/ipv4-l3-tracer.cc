@@ -23,6 +23,7 @@
 #include "ns3/config.h"
 #include "ns3/names.h"
 #include "ns3/callback.h"
+#include "ns3/ipv4-l3-protocol.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -47,12 +48,10 @@ Ipv4L3Tracer::Ipv4L3Tracer (Ptr<Node> node)
 void
 Ipv4L3Tracer::Connect ()
 {
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Tx",
-                   MakeCallback (&Ipv4L3Tracer::Tx, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Rx",
-                   MakeCallback (&Ipv4L3Tracer::Rx, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::Ipv4L3Protocol/Drop",
-                   MakeCallback (&Ipv4L3Tracer::Drop, this));
+  Ptr<Ipv4L3Protocol> ip = m_nodePtr->GetObject<Ipv4L3Protocol> ();
+  ip->TraceConnectWithoutContext ("Tx",   MakeCallback (&Ipv4L3Tracer::Tx, this));
+  ip->TraceConnectWithoutContext ("Rx",   MakeCallback (&Ipv4L3Tracer::Rx, this));
+  ip->TraceConnectWithoutContext ("Drop", MakeCallback (&Ipv4L3Tracer::Drop, this));
 }
 
 } // namespace ns3

@@ -24,6 +24,7 @@
 #include "ns3/config.h"
 #include "ns3/names.h"
 #include "ns3/callback.h"
+#include "ns3/ndn-forwarding-strategy.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -65,33 +66,24 @@ L3Tracer::~L3Tracer ()
 void
 L3Tracer::Connect ()
 {
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/OutInterests",
-                   MakeCallback (&L3Tracer::OutInterests, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/InInterests",
-                   MakeCallback (&L3Tracer::InInterests, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/DropInterests",
-                   MakeCallback (&L3Tracer::DropInterests, this));
-
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/OutData",
-                   MakeCallback (&L3Tracer::OutData, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/InData",
-                   MakeCallback (&L3Tracer::InData, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/DropData",
-                   MakeCallback (&L3Tracer::DropData, this));
+  Ptr<ForwardingStrategy> fw = m_nodePtr->GetObject<ForwardingStrategy> ();
+  
+  fw->TraceConnectWithoutContext ("OutInterests",  MakeCallback (&L3Tracer::OutInterests, this));
+  fw->TraceConnectWithoutContext ("InInterests",   MakeCallback (&L3Tracer::InInterests, this));
+  fw->TraceConnectWithoutContext ("DropInterests", MakeCallback (&L3Tracer::DropInterests, this));
+                                                                           
+  fw->TraceConnectWithoutContext ("OutData",  MakeCallback (&L3Tracer::OutData, this));
+  fw->TraceConnectWithoutContext ("InData",   MakeCallback (&L3Tracer::InData, this));
+  fw->TraceConnectWithoutContext ("DropData", MakeCallback (&L3Tracer::DropData, this));
 
   // only for some strategies
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/OutNacks",
-                   MakeCallback (&L3Tracer::OutNacks, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/InNacks",
-                   MakeCallback (&L3Tracer::InNacks, this));
-  Config::Connect ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/DropNacks",
-                   MakeCallback (&L3Tracer::DropNacks, this));
-
+  fw->TraceConnectWithoutContext ("OutNacks",  MakeCallback (&L3Tracer::OutNacks, this));
+  fw->TraceConnectWithoutContext ("InNacks",   MakeCallback (&L3Tracer::InNacks, this));
+  fw->TraceConnectWithoutContext ("DropNacks", MakeCallback (&L3Tracer::DropNacks, this));
+  
   // satisfied/timed out PIs
-  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/SatisfiedInterests",
-                                 MakeCallback (&L3Tracer::SatisfiedInterests, this));
-  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ForwardingStrategy/TimedOutInterests",
-                                 MakeCallback (&L3Tracer::TimedOutInterests, this));
+  fw->TraceConnectWithoutContext ("SatisfiedInterests", MakeCallback (&L3Tracer::SatisfiedInterests, this));
+  fw->TraceConnectWithoutContext ("TimedOutInterests", MakeCallback (&L3Tracer::TimedOutInterests, this));
 }
 
 } // namespace ndn

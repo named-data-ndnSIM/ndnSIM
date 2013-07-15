@@ -41,6 +41,12 @@ NS_LOG_COMPONENT_DEFINE ("ndn.L3AggregateTracer");
 namespace ns3 {
 namespace ndn {
 
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
+
 boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3AggregateTracer> > >
 L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
@@ -48,11 +54,21 @@ L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* =
   using namespace std;
 
   std::list<Ptr<L3AggregateTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
@@ -79,11 +95,21 @@ L3AggregateTracer::Install (const NodeContainer &nodes, const std::string &file,
   using namespace std;
 
   std::list<Ptr<L3AggregateTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeContainer::Iterator node = nodes.Begin ();
        node != nodes.End ();
@@ -110,11 +136,21 @@ L3AggregateTracer::Install (Ptr<Node> node, const std::string &file, Time averag
   using namespace std;
 
   std::list<Ptr<L3AggregateTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   Ptr<L3AggregateTracer> trace = Install (node, outputStream, averagingPeriod);
   tracers.push_back (trace);
@@ -262,56 +298,49 @@ L3AggregateTracer::Print (std::ostream &os) const
 }
 
 void
-L3AggregateTracer::OutInterests  (std::string context,
-                                  Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::OutInterests  (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outInterests ++;
   m_stats[face].get<1> ().m_outInterests += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::InInterests   (std::string context,
-                                  Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::InInterests   (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inInterests ++;
   m_stats[face].get<1> ().m_inInterests += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::DropInterests (std::string context,
-                                  Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::DropInterests (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropInterests ++;
   m_stats[face].get<1> ().m_dropInterests += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::OutNacks  (std::string context,
-                              Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::OutNacks  (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outNacks ++;
   m_stats[face].get<1> ().m_outNacks += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::InNacks   (std::string context,
-                              Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::InNacks   (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inNacks ++;
   m_stats[face].get<1> ().m_inNacks += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::DropNacks (std::string context,
-                              Ptr<const Interest> header, Ptr<const Face> face)
+L3AggregateTracer::DropNacks (Ptr<const Interest> header, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropNacks ++;
   m_stats[face].get<1> ().m_dropNacks += header->GetSerializedSize ();
 }
 
 void
-L3AggregateTracer::OutData  (std::string context,
-                             Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3AggregateTracer::OutData  (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                              bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -319,8 +348,7 @@ L3AggregateTracer::OutData  (std::string context,
 }
 
 void
-L3AggregateTracer::InData   (std::string context,
-                             Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3AggregateTracer::InData   (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                              Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -328,8 +356,7 @@ L3AggregateTracer::InData   (std::string context,
 }
 
 void
-L3AggregateTracer::DropData (std::string context,
-                             Ptr<const ContentObject> header, Ptr<const Packet> payload,
+L3AggregateTracer::DropData (Ptr<const ContentObject> header, Ptr<const Packet> payload,
                              Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

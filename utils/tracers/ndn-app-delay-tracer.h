@@ -25,6 +25,7 @@
 #include "ns3/simple-ref-count.h"
 #include <ns3/nstime.h>
 #include <ns3/event-id.h>
+#include <ns3/node-container.h>
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -49,8 +50,7 @@ public:
   /**
    * @brief Helper method to install tracers on all simulation nodes
    *
-   * @param file File to which traces will be written
-   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
    *
    * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
@@ -59,6 +59,46 @@ public:
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
   InstallAll (const std::string &file);
 
+  /**
+   * @brief Helper method to install tracers on the selected simulation nodes
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+  Install (const NodeContainer &nodes, const std::string &file);
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+  Install (Ptr<Node> node, const std::string &file);
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param outputStream Smart pointer to a stream
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   */
+  static Ptr<AppDelayTracer>
+  Install (Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream);
+  
   /**
    * @brief Trace constructor that attaches to all applications on the node using node's pointer
    * @param os    reference to the output stream

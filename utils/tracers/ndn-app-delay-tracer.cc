@@ -44,6 +44,11 @@ using namespace std;
 namespace ns3 {
 namespace ndn {
 
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
 
 boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
 AppDelayTracer::InstallAll (const std::string &file)
@@ -52,19 +57,27 @@ AppDelayTracer::InstallAll (const std::string &file)
   using namespace std;
 
   std::list<Ptr<AppDelayTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream = make_shared<std::ofstream> ();
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
        node++)
     {
-      NS_LOG_DEBUG ("Node: " << (*node)->GetId ());
-
-      Ptr<AppDelayTracer> trace = Create<AppDelayTracer> (outputStream, *node);
+      Ptr<AppDelayTracer> trace = Install (*node, outputStream);
       tracers.push_back (trace);
     }
 
@@ -76,6 +89,95 @@ AppDelayTracer::InstallAll (const std::string &file)
     }
 
   return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+AppDelayTracer::Install (const NodeContainer &nodes, const std::string &file)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<AppDelayTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  for (NodeContainer::Iterator node = nodes.Begin ();
+       node != nodes.End ();
+       node++)
+    {
+      Ptr<AppDelayTracer> trace = Install (*node, outputStream);
+      tracers.push_back (trace);
+    }
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+AppDelayTracer::Install (Ptr<Node> node, const std::string &file)
+{
+  using namespace boost;
+  using namespace std;
+
+  std::list<Ptr<AppDelayTracer> > tracers;
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+
+      if (!os->is_open ())
+        return boost::make_tuple (outputStream, tracers);
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
+
+  Ptr<AppDelayTracer> trace = Install (node, outputStream);
+  tracers.push_back (trace);
+
+  if (tracers.size () > 0)
+    {
+      // *m_l3RateTrace << "# "; // not necessary for R's read.table
+      tracers.front ()->PrintHeader (*outputStream);
+      *outputStream << "\n";
+    }
+
+  return boost::make_tuple (outputStream, tracers);
+}
+
+
+Ptr<AppDelayTracer>
+AppDelayTracer::Install (Ptr<Node> node,
+                         boost::shared_ptr<std::ostream> outputStream)
+{
+  NS_LOG_DEBUG ("Node: " << node->GetId ());
+
+  Ptr<AppDelayTracer> trace = Create<AppDelayTracer> (outputStream, node);
+
+  return trace;
 }
 
 //////////////////////////////////////////////////////////////////////////////

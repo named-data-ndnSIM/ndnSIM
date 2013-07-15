@@ -25,6 +25,7 @@
 
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
+#include "ns3/node-container.h"
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -59,6 +60,47 @@ public:
   static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
 
+  /**
+   * @brief Helper method to install tracers on the selected simulation nodes
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
+  Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   *
+   */
+  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<Ipv4RateL3Tracer> > >
+  Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param outputStream Smart pointer to a stream
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   *
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   */
+  static Ptr<Ipv4RateL3Tracer>
+  Install (Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream, Time averagingPeriod = Seconds (0.5));
+  
   void
   SetAveragingPeriod (const Time &period);
 
@@ -69,16 +111,13 @@ public:
   Print (std::ostream &os) const;
 
   virtual void
-  Rx  (std::string context,
-       Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
+  Rx  (Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
 
   virtual void
-  Tx   (std::string context,
-        Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
+  Tx   (Ptr<const Packet>, Ptr<Ipv4>,  uint32_t);
 
   virtual void
-  Drop (std::string context,
-        const Ipv4Header &, Ptr<const Packet>, Ipv4L3Protocol::DropReason, Ptr<Ipv4>, uint32_t);
+  Drop (const Ipv4Header &, Ptr<const Packet>, Ipv4L3Protocol::DropReason, Ptr<Ipv4>, uint32_t);
 
 private:
   void

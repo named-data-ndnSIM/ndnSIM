@@ -18,8 +18,8 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef CCNX_L3_TRACER_H
-#define CCNX_L3_TRACER_H
+#ifndef NDN_L3_TRACER_H
+#define NDN_L3_TRACER_H
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
@@ -39,9 +39,6 @@ class Face;
 
 class Interest;
 class ContentObject;
-
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
 
 /**
  * @brief Base class for network-layer (incoming/outgoing Interests and Data) tracing of NDN stack
@@ -87,41 +84,32 @@ protected:
   Connect ();
 
   virtual void
-  OutInterests  (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>) = 0;
+  OutInterests  (Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  InInterests   (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>) = 0;
+  InInterests   (Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  DropInterests (std::string context,
-                 Ptr<const Interest>, Ptr<const Face>) = 0;
+  DropInterests (Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  OutNacks  (std::string context,
-             Ptr<const Interest>, Ptr<const Face>) = 0;
+  OutNacks  (Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  InNacks   (std::string context,
-             Ptr<const Interest>, Ptr<const Face>) = 0;
+  InNacks   (Ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  DropNacks (std::string context,
-             Ptr<const Interest>, Ptr<const Face>) = 0;
+  DropNacks (Ptr<const Interest>, Ptr<const Face>) = 0;
 
 
   virtual void
-  OutData  (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
+  OutData  (Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
 
   virtual void
-  InData   (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
+  InData   (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
 
   virtual void
-  DropData (std::string context,
-            Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
+  DropData (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
 
   virtual void
   SatisfiedInterests (Ptr<const pit::Entry>) = 0;
@@ -180,4 +168,4 @@ operator << (std::ostream &os, const L3Tracer &tracer)
 } // namespace ndn
 } // namespace ns3
 
-#endif // CCNX_L3_TRACER_H
+#endif // NDN_L3_TRACER_H
