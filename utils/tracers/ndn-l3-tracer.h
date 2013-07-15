@@ -136,6 +136,9 @@ protected:
       m_dropData      = 0;
       m_satisfiedInterests = 0;
       m_timedOutInterests = 0;
+
+      m_outSatisfiedInterests = 0;
+      m_outTimedOutInterests = 0;
     }
 
     double m_inInterests;
@@ -149,6 +152,8 @@ protected:
     double m_dropData;
     double m_satisfiedInterests;
     double m_timedOutInterests;
+    double m_outSatisfiedInterests;
+    double m_outTimedOutInterests;
   };
 };
 

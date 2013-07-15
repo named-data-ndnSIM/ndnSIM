@@ -295,6 +295,12 @@ L3RateTracer::Print (std::ostream &os) const
       PRINTER ("InData",   m_inData);
       PRINTER ("OutData",  m_outData);
       PRINTER ("DropData", m_dropData);
+
+      PRINTER ("InSatisfiedInterests", m_satisfiedInterests);
+      PRINTER ("InTimedOutInterests", m_timedOutInterests);
+
+      PRINTER ("OutSatisfiedInterests", m_outSatisfiedInterests);
+      PRINTER ("OutTimedOutInterests", m_outTimedOutInterests);
     }
 
   {
@@ -375,17 +381,45 @@ L3RateTracer::DropData (Ptr<const ContentObject> header, Ptr<const Packet> paylo
 }
 
 void
-L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry>)
+L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry> entry)
 {
   m_stats[0].get<0> ().m_satisfiedInterests ++;
   // no "size" stats
+
+  for (pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
+       i != entry->GetIncoming ().end ();
+       i++)
+    {
+      m_stats[i->m_face].get<0> ().m_satisfiedInterests ++;
+    }
+
+  for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
+       i != entry->GetOutgoing ().end ();
+       i++)
+    {
+      m_stats[i->m_face].get<0> ().m_outSatisfiedInterests ++;
+    }
 }
 
 void
-L3RateTracer::TimedOutInterests (Ptr<const pit::Entry>)
+L3RateTracer::TimedOutInterests (Ptr<const pit::Entry> entry)
 {
   m_stats[0].get<0> ().m_timedOutInterests ++;
   // no "size" stats
+  
+  for (pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
+       i != entry->GetIncoming ().end ();
+       i++)
+    {
+      m_stats[i->m_face].get<0> ().m_timedOutInterests ++;
+    }
+
+  for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
+       i != entry->GetOutgoing ().end ();
+       i++)
+    {
+      m_stats[i->m_face].get<0> ().m_outTimedOutInterests ++;
+    }
 }
 
 
