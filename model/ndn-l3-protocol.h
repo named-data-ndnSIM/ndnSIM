@@ -74,9 +74,9 @@ public:
    */
   static TypeId GetTypeId ();
 
-  static const uint16_t ETHERNET_FRAME_TYPE; ///< \brief Ethernet Frame Type of Ndn
-  // static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of Ndn
-  // static const uint16_t UDP_PORT;            ///< \brief UDP port of Ndn
+  static const uint16_t ETHERNET_FRAME_TYPE; ///< @brief Ethernet Frame Type of Ndn
+  static const uint16_t IP_STACK_PORT;       ///< @brief TCP/UDP port for NDN stack
+  // static const uint16_t IP_PROTOCOL_TYPE;    ///< \brief IP protocol type of NDN
 
   /**
    * \brief Default constructor. Creates an empty stack without forwarding strategy set

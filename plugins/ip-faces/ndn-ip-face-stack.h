@@ -76,9 +76,10 @@ protected:
   Ptr<Node> m_node;
   
   bool m_enableTcp;
-  // bool m_enableUdp;
+  bool m_enableUdp;
   
   Ptr<Socket> m_tcpServer;
+  Ptr<Socket> m_udpServer;
 };
 
 } // namespace ndn

@@ -38,8 +38,6 @@ namespace ndn {
     
 NS_OBJECT_ENSURE_REGISTERED (IpFaceStack);
 
-const uint16_t NDN_IP_STACK_PORT = 9695;
-
 TypeId
 IpFaceStack::GetTypeId (void)
 {
@@ -53,10 +51,10 @@ IpFaceStack::GetTypeId (void)
                    MakeBooleanAccessor (&IpFaceStack::m_enableTcp),
                    MakeBooleanChecker ())
 
-    // .AddAttribute ("EnableUDP", "Enable ability to create UDP faces",
-    //                BooleanValue (true),
-    //                MakeBooleanAccessor (&IpFaceStack::m_enableUdp),
-    //                MakeBooleanChecker ())
+    .AddAttribute ("EnableUDP", "Enable ability to create UDP faces",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&IpFaceStack::m_enableUdp),
+                   MakeBooleanChecker ())
     ;
   return tid;
 }
@@ -92,12 +90,20 @@ IpFaceStack::StartServer () // Called at time specified by Start
     {
       m_tcpServer = Socket::CreateSocket (m_node, TcpSocketFactory::GetTypeId ());
   
-      m_tcpServer->Bind (InetSocketAddress (Ipv4Address::GetAny (), NDN_IP_STACK_PORT));
+      m_tcpServer->Bind (InetSocketAddress (Ipv4Address::GetAny (), L3Protocol::IP_STACK_PORT));
       m_tcpServer->Listen ();
 
       m_tcpServer->SetAcceptCallback (MakeCallback (&IpFaceStack::OnTcpConnectionRequest, this),
                                       MakeCallback (&IpFaceStack::OnTcpConnectionAccept, this));
+    }
 
+  if (m_enableUdp)
+    {
+      // m_udpServer = Socket::CreateSocket (m_node, UdpSocketFactory::GetTypeId ());  
+      // m_udpServer->Bind (InetSocketAddress (Ipv4Address::GetAny (), L3Protocol::IP_STACK_PORT));
+      
+      // m_udpServer->SetRecvCallback (MakeCallback (&IpFaceStack::HandleRead, this));
+      // #error "Broken"
     }
 }
 

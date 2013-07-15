@@ -37,8 +37,6 @@ NS_LOG_COMPONENT_DEFINE ("ndn.TcpFace");
 namespace ns3 {
 namespace ndn {
 
-const uint16_t NDN_IP_STACK_PORT = 9695;
-
 TcpFace::FaceMap TcpFace::s_map;
 
 class TcpBoundaryHeader : public Header
@@ -262,7 +260,7 @@ TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address)
   
   socket->SetConnectCallback (MakeCallback (&TcpFace::OnConnect, face),
                               MakeNullCallback< void, Ptr< Socket > > ());
-  socket->Connect (InetSocketAddress (address, NDN_IP_STACK_PORT));
+  socket->Connect (InetSocketAddress (address, L3Protocol::IP_STACK_PORT));
 
   s_map.insert (std::make_pair (address, face));
 
@@ -286,7 +284,7 @@ TcpFace::OnConnect (Ptr<Socket> socket)
 std::ostream&
 TcpFace::Print (std::ostream& os) const
 {
-  os << "dev=tcp(" << GetId () << ")";
+  os << "dev=tcp(" << GetId () << ", " << m_address << ")";
   return os;
 }
 
