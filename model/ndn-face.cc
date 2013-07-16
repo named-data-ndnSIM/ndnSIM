@@ -34,10 +34,8 @@
 
 #include "ns3/ndn-header-helper.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
-#include "ns3/ndnSIM/model/wire/ndnsim.h"
-#include "ns3/ndnSIM/model/wire/ndnsim/wire-ndnsim.h"
-#include "ns3/ndnSIM/model/wire/ccnb.h"
-#include "ns3/ndnSIM/model/wire/ccnb/wire-ccnb.h"
+
+#include "ns3/ndn-wire.h"
 
 #include <boost/ref.hpp>
 
@@ -58,14 +56,6 @@ Face::GetTypeId ()
                    TypeId::ATTR_GET, // allow only getting it.
                    UintegerValue (0),
                    MakeUintegerAccessor (&Face::m_id),
-                   MakeUintegerChecker<uint32_t> ())
-
-    .AddAttribute ("WireFormat",
-                   "Default wire format for the face.  The face will be accepting packets "
-                   "in any supported packet formats, but if encoding requested, it will "
-                   "use default wire format to encode (0 for ndnSIM (default), 1 for CCNb)",
-                   UintegerValue (WIRE_FORMAT_NDNSIM),
-                   MakeUintegerAccessor (&Face::m_wireFormat),
                    MakeUintegerChecker<uint32_t> ())
     ;
   return tid;
@@ -139,16 +129,7 @@ Face::SendInterest (Ptr<const Interest> interest)
       return false;
     }
 
-  Ptr<Packet> packet;
-  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
-    packet = wire::ndnSIM::Interest::ToWire (interest);
-  else if (m_wireFormat == WIRE_FORMAT_CCNB)
-    packet = wire::ccnb::Interest::ToWire (interest);
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-    }
-  return Send (packet);
+  return Send (Wire::FromInterest (interest));
 }
 
 bool
@@ -161,16 +142,7 @@ Face::SendData (Ptr<const ContentObject> data)
       return false;
     }
 
-  Ptr<Packet> packet;
-  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
-    packet = wire::ndnSIM::Data::ToWire (data);
-  else if (m_wireFormat == WIRE_FORMAT_CCNB)
-    packet = wire::ccnb::Data::ToWire (data);
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-    }
-  return Send (packet);
+  return Send (Wire::FromData (data));
 }
 
 bool
@@ -205,33 +177,20 @@ Face::Receive (Ptr<const Packet> p)
       switch (type)
         {
         case HeaderHelper::INTEREST_NDNSIM:
-          {
-            Ptr<Interest> interest = wire::ndnSIM::Interest::FromWire (packet);
-            return ReceiveInterest (interest);
-          }
-        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
-          {
-            Ptr<ContentObject> data = wire::ndnSIM::Data::FromWire (packet);
-            return ReceiveData (data);
-          }
+          return ReceiveInterest (Wire::ToInterest (packet, Wire::WIRE_FORMAT_NDNSIM));
         case HeaderHelper::INTEREST_CCNB:
-          {
-            Ptr<Interest> interest = wire::ccnb::Interest::FromWire (packet);
-            return ReceiveInterest (interest);
-          }
+          return ReceiveInterest (Wire::ToInterest (packet, Wire::WIRE_FORMAT_CCNB));
+        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
+          return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_NDNSIM));
         case HeaderHelper::CONTENT_OBJECT_CCNB:
-          {
-            Ptr<ContentObject> data = wire::ccnb::Data::FromWire (packet);
-            return ReceiveData (data);
-          }
+          return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_CCNB));
         }
 
       // exception will be thrown if packet is not recognized
     }
   catch (UnknownHeaderException)
     {
-      NS_ASSERT_MSG (false, "Unknown NDN header. Should not happen");
-      NS_LOG_ERROR ("Unknown NDN header. Should not happen");
+      NS_FATAL_ERROR ("Unknown NDN header. Should not happen");
       return false;
     }
 }
@@ -312,56 +271,6 @@ operator<< (std::ostream& os, const Face &face)
   face.Print (os);
   return os;
 }
-
-uint32_t
-Face::NameToWireSize (Ptr<Name> name) const
-{
-  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
-    return wire::NdnSim::SerializedSizeName (*name);
-  else if (m_wireFormat == WIRE_FORMAT_CCNB)
-    return wire::Ccnb::SerializedSizeName (*name);
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-    }
-  return 0;
-}
-  
-/**
- * @brief Convert name to wire format
- */
-void
-Face::NameToWire (Buffer::Iterator start, Ptr<const Name> name) const
-{
-  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
-    wire::NdnSim::SerializedSizeName (*name);
-  else if (m_wireFormat == WIRE_FORMAT_CCNB)
-    wire::Ccnb::SerializedSizeName (*name);
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-    }
-}
-
-/**
- * @brief Convert name from wire format
- */
-Ptr<Name>
-Face::NameFromWire (Buffer::Iterator start) const
-{
-  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
-    return wire::NdnSim::DeserializeName (start);
-  else if (m_wireFormat == WIRE_FORMAT_CCNB)
-    {
-      return wire::Ccnb::DeserializeName (start);
-    }
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-    }
-  return 0;
-}
-
 
 } // namespace ndn
 } // namespace ns3

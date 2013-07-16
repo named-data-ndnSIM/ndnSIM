@@ -56,7 +56,7 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
 
-  Config::SetDefault ("ns3::ndn::Face::WireFormat", StringValue ("1"));
+  Config::SetGlobal ("ndn::WireFormat", StringValue ("1"));
 
   // Creating nodes
   NodeContainer nodes;

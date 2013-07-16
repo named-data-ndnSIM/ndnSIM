@@ -59,12 +59,6 @@ class Face :
     public Object
 {
 public:
-  enum
-    {
-      WIRE_FORMAT_NDNSIM = 0,
-      WIRE_FORMAT_CCNB = 1
-    };
-
   static TypeId
   GetTypeId ();
 
@@ -248,27 +242,6 @@ public:
   bool
   operator< (const Face &face) const;
 
-  ///////////////////////////////////////////////////////////////////////////////
-  // Helpers to create wire-formatted data in default wire format, since settings about
-  // the wire format belong to the face
-  /*
-   * @brief Get size of buffer to fit wire-formatted name object
-   */
-  uint32_t
-  NameToWireSize (Ptr<Name> name) const;
-  
-  /**
-   * @brief Convert name to wire format
-   */
-  void
-  NameToWire (Buffer::Iterator start, Ptr<const Name> name) const;
-
-  /**
-   * @brief Convert name from wire format
-   */
-  Ptr<Name>
-  NameFromWire (Buffer::Iterator start) const;
-  
 protected:
   /**
    * @brief Send packet down to the stack (towards app or network)
@@ -296,8 +269,6 @@ protected:
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
 
 private:
-  uint32_t m_wireFormat;
-
   InterestHandler m_upstreamInterestHandler;
   DataHandler m_upstreamDataHandler;
   bool m_ifup;

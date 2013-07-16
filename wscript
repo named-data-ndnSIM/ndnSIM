@@ -150,8 +150,7 @@ def build(bld):
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
 
-        "model/wire/ndnsim.h",
-        "model/wire/ccnb.h",
+        "model/wire/ndn-wire.h",
 
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",

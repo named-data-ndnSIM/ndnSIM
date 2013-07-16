@@ -55,11 +55,6 @@ public:
   Interest (const Interest &interest);
 
   /**
-   * @brief Another version of copy constructor
-   */
-  Interest (Ptr<const Interest> interest);  
-
-  /**
    * \brief Set interest name
    *
    * @param name smart pointer to Name
