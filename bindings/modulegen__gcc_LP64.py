@@ -336,6 +336,8 @@ def register_types_ns3_ndn(module):
     module.add_class('ContentStore', parent=root_module['ns3::Object'])
     ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Face [class]
     module.add_class('Face', parent=root_module['ns3::Object'])
+    ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Face [enumeration]
+    module.add_enum('', ['WIRE_FORMAT_NDNSIM', 'WIRE_FORMAT_CCNB'], outer_class=root_module['ns3::ndn::Face'])
     ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Face::Flags [enumeration]
     module.add_enum('Flags', ['APPLICATION'], outer_class=root_module['ns3::ndn::Face'])
     ## ndn-face-container.h (module 'ndnSIM'): ns3::ndn::FaceContainer [class]
@@ -424,6 +426,12 @@ def register_types_ns3_ndn(module):
     nested_module = module.add_cpp_namespace('pit')
     register_types_ns3_ndn_pit(nested_module)
     
+    
+    ## Register a nested module for the namespace wire
+    
+    nested_module = module.add_cpp_namespace('wire')
+    register_types_ns3_ndn_wire(nested_module)
+    
 
 def register_types_ns3_ndn_cs(module):
     root_module = module.get_root()
@@ -475,6 +483,38 @@ def register_types_ns3_ndn_pit(module):
     module.add_container('std::set< ns3::ndn::pit::IncomingFace >', 'ns3::ndn::pit::IncomingFace', container_type='set')
     module.add_container('std::set< ns3::ndn::pit::OutgoingFace >', 'ns3::ndn::pit::OutgoingFace', container_type='set')
     module.add_container('std::set< unsigned int >', 'unsigned int', container_type='set')
+
+def register_types_ns3_ndn_wire(module):
+    root_module = module.get_root()
+    
+    
+    ## Register a nested module for the namespace ccnb
+    
+    nested_module = module.add_cpp_namespace('ccnb')
+    register_types_ns3_ndn_wire_ccnb(nested_module)
+    
+    
+    ## Register a nested module for the namespace ndnSIM
+    
+    nested_module = module.add_cpp_namespace('ndnSIM')
+    register_types_ns3_ndn_wire_ndnSIM(nested_module)
+    
+
+def register_types_ns3_ndn_wire_ccnb(module):
+    root_module = module.get_root()
+    
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Data [class]
+    module.add_class('Data', parent=root_module['ns3::Header'])
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Interest [class]
+    module.add_class('Interest', parent=root_module['ns3::Header'])
+
+def register_types_ns3_ndn_wire_ndnSIM(module):
+    root_module = module.get_root()
+    
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Data [class]
+    module.add_class('Data', parent=root_module['ns3::Header'])
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Interest [class]
+    module.add_class('Interest', parent=root_module['ns3::Header'])
 
 def register_methods(root_module):
     register_Ns3Address_methods(root_module, root_module['ns3::Address'])
@@ -640,6 +680,10 @@ def register_methods(root_module):
     register_Ns3NdnPitOutgoingFace_methods(root_module, root_module['ns3::ndn::pit::OutgoingFace'])
     register_Ns3NdnPitI_face_methods(root_module, root_module['ns3::ndn::pit::i_face'])
     register_Ns3NdnPitI_retx_methods(root_module, root_module['ns3::ndn::pit::i_retx'])
+    register_Ns3NdnWireCcnbData_methods(root_module, root_module['ns3::ndn::wire::ccnb::Data'])
+    register_Ns3NdnWireCcnbInterest_methods(root_module, root_module['ns3::ndn::wire::ccnb::Interest'])
+    register_Ns3NdnWireNdnSIMData_methods(root_module, root_module['ns3::ndn::wire::ndnSIM::Data'])
+    register_Ns3NdnWireNdnSIMInterest_methods(root_module, root_module['ns3::ndn::wire::ndnSIM::Interest'])
     return
 
 def register_Ns3Address_methods(root_module, cls):
@@ -4897,6 +4941,15 @@ def register_Ns3NdnContentObject_methods(root_module, cls):
                    'uint32_t', 
                    [], 
                    is_const=True)
+    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObject::SetKeyLocator(ns3::Ptr<ns3::ndn::Name> keyLocator) [member function]
+    cls.add_method('SetKeyLocator', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Name >', 'keyLocator')])
+    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Name const> ns3::ndn::ContentObject::GetKeyLocator() const [member function]
+    cls.add_method('GetKeyLocator', 
+                   'ns3::Ptr< ns3::ndn::Name const >', 
+                   [], 
+                   is_const=True)
     ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::ContentObject::SetPayload(ns3::Ptr<ns3::Packet> payload) [member function]
     cls.add_method('SetPayload', 
                    'void', 
@@ -6492,6 +6545,218 @@ def register_Ns3NdnPitI_retx_methods(root_module, cls):
     cls.add_constructor([param('ns3::ndn::pit::i_retx const &', 'arg0')])
     return
 
+def register_Ns3NdnWireCcnbData_methods(root_module, cls):
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Data::Data(ns3::ndn::wire::ccnb::Data const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::wire::ccnb::Data const &', 'arg0')])
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Data::Data() [constructor]
+    cls.add_constructor([])
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Data::Data(ns3::Ptr<ns3::ndn::ContentObject> data) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::ContentObject >', 'data')])
+    ## ccnb.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ccnb::Data::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::ContentObject> ns3::ndn::wire::ccnb::Data::FromWire(ns3::Ptr<ns3::Packet> packet) [member function]
+    cls.add_method('FromWire', 
+                   'ns3::Ptr< ns3::ndn::ContentObject >', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
+                   is_static=True)
+    ## ccnb.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::ContentObject> ns3::ndn::wire::ccnb::Data::GetData() [member function]
+    cls.add_method('GetData', 
+                   'ns3::Ptr< ns3::ndn::ContentObject >', 
+                   [])
+    ## ccnb.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::wire::ccnb::Data::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ccnb::Data::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::wire::ccnb::Data::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ccnb.h (module 'ndnSIM'): void ns3::ndn::wire::ccnb::Data::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): void ns3::ndn::wire::ccnb::Data::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::Ptr<ns3::Packet> ns3::ndn::wire::ccnb::Data::ToWire(ns3::Ptr<ns3::ndn::ContentObject const> data) [member function]
+    cls.add_method('ToWire', 
+                   'ns3::Ptr< ns3::Packet >', 
+                   [param('ns3::Ptr< ns3::ndn::ContentObject const >', 'data')], 
+                   is_static=True)
+    return
+
+def register_Ns3NdnWireCcnbInterest_methods(root_module, cls):
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Interest::Interest(ns3::ndn::wire::ccnb::Interest const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::wire::ccnb::Interest const &', 'arg0')])
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Interest::Interest() [constructor]
+    cls.add_constructor([])
+    ## ccnb.h (module 'ndnSIM'): ns3::ndn::wire::ccnb::Interest::Interest(ns3::Ptr<ns3::ndn::Interest> interest) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::Interest >', 'interest')])
+    ## ccnb.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ccnb::Interest::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::Interest> ns3::ndn::wire::ccnb::Interest::FromWire(ns3::Ptr<ns3::Packet> packet) [member function]
+    cls.add_method('FromWire', 
+                   'ns3::Ptr< ns3::ndn::Interest >', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
+                   is_static=True)
+    ## ccnb.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::wire::ccnb::Interest::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Interest> ns3::ndn::wire::ccnb::Interest::GetInterest() [member function]
+    cls.add_method('GetInterest', 
+                   'ns3::Ptr< ns3::ndn::Interest >', 
+                   [])
+    ## ccnb.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ccnb::Interest::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::wire::ccnb::Interest::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ccnb.h (module 'ndnSIM'): void ns3::ndn::wire::ccnb::Interest::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): void ns3::ndn::wire::ccnb::Interest::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## ccnb.h (module 'ndnSIM'): static ns3::Ptr<ns3::Packet> ns3::ndn::wire::ccnb::Interest::ToWire(ns3::Ptr<ns3::ndn::Interest const> interest) [member function]
+    cls.add_method('ToWire', 
+                   'ns3::Ptr< ns3::Packet >', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'interest')], 
+                   is_static=True)
+    return
+
+def register_Ns3NdnWireNdnSIMData_methods(root_module, cls):
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Data::Data(ns3::ndn::wire::ndnSIM::Data const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::wire::ndnSIM::Data const &', 'arg0')])
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Data::Data() [constructor]
+    cls.add_constructor([])
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Data::Data(ns3::Ptr<ns3::ndn::ContentObject> data) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::ContentObject >', 'data')])
+    ## ndnsim.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ndnSIM::Data::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::ContentObject> ns3::ndn::wire::ndnSIM::Data::FromWire(ns3::Ptr<ns3::Packet> packet) [member function]
+    cls.add_method('FromWire', 
+                   'ns3::Ptr< ns3::ndn::ContentObject >', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
+                   is_static=True)
+    ## ndnsim.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::ContentObject> ns3::ndn::wire::ndnSIM::Data::GetData() [member function]
+    cls.add_method('GetData', 
+                   'ns3::Ptr< ns3::ndn::ContentObject >', 
+                   [])
+    ## ndnsim.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::wire::ndnSIM::Data::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ndnSIM::Data::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::wire::ndnSIM::Data::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ndnsim.h (module 'ndnSIM'): void ns3::ndn::wire::ndnSIM::Data::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): void ns3::ndn::wire::ndnSIM::Data::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::Ptr<ns3::Packet> ns3::ndn::wire::ndnSIM::Data::ToWire(ns3::Ptr<ns3::ndn::ContentObject const> data) [member function]
+    cls.add_method('ToWire', 
+                   'ns3::Ptr< ns3::Packet >', 
+                   [param('ns3::Ptr< ns3::ndn::ContentObject const >', 'data')], 
+                   is_static=True)
+    return
+
+def register_Ns3NdnWireNdnSIMInterest_methods(root_module, cls):
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Interest::Interest(ns3::ndn::wire::ndnSIM::Interest const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::wire::ndnSIM::Interest const &', 'arg0')])
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Interest::Interest() [constructor]
+    cls.add_constructor([])
+    ## ndnsim.h (module 'ndnSIM'): ns3::ndn::wire::ndnSIM::Interest::Interest(ns3::Ptr<ns3::ndn::Interest> interest) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::ndn::Interest >', 'interest')])
+    ## ndnsim.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ndnSIM::Interest::Deserialize(ns3::Buffer::Iterator start) [member function]
+    cls.add_method('Deserialize', 
+                   'uint32_t', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::Interest> ns3::ndn::wire::ndnSIM::Interest::FromWire(ns3::Ptr<ns3::Packet> packet) [member function]
+    cls.add_method('FromWire', 
+                   'ns3::Ptr< ns3::ndn::Interest >', 
+                   [param('ns3::Ptr< ns3::Packet >', 'packet')], 
+                   is_static=True)
+    ## ndnsim.h (module 'ndnSIM'): ns3::TypeId ns3::ndn::wire::ndnSIM::Interest::GetInstanceTypeId() const [member function]
+    cls.add_method('GetInstanceTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Interest> ns3::ndn::wire::ndnSIM::Interest::GetInterest() [member function]
+    cls.add_method('GetInterest', 
+                   'ns3::Ptr< ns3::ndn::Interest >', 
+                   [])
+    ## ndnsim.h (module 'ndnSIM'): uint32_t ns3::ndn::wire::ndnSIM::Interest::GetSerializedSize() const [member function]
+    cls.add_method('GetSerializedSize', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::TypeId ns3::ndn::wire::ndnSIM::Interest::GetTypeId() [member function]
+    cls.add_method('GetTypeId', 
+                   'ns3::TypeId', 
+                   [], 
+                   is_static=True)
+    ## ndnsim.h (module 'ndnSIM'): void ns3::ndn::wire::ndnSIM::Interest::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): void ns3::ndn::wire::ndnSIM::Interest::Serialize(ns3::Buffer::Iterator start) const [member function]
+    cls.add_method('Serialize', 
+                   'void', 
+                   [param('ns3::Buffer::Iterator', 'start')], 
+                   is_const=True, is_virtual=True)
+    ## ndnsim.h (module 'ndnSIM'): static ns3::Ptr<ns3::Packet> ns3::ndn::wire::ndnSIM::Interest::ToWire(ns3::Ptr<ns3::ndn::Interest const> interest) [member function]
+    cls.add_method('ToWire', 
+                   'ns3::Ptr< ns3::Packet >', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'interest')], 
+                   is_static=True)
+    return
+
 def register_functions(root_module):
     module = root_module
     register_functions_ns3_FatalImpl(module.get_submodule('FatalImpl'), root_module)
@@ -6514,6 +6779,7 @@ def register_functions_ns3_ndn(module, root_module):
     register_functions_ns3_ndn_fib(module.get_submodule('fib'), root_module)
     register_functions_ns3_ndn_fw(module.get_submodule('fw'), root_module)
     register_functions_ns3_ndn_pit(module.get_submodule('pit'), root_module)
+    register_functions_ns3_ndn_wire(module.get_submodule('wire'), root_module)
     return
 
 def register_functions_ns3_ndn_cs(module, root_module):
@@ -6526,6 +6792,17 @@ def register_functions_ns3_ndn_fw(module, root_module):
     return
 
 def register_functions_ns3_ndn_pit(module, root_module):
+    return
+
+def register_functions_ns3_ndn_wire(module, root_module):
+    register_functions_ns3_ndn_wire_ccnb(module.get_submodule('ccnb'), root_module)
+    register_functions_ns3_ndn_wire_ndnSIM(module.get_submodule('ndnSIM'), root_module)
+    return
+
+def register_functions_ns3_ndn_wire_ccnb(module, root_module):
+    return
+
+def register_functions_ns3_ndn_wire_ndnSIM(module, root_module):
     return
 
 def main():
