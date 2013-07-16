@@ -59,6 +59,12 @@ class Face :
     public Object
 {
 public:
+  enum
+    {
+      WIRE_FORMAT_NDNSIM = 0,
+      WIRE_FORMAT_CCNB = 1
+    };
+
   static TypeId
   GetTypeId ();
 
@@ -190,7 +196,7 @@ public:
     {
       APPLICATION = 1 ///< @brief An application face
     };
-  
+
   /**
    * @brief Print information about the face into the stream
    * @param os stream to write information to
@@ -248,7 +254,7 @@ protected:
    */
   virtual bool
   Send (Ptr<Packet> packet);
-  
+
   /**
    * @brief Send packet up to the stack (towards forwarding strategy)
    */
@@ -269,6 +275,8 @@ protected:
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
 
 private:
+  uint32_t m_wireFormat;
+
   InterestHandler m_upstreamInterestHandler;
   DataHandler m_upstreamDataHandler;
   bool m_ifup;

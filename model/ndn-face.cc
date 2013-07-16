@@ -35,6 +35,7 @@
 #include "ns3/ndn-header-helper.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 #include "ns3/ndnSIM/model/wire/ndnsim.h"
+#include "ns3/ndnSIM/model/wire/ccnb.h"
 
 #include <boost/ref.hpp>
 
@@ -55,6 +56,14 @@ Face::GetTypeId ()
                    TypeId::ATTR_GET, // allow only getting it.
                    UintegerValue (0),
                    MakeUintegerAccessor (&Face::m_id),
+                   MakeUintegerChecker<uint32_t> ())
+
+    .AddAttribute ("WireFormat",
+                   "Default wire format for the face.  The face will be accepting packets "
+                   "in any supported packet formats, but if encoding requested, it will "
+                   "use default wire format to encode (0 for ndnSIM (default), 1 for CCNb)",
+                   UintegerValue (WIRE_FORMAT_NDNSIM),
+                   MakeUintegerAccessor (&Face::m_wireFormat),
                    MakeUintegerChecker<uint32_t> ())
     ;
   return tid;
@@ -128,7 +137,15 @@ Face::SendInterest (Ptr<const Interest> interest)
       return false;
     }
 
-  Ptr<Packet> packet = wire::ndnSIM::Interest::ToWire (interest);
+  Ptr<Packet> packet;
+  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
+    packet = wire::ndnSIM::Interest::ToWire (interest);
+  else if (m_wireFormat == WIRE_FORMAT_CCNB)
+    packet = wire::ccnb::Interest::ToWire (interest);
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported format requested");
+    }
   return Send (packet);
 }
 
@@ -142,7 +159,15 @@ Face::SendData (Ptr<const ContentObject> data)
       return false;
     }
 
-  Ptr<Packet> packet = wire::ndnSIM::Data::ToWire (data);
+  Ptr<Packet> packet;
+  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
+    packet = wire::ndnSIM::Data::ToWire (data);
+  else if (m_wireFormat == WIRE_FORMAT_CCNB)
+    packet = wire::ccnb::Data::ToWire (data);
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported format requested");
+    }
   return Send (packet);
 }
 
@@ -188,9 +213,15 @@ Face::Receive (Ptr<const Packet> p)
             return ReceiveData (data);
           }
         case HeaderHelper::INTEREST_CCNB:
+          {
+            Ptr<Interest> interest = wire::ccnb::Interest::FromWire (packet);
+            return ReceiveInterest (interest);
+          }
         case HeaderHelper::CONTENT_OBJECT_CCNB:
-          NS_FATAL_ERROR ("ccnb support is broken in this implementation");
-          return false;
+          {
+            Ptr<ContentObject> data = wire::ccnb::Data::FromWire (packet);
+            return ReceiveData (data);
+          }
         }
 
       // exception will be thrown if packet is not recognized
@@ -242,18 +273,11 @@ Face::GetMetric (void) const
   return m_metric;
 }
 
-/**
- * These are face states and may be distinct from
- * NetDevice states, such as found in real implementations
- * (where the device may be down but face state is still up).
- */
-
 void
 Face::SetFlags (uint32_t flags)
 {
   m_flags = flags;
 }
-
 
 bool
 Face::operator== (const Face &face) const
