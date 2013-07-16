@@ -55,7 +55,7 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
   uint8_t byte = 0;
   while (!start.IsEnd() && !(byte & CCN_TT_HBIT))
     {
-      value <<= 8;
+      value <<= 7;
       value += byte;
       byte = start.ReadU8 ();
       // Block::counter ++;
