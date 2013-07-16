@@ -3,7 +3,7 @@
  * Copyright (c) 2013, Regents of the University of California
  *                     Alexander Afanasyev
  * 
- * BSD license, See the doc/LICENSE file for more information
+ * GNU 3.0 license, See the LICENSE file for more information
  * 
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */

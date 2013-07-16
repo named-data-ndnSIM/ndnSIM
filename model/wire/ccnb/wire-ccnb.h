@@ -85,24 +85,6 @@ public:
   AppendCloser (Buffer::Iterator &start);
 
   /**
-   * @brief Append Name in CCNB encoding
-   * @param start Buffer to store serialized Interest
-   * @param name constant reference to Name object
-   *
-   * @returns written length
-   */
-  static size_t
-  AppendName (Buffer::Iterator &start, const Name &name);
-
-  /**
-   * @brief Estimate size of Name in CCNB encoding
-   * @param name constant reference to Name object
-   * @returns estimated length
-   */
-  static size_t
-  EstimateName (const Name &name);
-
-  /**
    * Append a binary timestamp as a BLOB using the ccn binary
    * Timestamp representation (12-bit fraction).
    *
@@ -187,6 +169,36 @@ public:
    */
   static size_t
   EstimateString (uint32_t dtag, const std::string &string);
+
+  ////////////////////////////////
+  // General use wire formatters
+  ////////////////////////////////
+  
+  /**
+   * @brief Append Name in CCNB encoding
+   * @param start Buffer to store serialized Interest
+   * @param name constant reference to Name object
+   *
+   * @returns written length
+   */
+  static size_t
+  SerializeName (Buffer::Iterator &start, const Name &name);
+
+  /**
+   * @brief Estimate size of Name in CCNB encoding
+   * @param name constant reference to Name object
+   * @returns estimated length
+   */
+  static size_t
+  SerializedSizeName (const Name &name);
+
+  /**
+   * @brief Deserialize Name from CCNB encodeing
+   * @param start Buffer that stores serialized Interest
+   * @param name Name object
+   */
+  static Ptr<Name>
+  DeserializeName (Buffer::Iterator &start);
 }; // Ccnb
 
 

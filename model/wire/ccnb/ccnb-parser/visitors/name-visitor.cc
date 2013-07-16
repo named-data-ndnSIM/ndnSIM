@@ -50,8 +50,7 @@ NameVisitor::visit (Dtag &n, boost::any param/*should be Name* */)
                                                                                       )));
       break;
     default:
-      // ignore any other components
-      // when parsing Exclude, there could be <Any /> and <Bloom /> tags
+      VoidDepthFirstVisitor::visit (n, param);
       break;
     }
 }

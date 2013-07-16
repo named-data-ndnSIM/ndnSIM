@@ -194,8 +194,8 @@ Data::Serialize (Buffer::Iterator start) const
   Ccnb::AppendCloser (start);                                    // </Signature>
 
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
-  Ccnb::AppendName (start, m_data->GetName()); //   <Component>...</Component>...
-  Ccnb::AppendCloser (start);                                  // </Name>
+  Ccnb::SerializeName (start, m_data->GetName());                                      //   <Component>...</Component>...
+  Ccnb::AppendCloser (start);                                                          // </Name>
 
   // fake signature
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_SignedInfo, CcnbParser::CCN_DTAG); // <SignedInfo>
@@ -234,7 +234,7 @@ Data::Serialize (Buffer::Iterator start) const
         Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_KeyName, CcnbParser::CCN_DTAG);    // <KeyName>
         {
           Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);       // <Name>
-          Ccnb::AppendName (start, *m_data->GetKeyLocator ());   //   <Component>...</Component>...
+          Ccnb::SerializeName (start, *m_data->GetKeyLocator ());         //   <Component>...</Component>...
           Ccnb::AppendCloser (start);                                     // </Name>
         }
         Ccnb::AppendCloser (start);                                     // </KeyName>
@@ -270,7 +270,7 @@ Data::GetSerializedSize () const
   written += 1;                                    // </Signature>
 
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>
-  written += Ccnb::EstimateName (m_data->GetName ()); //   <Component>...</Component>...
+  written += Ccnb::SerializedSizeName (m_data->GetName ()); //   <Component>...</Component>...
   written += 1;                                  // </Name>
 
   // fake signature
@@ -307,7 +307,7 @@ Data::GetSerializedSize () const
         written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_KeyName);    // <KeyName>
         {
           written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);       // <Name>
-          written += Ccnb::EstimateName (*m_data->GetKeyLocator ());        //   <Component>...</Component>...
+          written += Ccnb::SerializedSizeName (*m_data->GetKeyLocator ());        //   <Component>...</Component>...
           written += 1;                                               // </Name>
         }
         written += 1;                                               // </KeyName>
@@ -353,11 +353,7 @@ public:
         {
           // process name components
           Ptr<Name> name = Create<Name> ();
-
-          BOOST_FOREACH (Ptr<CcnbParser::Block> block, n.m_nestedTags)
-            {
-              block->accept (nameVisitor, &(*name));
-            }
+          n.accept (nameVisitor, GetPointer (name));
           contentObject.SetName (name);
           break;
         }
@@ -454,17 +450,9 @@ public:
           if (n.m_nestedTags.size ()!=1) // should be exactly one nested tag
             throw CcnbParser::CcnbDecodingException ();
 
-          Ptr<CcnbParser::BaseTag> nameTag = DynamicCast<CcnbParser::BaseTag>(n.m_nestedTags.front ());
-          if (nameTag == 0)
-            throw CcnbParser::CcnbDecodingException ();
-
           // process name components
           Ptr<Name> name = Create<Name> ();
-
-          BOOST_FOREACH (Ptr<CcnbParser::Block> block, nameTag->m_nestedTags)
-            {
-              block->accept (nameVisitor, &(*name));
-            }
+          n.accept (nameVisitor, GetPointer (name));
           contentObject.SetKeyLocator (name);
           break;
         }

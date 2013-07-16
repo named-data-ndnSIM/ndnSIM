@@ -55,6 +55,17 @@ Interest::Interest (const Interest &interest)
 {
 }
 
+Interest::Interest (Ptr<const Interest> interest)
+  : m_name             (Create<Name> (interest->GetName ()))
+  , m_scope            (interest->m_scope)
+  , m_interestLifetime (interest->m_interestLifetime)
+  , m_nonce            (interest->m_nonce)
+  , m_nackType         (interest->m_nackType)
+  , m_payload          (interest->GetPayload ()->Copy ())
+  , m_wire             (0)
+{
+}
+
 void
 Interest::SetName (Ptr<Name> name)
 {

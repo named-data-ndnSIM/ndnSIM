@@ -116,7 +116,7 @@ Interest::Serialize (Buffer::Iterator start) const
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
   
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG); // <Name>
-  Ccnb::AppendName (start, m_interest->GetName());                // <Component>...</Component>...
+  Ccnb::SerializeName (start, m_interest->GetName());                // <Component>...</Component>...
   Ccnb::AppendCloser (start);                               // </Name>
 
   // if (m_interest->GetMinSuffixComponents() >= 0)
@@ -183,7 +183,7 @@ Interest::GetSerializedSize () const
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>
   
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name); // <Name>
-  written += Ccnb::EstimateName (m_interest->GetName()); // <Component>...</Component>...
+  written += Ccnb::SerializedSizeName (m_interest->GetName()); // <Component>...</Component>...
   written += 1; // </Name>
 
   // if (m_interest->GetMinSuffixComponents() >= 0)
@@ -281,11 +281,7 @@ InterestVisitor::visit (CcnbParser::Dtag &n, boost::any param/*should be Interes
 
         // process name components
         Ptr<Name> name = Create<Name> ();
-        
-        BOOST_FOREACH (Ptr<CcnbParser::Block> block, n.m_nestedTags)
-          {
-            block->accept (nameVisitor, &(*name));
-          }
+        n.accept (nameVisitor, GetPointer (name));
         interest.SetName (name);
         break;
       }

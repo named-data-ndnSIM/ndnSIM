@@ -3,7 +3,7 @@
  * Copyright (c) 2013, Regents of the University of California
  *                     Alexander Afanasyev
  * 
- * BSD license, See the doc/LICENSE file for more information
+ * GNU 3.0 license, See the LICENSE file for more information
  * 
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
@@ -16,6 +16,8 @@ using namespace std;
 #include <ns3/packet.h>
 #include <ns3/log.h>
 
+#include "ndnsim/wire-ndnsim.h"
+
 NS_LOG_COMPONENT_DEFINE ("ndn.wire.ndnSIM");
 
 NDN_NAMESPACE_BEGIN
@@ -25,84 +27,6 @@ namespace ndnSIM {
 
 NS_OBJECT_ENSURE_REGISTERED (Interest);
 NS_OBJECT_ENSURE_REGISTERED (Data);
-
-
-class Name
-{
-public:
-  Name ()
-    : m_name (Create<ndn::Name> ())
-  {
-  }
-  
-  Name (Ptr<ndn::Name> name)
-    : m_name (name)
-  {
-  }
-
-  Ptr<ndn::Name>
-  GetName ()
-  {
-    return m_name;
-  }
-  
-  size_t
-  GetSerializedSize () const
-  {
-    size_t nameSerializedSize = 2;
-
-    for (std::list<std::string>::const_iterator i = m_name->begin ();
-         i != m_name->end ();
-         i++)
-      {
-        nameSerializedSize += 2 + i->size ();
-      }
-    NS_ASSERT_MSG (nameSerializedSize < 30000, "Name is too long (> 30kbytes)");
-
-    return nameSerializedSize;
-  }
-
-  uint32_t
-  Serialize (Buffer::Iterator start) const
-  {
-    Buffer::Iterator i = start;
-
-    i.WriteU16 (static_cast<uint16_t> (GetSerializedSize ()-2));
-
-    for (std::list<std::string>::const_iterator item = m_name->begin ();
-         item != m_name->end ();
-         item++)
-      {
-        i.WriteU16 (static_cast<uint16_t> (item->size ()));
-        i.Write (reinterpret_cast<const uint8_t*> (item->c_str ()), item->size ());
-      }
-
-    return i.GetDistanceFrom (start);
-  }
-
-  uint32_t
-  Deserialize (Buffer::Iterator start)
-  {
-    Buffer::Iterator i = start;
-
-    uint16_t nameLength = i.ReadU16 ();
-    while (nameLength > 0)
-      {
-        uint16_t length = i.ReadU16 ();
-        nameLength = nameLength - 2 - length;
-
-        uint8_t tmp[length];
-        i.Read (tmp, length);
-
-        m_name->Add (string (reinterpret_cast<const char*> (tmp), length));
-      }
-
-    return i.GetDistanceFrom (start);
-  }
-
-private:
-  Ptr<ndn::Name> m_name;
-};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +103,7 @@ Interest::GetSerializedSize (void) const
   size_t size =
     1/*version*/ + 1 /*type*/ + 2/*length*/ +
     (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
-     (Name (ConstCast<ndn::Name> (m_interest->GetNamePtr ())).GetSerializedSize ()) +
+     NdnSim::SerializedSizeName (m_interest->GetName ()) +
      (2 + 0)/* selectors */ +
      (2 + 0)/* options */);
   
@@ -205,8 +129,7 @@ Interest::Serialize (Buffer::Iterator start) const
   // rounding timestamp value to seconds
   start.WriteU16 (static_cast<uint16_t> (m_interest->GetInterestLifetime ().ToInteger (Time::S)));
 
-  uint32_t offset = Name (ConstCast<ndn::Name> (m_interest->GetNamePtr ())).Serialize (start);
-  start.Next (offset);
+  NdnSim::SerializeName (start, m_interest->GetName ());
   
   start.WriteU16 (0); // no selectors
   start.WriteU16 (0); // no options
@@ -231,10 +154,7 @@ Interest::Deserialize (Buffer::Iterator start)
 
   m_interest->SetInterestLifetime (Seconds (i.ReadU16 ()));
 
-  Name name;
-  uint32_t offset = name.Deserialize (i);
-  m_interest->SetName (name.GetName ());
-  i.Next (offset);
+  m_interest->SetName (NdnSim::DeserializeName (i));
   
   i.ReadU16 ();
   i.ReadU16 ();
@@ -324,7 +244,9 @@ uint32_t
 Data::GetSerializedSize () const
 {
   uint32_t size = 1 + 1 + 2 +
-    ((2 + 2) + (Name (ConstCast<ndn::Name> (m_data->GetNamePtr ())).GetSerializedSize ()) + (2 + 2 + 4 + 2 + 2 + (2 + 0)));
+    ((2 + 2) +
+     NdnSim::SerializedSizeName (m_data->GetName ()) +
+     (2 + 2 + 4 + 2 + 2 + (2 + 0)));
   if (m_data->GetSignature () != 0)
     size += 4;
   
@@ -352,8 +274,7 @@ Data::Serialize (Buffer::Iterator start) const
     }
 
   // name
-  uint32_t offset = Name (ConstCast<ndn::Name> (m_data->GetNamePtr ())).Serialize (start);
-  start.Next (offset);
+  NdnSim::SerializeName (start, m_data->GetName ());
 
   // content
   // for now assume that contentdata length is zero
@@ -396,10 +317,7 @@ Data::Deserialize (Buffer::Iterator start)
   else
     throw new ContentObjectException ();
 
-  Name name;
-  uint32_t offset = name.Deserialize (i);
-  m_data->SetName (name.GetName ());
-  i.Next (offset);
+  m_data->SetName (NdnSim::DeserializeName (i));
 
   if (i.ReadU16 () != (2 + 4 + 2 + 2 + (2 + 0))) // content length
     throw new ContentObjectException ();

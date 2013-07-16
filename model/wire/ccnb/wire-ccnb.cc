@@ -23,6 +23,8 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include "ccnb-parser/common.h"
+#include "ccnb-parser/visitors/name-visitor.h"
+#include "ccnb-parser/syntax-tree/block.h"
 
 NDN_NAMESPACE_BEGIN
 
@@ -96,29 +98,6 @@ Ccnb::AppendCloser (Buffer::Iterator &start)
 {
   start.WriteU8 (CcnbParser::CCN_CLOSE);
   return 1;
-}
-
-size_t
-Ccnb::AppendName (Buffer::Iterator &start, const Name &name)
-{
-  size_t written = 0;
-  BOOST_FOREACH (const std::string &component, name.GetComponents())
-    {
-      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Component,
-                                   reinterpret_cast<const uint8_t*>(component.c_str()), component.size());
-    }
-  return written;
-}
-
-size_t
-Ccnb::EstimateName (const Name &name)
-{
-  size_t written = 0;
-  BOOST_FOREACH (const std::string &component, name.GetComponents())
-    {
-      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Component, component.size());
-    }
-  return written;
 }
 
 size_t
@@ -206,6 +185,41 @@ size_t
 Ccnb::EstimateString (uint32_t dtag, const std::string &string)
 {
   return EstimateBlockHeader (dtag) + EstimateBlockHeader (string.size ()) + string.size () + 1;
+}
+
+size_t
+Ccnb::SerializeName (Buffer::Iterator &start, const Name &name)
+{
+  size_t written = 0;
+  BOOST_FOREACH (const std::string &component, name.GetComponents())
+    {
+      written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Component,
+                                   reinterpret_cast<const uint8_t*>(component.c_str()), component.size());
+    }
+  return written;
+}
+
+size_t
+Ccnb::SerializedSizeName (const Name &name)
+{
+  size_t written = 0;
+  BOOST_FOREACH (const std::string &component, name.GetComponents())
+    {
+      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Component, component.size());
+    }
+  return written;
+}
+
+Ptr<Name>
+Ccnb::DeserializeName (Buffer::Iterator &i)
+{
+  Ptr<Name> name = Create<Name> ();
+  CcnbParser::NameVisitor nameVisitor;
+
+  Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
+  root->accept (nameVisitor, GetPointer (name));
+
+  return name;
 }
 
 } // wire

@@ -35,7 +35,9 @@
 #include "ns3/ndn-header-helper.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
 #include "ns3/ndnSIM/model/wire/ndnsim.h"
+#include "ns3/ndnSIM/model/wire/ndnsim/wire-ndnsim.h"
 #include "ns3/ndnSIM/model/wire/ccnb.h"
+#include "ns3/ndnSIM/model/wire/ccnb/wire-ccnb.h"
 
 #include <boost/ref.hpp>
 
@@ -310,6 +312,56 @@ operator<< (std::ostream& os, const Face &face)
   face.Print (os);
   return os;
 }
+
+uint32_t
+Face::NameToWireSize (Ptr<Name> name) const
+{
+  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
+    return wire::NdnSim::SerializedSizeName (*name);
+  else if (m_wireFormat == WIRE_FORMAT_CCNB)
+    return wire::Ccnb::SerializedSizeName (*name);
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported format requested");
+    }
+  return 0;
+}
+  
+/**
+ * @brief Convert name to wire format
+ */
+void
+Face::NameToWire (Buffer::Iterator start, Ptr<const Name> name) const
+{
+  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
+    wire::NdnSim::SerializedSizeName (*name);
+  else if (m_wireFormat == WIRE_FORMAT_CCNB)
+    wire::Ccnb::SerializedSizeName (*name);
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported format requested");
+    }
+}
+
+/**
+ * @brief Convert name from wire format
+ */
+Ptr<Name>
+Face::NameFromWire (Buffer::Iterator start) const
+{
+  if (m_wireFormat == WIRE_FORMAT_NDNSIM)
+    return wire::NdnSim::DeserializeName (start);
+  else if (m_wireFormat == WIRE_FORMAT_CCNB)
+    {
+      return wire::Ccnb::DeserializeName (start);
+    }
+  else
+    {
+      NS_FATAL_ERROR ("Unsupported format requested");
+    }
+  return 0;
+}
+
 
 } // namespace ndn
 } // namespace ns3
