@@ -44,7 +44,7 @@ namespace ns3 {
 namespace ndn {
 
 NS_OBJECT_ENSURE_REGISTERED (Producer);
-    
+
 TypeId
 Producer::GetTypeId (void)
 {
@@ -62,16 +62,24 @@ Producer::GetTypeId (void)
                    MakeNameChecker ())
     .AddAttribute ("PayloadSize", "Virtual payload size for Content packets",
                    UintegerValue (1024),
-                   MakeUintegerAccessor(&Producer::m_virtualPayloadSize),
-                   MakeUintegerChecker<uint32_t>())
+                   MakeUintegerAccessor (&Producer::m_virtualPayloadSize),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("Freshness", "Freshness of data packets, if 0, then unlimited freshness",
                    TimeValue (Seconds (0)),
                    MakeTimeAccessor (&Producer::m_freshness),
                    MakeTimeChecker ())
+    .AddAttribute ("Signature", "Fake signature, 0 valid signature (default), other values application-specific",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&Producer::m_signature),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("KeyLocator", "Name to be used for key locator.  If root, then key locator is not used",
+                   NameValue (),
+                   MakeNameAccessor (&Producer::m_keyLocator),
+                   MakeNameChecker ())
     ;
   return tid;
 }
-    
+
 Producer::Producer ()
 {
   // NS_LOG_FUNCTION_NOARGS ();
@@ -87,13 +95,13 @@ Producer::StartApplication ()
   App::StartApplication ();
 
   NS_LOG_DEBUG ("NodeID: " << GetNode ()->GetId ());
-  
+
   Ptr<Fib> fib = GetNode ()->GetObject<Fib> ();
-  
+
   Ptr<fib::Entry> fibEntry = fib->Add (m_prefix, m_face, 0);
 
   fibEntry->UpdateStatus (m_face, fib::FaceMetric::NDN_FIB_GREEN);
-  
+
   // // make face green, so it will be used primarily
   // StaticCast<fib::FibImpl> (fib)->modify (fibEntry,
   //                                        ll::bind (&fib::Entry::UpdateStatus,
@@ -118,12 +126,18 @@ Producer::OnInterest (Ptr<const Interest> interest)
   NS_LOG_FUNCTION (this << interest);
 
   if (!m_active) return;
-    
+
   Ptr<ContentObject> data = Create<ContentObject> (Create<Packet> (m_virtualPayloadSize));
   Ptr<Name> dataName = Create<Name> (interest->GetName ());
   dataName->Append (m_postfix);
   data->SetName (dataName);
   data->SetFreshness (m_freshness);
+
+  data->SetSignature (m_signature);
+  if (m_keyLocator.size () > 0)
+    {
+      data->SetKeyLocator (Create<Name> (m_keyLocator));
+    }
 
   NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << data->GetName ());
 
