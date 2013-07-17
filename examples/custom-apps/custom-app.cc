@@ -59,8 +59,8 @@ CustomApp::StartApplication ()
 
   // Create a name components object for name ``/prefix/sub``
   Ptr<ndn::Name> prefix = Create<ndn::Name> (); // now prefix contains ``/``
-  prefix->Add ("prefix"); // now prefix contains ``/prefix``
-  prefix->Add ("sub"); // now prefix contains ``/prefix/sub``
+  prefix->append ("prefix"); // now prefix contains ``/prefix``
+  prefix->append ("sub"); // now prefix contains ``/prefix/sub``
 
   /////////////////////////////////////////////////////////////////////////////
   // Creating FIB entry that ensures that we will receive incoming Interests //

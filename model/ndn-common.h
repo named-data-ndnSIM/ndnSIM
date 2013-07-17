@@ -11,7 +11,29 @@
 #ifndef NDN_COMMON_H
 #define NDN_COMMON_H
 
+#include "ns3/nstime.h"
+#include "ns3/simulator.h"
+
+#define NDNSIM_MODE 1
+
 #define NDN_NAMESPACE_BEGIN  namespace ns3 { namespace ndn {
 #define NDN_NAMESPACE_END    } /*ndn*/ } /*ns3*/ 
+
+NDN_NAMESPACE_BEGIN
+
+typedef Time TimeInterval;
+
+namespace time
+{
+
+inline Time
+NowUnixTimestamp ()
+{
+  return Simulator::Now ();
+}
+
+}
+
+NDN_NAMESPACE_END
 
 #endif // NDN_COMMON_H

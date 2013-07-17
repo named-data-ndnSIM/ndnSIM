@@ -176,7 +176,7 @@ ConsumerZipfMandelbrot::SendPacket() {
 
   //
   Ptr<Name> nameWithSequence = Create<Name> (m_interestName);
-  (*nameWithSequence) (seq);
+  nameWithSequence->appendSeqNum (seq);
   //
 
   Ptr<Interest> interest = Create<Interest> ();

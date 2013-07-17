@@ -129,7 +129,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
 
   Ptr<ContentObject> data = Create<ContentObject> (Create<Packet> (m_virtualPayloadSize));
   Ptr<Name> dataName = Create<Name> (interest->GetName ());
-  dataName->Append (m_postfix);
+  dataName->append (m_postfix);
   data->SetName (dataName);
   data->SetFreshness (m_freshness);
 

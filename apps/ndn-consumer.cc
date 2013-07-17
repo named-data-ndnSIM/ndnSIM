@@ -37,13 +37,8 @@
 #include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.h"
 
 #include <boost/ref.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
 
 #include "ns3/names.h"
-
-namespace ll = boost::lambda;
 
 NS_LOG_COMPONENT_DEFINE ("ndn.Consumer");
 
@@ -200,7 +195,7 @@ Consumer::SendPacket ()
 
   //
   Ptr<Name> nameWithSequence = Create<Name> (m_interestName);
-  (*nameWithSequence) (seq);
+  nameWithSequence->appendSeqNum (seq);
   //
 
   Ptr<Interest> interest = Create<Interest> ();
@@ -238,7 +233,7 @@ Consumer::OnContentObject (Ptr<const ContentObject> data)
 
   // NS_LOG_INFO ("Received content object: " << boost::cref(*data));
 
-  uint32_t seq = boost::lexical_cast<uint32_t> (data->GetName ().GetComponents ().back ());
+  uint32_t seq = data->GetName ().get (-1).toSeqNum ();
   NS_LOG_INFO ("< DATA for " << seq);
 
   int hopCount = -1;
@@ -282,7 +277,7 @@ Consumer::OnNack (Ptr<const Interest> interest)
   // NS_LOG_FUNCTION (interest->GetName ());
 
   // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
-  uint32_t seq = boost::lexical_cast<uint32_t> (interest->GetName ().GetComponents ().back ());
+  uint32_t seq = interest->GetName ().get (-1).toSeqNum ();
   NS_LOG_INFO ("< NACK for " << seq);
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << "NACK for " << seq << "\n";
 

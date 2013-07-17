@@ -26,12 +26,12 @@ NdnSim::SerializeName (Buffer::Iterator &i, const Name &name)
 
   i.WriteU16 (static_cast<uint16_t> (SerializedSizeName (name)-2));
 
-  for (std::list<std::string>::const_iterator item = name.begin ();
+  for (Name::const_iterator item = name.begin ();
        item != name.end ();
        item++)
     {
       i.WriteU16 (static_cast<uint16_t> (item->size ()));
-      i.Write (reinterpret_cast<const uint8_t*> (item->c_str ()), item->size ());
+      i.Write (reinterpret_cast<const uint8_t*> (item->buf ()), item->size ());
     }
 
   return i.GetDistanceFrom (start);
@@ -42,7 +42,7 @@ NdnSim::SerializedSizeName (const Name &name)
 {
   size_t nameSerializedSize = 2;
 
-  for (std::list<std::string>::const_iterator i = name.begin ();
+  for (Name::const_iterator i = name.begin ();
        i != name.end ();
        i++)
     {
@@ -67,7 +67,7 @@ NdnSim::DeserializeName (Buffer::Iterator &i)
       uint8_t tmp[length];
       i.Read (tmp, length);
 
-      name->Add (std::string (reinterpret_cast<const char*> (tmp), length));
+      name->append (std::string (reinterpret_cast<const char*> (tmp), length));
     }
 
   return name;

@@ -191,10 +191,10 @@ size_t
 Ccnb::SerializeName (Buffer::Iterator &start, const Name &name)
 {
   size_t written = 0;
-  BOOST_FOREACH (const std::string &component, name.GetComponents())
+  BOOST_FOREACH (const name::Component &component, name)
     {
       written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Component,
-                                   reinterpret_cast<const uint8_t*>(component.c_str()), component.size());
+                                   reinterpret_cast<const uint8_t*>(component.buf ()), component.size());
     }
   return written;
 }
@@ -203,9 +203,9 @@ size_t
 Ccnb::SerializedSizeName (const Name &name)
 {
   size_t written = 0;
-  BOOST_FOREACH (const std::string &component, name.GetComponents())
+  BOOST_FOREACH (const name::Component &component, name)
     {
-      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Component, component.size());
+      written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Component, component.size ());
     }
   return written;
 }

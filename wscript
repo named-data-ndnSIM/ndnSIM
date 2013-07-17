@@ -137,6 +137,12 @@ def build(bld):
         "model/ndn-name-components.h",
         "model/ndn-name.h",
 
+        "ndn.cxx/name.h",
+        "ndn.cxx/name-component.h",
+        "ndn.cxx/blob.h",
+        "ndn.cxx/exclude.h",
+        "ndn.cxx/ndn-api-face.h",
+
         "model/cs/ndn-content-store.h",
 
         "model/fib/ndn-fib.h",
@@ -155,7 +161,6 @@ def build(bld):
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",
 
-        "ndn.cxx/ndn-api-face.h",
         "apps/callback-based-app.h",
         ]
 
@@ -186,7 +191,7 @@ def build(bld):
 
     bld.recurse ('tools')
 
-    bld.ns3_python_bindings()
+    # bld.ns3_python_bindings()
 
 
 @TaskGen.feature('ns3fullmoduleheaders')

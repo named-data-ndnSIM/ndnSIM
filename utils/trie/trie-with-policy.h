@@ -48,7 +48,7 @@ public:
 
   inline
   trie_with_policy (size_t bucketSize = 10, size_t bucketIncrement = 10)
-    : trie_ ("", bucketSize, bucketIncrement)
+    : trie_ (name::Component (), bucketSize, bucketIncrement)
     , policy_ (*this)
   {
   }

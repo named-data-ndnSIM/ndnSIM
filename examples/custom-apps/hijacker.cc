@@ -21,6 +21,7 @@
 // hijacker.cc
 
 #include "hijacker.h"
+#include "ns3/ndn-name.h"
 
 NS_LOG_COMPONENT_DEFINE ("Hijacker");
 
@@ -60,7 +61,7 @@ Hijacker::StartApplication ()
 
   // equivalent to setting interest filter for "/" prefix
   Ptr<ndn::Fib> fib = GetNode ()->GetObject<ndn::Fib> ();
-  Ptr<ndn::fib::Entry> fibEntry = fib->Add ("/", m_face, 0);
+  Ptr<ndn::fib::Entry> fibEntry = fib->Add (ndn::Name ("/"), m_face, 0);
   fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
 }
 
