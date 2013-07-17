@@ -67,7 +67,7 @@ NdnSim::DeserializeName (Buffer::Iterator &i)
       uint8_t tmp[length];
       i.Read (tmp, length);
 
-      name->append (std::string (reinterpret_cast<const char*> (tmp), length));
+      name->append (tmp, length);
     }
 
   return name;

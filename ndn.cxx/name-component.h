@@ -104,9 +104,27 @@ public:
   ////////////////////////////////////
 
   /**
+   * @brief Create component from URI encoded string
+   * @param uri URI encoded name component (convert escaped with % characters)
+   * @return *this
+   */
+  Component &
+  fromUri (const std::string &uri);
+
+  /**
+   * @brief Create component from URI encoded string, with string specified by a pair of iterators
+   * @param begin begin iterator pointing to the URI encoded name
+   * @param end end iterator
+   * @return *this
+   */
+  Component &
+  fromUri (std::string::const_iterator begin, std::string::const_iterator end);
+  
+  /**
    * @brief Create network-ordered numeric component
    *
    * @param number number to be encoded and added as a component
+   * @return *this
    *
    * Number is encoded and added in network order. Tail zero-bytes are not included.
    * For example, if the number is 1, then 1-byte binary blob will be added  0x01.
@@ -114,7 +132,7 @@ public:
    *
    * If the number is zero, an empty component will be created
    */
-  static Component
+  Component &
   fromNumber (uint64_t number);
 
   /**
@@ -134,7 +152,7 @@ public:
    *
    * @see fromNumber
    */
-  static Component
+  Component &
   fromNumberWithMarker (uint64_t number, unsigned char marker);
   
   //////////////////////////////////////////////////////////////////////////////////

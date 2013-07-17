@@ -483,16 +483,14 @@ Name &
 Name::appendNumber (uint64_t number)
 {
   name::Component comp;
-  name::Component::fromNumber (number).swap (comp);
-  return appendBySwap (comp);
+  return appendBySwap (comp.fromNumber (number));
 }
 
 Name &
 Name::appendNumberWithMarker (uint64_t number, unsigned char marker)
 {
   name::Component comp;
-  name::Component::fromNumberWithMarker (number, marker).swap (comp);
-  return appendBySwap (comp);
+  return appendBySwap (comp.fromNumberWithMarker (number, marker));
 }
 
 inline Name &

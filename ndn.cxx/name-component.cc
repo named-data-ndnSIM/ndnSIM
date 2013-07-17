@@ -23,6 +23,24 @@ Component::Component ()
 
 Component::Component (const std::string &uri)
 {
+  copy (uri.begin (), uri.end (), back_inserter (*this));
+}
+
+Component::Component (std::string::const_iterator begin, std::string::const_iterator end)
+{
+  copy (begin, end, back_inserter (*this));
+}
+
+Component::Component (const void *buf, size_t length)
+{
+  copy (static_cast<const char*> (buf),
+        static_cast<const char*> (buf)+length,
+        back_inserter (*this));
+}
+
+Component &
+Component::fromUri (const std::string &uri)
+{
   try
     {
       Uri::fromEscaped (uri.begin (), uri.end (), back_inserter (*this));
@@ -34,9 +52,12 @@ Component::Component (const std::string &uri)
                              << error::msg (uri)
                              << error::pos (error::get_pos (err)));
     }
+
+  return *this;
 }
 
-Component::Component (std::string::const_iterator begin, std::string::const_iterator end)
+Component &
+Component::fromUri (std::string::const_iterator begin, std::string::const_iterator end)
 {
   try
     {
@@ -49,13 +70,7 @@ Component::Component (std::string::const_iterator begin, std::string::const_iter
                              << error::msg (std::string (begin, end))
                              << error::pos (error::get_pos (err)));
     }
-}
-
-Component::Component (const void *buf, size_t length)
-{
-  copy (static_cast<const char*> (buf),
-        static_cast<const char*> (buf)+length,
-        back_inserter (*this));
+  return *this;
 }
 
 int
@@ -76,33 +91,31 @@ Component::compare (const Component &other) const
   return (std::lexicographical_compare (diff.first, end (), diff.second, other.end ())) ? -1 : +1;    
 }
 
-Component
+Component &
 Component::fromNumber (uint64_t number)
 {
-  Component comp;
   while (number > 0)
     {
-      comp.push_back (static_cast<unsigned char> (number & 0xFF));
+      this->push_back (static_cast<unsigned char> (number & 0xFF));
       number >>= 8;
     }
-  std::reverse (comp.begin (), comp.end ());
-  return comp;
+  std::reverse (this->begin (), this->end ());
+  return *this;
 }
 
-Component
+Component &
 Component::fromNumberWithMarker (uint64_t number, unsigned char marker)
 {
-  Component comp;
-  comp.push_back (marker);
+  this->push_back (marker);
 
   while (number > 0)
     {
-      comp.push_back (static_cast<unsigned char> (number & 0xFF));
+      this->push_back (static_cast<unsigned char> (number & 0xFF));
       number >>= 8;
     }
 
-  std::reverse (comp.begin () + 1, comp.end ());
-  return comp;
+  std::reverse (this->begin () + 1, this->end ());
+  return *this;
 }
 
 std::string

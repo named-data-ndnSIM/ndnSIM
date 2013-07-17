@@ -92,7 +92,8 @@ Name::Name (const string &uri)
         break;
       
       string::const_iterator endOfComponent = std::find (i, end, '/');
-      append (name::Component (i, endOfComponent));
+      name::Component comp;
+      appendBySwap (comp.fromUri (i, endOfComponent));
 
       i = endOfComponent;
     }
