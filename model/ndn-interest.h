@@ -229,6 +229,13 @@ private:
   mutable Ptr<const Packet> m_wire;
 };
 
+inline std::ostream &
+operator << (std::ostream &os, const Interest &i)
+{
+  i.Print (os);
+  return os;
+}
+
 inline Ptr<const Packet>
 Interest::GetWire () const
 {

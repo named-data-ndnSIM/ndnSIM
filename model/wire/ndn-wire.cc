@@ -1,10 +1,10 @@
 /** -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
-/* 
+/*
  * Copyright (c) 2013, Regents of the University of California
  *                     Alexander Afanasyev
- * 
+ *
  * GNU 3.0 license, See the LICENSE file for more information
- * 
+ *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
@@ -25,7 +25,7 @@
 NDN_NAMESPACE_BEGIN
 
 static
-GlobalValue g_wireFormat ("ndn::WireFormat", 
+GlobalValue g_wireFormat ("ndn::WireFormat",
                           "Default wire format for ndnSIM.  ndnSIM will be accepting packets "
                           "in any supported packet formats, but if encoding requested, it will "
                           "use default wire format to encode (0 for ndnSIM (default), 1 for CCNb)",
@@ -51,7 +51,7 @@ Wire::FromInterest (Ptr<const Interest> interest, int8_t wireFormat/* = WIRE_FOR
 {
   if (wireFormat == WIRE_FORMAT_DEFAULT)
     wireFormat = GetWireFormat ();
-    
+
   if (wireFormat == WIRE_FORMAT_NDNSIM)
     return wire::ndnSIM::Interest::ToWire (interest);
   else if (wireFormat == WIRE_FORMAT_CCNB)
@@ -173,33 +173,97 @@ Wire::ToData (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETECT*/
 }
 
 
-uint32_t
-Wire::FromNameSize (Ptr<const Name> name, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+std::string
+Wire::FromInterestStr (Ptr<const Interest> interest, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
 {
-  if (wireFormat == WIRE_FORMAT_DEFAULT)
-    wireFormat = GetWireFormat ();
+  Ptr<Packet> pkt = FromInterest (interest, wireFormat);
+  std::string wire;
+  wire.resize (pkt->GetSize ());
+  pkt->CopyData (reinterpret_cast<uint8_t*> (&wire[0]), wire.size ());
 
-  if (wireFormat == WIRE_FORMAT_NDNSIM)
-    return wire::NdnSim::SerializedSizeName (*name);
-  else if (wireFormat == WIRE_FORMAT_CCNB)
-    return wire::Ccnb::SerializedSizeName (*name);
-  else
-    {
-      NS_FATAL_ERROR ("Unsupported format requested");
-      return 0;
-    }
+  return wire;
 }
-  
-void
-Wire::FromName (Buffer::Iterator start, Ptr<const Name> name, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+
+Ptr<Interest>
+Wire::ToInterestStr (const std::string &wire, int8_t type/* = WIRE_FORMAT_AUTODETECT*/)
 {
+  Ptr<Packet> pkt = Create<Packet> (reinterpret_cast<const uint8_t*> (&wire[0]), wire.size ());
+  return ToInterest (pkt, type);
+}
+
+std::string
+Wire::FromDataStr (Ptr<const ContentObject> data, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+{
+  Ptr<Packet> pkt = FromData (data, wireFormat);
+  std::string wire;
+  wire.resize (pkt->GetSize ());
+  pkt->CopyData (reinterpret_cast<uint8_t*> (&wire[0]), wire.size ());
+
+  return wire;
+}
+
+Ptr<ContentObject>
+Wire::ToDataStr (const std::string &wire, int8_t type/* = WIRE_FORMAT_AUTODETECT*/)
+{
+  Ptr<Packet> pkt = Create<Packet> (reinterpret_cast<const uint8_t*> (&wire[0]), wire.size ());
+  return ToData (pkt, type);
+}
+
+// uint32_t
+// Wire::FromNameSize (Ptr<const Name> name, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+// {
+//   if (wireFormat == WIRE_FORMAT_DEFAULT)
+//     wireFormat = GetWireFormat ();
+
+//   if (wireFormat == WIRE_FORMAT_NDNSIM)
+//     {
+//       std::cout << wire::NdnSim::SerializedSizeName (*name) << std::endl;
+//       return wire::NdnSim::SerializedSizeName (*name);
+//     }
+//   else if (wireFormat == WIRE_FORMAT_CCNB)
+//     return wire::Ccnb::SerializedSizeName (*name);
+//   else
+//     {
+//       NS_FATAL_ERROR ("Unsupported format requested");
+//       return 0;
+//     }
+// }
+
+std::string
+Wire::FromName (Ptr<const Name> name, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+{
+
   if (wireFormat == WIRE_FORMAT_DEFAULT)
     wireFormat = GetWireFormat ();
 
   if (wireFormat == WIRE_FORMAT_NDNSIM)
-    wire::NdnSim::SerializedSizeName (*name);
+    {
+      Buffer buf;
+      buf.AddAtStart (wire::NdnSim::SerializedSizeName (*name));
+      Buffer::Iterator i = buf.Begin ();
+
+      wire::NdnSim::SerializeName (i, *name);
+
+      std::string wire;
+      wire.resize (buf.GetSize ());
+      buf.CopyData (reinterpret_cast<uint8_t *>(&wire[0]), wire.size ());
+
+      return wire;
+    }
   else if (wireFormat == WIRE_FORMAT_CCNB)
-    wire::Ccnb::SerializedSizeName (*name);
+    {
+      Buffer buf;
+      buf.AddAtStart (wire::NdnSim::SerializedSizeName (*name));
+      Buffer::Iterator i = buf.Begin ();
+
+      wire::Ccnb::SerializeName (i, *name);
+
+      std::string wire;
+      wire.resize (buf.GetSize ());
+      buf.CopyData (reinterpret_cast<uint8_t *>(&wire[0]), wire.size ());
+
+      return wire;
+    }
   else
     {
       NS_FATAL_ERROR ("Unsupported format requested");
@@ -207,17 +271,25 @@ Wire::FromName (Buffer::Iterator start, Ptr<const Name> name, int8_t wireFormat/
 }
 
 Ptr<Name>
-Wire::ToName (Buffer::Iterator start, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+Wire::ToName (const std::string &name, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
 {
+  Buffer buf;
+  buf.AddAtStart (name.size ());
+  Buffer::Iterator i = buf.Begin ();
+  i.Write (reinterpret_cast<const uint8_t *> (&name[0]), name.size ());
+
+  i = buf.Begin ();
+
   if (wireFormat == WIRE_FORMAT_DEFAULT)
     wireFormat = GetWireFormat ();
 
   if (wireFormat == WIRE_FORMAT_NDNSIM)
-    return wire::NdnSim::DeserializeName (start);
+    {
+      return wire::NdnSim::DeserializeName (i);
+    }
   else if (wireFormat == WIRE_FORMAT_CCNB)
     {
-      return wire::Ccnb::DeserializeName (start);
-      return 0;
+      return wire::Ccnb::DeserializeName (i);
     }
   else
     {

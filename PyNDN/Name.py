@@ -17,96 +17,39 @@
 #             Jeff Burke <jburke@ucla.edu>
 #
 
-import ndn
-from . import _ndn
+def toWire (name):
+    buf = ns.network.Buffer (ns.ndnSIM.ndn.Wire.FromNameSize (name))
+    ns.ndnSIM.ndn.Wire.FromName (buf.Begin (), name)
+    
+    output = bytearray (buf.GetSize ())
+    buf.CopyData (output, buf.GetSize ())
+    
+    return buf
+
+import ns.ndnSIM
+import ns.network
 
 from copy import copy
 import time, struct, random
 
-NAME_NORMAL = 0
-NAME_ANY    = 1
+class Name (ns.ndnSIM.ndn.Name):
+    def __init__(self, name=None):
+        super (Name, self).__init__ (name)
 
-class Name(object):
-    def __init__(self, components=[], name_type=NAME_NORMAL, ccn_data=None, ccnb_buffer=None):
-        self._setattr('type', name_type)
+    @staticmethod
+    def fromWire (wire):
+        return ns.ndnSIM.ndn.Wire.ToName (wire)
 
-        # py-ndn
-        #self._setattr('ccn_data_dirty', True)
-        self._setattr('ccn_data', ccn_data)
+    @staticmethod
+    def toWire (name):
+        buf = ns.network.Buffer ()
+        buf.AddToStart (ns.ndnSIM.ndn.Wire.FromNameSize (name))
+        ns.ndnSIM.ndn.Wire.FromName (buf.Begin (), name)
 
-                # Name from simple buffer containing name in ccnb encoding
-                if ccnb_buffer:
-                        self._setattr('components', _ndn.name_comps_from_ccn_buffer (bytes (ccnb_buffer)))
-
-        # Name from CCN
-        elif ccn_data:
-            self._setattr('components', _ndn.name_comps_from_ccn(ccn_data))
-            self._setattr('ccn_data_dirty', False)
-
-        # Copy Name from another Name object
-        elif isinstance(components, self.__class__):
-            self._setattr('components', copy(components.components))
-            if not components.ccn_data_dirty:
-                self._setattr('ccn_data', components.ccn_data)
-                self._setattr('ccn_data_dirty', False)
-
-        # Name as string (URI)
-        elif type(components) is str:
-            ccn_data = _ndn.name_from_uri(components)
-            self._setattr('components', _ndn.name_comps_from_ccn(ccn_data))
-            self._setattr('ccn_data', ccn_data)
-            self._setattr('ccn_data_dirty', False)
-
-        # Otherwise assume name is a list
-        else:
-            self._setattr('components', copy(components))
-
-    def _setattr(self, name, value):
-        if name == 'components' or name == 'ccn_data':
-            self._setattr('ccn_data_dirty', True)
-        super(Name, self).__setattr__(name, value)
-
-    def _append(self, component):
-        components = copy(self.components)
-        components.append(component)
-
-        return Name(components)
-
-    def append(self, value):
-        components = copy(self.components)
-                if isinstance (value, Name):
-                        components.extend (value.components)
-                else:   
-                        components.append (bytes (value))
-        return Name(components)
-
-    def appendKeyID(self, digest):
-        if isinstance(digest, ndn.Key):
-            digest = digest.publicKeyID
-
-        component = b'\xc1.M.K\x00'
-        component += digest
-
-        return self._append(component)
-
-    def appendVersion(self, version = None):
-        if not version:
-            inttime = int(time.time() * 4096 + 0.5)
-            bintime = struct.pack("!Q", inttime)
-            version = bintime.lstrip(b'\x00')
-        component = b'\xfd' + version
-
-        return self._append(component)
-
-    def appendSegment(self, segment):
-        return self._append(self.num2seg(segment))
-
-    def appendNonce(self):
-        val = random.getrandbits(64)
-        component = b'\xc1.N\x00' + struct.pack("@Q", val)
-
-        return self._append(component)
-
+        output = bytearray (buf.GetSize ())
+        buf.CopyData (output, buf.GetSize ())
+        return output
+    
     def get_ccnb(self):
         return _ndn.dump_charbuf(self.ccn_data)
 
@@ -156,40 +99,11 @@ class Name(object):
         else:
             raise ValueError("Unknown __getitem__ type: %s" % type(key))
 
-    def __setitem__(self, key, value):
-        self.components[key] = value
+    # def __setitem__(self, key, value):
+    #     self.components[key] = value
 
-    def __delitem__(self, key):
-        del self.components[key]
+    # def __delitem__(self, key):
+    #     del self.components[key]
 
-    def __len__(self):
-        return len(self.components)
-
-    def __lt__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) < 0
-
-    def __gt__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) > 0
-
-    def __eq__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) == 0
-
-    def __le__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) <= 0
-
-    def __ge__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) >= 0
-
-    def __ne__(self, other):
-        return _ndn.compare_names(self.ccn_data, other.ccn_data) != 0
-
-    @staticmethod
-    def num2seg(num):
-        return b'\x00' + struct.pack('!Q', num).lstrip(b'\x00')
-
-    @staticmethod
-    def seg2num(segment):
-        return long(struct.unpack("!Q", (8 - len(segment)) * "\x00" + segment)[0])
-
-        def isPrefixOf (self, other):
-                return self[:] == other[:len(self)]
+    # def __len__(self):
+    #     return len(self.components)
