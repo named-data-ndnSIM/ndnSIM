@@ -117,16 +117,7 @@ private:
   ApiFacePriv *m_this;
 };
 
-
-/// @cond include_hidden
-#ifdef PYTHON_SCAN
-struct CallbackVoidNameInterest : public Callback<void, Ptr<const Name>, Ptr<const Interest> > { };
-struct CallbackVoidInterestContentObject : public Callback<void, Ptr<const Interest>, Ptr<const ContentObject> > { };
-struct CallbackVoidInterest : public Callback<void, Ptr<const Interest> > { };
-#endif
-/// @endcond
-
-}
-}
+} // ndn
+} // ns3
 
 #endif // NDN_API_HANDLER_H

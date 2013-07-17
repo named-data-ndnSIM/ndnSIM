@@ -150,6 +150,11 @@ Exclude::excludeAfter (const name::Component &from)
   return *this;
 }
 
+void
+Exclude::appendExclude (const name::Component &name, bool any)
+{
+  m_exclude.insert (std::make_pair (name, any));
+}
 
 std::ostream&
 operator << (std::ostream &os, const Exclude &exclude)

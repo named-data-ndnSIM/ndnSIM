@@ -23,19 +23,19 @@ Component::Component ()
 
 Component::Component (const std::string &uri)
 {
-  copy (uri.begin (), uri.end (), back_inserter (*this));
+  copy (uri.begin (), uri.end (), std::back_inserter (*this));
 }
 
 Component::Component (std::string::const_iterator begin, std::string::const_iterator end)
 {
-  copy (begin, end, back_inserter (*this));
+  copy (begin, end, std::back_inserter (*this));
 }
 
 Component::Component (const void *buf, size_t length)
 {
   copy (static_cast<const char*> (buf),
         static_cast<const char*> (buf)+length,
-        back_inserter (*this));
+        std::back_inserter (*this));
 }
 
 Component &
@@ -43,7 +43,7 @@ Component::fromUri (const std::string &uri)
 {
   try
     {
-      Uri::fromEscaped (uri.begin (), uri.end (), back_inserter (*this));
+      Uri::fromEscaped (uri.begin (), uri.end (), std::back_inserter (*this));
     }
   catch (error::Uri &err)
     {
@@ -61,7 +61,7 @@ Component::fromUri (std::string::const_iterator begin, std::string::const_iterat
 {
   try
     {
-      Uri::fromEscaped (begin, end, back_inserter (*this));
+      Uri::fromEscaped (begin, end, std::back_inserter (*this));
     }
   catch (error::Uri &err)
     {

@@ -11,11 +11,7 @@
 #ifndef NDN_NAME_COMPONENT_H
 #define NDN_NAME_COMPONENT_H
 
-#include <string>
-#include <vector>
-
 #include "blob.h"
-#include <stdint.h>
 
 NDN_NAMESPACE_BEGIN
 
@@ -24,7 +20,7 @@ namespace name {
 /**
  * @brief Class to representing binary blob of NDN name component
  *
- * This class is based on std::vector<char> and just provides several helpers
+ * This class is based on Blob (std::vector<char>) and just provides several helpers
  * to work with name components, as well as operator to apply canonical
  * ordering on name components
  */
@@ -290,8 +286,12 @@ Component::toVersion () const
 /**
  * @brief Stream output operator (output in escaped URI format)
  */
-std::ostream&
-operator <<(std::ostream &os, const Component &name);
+inline std::ostream&
+operator <<(std::ostream &os, const Component &name)
+{
+  name.toUri (os);
+  return os;
+}
 
 } // name
 

@@ -137,9 +137,9 @@ def build(bld):
         "model/ndn-name-components.h",
         "model/ndn-name.h",
 
-        "ndn.cxx/name.h",
-        "ndn.cxx/name-component.h",
         "ndn.cxx/blob.h",
+        "ndn.cxx/name-component.h",
+        "ndn.cxx/name.h",
         "ndn.cxx/exclude.h",
         "ndn.cxx/ndn-api-face.h",
 
