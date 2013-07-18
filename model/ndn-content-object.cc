@@ -31,7 +31,8 @@ namespace ns3 {
 namespace ndn {
 
 ContentObject::ContentObject (Ptr<Packet> payload/* = Create<Packet> ()*/)
-  : m_signature (0)
+  : m_name (Create<Name> ())
+  , m_signature (0)
   , m_payload (payload)
   , m_wire (0)
 {

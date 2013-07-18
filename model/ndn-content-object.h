@@ -190,6 +190,13 @@ private:
   mutable Ptr<const Packet> m_wire;
 };
 
+inline std::ostream &
+operator << (std::ostream &os, const ContentObject &d)
+{
+  d.Print (os);
+  return os;
+}
+
 /**
  * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception

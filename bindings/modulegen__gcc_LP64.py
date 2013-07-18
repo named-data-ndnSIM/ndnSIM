@@ -5039,6 +5039,7 @@ def register_Ns3NdnBlob_methods(root_module, cls):
     return
 
 def register_Ns3NdnContentObject_methods(root_module, cls):
+    cls.add_output_stream_operator()
     ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObject::ContentObject(ns3::Ptr<ns3::Packet> payload=ns3::Create( )) [constructor]
     cls.add_constructor([param('ns3::Ptr< ns3::Packet >', 'payload', default_value='ns3::Create( )')])
     ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::ContentObject::ContentObject(ns3::ndn::ContentObject const & other) [copy constructor]
