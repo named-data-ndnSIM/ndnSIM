@@ -17,24 +17,16 @@
 #             Jeff Burke <jburke@ucla.edu>
 #
 
-def toWire (name):
-    buf = ns.network.Buffer (ns.ndnSIM.ndn.Wire.FromNameSize (name))
-    ns.ndnSIM.ndn.Wire.FromName (buf.Begin (), name)
-    
-    output = bytearray (buf.GetSize ())
-    buf.CopyData (output, buf.GetSize ())
-    
-    return buf
-
 import ns.ndnSIM
-import ns.network
 
-from copy import copy
-import time, struct, random
+class Name ():
+    _name = None
 
-class Name (ns.ndnSIM.ndn.Name):
-    def __init__(self, name=None):
-        super (Name, self).__init__ (name)
+    def __init__ (self, value = None):
+        if value:
+            self._name = ns.ndnSIM.ndn.Name (value)
+        else:
+            self._name = ns.ndnSIM.ndn.Name ()
 
     @staticmethod
     def fromWire (wire):
@@ -42,68 +34,31 @@ class Name (ns.ndnSIM.ndn.Name):
 
     @staticmethod
     def toWire (name):
-        buf = ns.network.Buffer ()
-        buf.AddToStart (ns.ndnSIM.ndn.Wire.FromNameSize (name))
-        ns.ndnSIM.ndn.Wire.FromName (buf.Begin (), name)
-
-        output = bytearray (buf.GetSize ())
-        buf.CopyData (output, buf.GetSize ())
-        return output
+        return ns.ndnSIM.ndn.Wire.FromName (name)
     
-    def get_ccnb(self):
-        return _ndn.dump_charbuf(self.ccn_data)
+    def __getattr__ (self, name):
+        return self._name.__getattribute__ (name)
 
-    def __repr__(self):
-        global NAME_NORMAL, NAME_ANY
+    def __len__ (self):
+        return self._name.size ()
 
-        if self.type == NAME_NORMAL:
-            return "ndn.Name('ccnx:" + _ndn.name_to_uri(self.ccn_data) + "')"
-        elif self.type == NAME_ANY:
-            return "ndn.Name(name_type=ndn.NAME_ANY)"
-        else:
-            raise ValueError("Name is of wrong type %d" % self.type)
-
-    def __str__(self):
-        global NAME_NORMAL, NAME_ANY
-
-        if self.type == NAME_NORMAL:
-            return _ndn.name_to_uri(self.ccn_data)
-        elif self.type == NAME_ANY:
-            return "<any>"
-        else:
-            raise ValueError("Name is of wrong type %d" % self.type)
-
-    def __len__(self):
-        return len(self.components)
-
-    def __add__(self, other):
-        return self.append(other)
-
-    def __setattr__(self, name, value):
-        raise TypeError("can't modify immutable instance")
-
-    __delattr__ = __setattr__
-
-    def __getattribute__(self, name):
-        if name == "ccn_data":
-            if object.__getattribute__(self, 'ccn_data_dirty'):
-                self._setattr('ccn_data', _ndn.name_comps_to_ccn(self.components))
-                self._setattr('ccn_data_dirty', False)
-        return object.__getattribute__(self, name)
+    def __add__ (self, other):
+        return self._name.append (other)
 
     def __getitem__(self, key):
-        if type(key) is int:
-            return self.components[key]
-        elif type(key) is slice:
-            return Name(self.components[key])
+        if type (key) is int:
+            if abs(key) < self._name.size ():
+                return self._name.get (key)
+            else:
+                raise IndexError ("index out of range")
+        elif type (key) is slice:
+            name = ns.ndnSIM.ndn.Name ()
+            for component in xrange (*key.indices (self.size ())):
+                name.append (self._name.get (component))
+            return name
         else:
-            raise ValueError("Unknown __getitem__ type: %s" % type(key))
+            raise ValueError("Unknown __getitem__ type: %s" % type (key))
 
-    # def __setitem__(self, key, value):
-    #     self.components[key] = value
+    def __repr__ (self):
+        return "ndnSIM.Name('" + self._name.toUri () + "')"
 
-    # def __delitem__(self, key):
-    #     del self.components[key]
-
-    # def __len__(self):
-    #     return len(self.components)
