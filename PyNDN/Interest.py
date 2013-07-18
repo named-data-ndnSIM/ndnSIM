@@ -19,18 +19,27 @@
 
 import ns.ndnSIM
 import ns.core
-import Name
+from Name import Name
 
 class Interest (object):
     _interest = None
 
-    def __init__(self, name = None, 
-                 scope = None, interestLifetime = None):
-        self._interest = ns.ndnSIM.ndn.Interest ()
+    def __init__(self,
+                 name = None, scope = None, interestLifetime = None,
+                 interest = None):
+        if interest:
+            if type (interest) is Interest:
+                self._interest = interest._interest
+            elif type (interest) is ns.ndnSIM.ndn.Interest:
+                self._interest = interest
+            else:
+                raise TypeError ("Invalid type supplied for 'interest' parameter [%s]" % type (interest))
+        else:
+            self._interest = ns.ndnSIM.ndn.Interest ()
         
-        self.name = name
-        self.scope = scope
-        self.interestLifetime = interestLifetime
+            self.name = name
+            self.scope = scope
+            self.interestLifetime = interestLifetime
 
     def __getattr__ (self, name):
         if name == "name":

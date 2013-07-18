@@ -17,22 +17,20 @@
 #             Jeff Burke <jburke@ucla.edu>
 #
 
-__all__ = ['Face', 'Closure', 'ContentObject', 'Interest', 'Key', 'Name']
+__all__ = ['Face', 'Name', 'Interest', 'Data', 'Key', 'ContentObject']
 
 VERSION = 0.3
+NDNSIM = True
 
-# import sys as _sys
+import sys as _sys
 
-# try:
-# 	from ndn.Face import *
-# 	from ndn.Closure import *
-# 	from ndn.ContentObject import *
-# 	from ndn.Interest import *
-# 	from ndn.Key import *
-# 	from ndn.Name import *
-# 	from ndn import NameCrypto
-#     from ndn.LocalPrefixDiscovery import *
+try:
+    from Face import Face, EventLoop
+    from Name import Name
+    from Interest import Interest
+    from Data import Data, ContentObject, SignedInfo
+    from Key import Key
 
-# except ImportError:
-# 	del _sys.modules[__name__]
-# 	raise
+except ImportError:
+    del _sys.modules[__name__]
+    raise

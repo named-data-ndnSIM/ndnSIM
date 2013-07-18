@@ -18,12 +18,17 @@
 #
 
 import ns.core
+import ns.network
 import ns.ndnSIM
+from Data import Data
+from Interest import Interest
+
+import functools
 
 class Face (ns.ndnSIM.ndn.ApiFace):
     def __init__(self):
         self.nodeId = ns.core.Simulator.GetContext ()
-        self.node = ns.core.NodeList.GetNode (self.nodeId)
+        self.node = ns.network.NodeList.GetNode (self.nodeId)
         super(Face, self).__init__ (self.node)
 
     def connect (self):
@@ -36,29 +41,57 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         pass
 
     def expressInterestSimple (self, name, onData, onTimeout, template = None):
-        if template:
-            interest = ns.ndnSIM.ndn.Interest (template)
-        else:
-            interest = ns.ndnSIM.ndn.Interest ()
+        """
+        onData:    void <interest, name>
+        onTimeout: void <interest>
+        """
 
-        interest.SetName (name)
-        self.ExpressInterest (interest, onData, onTimeout)
+        interest = Interest (interest = template)
+        interest.name = name
+
+        class OnDataConvert:
+            def __init__ (self, onData):
+                self.onData = onData
+            def __call__ (self, interest, data):
+                if self.onData:
+                    return self.onData (Interest (interest=interest), Data (data = data))
+        
+        class OnTimeoutConvert:
+            def __init__ (self, onTimeout):
+                self.onTimeout = onTimeout
+            def __call__ (self, interest):
+                if self.onTimeout:
+                    self.onTimeout (Interest (interest=interest))
+
+        self.ExpressInterest (interest, OnDataConvert (onData), OnTimeoutConvert (onTimeout))
 
     def setInterestFilterSimple (self, name, onInterest, flags = None):
-        self.SetInterestFilter (name, onInterest)
+        """
+        onInterest: void <name, interest>
+        """
 
-    def clearInterestFilter(self, name):
-        self.ClearInterestFilter (name)
+        class OnInterestConvert:
+            def __init__ (self, onInterest):
+                self.onInterest = onInterest
+            def __call__ (self, name, interest):
+                if self.onInterest:
+                    self.onInterest (Name (name = name), Interest (interest = interest))
 
-    def get(self, name, template = None, timeoutms = 3000):
-        raise ("NS-3 simulation cannot have syncrhonous operations")
+        self.SetInterestFilter (name, OnInterestConvert (onInterest))
 
-    def put(self, data):
+    def clearInterestFilter (self, name):
+        if type (name) is Name:
+            self.ClearInterestFilter (name._name)
+        elif type (name) is ns.ndnSIM.ndn.Name:
+            self.ClearInterestFilter (name)
+        else:
+            raise TypeError ("Wrong type for 'name' parameter [%s]" % type (name))
+
+    def get (self, name, template = None, timeoutms = 3000):
+        raise NotImplementedError ("NS-3 simulation cannot have syncrhonous operations")
+
+    def put (self, data):
         self.Put (data)
-
-    @staticmethod
-    def getDefaultKey ():
-        return None
 
 class EventLoop(object):
     def execute (self, event):

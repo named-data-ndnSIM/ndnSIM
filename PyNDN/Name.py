@@ -22,11 +22,21 @@ import ns.ndnSIM
 class Name ():
     _name = None
 
-    def __init__ (self, value = None):
-        if value:
-            self._name = ns.ndnSIM.ndn.Name (value)
+    def __init__ (self, 
+                  value = None,
+                  name = None):
+        if name:
+            if type (name) is ns.ndnSIM.ndn.Name:
+                self._name = name
+            elif type (name) is Name:
+                self._name = name._name
+            else:
+                raise TypeError ("Incorrect type for 'name' parameter [%s]" % type (name))
         else:
-            self._name = ns.ndnSIM.ndn.Name ()
+            if value:
+                self._name = ns.ndnSIM.ndn.Name (value)
+            else:
+                self._name = ns.ndnSIM.ndn.Name ()
 
     @staticmethod
     def fromWire (wire):
