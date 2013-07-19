@@ -68,6 +68,33 @@ InterestSerializationTest::DoRun ()
   NS_TEST_ASSERT_MSG_EQ (source->GetInterestLifetime (), target->GetInterestLifetime (), "source/target interest lifetime failed");
   NS_TEST_ASSERT_MSG_EQ (source->GetNonce ()           , target->GetNonce ()           , "source/target nonce failed");
   NS_TEST_ASSERT_MSG_EQ (source->GetNack ()            , target->GetNack ()            , "source/target NACK failed");
+
+  NS_TEST_ASSERT_MSG_EQ (source->GetExclude ()         , 0, "exclude should be empty");
+  NS_TEST_ASSERT_MSG_EQ (target->GetExclude ()         , 0, "exclude should be empty");
+  
+  Ptr<Exclude> exclude = Create<Exclude> ();
+  exclude->excludeAfter (name::Component ());
+  source->SetExclude (exclude);
+  
+  NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (*source->GetExclude ()),
+                         " ----> ", "exclude should contain only <ANY/>");
+
+  exclude->appendExclude (name::Component ("alex"), false);
+  exclude->excludeAfter (name::Component ("zhenkai"));
+
+  source->SetExclude (exclude);  
+  NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (*source->GetExclude ()),
+                         " ----> alex zhenkai ----> ", "exclude should contain only <ANY/>");
+
+  NS_TEST_ASSERT_MSG_EQ (source->GetWire (), 0, "Wire should be empty");
+  NS_TEST_ASSERT_MSG_NE (source->GetPayload (), 0, "Payload should not be empty");
+
+  packet = wire::ndnSIM::Interest::ToWire (source);
+  target = wire::ndnSIM::Interest::FromWire (packet);
+  NS_TEST_ASSERT_MSG_NE (target->GetExclude (), 0, "exclude should not be empty");
+
+  NS_TEST_ASSERT_MSG_EQ (boost::lexical_cast<std::string> (*target->GetExclude ()),
+                         " ----> alex zhenkai ----> ", "exclude should contain only <ANY/>");
 }
 
 void

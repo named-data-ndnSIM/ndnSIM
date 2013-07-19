@@ -35,6 +35,7 @@ Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
   , m_nackType (NORMAL_INTEREST)
+  , m_exclude (0)
   , m_payload (payload)
   , m_wire (0)
 {
@@ -50,6 +51,7 @@ Interest::Interest (const Interest &interest)
   , m_interestLifetime (interest.m_interestLifetime)
   , m_nonce            (interest.m_nonce)
   , m_nackType         (interest.m_nackType)
+  , m_exclude          (interest.m_exclude ? Create<Exclude> (*interest.GetExclude ()) : 0)
   , m_payload          (interest.GetPayload ()->Copy ())
   , m_wire             (0)
 {
@@ -133,6 +135,19 @@ uint8_t
 Interest::GetNack () const
 {
   return m_nackType;
+}
+
+void
+Interest::SetExclude (Ptr<Exclude> exclude)
+{
+  m_exclude = exclude;
+  m_wire = 0;
+}
+
+Ptr<const Exclude>
+Interest::GetExclude () const
+{
+  return m_exclude;
 }
 
 void

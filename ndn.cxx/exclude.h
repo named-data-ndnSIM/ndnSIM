@@ -11,8 +11,9 @@
 #ifndef NDN_EXCLUDE_H
 #define NDN_EXCLUDE_H
 
-#include "name-component.h"
+#include <ns3/simple-ref-count.h>
 
+#include "name-component.h"
 #include <map>
 
 NDN_NAMESPACE_BEGIN
@@ -20,7 +21,7 @@ NDN_NAMESPACE_BEGIN
 /**
  * @brief Class to represent Exclude component in NDN interests
  */
-class Exclude
+class Exclude : public SimpleRefCount<Exclude>
 {
 public:
   typedef std::map< name::Component, bool /*any*/, std::greater<name::Component> > exclude_type;
@@ -34,6 +35,8 @@ public:
    * @brief Default constructor an empty exclude
    */
   Exclude ();
+
+  // no need for explicit copy constructor
 
   /**
    * @brief Check if name component is excluded

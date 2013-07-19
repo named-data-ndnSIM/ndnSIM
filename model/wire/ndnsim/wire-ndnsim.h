@@ -16,7 +16,8 @@
 #include "ns3/buffer.h"
 
 #include "ns3/ndn-common.h"
-#include "ns3/ndn-name.h"
+#include "ns3/ndnSIM/ndn.cxx/name.h"
+#include "ns3/ndnSIM/ndn.cxx/exclude.h"
 
 NDN_NAMESPACE_BEGIN
 
@@ -53,6 +54,42 @@ public:
    */
   static Ptr<Name>
   DeserializeName (Buffer::Iterator &start);
+
+
+  enum Selectors {
+    SelectorExclude = 0x01
+  };
+
+  enum ExcludeTypes {
+    ExcludeNameType = 0x01,
+    ExcludeAnyType = 0x02
+  };
+  
+  /**
+   * @brief Append Exclude in ndnSIM encoding
+   * @param start Buffer to store serialized Interest
+   * @param exclude constant reference to Exclude object
+   *
+   * @returns written length
+   */
+  static size_t
+  SerializeExclude (Buffer::Iterator &start, const Exclude &exclude);
+
+  /**
+   * @brief Estimate size of Exclude in ndnSIM encoding
+   * @param exclude constant reference to Exclude object
+   * @returns estimated length
+   */
+  static size_t
+  SerializedSizeExclude (const Exclude &exclude);
+
+  /**
+   * @brief Deserialize Exclude from ndnSIM encodeing
+   * @param start Buffer that stores serialized Interest
+   * @param exclude Exclude object
+   */
+  static Ptr<Exclude>
+  DeserializeExclude (Buffer::Iterator &start);
 }; // NdnSim
 
 } // wire

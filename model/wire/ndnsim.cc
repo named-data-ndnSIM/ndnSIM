@@ -104,7 +104,11 @@ Interest::GetSerializedSize (void) const
     1/*version*/ + 1 /*type*/ + 2/*length*/ +
     (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
      NdnSim::SerializedSizeName (m_interest->GetName ()) +
-     (2 + 0)/* selectors */ +
+
+     (2 +
+      (m_interest->GetExclude () == 0 ? 0 : (1 + NdnSim::SerializedSizeExclude (*m_interest->GetExclude ())))
+      )/* selectors */ +
+     
      (2 + 0)/* options */);
   
   NS_LOG_INFO ("Serialize size = " << size);
@@ -130,8 +134,18 @@ Interest::Serialize (Buffer::Iterator start) const
   start.WriteU16 (static_cast<uint16_t> (m_interest->GetInterestLifetime ().ToInteger (Time::S)));
 
   NdnSim::SerializeName (start, m_interest->GetName ());
+
+  if (m_interest->GetExclude () == 0)
+    {
+      start.WriteU16 (0); // no selectors
+    }
+  else
+    {
+      start.WriteU16 (1 + NdnSim::SerializedSizeExclude (*m_interest->GetExclude ()));
+      start.WriteU8 (0x01);
+      NdnSim::SerializeExclude (start, *m_interest->GetExclude ());
+    }
   
-  start.WriteU16 (0); // no selectors
   start.WriteU16 (0); // no options
 }
 
@@ -156,7 +170,14 @@ Interest::Deserialize (Buffer::Iterator start)
 
   m_interest->SetName (NdnSim::DeserializeName (i));
   
-  i.ReadU16 ();
+  uint32_t selectorsLen = i.ReadU16 ();
+  if (selectorsLen > 0)
+    {
+      if (i.ReadU8 () != 0x01) // exclude filter only
+        throw InterestException ();
+
+      m_interest->SetExclude (NdnSim::DeserializeExclude (i));
+    }
   i.ReadU16 ();
 
   NS_ASSERT (GetSerializedSize () == (i.GetDistanceFrom (start)));

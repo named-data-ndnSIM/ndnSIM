@@ -27,7 +27,8 @@
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
 
-#include <ns3/ndn-name.h>
+#include <ns3/ndnSIM/ndn.cxx/name.h>
+#include <ns3/ndnSIM/ndn.cxx/exclude.h>
 
 namespace ns3 {
 
@@ -178,7 +179,21 @@ public:
   GetNack () const;
 
   /**
-   * @brief Get virtual "payload" of interest packet
+   * @brief Set exclude filter of interest packet
+   *
+   * Empty or 0 means no exclude filter
+   */
+  void
+  SetExclude (Ptr<Exclude> exclude);
+
+  /**
+   * @brief Get exclude filter of interest packet
+   */
+  Ptr<const Exclude>
+  GetExclude () const;
+  
+  /**
+   * @brief Set virtual "payload" of interest packet
    *
    * This payload can carry packet tags
    */
@@ -186,7 +201,7 @@ public:
   SetPayload (Ptr<Packet> payload);
 
   /**
-   * @brief Set virtual "payload" to interest packet
+   * @brief Get virtual "payload" to interest packet
    *
    * This payload can carry packet tags
    */
@@ -224,6 +239,8 @@ private:
   Time  m_interestLifetime; ///< @brief InterestLifetime
   uint32_t m_nonce;         ///< @brief Nonce. not used if zero
   uint8_t  m_nackType;      ///< @brief Negative Acknowledgement type
+
+  Ptr<Exclude> m_exclude;   ///< @brief Exclude filter
   Ptr<Packet> m_payload;    ///< @brief virtual payload
 
   mutable Ptr<const Packet> m_wire;
