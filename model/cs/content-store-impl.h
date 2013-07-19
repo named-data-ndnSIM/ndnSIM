@@ -155,6 +155,24 @@ ContentStoreImpl< Policy >::GetTypeId ()
   return tid;
 }
 
+struct isNotExcluded
+{
+  inline
+  isNotExcluded (const Exclude &exclude)
+    : m_exclude (exclude)
+  {
+  }
+  
+  bool
+  operator () (const name::Component &comp) const
+  {
+    return !m_exclude.isExcluded (comp);
+  }
+
+private:
+  const Exclude &m_exclude;
+};
+
 template<class Policy>
 Ptr<ContentObject>
 ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
@@ -162,7 +180,16 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
   NS_LOG_FUNCTION (this << interest->GetName ());
 
   /// @todo Change to search with predicate
-  typename super::const_iterator node = this->deepest_prefix_match (interest->GetName ());
+  typename super::const_iterator node;
+  if (interest->GetExclude () == 0)
+    {
+      node = this->deepest_prefix_match (interest->GetName ());
+    }
+  else
+    {
+      node = this->deepest_prefix_match_if_next_level (interest->GetName (),
+                                                       isNotExcluded (*interest->GetExclude ()));
+    }
 
   if (node != this->end ())
     {

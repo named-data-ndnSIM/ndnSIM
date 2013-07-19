@@ -415,6 +415,32 @@ public:
     return 0;
   }
 
+  /**
+   * @brief Find next payload of the sub-trie satisfying the predicate
+   * @param pred predicate
+   *
+   * This version check predicate only for the next level children
+   *
+   * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
+   */
+  template<class Predicate>
+  inline const iterator
+  find_if_next_level (Predicate pred)
+  {
+    typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
+    for (typename trie::unordered_set::iterator subnode = children_.begin ();
+         subnode != children_.end ();
+         subnode++ )
+      {
+        if (pred (subnode->key ()))
+          {
+            return subnode->find ();
+          }
+      }
+
+    return 0;
+  }
+
   iterator end ()
   {
     return 0;

@@ -210,7 +210,7 @@ public:
    */
   template<class Predicate>
   inline iterator
-  deepest_prefix_match (const FullKey &key, Predicate pred)
+  deepest_prefix_match_if (const FullKey &key, Predicate pred)
   {
     iterator foundItem, lastItem;
     bool reachLast;
@@ -236,6 +236,40 @@ public:
       }
   }
 
+  /**
+   * @brief Find a node that has prefix at least as the key
+   *
+   * This version of find checks predicate for the next level and if
+   * predicate is True, returns first deepest match available
+   */
+  template<class Predicate>
+  inline iterator
+  deepest_prefix_match_if_next_level (const FullKey &key, Predicate pred)
+  {
+    iterator foundItem, lastItem;
+    bool reachLast;
+    boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+
+    // guard in case we don't have anything in the trie
+    if (lastItem == trie_.end ())
+      return trie_.end ();
+
+    if (reachLast)
+      {
+        foundItem = lastItem->find_if_next_level (pred); // may or may not find something
+        if (foundItem == trie_.end ())
+          {
+            return trie_.end ();
+          }
+        policy_.lookup (s_iterator_to (foundItem));
+        return foundItem;
+      }
+    else
+      { // couldn't find a node that has prefix at least as key
+        return trie_.end ();
+      }
+  }
+  
   iterator end () const
   {
     return 0;

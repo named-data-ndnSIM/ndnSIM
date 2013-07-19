@@ -139,7 +139,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
       data->SetKeyLocator (Create<Name> (m_keyLocator));
     }
 
-  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject:\n" << data->GetName ());
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject: " << data->GetName ());
 
   // Echo back FwHopCountTag if exists
   FwHopCountTag hopCountTag;

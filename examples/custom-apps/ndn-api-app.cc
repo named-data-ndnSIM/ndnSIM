@@ -61,6 +61,10 @@ ApiApp::RequestData ()
   Ptr<Interest> interest = Create<Interest> ();
   interest->SetName (m_name);
   interest->SetInterestLifetime (m_interestLifetime);
+
+  Ptr<Exclude> exclude = Create<Exclude> ();
+  exclude->excludeOne (name::Component ("unique"));
+  interest->SetExclude (exclude);
   
   m_face->ExpressInterest (interest,
                            MakeCallback (&ApiApp::GotData, this),
@@ -80,6 +84,7 @@ ApiApp::StartApplication ()
   m_face = CreateObject<ApiFace> (GetNode ());
   
   Simulator::Schedule (Seconds (1), &::ns3::ndn::ApiApp::RequestData, this);
+  Simulator::Schedule (Seconds (10), &::ns3::ndn::ApiApp::RequestData, this);
 }
 
 void
