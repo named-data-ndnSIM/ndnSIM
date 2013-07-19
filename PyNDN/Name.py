@@ -40,11 +40,10 @@ class Name ():
 
     @staticmethod
     def fromWire (wire):
-        return ns.ndnSIM.ndn.Wire.ToName (wire)
+        return Name (name = ns.ndnSIM.ndn.Wire.ToName (wire))
 
-    @staticmethod
-    def toWire (name):
-        return ns.ndnSIM.ndn.Wire.FromName (name)
+    def toWire (self):
+        return ns.ndnSIM.ndn.Wire.FromName (self._name)
     
     def __getattr__ (self, name):
         return self._name.__getattribute__ (name)

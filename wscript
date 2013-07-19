@@ -193,6 +193,10 @@ def build(bld):
 
     bld.ns3_python_bindings()
 
+    bld (features = "pyext",
+         source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+         install_from = "."
+         )
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')
