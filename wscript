@@ -124,6 +124,7 @@ def build(bld):
         "helper/ndn-header-helper.h",
         "helper/ndn-face-container.h",
         "helper/ndn-global-routing-helper.h",
+        "helper/ndn-link-control-helper.h",
 
         "apps/ndn-app.h",
 
