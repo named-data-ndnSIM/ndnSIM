@@ -161,7 +161,7 @@ Simulating using ndnSIM
 
 While it is possible to write simulations directly inside NS-3 (in ``scratch/`` folder) or ndnSIM (in ``examples/``), the recommended way is to write your simulation scenarios, as well as any custom extensions, separately from the NS-3 or ndnSIM core.
 
-For example, you can you can use the following template to write your extensions, simulation scenarios, and metric processing scripts: `<http://github.com/cawka/ndnSIM-scenario-template>`_:
+For example, you can use the following template to write your extensions, simulation scenarios, and metric processing scripts: `<http://github.com/cawka/ndnSIM-scenario-template>`_:
 
 .. code-block:: bash
 
