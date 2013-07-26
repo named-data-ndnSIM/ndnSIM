@@ -47,7 +47,7 @@ public:
     typename PolicyTraits::template container_hook<parent_trie>::type >::type policy_container;
 
   inline
-  trie_with_policy (size_t bucketSize = 10, size_t bucketIncrement = 10)
+  trie_with_policy (size_t bucketSize = 1, size_t bucketIncrement = 1)
     : trie_ (name::Component (), bucketSize, bucketIncrement)
     , policy_ (*this)
   {

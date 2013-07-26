@@ -151,7 +151,7 @@ public:
   typedef PayloadTraits payload_traits;
 
   inline
-  trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10)
+  trie (const Key &key, size_t bucketSize = 1, size_t bucketIncrement = 1)
     : key_ (key)
     , initialBucketSize_ (bucketSize)
     , bucketIncrement_ (bucketIncrement)
