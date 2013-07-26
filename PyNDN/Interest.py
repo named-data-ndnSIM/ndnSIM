@@ -41,8 +41,18 @@ class Interest (object):
             self.scope = scope
             self.interestLifetime = interestLifetime
 
+    @staticmethod
+    def fromWire (wire):
+        return Interest (interest = ns.ndnSIM.ndn.Wire.ToInterest (wire))
+
+    def toWire (self):
+        return ns.ndnSIM.ndn.Wire.FromInterest (self._interest)
+
     def __getattr__ (self, name):
-        if name == "name":
+        if name == "_interest":
+            return object.__getattr__ (self, name)
+
+        elif name == "name":
             return Name (self._interest.GetName ())
         elif name == "scope":
             return self._interest.GetScope ()
@@ -54,6 +64,7 @@ class Interest (object):
     def __setattr__(self, name, value):
         if name == "_interest":
             return object.__setattr__ (self, name, value)
+
         elif name == "name":
             if not value:
                 return self._interest.SetName (ns.ndnSIM.ndn.Name ())
