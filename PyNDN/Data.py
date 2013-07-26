@@ -1,12 +1,12 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
-# 
+#
 # Copyright (c) 2011-2013, Regents of the University of California
 #                          Alexander Afanasyev
-# 
+#
 # GNU 3.0 license, See the LICENSE file for more information
-# 
+#
 # Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
-# 
+#
 
 #
 # Based on PyCCN code, copyrighted and licensed as follows
@@ -19,6 +19,9 @@
 
 import ns.ndnSIM
 from Name import Name
+
+class DataError (Exception):
+    pass
 
 class Data (object):
     _data = None
@@ -40,16 +43,33 @@ class Data (object):
             self.content = content
             self.signedInfo = signed_info or SignedInfo ()
 
+    @staticmethod
+    def fromWire (wire):
+        data = Data (data = ns.ndnSIM.ndn.Wire.ToData (wire))
+        # timestamp
+        data.signedInfo.freshnessSeconds = data._data.GetFreshness ()
+        if data._data.GetKeyLocator ():
+            data.keyLocator = Name (_name = data._data.GetKeyLocator ())
+
     def sign (self, key):
         """There is no actual signing in ndnSIM for now, but we will assign signature bits based on key"""
         self._data.SetSignature (key.fakeKey)
+
+    def toWire (self):
+        if self._data.GetSignature () == 0:
+            raise DataError ("Data packet has not been signed, cannot create wire format")
+
+        return ns.ndnSIM.ndn.Wire.FromData (self._data)
 
     def verify_signature (self, key):
         """There is no actual signing in ndnSIM for now, but we will check if signature matches the key"""
         return self._data.GetSignature () == key.fakeKey
 
     def __getattr__ (self, name):
-        if name == "signedInfo":
+        if name == "_data":
+            return object.__getattr__ (self, name)
+
+        elif name == "signedInfo":
             return object.__getattr__ (self, name)
         elif name == "name":
             return Name (self._data.GetName ())
@@ -57,24 +77,29 @@ class Data (object):
             return self._data.GetScope ()
         elif name == "interestLifetime":
             return self._data.GetInterestLifetime ().ToDouble (ns.core.Time.S)
+        elif name == "content":
+            pkt = self._data.GetContent ()
+            return ns.ndnSIM.ndn.PacketToBuffer (pkt)
         else:
             return self._data.__getattribute__ (name)
 
     def __setattr__(self, name, value):
         if name == "_data":
             return object.__setattr__ (self, name, value)
+
         elif name == 'signedInfo':
             if not value:
                 return
             if type (value) is SignedInfo:
                 object.__setattr__ (self, name, value)
-                
+
                 if value.timestamp:
+                    # ?
                     pass
                 if value.freshnessSeconds:
-                    pass
+                    self._data.SetFreshness (ns.core.Seconds (value))
                 if value.keyLocator:
-                    pass
+                    self._data.SetKeyLocator (value._name)
             else:
                 raise TypeError ("signedInfo can be assigned either None or SignedInfo object, [%s] supplied" % type (value))
         elif name == "name":
@@ -93,7 +118,7 @@ class Data (object):
                 pkt = ns.network.Packet ()
                 self._data.SetPayload (pkt)
             else:
-                pkt = ns.network.Packet (bytes (value))
+                pkt = ns.ndnSIM.ndn.BufferToPacket (bytes (value))
                 self._data.SetPayload (pkt)
         else:
             raise NameError ("Unknown attribute [%s]" % name)
