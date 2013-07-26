@@ -184,6 +184,9 @@ Face::Receive (Ptr<const Packet> p)
           return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_NDNSIM));
         case HeaderHelper::CONTENT_OBJECT_CCNB:
           return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_CCNB));
+        default:
+          NS_FATAL_ERROR ("Not supported NDN header");
+          return false;
         }
 
       // exception will be thrown if packet is not recognized
@@ -193,6 +196,8 @@ Face::Receive (Ptr<const Packet> p)
       NS_FATAL_ERROR ("Unknown NDN header. Should not happen");
       return false;
     }
+
+  return false;
 }
 
 bool
