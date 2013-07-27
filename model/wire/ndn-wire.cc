@@ -97,6 +97,7 @@ Wire::ToInterest (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETE
           NS_FATAL_ERROR ("Unknown NDN header");
           return 0;
         }
+        return 0;
     }
   else
     {
@@ -163,6 +164,7 @@ Wire::ToData (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETECT*/
           NS_FATAL_ERROR ("Unknown NDN header");
           return 0;
         }
+        return 0;
     }
   else
     {
