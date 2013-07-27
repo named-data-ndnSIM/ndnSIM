@@ -85,6 +85,9 @@ Wire::ToInterest (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETE
             case HeaderHelper::CONTENT_OBJECT_CCNB:
               NS_FATAL_ERROR ("Data packet supplied for InterestFromWire function");
               break;
+            default:
+              NS_FATAL_ERROR ("Unsupported format");
+              return 0;
             }
 
           // exception will be thrown if packet is not recognized
@@ -148,6 +151,9 @@ Wire::ToData (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETECT*/
             case HeaderHelper::INTEREST_CCNB:
               NS_FATAL_ERROR ("Interest supplied for DataFromWire function");
               break;
+            default:
+              NS_FATAL_ERROR ("Unsupported format");
+              return 0;
             }
 
           // exception will be thrown if packet is not recognized
