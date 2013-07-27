@@ -110,6 +110,8 @@ private:
 
 NS_OBJECT_ENSURE_REGISTERED (TcpFace);
 
+const Callback< void, Ptr<Face> > TcpFace::NULL_CREATE_CALLBACK = MakeNullCallback< void, Ptr<Face> > ();
+
 TypeId
 TcpFace::GetTypeId ()
 {
@@ -144,19 +146,31 @@ TcpFace& TcpFace::operator= (const TcpFace &)
 }
 
 void
-TcpFace::RegisterProtocolHandler (ProtocolHandler handler)
+TcpFace::RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler)
 {
   NS_LOG_FUNCTION (this);
 
-  Face::RegisterProtocolHandler (handler);
-
+  Face::RegisterProtocolHandlers (interestHandler, dataHandler);
   m_socket->SetRecvCallback (MakeCallback (&TcpFace::ReceiveFromTcp, this));
 }
 
-bool
-TcpFace::SendImpl (Ptr<Packet> packet)
+void
+TcpFace:: UnRegisterProtocolHandlers ()
 {
+  m_socket->SetRecvCallback (MakeNullCallback< void, Ptr<Socket> > ());
+  Face::UnRegisterProtocolHandlers ();
+}
+
+bool
+TcpFace::Send (Ptr<Packet> packet)
+{
+  if (!Face::Send (packet))
+    {
+      return false;
+    }
+  
   NS_LOG_FUNCTION (this << packet);
+
   Ptr<Packet> boundary = Create<Packet> ();
   TcpBoundaryHeader hdr (packet);
   boundary->AddHeader (hdr);
@@ -247,7 +261,7 @@ TcpFace::GetFaceByAddress (const Ipv4Address &address)
 }
 
 Ptr<TcpFace>
-TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address)
+TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address, Callback< void, Ptr<Face> > onCreate)
 {
   NS_LOG_FUNCTION (address);
 
@@ -257,6 +271,8 @@ TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address)
   
   Ptr<Socket> socket = Socket::CreateSocket (node, TcpSocketFactory::GetTypeId ());
   Ptr<TcpFace> face = CreateObject<TcpFace> (node, socket, address);
+
+  face->SetCreateCallback (onCreate);
   
   socket->SetConnectCallback (MakeCallback (&TcpFace::OnConnect, face),
                               MakeNullCallback< void, Ptr< Socket > > ());
@@ -265,6 +281,12 @@ TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address)
   s_map.insert (std::make_pair (address, face));
 
   return face;
+}
+
+void
+TcpFace::SetCreateCallback (Callback< void, Ptr<Face> > callback)
+{
+  m_onCreateCallback = callback;
 }
 
 void
@@ -279,6 +301,12 @@ TcpFace::OnConnect (Ptr<Socket> socket)
 
   socket->SetCloseCallbacks (MakeCallback (&TcpFace::OnTcpConnectionClosed, this),
                              MakeCallback (&TcpFace::OnTcpConnectionClosed, this));
+
+  if (!m_onCreateCallback.IsNull ())
+    {
+      m_onCreateCallback (this);
+      m_onCreateCallback = NULL_CREATE_CALLBACK;
+    }
 }
     
 std::ostream&

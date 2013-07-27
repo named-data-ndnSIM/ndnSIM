@@ -60,25 +60,45 @@ IpFacesHelper::InstallAll ()
 }
 
 
-static void
-CreateTcpFaceStep2 (Ptr<Node> node, Ipv4Address address, const std::string &prefix)
+struct TcpPrefixRegistrator : SimpleRefCount<TcpPrefixRegistrator>
 {
-  Ptr<Face> face = TcpFace::CreateOrGetFace (node, address);
-  ndn::StackHelper::AddRoute (node, prefix, face, 1);
-}
+  TcpPrefixRegistrator (Ptr<Node> node, const std::string &prefix, int16_t metric)
+    : m_node (node)
+    , m_prefix (prefix)
+    , m_metric (metric)
+  {
+  }
+
+  void
+  Run (Ptr<Face> face)
+  {
+    ndn::StackHelper::AddRoute (m_node, m_prefix, face, m_metric);
+  }
+private:
+  Ptr<Node> m_node;
+  std::string m_prefix;
+  int16_t m_metric;
+};
 
 static void
-CreateTcpFaceStep1 (Ptr<Node> node, Ipv4Address address, const std::string &prefix)
+ScheduledCreateTcp (Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric)
 {
-  TcpFace::CreateOrGetFace (node, address);
-  
-  Simulator::ScheduleWithContext (node->GetId (), Seconds (1.0), CreateTcpFaceStep2, node, address, prefix);
+  Ptr<Face> face = TcpFace::GetFaceByAddress (address);
+  if (face == 0)
+    {
+      Ptr<TcpPrefixRegistrator> registrator = Create<TcpPrefixRegistrator> (node, prefix, metric);
+      TcpFace::CreateOrGetFace (node, address, MakeCallback (&TcpPrefixRegistrator::Run, registrator));
+    }
+  else
+    {
+      ndn::StackHelper::AddRoute (node, prefix, face, metric);
+    }
 }
 
 void
-IpFacesHelper::CreateTcpFace (Ptr<Node> node, Ipv4Address address, const std::string &prefix)
+IpFacesHelper::CreateTcpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric/* = 1*/)
 {
-  Simulator::ScheduleWithContext (node->GetId (), Seconds (1.0), CreateTcpFaceStep1, node, address, prefix);
+  Simulator::ScheduleWithContext (node->GetId (), when, ScheduledCreateTcp, node, address, prefix, metric);
 }
 
 

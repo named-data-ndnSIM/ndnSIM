@@ -97,9 +97,8 @@ main (int argc, char *argv[])
                        Ipv4Address ("10.1.2.1"),
                        1, 1);
   
-  ndn::IpFacesHelper ipFacesHelper;
-  ipFacesHelper.InstallAll ();
-  ipFacesHelper.CreateTcpFace (nodes.Get (0), Ipv4Address ("10.1.2.2"), "/tcp-route");
+  ndn::IpFacesHelper::InstallAll ();
+  ndn::IpFacesHelper::CreateTcpFace (Seconds (1.0), nodes.Get (0), Ipv4Address ("10.1.2.2"), "/tcp-route");
   
   // Installing applications
 

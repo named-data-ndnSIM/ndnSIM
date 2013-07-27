@@ -26,6 +26,7 @@
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
+#include "ns3/boolean.h"
 
 #include "ns3/socket.h"
 #include "ns3/tcp-socket-factory.h"

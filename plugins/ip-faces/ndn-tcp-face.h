@@ -24,6 +24,7 @@
 #include "ns3/ndn-face.h"
 #include "ns3/socket.h"
 #include "ns3/ptr.h"
+#include "ns3/callback.h"
 
 #include <map>
 
@@ -48,7 +49,8 @@ public:
    * All created TCP faces are stored internally in the map, and if the same face is created, it will simply be looked up
    */
   static Ptr<TcpFace>
-  CreateOrGetFace (Ptr<Node> node, Ipv4Address address);
+  CreateOrGetFace (Ptr<Node> node, Ipv4Address address,
+                   Callback< void, Ptr<Face> > onCreate = NULL_CREATE_CALLBACK);
   
   /**
    * \brief Constructor
@@ -59,9 +61,12 @@ public:
   virtual ~TcpFace();
 
   ////////////////////////////////////////////////////////////////////
-  // methods overloaded from NdnFace
+  // methods overloaded from ndn::Face
   virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
+  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
+
+  virtual void
+  UnRegisterProtocolHandlers ();
 
   void
   OnTcpConnectionClosed (Ptr<Socket> socket);
@@ -72,14 +77,19 @@ public:
   static Ptr<TcpFace>
   GetFaceByAddress (const Ipv4Address &addr);
 
+  void
+  SetCreateCallback (Callback< void, Ptr<Face> > callback);
+
+public:
+  const static Callback< void, Ptr<Face> > NULL_CREATE_CALLBACK;
 private:
   void
   OnConnect (Ptr<Socket> socket);
   
 protected:
-  // also from NdnFace
+  // also from ndn::Face
   virtual bool
-  SendImpl (Ptr<Packet> p);
+  Send (Ptr<Packet> p);
 
 public:
   /**
@@ -100,6 +110,7 @@ private:
   Ptr<Socket> m_socket;
   Ipv4Address m_address;
   uint32_t m_pendingPacketLength;
+  Callback< void, Ptr<Face> > m_onCreateCallback;
 
   typedef std::map<Ipv4Address, Ptr<TcpFace> > FaceMap;
   static FaceMap s_map;
