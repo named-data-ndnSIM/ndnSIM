@@ -143,53 +143,49 @@ ForwardingStrategy::DoDispose ()
 
 void
 ForwardingStrategy::OnInterest (Ptr<Face> inFace,
-                                Ptr<const Interest> header,
-                                Ptr<const Packet> origPacket)
+                                Ptr<Interest> interest)
 {
-  m_inInterests (header, inFace);
+  NS_LOG_FUNCTION (inFace << interest->GetName ());
+  m_inInterests (interest, inFace);
 
-  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
+  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*interest);
   bool similarInterest = true;
   if (pitEntry == 0)
     {
       similarInterest = false;
-      pitEntry = m_pit->Create (header);
+      pitEntry = m_pit->Create (interest);
       if (pitEntry != 0)
         {
-          DidCreatePitEntry (inFace, header, origPacket, pitEntry);
+          DidCreatePitEntry (inFace, interest, pitEntry);
         }
       else
         {
-          FailedToCreatePitEntry (inFace, header, origPacket);
+          FailedToCreatePitEntry (inFace, interest);
           return;
         }
     }
 
   bool isDuplicated = true;
-  if (!pitEntry->IsNonceSeen (header->GetNonce ()))
+  if (!pitEntry->IsNonceSeen (interest->GetNonce ()))
     {
-      pitEntry->AddSeenNonce (header->GetNonce ());
+      pitEntry->AddSeenNonce (interest->GetNonce ());
       isDuplicated = false;
     }
 
   if (isDuplicated)
     {
-      DidReceiveDuplicateInterest (inFace, header, origPacket, pitEntry);
+      DidReceiveDuplicateInterest (inFace, interest, pitEntry);
       return;
     }
 
-  Ptr<Packet> contentObject;
-  Ptr<const ContentObject> contentObjectHeader; // used for tracing
-  Ptr<const Packet> payload; // used for tracing
-  boost::tie (contentObject, contentObjectHeader, payload) = m_contentStore->Lookup (header);
+  Ptr<ContentObject> contentObject;
+  contentObject = m_contentStore->Lookup (interest);
   if (contentObject != 0)
     {
-      NS_ASSERT (contentObjectHeader != 0);
-
       FwHopCountTag hopCountTag;
-      if (origPacket->PeekPacketTag (hopCountTag))
+      if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
         {
-          contentObject->AddPacketTag (hopCountTag);
+          contentObject->GetPayload ()->AddPacketTag (hopCountTag);
         }
 
       pitEntry->AddIncoming (inFace/*, Seconds (1.0)*/);
@@ -198,56 +194,49 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       WillSatisfyPendingInterest (0, pitEntry);
 
       // Actually satisfy pending interest
-      SatisfyPendingInterest (0, contentObjectHeader, payload, contentObject, pitEntry);
+      SatisfyPendingInterest (0, contentObject, pitEntry);
       return;
     }
 
-  if (similarInterest && ShouldSuppressIncomingInterest (inFace, header, origPacket, pitEntry))
+  if (similarInterest && ShouldSuppressIncomingInterest (inFace, interest, pitEntry))
     {
-      pitEntry->AddIncoming (inFace/*, header->GetInterestLifetime ()*/);
+      pitEntry->AddIncoming (inFace/*, interest->GetInterestLifetime ()*/);
       // update PIT entry lifetime
-      pitEntry->UpdateLifetime (header->GetInterestLifetime ());
+      pitEntry->UpdateLifetime (interest->GetInterestLifetime ());
 
       // Suppress this interest if we're still expecting data from some other face
       NS_LOG_DEBUG ("Suppress interests");
-      m_dropInterests (header, inFace);
+      m_dropInterests (interest, inFace);
 
-      DidSuppressSimilarInterest (inFace, header, origPacket, pitEntry);
+      DidSuppressSimilarInterest (inFace, interest, pitEntry);
       return;
     }
 
   if (similarInterest)
     {
-      DidForwardSimilarInterest (inFace, header, origPacket, pitEntry);
+      DidForwardSimilarInterest (inFace, interest, pitEntry);
     }
 
-  PropagateInterest (inFace, header, origPacket, pitEntry);
+  PropagateInterest (inFace, interest, pitEntry);
 }
 
 void
 ForwardingStrategy::OnData (Ptr<Face> inFace,
-                            Ptr<const ContentObject> header,
-                            Ptr<Packet> payload,
-                            Ptr<const Packet> origPacket)
+                            Ptr<ContentObject> data)
 {
-  NS_LOG_FUNCTION (inFace << header->GetName () << payload << origPacket);
-  m_inData (header, payload, inFace);
+  NS_LOG_FUNCTION (inFace << data->GetName ());
+  m_inData (data, inFace);
 
   // Lookup PIT entry
-  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*header);
+  Ptr<pit::Entry> pitEntry = m_pit->Lookup (*data);
   if (pitEntry == 0)
     {
       bool cached = false;
 
       if (m_cacheUnsolicitedData || (m_cacheUnsolicitedDataFromApps && (inFace->GetFlags () | Face::APPLICATION)))
         {
-          FwHopCountTag hopCountTag;
-
-          Ptr<Packet> payloadCopy = payload->Copy ();
-          payloadCopy->RemovePacketTag (hopCountTag);
-
           // Optimistically add or update entry in the content store
-          cached = m_contentStore->Add (header, payloadCopy);
+          cached = m_contentStore->Add (data);
         }
       else
         {
@@ -255,32 +244,16 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
           // (unsolicited data packets should not "poison" content store)
 
           //drop dulicated or not requested data packet
-          m_dropData (header, payload, inFace);
+          m_dropData (data, inFace);
         }
 
-      DidReceiveUnsolicitedData (inFace, header, payload, origPacket, cached);
+      DidReceiveUnsolicitedData (inFace, data, cached);
       return;
     }
   else
     {
-      bool cached = false;
-
-      FwHopCountTag hopCountTag;
-      if (payload->PeekPacketTag (hopCountTag))
-        {
-          Ptr<Packet> payloadCopy = payload->Copy ();
-          payloadCopy->RemovePacketTag (hopCountTag);
-
-          // Add or update entry in the content store
-          cached = m_contentStore->Add (header, payloadCopy);
-        }
-      else
-        {
-          // Add or update entry in the content store
-          cached = m_contentStore->Add (header, payload); // no need for extra copy
-        }
-
-      DidReceiveSolicitedData (inFace, header, payload, origPacket, cached);
+      bool cached = m_contentStore->Add (data);
+      DidReceiveSolicitedData (inFace, data, cached);
     }
 
   while (pitEntry != 0)
@@ -289,33 +262,30 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
       WillSatisfyPendingInterest (inFace, pitEntry);
 
       // Actually satisfy pending interest
-      SatisfyPendingInterest (inFace, header, payload, origPacket, pitEntry);
+      SatisfyPendingInterest (inFace, data, pitEntry);
 
       // Lookup another PIT entry
-      pitEntry = m_pit->Lookup (*header);
+      pitEntry = m_pit->Lookup (*data);
     }
 }
 
 void
 ForwardingStrategy::DidCreatePitEntry (Ptr<Face> inFace,
-                                       Ptr<const Interest> header,
-                                       Ptr<const Packet> origPacket,
+                                       Ptr<const Interest> interest,
                                        Ptr<pit::Entry> pitEntrypitEntry)
 {
 }
 
 void
 ForwardingStrategy::FailedToCreatePitEntry (Ptr<Face> inFace,
-                                            Ptr<const Interest> header,
-                                            Ptr<const Packet> origPacket)
+                                            Ptr<const Interest> interest)
 {
-  m_dropInterests (header, inFace);
+  m_dropInterests (interest, inFace);
 }
 
 void
 ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                                                 Ptr<const Interest> header,
-                                                 Ptr<const Packet> origPacket,
+                                                 Ptr<const Interest> interest,
                                                  Ptr<pit::Entry> pitEntry)
 {
   /////////////////////////////////////////////////////////////////////////////////////////
@@ -324,35 +294,32 @@ ForwardingStrategy::DidReceiveDuplicateInterest (Ptr<Face> inFace,
   //                                                                                     //
   /////////////////////////////////////////////////////////////////////////////////////////
   pitEntry->AddIncoming (inFace);
-  m_dropInterests (header, inFace);
+  m_dropInterests (interest, inFace);
 }
 
 void
 ForwardingStrategy::DidSuppressSimilarInterest (Ptr<Face> face,
-                                                Ptr<const Interest> header,
-                                                Ptr<const Packet> origPacket,
+                                                Ptr<const Interest> interest,
                                                 Ptr<pit::Entry> pitEntry)
 {
 }
 
 void
 ForwardingStrategy::DidForwardSimilarInterest (Ptr<Face> inFace,
-                                               Ptr<const Interest> header,
-                                               Ptr<const Packet> origPacket,
+                                               Ptr<const Interest> interest,
                                                Ptr<pit::Entry> pitEntry)
 {
 }
 
 void
 ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
-                                                 Ptr<const Interest> header,
-                                                 Ptr<const Packet> origPacket,
+                                                 Ptr<const Interest> interest,
                                                  Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << boost::cref (*inFace));
   if (pitEntry->AreAllOutgoingInVain ())
     {
-      m_dropInterests (header, inFace);
+      m_dropInterests (interest, inFace);
 
       // All incoming interests cannot be satisfied. Remove them
       pitEntry->ClearIncoming ();
@@ -369,8 +336,7 @@ ForwardingStrategy::DidExhaustForwardingOptions (Ptr<Face> inFace,
 
 bool
 ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
-                                                 Ptr<const Interest> header,
-                                                 Ptr<const Packet> packet,
+                                                 Ptr<const Interest> interest,
                                                  Ptr<pit::Entry> pitEntry)
 {
   pit::Entry::in_iterator existingInFace = pitEntry->GetIncoming ().find (inFace);
@@ -388,9 +354,7 @@ ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
-                                            Ptr<const ContentObject> header,
-                                            Ptr<const Packet> payload,
-                                            Ptr<const Packet> origPacket,
+                                            Ptr<const ContentObject> data,
                                             Ptr<pit::Entry> pitEntry)
 {
   if (inFace != 0)
@@ -399,14 +363,14 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
   //satisfy all pending incoming Interests
   BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
     {
-      bool ok = incoming.m_face->Send (origPacket->Copy ());
+      bool ok = incoming.m_face->SendData (data);
 
-      DidSendOutData (inFace, incoming.m_face, header, payload, origPacket, pitEntry);
+      DidSendOutData (inFace, incoming.m_face, data, pitEntry);
       NS_LOG_DEBUG ("Satisfy " << *incoming.m_face);
 
       if (!ok)
         {
-          m_dropData (header, payload, incoming.m_face);
+          m_dropData (data, incoming.m_face);
           NS_LOG_DEBUG ("Cannot satisfy data to " << *incoming.m_face);
         }
     }
@@ -423,9 +387,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
-                                             Ptr<const ContentObject> header,
-                                             Ptr<const Packet> payload,
-                                             Ptr<const Packet> origPacket,
+                                             Ptr<const ContentObject> data,
                                              bool didCreateCacheEntry)
 {
   // do nothing
@@ -433,9 +395,7 @@ ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                                               Ptr<const ContentObject> header,
-                                               Ptr<const Packet> payload,
-                                               Ptr<const Packet> origPacket,
+                                               Ptr<const ContentObject> data,
                                                bool didCreateCacheEntry)
 {
   // do nothing
@@ -458,8 +418,7 @@ ForwardingStrategy::WillSatisfyPendingInterest (Ptr<Face> inFace,
 
 bool
 ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
-                                                    Ptr<const Interest> header,
-                                                    Ptr<const Packet> origPacket,
+                                                    Ptr<const Interest> interest,
                                                     Ptr<pit::Entry> pitEntry)
 {
   bool isNew = pitEntry->GetIncoming ().size () == 0 && pitEntry->GetOutgoing ().size () == 0;
@@ -467,7 +426,7 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
   if (isNew) return false; // never suppress new interests
 
   bool isRetransmitted = m_detectRetransmissions && // a small guard
-                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);
+                         DetectRetransmittedInterest (inFace, interest, pitEntry);
 
   if (pitEntry->GetOutgoing ().find (inFace) != pitEntry->GetOutgoing ().end ())
     {
@@ -493,18 +452,17 @@ ForwardingStrategy::ShouldSuppressIncomingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
-                                       Ptr<const Interest> header,
-                                       Ptr<const Packet> origPacket,
+                                       Ptr<const Interest> interest,
                                        Ptr<pit::Entry> pitEntry)
 {
   bool isRetransmitted = m_detectRetransmissions && // a small guard
-                         DetectRetransmittedInterest (inFace, header, origPacket, pitEntry);
+                         DetectRetransmittedInterest (inFace, interest, pitEntry);
 
-  pitEntry->AddIncoming (inFace/*, header->GetInterestLifetime ()*/);
+  pitEntry->AddIncoming (inFace/*, interest->GetInterestLifetime ()*/);
   /// @todo Make lifetime per incoming interface
-  pitEntry->UpdateLifetime (header->GetInterestLifetime ());
+  pitEntry->UpdateLifetime (interest->GetInterestLifetime ());
 
-  bool propagated = DoPropagateInterest (inFace, header, origPacket, pitEntry);
+  bool propagated = DoPropagateInterest (inFace, interest, pitEntry);
 
   if (!propagated && isRetransmitted) //give another chance if retransmitted
     {
@@ -512,13 +470,13 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
       pitEntry->IncreaseAllowedRetxCount ();
 
       // try again
-      propagated = DoPropagateInterest (inFace, header, origPacket, pitEntry);
+      propagated = DoPropagateInterest (inFace, interest, pitEntry);
     }
 
   // if (!propagated)
   //   {
   //     NS_LOG_DEBUG ("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-  //     NS_LOG_DEBUG ("+++ Not propagated ["<< header->GetName () <<"], but number of outgoing faces: " << pitEntry->GetOutgoing ().size ());
+  //     NS_LOG_DEBUG ("+++ Not propagated ["<< interest->GetName () <<"], but number of outgoing faces: " << pitEntry->GetOutgoing ().size ());
   //     NS_LOG_DEBUG ("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
   //   }
 
@@ -527,15 +485,14 @@ ForwardingStrategy::PropagateInterest (Ptr<Face> inFace,
   // ForwardingStrategy failed to find it.
   if (!propagated && pitEntry->AreAllOutgoingInVain ())
     {
-      DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
+      DidExhaustForwardingOptions (inFace, interest, pitEntry);
     }
 }
 
 bool
 ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const Interest> header,
-                                        Ptr<const Packet> origPacket,
+                                        Ptr<const Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
   if (outFace == inFace)
@@ -565,11 +522,10 @@ ForwardingStrategy::CanSendOutInterest (Ptr<Face> inFace,
 bool
 ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const Interest> header,
-                                        Ptr<const Packet> origPacket,
+                                        Ptr<const Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
-  if (!CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+  if (!CanSendOutInterest (inFace, outFace, interest, pitEntry))
     {
       return false;
     }
@@ -577,14 +533,13 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
   pitEntry->AddOutgoing (outFace);
 
   //transmission
-  Ptr<Packet> packetToSend = origPacket->Copy ();
-  bool successSend = outFace->Send (packetToSend);
+  bool successSend = outFace->SendInterest (interest);
   if (!successSend)
     {
-      m_dropInterests (header, outFace);
+      m_dropInterests (interest, outFace);
     }
 
-  DidSendOutInterest (inFace, outFace, header, origPacket, pitEntry);
+  DidSendOutInterest (inFace, outFace, interest, pitEntry);
 
   return true;
 }
@@ -592,22 +547,19 @@ ForwardingStrategy::TrySendOutInterest (Ptr<Face> inFace,
 void
 ForwardingStrategy::DidSendOutInterest (Ptr<Face> inFace,
                                         Ptr<Face> outFace,
-                                        Ptr<const Interest> header,
-                                        Ptr<const Packet> origPacket,
+                                        Ptr<const Interest> interest,
                                         Ptr<pit::Entry> pitEntry)
 {
-  m_outInterests (header, outFace);
+  m_outInterests (interest, outFace);
 }
 
 void
 ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
                                     Ptr<Face> outFace,
-                                    Ptr<const ContentObject> header,
-                                    Ptr<const Packet> payload,
-                                    Ptr<const Packet> origPacket,
+                                    Ptr<const ContentObject> data,
                                     Ptr<pit::Entry> pitEntry)
 {
-  m_outData (header, payload, inFace == 0, outFace);
+  m_outData (data, inFace == 0, outFace);
 }
 
 void

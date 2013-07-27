@@ -35,9 +35,6 @@ namespace ndn {
 class Interest;
 class ContentObject;
 
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
-
 class Face;
 
 /**
@@ -49,11 +46,6 @@ class Face;
 class App: public Application
 {
 public:
-  /**
-   * @brief A callback to pass packets to underlying NDN protocol
-   */
-  typedef Callback<bool, const Ptr<const Packet>&> ProtocolHandler;
-  
   static TypeId GetTypeId ();
 
   /**
@@ -61,12 +53,6 @@ public:
    */
   App ();
   virtual ~App ();
-
-  /**
-   * @brief Register lower layer callback (to send interests from the application)
-   */
-  void
-  RegisterProtocolHandler (ProtocolHandler handler);
 
   /**
    * @brief Get application ID (ID of applications face)
@@ -81,14 +67,14 @@ public:
    *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  OnInterest (Ptr<const Interest> interest);
 
   /**
    * @brief Method that will be called every time new NACK arrives
    * @param interest Interest header
    */
   virtual void
-  OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  OnNack (Ptr<const Interest> interest);
   
   /**
    * @brief Method that will be called every time new ContentObject arrives
@@ -96,8 +82,7 @@ public:
    * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
    */
   virtual void
-  OnContentObject (const Ptr<const ContentObject> &contentObject,
-                   Ptr<Packet> payload);
+  OnContentObject (Ptr<const ContentObject> contentObject);
   
 protected:
   /**
@@ -114,7 +99,6 @@ protected:
   StopApplication ();     ///< @brief Called at time specified by Stop
 
 protected:
-  ProtocolHandler m_protocolHandler; ///< @brief A callback to pass packets to underlying NDN protocol
   bool m_active;  ///< @brief Flag to indicate that application is active (set by StartApplication and StopApplication)
   Ptr<Face> m_face;   ///< @brief automatically created application face through which application communicates
 
@@ -124,14 +108,14 @@ protected:
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  Ptr<App>, Ptr<Face> > m_receivedContentObjects; ///< @brief App-level trace of received Data
 
 
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  Ptr<App>, Ptr<Face> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
 };
 

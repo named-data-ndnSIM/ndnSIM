@@ -82,19 +82,31 @@ NetDeviceFace::GetNetDevice () const
 }
 
 void
-NetDeviceFace::RegisterProtocolHandler (ProtocolHandler handler)
+NetDeviceFace::RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler)
 {
   NS_LOG_FUNCTION (this);
 
-  Face::RegisterProtocolHandler (handler);
+  Face::RegisterProtocolHandlers (interestHandler, dataHandler);
 
   m_node->RegisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this),
                                    L3Protocol::ETHERNET_FRAME_TYPE, m_netDevice, true/*promiscuous mode*/);
 }
 
-bool
-NetDeviceFace::SendImpl (Ptr<Packet> packet)
+void
+NetDeviceFace:: UnRegisterProtocolHandlers ()
 {
+  m_node->UnregisterProtocolHandler (MakeCallback (&NetDeviceFace::ReceiveFromNetDevice, this));
+  Face::UnRegisterProtocolHandlers ();
+}
+
+bool
+NetDeviceFace::Send (Ptr<Packet> packet)
+{
+  if (!Face::Send (packet))
+    {
+      return false;
+    }
+  
   NS_LOG_FUNCTION (this << packet);
 
   NS_ASSERT_MSG (packet->GetSize () <= m_netDevice->GetMtu (),

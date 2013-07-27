@@ -56,6 +56,8 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("10ms"));
   Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("20"));
 
+  Config::SetGlobal ("ndn::WireFormat", StringValue ("1"));
+
   // Creating nodes
   NodeContainer nodes;
   nodes.Create (3);
@@ -84,10 +86,12 @@ main (int argc, char *argv[])
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix ("/prefix");
   producerHelper.SetAttribute ("PayloadSize", StringValue("1024"));
+  producerHelper.SetAttribute ("Signature", UintegerValue (100));
+  producerHelper.SetAttribute ("KeyLocator", StringValue ("/unique/key/locator"));
   producerHelper.Install (nodes.Get (2)); // last node
 
   PcapWriter trace ("ndn-simple-trace.pcap");
-  Config::ConnectWithoutContext ("/NodeList/*/$ns3::ndn::L3Protocol/FaceList/*/NdnTx",
+  Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/MacTx",
 				 MakeCallback (&PcapWriter::TracePacket, &trace));
 
   Simulator::Stop (Seconds (20.0));

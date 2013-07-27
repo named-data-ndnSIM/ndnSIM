@@ -27,6 +27,7 @@
 #include "ns3/string.h"
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
+#include "ns3/integer.h"
 #include "ns3/double.h"
 
 #include "ns3/ndn-app-face.h"

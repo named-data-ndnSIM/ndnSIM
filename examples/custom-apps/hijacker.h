@@ -39,7 +39,7 @@ public:
 
   // Receive all Interests but do nothing in response
   void
-  OnInterest (const Ptr<const ndn::Interest> &interest, Ptr<Packet> packet);
+  OnInterest (Ptr<const ndn::Interest> interest);
 
 protected:
   // inherited from Application base class.

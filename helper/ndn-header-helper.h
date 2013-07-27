@@ -91,14 +91,6 @@ public:
 
   static Type
   GetNdnHeaderType (Ptr<const Packet> packet);
-
-  /**
-   * @brief A heavy-weight operation to get name of the packet
-   *
-   * This function returns name of the packet by deserializing a copy of the packet to a right header
-   */
-  static Ptr<const Name>
-  GetName (Ptr<const Packet> packet);
 };
 
   /**

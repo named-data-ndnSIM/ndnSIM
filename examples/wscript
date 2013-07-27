@@ -85,3 +85,12 @@ def build(bld):
 
     obj = bld.create_ns3_program('ndn-simple-with-pit-count-stats', all_modules)
     obj.source = 'ndn-simple-with-pit-count-stats.cc'
+
+    obj = bld.create_ns3_program('ndn-simple-api', all_modules)
+    obj.source = [
+        'ndn-simple-api.cc',
+        'custom-apps/ndn-api-app.cc'
+        ]
+
+    obj = bld.create_ns3_program('ndn-simple-with-link-failure', all_modules)
+    obj.source = 'ndn-simple-with-link-failure.cc'

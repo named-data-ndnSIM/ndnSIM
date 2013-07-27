@@ -103,13 +103,13 @@ protected:
 
 
   virtual void
-  OutData  (Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>) = 0;
+  OutData  (Ptr<const ContentObject>, bool fromCache, Ptr<const Face>) = 0;
 
   virtual void
-  InData   (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
+  InData   (Ptr<const ContentObject>, Ptr<const Face>) = 0;
 
   virtual void
-  DropData (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>) = 0;
+  DropData (Ptr<const ContentObject>, Ptr<const Face>) = 0;
 
   virtual void
   SatisfiedInterests (Ptr<const pit::Entry>) = 0;

@@ -87,8 +87,7 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
   
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
@@ -134,8 +133,7 @@ template<class Parent>
 bool
 PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                               Ptr<Face> outFace,
-                                              Ptr<const Interest> header,
-                                              Ptr<const Packet> origPacket,
+                                              Ptr<const Interest> interest,
                                               Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -143,7 +141,7 @@ PerOutFaceLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
   Ptr<Limits> faceLimits = outFace->template GetObject<Limits> ();
   if (faceLimits->IsBelowLimit ())
     {
-      if (super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+      if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
         {
           faceLimits->BorrowLimit ();
           return true;
@@ -175,7 +173,7 @@ PerOutFaceLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitE
 template<class Parent>
 void
 PerOutFaceLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                                        Ptr<pit::Entry> pitEntry)
+                                                      Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 

@@ -47,8 +47,8 @@ void PrintCsMemStatsHeader (std::ostream &os)
 {
   os << "SimulationTime" << "\t"
      << "RealTime" << "\t"
-     << "NumberOfProcessedData" << "\t"
-     << "NumberOfProcessedInterests" << "\t"
+     // << "NumberOfProcessedData" << "\t"
+     // << "NumberOfProcessedInterests" << "\t"
      << "NumberPitEntries" << "\t"
      << "NumberCsEntries" << "\t"
      << "MemUsage" << "\n";
@@ -64,8 +64,8 @@ PrintCsMemStats (std::ostream &os, Time nextPrintTime, double beginRealTime)
   os << Simulator::Now ().ToDouble (Time::S) << "\t";
   os << realTime << "\t";
 
-  os << ndn::L3Protocol::GetDataCounter () << "\t";
-  os << ndn::L3Protocol::GetInterestCounter () << "\t";
+  // os << ndn::L3Protocol::GetDataCounter () << "\t";
+  // os << ndn::L3Protocol::GetInterestCounter () << "\t";
 
   uint64_t pitCount = 0;
   uint64_t csCount = 0;

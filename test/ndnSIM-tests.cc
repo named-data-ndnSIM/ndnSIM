@@ -24,6 +24,7 @@
 #include "ndnSIM-serialization.h"
 #include "ndnSIM-pit.h"
 #include "ndnSIM-fib-entry.h"
+#include "ndnSIM-api.h"
 
 namespace ns3
 {
@@ -32,14 +33,15 @@ class NdnSimTestSuite : public TestSuite
 {
 public:
   NdnSimTestSuite ()
-    : TestSuite ("ndnSIM-suite", UNIT)
+    : TestSuite ("ndnSIM", UNIT)
   {
     SetDataDir (NS_TEST_SOURCEDIR);
 
-    AddTestCase (new InterestSerializationTest ());
-    AddTestCase (new ContentObjectSerializationTest ());
-    AddTestCase (new FibEntryTest ());
-    // AddTestCase (new PitTest ());
+    AddTestCase (new InterestSerializationTest (), TestCase::QUICK);
+    AddTestCase (new ContentObjectSerializationTest (), TestCase::QUICK);
+    AddTestCase (new FibEntryTest (), TestCase::QUICK);
+    AddTestCase (new PitTest (), TestCase::QUICK);
+    AddTestCase (new ApiTest (), TestCase::QUICK);
   }
 };
 

@@ -6,6 +6,9 @@ Examples
 .. note::
    :red:`!!! This page only shows up examples of how to config topology and perform basic operations in ndnSIM (an example equivalent to "Hello, world1") !!!  These are **NOT** examples of real experimentations (just like "Hello, world!" is not a real program).`
 
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
+
 .. _simple-scenario:
 
 Simple scenario
@@ -45,6 +48,9 @@ If this code is placed into ``scratch/ndn-simple.cc`` and NS-3 is compiled in de
 simulation using the following command (in optimized mode nothing will be printed out)::
 
      NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple
+
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
 
 .. _9-node-grid-example:
 
@@ -94,6 +100,9 @@ If this code is placed into ``scratch/ndn-grid.cc`` and NS-3 is compiled in debu
 simulation using the following command (in optimized mode nothing will be printed out)::
 
     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid
+
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
 
 .. _9-node-grid-example-using-topology-plugin:
 
@@ -155,6 +164,8 @@ If the topology file is placed into ``src/ndnSIM/examples/topologies/topo-grid-3
 
     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid-topo-plugin
 
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
 
 6-node bottleneck topology
 --------------------------
@@ -194,6 +205,9 @@ This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-rel
 To run this scenario and see what is happening, use the following command::
 
         NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-congestion-topo-plugin
+
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
 
 .. _11-node 2-bottleneck topology with custom forwarding strategy:
 
@@ -260,6 +274,9 @@ You can also run using visualizer module to verify that both bottleneck links ar
 
         ./waf --run=ndn-congestion-alt-topo-plugin --visualize
 
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
+
 3-level binary tree with packet-level trace helpers
 ---------------------------------------------------
 
@@ -308,6 +325,33 @@ simulation using the following command (in optimized mode nothing will be printe
 This will generate ``ndn-simple-trace.pcap``, which can be fed to tcpdump::
 
      tcpdump -r ndn-simple-trace.pcap
+
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
+
+.. _Simple scenario with link failures:
+
+Simple scenario with link failures
+----------------------------------
+
+The following example (``ndn-simple-with-link-failure.cc``) shows how to "fail" links in ndnSIM simulation.
+The basic idea is to set ndn::Faces that correspond to the failed link to DOWN state.
+ndnSIM now includes a simple helper that simplifies this process.
+
+.. literalinclude:: ../../examples/ndn-simple-with-link-failure.cc
+   :language: c++
+   :linenos:
+   :lines: 21-31,52-
+   :emphasize-lines: 54-56
+
+If this code is placed into ``scratch/ndn-simple-with-link-failure.cc`` and NS-3 is compiled in debug mode, you can run and see progress of the
+simulation using the following command (in optimized mode nothing will be printed out)::
+
+     NS_LOG=ndn.Consumer:ndn.Producer:ndn.LinkControlHelper ./waf --run=ndn-simple-with-link-failure
+
+.. note::
+   If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can directly run the example without putting scenario into ``scratch/`` folder.
+
 
 25-node tree topology with L2Tracer
 -----------------------------------

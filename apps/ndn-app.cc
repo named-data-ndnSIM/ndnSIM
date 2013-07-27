@@ -64,8 +64,7 @@ App::GetTypeId (void)
 }
     
 App::App ()
-  : m_protocolHandler (0)
-  , m_active (false)
+  : m_active (false)
   , m_face (0)
 {
 }
@@ -85,12 +84,6 @@ App::DoDispose (void)
   Application::DoDispose ();
 }
 
-void
-App::RegisterProtocolHandler (ProtocolHandler handler)
-{
-  m_protocolHandler = handler;
-}
-
 uint32_t
 App::GetId () const
 {
@@ -101,25 +94,24 @@ App::GetId () const
 }
 
 void
-App::OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet)
+App::OnInterest (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedInterests (interest, this, m_face);
 }
 
 void
-App::OnNack (const Ptr<const Interest> &interest, Ptr<Packet> packet)
+App::OnNack (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest);
   m_receivedNacks (interest, this, m_face);
 }
 
 void
-App::OnContentObject (const Ptr<const ContentObject> &contentObject,
-                          Ptr<Packet> payload)
+App::OnContentObject (Ptr<const ContentObject> contentObject)
 {
-  NS_LOG_FUNCTION (this << contentObject << payload);
-  m_receivedContentObjects (contentObject, payload, this, m_face);
+  NS_LOG_FUNCTION (this << contentObject);
+  m_receivedContentObjects (contentObject, this, m_face);
 }
 
 // Application Methods
@@ -164,7 +156,7 @@ App::StopApplication () // Called at time specified by Stop
   // step 3. Destroy face
   if (m_face->GetReferenceCount () != 1)
     {
-      NS_LOG_ERROR ("Please a bug report on https://github.com/NDN-Routing/ndnSIM/issues:");
+      NS_LOG_ERROR ("Please a bug report on https://github.com/NDN-Routing/ndnSIM/issues");
       NS_LOG_ERROR ("At this point, nobody else should have referenced this face, but we have "
                     << m_face->GetReferenceCount () << " references");
 

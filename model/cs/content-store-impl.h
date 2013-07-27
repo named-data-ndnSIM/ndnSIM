@@ -44,8 +44,8 @@ public:
   typedef Entry base_type;
 
 public:
-  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObject> header, Ptr<const Packet> packet)
-    : Entry (cs, header, packet)
+  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObject> data)
+    : Entry (cs, data)
     , item_ (0)
   {
   }
@@ -86,11 +86,11 @@ public:
 
   // from ContentStore
 
-  virtual inline boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+  virtual inline Ptr<ContentObject>
   Lookup (Ptr<const Interest> interest);
 
   virtual inline bool
-  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet);
+  Add (Ptr<const ContentObject> data);
 
   // virtual bool
   // Remove (Ptr<Interest> header);
@@ -155,40 +155,65 @@ ContentStoreImpl< Policy >::GetTypeId ()
   return tid;
 }
 
+struct isNotExcluded
+{
+  inline
+  isNotExcluded (const Exclude &exclude)
+    : m_exclude (exclude)
+  {
+  }
+  
+  bool
+  operator () (const name::Component &comp) const
+  {
+    return !m_exclude.isExcluded (comp);
+  }
+
+private:
+  const Exclude &m_exclude;
+};
+
 template<class Policy>
-boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+Ptr<ContentObject>
 ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
 
   /// @todo Change to search with predicate
-  typename super::const_iterator node = this->deepest_prefix_match (interest->GetName ());
-
-  if (node != this->end ())
+  typename super::const_iterator node;
+  if (interest->GetExclude () == 0)
     {
-      this->m_cacheHitsTrace (interest, node->payload ()->GetHeader ());
-
-      // NS_LOG_DEBUG ("cache hit with " << node->payload ()->GetHeader ()->GetName ());
-      return boost::make_tuple (node->payload ()->GetFullyFormedNdnPacket (),
-                                node->payload ()->GetHeader (),
-                                node->payload ()->GetPacket ());
+      node = this->deepest_prefix_match (interest->GetName ());
     }
   else
     {
-      // NS_LOG_DEBUG ("cache miss for " << interest->GetName ());
+      node = this->deepest_prefix_match_if_next_level (interest->GetName (),
+                                                       isNotExcluded (*interest->GetExclude ()));
+    }
+
+  if (node != this->end ())
+    {
+      this->m_cacheHitsTrace (interest, node->payload ()->GetData ());
+
+      Ptr<ContentObject> copy = Create<ContentObject> (*node->payload ()->GetData ());
+      ConstCast<Packet> (copy->GetPayload ())->RemoveAllPacketTags ();
+      return copy;
+    }
+  else
+    {
       this->m_cacheMissesTrace (interest);
-      return boost::tuple<Ptr<Packet>, Ptr<ContentObject>, Ptr<Packet> > (0, 0, 0);
+      return 0;
     }
 }
 
 template<class Policy>
 bool
-ContentStoreImpl<Policy>::Add (Ptr<const ContentObject> header, Ptr<const Packet> packet)
+ContentStoreImpl<Policy>::Add (Ptr<const ContentObject> data)
 {
-  NS_LOG_FUNCTION (this << header->GetName ());
+  NS_LOG_FUNCTION (this << data->GetName ());
 
-  Ptr< entry > newEntry = Create< entry > (this, header, packet);
-  std::pair< typename super::iterator, bool > result = super::insert (header->GetName (), newEntry);
+  Ptr< entry > newEntry = Create< entry > (this, data);
+  std::pair< typename super::iterator, bool > result = super::insert (data->GetName (), newEntry);
 
   if (result.first != super::end ())
     {

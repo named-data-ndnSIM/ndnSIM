@@ -65,17 +65,16 @@ BestRoute::BestRoute ()
 
 bool
 BestRoute::DoPropagateInterest (Ptr<Face> inFace,
-                                Ptr<const Interest> header,
-                                Ptr<const Packet> origPacket,
+                                Ptr<const Interest> interest,
                                 Ptr<pit::Entry> pitEntry)
 {
-  NS_LOG_FUNCTION (this << header->GetName ());
+  NS_LOG_FUNCTION (this << interest->GetName ());
 
   // No real need to call parent's (green-yellow-red's strategy) method, since it is incorporated
   // in the logic of the BestRoute strategy
   //
   // // Try to work out with just green faces
-  // bool greenOk = super::DoPropagateInterest (inFace, header, origPacket, pitEntry);
+  // bool greenOk = super::DoPropagateInterest (inFace, interest, origPacket, pitEntry);
   // if (greenOk)
   //   return true;
 
@@ -87,7 +86,7 @@ BestRoute::DoPropagateInterest (Ptr<Face> inFace,
       if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in front
         break;
 
-      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }

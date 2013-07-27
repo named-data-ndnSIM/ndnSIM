@@ -29,57 +29,47 @@ NS_LOG_COMPONENT_DEFINE ("ndn.Interest");
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (Interest);
-
-TypeId
-Interest::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::ndn::Interest")
-    .SetGroupName ("Ndn")
-    .SetParent<Header> ()
-    .AddConstructor<Interest> ()
-    ;
-  return tid;
-}
-  
-
-Interest::Interest ()
+Interest::Interest (Ptr<Packet> payload/* = Create<Packet> ()*/)
   : m_name ()
   , m_scope (0xFF)
   , m_interestLifetime (Seconds (0))
   , m_nonce (0)
   , m_nackType (NORMAL_INTEREST)
+  , m_exclude (0)
+  , m_payload (payload)
+  , m_wire (0)
 {
+  if (m_payload == 0) // just in case
+    {
+      m_payload = Create<Packet> ();
+    }
 }
 
 Interest::Interest (const Interest &interest)
-  : m_name                (Create<Name> (interest.GetName ()))
-  , m_scope               (interest.m_scope)
-  , m_interestLifetime    (interest.m_interestLifetime)
-  , m_nonce               (interest.m_nonce)
-  , m_nackType            (interest.m_nackType)
+  : m_name             (Create<Name> (interest.GetName ()))
+  , m_scope            (interest.m_scope)
+  , m_interestLifetime (interest.m_interestLifetime)
+  , m_nonce            (interest.m_nonce)
+  , m_nackType         (interest.m_nackType)
+  , m_exclude          (interest.m_exclude ? Create<Exclude> (*interest.GetExclude ()) : 0)
+  , m_payload          (interest.GetPayload ()->Copy ())
+  , m_wire             (0)
 {
-}
-
-Ptr<Interest>
-Interest::GetInterest (Ptr<Packet> packet)
-{
-  Ptr<Interest> interest = Create<Interest> ();
-  packet->RemoveHeader (*interest);
-
-  return interest;
+  NS_LOG_FUNCTION ("correct copy constructor");
 }
 
 void
 Interest::SetName (Ptr<Name> name)
 {
   m_name = name;
+  m_wire = 0;
 }
 
 void
 Interest::SetName (const Name &name)
 {
   m_name = Create<Name> (name);
+  m_wire = 0;
 }
 
 const Name&
@@ -99,6 +89,7 @@ void
 Interest::SetScope (int8_t scope)
 {
   m_scope = scope;
+  m_wire = 0;
 }
 
 int8_t
@@ -111,6 +102,7 @@ void
 Interest::SetInterestLifetime (Time lifetime)
 {
   m_interestLifetime = lifetime;
+  m_wire = 0;
 }
 
 Time
@@ -123,6 +115,7 @@ void
 Interest::SetNonce (uint32_t nonce)
 {
   m_nonce = nonce;
+  m_wire = 0;
 }
 
 uint32_t
@@ -135,6 +128,7 @@ void
 Interest::SetNack (uint8_t nackType)
 {
   m_nackType = nackType;
+  m_wire = 0;
 }
 
 uint8_t
@@ -143,82 +137,32 @@ Interest::GetNack () const
   return m_nackType;
 }
 
-uint32_t
-Interest::GetSerializedSize (void) const
-{
-  size_t size =
-    1/*version*/ + 1 /*type*/ + 2/*length*/ +
-    (4/*nonce*/ + 1/*scope*/ + 1/*nack type*/ + 2/*timestamp*/ +
-     (m_name->GetSerializedSize ()) +
-     (2 + 0)/* selectors */ +
-     (2 + 0)/* options */);
-  NS_LOG_INFO ("Serialize size = " << size);
-
-  return size;
-}
-    
 void
-Interest::Serialize (Buffer::Iterator start) const
+Interest::SetExclude (Ptr<Exclude> exclude)
 {
-  start.WriteU8 (0x80); // version
-  start.WriteU8 (0x00); // packet type
-
-  start.WriteU16 (GetSerializedSize () - 4);
-
-  start.WriteU32 (m_nonce);
-  start.WriteU8 (m_scope);
-  start.WriteU8 (m_nackType);
-
-  NS_ASSERT_MSG (0 <= m_interestLifetime.ToInteger (Time::S) && m_interestLifetime.ToInteger (Time::S) < 65535,
-                 "Incorrect InterestLifetime (should not be smaller than 0 and larger than 65535");
-  
-  // rounding timestamp value to seconds
-  start.WriteU16 (static_cast<uint16_t> (m_interestLifetime.ToInteger (Time::S)));
-
-  uint32_t offset = m_name->Serialize (start);
-  start.Next (offset);
-  
-  start.WriteU16 (0); // no selectors
-  start.WriteU16 (0); // no options
+  m_exclude = exclude;
+  m_wire = 0;
 }
 
-uint32_t
-Interest::Deserialize (Buffer::Iterator start)
+Ptr<const Exclude>
+Interest::GetExclude () const
 {
-  Buffer::Iterator i = start;
-  
-  if (i.ReadU8 () != 0x80)
-    throw new InterestException ();
-
-  if (i.ReadU8 () != 0x00)
-    throw new InterestException ();
-
-  i.ReadU16 (); // length, don't need it right now
-  
-  m_nonce = i.ReadU32 ();
-  m_scope = i.ReadU8 ();
-  m_nackType = i.ReadU8 ();
-  
-  m_interestLifetime = Seconds (i.ReadU16 ());
-
-  m_name = Create<Name> ();
-  uint32_t offset = m_name->Deserialize (i);
-  i.Next (offset);
-  
-  i.ReadU16 ();
-  i.ReadU16 ();
-
-  NS_ASSERT (GetSerializedSize () == (i.GetDistanceFrom (start)));
-
-  return i.GetDistanceFrom (start);
+  return m_exclude;
 }
 
-TypeId
-Interest::GetInstanceTypeId (void) const
+void
+Interest::SetPayload (Ptr<Packet> payload)
 {
-  return GetTypeId ();
+  m_payload = payload;
+  m_wire = 0;
 }
-  
+
+Ptr<const Packet>
+Interest::GetPayload () const
+{
+  return m_payload;
+}
+
 void
 Interest::Print (std::ostream &os) const
 {

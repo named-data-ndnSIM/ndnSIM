@@ -27,6 +27,7 @@
 #include "ns3/nstime.h"
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
+#include "ns3/packet.h"
 
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>

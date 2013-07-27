@@ -142,13 +142,13 @@ protected:
   DropNacks (Ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  OutData  (Ptr<const ContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const Face>);
+  OutData  (Ptr<const ContentObject>, bool fromCache, Ptr<const Face>);
 
   virtual void
-  InData   (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
+  InData   (Ptr<const ContentObject>, Ptr<const Face>);
 
   virtual void
-  DropData (Ptr<const ContentObject>, Ptr<const Packet>, Ptr<const Face>);
+  DropData (Ptr<const ContentObject>, Ptr<const Face>);
 
 
   virtual void

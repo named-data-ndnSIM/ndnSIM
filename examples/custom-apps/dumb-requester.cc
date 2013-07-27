@@ -91,29 +91,26 @@ DumbRequester::SendInterest ()
   Ptr<ndn::Name> prefix = Create<ndn::Name> (m_name); // another way to create name
 
   // Create and configure ndn::Interest
-  ndn::Interest interestHeader;
+  Ptr<ndn::Interest> interest = Create<ndn::Interest> ();
   UniformVariable rand (0,std::numeric_limits<uint32_t>::max ());
-  interestHeader.SetNonce            (rand.GetValue ());
-  interestHeader.SetName             (prefix);
-  interestHeader.SetInterestLifetime (Seconds (1.0));
-
-  // Create packet and add ndn::Interest
-  Ptr<Packet> packet = Create<Packet> ();
-  packet->AddHeader (interestHeader);
+  interest->SetNonce            (rand.GetValue ());
+  interest->SetName             (prefix);
+  interest->SetInterestLifetime (Seconds (1.0));
 
   NS_LOG_DEBUG ("Sending Interest packet for " << *prefix);
   
-  // Forward packet to lower (network) layer
-  m_protocolHandler (packet);
 
   // Call trace (for logging purposes)
-  m_transmittedInterests (&interestHeader, this, m_face);
+  m_transmittedInterests (interest, this, m_face);
+
+  // Forward packet to lower (network) layer
+  m_face->ReceiveInterest (interest);
+
   Simulator::Schedule (Seconds (1.0), &DumbRequester::SendInterest, this);
 }
 
 void
-DumbRequester::OnContentObject (const Ptr<const ndn::ContentObject> &contentObject,
-                                Ptr<Packet> payload)
+DumbRequester::OnContentObject (Ptr<const ndn::ContentObject> contentObject)
 {
   NS_LOG_DEBUG ("Receiving ContentObject packet for " << contentObject->GetName ());
 }

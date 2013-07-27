@@ -43,34 +43,29 @@ public:
   // from super
   virtual void
   OnInterest (Ptr<Face> face,
-              Ptr<const Interest> header,
-              Ptr<const Packet> origPacket);
+              Ptr<Interest> interest);
 
 protected:
   // from super
   virtual void
   DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> packet,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry);
 
   // from super
   virtual void
   DidExhaustForwardingOptions (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> packet,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry);
 
   virtual void
   OnNack (Ptr<Face> inFace,
-          Ptr<const Interest> header,
-          Ptr<const Packet> origPacket);
+          Ptr<Interest> nack);
 
   virtual void
   DidReceiveValidNack (Ptr<Face> inFace,
                        uint32_t nackCode,
-                       Ptr<const Interest> header,
-                       Ptr<const Packet> origPacket,
+                       Ptr<const Interest> nack,
                        Ptr<pit::Entry> pitEntry);
   
 protected:  

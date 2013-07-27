@@ -34,7 +34,7 @@ namespace ndn {
 
 NS_OBJECT_ENSURE_REGISTERED (ContentStore);
 
-TypeId 
+TypeId
 ContentStore::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::ndn::ContentStore")
@@ -60,40 +60,22 @@ namespace cs {
 
 //////////////////////////////////////////////////////////////////////
 
-Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> header, Ptr<const Packet> packet)
+Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> data)
   : m_cs (cs)
-  , m_header (header)
-  , m_packet (packet->Copy ())
+  , m_data (data)
 {
-}
-
-Ptr<Packet>
-Entry::GetFullyFormedNdnPacket () const
-{
-  static ContentObjectTail tail; ///< \internal for optimization purposes
-
-  Ptr<Packet> packet = m_packet->Copy ();
-  packet->AddHeader (*m_header);
-  packet->AddTrailer (tail);
-  return packet;
 }
 
 const Name&
 Entry::GetName () const
 {
-  return m_header->GetName ();
+  return m_data->GetName ();
 }
 
 Ptr<const ContentObject>
-Entry::GetHeader () const
+Entry::GetData () const
 {
-  return m_header;
-}
-
-Ptr<const Packet>
-Entry::GetPacket () const
-{
-  return m_packet;
+  return m_data;
 }
 
 Ptr<ContentStore>

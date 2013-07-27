@@ -44,8 +44,7 @@ CustomStrategy::CustomStrategy ()
 
 bool
 CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
-                                     Ptr<const Interest> header,
-                                     Ptr<const Packet> origPacket,
+                                     Ptr<const Interest> interest,
                                      Ptr<pit::Entry> pitEntry)
 {
   typedef fib::FaceMetricContainer::type::index<fib::i_metric>::type FacesByMetric;
@@ -57,7 +56,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
   // forward to best-metric face
   if (faceIterator != faces.end ())
     {
-      if (TrySendOutInterest (inFace, faceIterator->GetFace (), header, origPacket, pitEntry))
+      if (TrySendOutInterest (inFace, faceIterator->GetFace (), interest, pitEntry))
         propagatedCount ++;
 
       faceIterator ++;
@@ -66,7 +65,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
   // forward to second-best-metric face
   if (faceIterator != faces.end ())
     {
-      if (TrySendOutInterest (inFace, faceIterator->GetFace (), header, origPacket, pitEntry))
+      if (TrySendOutInterest (inFace, faceIterator->GetFace (), interest, pitEntry))
         propagatedCount ++;
 
       faceIterator ++;
@@ -76,8 +75,7 @@ CustomStrategy::DoPropagateInterest (Ptr<Face> inFace,
 
 void
 CustomStrategy::DidSendOutInterest (Ptr<Face> inFace, Ptr<Face> outFace,
-                                    Ptr<const Interest> header,
-                                    Ptr<const Packet> origPacket,
+                                    Ptr<const Interest> interest,
                                     Ptr<pit::Entry> pitEntry)
 {
   m_counter ++;

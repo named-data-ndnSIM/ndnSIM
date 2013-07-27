@@ -64,8 +64,7 @@ GreenYellowRed::GetTypeId (void)
 
 bool
 GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
-                                     Ptr<const Interest> header,
-                                     Ptr<const Packet> origPacket,
+                                     Ptr<const Interest> interest,
                                      Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
@@ -79,7 +78,7 @@ GreenYellowRed::DoPropagateInterest (Ptr<Face> inFace,
           metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_YELLOW)
         break; //propagate only to green faces
 
-      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }
@@ -123,11 +122,10 @@ GreenYellowRed::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 void
 GreenYellowRed::DidReceiveValidNack (Ptr<Face> inFace,
                                      uint32_t nackCode,
-                                     Ptr<const Interest> header,
-                                     Ptr<const Packet> origPacket,
+                                     Ptr<const Interest> nack,
                                      Ptr<pit::Entry> pitEntry)
 {
-  super::DidReceiveValidNack (inFace, nackCode, header, origPacket, pitEntry);
+  super::DidReceiveValidNack (inFace, nackCode, nack, pitEntry);
 
   if (inFace != 0 &&
       (nackCode == Interest::NACK_CONGESTION ||

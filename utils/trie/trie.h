@@ -151,7 +151,7 @@ public:
   typedef PayloadTraits payload_traits;
 
   inline
-  trie (const Key &key, size_t bucketSize = 10, size_t bucketIncrement = 10)
+  trie (const Key &key, size_t bucketSize = 1, size_t bucketIncrement = 1)
     : key_ (key)
     , initialBucketSize_ (bucketSize)
     , bucketIncrement_ (bucketIncrement)
@@ -410,6 +410,32 @@ public:
         iterator value = subnode->find_if (pred);
         if (value != 0)
           return value;
+      }
+
+    return 0;
+  }
+
+  /**
+   * @brief Find next payload of the sub-trie satisfying the predicate
+   * @param pred predicate
+   *
+   * This version check predicate only for the next level children
+   *
+   * @returns end() or a valid iterator pointing to the trie leaf (order is not defined, enumeration )
+   */
+  template<class Predicate>
+  inline const iterator
+  find_if_next_level (Predicate pred)
+  {
+    typedef trie<FullKey, PayloadTraits, PolicyHook> trie;
+    for (typename trie::unordered_set::iterator subnode = children_.begin ();
+         subnode != children_.end ();
+         subnode++ )
+      {
+        if (pred (subnode->key ()))
+          {
+            return subnode->find ();
+          }
       }
 
     return 0;

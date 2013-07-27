@@ -176,22 +176,15 @@ ConsumerZipfMandelbrot::SendPacket() {
 
   //
   Ptr<Name> nameWithSequence = Create<Name> (m_interestName);
-  (*nameWithSequence) (seq);
+  nameWithSequence->appendSeqNum (seq);
   //
 
-  Interest interestHeader;
-  interestHeader.SetNonce (m_rand.GetValue ());
-  interestHeader.SetName  (nameWithSequence);
+  Ptr<Interest> interest = Create<Interest> ();
+  interest->SetNonce (m_rand.GetValue ());
+  interest->SetName  (nameWithSequence);
 
-  // NS_LOG_INFO ("Requesting Interest: \n" << interestHeader);
+  // NS_LOG_INFO ("Requesting Interest: \n" << *interest);
   NS_LOG_INFO ("> Interest for " << seq<<", Total: "<<m_seq<<", face: "<<m_face->GetId());
-
-  Ptr<Packet> packet = Create<Packet> ();
-
-  //NS_LOG_DEBUG ("= Interest for " << seq<<", Total: "<<m_seq<<", face: "<<m_face->GetId());
-  packet->AddHeader (interestHeader);
-  //NS_LOG_DEBUG ("Interest packet size: " << packet->GetSize ());
-
   NS_LOG_DEBUG ("Trying to add " << seq << " with " << Simulator::Now () << ". already " << m_seqTimeouts.size () << " items");
 
   m_seqTimeouts.insert (SeqTimeout (seq, Simulator::Now ()));
@@ -202,14 +195,13 @@ ConsumerZipfMandelbrot::SendPacket() {
 
   m_seqRetxCounts[seq] ++;
 
-  m_transmittedInterests (&interestHeader, this, m_face);
-
   m_rtt->SentSeq (SequenceNumber32 (seq), 1);
 
   FwHopCountTag hopCountTag;
-  packet->AddPacketTag (hopCountTag);
+  interest->GetPayload ()->AddPacketTag (hopCountTag);
 
-  m_protocolHandler (packet);
+  m_transmittedInterests (interest, this, m_face);
+  m_face->ReceiveInterest (interest);
 
   ConsumerZipfMandelbrot::ScheduleNextPacket ();
 }

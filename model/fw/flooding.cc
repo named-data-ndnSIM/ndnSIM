@@ -66,8 +66,7 @@ Flooding::Flooding ()
 
 bool
 Flooding::DoPropagateInterest (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> origPacket,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this);
@@ -80,7 +79,7 @@ Flooding::DoPropagateInterest (Ptr<Face> inFace,
       if (metricFace.GetStatus () == fib::FaceMetric::NDN_FIB_RED) // all non-read faces are in the front of the list
         break;
 
-      if (!TrySendOutInterest (inFace, metricFace.GetFace (), header, origPacket, pitEntry))
+      if (!TrySendOutInterest (inFace, metricFace.GetFace (), interest, pitEntry))
         {
           continue;
         }

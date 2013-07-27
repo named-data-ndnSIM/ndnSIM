@@ -108,12 +108,14 @@ def build(bld):
                                        'apps/*.cc',
                                        'utils/**/*.cc',
                                        'helper/**/*.cc',
+                                       'ndn.cxx/**/*.cc',
                                        ])
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
                            'utils/**/*.h',
                            'model/**/*.h',
                            'apps/**/*.h',
                            'helper/**/*.h',
+                           'ndn.cxx/**/*.h',
                            ])]
 
     headers.source = [
@@ -122,9 +124,11 @@ def build(bld):
         "helper/ndn-header-helper.h",
         "helper/ndn-face-container.h",
         "helper/ndn-global-routing-helper.h",
+        "helper/ndn-link-control-helper.h",
 
         "apps/ndn-app.h",
 
+        "model/ndn-common.h",
         "model/ndn-l3-protocol.h",
         "model/ndn-face.h",
         "model/ndn-app-face.h",
@@ -133,6 +137,12 @@ def build(bld):
         "model/ndn-content-object.h",
         "model/ndn-name-components.h",
         "model/ndn-name.h",
+
+        "ndn.cxx/blob.h",
+        "ndn.cxx/name-component.h",
+        "ndn.cxx/name.h",
+        "ndn.cxx/exclude.h",
+        "ndn.cxx/ndn-api-face.h",
 
         "model/cs/ndn-content-store.h",
 
@@ -147,11 +157,12 @@ def build(bld):
         "model/fw/ndn-forwarding-strategy.h",
         "model/fw/ndn-fw-tag.h",
 
-        # "utils/batches.h",
+        "model/wire/ndn-wire.h",
+
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",
-        # "utils/weights-path-stretch-tag.h",
 
+        "apps/callback-based-app.h",
         ]
 
     if 'topology' in bld.env['NDN_plugins']:
@@ -183,6 +194,10 @@ def build(bld):
 
     bld.ns3_python_bindings()
 
+    bld (features = "pyext",
+         source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+         install_from = "."
+         )
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')

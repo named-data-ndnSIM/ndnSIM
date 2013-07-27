@@ -32,7 +32,10 @@
 #include "ns3/random-variable.h"
 #include "ns3/pointer.h"
 
+#include "ns3/ndn-header-helper.h"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+
+#include "ns3/ndn-wire.h"
 
 #include <boost/ref.hpp>
 
@@ -54,13 +57,6 @@ Face::GetTypeId ()
                    UintegerValue (0),
                    MakeUintegerAccessor (&Face::m_id),
                    MakeUintegerChecker<uint32_t> ())
-
-    .AddTraceSource ("NdnTx", "Transmitted packet trace",
-                     MakeTraceSourceAccessor (&Face::m_txTrace))
-    .AddTraceSource ("NdnRx", "Received packet trace",
-                     MakeTraceSourceAccessor (&Face::m_rxTrace))
-    .AddTraceSource ("NdnDrop", "Dropped packet trace",
-                     MakeTraceSourceAccessor (&Face::m_dropTrace))
     ;
   return tid;
 }
@@ -72,7 +68,8 @@ Face::GetTypeId ()
  */
 Face::Face (Ptr<Node> node)
   : m_node (node)
-  , m_protocolHandler (MakeNullCallback<void,const Ptr<Face>&,const Ptr<const Packet>&> ())
+  , m_upstreamInterestHandler (MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ())
+  , m_upstreamDataHandler (MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
@@ -104,25 +101,53 @@ Face::GetNode () const
 }
 
 void
-Face::RegisterProtocolHandler (ProtocolHandler handler)
+Face::RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler)
 {
   NS_LOG_FUNCTION_NOARGS ();
 
-  m_protocolHandler = handler;
+  m_upstreamInterestHandler = interestHandler;
+  m_upstreamDataHandler = dataHandler;
+}
+
+void
+Face::UnRegisterProtocolHandlers ()
+{
+  NS_LOG_FUNCTION_NOARGS ();
+
+  m_upstreamInterestHandler = MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ();
+  m_upstreamDataHandler = MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ();
+}
+
+
+bool
+Face::SendInterest (Ptr<const Interest> interest)
+{
+  NS_LOG_FUNCTION (this << boost::cref (*this) << interest->GetName ());
+
+  if (!IsUp ())
+    {
+      return false;
+    }
+
+  return Send (Wire::FromInterest (interest));
+}
+
+bool
+Face::SendData (Ptr<const ContentObject> data)
+{
+  NS_LOG_FUNCTION (this << data);
+
+  if (!IsUp ())
+    {
+      return false;
+    }
+
+  return Send (Wire::FromData (data));
 }
 
 bool
 Face::Send (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
-  NS_LOG_DEBUG (*packet);
-
-  if (!IsUp ())
-    {
-      m_dropTrace (packet);
-      return false;
-    }
-
   FwHopCountTag hopCount;
   bool tagExists = packet->RemovePacketTag (hopCount);
   if (tagExists)
@@ -131,23 +156,13 @@ Face::Send (Ptr<Packet> packet)
       packet->AddPacketTag (hopCount);
     }
 
-  bool ok = SendImpl (packet);
-  if (ok)
-    {
-      m_txTrace (packet);
-      return true;
-    }
-  else
-    {
-      m_dropTrace (packet);
-      return false;
-    }
+  return true;
 }
 
 bool
-Face::Receive (const Ptr<const Packet> &packet)
+Face::Receive (Ptr<const Packet> p)
 {
-  NS_LOG_FUNCTION (boost::cref (*this) << packet << packet->GetSize ());
+  NS_LOG_FUNCTION (this << p << p->GetSize ());
 
   if (!IsUp ())
     {
@@ -155,9 +170,59 @@ Face::Receive (const Ptr<const Packet> &packet)
       return false;
     }
 
-  m_rxTrace (packet);
-  m_protocolHandler (this, packet);
+  Ptr<Packet> packet = p->Copy (); // give upper layers a rw copy of the packet
+  try
+    {
+      HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (packet);
+      switch (type)
+        {
+        case HeaderHelper::INTEREST_NDNSIM:
+          return ReceiveInterest (Wire::ToInterest (packet, Wire::WIRE_FORMAT_NDNSIM));
+        case HeaderHelper::INTEREST_CCNB:
+          return ReceiveInterest (Wire::ToInterest (packet, Wire::WIRE_FORMAT_CCNB));
+        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
+          return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_NDNSIM));
+        case HeaderHelper::CONTENT_OBJECT_CCNB:
+          return ReceiveData (Wire::ToData (packet, Wire::WIRE_FORMAT_CCNB));
+        default:
+          NS_FATAL_ERROR ("Not supported NDN header");
+          return false;
+        }
 
+      // exception will be thrown if packet is not recognized
+    }
+  catch (UnknownHeaderException)
+    {
+      NS_FATAL_ERROR ("Unknown NDN header. Should not happen");
+      return false;
+    }
+
+  return false;
+}
+
+bool
+Face::ReceiveInterest (Ptr<Interest> interest)
+{
+  if (!IsUp ())
+    {
+      // no tracing here. If we were off while receiving, we shouldn't even know that something was there
+      return false;
+    }
+
+  m_upstreamInterestHandler (this, interest);
+  return true;
+}
+
+bool
+Face::ReceiveData (Ptr<ContentObject> data)
+{
+  if (!IsUp ())
+    {
+      // no tracing here. If we were off while receiving, we shouldn't even know that something was there
+      return false;
+    }
+
+  m_upstreamDataHandler (this, data);
   return true;
 }
 
@@ -171,28 +236,7 @@ Face::SetMetric (uint16_t metric)
 uint16_t
 Face::GetMetric (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
   return m_metric;
-}
-
-/**
- * These are face states and may be distinct from
- * NetDevice states, such as found in real implementations
- * (where the device may be down but face state is still up).
- */
-
-bool
-Face::IsUp (void) const
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  return m_ifup;
-}
-
-void
-Face::SetUp (bool up/* = true*/)
-{
-  NS_LOG_FUNCTION_NOARGS ();
-  m_ifup = up;
 }
 
 void
@@ -200,7 +244,6 @@ Face::SetFlags (uint32_t flags)
 {
   m_flags = flags;
 }
-
 
 bool
 Face::operator== (const Face &face) const

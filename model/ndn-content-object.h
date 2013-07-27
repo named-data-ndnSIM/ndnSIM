@@ -22,66 +22,34 @@
 #ifndef _NDN_CONTENT_OBJECT_HEADER_H_
 #define _NDN_CONTENT_OBJECT_HEADER_H_
 
-#include "ns3/integer.h"
-#include "ns3/header.h"
 #include "ns3/simple-ref-count.h"
-#include "ns3/trailer.h"
 #include "ns3/nstime.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
-#include <string>
-#include <vector>
-#include <list>
-
-#include "ndn-name.h"
+#include <ns3/ndn-name.h>
 
 namespace ns3 {
 namespace ndn {
 
 /**
- * ContentObject header
- *
- * Only few important fields are actually implemented in the simulation
- *
- * @see http://ndnsim.net/new-packet-formats.html
- *
- * Optimized and simplified formatting of Interest packets
- *
- *	ContentObject ::= Signature
- *                	  Name
- *                   	  Content
- *
- *      0                   1                   2                   3
- *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
- *      ~                                                               ~
- *      ~                           Signature                           ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
- *      ~                                                               ~
- *      ~                             Name                              ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *      |            Length             |                               |
- *      |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
- *      ~                                                               ~
- *      ~                           Content                             ~
- *      |							        |	
- *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
+ * @ingroup Ndn
+ * @brief ContentObject header
  */
-class ContentObject : public SimpleRefCount<ContentObject,Header>
+class ContentObject : public SimpleRefCount<ContentObject>
 {
 public:
   /**
-   * Constructor
+   * @brief Constructor
    *
    * Creates a null header
    **/
-  ContentObject ();
+  ContentObject (Ptr<Packet> payload = Create<Packet> ());
+
+  /**
+   * @brief Copy constructor
+   */
+  ContentObject (const ContentObject &other);
 
   /**
    * \brief Set content object name
@@ -154,47 +122,99 @@ public:
   uint32_t
   GetSignature () const;
 
+  /**
+   * @brief Set key locator
+   * @param keyLocator name of the key
+   */
+  void
+  SetKeyLocator (Ptr<Name> keyLocator);
+
+  /**
+   * @brief Get key locator
+   *
+   * Note that only <KeyName> option for the key locator is supported
+   */
+  Ptr<const Name>
+  GetKeyLocator () const;
+  
   //////////////////////////////////////////////////////////////////
+  /**
+   * @brief Get payload of data packet
+   *
+   * This payload can also carry packet tags
+   */
+  void
+  SetPayload (Ptr<Packet> payload);
 
-  static TypeId GetTypeId (void); ///< @brief Get TypeId
-  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
-  virtual void Print (std::ostream &os) const; ///< @brief Print out information about the Header into the stream
-  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Header
-  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Header
-  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Header
+  /**
+   * @brief Set payload of data packet
+   *
+   * This payload can also carry packet tags
+   */
+  Ptr<const Packet>
+  GetPayload () const;
+  
+  /**
+   * @brief Get wire formatted packet
+   *
+   * If wire formatted packet has not been set before, 0 will be returned
+   */
+  inline Ptr<const Packet>
+  GetWire () const;
 
+  /**
+   * @brief Set (cache) wire formatted packet
+   */
+  inline void
+  SetWire (Ptr<const Packet> packet) const;
+
+  /**
+   * @brief Print Interest in plain-text to the specified output stream
+   */
+  void
+  Print (std::ostream &os) const;
+  
+private:
+  // NO_ASSIGN
+  ContentObject &
+  operator = (const ContentObject &other) { return *this; }
+  
 private:
   Ptr<Name> m_name;
   Time m_freshness;
   Time m_timestamp;
   uint32_t m_signature; // 0, means no signature, any other value application dependent (not a real signature)
+  Ptr<Packet> m_payload;
+  Ptr<Name> m_keyLocator;
+
+  mutable Ptr<const Packet> m_wire;
 };
 
-typedef ContentObject ContentObjectHeader;
-
-/**
- * ContentObjectTail for compatibility with other packet formats
- */
-class ContentObjectTail : public Trailer
+inline std::ostream &
+operator << (std::ostream &os, const ContentObject &d)
 {
-public:
-  ContentObjectTail ();
-  //////////////////////////////////////////////////////////////////
-
-  static TypeId GetTypeId (void); ///< @brief Get TypeId
-  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
-  virtual void Print (std::ostream &os) const; ///< @brief Print out information about Tail into the stream
-  virtual uint32_t GetSerializedSize (void) const; ///< @brief Get size necessary to serialize the Tail
-  virtual void Serialize (Buffer::Iterator start) const; ///< @brief Serialize the Tail
-  virtual uint32_t Deserialize (Buffer::Iterator start); ///< @brief Deserialize the Tail
-};
-
+  d.Print (os);
+  return os;
+}
 
 /**
  * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception
  */
 class ContentObjectException {};
+
+inline Ptr<const Packet>
+ContentObject::GetWire () const
+{
+  return m_wire;
+}
+
+inline void
+ContentObject::SetWire (Ptr<const Packet> packet) const
+{
+  m_wire = packet;
+}
+
 
 } // namespace ndn
 } // namespace ns3

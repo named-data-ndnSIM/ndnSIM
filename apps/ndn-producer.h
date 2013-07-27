@@ -41,14 +41,14 @@ namespace ndn {
  */
 class Producer : public App
 {
-public: 
+public:
   static TypeId
   GetTypeId (void);
-        
+
   Producer ();
 
   // inherited from NdnApp
-  void OnInterest (const Ptr<const Interest> &interest, Ptr<Packet> packet);
+  void OnInterest (Ptr<const Interest> interest);
 
 protected:
   // inherited from Application base class.
@@ -60,8 +60,12 @@ protected:
 
 private:
   Name m_prefix;
+  Name m_postfix;
   uint32_t m_virtualPayloadSize;
   Time m_freshness;
+
+  uint32_t m_signature;
+  Name m_keyLocator;
 };
 
 } // namespace ndn

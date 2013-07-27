@@ -30,7 +30,7 @@ NS_LOG_COMPONENT_DEFINE ("ndn.PitTest");
 namespace ns3
 {
 
-class Client : public ndn::App
+class PitTestClient : public ndn::App
 {
 protected:
   void
@@ -42,10 +42,10 @@ protected:
     Ptr<ndn::fib::Entry> fibEntry = GetNode ()->GetObject<ndn::Fib> ()->Add (ndn::Name ("/"), m_face, 0);
     fibEntry->UpdateStatus (m_face, ndn::fib::FaceMetric::NDN_FIB_GREEN);
     
-    Simulator::Schedule (Seconds (0.1), &Client::SendPacket, this, std::string("/1"), 1);
-    Simulator::Schedule (Seconds (0.2), &Client::SendPacket, this, std::string("/2"), 1);
-    Simulator::Schedule (Seconds (0.3), &Client::SendPacket, this, std::string("/3"), 1);
-    Simulator::Schedule (Seconds (0.4), &Client::SendPacket, this, std::string("/1"), 2);
+    Simulator::Schedule (Seconds (0.1), &PitTestClient::SendPacket, this, std::string("/1"), 1);
+    Simulator::Schedule (Seconds (0.2), &PitTestClient::SendPacket, this, std::string("/2"), 1);
+    Simulator::Schedule (Seconds (0.3), &PitTestClient::SendPacket, this, std::string("/3"), 1);
+    Simulator::Schedule (Seconds (0.4), &PitTestClient::SendPacket, this, std::string("/1"), 2);
   }
 
   void
@@ -58,14 +58,12 @@ private:
   void
   SendPacket (const std::string &prefix, uint32_t nonce)
   {
-    Ptr<Packet> pkt = Create<Packet> (0);
-    ndn::Interest i;
-    i.SetName (Create<ndn::Name> (prefix));
-    i.SetNonce (nonce);
-    i.SetInterestLifetime (Seconds (0.5));
+    Ptr<ndn::Interest> interest = Create<ndn::Interest> ();
+    interest->SetName (Create<ndn::Name> (prefix));
+    interest->SetNonce (nonce);
+    interest->SetInterestLifetime (Seconds (0.5));
 
-    pkt->AddHeader (i);
-    m_protocolHandler (pkt);
+    m_face->ReceiveInterest (interest);
   }
 };
 
@@ -120,7 +118,8 @@ PitTest::DoRun ()
 
   ndn::StackHelper::AddRoute (node, "/", 0, 0);
 
-  Ptr<Client> app1 = CreateObject<Client> ();
+  Ptr<Application> app1 = CreateObject<PitTestClient> ();
+  app1->SetStartTime (Seconds (0.0));
   node->AddApplication (app1);
 
   Simulator::Schedule (Seconds (0.0001), &PitTest::Test, this, node->GetObject<ndn::Fib> ());
@@ -137,7 +136,7 @@ PitTest::DoRun ()
 
   Simulator::Schedule (Seconds (0.91), &PitTest::Check0, this, node->GetObject<ndn::Pit> ());
 
-  Simulator::Stop (Seconds (1.0));
+  Simulator::Stop (Seconds (10.0));
   Simulator::Run ();
   Simulator::Destroy ();
 }

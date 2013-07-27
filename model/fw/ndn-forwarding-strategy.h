@@ -34,9 +34,6 @@ class Face;
 class Interest;
 class ContentObject;
 
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
-
 class Pit;
 namespace pit { class Entry; }
 class FibFaceMetric;
@@ -52,7 +49,7 @@ class ForwardingStrategy :
     public Object
 {
 public:
-  static TypeId GetTypeId (void);
+  static TypeId GetTypeId ();
 
   /**
    * @brief Helper function to retrieve logging name for the forwarding strategy
@@ -69,29 +66,23 @@ public:
    * \brief Actual processing of incoming Ndn interests. Note, interests do not have payload
    *
    * Processing Interest packets
-   * @param face    incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param face     incoming face
+   * @param interest Interest packet
    */
   virtual void
   OnInterest (Ptr<Face> face,
-              Ptr<const Interest> header,
-              Ptr<const Packet> origPacket);
+              Ptr<Interest> interest);
 
   /**
    * \brief Actual processing of incoming Ndn content objects
    *
    * Processing ContentObject packets
    * @param face    incoming face
-   * @param header  deserialized ContentObject header
-   * @param payload data packet payload
-   * @param origPacket  original packet
+   * @param data    Data packet
    */
   virtual void
   OnData (Ptr<Face> face,
-          Ptr<const ContentObject> header,
-          Ptr<Packet> payload,
-          Ptr<const Packet> origPacket);
+          Ptr<ContentObject> data);
 
   /**
    * @brief Event fired just before PIT entry is removed by timeout
@@ -142,15 +133,13 @@ protected:
    *
    * @param inFace  incoming face
    * @param header  deserialized Interest header
-   * @param origPacket  original packet
    * @param pitEntry created PIT entry (incoming and outgoing face sets are empty)
    *
    * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
    */
   virtual void
   DidCreatePitEntry (Ptr<Face> inFace,
-                     Ptr<const Interest> header,
-                     Ptr<const Packet> origPacket,
+                     Ptr<const Interest> interest,
                      Ptr<pit::Entry> pitEntry);
 
   /**
@@ -159,14 +148,12 @@ protected:
    * Note that this call can be called only for non-similar Interest (i.e., there is an attempt to create a new PIT entry).
    * For any non-similar Interests, either FailedToCreatePitEntry or DidCreatePitEntry is called.
    *
-   * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param inFace   incoming face
+   * @param interest Interest packet
    */
   virtual void
   FailedToCreatePitEntry (Ptr<Face> inFace,
-                          Ptr<const Interest> header,
-                          Ptr<const Packet> origPacket);
+                          Ptr<const Interest> interest);
 
   /**
    * @brief An event that is fired every time a duplicated Interest is received
@@ -174,16 +161,14 @@ protected:
    * This even is the last action that is performed before the Interest processing is halted
    *
    * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param interest Interest packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    *
    * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
    */
   virtual void
   DidReceiveDuplicateInterest (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> origPacket,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry);
 
   /**
@@ -192,16 +177,14 @@ protected:
    * This even is the last action that is performed before the Interest processing is halted
    *
    * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param interest Interest packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    *
    * @see DidReceiveDuplicateInterest, DidForwardSimilarInterest, ShouldSuppressIncomingInterest
    */
   virtual void
   DidSuppressSimilarInterest (Ptr<Face> inFace,
-                              Ptr<const Interest> header,
-                              Ptr<const Packet> origPacket,
+                              Ptr<const Interest> interest,
                               Ptr<pit::Entry> pitEntry);
 
   /**
@@ -210,16 +193,14 @@ protected:
    * This even is fired just before handling the Interest to PropagateInterest method
    *
    * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param interest Interest packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    *
    * @see DidReceiveDuplicateInterest, DidSuppressSimilarInterest, ShouldSuppressIncomingInterest
    */
   virtual void
   DidForwardSimilarInterest (Ptr<Face> inFace,
-                             Ptr<const Interest> header,
-                             Ptr<const Packet> origPacket,
+                             Ptr<const Interest> interest,
                              Ptr<pit::Entry> pitEntry);
 
   /**
@@ -229,16 +210,14 @@ protected:
    * and retransmitted Interest cannot by forwarded.  For more details, refer to the implementation.
    *
    * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param interest Interest header
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    *
    * @see DetectRetransmittedInterest
    */
   virtual void
   DidExhaustForwardingOptions (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> origPacket,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry);
 
   /**
@@ -250,15 +229,13 @@ protected:
    * already has inFace (i.e., a similar interest is received on the same face more than once).
    *
    * @param inFace  incoming face
-   * @param header  deserialized Interest header
-   * @param origPacket  original packet
+   * @param interest Interest header
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    * @return true if Interest should be considered as retransmitted
    */
   virtual bool
   DetectRetransmittedInterest (Ptr<Face> inFace,
-                               Ptr<const Interest> header,
-                               Ptr<const Packet> origPacket,
+                               Ptr<const Interest> interest,
                                Ptr<pit::Entry> pitEntry);
 
   /**
@@ -279,50 +256,38 @@ protected:
    * Note that when Interest is satisfied from the cache, incoming face will be 0
    *
    * @param inFace  incoming face
-   * @param header  deserialized ContentObject header
-   * @param payload ContentObject payload
-   * @param origPacket  original packet
+   * @param data    Data packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    */
   virtual void
   SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
-                          Ptr<const ContentObject> header,
-                          Ptr<const Packet> payload,
-                          Ptr<const Packet> origPacket,
+                          Ptr<const ContentObject> data,
                           Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event which is fired just after data was send out on the face
    *
-   * @param inFace     incoming face of the ContentObject
+   * @param inFace   incoming face of the ContentObject
    * @param outFace  outgoing face
-   * @param header  deserialized ContentObject header
-   * @param payload ContentObject payload
-   * @param origPacket  original packet
+   * @param data     Data packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
    */
   virtual void
   DidSendOutData (Ptr<Face> inFace,
                   Ptr<Face> outFace,
-                  Ptr<const ContentObject> header,
-                  Ptr<const Packet> payload,
-                  Ptr<const Packet> origPacket,
+                  Ptr<const ContentObject> data,
                   Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event which is fired every time a requested (solicited) DATA packet (there is an active PIT entry) is received
    *
    * @param inFace  incoming face
-   * @param header  deserialized ContentObject header
-   * @param payload ContentObject payload
-   * @param origPacket  original packet
+   * @param data    Data packet
    * @param didCreateCacheEntry flag indicating whether a cache entry was added for this data packet or not (e.g., packet already exists in cache)
    */
   virtual void
   DidReceiveSolicitedData (Ptr<Face> inFace,
-                           Ptr<const ContentObject> header,
-                           Ptr<const Packet> payload,
-                           Ptr<const Packet> origPacket,
+                           Ptr<const ContentObject> data,
                            bool didCreateCacheEntry);
 
   /**
@@ -332,16 +297,12 @@ protected:
    * attribute CacheUnsolicitedData true
    *
    * @param inFace  incoming face
-   * @param header  deserialized ContentObject header
-   * @param payload ContentObject payload
-   * @param origPacket  original packet
+   * @param data    Data packet
    * @param didCreateCacheEntry flag indicating whether a cache entry was added for this data packet or not (e.g., packet already exists in cache)
    */
   virtual void
   DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                             Ptr<const ContentObject> header,
-                             Ptr<const Packet> payload,
-                             Ptr<const Packet> origPacket,
+                             Ptr<const ContentObject> data,
                              bool didCreateCacheEntry);
 
   /**
@@ -353,14 +314,12 @@ protected:
    * For more details, refer to the source code.
    *
    * @param inFace  incoming face
-   * @param header  deserialized ContentObject header
+   * @param interest Interest packet
    * @param payload ContentObject payload
-   * @param origPacket  original packet
    */
   virtual bool
   ShouldSuppressIncomingInterest (Ptr<Face> inFace,
-                                  Ptr<const Interest> header,
-                                  Ptr<const Packet> origPacket,
+                                  Ptr<const Interest> interest,
                                   Ptr<pit::Entry> pitEntry);
 
   /**
@@ -373,8 +332,7 @@ protected:
    *
    * @param inFace     incoming face of the Interest
    * @param outFace    proposed outgoing face of the Interest
-   * @param header     parsed Interest header
-   * @param origPacket original Interest packet
+   * @param interest   Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    *
    * @see DetectRetransmittedInterest
@@ -382,8 +340,7 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /**
@@ -393,8 +350,7 @@ protected:
    *
    * @param inFace     incoming face of the Interest
    * @param outFace    proposed outgoing face of the Interest
-   * @param header     parsed Interest header
-   * @param origPacket original Interest packet
+   * @param interest Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    *
    * @see CanSendOutInterest
@@ -402,8 +358,7 @@ protected:
   virtual bool
   TrySendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /**
@@ -411,15 +366,13 @@ protected:
    *
    * @param inFace     incoming face of the Interest
    * @param outFace    outgoing face of the Interest
-   * @param header     parsed Interest header
-   * @param origPacket original Interest packet
+   * @param interest Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    */
   virtual void
   DidSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /**
@@ -429,16 +382,14 @@ protected:
    * PIT entry lifetime, calling DoPropagateInterest, and retransmissions (enabled by default).
    *
    * @param inFace     incoming face
-   * @param header     Interest header
-   * @param origPacket original Interest packet
+   * @param interest   Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    *
    * @see DoPropagateInterest
    */
   virtual void
   PropagateInterest (Ptr<Face> inFace,
-                     Ptr<const Interest> header,
-                     Ptr<const Packet> origPacket,
+                     Ptr<const Interest> interest,
                      Ptr<pit::Entry> pitEntry);
 
   /**
@@ -452,8 +403,7 @@ protected:
    * PIT entry lifetime, calling DoPropagateInterest, as well as perform retransmissions (enabled by default).
    *
    * @param inFace     incoming face
-   * @param header     Interest header
-   * @param origPacket original Interest packet
+   * @param interest   Interest packet
    * @param pitEntry   reference to PIT entry (reference to corresponding FIB entry inside)
    *
    * @return true if interest was successfully propagated, false if all options have failed
@@ -462,8 +412,7 @@ protected:
    */
   virtual bool
   DoPropagateInterest (Ptr<Face> inFace,
-                       Ptr<const Interest> header,
-                       Ptr<const Packet> origPacket,
+                       Ptr<const Interest> interest,
                        Ptr<pit::Entry> pitEntry) = 0;
 
 protected:
@@ -493,14 +442,14 @@ protected:
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  bool /*from cache*/,
                  Ptr<const Face> > m_outData; ///< @brief trace of outgoing Data
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                  Ptr<const Face> > m_inData; ///< @brief trace of incoming Data
 
-  TracedCallback<Ptr<const ContentObject>, Ptr<const Packet>,
+  TracedCallback<Ptr<const ContentObject>,
                   Ptr<const Face> > m_dropData;  ///< @brief trace of dropped Data
 
   ////////////////////////////////////////////////////////////////////

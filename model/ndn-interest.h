@@ -22,16 +22,13 @@
 #ifndef _NDN_INTEREST_HEADER_H_
 #define _NDN_INTEREST_HEADER_H_
 
-#include "ns3/integer.h"
-#include "ns3/header.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/nstime.h"
+#include "ns3/packet.h"
+#include "ns3/ptr.h"
 
-#include <string>
-#include <vector>
-#include <list>
-
-#include "ndn-name.h"
+#include <ns3/ndnSIM/ndn.cxx/name.h>
+#include <ns3/ndnSIM/ndn.cxx/exclude.h>
 
 namespace ns3 {
 
@@ -40,50 +37,10 @@ class Packet;
 namespace ndn {
 
 /**
-  * @brief NDN Interest and routines to serialize/deserialize
-  *
-  * Optimized and simplified formatting of Interest packets 
-  *
-  *	Interest ::= Nonce 
-  *	     	     Scope 
-  *		     InterestLifetime 
-  *	     	     Name 
-  *	     	     Selectors 
-  *	     	     Options
-  *
-  * Minumum size of the Interest packet: 1 + 4 + 2 + 1 + (2 + 0) + (2 + 0) + (2 + 0) = 14
-  *
-  * Maximum size of the Interest packet: 1 + 4 + 2 + 1 + (2 + 65535) + (2 + 65535) + (2 + 65535) = 196619
-  *
-  * ::
-  *
-  *        0                   1                   2                   3
-  *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  *        |                          Nonce                                |
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  *        |     Scope     |   Reserved    |      InterestLifetime         |
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  *        |            Length             |                               |
-  *	   |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
-  *        ~                                                               ~
-  *        ~                            Name                               ~
-  *        |							           |	
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  *        |            Length             |                               |
-  *        |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
-  *        ~                                                               ~
-  *        ~                          Selectors                            ~
-  *        |							            |	
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  *        |            Length             |                               |
-  *	   |-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
-  *        ~                                                               ~
-  *        ~                          Options                              ~
-  *        |							           |	
-  *        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  * **/
-class Interest : public SimpleRefCount<Interest, Header>
+ * @brief NDN Interest (wire formats are defined in wire)
+ *
+ **/
+class Interest : public SimpleRefCount<Interest>
 {
 public:
   /**
@@ -91,7 +48,7 @@ public:
    *
    * Creates a null header
    **/
-  Interest ();
+  Interest (Ptr<Packet> payload = Create<Packet> ());
 
   /**
    * @brief Copy constructor
@@ -221,51 +178,92 @@ public:
   uint8_t
   GetNack () const;
 
-  //////////////////////////////////////////////////////////////////
-
-  static TypeId GetTypeId (void); ///< @brief Get TypeId of the class
-  virtual TypeId GetInstanceTypeId (void) const; ///< @brief Get TypeId of the instance
-  
   /**
-   * \brief Print Interest packet 
+   * @brief Set exclude filter of interest packet
+   *
+   * Empty or 0 means no exclude filter
    */
-  virtual void Print (std::ostream &os) const;
-  
-  /**
-   * \brief Get the size of Interest packet
-   * Returns the Interest packet size after serialization
-   */
-  virtual uint32_t GetSerializedSize (void) const;
-  
-  /**
-   * \brief Serialize Interest packet
-   * Serializes Interest packet into Buffer::Iterator
-   * @param[in] start buffer to contain serialized Interest packet
-   */
-  virtual void Serialize (Buffer::Iterator start) const;
-  
-  /**
-   * \brief Deserialize Interest packet
-   * Deserializes Buffer::Iterator into Interest packet
-   * @param[in] start buffer that contains serialized Interest packet
-   */ 
-  virtual uint32_t Deserialize (Buffer::Iterator start);
+  void
+  SetExclude (Ptr<Exclude> exclude);
 
   /**
-   * @brief Cheat for python bindings
+   * @brief Get exclude filter of interest packet
    */
-  static Ptr<Interest>
-  GetInterest (Ptr<Packet> packet);
+  Ptr<const Exclude>
+  GetExclude () const;
+  
+  /**
+   * @brief Set virtual "payload" of interest packet
+   *
+   * This payload can carry packet tags
+   */
+  void
+  SetPayload (Ptr<Packet> payload);
+
+  /**
+   * @brief Get virtual "payload" to interest packet
+   *
+   * This payload can carry packet tags
+   */
+  Ptr<const Packet>
+  GetPayload () const;
+  
+  /**
+   * @brief Get wire formatted packet
+   *
+   * If wire formatted packet has not been set before, 0 will be returned
+   */
+  inline Ptr<const Packet>
+  GetWire () const;
+
+  /**
+   * @brief Set (cache) wire formatted packet
+   */
+  inline void
+  SetWire (Ptr<const Packet> packet) const;
+
+  /**
+   * @brief Print Interest in plain-text to the specified output stream
+   */
+  void
+  Print (std::ostream &os) const;
   
 private:
-  Ptr<Name> m_name;    ///< Interest name
-  uint8_t m_scope;                ///< 0xFF not set, 0 local scope, 1 this host, 2 immediate neighborhood
-  Time  m_interestLifetime;      ///< InterestLifetime
-  uint32_t m_nonce;              ///< Nonce. not used if zero
-  uint8_t  m_nackType;           ///< Negative Acknowledgement type
+  // NO_ASSIGN
+  Interest &
+  operator = (const Interest &other) { return *this; }
+  
+private:
+  Ptr<Name> m_name;         ///< @brief Interest name
+  uint8_t m_scope;          ///< @brief 0xFF not set, 0 local scope, 1 this host, 2 immediate neighborhood
+  Time  m_interestLifetime; ///< @brief InterestLifetime
+  uint32_t m_nonce;         ///< @brief Nonce. not used if zero
+  uint8_t  m_nackType;      ///< @brief Negative Acknowledgement type
+
+  Ptr<Exclude> m_exclude;   ///< @brief Exclude filter
+  Ptr<Packet> m_payload;    ///< @brief virtual payload
+
+  mutable Ptr<const Packet> m_wire;
 };
 
-typedef Interest InterestHeader;
+inline std::ostream &
+operator << (std::ostream &os, const Interest &i)
+{
+  i.Print (os);
+  return os;
+}
+
+inline Ptr<const Packet>
+Interest::GetWire () const
+{
+  return m_wire;
+}
+
+inline void
+Interest::SetWire (Ptr<const Packet> packet) const
+{
+  m_wire = packet;
+}
 
 /**
  * @ingroup ndn-exceptions

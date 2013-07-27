@@ -36,13 +36,7 @@ namespace ndn {
 
 class ContentObject;
 class Interest;
-
-typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
-
 class Name;
-typedef Name NameComponents;
-
 class ContentStore;
 
 namespace cs {
@@ -50,13 +44,6 @@ namespace cs {
 /**
  * \ingroup ndn
  * \brief NDN content store entry
- *
- * Content store entry stores separately pseudo header and content of
- * ContentObject packet.  It is responsibility of the caller to
- * construct a fully formed NDN Packet by calling Copy(), AddHeader(),
- * AddTail() on the packet received by GetPacket() method.
- *
- * GetFullyFormedNdnPacket method provided as a convenience
  */
 class Entry : public SimpleRefCount<Entry>
 {
@@ -70,7 +57,7 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> header, Ptr<const Packet> packet);
+  Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> data);
 
   /**
    * \brief Get prefix of the stored entry
@@ -84,21 +71,7 @@ public:
    * \returns ContentObject of the stored entry
    */
   Ptr<const ContentObject>
-  GetHeader () const;
-
-  /**
-   * \brief Get content of the stored entry
-   * \returns content of the stored entry
-   */
-  Ptr<const Packet>
-  GetPacket () const;
-
-  /**
-   * \brief Convenience method to create a fully formed Ndn packet from stored header and content
-   * \returns A read-write copy of the packet with ContentObject and ContentObjectTail
-   */
-  Ptr<Packet>
-  GetFullyFormedNdnPacket () const;
+  GetData () const;
 
   /**
    * @brief Get pointer to access store, to which this entry is added
@@ -108,8 +81,7 @@ public:
 
 private:
   Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
-  Ptr<const ContentObject> m_header; ///< \brief non-modifiable ContentObject
-  Ptr<Packet> m_packet; ///< \brief non-modifiable content of the ContentObject packet
+  Ptr<const ContentObject> m_data; ///< \brief non-modifiable ContentObject
 };
 
 } // namespace cs
@@ -147,7 +119,7 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  virtual boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+  virtual Ptr<ContentObject>
   Lookup (Ptr<const Interest> interest) = 0;
 
   /**
@@ -159,7 +131,7 @@ public:
    * @returns true if an existing entry was updated, false otherwise
    */
   virtual bool
-  Add (Ptr<const ContentObject> header, Ptr<const Packet> packet) = 0;
+  Add (Ptr<const ContentObject> data) = 0;
 
   // /*
   //  * \brief Add a new content to the content store.

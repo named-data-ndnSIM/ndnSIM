@@ -170,11 +170,31 @@ Selectors
 
 ::
 
-	Selectors ::= Length (Selector)*
+	Selectors ::= Length (SelectorType Selector)*
+
+        SelectorType ::= uint8_t
 
 	Selector ::= MinSuffixComponents | MaxSuffixComponents | Publisher | Exclude | ChildSelector | AnswerOriginKind
 
-All selectors are for now undefined
+Currently, ndnSIM defines following SelectorTypes:
+
+- 0x01: Exclude
+
+Other types are currently undefined
+
+Exclude
+~~~~~~~
+
+::
+
+	Exclude ::= Length (ExcludeComponent)*
+
+        ExcludeComponent ::= ExcludeNameType NameComponent ExcludeAnyType? |
+                             ExcludeAnyType
+
+        ExcludeNameType ::= uint8_t  (==0x01)
+
+        ExcludeAnyType ::= uint8_t   (==0x02)
 
 Options
 ~~~~~~~

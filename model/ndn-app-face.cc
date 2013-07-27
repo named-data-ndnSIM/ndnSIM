@@ -76,66 +76,42 @@ AppFace::AppFace (const AppFace &)
 {
 }
 
-AppFace& AppFace::operator= (const AppFace &)
+AppFace&
+AppFace::operator= (const AppFace &)
 {
   return *((AppFace*)0);
 }
 
-
-void
-AppFace::RegisterProtocolHandler (ProtocolHandler handler)
+bool
+AppFace::SendInterest (Ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << interest);
 
-  Face::RegisterProtocolHandler (handler);
+  if (!IsUp ())
+    {
+      return false;
+    }
 
-  m_app->RegisterProtocolHandler (MakeCallback (&Face::Receive, this));
+  if (interest->GetNack () > 0)
+    m_app->OnNack (interest);
+  else
+    m_app->OnInterest (interest);
+  
+  return true;
 }
 
 bool
-AppFace::SendImpl (Ptr<Packet> p)
+AppFace::SendData (Ptr<const ContentObject> data)
 {
-  NS_LOG_FUNCTION (this << p);
+  NS_LOG_FUNCTION (this << data);
 
-  try
+  if (!IsUp ())
     {
-      HeaderHelper::Type type = HeaderHelper::GetNdnHeaderType (p);
-      switch (type)
-        {
-        case HeaderHelper::INTEREST_NDNSIM:
-          {
-            Ptr<Interest> header = Create<Interest> ();
-            p->RemoveHeader (*header);
-
-            if (header->GetNack () > 0)
-              m_app->OnNack (header, p);
-            else
-              m_app->OnInterest (header, p);
-          
-            break;
-          }
-        case HeaderHelper::CONTENT_OBJECT_NDNSIM:
-          {
-            static ContentObjectTail tail;
-            Ptr<ContentObject> header = Create<ContentObject> ();
-            p->RemoveHeader (*header);
-            p->RemoveTrailer (tail);
-            m_app->OnContentObject (header, p/*payload*/);
-          
-            break;
-          }
-        default:
-          NS_FATAL_ERROR ("ccnb support is currently broken");
-          break;
-        }
-      
-      return true;
-    }
-  catch (UnknownHeaderException)
-    {
-      NS_LOG_ERROR ("Unknown header type");
       return false;
     }
+
+  m_app->OnContentObject (data);
+  return true;
 }
 
 std::ostream&

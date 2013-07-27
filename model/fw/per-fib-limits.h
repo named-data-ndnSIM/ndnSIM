@@ -99,8 +99,7 @@ protected:
   virtual bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const Interest> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
 
   /// \copydoc ForwardingStrategy::WillSatisfyPendingInterest
@@ -141,8 +140,7 @@ template<class Parent>
 bool
 PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
-                                          Ptr<const Interest> header,
-                                          Ptr<const Packet> origPacket,
+                                          Ptr<const Interest> interest,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -152,7 +150,7 @@ PerFibLimits<Parent>::CanSendOutInterest (Ptr<Face> inFace,
 
   if (fibLimits->IsBelowLimit ())
     {
-      if (super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry))
+      if (super::CanSendOutInterest (inFace, outFace, interest, pitEntry))
         {
           fibLimits->BorrowLimit ();
           return true;
@@ -185,7 +183,7 @@ PerFibLimits<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
 template<class Parent>
 void
 PerFibLimits<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                                        Ptr<pit::Entry> pitEntry)
+                                                  Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 

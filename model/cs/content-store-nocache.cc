@@ -55,15 +55,15 @@ Nocache::~Nocache ()
 {
 }
 
-boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> >
+Ptr<ContentObject>
 Nocache::Lookup (Ptr<const Interest> interest)
 {
   this->m_cacheMissesTrace (interest);
-  return boost::tuple<Ptr<Packet>, Ptr<const ContentObject>, Ptr<const Packet> > (0, 0, 0);
+  return 0;
 }
 
 bool
-Nocache::Add (Ptr<const ContentObject> header, Ptr<const Packet> packet)
+Nocache::Add (Ptr<const ContentObject> data)
 {
   return false;
 }

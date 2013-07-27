@@ -25,6 +25,7 @@
 #include "ns3/ndn-name.h"
 #include "ns3/ndn-interest.h"
 
+#include "ns3/packet.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
