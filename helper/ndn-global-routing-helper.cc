@@ -18,6 +18,12 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+#endif
+
 #include "ndn-global-routing-helper.h"
 
 #include "ns3/ndn-l3-protocol.h"

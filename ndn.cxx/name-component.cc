@@ -8,6 +8,11 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreorder"
+#endif
+
 #include "name-component.h"
 
 #include "detail/error.h"
