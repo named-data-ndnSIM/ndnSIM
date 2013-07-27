@@ -67,7 +67,7 @@ def configure(conf):
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 
-    conf.env['NDN_plugins'] = ['topology']
+    conf.env['NDN_plugins'] = ['topology', 'ip-faces']
     if Options.options.enable_ndn_plugins:
         conf.env['NDN_plugins'] = conf.env['NDN_plugins'] + Options.options.enable_ndn_plugins.split(',')
 
@@ -180,6 +180,13 @@ def build(bld):
             ])
         module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
         module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/mobility/**/*.h'])])
+
+    if 'ip-faces' in bld.env['NDN_plugins']:
+        headers.source.extend ([
+            "plugins/ip-faces/ndn-ip-faces-helper.h",
+            ])
+        module.source.extend (bld.path.ant_glob(['plugins/ip-faces/*.cc']))
+        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/ip-faces/**/*.h'])])
 
     # bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
     # bld.install_files('$PREFIX/include', ndnSIM_headers)

@@ -49,6 +49,7 @@ namespace ns3 {
 namespace ndn {
 
 const uint16_t L3Protocol::ETHERNET_FRAME_TYPE = 0x7777;
+const uint16_t L3Protocol::IP_STACK_PORT = 9695;
 
 NS_OBJECT_ENSURE_REGISTERED (L3Protocol);
 
