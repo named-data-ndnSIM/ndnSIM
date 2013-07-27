@@ -48,43 +48,9 @@ namespace fw { class Tag; }
 
 namespace pit {
 
-/// @cond include_hidden
-class i_face {};
-class i_retx {};
-/// @endcond
-
 /**
- * \ingroup ndn
- * \brief Typedef for indexed face container of PitEntryOutgoingFace
- *
- * Indexes:
- * - by face (may be it will be possible to replace with just the std::map)
- */
-// struct OutgoingFaceContainer
-// {
-//   /// @cond include_hidden
-//   typedef boost::multi_index::multi_index_container<
-//     OutgoingFace,
-//     boost::multi_index::indexed_by<
-//       // For fast access to elements using NdnFace
-//       boost::multi_index::ordered_unique<
-//         boost::multi_index::tag<i_face>,
-//         boost::multi_index::member<OutgoingFace, Ptr<Face>, &OutgoingFace::m_face>
-//       >
-//       // ,
-//       // boost::multi_index::ordered_non_unique<
-//       //   boost::multi_index::tag<i_retx>,
-//       //   boost::multi_index::member<OutgoingFace, uint32_t, &OutgoingFace::m_retxCount>
-//       // >
-//     >
-//    > type;
-//   /// @endcond
-// };
-
-
-/**
- * \ingroup ndn
- * \brief structure for PIT entry
+ * @ingroup ndn-pit
+ * @brief structure for PIT entry
  *
  * All set-methods are virtual, in case index rearrangement is necessary in the derived classes
  */
@@ -315,6 +281,7 @@ protected:
   std::list< boost::shared_ptr<fw::Tag> > m_fwTags; ///< @brief Forwarding strategy tags
 };
 
+/// @cond include_hidden
 struct EntryIsNotEmpty
 {
   bool
@@ -323,6 +290,7 @@ struct EntryIsNotEmpty
     return !entry->GetIncoming ().empty ();
   }
 };
+/// @endcond
 
 std::ostream& operator<< (std::ostream& os, const Entry &entry);
 

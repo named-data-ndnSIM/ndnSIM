@@ -34,8 +34,8 @@
 namespace ns3 {
 
 /**
- * @ingroup ccnx
- * @brief CCNx network-layer rate tracer
+ * @ingroup ndn-tracers
+ * @brief IPv4 network-layer rate tracer
  */
 class Ipv4RateL3Tracer : public Ipv4L3Tracer
 {

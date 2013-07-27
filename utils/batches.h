@@ -30,6 +30,7 @@
 namespace ns3 {
 
 /**
+ * @ingroup ndn-apps
  * @brief Class representing sets of (time, number) tuples with support of reading writing to streams
  */
 class Batches : public std::list<boost::tuple<Time, uint32_t> >

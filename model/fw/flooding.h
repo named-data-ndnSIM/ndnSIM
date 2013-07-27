@@ -30,10 +30,18 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
- * \brief Flooding strategy
+ * @ingroup ndn-fw
+ * @brief Simple flooding strategy
  *
- * \todo Describe
+ * Interests will be forwarded to all available faces available for a route (FIB entry).
+ * If there are no available GREEN or YELLOW faces, interests is dropped.
+ *
+ * Usage example:
+ * @code
+ *     ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
+ *     ...
+ *     ndnHelper.Install (nodes);
+ * @endcode
  */
 class Flooding :
     public Nacks

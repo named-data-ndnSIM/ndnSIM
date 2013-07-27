@@ -30,6 +30,7 @@ namespace ndn {
 class Face;
 
 /**
+ * @ingroup ndn-fw
  * @brief Packet tag that is used to keep information about face from which packet was received
  *
  * This tag may be extended later to include more information, if necessary

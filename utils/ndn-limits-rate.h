@@ -28,7 +28,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * \ingroup ndn
+ * \ingroup ndn-fw
  * \brief Structure to manage limits for outstanding interests
  */
 class LimitsRate :

@@ -31,6 +31,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
+ * @ingroup ndn-helpers
  * \brief A helper to make it easier to instantiate an ns3::NdnConsumer Application
  * on a set of nodes.
  */

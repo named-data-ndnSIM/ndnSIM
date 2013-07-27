@@ -27,6 +27,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
+ * @ingroup ndn-fw
  * @brief Packet tag that is used to track hop count for Interest-Data pairs
  */
 class FwHopCountTag : public Tag

@@ -38,7 +38,11 @@ class ContentObject;
 class Face;
 
 /**
- * @ingroup ndn
+ * \ingroup ndn
+ * \defgroup ndn-apps NDN applications
+ */
+/**
+ * @ingroup ndn-apps
  * @brief Base class that all NDN applications should be derived from.
  * 
  * The class implements virtual calls onInterest, onNack, and onContentObject

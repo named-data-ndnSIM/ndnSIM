@@ -18,6 +18,10 @@
 NDN_NAMESPACE_BEGIN
 
 namespace wire {
+
+/**
+ * @brief Namespace for CCNb wire format operations
+ */
 namespace ccnb {
 
 /**

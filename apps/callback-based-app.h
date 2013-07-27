@@ -19,7 +19,7 @@
 namespace ns3 {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-apps
  * @brief A meta application that can be used to create custom apps within Python bindings 
  */
 class CallbackBasedApp: public Application

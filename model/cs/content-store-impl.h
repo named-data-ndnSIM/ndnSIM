@@ -37,6 +37,10 @@ namespace ns3 {
 namespace ndn {
 namespace cs {
 
+/**
+ * @ingroup ndn-cs
+ * @brief Cache entry implementation with additional references to the base container
+ */
 template<class CS>
 class EntryImpl : public Entry
 {
@@ -65,6 +69,10 @@ private:
 
 
 
+/**
+ * @ingroup ndn-cs
+ * @brief Base implementation of NDN content store
+ */
 template<class Policy>
 class ContentStoreImpl : public ContentStore,
                          protected ndnSIM::trie_with_policy< Name,
@@ -179,7 +187,6 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
 
-  /// @todo Change to search with predicate
   typename super::const_iterator node;
   if (interest->GetExclude () == 0)
     {

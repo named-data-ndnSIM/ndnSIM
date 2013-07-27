@@ -33,7 +33,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup Ndn
+ * @ingroup ndn
  * @brief ContentObject header
  */
 class ContentObject : public SimpleRefCount<ContentObject>
@@ -198,7 +198,6 @@ operator << (std::ostream &os, const ContentObject &d)
 }
 
 /**
- * @ingroup ndn-exceptions
  * @brief Class for ContentObject parsing exception
  */
 class ContentObjectException {};

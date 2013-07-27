@@ -29,6 +29,10 @@ namespace ns3 {
 
 class Ipv4Header;
 
+/**
+ * @ingroup ndn-tracers
+ * @brief Base class for IPv4/TCP based applications
+ */
 class Ipv4AppTracer : public SimpleRefCount<Ipv4AppTracer>
 {
 public:

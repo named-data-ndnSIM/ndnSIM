@@ -35,7 +35,7 @@ class Channel;
 namespace ndn {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-helpers
  * @brief Helper for NDN IP-based face creation
  */
 class IpFacesHelper

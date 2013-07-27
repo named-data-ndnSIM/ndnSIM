@@ -28,6 +28,10 @@ class Pit;
 
 namespace pit {
 
+/**
+ * @ingroup ndn-pit
+ * @brief PIT entry implementation with additional pointers to the underlying container
+ */
 template<class Pit>
 class EntryImpl : public Entry
 {
@@ -89,6 +93,7 @@ private:
   typename Pit::super::iterator item_;
 };
 
+/// @cond include_hidden
 template<class T>
 struct TimestampIndex
 {
@@ -98,6 +103,7 @@ struct TimestampIndex
     return a.GetExpireTime () < b.GetExpireTime ();
   }
 };
+/// @endcond
 
 } // namespace pit
 } // namespace ndn

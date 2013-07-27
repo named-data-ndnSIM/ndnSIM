@@ -29,6 +29,12 @@ namespace ns3 {
 
 class Node;
 
+/**
+ * @ingroup ndn-tracers
+ * @brief Link-layer tracer
+ *
+ * @todo Finish implementation
+ */
 class L2Tracer : public SimpleRefCount<L2Tracer>
 {
 public:

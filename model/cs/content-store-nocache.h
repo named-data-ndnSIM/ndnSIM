@@ -29,8 +29,8 @@ namespace ndn {
 namespace cs {
 
 /**
- * \ingroup ndn
- * \brief Implementation of ContentStore that completely disables caching
+ * @ingroup ndn-cs
+ * @brief Implementation of ContentStore that completely disables caching
  */
 class Nocache : public ContentStore
 {

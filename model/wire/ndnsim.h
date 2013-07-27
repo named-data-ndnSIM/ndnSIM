@@ -17,7 +17,14 @@
 
 NDN_NAMESPACE_BEGIN
 
+/**
+ * @brief Namespace encapsulating wire operations
+ */
 namespace wire {
+
+/**
+ * @brief Namespace for ndnSIM wire format operations
+ */
 namespace ndnSIM {
 
 /**

@@ -29,7 +29,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-apps
  * \brief Ndn application for sending out Interest packets in batches
  */
 class ConsumerBatches: public Consumer

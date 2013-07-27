@@ -38,8 +38,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
- * \brief Strategy implementing per-FIB entry limits
+ * @ingroup ndn-fw
+ * @brief Strategy implementing per-FIB entry limits
  */
 template<class Parent>
 class PerFibLimits :

@@ -27,8 +27,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
- * \brief Abstract class for the forwarding strategy tag, which can be added to PIT entries
+ * @ingroup ndn-fw
+ * @brief Abstract class for the forwarding strategy tag, which can be added to PIT entries
  */
 class Tag
 {

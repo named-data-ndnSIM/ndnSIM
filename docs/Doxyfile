@@ -570,9 +570,9 @@ WARN_LOGFILE           = doxygen.warnings.log
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = ../model ../helper ../utils ../apps \
-						 ../plugins/topology ../plugins/mobility \
-						 introspected-doxygen.h doxygen.h
+INPUT                  = ../model ../ndn.cxx ../helper ../utils ../apps \
+                       ../plugins/topology ../plugins/ip-faces \
+                       introspected-doxygen.h doxygen.h
 
 # introspected-doxygen.h should be manually created:
 # For example:
@@ -1259,7 +1259,7 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH           =
+INCLUDE_PATH           = ../../../build
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
@@ -1278,7 +1278,10 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = NS3_ASSERT_ENABLE \
                          NS3_LOG_ENABLE \
-                         DOXYGEN
+                         DOXYGEN \
+                         "NDN_NAMESPACE_BEGIN=namespace ns3 { namespace ndn {" \
+                         "NDN_NAMESPACE_END="}}"
+
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

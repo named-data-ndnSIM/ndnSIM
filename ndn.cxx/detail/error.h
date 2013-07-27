@@ -35,6 +35,10 @@
 
 NDN_NAMESPACE_BEGIN
 
+/**
+ * @ingroup ndn-cxx
+ * @brief Namespace holding all errors from NDN.cxx API
+ */
 namespace error
 {
 

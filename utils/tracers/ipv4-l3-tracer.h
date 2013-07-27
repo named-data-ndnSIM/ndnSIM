@@ -29,6 +29,10 @@ namespace ns3 {
 
 class Node;
 
+/**
+ * @ingroup ndn-tracers
+ * @brief Base class for IPv4 network-layer tracers
+ */
 class Ipv4L3Tracer : public SimpleRefCount<Ipv4L3Tracer>
 {
 public:

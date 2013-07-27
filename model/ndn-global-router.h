@@ -40,6 +40,7 @@ class Name;
 typedef Name NameComponents;
 
 /**
+ * @ingroup ndn
  * @brief Class representing global router interface for ndnSIM
  */
 class GlobalRouter : public Object

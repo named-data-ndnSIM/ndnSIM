@@ -34,7 +34,7 @@ class Name;
 typedef Name NameComponents;
 
 /**
- * \ingroup ndn-helpers
+ * @ingroup ndn-helpers
  *
  * \brief Class implementing functionality to detect Ndn packet type and
  * create the corresponding object
@@ -94,13 +94,7 @@ public:
 };
 
   /**
-   * \ingroup ndn
-   * \defgroup ndn-exceptions Exceptions
-   */
-  /**
-   * \ingroup ndn-exceptions
-   * \brief Exception thrown if Ndn stack receives unrecognized
-   * message type
+   * \brief Exception thrown if NDN stack receives unrecognized message type
    */
 class UnknownHeaderException {};
 

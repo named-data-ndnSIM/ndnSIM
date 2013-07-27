@@ -19,6 +19,7 @@
 NDN_NAMESPACE_BEGIN
 
 /**
+ * @ingroup ndn-cxx
  * @brief Class to represent Exclude component in NDN interests
  */
 class Exclude : public SimpleRefCount<Exclude>

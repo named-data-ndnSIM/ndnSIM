@@ -29,6 +29,19 @@
 namespace ns3 {
 namespace ndn {
 
+/**
+ * @ingroup ndn
+ * @defgroup ndn-fw NDN forwarding strategies
+ */
+
+
+/**
+ * @ingroup ndn-fw
+ * @brief Namespace for Forwarding Strategy operations
+ */
+namespace fw {
+}
+
 class Face;
 
 class Interest;
@@ -42,8 +55,8 @@ namespace fib { class Entry; }
 class ContentStore;
 
 /**
- * \ingroup ndn
- * \brief Abstract base class for Ndn forwarding strategies
+ * @ingroup ndn-fw
+ * @brief Abstract base class for Ndn forwarding strategies
  */
 class ForwardingStrategy :
     public Object

@@ -37,9 +37,16 @@ namespace ndn {
 class ApiFacePriv;
 
 /**
- * \ingroup sync
- * @brief A handler for NDN; clients of this code do not need to deal
- * with NDN API directly
+ * @ingroup ndn
+ * @defgroup ndn-cxx NDN.cxx API
+ */
+
+/**
+ * @ingroup ndn-face
+ * @ingroup ndn-cxx
+ * @brief An application NDN face, providing richer API interface, compared to ndn::AppFace
+ *
+ * @see ndn::AppFace
  */
 class ApiFace
   : public ns3::ndn::Face

@@ -11,6 +11,11 @@ a {
     font-weight: bold;
 }
 
+a:visited {
+    color: #91A501;
+    font-weight: bold;
+}
+
 /* Sphinx headings */
 div.body h1,
 div.body h2,

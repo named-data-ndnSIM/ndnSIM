@@ -41,8 +41,8 @@ namespace ndn {
 class App;
 
 /**
- * @ingroup ndn
- * @brief  network-layer tracer for aggregate packet counts
+ * @ingroup ndn-tracers
+ * @brief Tracer to obtain application-level delays
  */
 class AppDelayTracer : public SimpleRefCount<AppDelayTracer>
 {

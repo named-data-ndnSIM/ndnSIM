@@ -32,6 +32,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
+ * @ingroup ndn-apps
  * @brief A simple Interest-sink applia simple Interest-sink application
  *
  * A simple Interest-sink applia simple Interest-sink application,

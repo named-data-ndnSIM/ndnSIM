@@ -28,7 +28,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
+ * @ingroup ndn-fw
+ * @brief Forwarding strategy extensions to track simple link status based on data plane performance
  */
 class GreenYellowRed :
     public Nacks

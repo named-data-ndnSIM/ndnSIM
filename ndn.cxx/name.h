@@ -23,6 +23,7 @@
 NDN_NAMESPACE_BEGIN
 
 /**
+ * @ingroup ndn-cxx
  * @brief Class for NDN Name
  */
 class Name : public SimpleRefCount<Name>

@@ -30,6 +30,10 @@ namespace ns3 {
 namespace ndn {
 namespace cs {
 
+/**
+ * @ingroup ndn-cs
+ * @brief Special content store realization that provides ability to track stats of CS operations
+ */
 template<class Policy>
 class ContentStoreWithStats :
     public ContentStoreImpl< ndnSIM::multi_policy_traits< boost::mpl::vector2< Policy, ndnSIM::lifetime_stats_policy_traits > > >

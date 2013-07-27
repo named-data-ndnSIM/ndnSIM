@@ -41,7 +41,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-apps
  * \brief NDN application for sending out Interest packets
  */
 class Consumer: public App

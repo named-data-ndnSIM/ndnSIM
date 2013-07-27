@@ -29,7 +29,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * \ingroup ndn
+ * \ingroup ndn-fw
  * \brief Abstract class to manage Interest limits 
  */
 class Limits :

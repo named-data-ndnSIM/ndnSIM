@@ -29,7 +29,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-apps
  * \brief Ndn application for sending out Interest packets (window-based)
  *
  * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the simulator.

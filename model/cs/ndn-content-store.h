@@ -39,11 +39,20 @@ class Interest;
 class Name;
 class ContentStore;
 
+/**
+ * @ingroup ndn
+ * @defgroup ndn-cs Content Store
+ */
+
+/**
+ * @ingroup ndn-cs
+ * @brief Namespace for ContentStore operations
+ */
 namespace cs {
 
 /**
- * \ingroup ndn
- * \brief NDN content store entry
+ * @ingroup ndn-cs
+ * @brief NDN content store entry
  */
 class Entry : public SimpleRefCount<Entry>
 {
@@ -88,7 +97,7 @@ private:
 
 
 /**
- * \ingroup ndn
+ * @ingroup ndn-cs
  * \brief Base class for NDN content store
  *
  * Particular implementations should implement Lookup, Add, and Print methods

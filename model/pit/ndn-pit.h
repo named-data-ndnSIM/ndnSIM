@@ -30,6 +30,18 @@
 namespace ns3 {
 namespace ndn {
 
+/**
+ * @ingroup ndn
+ * @defgroup ndn-pit PIT
+ */
+
+/**
+ * @ingroup ndn-pit
+ * @brief Namespace for PIT operations
+ */
+namespace pit {
+}
+
 class L3Protocol;
 class Face;
 class ContentObject;
@@ -42,8 +54,8 @@ typedef ContentObject ContentObjectHeader;
 ////////////////////////////////////////////////////////////////////////
 
 /**
- * \ingroup ndn
- * \brief Class implementing Pending Interests Table
+ * @ingroup ndn-pit
+ * @brief Class implementing Pending Interests Table
  */
 class Pit : public Object
 {

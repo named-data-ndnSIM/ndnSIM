@@ -33,7 +33,10 @@
 namespace ns3 {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-tracers
+ * @brief Tracer to collect link-layer rate information about links
+ *
+ * @todo Finish implementation
  */
 class L2RateTracer : public L2Tracer
 {

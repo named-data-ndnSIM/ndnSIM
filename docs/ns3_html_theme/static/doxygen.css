@@ -105,9 +105,9 @@ a {
 	text-decoration: none;
 }
 
-.contents a:visited {
+/*.contents a:visited {
 	color: #686868;
-}
+}*/
 
 a:hover {
 	text-decoration: underline;

@@ -33,8 +33,13 @@ class Interest;
 typedef Interest InterestHeader;
 
 /**
- * \ingroup ndn
- * \brief Class implementing FIB functionality
+ * @ingroup ndn
+ * @defgroup ndn-fib FIB
+ */
+
+/**
+ * @ingroup ndn-fib
+ * @brief Class implementing FIB functionality
  */
 class Fib : public Object
 {

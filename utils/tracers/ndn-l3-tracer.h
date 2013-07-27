@@ -24,6 +24,11 @@
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 
+/**
+ * @ingroup ndn-helpers
+ * @defgroup ndn-tracers Helpers to simplify metric collection
+ */
+
 namespace ns3 {
 
 class Node;
@@ -41,6 +46,7 @@ class Interest;
 class ContentObject;
 
 /**
+ * @ingroup ndn-tracers
  * @brief Base class for network-layer (incoming/outgoing Interests and Data) tracing of NDN stack
  */
 class L3Tracer : public SimpleRefCount<L3Tracer>

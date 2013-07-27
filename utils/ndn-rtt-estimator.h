@@ -36,7 +36,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * \ingroup tcp
+ * \ingroup ndn-apps
  *
  * \brief Helper class to store RTT measurements
  */

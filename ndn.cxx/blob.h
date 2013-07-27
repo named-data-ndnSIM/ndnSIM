@@ -20,6 +20,7 @@
 NDN_NAMESPACE_BEGIN
 
 /**
+ * @ingroup ndn-cxx
  * @brief Class representing a general-use binary blob
  */
 class Blob

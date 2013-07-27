@@ -38,8 +38,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
- * \brief Strategy implementing per-outgoing face limits
+ * @ingroup ndn-fw
+ * @brief Strategy implementing per-outgoing face limits
  */
 template<class Parent>
 class PerOutFaceLimits :

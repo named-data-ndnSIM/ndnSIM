@@ -48,6 +48,7 @@ typedef ContentObject ContentObjectHeader;
 
 namespace cs {
 
+/// @cond include_hidden
 struct Stats
 {
   inline void Reset ()
@@ -58,11 +59,12 @@ struct Stats
   double m_cacheHits;
   double m_cacheMisses;
 };
+/// @endcond
 
 }  
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-tracers
  * @brief NDN tracer for cache performance (hits and misses)
  */
 class CsTracer : public SimpleRefCount<CsTracer>

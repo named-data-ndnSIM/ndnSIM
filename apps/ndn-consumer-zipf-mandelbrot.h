@@ -38,7 +38,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-apps
  * @brief NDN app requesting contents following Zipf-Mandelbrot Distbituion
  *
  * The class implements an app which requests contents following Zipf-Mandelbrot Distribution

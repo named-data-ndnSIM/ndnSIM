@@ -37,8 +37,8 @@ class Packet;
 namespace ndn {
 
 /**
+ * @ingroup ndn
  * @brief NDN Interest (wire formats are defined in wire)
- *
  **/
 class Interest : public SimpleRefCount<Interest>
 {
@@ -266,7 +266,6 @@ Interest::SetWire (Ptr<const Packet> packet) const
 }
 
 /**
- * @ingroup ndn-exceptions
  * @brief Class for Interest parsing exception 
  */
 class InterestException {};

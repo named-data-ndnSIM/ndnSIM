@@ -35,7 +35,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * \ingroup ndn
+ * \ingroup ndn-apps
  *
  * \brief The modified version of "Mean--Deviation" RTT estimator, as discussed by Van Jacobson that better suits NDN communication model
  *

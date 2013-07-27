@@ -31,8 +31,8 @@ namespace ndn {
 namespace pit {
 
 /**
- * \ingroup ndn
- * \brief PIT state component for each incoming interest (not including duplicates)
+ * @ingroup ndn-pit
+ * @brief PIT state component for each incoming interest (not including duplicates)
  */
 struct IncomingFace
 {

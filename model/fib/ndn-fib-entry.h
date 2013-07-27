@@ -45,10 +45,14 @@ typedef Name NameComponents;
 
 class Fib;
 
+/**
+ * @ingroup ndn-fib
+ * @brief Namespace for FIB operations
+ */
 namespace fib {
 
 /**
- * \ingroup ndn
+ * @ingroup ndn-fib
  * \brief Structure holding various parameters associated with a (FibEntry, Face) tuple
  */
 class FaceMetric
@@ -191,8 +195,8 @@ class i_nth {};
 
 
 /**
- * \ingroup ndn
- * \brief Typedef for indexed face container of Entry
+ * @ingroup ndn-fib
+ * @brief Typedef for indexed face container of Entry
  *
  * Currently, there are 2 indexes:
  * - by face (used to find record and update metric)
@@ -232,7 +236,7 @@ struct FaceMetricContainer
 };
 
 /**
- * \ingroup ndn
+ * @ingroup ndn-fib
  * \brief Structure for FIB table entry, holding indexed list of
  *        available faces and their respective metrics
  */

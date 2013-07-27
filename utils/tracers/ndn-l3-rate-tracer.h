@@ -36,8 +36,8 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
- * @brief CCNx network-layer rate tracer
+ * @ingroup ndn-tracers
+ * @brief NDN network-layer rate tracer
  */
 class L3RateTracer : public L3Tracer
 {

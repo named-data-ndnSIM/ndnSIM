@@ -31,8 +31,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ndn
- * \brief Best route strategy
+ * @ingroup ndn-fw
+ * @brief Best route strategy
  */
 class BestRoute :
     public GreenYellowRed

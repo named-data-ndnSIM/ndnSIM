@@ -27,6 +27,10 @@
 
 namespace ns3 {
 
+/**
+ * @ingroup ndn-tracers
+ * @brief Helper to track application-level sequence numbers (approximated from TCP ACKs)
+ */
 class Ipv4SeqsAppTracer : public Ipv4AppTracer
 {
 public:

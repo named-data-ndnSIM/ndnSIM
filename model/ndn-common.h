@@ -19,6 +19,19 @@
 #define NDN_NAMESPACE_BEGIN  namespace ns3 { namespace ndn {
 #define NDN_NAMESPACE_END    } /*ndn*/ } /*ns3*/ 
 
+/**
+ * @brief NS-3 namespace
+ */
+namespace ns3 {
+
+/**
+ * @brief ndnSIM namespace
+ */
+namespace ndn {
+}
+
+}
+
 NDN_NAMESPACE_BEGIN
 
 typedef Time TimeInterval;

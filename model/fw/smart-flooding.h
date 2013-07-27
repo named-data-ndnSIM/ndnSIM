@@ -29,7 +29,8 @@ namespace ndn {
 namespace fw {
 
 /**
- * \ingroup ccnx
+ * @ingroup ndn-fw
+ * @brief Smart flooding forwarding strategy
  */
 class SmartFlooding :
     public GreenYellowRed

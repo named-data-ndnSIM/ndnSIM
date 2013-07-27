@@ -32,7 +32,7 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * \ingroup ndn-helpers
+ * @ingroup ndn-helpers
  * \brief A pool for Ndn faces
  * 
  * Provides tools to perform basic manipulation on faces, such as

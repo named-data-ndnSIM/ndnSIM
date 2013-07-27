@@ -39,6 +39,7 @@
 #endif
 
 /**
+ * @ingroup ndn-helpers
  * @brief Utility class to evaluate current usage of RAM
  */
 class MemUsage

@@ -36,8 +36,8 @@ namespace ns3 {
 namespace ndn {
 
 /**
- * @ingroup ndn
- * @brief CCNx network-layer tracer for aggregate packet counts
+ * @ingroup ndn-tracers
+ * @brief NDN network-layer tracer for aggregate packet counts
  */
 class L3AggregateTracer : public L3Tracer
 {

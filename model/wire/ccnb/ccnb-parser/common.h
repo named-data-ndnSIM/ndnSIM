@@ -31,14 +31,6 @@ NDN_NAMESPACE_BEGIN;
 
 namespace wire {
 
-/**
- * \ingroup ndn
- * \defgroup ndn-ccnb CCNB decoding routines
- */
-/**
- * \ingroup ndn-ccnb
- * \brief Namespace for ccnb parer
- */
 namespace CcnbParser {
 
 // forward declarations
@@ -54,8 +46,6 @@ class Ext;
 
 /**
  * \brief Exception thrown if there is a parsing error
- *
- * \todo inherit this class from some exception class and provide meaningful error messages
  */
 class CcnbDecodingException {};
 

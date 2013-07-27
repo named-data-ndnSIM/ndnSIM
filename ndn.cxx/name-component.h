@@ -18,6 +18,7 @@ NDN_NAMESPACE_BEGIN
 namespace name {
 
 /**
+ * @ingroup ndn-cxx
  * @brief Class to representing binary blob of NDN name component
  *
  * This class is based on Blob (std::vector<char>) and just provides several helpers
