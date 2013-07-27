@@ -82,7 +82,7 @@ def configure(conf):
 def build(bld):
     deps = ['core', 'network', 'point-to-point']
     deps.append ('internet') # Until RttEstimator is moved to network module
-    if bld.env['ENABLE_PYTHON_BINDINGS']:
+    if 'visualizer' in bld.env['NS3_ENABLED_MODULES']:
         deps.append ('visualizer')
 
     if 'topology' in bld.env['NDN_plugins']:
