@@ -27,6 +27,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ndn-tcp-face.h"
+#include "ndn-udp-face.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.IpFacesHelper");
 
@@ -83,11 +84,14 @@ private:
 static void
 ScheduledCreateTcp (Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric)
 {
-  Ptr<Face> face = TcpFace::GetFaceByAddress (address);
+  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack> ();
+  NS_ASSERT_MSG (stack != 0, "ndn::IpFaceStack needs to be installed on the node");
+
+  Ptr<Face> face = stack->GetTcpFaceByAddress (address);
   if (face == 0)
     {
       Ptr<TcpPrefixRegistrator> registrator = Create<TcpPrefixRegistrator> (node, prefix, metric);
-      TcpFace::CreateOrGetFace (node, address, MakeCallback (&TcpPrefixRegistrator::Run, registrator));
+      stack->CreateOrGetTcpFace (address, MakeCallback (&TcpPrefixRegistrator::Run, registrator));
     }
   else
     {
@@ -101,6 +105,21 @@ IpFacesHelper::CreateTcpFace (const Time &when, Ptr<Node> node, Ipv4Address addr
   Simulator::ScheduleWithContext (node->GetId (), when, ScheduledCreateTcp, node, address, prefix, metric);
 }
 
+static void
+ScheduledCreateUdp (Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric)
+{
+  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack> ();
+  NS_ASSERT_MSG (stack != 0, "ndn::IpFaceStack needs to be installed on the node");
+
+  Ptr<Face> face = stack->CreateOrGetUdpFace (address);
+  ndn::StackHelper::AddRoute (node, prefix, face, metric);
+}
+
+void
+IpFacesHelper::CreateUdpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric/* = 1*/)
+{
+  Simulator::ScheduleWithContext (node->GetId (), when, ScheduledCreateUdp, node, address, prefix, metric);
+}
 
 } // namespace ndn
 } // namespace ns3

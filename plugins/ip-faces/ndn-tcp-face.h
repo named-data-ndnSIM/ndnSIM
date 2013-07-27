@@ -42,15 +42,6 @@ class TcpFace : public Face
 public:
   static TypeId
   GetTypeId ();
-
-  /**
-   * @brief A singleton method allowing creation and lookup of faces
-   *
-   * All created TCP faces are stored internally in the map, and if the same face is created, it will simply be looked up
-   */
-  static Ptr<TcpFace>
-  CreateOrGetFace (Ptr<Node> node, Ipv4Address address,
-                   Callback< void, Ptr<Face> > onCreate = NULL_CREATE_CALLBACK);
   
   /**
    * \brief Constructor
@@ -59,14 +50,6 @@ public:
    */
   TcpFace (Ptr<Node> node, Ptr<Socket> socket, Ipv4Address address);
   virtual ~TcpFace();
-
-  ////////////////////////////////////////////////////////////////////
-  // methods overloaded from ndn::Face
-  virtual void
-  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
-
-  virtual void
-  UnRegisterProtocolHandlers ();
 
   void
   OnTcpConnectionClosed (Ptr<Socket> socket);
@@ -80,24 +63,24 @@ public:
   void
   SetCreateCallback (Callback< void, Ptr<Face> > callback);
 
-public:
-  const static Callback< void, Ptr<Face> > NULL_CREATE_CALLBACK;
-private:
   void
   OnConnect (Ptr<Socket> socket);
+
+  ////////////////////////////////////////////////////////////////////
+  // methods overloaded from ndn::Face
+  virtual void
+  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
+
+  virtual void
+  UnRegisterProtocolHandlers ();
+
+  virtual std::ostream&
+  Print (std::ostream &os) const;
   
 protected:
   // also from ndn::Face
   virtual bool
   Send (Ptr<Packet> p);
-
-public:
-  /**
-   * @brief Print out name of the NdnFace to the stream
-   */
-  virtual std::ostream&
-  Print (std::ostream &os) const;
-  ////////////////////////////////////////////////////////////////////
 
 private:  
   TcpFace (const TcpFace &); ///< \brief Disabled copy constructor
@@ -111,9 +94,6 @@ private:
   Ipv4Address m_address;
   uint32_t m_pendingPacketLength;
   Callback< void, Ptr<Face> > m_onCreateCallback;
-
-  typedef std::map<Ipv4Address, Ptr<TcpFace> > FaceMap;
-  static FaceMap s_map;
 };
 
 } // namespace ndn

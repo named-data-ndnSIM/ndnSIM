@@ -26,7 +26,7 @@
 #include "ns3/packet.h"
 #include "ns3/node.h"
 #include "ns3/pointer.h"
-#include "ns3/tcp-socket-factory.h"
+#include "ns3/udp-socket-factory.h"
 
 #include "ns3/ndn-name.h"
 
@@ -36,8 +36,6 @@ NS_LOG_COMPONENT_DEFINE ("ndn.UdpFace");
 
 namespace ns3 {
 namespace ndn {
-
-UdpFace::FaceMap UdpFace::s_map;
 
 NS_OBJECT_ENSURE_REGISTERED (UdpFace);
 
@@ -73,42 +71,24 @@ UdpFace& UdpFace::operator= (const UdpFace &)
   return *this;
 }
 
-void
-UdpFace::RegisterProtocolHandler (ProtocolHandler handler)
+bool
+UdpFace::ReceiveFromUdp (Ptr<const Packet> p)
 {
-  NS_LOG_FUNCTION (this);
-
-  Face::RegisterProtocolHandler (handler);
-
-  m_socket->SetRecvCallback (MakeCallback (&UdpFace::ReceiveFromUdp, this));
+  return Face::Receive (p);
 }
 
 bool
-UdpFace::SendImpl (Ptr<Packet> packet)
+UdpFace::Send (Ptr<Packet> packet)
 {
-  NS_LOG_FUNCTION (this << packet);
-  Ptr<Packet> boundary = Create<Packet> ();
-  TcpBoundaryHeader hdr (packet);
-  boundary->AddHeader (hdr);
+  if (!Face::Send (packet))
+    {
+      return false;
+    }
   
-  m_socket->Send (boundary);
+  NS_LOG_FUNCTION (this << packet);
   m_socket->Send (packet);
 
   return true;
-}
-
-void
-UdpFace::ReceiveFromUdp (Ptr< Socket > clientSocket)
-{
-  NS_LOG_FUNCTION (this << clientSocket);
-
-  Ptr<Packet> packet;
-  Address from;
-  while ((packet = socket->RecvFrom (from)))
-    {
-      Receive (realPacket);
-    }
-  }
 }
 
 Ipv4Address
@@ -117,45 +97,12 @@ UdpFace::GetAddress () const
   return m_address;
 }
 
-Ptr<UdpFace>
-UdpFace::GetFaceByAddress (const Ipv4Address &address)
-{
-  FaceMap::iterator i = s_map.find (address);
-  if (i != s_map.end ())
-    return i->second;
-  else
-    return 0;
-}
-
-Ptr<UdpFace>
-UdpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address)
-{
-  NS_LOG_FUNCTION (address);
-
-  FaceMap::iterator i = s_map.find (address);
-  if (i != s_map.end ())
-    return i->second;
-  
-  Ptr<Socket> socket = Socket::CreateSocket (node, UdpSocketFactory::GetTypeId ());
-  Ptr<UdpFace> face = CreateObject<UdpFace> (node, socket, address);
-
-  Ptr<L3Protocol> ndn = GetNode ()->GetObject<L3Protocol> ();
-  
-  ndn->AddFace (this);
-  this->SetUp (true);
-
-  s_map.insert (std::make_pair (address, face));
-
-  return face;
-}
-    
 std::ostream&
 UdpFace::Print (std::ostream& os) const
 {
-  os << "dev=udp(" << GetId () << ")";
+  os << "dev=udp(" << GetId () << "," << GetAddress () << ")";
   return os;
 }
 
 } // namespace ndn
 } // namespace ns3
-

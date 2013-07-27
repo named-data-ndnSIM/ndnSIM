@@ -37,11 +37,13 @@ class Packet;
 namespace ndn {
 
 class Face;
+class TcpFace;
+class UdpFace;
 
 /**
  * @ingroup ndn
  * @brief Application that provides functionality of creating IP-based faces on NDN nodes
- * 
+ *
  * The class implements virtual calls onInterest, onNack, and onContentObject
  */
 class IpFaceStack: public Object
@@ -55,6 +57,41 @@ public:
   IpFaceStack ();
   virtual ~IpFaceStack ();
 
+  /**
+   * @brief Lookup TcpFace for a given address
+   */
+  Ptr<TcpFace>
+  GetTcpFaceByAddress (const Ipv4Address &addr);
+
+  /**
+   * @brief Destroy TcpFace, e.g., after TCP connection got dropped
+   */
+  void
+  DestroyTcpFace (Ptr<TcpFace> face);
+
+  /**
+   * @brief Lookup UdpFace for a given address
+   */
+  Ptr<UdpFace>
+  GetUdpFaceByAddress (const Ipv4Address &addr);
+
+  /**
+   * @brief Method allowing creation and lookup of faces
+   *
+   * All created UDP faces are stored internally in the map, and if the same face is created, it will simply be looked up
+   */
+  Ptr<TcpFace>
+  CreateOrGetTcpFace (Ipv4Address address,
+                      Callback< void, Ptr<Face> > onCreate = NULL_CREATE_CALLBACK);
+
+  /**
+   * @brief Method allowing creation and lookup of faces
+   *
+   * All created TCP faces are stored internally in the map, and if the same face is created, it will simply be looked up
+   */
+  Ptr<UdpFace>
+  CreateOrGetUdpFace (Ipv4Address address);
+
 protected:
   void
   NotifyNewAggregate ();
@@ -62,7 +99,7 @@ protected:
 private:
   void
   StartServer ();
-  
+
   bool
   OnTcpConnectionRequest (Ptr< Socket > sock, const Address &addr);
 
@@ -72,14 +109,25 @@ private:
   void
   OnTcpConnectionClosed (Ptr< Socket > sock);
 
+  void
+  OnUdpPacket (Ptr< Socket > sock);
+
+public:
+  const static Callback< void, Ptr<Face> > NULL_CREATE_CALLBACK;
+
 protected:
   Ptr<Node> m_node;
-  
+
   bool m_enableTcp;
   bool m_enableUdp;
-  
+
   Ptr<Socket> m_tcpServer;
   Ptr<Socket> m_udpServer;
+
+  typedef std::map< Ipv4Address, Ptr<TcpFace> > TcpFaceMap;
+  typedef std::map< Ipv4Address, Ptr<UdpFace> > UdpFaceMap;
+  TcpFaceMap m_tcpFaceMap;
+  UdpFaceMap m_udpFaceMap;
 };
 
 } // namespace ndn

@@ -41,14 +41,6 @@ class UdpFace : public Face
 public:
   static TypeId
   GetTypeId ();
-
-  /**
-   * @brief A singleton method allowing creation and lookup of faces
-   *
-   * All created UDP faces are stored internally in the map, and if the same face is created, it will simply be looked up
-   */
-  static Ptr<UdpFace>
-  CreateOrGetFace (Ptr<Node> node, Ipv4Address address);
   
   /**
    * \brief Constructor
@@ -58,43 +50,29 @@ public:
   UdpFace (Ptr<Node> node, Ptr<Socket> socket, Ipv4Address address);
   virtual ~UdpFace();
 
-  ////////////////////////////////////////////////////////////////////
-  // methods overloaded from NdnFace
-  virtual void
-  RegisterProtocolHandler (ProtocolHandler handler);
-
   Ipv4Address
   GetAddress () const;
 
-  static Ptr<UdpFace>
-  GetFaceByAddress (const Ipv4Address &addr);
-
-protected:
-  // also from NdnFace
   virtual bool
-  SendImpl (Ptr<Packet> p);
+  ReceiveFromUdp (Ptr<const Packet> p);
 
-public:
-  /**
-   * @brief Print out name of the NdnFace to the stream
-   */
+  ////////////////////////////////////////////////////////////////////
+  // methods overloaded from ndn::Face
   virtual std::ostream&
   Print (std::ostream &os) const;
-  ////////////////////////////////////////////////////////////////////
+
+protected:
+  // also from ndn::Face
+  virtual bool
+  Send (Ptr<Packet> p);
 
 private:  
   UdpFace (const UdpFace &); ///< \brief Disabled copy constructor
   UdpFace& operator= (const UdpFace &); ///< \brief Disabled copy operator
 
-  void
-  ReceiveFromUdp (Ptr< Socket > clientSocket);
-
 private:
   Ptr<Socket> m_socket;
   Ipv4Address m_address;
-
-  typedef std::map<Ipv4Address, Ptr<UdpFace> > FaceMap;
-  static FaceMap s_map;
 };
 
 } // namespace ndn

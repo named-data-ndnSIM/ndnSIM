@@ -77,6 +77,12 @@ public:
    */
   static void
   CreateTcpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric = 1);
+
+  /**
+   * @brief Create TCP face
+   */
+  static void
+  CreateUdpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric = 1);
 };
 
 } // namespace ndn

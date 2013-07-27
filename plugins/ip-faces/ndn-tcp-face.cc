@@ -20,6 +20,8 @@
  */
 
 #include "ndn-tcp-face.h"
+#include "ndn-ip-face-stack.h"
+
 #include "ns3/ndn-l3-protocol.h"
 
 #include "ns3/log.h"
@@ -36,8 +38,6 @@ NS_LOG_COMPONENT_DEFINE ("ndn.TcpFace");
 
 namespace ns3 {
 namespace ndn {
-
-TcpFace::FaceMap TcpFace::s_map;
 
 class TcpBoundaryHeader : public Header
 {
@@ -110,8 +110,6 @@ private:
 
 NS_OBJECT_ENSURE_REGISTERED (TcpFace);
 
-const Callback< void, Ptr<Face> > TcpFace::NULL_CREATE_CALLBACK = MakeNullCallback< void, Ptr<Face> > ();
-
 TypeId
 TcpFace::GetTypeId ()
 {
@@ -155,7 +153,7 @@ TcpFace::RegisterProtocolHandlers (const InterestHandler &interestHandler, const
 }
 
 void
-TcpFace:: UnRegisterProtocolHandlers ()
+TcpFace::UnRegisterProtocolHandlers ()
 {
   m_socket->SetRecvCallback (MakeNullCallback< void, Ptr<Socket> > ());
   Face::UnRegisterProtocolHandlers ();
@@ -241,46 +239,13 @@ void
 TcpFace::OnTcpConnectionClosed (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this << socket);
-  s_map.erase (m_address);
+  GetNode ()->GetObject<IpFaceStack> ()->DestroyTcpFace (this);
 }
 
 Ipv4Address
 TcpFace::GetAddress () const
 {
   return m_address;
-}
-
-Ptr<TcpFace>
-TcpFace::GetFaceByAddress (const Ipv4Address &address)
-{
-  FaceMap::iterator i = s_map.find (address);
-  if (i != s_map.end ())
-    return i->second;
-  else
-    return 0;
-}
-
-Ptr<TcpFace>
-TcpFace::CreateOrGetFace (Ptr<Node> node, Ipv4Address address, Callback< void, Ptr<Face> > onCreate)
-{
-  NS_LOG_FUNCTION (address);
-
-  FaceMap::iterator i = s_map.find (address);
-  if (i != s_map.end ())
-    return i->second;
-  
-  Ptr<Socket> socket = Socket::CreateSocket (node, TcpSocketFactory::GetTypeId ());
-  Ptr<TcpFace> face = CreateObject<TcpFace> (node, socket, address);
-
-  face->SetCreateCallback (onCreate);
-  
-  socket->SetConnectCallback (MakeCallback (&TcpFace::OnConnect, face),
-                              MakeNullCallback< void, Ptr< Socket > > ());
-  socket->Connect (InetSocketAddress (address, L3Protocol::IP_STACK_PORT));
-
-  s_map.insert (std::make_pair (address, face));
-
-  return face;
 }
 
 void
@@ -305,7 +270,7 @@ TcpFace::OnConnect (Ptr<Socket> socket)
   if (!m_onCreateCallback.IsNull ())
     {
       m_onCreateCallback (this);
-      m_onCreateCallback = NULL_CREATE_CALLBACK;
+      m_onCreateCallback = IpFaceStack::NULL_CREATE_CALLBACK;
     }
 }
     
