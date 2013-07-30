@@ -364,7 +364,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes ()
       for (uint32_t faceId = 0; faceId < l3->GetNFaces (); faceId++)
         {
           originalMetric[faceId] = l3->GetFace (faceId)->GetMetric ();
-          l3->GetFace (faceId)->SetMetric (std::numeric_limits<int16_t>::max ()-1); // value std::numeric_limits<int16_t>::max () MUST NOT be used (reserved)
+          l3->GetFace (faceId)->SetMetric (std::numeric_limits<uint16_t>::max ()-1); // value std::numeric_limits<uint16_t>::max () MUST NOT be used (reserved)
         }
 
       for (uint32_t enabledFaceId = 0; enabledFaceId < l3->GetNFaces (); enabledFaceId++)

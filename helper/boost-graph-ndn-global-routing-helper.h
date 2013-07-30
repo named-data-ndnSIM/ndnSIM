@@ -221,8 +221,8 @@ struct WeightCompare :
                                 bool>
 {
   bool
-  operator () (property_traits< EdgeWeights >::reference a,
-               property_traits< EdgeWeights >::reference b) const
+  operator () (tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t, double > a,
+               tuple< ns3::Ptr<ns3::ndn::Face>, uint32_t, double > b) const
   {
     return a.get<1> () < b.get<1> ();
   }

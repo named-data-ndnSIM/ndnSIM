@@ -273,7 +273,7 @@ private:
   DataHandler m_upstreamDataHandler;
   bool m_ifup;
   uint32_t m_id; ///< \brief id of the interface in NDN stack (per-node uniqueness)
-  uint32_t m_metric; ///< \brief metric of the face
+  uint16_t m_metric; ///< \brief metric of the face
   uint32_t m_flags; ///< @brief faces flags (e.g., APPLICATION)
 };
 
