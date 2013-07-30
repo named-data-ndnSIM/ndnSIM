@@ -101,3 +101,13 @@ Research papers that use ndnSIM
     And the average throughput is reduced significantly by nearly 47% in comparison to that of the case without in-networking caching.
     Moreover, it also shows the performance under different sizes of content store.
     The effectiveness of the CCP strategy is proved during the simulation.
+
+- **M. Wahlisch, T.C. Schmidt, and M. Vahlenkamp, "Backscatter from the Data Plane--Threats to Stability and Security in Information-Centric Network Infrastructure", in Computer Networks, 2013** (`DOI 10.1016/j.comnet.2013.07.009 <http://dx.doi.org/10.1016/j.comnet.2013.07.009>`)
+
+    Information-centric networking (ICN) raises data objects to first class routable entities in the network and changes the Internet paradigm from host-centric connectivity to data-oriented delivery.
+    However, current approaches to content routing heavily rely on data-driven protocol events and thereby introduce a strong coupling of the control to the data plane in the underlying routing infrastructure.
+    In this paper, threats to the stability and security of the content distribution system are analyzed in theory, simulations, and practical experiments.
+    We derive relations between state resources and the performance of routers, and demonstrate how this coupling can be misused in practice.
+    We further show how state-based forwarding tends to degrade by decorrelating resources.
+    We identify intrinsic attack vectors present in current content-centric routing, as well as possibilities and limitations to mitigate them.
+    Our overall findings suggest that major architectural refinements are required prior to global ICN deployment in the real world.
