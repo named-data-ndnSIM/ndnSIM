@@ -190,7 +190,8 @@ Data::Serialize (Buffer::Iterator start) const
   //   {
   //     Ccnb::AppendString (start, CcnbParser::CCN_DTAG_DigestAlgorithm, GetSignature ().GetDigestAlgorithm ());
   //   }
-  Ccnb::AppendTaggedBlob (start, CcnbParser::CCN_DTAG_SignatureBits, m_data->GetSignature ()); // <SignatureBits />
+  Ccnb::AppendString (start, CcnbParser::CCN_DTAG_DigestAlgorithm, "NOP");
+  Ccnb::AppendTaggedBlobWithPadding (start, CcnbParser::CCN_DTAG_SignatureBits, 16, m_data->GetSignature ()); // <SignatureBits />
   Ccnb::AppendCloser (start);                                    // </Signature>
 
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
@@ -269,8 +270,10 @@ Data::GetSerializedSize () const
   //   {
   //     written += Ccnb::EstimateString (CcnbParser::CCN_DTAG_DigestAlgorithm, GetSignature ().GetDigestAlgorithm ());
   //   }
-  written += Ccnb::EstimateTaggedBlob (CcnbParser::CCN_DTAG_SignatureBits,
-                                       sizeof (m_data->GetSignature ()));      // <SignatureBits />
+  written += Ccnb::EstimateString (CcnbParser::CCN_DTAG_DigestAlgorithm, "NOP");
+  // "signature" will be always padded to 16 octets
+  written += Ccnb::EstimateTaggedBlob (CcnbParser::CCN_DTAG_SignatureBits, 16);      // <SignatureBits />
+  // written += Ccnb::EstimateTaggedBlob (CcnbParser::CCN_DTAG_SignatureBits, sizeof (m_data->GetSignature ()));      // <SignatureBits />
   written += 1;                                    // </Signature>
 
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>

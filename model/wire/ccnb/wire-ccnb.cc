@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu> 
+ * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
 #include "wire-ccnb.h"
@@ -92,7 +92,7 @@ Ccnb::EstimateNumber (uint32_t number)
   os << number;
   return EstimateBlockHeader (os.str ().size ()) + os.str ().size ();
 }
-  
+
 size_t
 Ccnb::AppendCloser (Buffer::Iterator &start)
 {
@@ -110,7 +110,7 @@ Ccnb::AppendTimestampBlob (Buffer::Iterator &start, const Time &time)
   intmax_t ts = time.ToInteger (Time::S) >> 4;
   for (;  required_bytes < 7 && ts != 0; ts >>= 8) // not more than 6 bytes?
      required_bytes++;
-  
+
   size_t len = AppendBlockHeader(start, required_bytes, CcnbParser::CCN_BLOB);
 
   // write part with seconds
@@ -123,7 +123,7 @@ Ccnb::AppendTimestampBlob (Buffer::Iterator &start, const Time &time)
        (((time.ToInteger (Time::NS) % 1000000000) / 5 * 8 + 195312) / 390625);
   for (int i = required_bytes - 2; i < required_bytes; i++)
     start.WriteU8 ( ts >> (8 * (required_bytes - 1 - i)) );
-  
+
   return len + required_bytes;
 }
 
@@ -149,6 +149,35 @@ Ccnb::AppendTaggedBlob (Buffer::Iterator &start, uint32_t dtag,
       written += AppendBlockHeader (start, size, CcnbParser::CCN_BLOB);
       start.Write (data, size);
       written += size;
+      /* size */
+    }
+  written += AppendCloser (start);
+  /* 1 */
+
+  return written;
+}
+
+size_t
+Ccnb::AppendTaggedBlobWithPadding (Buffer::Iterator &start, uint32_t dtag,
+                                   uint32_t length,
+                                   const uint8_t *data, size_t size)
+{
+  if (size > length)
+    {
+      // no padding required
+      return AppendTaggedBlob (start, dtag, data, size);
+    }
+
+
+  size_t written = AppendBlockHeader (start, dtag, CcnbParser::CCN_DTAG);
+
+  /* 2 */
+  if (length>0)
+    {
+      written += AppendBlockHeader (start, length, CcnbParser::CCN_BLOB);
+      start.Write (data, size);
+      start.WriteU8 (0, length - size);
+      written += length;
       /* size */
     }
   written += AppendCloser (start);

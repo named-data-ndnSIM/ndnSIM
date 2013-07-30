@@ -121,6 +121,24 @@ public:
                     const uint8_t *data, size_t size);
   
   /**
+   * Append a tagged BLOB, adding 0-byte padding if necessary
+   *
+   * This is a ccnb-encoded element with containing the BLOB as content
+   *
+   * @param start start iterator of  the buffer to append to.
+   * @param dtag is the element's dtab
+   * @param length minimum required length of the added field (padding added if necessary)
+   * @param data points to the binary data
+   * @param size is the size of the data, in bytes
+   *
+   * @returns written length
+   */
+  static size_t
+  AppendTaggedBlobWithPadding (Buffer::Iterator &start, uint32_t dtag,
+                               uint32_t length,
+                               const uint8_t *data, size_t size);
+
+  /**
    * @brief Estimate size of a tagged BLOB in CCNB enconding
    * @param dtag is the element's dtab
    * @param size is the size of the data, in bytes
@@ -145,6 +163,24 @@ public:
   template<class T>
   static inline size_t
   AppendTaggedBlob (Buffer::Iterator &start, uint32_t dtag, const T &data);
+
+  /**
+   * Append value as a tagged BLOB (templated version), add 0-padding if necessary
+   *
+   * This is a ccnb-encoded element with containing the BLOB as content
+   *
+   * Data will be reinterpret_cast<const uint8_t*> and size will be obtained using sizeof
+   *
+   * @param start start iterator of  the buffer to append to.
+   * @param dtag is the element's dtab
+   * @param length minimum required length of the field
+   * @param data a value to add
+   *
+   * @returns written length
+   */
+  template<class T>
+  static inline size_t
+  AppendTaggedBlobWithPadding (Buffer::Iterator &start, uint32_t dtag, uint32_t length, const T &data);
 
   /**
    * Append a tagged string (should be a valid UTF-8 coded string)
@@ -203,10 +239,17 @@ public:
 
 
 template<class T>
-size_t
+inline size_t
 Ccnb::AppendTaggedBlob (Buffer::Iterator &start, uint32_t dtag, const T &data)
 {
   return AppendTaggedBlob (start, dtag, reinterpret_cast<const uint8_t*> (&data), sizeof (data));
+}
+
+template<class T>
+inline size_t
+Ccnb::AppendTaggedBlobWithPadding (Buffer::Iterator &start, uint32_t dtag, uint32_t length, const T &data)
+{
+  return AppendTaggedBlobWithPadding (start, dtag, length, reinterpret_cast<const uint8_t*> (&data), sizeof (data));
 }
 
 } // wire
