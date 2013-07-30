@@ -46,7 +46,7 @@ const uint8_t CCN_TT_HBIT = ((uint8_t)(1 << 7));
 
 // int Block::counter = 0;
 
-Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
+Ptr<Block> Block::ParseBlock (Buffer::Iterator &start, bool dontParseBlock)
 {
   // std::cout << "<< pos: " << counter << "\n";
   uint32_t value = 0;
@@ -62,6 +62,11 @@ Ptr<Block> Block::ParseBlock (Buffer::Iterator &start)
     }
   if (start.IsEnd())
     CcnbDecodingException ();
+
+  if (dontParseBlock)
+    {
+      return 0;
+    }
   
   value <<= 4;
   value += ( (byte&(~CCN_TT_HBIT)) >> 3);

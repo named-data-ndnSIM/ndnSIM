@@ -53,11 +53,13 @@ public:
    * \brief Parsing stream (recursively) and creating a parsed BLOCK
    * object
    *
-   * \param start buffer iterator pointing to the start position for parsing 
+   * \param start buffer iterator pointing to the start position for parsing
+   * \param dontParseBlock parameter to indicate whether the block should not be parsed, just length
+   *                       of the block should be consumed (e.g., in case of "cheating" with content of Data packets)
    * \returns parsed ccnb-encoded block, that could contain more block inside
    */
   static Ptr<Block>
-  ParseBlock (Buffer::Iterator &start);
+  ParseBlock (Buffer::Iterator &start, bool dontParseBlock = false);
 
   virtual ~Block ();
   

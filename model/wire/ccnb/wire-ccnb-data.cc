@@ -246,6 +246,10 @@ Data::Serialize (Buffer::Iterator start) const
 
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Content, CcnbParser::CCN_DTAG); // <Content>
 
+  uint32_t payloadSize = m_data->GetPayload ()->GetSize ();
+  if (payloadSize > 0)
+    Ccnb::AppendBlockHeader (start, payloadSize, CcnbParser::CCN_BLOB);
+
   // there are no closing tags !!!
   // The closing tag is handled by ContentObjectTail
 }
@@ -318,6 +322,10 @@ Data::GetSerializedSize () const
   written += 1; // </SignedInfo>
 
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Content); // <Content>
+
+  uint32_t payloadSize = m_data->GetPayload ()->GetSize ();
+  if (payloadSize > 0)
+    written += Ccnb::EstimateBlockHeader (payloadSize);
 
   // there are no closing tags !!!
   // The closing tag is handled by ContentObjectTail

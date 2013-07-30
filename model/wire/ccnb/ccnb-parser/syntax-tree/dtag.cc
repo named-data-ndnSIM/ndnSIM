@@ -40,7 +40,10 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
    * buffer
    */
   if (dtag == CCN_DTAG_Content)
-    return; // hack #1. Do not process nesting block for <Content>
+    {
+      Block::ParseBlock (start, true); // process length field and ignore it
+      return; // hack #1. Do not process nesting block for <Content>
+    }
   
   // parse attributes until first nested block reached
   while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
