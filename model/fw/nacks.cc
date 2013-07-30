@@ -114,16 +114,6 @@ Nacks::DidReceiveDuplicateInterest (Ptr<Face> inFace,
       Ptr<Interest> nack = Create<Interest> (*interest);
       nack->SetNack (Interest::NACK_LOOP);
 
-      FwHopCountTag hopCountTag;
-      if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
-        {
-     	  nack->GetPayload ()->AddPacketTag (hopCountTag);
-        }
-      else
-        {
-          NS_LOG_DEBUG ("No FwHopCountTag tag associated with received duplicated Interest");
-        }
-
       inFace->SendInterest (nack);
       m_outNacks (nack, inFace);
     }
@@ -138,16 +128,6 @@ Nacks::DidExhaustForwardingOptions (Ptr<Face> inFace,
     {
       Ptr<Interest> nack = Create<Interest> (*interest);
       nack->SetNack (Interest::NACK_GIVEUP_PIT);
-
-      FwHopCountTag hopCountTag;
-      if (interest->GetPayload ()->PeekPacketTag (hopCountTag))
-        {
-     	  nack->GetPayload ()->AddPacketTag (hopCountTag);
-        }
-      else
-        {
-          NS_LOG_DEBUG ("No FwHopCountTag tag associated with original Interest");
-        }
 
       BOOST_FOREACH (const pit::IncomingFace &incoming, pitEntry->GetIncoming ())
         {
@@ -194,16 +174,6 @@ Nacks::DidReceiveValidNack (Ptr<Face> inFace,
 
       Ptr<Interest> interest = Create<Interest> (*nack);
       interest->SetNack (Interest::NORMAL_INTEREST);
-
-      FwHopCountTag hopCountTag;
-      if (nack->GetPayload ()->PeekPacketTag (hopCountTag))
-        {
-     	  interest->GetPayload ()->AddPacketTag (hopCountTag);
-        }
-      else
-        {
-          NS_LOG_DEBUG ("No FwHopCountTag tag associated with received NACK");
-        }
 
       bool propagated = DoPropagateInterest (inFace, interest, pitEntry);
       if (!propagated)
