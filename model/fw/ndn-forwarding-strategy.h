@@ -45,7 +45,7 @@ namespace fw {
 class Face;
 
 class Interest;
-class ContentObject;
+class Data;
 
 class Pit;
 namespace pit { class Entry; }
@@ -89,13 +89,13 @@ public:
   /**
    * \brief Actual processing of incoming Ndn content objects
    *
-   * Processing ContentObject packets
+   * Processing Data packets
    * @param face    incoming face
    * @param data    Data packet
    */
   virtual void
   OnData (Ptr<Face> face,
-          Ptr<ContentObject> data);
+          Ptr<Data> data);
 
   /**
    * @brief Event fired just before PIT entry is removed by timeout
@@ -274,13 +274,13 @@ protected:
    */
   virtual void
   SatisfyPendingInterest (Ptr<Face> inFace, // 0 allowed (from cache)
-                          Ptr<const ContentObject> data,
+                          Ptr<const Data> data,
                           Ptr<pit::Entry> pitEntry);
 
   /**
    * @brief Event which is fired just after data was send out on the face
    *
-   * @param inFace   incoming face of the ContentObject
+   * @param inFace   incoming face of the Data
    * @param outFace  outgoing face
    * @param data     Data packet
    * @param pitEntry an existing PIT entry, corresponding to the duplicated Interest
@@ -288,7 +288,7 @@ protected:
   virtual void
   DidSendOutData (Ptr<Face> inFace,
                   Ptr<Face> outFace,
-                  Ptr<const ContentObject> data,
+                  Ptr<const Data> data,
                   Ptr<pit::Entry> pitEntry);
 
   /**
@@ -300,7 +300,7 @@ protected:
    */
   virtual void
   DidReceiveSolicitedData (Ptr<Face> inFace,
-                           Ptr<const ContentObject> data,
+                           Ptr<const Data> data,
                            bool didCreateCacheEntry);
 
   /**
@@ -315,7 +315,7 @@ protected:
    */
   virtual void
   DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                             Ptr<const ContentObject> data,
+                             Ptr<const Data> data,
                              bool didCreateCacheEntry);
 
   /**
@@ -328,7 +328,7 @@ protected:
    *
    * @param inFace  incoming face
    * @param interest Interest packet
-   * @param payload ContentObject payload
+   * @param payload Data payload
    */
   virtual bool
   ShouldSuppressIncomingInterest (Ptr<Face> inFace,
@@ -455,14 +455,14 @@ protected:
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////
 
-  TracedCallback<Ptr<const ContentObject>,
+  TracedCallback<Ptr<const Data>,
                  bool /*from cache*/,
                  Ptr<const Face> > m_outData; ///< @brief trace of outgoing Data
 
-  TracedCallback<Ptr<const ContentObject>,
+  TracedCallback<Ptr<const Data>,
                  Ptr<const Face> > m_inData; ///< @brief trace of incoming Data
 
-  TracedCallback<Ptr<const ContentObject>,
+  TracedCallback<Ptr<const Data>,
                   Ptr<const Face> > m_dropData;  ///< @brief trace of dropped Data
 
   ////////////////////////////////////////////////////////////////////

@@ -44,11 +44,11 @@ namespace pit {
 
 class L3Protocol;
 class Face;
-class ContentObject;
+class Data;
 class Interest;
 
 typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
+typedef Data DataHeader;
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ public:
    *          returns 0
    */
   virtual Ptr<pit::Entry>
-  Lookup (const ContentObject &header) = 0;
+  Lookup (const Data &header) = 0;
 
   /**
    * \brief Find a PIT entry for the given content interest

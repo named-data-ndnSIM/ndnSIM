@@ -72,7 +72,7 @@ ApiApp::RequestData ()
 }
 
 void
-ApiApp::GotData (Ptr<const Interest> origInterest, Ptr<const ContentObject> data)
+ApiApp::GotData (Ptr<const Interest> origInterest, Ptr<const Data> data)
 {
   NS_LOG_FUNCTION (this << origInterest->GetName () << data->GetName ());
   // do nothing else

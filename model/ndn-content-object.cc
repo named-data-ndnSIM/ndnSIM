@@ -25,12 +25,12 @@
 
 #include <boost/foreach.hpp>
 
-NS_LOG_COMPONENT_DEFINE ("ndn.ContentObject");
+NS_LOG_COMPONENT_DEFINE ("ndn.Data");
 
 namespace ns3 {
 namespace ndn {
 
-ContentObject::ContentObject (Ptr<Packet> payload/* = Create<Packet> ()*/)
+Data::Data (Ptr<Packet> payload/* = Create<Packet> ()*/)
   : m_name (Create<Name> ())
   , m_signature (0)
   , m_payload (payload)
@@ -42,7 +42,7 @@ ContentObject::ContentObject (Ptr<Packet> payload/* = Create<Packet> ()*/)
     }
 }
 
-ContentObject::ContentObject (const ContentObject &other)
+Data::Data (const Data &other)
   : m_name (Create<Name> (other.GetName ()))
   , m_freshness (other.GetFreshness ())
   , m_timestamp (other.GetTimestamp ())
@@ -53,48 +53,48 @@ ContentObject::ContentObject (const ContentObject &other)
 }
 
 void
-ContentObject::SetName (Ptr<Name> name)
+Data::SetName (Ptr<Name> name)
 {
   m_name = name;
   m_wire = 0;
 }
 
 void
-ContentObject::SetName (const Name &name)
+Data::SetName (const Name &name)
 {
   m_name = Create<Name> (name);
   m_wire = 0;
 }
 
 const Name&
-ContentObject::GetName () const
+Data::GetName () const
 {
-  if (m_name==0) throw ContentObjectException();
+  if (m_name==0) throw DataException();
   return *m_name;
 }
 
 Ptr<const Name>
-ContentObject::GetNamePtr () const
+Data::GetNamePtr () const
 {
   return m_name;
 }
 
 
 void
-ContentObject::SetTimestamp (const Time &timestamp)
+Data::SetTimestamp (const Time &timestamp)
 {
   m_timestamp = timestamp;
   m_wire = 0;
 }
 
 Time
-ContentObject::GetTimestamp () const
+Data::GetTimestamp () const
 {
   return m_timestamp;
 }
     
 void
-ContentObject::SetFreshness (const Time &freshness)
+Data::SetFreshness (const Time &freshness)
 {
   m_freshness = freshness;
   m_wire = 0;
@@ -102,52 +102,52 @@ ContentObject::SetFreshness (const Time &freshness)
 
 
 Time
-ContentObject::GetFreshness () const
+Data::GetFreshness () const
 {
   return m_freshness;
 }
 
 void
-ContentObject::SetSignature (uint32_t signature)
+Data::SetSignature (uint32_t signature)
 {
   m_signature = signature;
   m_wire = 0;
 }
 
 uint32_t
-ContentObject::GetSignature () const
+Data::GetSignature () const
 {
   return m_signature;
 }
 
 void
-ContentObject::SetKeyLocator (Ptr<Name> keyLocator)
+Data::SetKeyLocator (Ptr<Name> keyLocator)
 {
   m_keyLocator = keyLocator;
 }
 
 Ptr<const Name>
-ContentObject::GetKeyLocator () const
+Data::GetKeyLocator () const
 {
   return m_keyLocator;
 }
 
 void
-ContentObject::Print (std::ostream &os) const
+Data::Print (std::ostream &os) const
 {
   os << "D: " << GetName ();
-  // os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
+  // os << "<Data><Name>" << GetName () << "</Name><Content>";
 }
 
 void
-ContentObject::SetPayload (Ptr<Packet> payload)
+Data::SetPayload (Ptr<Packet> payload)
 {
   m_payload = payload;
   m_wire = 0;
 }
 
 Ptr<const Packet>
-ContentObject::GetPayload () const
+Data::GetPayload () const
 {
   return m_payload;
 }

@@ -215,29 +215,29 @@ Data::GetInstanceTypeId (void) const
   
 
 Data::Data ()
-  : m_data (Create<ndn::ContentObject> ())
+  : m_data (Create<ndn::Data> ())
 {
 }
 
-Data::Data (Ptr<ndn::ContentObject> data)
+Data::Data (Ptr<ndn::Data> data)
   : m_data (data)
 {
 }
 
-Ptr<ndn::ContentObject>
+Ptr<ndn::Data>
 Data::GetData ()
 {
   return m_data;
 }
 
 Ptr<Packet>
-Data::ToWire (Ptr<const ndn::ContentObject> data)
+Data::ToWire (Ptr<const ndn::Data> data)
 {
   Ptr<const Packet> p = data->GetWire ();
   if (!p)
     {
       Ptr<Packet> packet = Create<Packet> (*data->GetPayload ());
-      Data wireEncoding (ConstCast<ndn::ContentObject> (data));
+      Data wireEncoding (ConstCast<ndn::Data> (data));
       packet->AddHeader (wireEncoding);
       data->SetWire (packet);
 
@@ -247,10 +247,10 @@ Data::ToWire (Ptr<const ndn::ContentObject> data)
   return p->Copy ();
 }
 
-Ptr<ndn::ContentObject>
+Ptr<ndn::Data>
 Data::FromWire (Ptr<Packet> packet)
 {
-  Ptr<ndn::ContentObject> data = Create<ndn::ContentObject> ();
+  Ptr<ndn::Data> data = Create<ndn::Data> ();
   data->SetWire (packet->Copy ());
 
   Data wireEncoding (data);
@@ -315,10 +315,10 @@ Data::Deserialize (Buffer::Iterator start)
   Buffer::Iterator i = start;
 
   if (i.ReadU8 () != 0x80)
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   if (i.ReadU8 () != 0x01)
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   i.ReadU16 (); // length
 
@@ -326,36 +326,36 @@ Data::Deserialize (Buffer::Iterator start)
   if (signatureLength == 6)
     {
       if (i.ReadU16 () != 0xFF00) // signature type
-        throw new ContentObjectException ();
+        throw new DataException ();
       m_data->SetSignature (i.ReadU32 ());
     }
   else if (signatureLength == 2)
     {
       if (i.ReadU16 () != 0) // signature type
-        throw new ContentObjectException ();
+        throw new DataException ();
       m_data->SetSignature (0);
     }
   else
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   m_data->SetName (NdnSim::DeserializeName (i));
 
   if (i.ReadU16 () != (2 + 4 + 2 + 2 + (2 + 0))) // content length
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   if (i.ReadU16 () != (4 + 2 + 2 + (2 + 0))) // Length (content Info)
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   m_data->SetTimestamp (Seconds (i.ReadU32 ()));
   m_data->SetFreshness (Seconds (i.ReadU16 ()));
 
   if (i.ReadU16 () != 0) // Reserved
-    throw new ContentObjectException ();
+    throw new DataException ();
   if (i.ReadU16 () != 0) // Length (ContentInfoOptions)
-    throw new ContentObjectException ();
+    throw new DataException ();
 
   NS_ASSERT_MSG (i.GetDistanceFrom (start) == GetSerializedSize (),
-                 "Something wrong with ContentObject::Deserialize");
+                 "Something wrong with Data::Deserialize");
   
   return i.GetDistanceFrom (start);
 }

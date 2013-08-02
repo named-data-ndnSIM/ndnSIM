@@ -74,10 +74,10 @@ CcnxAppTracer::Connect ()
   Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$"+m_app+"/ReceivedInterests",
                    MakeCallback (&CcnxAppTracer::InInterests, this));
   
-  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$"+m_app+"/TransmittedContentObjects",
+  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$"+m_app+"/TransmittedDatas",
                    MakeCallback (&CcnxAppTracer::OutData, this));
 
-  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$"+m_app+"/ReceivedContentObjects",
+  Config::Connect ("/NodeList/"+m_node+"/ApplicationList/"+m_appId+"/$"+m_app+"/ReceivedDatas",
                    MakeCallback (&CcnxAppTracer::InData, this));
 }
 

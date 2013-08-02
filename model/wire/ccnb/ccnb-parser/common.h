@@ -116,7 +116,7 @@ enum ccn_dtag {
   CCN_DTAG_PublisherCertificateDigest = 61,
   CCN_DTAG_PublisherIssuerKeyDigest = 62,
   CCN_DTAG_PublisherIssuerCertificateDigest = 63,
-  CCN_DTAG_ContentObject = 64,	/* 20090915 */
+  CCN_DTAG_Data = 64,	/* 20090915 */
   CCN_DTAG_WrappedKey = 65,
   CCN_DTAG_WrappingKeyIdentifier = 66,
   CCN_DTAG_WrapAlgorithm = 67,

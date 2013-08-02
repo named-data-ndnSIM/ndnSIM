@@ -64,7 +64,7 @@ public:
   OnNack (Ptr<const Interest> interest);
 
   virtual void
-  OnContentObject (Ptr<const ContentObject> contentObject);
+  OnData (Ptr<const Data> contentObject);
 
   /**
    * @brief Timeout event

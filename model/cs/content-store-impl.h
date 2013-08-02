@@ -48,7 +48,7 @@ public:
   typedef Entry base_type;
 
 public:
-  EntryImpl (Ptr<ContentStore> cs, Ptr<const ContentObject> data)
+  EntryImpl (Ptr<ContentStore> cs, Ptr<const Data> data)
     : Entry (cs, data)
     , item_ (0)
   {
@@ -94,11 +94,11 @@ public:
 
   // from ContentStore
 
-  virtual inline Ptr<ContentObject>
+  virtual inline Ptr<Data>
   Lookup (Ptr<const Interest> interest);
 
   virtual inline bool
-  Add (Ptr<const ContentObject> data);
+  Add (Ptr<const Data> data);
 
   // virtual bool
   // Remove (Ptr<Interest> header);
@@ -182,7 +182,7 @@ private:
 };
 
 template<class Policy>
-Ptr<ContentObject>
+Ptr<Data>
 ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION (this << interest->GetName ());
@@ -202,7 +202,7 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
     {
       this->m_cacheHitsTrace (interest, node->payload ()->GetData ());
 
-      Ptr<ContentObject> copy = Create<ContentObject> (*node->payload ()->GetData ());
+      Ptr<Data> copy = Create<Data> (*node->payload ()->GetData ());
       ConstCast<Packet> (copy->GetPayload ())->RemoveAllPacketTags ();
       return copy;
     }
@@ -215,7 +215,7 @@ ContentStoreImpl<Policy>::Lookup (Ptr<const Interest> interest)
 
 template<class Policy>
 bool
-ContentStoreImpl<Policy>::Add (Ptr<const ContentObject> data)
+ContentStoreImpl<Policy>::Add (Ptr<const Data> data)
 {
   NS_LOG_FUNCTION (this << data->GetName ());
 

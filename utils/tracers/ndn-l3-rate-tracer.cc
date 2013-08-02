@@ -375,7 +375,7 @@ L3RateTracer::DropNacks (Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::OutData  (Ptr<const ContentObject> data,
+L3RateTracer::OutData  (Ptr<const Data> data,
                         bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -386,7 +386,7 @@ L3RateTracer::OutData  (Ptr<const ContentObject> data,
 }
 
 void
-L3RateTracer::InData   (Ptr<const ContentObject> data,
+L3RateTracer::InData   (Ptr<const Data> data,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -397,7 +397,7 @@ L3RateTracer::InData   (Ptr<const ContentObject> data,
 }
 
 void
-L3RateTracer::DropData (Ptr<const ContentObject> data,
+L3RateTracer::DropData (Ptr<const Data> data,
                         Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

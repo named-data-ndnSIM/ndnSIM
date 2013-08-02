@@ -59,7 +59,7 @@ protected:
 
 private:
   void
-  GotData (Ptr<const ndn::Interest>, Ptr<const ndn::ContentObject>)
+  GotData (Ptr<const ndn::Interest>, Ptr<const ndn::Data>)
   {
     datas++;
   }

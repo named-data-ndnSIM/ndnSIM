@@ -43,7 +43,7 @@ class Entry;
 class Face;
 
 class Interest;
-class ContentObject;
+class Data;
 
 /**
  * @ingroup ndn-tracers
@@ -109,13 +109,13 @@ protected:
 
 
   virtual void
-  OutData  (Ptr<const ContentObject>, bool fromCache, Ptr<const Face>) = 0;
+  OutData  (Ptr<const Data>, bool fromCache, Ptr<const Face>) = 0;
 
   virtual void
-  InData   (Ptr<const ContentObject>, Ptr<const Face>) = 0;
+  InData   (Ptr<const Data>, Ptr<const Face>) = 0;
 
   virtual void
-  DropData (Ptr<const ContentObject>, Ptr<const Face>) = 0;
+  DropData (Ptr<const Data>, Ptr<const Face>) = 0;
 
   virtual void
   SatisfiedInterests (Ptr<const pit::Entry>) = 0;

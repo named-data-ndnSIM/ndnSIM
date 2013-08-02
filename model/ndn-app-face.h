@@ -32,10 +32,10 @@ class Packet;
 namespace ndn {
 
 class Interest;
-class ContentObject;
+class Data;
 
 typedef Interest InterestHeader;
-typedef ContentObject ContentObjectHeader;
+typedef Data DataHeader;
 
 class App;
 
@@ -67,7 +67,7 @@ public:
   SendInterest (Ptr<const Interest> interest);
 
   virtual bool
-  SendData (Ptr<const ContentObject> data);
+  SendData (Ptr<const Data> data);
 
 public:
   virtual std::ostream&

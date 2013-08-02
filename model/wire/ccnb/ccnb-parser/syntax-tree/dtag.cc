@@ -62,7 +62,7 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
   while (!start.IsEnd () && BufferIteratorPeekU8 (start)!=CCN_CLOSE)
     {
       // hack #2. Stop processing nested blocks if last block was <Content>
-      if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>
+      if (m_dtag == CCN_DTAG_Data && // we are in <Data>
           DynamicCast<Dtag> (m_nestedTags.back())!=0 && // last block is DTAG
           DynamicCast<Dtag> (m_nestedTags.back())->m_dtag == CCN_DTAG_Content) 
         {
@@ -72,8 +72,8 @@ Dtag::Dtag (Buffer::Iterator &start, uint32_t dtag)
       m_nestedTags.push_back (Block::ParseBlock (start));
     }
 
-  // hack #3. Stop processing when last tag was <ContentObject>
-  if (m_dtag == CCN_DTAG_ContentObject && // we are in <ContentObject>
+  // hack #3. Stop processing when last tag was <Data>
+  if (m_dtag == CCN_DTAG_Data && // we are in <Data>
       DynamicCast<Dtag> (m_nestedTags.back())!=0 && // last block is DTAG
       DynamicCast<Dtag> (m_nestedTags.back())->m_dtag == CCN_DTAG_Content) 
     {

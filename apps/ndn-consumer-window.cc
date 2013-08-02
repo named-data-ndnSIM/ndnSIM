@@ -186,9 +186,9 @@ ConsumerWindow::ScheduleNextPacket ()
 ///////////////////////////////////////////////////
 
 void
-ConsumerWindow::OnContentObject (Ptr<const ContentObject> contentObject)
+ConsumerWindow::OnData (Ptr<const Data> contentObject)
 {
-  Consumer::OnContentObject (contentObject);
+  Consumer::OnData (contentObject);
 
   m_window = m_window + 1;
 

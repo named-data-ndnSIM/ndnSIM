@@ -60,7 +60,7 @@ namespace cs {
 
 //////////////////////////////////////////////////////////////////////
 
-Entry::Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> data)
+Entry::Entry (Ptr<ContentStore> cs, Ptr<const Data> data)
   : m_cs (cs)
   , m_data (data)
 {
@@ -72,7 +72,7 @@ Entry::GetName () const
   return m_data->GetName ();
 }
 
-Ptr<const ContentObject>
+Ptr<const Data>
 Entry::GetData () const
 {
   return m_data;

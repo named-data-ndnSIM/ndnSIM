@@ -83,7 +83,7 @@ CcnxSeqsAppTracer::OutInterests (std::string context,
 
 void
 CcnxSeqsAppTracer::OutData (std::string context,
-                            Ptr<const CcnxContentObject> header, Ptr<const Packet>,
+                            Ptr<const CcnxData> header, Ptr<const Packet>,
                             Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   PRINTER ("OutData");
@@ -107,7 +107,7 @@ CcnxSeqsAppTracer::InNacks (std::string context,
   
 void
 CcnxSeqsAppTracer::InData (std::string context,
-                           Ptr<const CcnxContentObject> header, Ptr<const Packet>,
+                           Ptr<const CcnxData> header, Ptr<const Packet>,
                            Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   PRINTER ("InData");

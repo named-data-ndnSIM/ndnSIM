@@ -33,7 +33,7 @@ class Packet;
 namespace ndn {
 
 class Interest;
-class ContentObject;
+class Data;
 
 class Face;
 
@@ -45,7 +45,7 @@ class Face;
  * @ingroup ndn-apps
  * @brief Base class that all NDN applications should be derived from.
  * 
- * The class implements virtual calls onInterest, onNack, and onContentObject
+ * The class implements virtual calls onInterest, onNack, and onData
  */
 class App: public Application
 {
@@ -81,12 +81,12 @@ public:
   OnNack (Ptr<const Interest> interest);
   
   /**
-   * @brief Method that will be called every time new ContentObject arrives
-   * @param contentObject ContentObject header
-   * @param payload payload (potentially virtual) of the ContentObject packet (may include packet tags of original packet)
+   * @brief Method that will be called every time new Data arrives
+   * @param contentObject Data header
+   * @param payload payload (potentially virtual) of the Data packet (may include packet tags of original packet)
    */
   virtual void
-  OnContentObject (Ptr<const ContentObject> contentObject);
+  OnData (Ptr<const Data> contentObject);
   
 protected:
   /**
@@ -112,15 +112,15 @@ protected:
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_receivedNacks; ///< @brief App-level trace of received NACKs
 
-  TracedCallback<Ptr<const ContentObject>,
-                 Ptr<App>, Ptr<Face> > m_receivedContentObjects; ///< @brief App-level trace of received Data
+  TracedCallback<Ptr<const Data>,
+                 Ptr<App>, Ptr<Face> > m_receivedDatas; ///< @brief App-level trace of received Data
 
 
   TracedCallback<Ptr<const Interest>,
                  Ptr<App>, Ptr<Face> > m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const ContentObject>,
-                 Ptr<App>, Ptr<Face> > m_transmittedContentObjects; ///< @brief App-level trace of transmitted Data
+  TracedCallback<Ptr<const Data>,
+                 Ptr<App>, Ptr<Face> > m_transmittedDatas; ///< @brief App-level trace of transmitted Data
 };
 
 } // namespace ndn

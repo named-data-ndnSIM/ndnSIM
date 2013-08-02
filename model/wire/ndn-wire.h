@@ -38,9 +38,9 @@ struct Wire
   ToInterest (Ptr<Packet> packet, int8_t type = WIRE_FORMAT_AUTODETECT);
 
   static Ptr<Packet>
-  FromData (Ptr<const ContentObject> data, int8_t wireFormat = WIRE_FORMAT_DEFAULT);
+  FromData (Ptr<const Data> data, int8_t wireFormat = WIRE_FORMAT_DEFAULT);
 
-  static Ptr<ContentObject>
+  static Ptr<Data>
   ToData (Ptr<Packet> packet, int8_t type = WIRE_FORMAT_AUTODETECT);
 
 
@@ -52,9 +52,9 @@ struct Wire
   ToInterestStr (const std::string &wire, int8_t type = WIRE_FORMAT_AUTODETECT);
 
   static std::string
-  FromDataStr (Ptr<const ContentObject> data, int8_t wireFormat = WIRE_FORMAT_DEFAULT);
+  FromDataStr (Ptr<const Data> data, int8_t wireFormat = WIRE_FORMAT_DEFAULT);
 
-  static Ptr<ContentObject>
+  static Ptr<Data>
   ToDataStr (const std::string &wire, int8_t type = WIRE_FORMAT_AUTODETECT);
 
   // /*

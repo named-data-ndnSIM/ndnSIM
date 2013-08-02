@@ -223,11 +223,11 @@ Consumer::SendPacket ()
 
 
 void
-Consumer::OnContentObject (Ptr<const ContentObject> data)
+Consumer::OnData (Ptr<const Data> data)
 {
   if (!m_active) return;
 
-  App::OnContentObject (data); // tracing inside
+  App::OnData (data); // tracing inside
 
   NS_LOG_FUNCTION (this << data);
 

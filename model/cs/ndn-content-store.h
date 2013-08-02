@@ -34,7 +34,7 @@ class Packet;
 
 namespace ndn {
 
-class ContentObject;
+class Data;
 class Interest;
 class Name;
 class ContentStore;
@@ -60,13 +60,13 @@ public:
   /**
    * \brief Construct content store entry
    *
-   * \param header Parsed ContentObject header
+   * \param header Parsed Data header
    * \param packet Original Ndn packet
    *
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  Entry (Ptr<ContentStore> cs, Ptr<const ContentObject> data);
+  Entry (Ptr<ContentStore> cs, Ptr<const Data> data);
 
   /**
    * \brief Get prefix of the stored entry
@@ -76,10 +76,10 @@ public:
   GetName () const;
 
   /**
-   * \brief Get ContentObject of the stored entry
-   * \returns ContentObject of the stored entry
+   * \brief Get Data of the stored entry
+   * \returns Data of the stored entry
    */
-  Ptr<const ContentObject>
+  Ptr<const Data>
   GetData () const;
 
   /**
@@ -90,7 +90,7 @@ public:
 
 private:
   Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
-  Ptr<const ContentObject> m_data; ///< \brief non-modifiable ContentObject
+  Ptr<const Data> m_data; ///< \brief non-modifiable Data
 };
 
 } // namespace cs
@@ -128,19 +128,19 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  virtual Ptr<ContentObject>
+  virtual Ptr<Data>
   Lookup (Ptr<const Interest> interest) = 0;
 
   /**
    * \brief Add a new content to the content store.
    *
-   * \param header Fully parsed ContentObject
+   * \param header Fully parsed Data
    * \param packet Fully formed Ndn packet to add to content store
    * (will be copied and stripped down of headers)
    * @returns true if an existing entry was updated, false otherwise
    */
   virtual bool
-  Add (Ptr<const ContentObject> data) = 0;
+  Add (Ptr<const Data> data) = 0;
 
   // /*
   //  * \brief Add a new content to the content store.
@@ -194,7 +194,7 @@ public:
 
 protected:
   TracedCallback<Ptr<const Interest>,
-                 Ptr<const ContentObject> > m_cacheHitsTrace; ///< @brief trace of cache hits
+                 Ptr<const Data> > m_cacheHitsTrace; ///< @brief trace of cache hits
 
   TracedCallback<Ptr<const Interest> > m_cacheMissesTrace; ///< @brief trace of cache misses
 };

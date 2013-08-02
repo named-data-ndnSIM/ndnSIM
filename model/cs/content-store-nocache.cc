@@ -55,7 +55,7 @@ Nocache::~Nocache ()
 {
 }
 
-Ptr<ContentObject>
+Ptr<Data>
 Nocache::Lookup (Ptr<const Interest> interest)
 {
   this->m_cacheMissesTrace (interest);
@@ -63,7 +63,7 @@ Nocache::Lookup (Ptr<const Interest> interest)
 }
 
 bool
-Nocache::Add (Ptr<const ContentObject> data)
+Nocache::Add (Ptr<const Data> data)
 {
   return false;
 }

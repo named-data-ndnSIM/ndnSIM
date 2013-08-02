@@ -50,7 +50,7 @@ public:
   Print (std::ostream &os) const;
 
   virtual inline bool
-  Add (Ptr<const ContentObject> data);
+  Add (Ptr<const Data> data);
 
 private:
   inline void
@@ -94,7 +94,7 @@ ContentStoreWithFreshness< Policy >::GetTypeId ()
 
 template<class Policy>
 inline bool
-ContentStoreWithFreshness< Policy >::Add (Ptr<const ContentObject> data)
+ContentStoreWithFreshness< Policy >::Add (Ptr<const Data> data)
 {
   bool ok = super::Add (data);
   if (!ok) return false;

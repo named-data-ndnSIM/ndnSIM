@@ -41,7 +41,7 @@ typedef Name NameComponents;
  *
  * Ndn doesn't really have a header, so we need this class to
  * determine type of Ndn packet and return corresponent header class,
- * Interest or ContentObject
+ * Interest or Data
  *
  * Throws UnknownHeaderException if header type couldn't be determined
  */
@@ -57,7 +57,7 @@ public:
   /**
    *	Packet ::= Version
    *		   PacketType
-   *		   (Interest | ContentObject)
+   *		   (Interest | Data)
    *
    *        0                   1
    *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
@@ -68,7 +68,7 @@ public:
    * For ccnb-encoding compatibility, ``Version`` / ``PacketType`` has two reserved values to denote ccnb-encoded packet:
    *
    * Version 0x01, PacketType 0xD2 --- ccnb-encoded ``Interest`` packet
-   * Version 0x04, PacketType 0x82 --- ccnb-encoded ``ContentObject`` packet
+   * Version 0x04, PacketType 0x82 --- ccnb-encoded ``Data`` packet
    *
    *
    * It peeks first 2 bytes of a packet.

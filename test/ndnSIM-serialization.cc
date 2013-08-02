@@ -98,9 +98,9 @@ InterestSerializationTest::DoRun ()
 }
 
 void
-ContentObjectSerializationTest::DoRun ()
+DataSerializationTest::DoRun ()
 {
-  Ptr<ContentObject> source = Create<ContentObject> (Create<Packet> (1024));
+  Ptr<Data> source = Create<Data> (Create<Packet> (1024));
   
   source->SetName (Create<Name> (boost::lexical_cast<Name> ("/test/test2/1")));
   NS_TEST_ASSERT_MSG_EQ (source->GetName (), boost::lexical_cast<Name> ("/test/test2/1"), "set/get name failed");
@@ -122,7 +122,7 @@ ContentObjectSerializationTest::DoRun ()
   packet = wire::ndnSIM::Data::ToWire (source);
   NS_TEST_ASSERT_MSG_EQ (packet->GetSize (), static_cast<unsigned int> (size + 4), "Signature size should have increased by 4");
 
-  Ptr<ContentObject> target = wire::ndnSIM::Data::FromWire (packet);
+  Ptr<Data> target = wire::ndnSIM::Data::FromWire (packet);
   
   NS_TEST_ASSERT_MSG_EQ (source->GetName ()     , target->GetName ()     , "source/target name failed");
   NS_TEST_ASSERT_MSG_EQ (source->GetFreshness (), target->GetFreshness (), "source/target freshness failed");

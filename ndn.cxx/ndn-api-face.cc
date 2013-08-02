@@ -154,7 +154,7 @@ ApiFace::ClearInterestFilter (Ptr<const Name> prefix)
 }
 
 void
-ApiFace::Put (Ptr<ContentObject> data)
+ApiFace::Put (Ptr<Data> data)
 {
   NS_LOG_INFO (">> D " << data->GetName ());
   
@@ -193,7 +193,7 @@ ApiFace::SendInterest (Ptr<const Interest> interest)
 }
 
 bool
-ApiFace::SendData (Ptr<const ContentObject> data)
+ApiFace::SendData (Ptr<const Data> data)
 {
   // data has been send out from NDN stack towards the application
   NS_LOG_DEBUG ("<< D " << data->GetName ());

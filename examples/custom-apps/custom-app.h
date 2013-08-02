@@ -30,12 +30,12 @@ namespace ns3 {
 /**
  * @brief A simple custom application
  *
- * This applications demonstrates how to send Interests and respond with ContentObjects to incoming interests
+ * This applications demonstrates how to send Interests and respond with Datas to incoming interests
  *
  * When application starts it "sets interest filter" (install FIB entry) for /prefix/sub, as well as
  * sends Interest for this prefix
  *
- * When an Interest is received, it is replied with a ContentObject with 1024-byte fake payload
+ * When an Interest is received, it is replied with a Data with 1024-byte fake payload
  */
 class CustomApp : public ndn::App
 {
@@ -58,7 +58,7 @@ public:
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnContentObject (Ptr<const ndn::ContentObject> contentObject);
+  OnData (Ptr<const ndn::Data> contentObject);
 
 private:
   void

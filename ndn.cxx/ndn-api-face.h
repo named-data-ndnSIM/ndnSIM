@@ -53,7 +53,7 @@ class ApiFace
 {
 public:
   typedef Callback<void, Ptr<const Name>,     Ptr<const Interest> > InterestCallback;
-  typedef Callback<void, Ptr<const Interest>, Ptr<const ContentObject> > DataCallback;
+  typedef Callback<void, Ptr<const Interest>, Ptr<const Data> > DataCallback;
   typedef Callback<void, Ptr<const Interest> > TimeoutCallback;
 
   /**
@@ -103,14 +103,14 @@ public:
    * @param data Data packet to publish
    */
   void
-  Put (Ptr<ContentObject> data);
+  Put (Ptr<Data> data);
 
 public:
   virtual bool
   SendInterest (Ptr<const Interest> interest);
 
   virtual bool
-  SendData (Ptr<const ContentObject> data);
+  SendData (Ptr<const Data> data);
 
   virtual std::ostream&
   Print (std::ostream &os) const;

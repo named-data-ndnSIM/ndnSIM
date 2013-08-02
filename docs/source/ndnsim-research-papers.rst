@@ -102,7 +102,7 @@ Research papers that use ndnSIM
     Moreover, it also shows the performance under different sizes of content store.
     The effectiveness of the CCP strategy is proved during the simulation.
 
-- **M. Wahlisch, T.C. Schmidt, and M. Vahlenkamp, "Backscatter from the Data Plane--Threats to Stability and Security in Information-Centric Network Infrastructure", in Computer Networks, 2013** (`DOI 10.1016/j.comnet.2013.07.009 <http://dx.doi.org/10.1016/j.comnet.2013.07.009>`)
+- **M. Wahlisch, T.C. Schmidt, and M. Vahlenkamp, "Backscatter from the Data Plane--Threats to Stability and Security in Information-Centric Network Infrastructure", in Computer Networks, 2013** (`DOI 10.1016/j.comnet.2013.07.009 <http://dx.doi.org/10.1016/j.comnet.2013.07.009>`_)
 
     Information-centric networking (ICN) raises data objects to first class routable entities in the network and changes the Internet paradigm from host-centric connectivity to data-oriented delivery.
     However, current approaches to content routing heavily rely on data-driven protocol events and thereby introduce a strong coupling of the control to the data plane in the underlying routing infrastructure.

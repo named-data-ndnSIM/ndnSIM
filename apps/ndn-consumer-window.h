@@ -53,7 +53,7 @@ public:
   OnNack (Ptr<const Interest> interest);
 
   virtual void
-  OnContentObject (Ptr<const ContentObject> contentObject);
+  OnData (Ptr<const Data> contentObject);
 
   virtual void
   OnTimeout (uint32_t sequenceNumber);

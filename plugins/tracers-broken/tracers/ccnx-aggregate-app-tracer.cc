@@ -135,7 +135,7 @@ CcnxAggregateAppTracer::OutInterests (std::string context,
 
 void
 CcnxAggregateAppTracer::OutData (std::string context,
-                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxData> header, Ptr<const Packet> payload,
                                  Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_outData++;
@@ -162,7 +162,7 @@ CcnxAggregateAppTracer::InNacks (std::string context,
   
 void
 CcnxAggregateAppTracer::InData (std::string context,
-                                Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                                Ptr<const CcnxData> header, Ptr<const Packet> payload,
                                 Ptr<CcnxApp>, Ptr<CcnxFace>)
 {
   m_inData++;

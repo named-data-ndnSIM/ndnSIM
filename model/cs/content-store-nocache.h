@@ -54,11 +54,11 @@ public:
   virtual
   ~Nocache ();
 
-  virtual Ptr<ContentObject>
+  virtual Ptr<Data>
   Lookup (Ptr<const Interest> interest);
 
   virtual bool
-  Add (Ptr<const ContentObject> data);
+  Add (Ptr<const Data> data);
 
   virtual void
   Print (std::ostream &os) const;

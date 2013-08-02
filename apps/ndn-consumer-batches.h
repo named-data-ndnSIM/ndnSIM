@@ -50,7 +50,7 @@ public:
   // OnNack (const Ptr<const Interest> &interest);
 
   // virtual void
-  // OnContentObject (const Ptr<const ContentObject> &contentObject,
+  // OnData (const Ptr<const Data> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
   // virtual void

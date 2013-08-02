@@ -39,7 +39,7 @@ class Node;
 namespace ndn {
 
 class Interest;
-class ContentObject;
+class Data;
 
 /**
  * \ingroup ndn
@@ -69,7 +69,7 @@ public:
    * \param packet Original packet
    */
   typedef Callback<void, Ptr<Face>, Ptr<Interest> > InterestHandler;
-  typedef Callback<void, Ptr<Face>, Ptr<ContentObject> > DataHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<Data> > DataHandler;
 
   /**
    * \brief Default constructor
@@ -119,7 +119,7 @@ public:
    * @returns true if Data packet is considered to be send out (enqueued)
    */
   virtual bool
-  SendData (Ptr<const ContentObject> data);
+  SendData (Ptr<const Data> data);
 
   /**
    * \brief Receive interest from application or another node and forward it up to the NDN stack
@@ -135,7 +135,7 @@ public:
    * By default it is called from inside Receive method, but can be used directly, if appropriate
    */
   virtual bool
-  ReceiveData (Ptr<ContentObject> data);
+  ReceiveData (Ptr<Data> data);
   ////////////////////////////////////////////////////////////////////
 
   /**

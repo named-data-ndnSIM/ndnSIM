@@ -178,7 +178,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
       return;
     }
 
-  Ptr<ContentObject> contentObject;
+  Ptr<Data> contentObject;
   contentObject = m_contentStore->Lookup (interest);
   if (contentObject != 0)
     {
@@ -222,7 +222,7 @@ ForwardingStrategy::OnInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::OnData (Ptr<Face> inFace,
-                            Ptr<ContentObject> data)
+                            Ptr<Data> data)
 {
   NS_LOG_FUNCTION (inFace << data->GetName ());
   m_inData (data, inFace);
@@ -354,7 +354,7 @@ ForwardingStrategy::DetectRetransmittedInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
-                                            Ptr<const ContentObject> data,
+                                            Ptr<const Data> data,
                                             Ptr<pit::Entry> pitEntry)
 {
   if (inFace != 0)
@@ -387,7 +387,7 @@ ForwardingStrategy::SatisfyPendingInterest (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
-                                             Ptr<const ContentObject> data,
+                                             Ptr<const Data> data,
                                              bool didCreateCacheEntry)
 {
   // do nothing
@@ -395,7 +395,7 @@ ForwardingStrategy::DidReceiveSolicitedData (Ptr<Face> inFace,
 
 void
 ForwardingStrategy::DidReceiveUnsolicitedData (Ptr<Face> inFace,
-                                               Ptr<const ContentObject> data,
+                                               Ptr<const Data> data,
                                                bool didCreateCacheEntry)
 {
   // do nothing
@@ -556,7 +556,7 @@ ForwardingStrategy::DidSendOutInterest (Ptr<Face> inFace,
 void
 ForwardingStrategy::DidSendOutData (Ptr<Face> inFace,
                                     Ptr<Face> outFace,
-                                    Ptr<const ContentObject> data,
+                                    Ptr<const Data> data,
                                     Ptr<pit::Entry> pitEntry)
 {
   m_outData (data, inFace == 0, outFace);

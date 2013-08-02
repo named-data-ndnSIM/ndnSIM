@@ -80,15 +80,15 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
+            Ptr<const CcnxData>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>);
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<const CcnxFace>);
+            Ptr<const CcnxData>, Ptr<const Packet>, Ptr<const CcnxFace>);
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
+            Ptr<const CcnxData>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>);
 
 private:
   void

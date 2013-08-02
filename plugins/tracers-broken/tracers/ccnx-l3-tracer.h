@@ -72,15 +72,15 @@ public:
   
   virtual void
   OutData  (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxData>, Ptr<const Packet>, bool fromCache, Ptr<const CcnxFace>) = 0;
 
   virtual void
   InData   (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxData>, Ptr<const Packet>, Ptr<const CcnxFace>) = 0;
 
   virtual void
   DropData (std::string context,
-            Ptr<const CcnxContentObject>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
+            Ptr<const CcnxData>, Ptr<const Packet>, Ccnx::DropReason, Ptr<const CcnxFace>) = 0;
 
 protected:
   std::string m_node;

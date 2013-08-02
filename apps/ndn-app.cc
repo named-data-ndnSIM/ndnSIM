@@ -51,14 +51,14 @@ App::GetTypeId (void)
     .AddTraceSource ("ReceivedNacks", "ReceivedNacks",
                     MakeTraceSourceAccessor (&App::m_receivedNacks))
     
-    .AddTraceSource ("ReceivedContentObjects", "ReceivedContentObjects",
-                    MakeTraceSourceAccessor (&App::m_receivedContentObjects))
+    .AddTraceSource ("ReceivedDatas", "ReceivedDatas",
+                    MakeTraceSourceAccessor (&App::m_receivedDatas))
 
     .AddTraceSource ("TransmittedInterests", "TransmittedInterests",
                     MakeTraceSourceAccessor (&App::m_transmittedInterests))
 
-    .AddTraceSource ("TransmittedContentObjects", "TransmittedContentObjects",
-                    MakeTraceSourceAccessor (&App::m_transmittedContentObjects))
+    .AddTraceSource ("TransmittedDatas", "TransmittedDatas",
+                    MakeTraceSourceAccessor (&App::m_transmittedDatas))
     ;
   return tid;
 }
@@ -108,10 +108,10 @@ App::OnNack (Ptr<const Interest> interest)
 }
 
 void
-App::OnContentObject (Ptr<const ContentObject> contentObject)
+App::OnData (Ptr<const Data> contentObject)
 {
   NS_LOG_FUNCTION (this << contentObject);
-  m_receivedContentObjects (contentObject, this, m_face);
+  m_receivedDatas (contentObject, this, m_face);
 }
 
 // Application Methods

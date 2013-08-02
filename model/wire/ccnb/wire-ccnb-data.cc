@@ -85,7 +85,7 @@ public:
     i.Prev (2); // Trailer interface requires us to go backwards
 
     i.WriteU8 (0x00); // </Content>
-    i.WriteU8 (0x00); // </ContentObject>
+    i.WriteU8 (0x00); // </Data>
   }
 
   virtual uint32_t Deserialize (Buffer::Iterator end)
@@ -97,7 +97,7 @@ public:
     NS_ASSERT_MSG (closing_tag_content==0, "Should be a closing tag </Content> (0x00)");
 
     uint8_t closing_tag_content_object = i.ReadU8 ();
-    NS_ASSERT_MSG (closing_tag_content_object==0, "Should be a closing tag </ContentObject> (0x00)");
+    NS_ASSERT_MSG (closing_tag_content_object==0, "Should be a closing tag </Data> (0x00)");
 
     return 2;
   }
@@ -124,23 +124,23 @@ Data::GetInstanceTypeId (void) const
 }
 
 Data::Data ()
-  : m_data (Create<ndn::ContentObject> ())
+  : m_data (Create<ndn::Data> ())
 {
 }
 
-Data::Data (Ptr<ndn::ContentObject> data)
+Data::Data (Ptr<ndn::Data> data)
   : m_data (data)
 {
 }
 
-Ptr<ndn::ContentObject>
+Ptr<ndn::Data>
 Data::GetData ()
 {
   return m_data;
 }
 
 Ptr<Packet>
-Data::ToWire (Ptr<const ndn::ContentObject> data)
+Data::ToWire (Ptr<const ndn::Data> data)
 {
   static DataTrailer trailer;
 
@@ -148,7 +148,7 @@ Data::ToWire (Ptr<const ndn::ContentObject> data)
   if (!p)
     {
       Ptr<Packet> packet = Create<Packet> (*data->GetPayload ());
-      Data wireEncoding (ConstCast<ndn::ContentObject> (data));
+      Data wireEncoding (ConstCast<ndn::Data> (data));
       packet->AddHeader (wireEncoding);
       packet->AddTrailer (trailer);
       data->SetWire (packet);
@@ -159,12 +159,12 @@ Data::ToWire (Ptr<const ndn::ContentObject> data)
   return p->Copy ();
 }
 
-Ptr<ndn::ContentObject>
+Ptr<ndn::Data>
 Data::FromWire (Ptr<Packet> packet)
 {
   static DataTrailer trailer;
 
-  Ptr<ndn::ContentObject> data = Create<ndn::ContentObject> ();
+  Ptr<ndn::Data> data = Create<ndn::Data> ();
   data->SetWire (packet->Copy ());
 
   Data wireEncoding (data);
@@ -179,7 +179,7 @@ Data::FromWire (Ptr<Packet> packet)
 void
 Data::Serialize (Buffer::Iterator start) const
 {
-  Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_ContentObject, CcnbParser::CCN_DTAG); // <ContentObject>
+  Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Data, CcnbParser::CCN_DTAG); // <Data>
 
   // fake signature
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Signature, CcnbParser::CCN_DTAG); // <Signature>
@@ -252,14 +252,14 @@ Data::Serialize (Buffer::Iterator start) const
     Ccnb::AppendBlockHeader (start, payloadSize, CcnbParser::CCN_BLOB);
 
   // there are no closing tags !!!
-  // The closing tag is handled by ContentObjectTail
+  // The closing tag is handled by DataTail
 }
 
 uint32_t
 Data::GetSerializedSize () const
 {
   size_t written = 0;
-  written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_ContentObject); // <ContentObject>
+  written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Data); // <Data>
 
   // fake signature
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Signature); // <Signature>
@@ -331,14 +331,14 @@ Data::GetSerializedSize () const
     written += Ccnb::EstimateBlockHeader (payloadSize);
 
   // there are no closing tags !!!
-  // The closing tag is handled by ContentObjectTail
+  // The closing tag is handled by DataTail
   return written;
 }
 
-class ContentObjectVisitor : public CcnbParser::VoidDepthFirstVisitor
+class DataVisitor : public CcnbParser::VoidDepthFirstVisitor
 {
 public:
-  virtual void visit (CcnbParser::Dtag &n, boost::any param/*should be ContentObject* */)
+  virtual void visit (CcnbParser::Dtag &n, boost::any param/*should be Data* */)
   {
     // uint32_t n.m_dtag;
     // std::list< Ptr<CcnbParser::Block> > n.m_nestedBlocks;
@@ -349,11 +349,11 @@ public:
     static CcnbParser::Uint32tBlobVisitor uint32tBlobVisitor;
     static CcnbParser::ContentTypeVisitor contentTypeVisitor;
 
-    ndn::ContentObject &contentObject = *(boost::any_cast<ndn::ContentObject*> (param));
+    ndn::Data &contentObject = *(boost::any_cast<ndn::Data*> (param));
 
     switch (n.m_dtag)
       {
-      case CcnbParser::CCN_DTAG_ContentObject:
+      case CcnbParser::CCN_DTAG_Data:
         // process nested blocks
         BOOST_FOREACH (Ptr<CcnbParser::Block> block, n.m_nestedTags)
           {
@@ -482,7 +482,7 @@ public:
 uint32_t
 Data::Deserialize (Buffer::Iterator start)
 {
-  static ContentObjectVisitor contentObjectVisitor;
+  static DataVisitor contentObjectVisitor;
 
   Buffer::Iterator i = start;
   Ptr<CcnbParser::Block> root = CcnbParser::Block::ParseBlock (i);
@@ -495,7 +495,7 @@ void
 Data::Print (std::ostream &os) const
 {
   os << "D: " << m_data->GetName ();
-  // os << "<ContentObject><Name>" << GetName () << "</Name><Content>";
+  // os << "<Data><Name>" << GetName () << "</Name><Content>";
 }
 
 } // ccnb

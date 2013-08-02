@@ -276,7 +276,7 @@ CsTracer::Print (std::ostream &os) const
 }
 
 void 
-CsTracer::CacheHits (Ptr<const Interest>, Ptr<const ContentObject>)
+CsTracer::CacheHits (Ptr<const Interest>, Ptr<const Data>)
 {
   m_stats.m_cacheHits ++;
 }

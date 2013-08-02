@@ -67,15 +67,15 @@ class Data : public Header
 {
 public:
   Data ();
-  Data (Ptr<ndn::ContentObject> data);
+  Data (Ptr<ndn::Data> data);
 
-  Ptr<ndn::ContentObject>
+  Ptr<ndn::Data>
   GetData ();
 
   static Ptr<Packet>
-  ToWire (Ptr<const ndn::ContentObject> data);
+  ToWire (Ptr<const ndn::Data> data);
 
-  static Ptr<ndn::ContentObject>
+  static Ptr<ndn::Data>
   FromWire (Ptr<Packet> packet);
   
   // from Header
@@ -87,7 +87,7 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-  Ptr<ndn::ContentObject> m_data;  
+  Ptr<ndn::Data> m_data;  
 };
 
 } // ccnb

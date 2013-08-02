@@ -116,27 +116,27 @@ CustomApp::OnInterest (Ptr<const ndn::Interest> interest)
   
   NS_LOG_DEBUG ("Received Interest packet for " << interest->GetName ());
 
-  // Create and configure ndn::ContentObject and ndn::ContentObjectTail
+  // Create and configure ndn::Data and ndn::DataTail
   // (header is added in front of the packet, tail is added at the end of the packet)
 
   // Note that Interests send out by the app will not be sent back to the app !
   
-  Ptr<ndn::ContentObject> data = Create<ndn::ContentObject> (Create<Packet> (1024));
+  Ptr<ndn::Data> data = Create<ndn::Data> (Create<Packet> (1024));
   data->SetName (Create<ndn::Name> (interest->GetName ())); // data will have the same name as Interests
 
-  NS_LOG_DEBUG ("Sending ContentObject packet for " << data->GetName ());  
+  NS_LOG_DEBUG ("Sending Data packet for " << data->GetName ());  
 
   // Call trace (for logging purposes)
-  m_transmittedContentObjects (data, this, m_face);
+  m_transmittedDatas (data, this, m_face);
 
   m_face->ReceiveData (data); 
 }
 
 // Callback that will be called when Data arrives
 void
-CustomApp::OnContentObject (Ptr<const ndn::ContentObject> contentObject)
+CustomApp::OnData (Ptr<const ndn::Data> contentObject)
 {
-  NS_LOG_DEBUG ("Receiving ContentObject packet for " << contentObject->GetName ());
+  NS_LOG_DEBUG ("Receiving Data packet for " << contentObject->GetName ());
 
   std::cout << "DATA received for name " << contentObject->GetName () << std::endl;
 }

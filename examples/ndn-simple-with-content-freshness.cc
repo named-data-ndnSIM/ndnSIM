@@ -33,7 +33,7 @@ using namespace ns3;
  *      | consumer | <------------> | router | <------------> | producer |
  *      +----------+         10ms   +--------+          10ms  +----------+
  *
- * This scenario demonstrates how to use content store that responds to Freshness parameter set in ContentObjects.
+ * This scenario demonstrates how to use content store that responds to Freshness parameter set in Datas.
  * That is, if producer set Freshness field to 2 seconds, the corresponding content object will not be cached
  * more than 2 seconds (can be cached for a shorter time, if entry is evicted earlier)
  * 

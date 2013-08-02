@@ -166,11 +166,11 @@ public:
    *
    * @param enable           Enable or disable limits
    * @param avgRtt           Average RTT
-   * @param avgContentObject Average size of contentObject packets (including all headers)
+   * @param avgData Average size of contentObject packets (including all headers)
    * @param avgInterest      Average size of interest packets (including all headers)
    */
   void
-  EnableLimits (bool enable = true, Time avgRtt=Seconds(0.1), uint32_t avgContentObject=1100, uint32_t avgInterest=40);
+  EnableLimits (bool enable = true, Time avgRtt=Seconds(0.1), uint32_t avgData=1100, uint32_t avgInterest=40);
 
   /**
    * \brief Install Ndn stack on the node
@@ -305,7 +305,7 @@ private:
 
   bool     m_limitsEnabled;
   Time     m_avgRtt;
-  uint32_t m_avgContentObjectSize;
+  uint32_t m_avgDataSize;
   uint32_t m_avgInterestSize;
   bool     m_needSetDefaultRoutes;
 

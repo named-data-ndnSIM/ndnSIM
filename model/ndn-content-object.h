@@ -34,9 +34,9 @@ namespace ndn {
 
 /**
  * @ingroup ndn
- * @brief ContentObject header
+ * @brief Data header
  */
-class ContentObject : public SimpleRefCount<ContentObject>
+class Data : public SimpleRefCount<Data>
 {
 public:
   /**
@@ -44,12 +44,12 @@ public:
    *
    * Creates a null header
    **/
-  ContentObject (Ptr<Packet> payload = Create<Packet> ());
+  Data (Ptr<Packet> payload = Create<Packet> ());
 
   /**
    * @brief Copy constructor
    */
-  ContentObject (const ContentObject &other);
+  Data (const Data &other);
 
   /**
    * \brief Set content object name
@@ -176,8 +176,8 @@ public:
   
 private:
   // NO_ASSIGN
-  ContentObject &
-  operator = (const ContentObject &other) { return *this; }
+  Data &
+  operator = (const Data &other) { return *this; }
   
 private:
   Ptr<Name> m_name;
@@ -191,25 +191,25 @@ private:
 };
 
 inline std::ostream &
-operator << (std::ostream &os, const ContentObject &d)
+operator << (std::ostream &os, const Data &d)
 {
   d.Print (os);
   return os;
 }
 
 /**
- * @brief Class for ContentObject parsing exception
+ * @brief Class for Data parsing exception
  */
-class ContentObjectException {};
+class DataException {};
 
 inline Ptr<const Packet>
-ContentObject::GetWire () const
+Data::GetWire () const
 {
   return m_wire;
 }
 
 inline void
-ContentObject::SetWire (Ptr<const Packet> packet) const
+Data::SetWire (Ptr<const Packet> packet) const
 {
   m_wire = packet;
 }

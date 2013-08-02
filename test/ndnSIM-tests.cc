@@ -38,7 +38,7 @@ public:
     SetDataDir (NS_TEST_SOURCEDIR);
 
     AddTestCase (new InterestSerializationTest (), TestCase::QUICK);
-    AddTestCase (new ContentObjectSerializationTest (), TestCase::QUICK);
+    AddTestCase (new DataSerializationTest (), TestCase::QUICK);
     AddTestCase (new FibEntryTest (), TestCase::QUICK);
     AddTestCase (new PitTest (), TestCase::QUICK);
     AddTestCase (new ApiTest (), TestCase::QUICK);

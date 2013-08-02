@@ -44,7 +44,7 @@ class UdpFace;
  * @ingroup ndn
  * @brief Application that provides functionality of creating IP-based faces on NDN nodes
  *
- * The class implements virtual calls onInterest, onNack, and onContentObject
+ * The class implements virtual calls onInterest, onNack, and onData
  */
 class IpFaceStack: public Object
 {

@@ -39,11 +39,11 @@ private:
   virtual void DoRun ();
 };
 
-class ContentObjectSerializationTest : public TestCase
+class DataSerializationTest : public TestCase
 {
 public:
-  ContentObjectSerializationTest ()
-    : TestCase ("ContentObject Serialization Test")
+  DataSerializationTest ()
+    : TestCase ("Data Serialization Test")
   {
   }
     

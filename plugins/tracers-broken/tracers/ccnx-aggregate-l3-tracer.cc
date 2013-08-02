@@ -173,7 +173,7 @@ CcnxAggregateL3Tracer::DropNacks (std::string context,
 
 void
 CcnxAggregateL3Tracer::OutData  (std::string context,
-                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxData> header, Ptr<const Packet> payload,
                                  bool fromCache, Ptr<const CcnxFace>)
 {
   m_packets.m_outData++;
@@ -182,7 +182,7 @@ CcnxAggregateL3Tracer::OutData  (std::string context,
 
 void
 CcnxAggregateL3Tracer::InData   (std::string context,
-                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxData> header, Ptr<const Packet> payload,
                                  Ptr<const CcnxFace>)
 {
   m_packets.m_inData++;
@@ -191,7 +191,7 @@ CcnxAggregateL3Tracer::InData   (std::string context,
 
 void
 CcnxAggregateL3Tracer::DropData (std::string context,
-                                 Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                                 Ptr<const CcnxData> header, Ptr<const Packet> payload,
                                  Ccnx::DropReason, Ptr<const CcnxFace>)
 {
   m_packets.m_dropData++;

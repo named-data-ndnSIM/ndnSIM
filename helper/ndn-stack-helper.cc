@@ -179,13 +179,13 @@ StackHelper::SetDefaultRoutes (bool needSet)
 void
 StackHelper::EnableLimits (bool enable/* = true*/,
                            Time avgRtt/*=Seconds(0.1)*/,
-                           uint32_t avgContentObject/*=1100*/,
+                           uint32_t avgData/*=1100*/,
                            uint32_t avgInterest/*=40*/)
 {
   NS_LOG_INFO ("EnableLimits: " << enable);
   m_limitsEnabled = enable;
   m_avgRtt = avgRtt;
-  m_avgContentObjectSize = avgContentObject;
+  m_avgDataSize = avgData;
   m_avgInterestSize = avgInterest;
 }
 
@@ -355,7 +355,7 @@ StackHelper::PointToPointNetDeviceCallback (Ptr<Node> node, Ptr<L3Protocol> ndn,
 
           NS_LOG_INFO("DataRate for this link is " << dataRate.Get());
 
-          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgContentObjectSize + m_avgInterestSize);
+          double maxInterestPackets = 1.0  * dataRate.Get ().GetBitRate () / 8.0 / (m_avgDataSize + m_avgInterestSize);
           // NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
           // NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
           NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) * maxInterestPackets));

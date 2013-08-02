@@ -81,7 +81,7 @@ public:
 
   // inherited from Pit
   virtual Ptr<Entry>
-  Lookup (const ContentObject &header);
+  Lookup (const Data &header);
 
   virtual Ptr<Entry>
   Lookup (const Interest &header);
@@ -300,7 +300,7 @@ PitImpl<Policy>::CleanExpired ()
 
 template<class Policy>
 Ptr<Entry>
-PitImpl<Policy>::Lookup (const ContentObject &header)
+PitImpl<Policy>::Lookup (const Data &header)
 {
   /// @todo use predicate to search with exclude filters
   typename super::iterator item = super::longest_prefix_match_if (header.GetName (), EntryIsNotEmpty ());

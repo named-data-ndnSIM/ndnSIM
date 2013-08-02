@@ -185,7 +185,7 @@ CcnxRateL3Tracer::DropNacks (std::string context,
 
 void
 CcnxRateL3Tracer::OutData  (std::string context,
-                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxData> header, Ptr<const Packet> payload,
                             bool fromCache, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -194,7 +194,7 @@ CcnxRateL3Tracer::OutData  (std::string context,
 
 void
 CcnxRateL3Tracer::InData   (std::string context,
-                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxData> header, Ptr<const Packet> payload,
                             Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -203,7 +203,7 @@ CcnxRateL3Tracer::InData   (std::string context,
 
 void
 CcnxRateL3Tracer::DropData (std::string context,
-                            Ptr<const CcnxContentObject> header, Ptr<const Packet> payload,
+                            Ptr<const CcnxData> header, Ptr<const Packet> payload,
                             Ccnx::DropReason, Ptr<const CcnxFace> face)
 {
   m_stats[face].get<0> ().m_dropData ++;

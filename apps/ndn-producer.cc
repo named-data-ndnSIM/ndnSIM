@@ -127,7 +127,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
 
   if (!m_active) return;
 
-  Ptr<ContentObject> data = Create<ContentObject> (Create<Packet> (m_virtualPayloadSize));
+  Ptr<Data> data = Create<Data> (Create<Packet> (m_virtualPayloadSize));
   Ptr<Name> dataName = Create<Name> (interest->GetName ());
   dataName->append (m_postfix);
   data->SetName (dataName);
@@ -139,7 +139,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
       data->SetKeyLocator (Create<Name> (m_keyLocator));
     }
 
-  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with ContentObject: " << data->GetName ());
+  NS_LOG_INFO ("node("<< GetNode()->GetId() <<") respodning with Data: " << data->GetName ());
 
   // Echo back FwHopCountTag if exists
   FwHopCountTag hopCountTag;
@@ -149,7 +149,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
     }
 
   m_face->ReceiveData (data);
-  m_transmittedContentObjects (data, this, m_face);
+  m_transmittedDatas (data, this, m_face);
 }
 
 } // namespace ndn

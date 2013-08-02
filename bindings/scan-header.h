@@ -19,7 +19,7 @@ __dummy_function_on_interest_callback_instantiation (Ptr<const Name>, Ptr<const 
 }
 
 static inline void
-__dummy_function_on_data_callback_instantiation (Ptr<const Interest>, Ptr<const ContentObject>)
+__dummy_function_on_data_callback_instantiation (Ptr<const Interest>, Ptr<const Data>)
 {
 }
 
@@ -51,7 +51,7 @@ __dummy_function_to_force_ndn_api_face_callback_instantiations ()
 // /// @cond include_hidden
 // #ifdef PYTHON_SCAN
 // struct CallbackVoidNameInterest : public Callback<void, Ptr<const Name>, Ptr<const Interest> > { };
-// struct CallbackVoidInterestContentObject : public Callback<void, Ptr<const Interest>, Ptr<const ContentObject> > { };
+// struct CallbackVoidInterestData : public Callback<void, Ptr<const Interest>, Ptr<const Data> > { };
 // struct CallbackVoidInterest : public Callback<void, Ptr<const Interest> > { };
 // #endif
 // /// @endcond

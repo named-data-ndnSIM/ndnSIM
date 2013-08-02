@@ -110,9 +110,9 @@ DumbRequester::SendInterest ()
 }
 
 void
-DumbRequester::OnContentObject (Ptr<const ndn::ContentObject> contentObject)
+DumbRequester::OnData (Ptr<const ndn::Data> contentObject)
 {
-  NS_LOG_DEBUG ("Receiving ContentObject packet for " << contentObject->GetName ());
+  NS_LOG_DEBUG ("Receiving Data packet for " << contentObject->GetName ());
 }
 
 

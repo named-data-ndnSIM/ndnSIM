@@ -113,7 +113,7 @@ Wire::ToInterest (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETE
 }
 
 Ptr<Packet>
-Wire::FromData (Ptr<const ContentObject> data, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+Wire::FromData (Ptr<const Data> data, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
 {
   if (wireFormat == WIRE_FORMAT_DEFAULT)
     wireFormat = GetWireFormat ();
@@ -129,7 +129,7 @@ Wire::FromData (Ptr<const ContentObject> data, int8_t wireFormat/* = WIRE_FORMAT
     }
 }
 
-Ptr<ContentObject>
+Ptr<Data>
 Wire::ToData (Ptr<Packet> packet, int8_t wireFormat/* = WIRE_FORMAT_AUTODETECT*/)
 {
   if (wireFormat == WIRE_FORMAT_AUTODETECT)
@@ -198,7 +198,7 @@ Wire::ToInterestStr (const std::string &wire, int8_t type/* = WIRE_FORMAT_AUTODE
 }
 
 std::string
-Wire::FromDataStr (Ptr<const ContentObject> data, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
+Wire::FromDataStr (Ptr<const Data> data, int8_t wireFormat/* = WIRE_FORMAT_DEFAULT*/)
 {
   Ptr<Packet> pkt = FromData (data, wireFormat);
   std::string wire;
@@ -208,7 +208,7 @@ Wire::FromDataStr (Ptr<const ContentObject> data, int8_t wireFormat/* = WIRE_FOR
   return wire;
 }
 
-Ptr<ContentObject>
+Ptr<Data>
 Wire::ToDataStr (const std::string &wire, int8_t type/* = WIRE_FORMAT_AUTODETECT*/)
 {
   Ptr<Packet> pkt = Create<Packet> (reinterpret_cast<const uint8_t*> (&wire[0]), wire.size ());

@@ -69,7 +69,7 @@ Face::GetTypeId ()
 Face::Face (Ptr<Node> node)
   : m_node (node)
   , m_upstreamInterestHandler (MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ())
-  , m_upstreamDataHandler (MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ())
+  , m_upstreamDataHandler (MakeNullCallback< void, Ptr<Face>, Ptr<Data> > ())
   , m_ifup (false)
   , m_id ((uint32_t)-1)
   , m_metric (0)
@@ -115,7 +115,7 @@ Face::UnRegisterProtocolHandlers ()
   NS_LOG_FUNCTION_NOARGS ();
 
   m_upstreamInterestHandler = MakeNullCallback< void, Ptr<Face>, Ptr<Interest> > ();
-  m_upstreamDataHandler = MakeNullCallback< void, Ptr<Face>, Ptr<ContentObject> > ();
+  m_upstreamDataHandler = MakeNullCallback< void, Ptr<Face>, Ptr<Data> > ();
 }
 
 
@@ -133,7 +133,7 @@ Face::SendInterest (Ptr<const Interest> interest)
 }
 
 bool
-Face::SendData (Ptr<const ContentObject> data)
+Face::SendData (Ptr<const Data> data)
 {
   NS_LOG_FUNCTION (this << data);
 
@@ -214,7 +214,7 @@ Face::ReceiveInterest (Ptr<Interest> interest)
 }
 
 bool
-Face::ReceiveData (Ptr<ContentObject> data)
+Face::ReceiveData (Ptr<Data> data)
 {
   if (!IsUp ())
     {

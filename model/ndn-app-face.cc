@@ -101,7 +101,7 @@ AppFace::SendInterest (Ptr<const Interest> interest)
 }
 
 bool
-AppFace::SendData (Ptr<const ContentObject> data)
+AppFace::SendData (Ptr<const Data> data)
 {
   NS_LOG_FUNCTION (this << data);
 
@@ -110,7 +110,7 @@ AppFace::SendData (Ptr<const ContentObject> data)
       return false;
     }
 
-  m_app->OnContentObject (data);
+  m_app->OnData (data);
   return true;
 }
 

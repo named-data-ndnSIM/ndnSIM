@@ -43,7 +43,7 @@ private:
   RequestData ();
 
   void
-  GotData (Ptr<const Interest> origInterest, Ptr<const ContentObject> data);
+  GotData (Ptr<const Interest> origInterest, Ptr<const Data> data);
   
 protected:
   // inherited from Application base class.

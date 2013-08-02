@@ -52,11 +52,11 @@ public:
 
   virtual void
   OutData (std::string context,
-           Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>);
+           Ptr<const CcnxData>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>);
   
   virtual void
   InData  (std::string context,
-           Ptr<const CcnxContentObject>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>);
+           Ptr<const CcnxData>, Ptr<const Packet>, Ptr<CcnxApp>, Ptr<CcnxFace>);
 
 protected:
   void

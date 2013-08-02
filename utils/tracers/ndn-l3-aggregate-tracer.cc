@@ -358,7 +358,7 @@ L3AggregateTracer::DropNacks (Ptr<const Interest> nack, Ptr<const Face> face)
 }
 
 void
-L3AggregateTracer::OutData  (Ptr<const ContentObject> data, 
+L3AggregateTracer::OutData  (Ptr<const Data> data, 
                              bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_outData ++;
@@ -369,7 +369,7 @@ L3AggregateTracer::OutData  (Ptr<const ContentObject> data,
 }
 
 void
-L3AggregateTracer::InData   (Ptr<const ContentObject> data, 
+L3AggregateTracer::InData   (Ptr<const Data> data, 
                              Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_inData ++;
@@ -380,7 +380,7 @@ L3AggregateTracer::InData   (Ptr<const ContentObject> data,
 }
 
 void
-L3AggregateTracer::DropData (Ptr<const ContentObject> data, 
+L3AggregateTracer::DropData (Ptr<const Data> data, 
                              Ptr<const Face> face)
 {
   m_stats[face].get<0> ().m_dropData ++;
