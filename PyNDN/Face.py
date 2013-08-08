@@ -24,7 +24,10 @@ from Data import Data
 from Interest import Interest
 from Name import Name
 
+import time
 import functools
+
+deleteList = []
 
 class Face (ns.ndnSIM.ndn.ApiFace):
     def __init__(self):
@@ -41,6 +44,7 @@ class Face (ns.ndnSIM.ndn.ApiFace):
     def defer_verification (self, deferVerification = True):
         pass
 
+
     def expressInterest (self, name, onData, onTimeout, template = None):
         """
         onData:    void <interest, name>
@@ -50,33 +54,15 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         interest = Interest (interest = template)
         interest.name = name
 
-        class OnDataConvert:
-            def __init__ (self, onData):
-                self.onData = onData
-            def __call__ (self, interest, data):
-                if self.onData:
-                    return self.onData (Interest (interest=interest), Data (data = data))
+        converter = ExpressInterestConverter (onData, onTimeout)
+        deleteList.append (converter)
 
-        class OnTimeoutConvert:
-            def __init__ (self, onTimeout):
-                self.onTimeout = onTimeout
-            def __call__ (self, interest):
-                if self.onTimeout:
-                    self.onTimeout (Interest (interest=interest))
-
-        self.ExpressInterest (interest._interest, OnDataConvert (onData), OnTimeoutConvert (onTimeout))
+        self.ExpressInterest (interest._interest, converter.handleOnData, converter.handleOnTimeout)
 
     def setInterestFilter (self, name, onInterest, flags = None):
         """
         onInterest: void <name, interest>
         """
-
-        class OnInterestConvert:
-            def __init__ (self, onInterest):
-                self.onInterest = onInterest
-            def __call__ (self, name, interest):
-                if self.onInterest:
-                    self.onInterest (Name (name = name), Interest (interest = interest))
 
         if isinstance (name, Name):
             name = name._name
@@ -85,7 +71,10 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         else:
             raise TypeError ("Wrong type for 'name' parameter [%s]" % type (name))
 
-        self.SetInterestFilter (name, OnInterestConvert (onInterest))
+        converter = OnInterestConvert (onInterest)
+        deleteList.append (converter)
+
+        self.SetInterestFilter (name, converter)
 
     def clearInterestFilter (self, name):
         if isinstance (name, Name):
@@ -95,10 +84,42 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         else:
             raise TypeError ("Wrong type for 'name' parameter [%s]" % type (name))
 
+        # @bug: memory leak, deleteList need to remove previosly set callback... but how?
         self.ClearInterestFilter (name)
 
     def get (self, name, template = None, timeoutms = 3000):
         raise NotImplementedError ("NS-3 simulation cannot have syncrhonous operations")
 
     def put (self, data):
-        self.Put (data)
+        if isinstance (data, Data):
+            self.Put (data._data)
+        elif isinstance (data, ns.ndnSIM.ndn.Data):
+            self.Put (data)
+        else:
+            raise TypeError ("Unsupported type to publish data [%s]" % type (data))
+
+def removeFromDeleteList (object):
+    deleteList.remove (object)
+
+class ExpressInterestConverter:
+    def __init__ (self, onData, onTimeout):
+        self.onData = onData
+        self.onTimeout = onTimeout
+
+    def handleOnData (self, interest, data):
+        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
+        if self.onData:
+            return self.onData (Interest (interest=interest), Data (data = data))
+
+    def handleOnTimeout (self, interest):
+        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
+        if self.onTimeout:
+            self.onTimeout (Interest (interest=interest))
+
+class OnInterestConvert (object):
+    def __init__ (self, onInterest):
+        self.onInterest = onInterest
+    def __call__ (self, name, interest):
+        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
+        if self.onInterest:
+            self.onInterest (Name (name = name), Interest (interest = interest))

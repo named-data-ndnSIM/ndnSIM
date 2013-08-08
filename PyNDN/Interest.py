@@ -43,10 +43,10 @@ class Interest (object):
 
     @staticmethod
     def fromWire (wire):
-        return Interest (interest = ns.ndnSIM.ndn.Wire.ToInterest (wire))
+        return Interest (interest = ns.ndnSIM.ndn.Wire.ToInterestStr (wire))
 
     def toWire (self):
-        return ns.ndnSIM.ndn.Wire.FromInterest (self._interest)
+        return ns.ndnSIM.ndn.Wire.FromInterestStr (self._interest)
 
     def __getattr__ (self, name):
         if name == "_interest":

@@ -35,6 +35,11 @@ class Data (object):
                 self._data = data._data
             elif isinstance (data, ns.ndnSIM.ndn.Data):
                 self._data = data
+                self.signedInfo = SignedInfo ()
+                # timestamp
+                self.signedInfo.freshnessSeconds = self._data.GetFreshness ().ToDouble (ns.core.Time.S)
+                if self._data.GetKeyLocator ():
+                    self.signedInfo.keyLocator = Name (name = self._data.GetKeyLocator ())
             else:
                 raise TypeError ("Invalid type supplied for 'data' parameter [%s]" % type (data))
         else:
@@ -46,11 +51,7 @@ class Data (object):
 
     @staticmethod
     def fromWire (wire):
-        data = Data (data = ns.ndnSIM.ndn.Wire.ToData (wire))
-        # timestamp
-        data.signedInfo.freshnessSeconds = data._data.GetFreshness ()
-        if data._data.GetKeyLocator ():
-            data.keyLocator = Name (_name = data._data.GetKeyLocator ())
+        return Data (data = ns.ndnSIM.ndn.Wire.ToDataStr (bytes (wire)))
 
     def sign (self, key):
         """There is no actual signing in ndnSIM for now, but we will assign signature bits based on key"""
@@ -60,7 +61,7 @@ class Data (object):
         if self._data.GetSignature () == 0:
             raise DataError ("Data packet has not been signed, cannot create wire format")
 
-        return ns.ndnSIM.ndn.Wire.FromData (self._data)
+        return ns.ndnSIM.ndn.Wire.FromDataStr (self._data)
 
     def verify_signature (self, key):
         """There is no actual signing in ndnSIM for now, but we will check if signature matches the key"""
@@ -79,7 +80,7 @@ class Data (object):
         elif name == "interestLifetime":
             return self._data.GetInterestLifetime ().ToDouble (ns.core.Time.S)
         elif name == "content":
-            pkt = self._data.GetContent ()
+            pkt = self._data.GetPayload ()
             return ns.ndnSIM.ndn.PacketToBuffer (pkt)
         else:
             return self._data.__getattribute__ (name)
@@ -125,4 +126,4 @@ class Data (object):
             raise NameError ("Unknown attribute [%s]" % name)
 
     def __repr__(self):
-        return "ndn.Data(%s)" % str (self._data)
+        return "ndn.Data(%s; %s)" % str (self._data, self.signedInfo)

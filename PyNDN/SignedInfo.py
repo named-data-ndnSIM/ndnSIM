@@ -44,7 +44,7 @@ class SignedInfo (object):
             args += ["keyLocator=%r" % self.keyLocator]
         if self.freshnessSeconds is not None:
             args += ["freshness=%r" % self.freshnessSeconds]
-        if self.timeStamp is not None:
+        if self.timestamp is not None:
             args += ["timestamp=%r" % self.timestamp]
         if self.type != CONTENT_DATA:
             args += ["type=%r" % self.type]

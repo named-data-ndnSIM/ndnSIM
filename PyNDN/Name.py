@@ -73,7 +73,10 @@ class Name (object):
             raise ValueError("Unknown __getitem__ type: %s" % type (key))
 
     def __repr__ (self):
-        return "ndnSIM.Name('" + self._name.toUri () + "')"
+        return "ndn.Name('" + self._name.toUri () + "')"
 
     def __str__ (self):
         return self._name.toUri ()
+
+    def isPrefixOf (self, other):
+        return self[:] == other[:len(self)]
