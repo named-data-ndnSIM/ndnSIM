@@ -65,7 +65,8 @@ class Data (object):
 
     def verify_signature (self, key):
         """There is no actual signing in ndnSIM for now, but we will check if signature matches the key"""
-        return self._data.GetSignature () == key.fakeKey
+        return True
+        # return self._data.GetSignature () == key.fakeKey
 
     def __getattr__ (self, name):
         if name == "_data":

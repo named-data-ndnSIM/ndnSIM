@@ -24,8 +24,8 @@ from Data import Data
 from Interest import Interest
 from Name import Name
 
-import time
 import functools
+import traceback
 
 deleteList = []
 
@@ -99,7 +99,10 @@ class Face (ns.ndnSIM.ndn.ApiFace):
             raise TypeError ("Unsupported type to publish data [%s]" % type (data))
 
 def removeFromDeleteList (object):
-    deleteList.remove (object)
+    try:
+        deleteList.remove (object)
+    except:
+        pass
 
 class ExpressInterestConverter:
     def __init__ (self, onData, onTimeout):
@@ -108,18 +111,27 @@ class ExpressInterestConverter:
 
     def handleOnData (self, interest, data):
         ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
-        if self.onData:
-            return self.onData (Interest (interest=interest), Data (data = data))
+        try:
+            if self.onData:
+                return self.onData (Interest (interest=interest), Data (data = data))
+        except Exception, e:
+            traceback.print_exc()
 
     def handleOnTimeout (self, interest):
         ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
-        if self.onTimeout:
-            self.onTimeout (Interest (interest=interest))
+        try:
+            if self.onTimeout:
+                self.onTimeout (Interest (interest=interest))
+        except Exception, e:
+            traceback.print_exc()
 
 class OnInterestConvert (object):
     def __init__ (self, onInterest):
         self.onInterest = onInterest
     def __call__ (self, name, interest):
         ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
-        if self.onInterest:
-            self.onInterest (Name (name = name), Interest (interest = interest))
+        try:
+            if self.onInterest:
+                self.onInterest (Name (name = name), Interest (interest = interest))
+        except Exception, e:
+            traceback.print_exc()

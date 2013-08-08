@@ -138,14 +138,14 @@ class ComponentMatcher(BaseMatcher):
 
         matcher = re.compile(self.expr)
         if self.exact:
-            res = matcher.match(name[offset])
+            res = matcher.match(str(name[offset]))
             if res:
                 self._appendBackRef(res)
                 self.matchResult.append(name[offset])
                 _LOG.debug("Succeed " + self.__class__.__name__ + ".match() ")
                 return True
         else:
-            res = matcher.search(name[offset])
+            res = matcher.search(str(name[offset]))
             if res:
                 self._appendBackRef(res)
                 self.matchResult.append(name[offset])

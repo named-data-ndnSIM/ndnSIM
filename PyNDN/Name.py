@@ -25,7 +25,7 @@ class Name (object):
     def __init__ (self, 
                   value = None,
                   name = None):
-        if name:
+        if name is not None:
             if isinstance (name, ns.ndnSIM.ndn.Name):
                 self._name = name
             elif isinstance (name, Name):
@@ -33,8 +33,15 @@ class Name (object):
             else:
                 raise TypeError ("Incorrect type for 'name' parameter [%s]" % type (name))
         else:
-            if value:
-                self._name = ns.ndnSIM.ndn.Name (value)
+            if value is not None:
+                if isinstance (value, Name):
+                    self._name = ns.ndnSIM.ndn.Name (value._name)
+                elif isinstance (value, ns.ndnSIM.ndn.Name):
+                    self._name = ns.ndnSIM.ndn.Name (value)
+                elif isinstance (value, str):
+                    self._name = ns.ndnSIM.ndn.Name (value)
+                else:
+                    raise TypeError ("Not support tyupe [%s]" % type (value))
             else:
                 self._name = ns.ndnSIM.ndn.Name ()
 
@@ -80,3 +87,7 @@ class Name (object):
 
     def isPrefixOf (self, other):
         return self[:] == other[:len(self)]
+
+    @property
+    def keyName (self):
+        return self
