@@ -24,7 +24,7 @@
 #include "ns3/packet.h"
 
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/ndn-l3-protocol.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-app-face.h"

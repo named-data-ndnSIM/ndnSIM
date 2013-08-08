@@ -30,7 +30,7 @@
 
 #include "ns3/ndn-app-face.h"
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 
 NS_LOG_COMPONENT_DEFINE ("DumbRequester");
 

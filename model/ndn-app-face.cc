@@ -32,7 +32,7 @@
 #include "ns3/ndn-app.h"
 
 #include "ndn-interest.h"
-#include "ndn-content-object.h"
+#include "ndn-data.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.AppFace");
 

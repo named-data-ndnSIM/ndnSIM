@@ -24,7 +24,7 @@
 #include "ndn-content-store.h"
 #include "ns3/packet.h"
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include <boost/foreach.hpp>
 
 #include "ns3/log.h"

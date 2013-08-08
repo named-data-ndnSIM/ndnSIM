@@ -19,7 +19,7 @@
  *         Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-content-object.h"
+#include "ndn-data.h"
 
 #include "ns3/log.h"
 

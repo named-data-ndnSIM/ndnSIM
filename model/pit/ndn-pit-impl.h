@@ -30,7 +30,7 @@
 #include "ndn-pit-entry-impl.h"
 
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/ndn-forwarding-strategy.h"
 #include "ns3/ndn-name.h"
 

@@ -21,7 +21,7 @@
 #include "ndn-pit.h"
 
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 
 #include "ns3/log.h"
 #include "ns3/nstime.h"

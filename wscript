@@ -134,7 +134,7 @@ def build(bld):
         "model/ndn-app-face.h",
         "model/ndn-net-device-face.h",
         "model/ndn-interest.h",
-        "model/ndn-content-object.h",
+        "model/ndn-data.h",
         "model/ndn-name-components.h",
         "model/ndn-name.h",
 

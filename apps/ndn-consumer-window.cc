@@ -27,7 +27,7 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/ndn-interest.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerWindow");

@@ -28,7 +28,7 @@
 
 #include "ns3/ndn-app.h"
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"

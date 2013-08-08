@@ -23,7 +23,7 @@
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-fib.h"
 #include "ns3/ndn-content-store.h"
