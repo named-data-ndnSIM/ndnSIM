@@ -19,16 +19,16 @@
 
 import ns.ndnSIM
 
-class Name ():
+class Name (object):
     _name = None
 
     def __init__ (self, 
                   value = None,
                   name = None):
         if name:
-            if type (name) is ns.ndnSIM.ndn.Name:
+            if isinstance (name, ns.ndnSIM.ndn.Name):
                 self._name = name
-            elif type (name) is Name:
+            elif isinstance (name, Name):
                 self._name = name._name
             else:
                 raise TypeError ("Incorrect type for 'name' parameter [%s]" % type (name))
@@ -44,6 +44,10 @@ class Name ():
 
     def toWire (self):
         return ns.ndnSIM.ndn.Wire.FromName (self._name)
+
+    def append (self, value):
+        self._name.append (value)
+        return self
     
     def __getattr__ (self, name):
         return self._name.__getattribute__ (name)
@@ -55,12 +59,12 @@ class Name ():
         return self._name.append (other)
 
     def __getitem__(self, key):
-        if type (key) is int:
+        if isinstance (key, int):
             if abs(key) < self._name.size ():
                 return self._name.get (key)
             else:
                 raise IndexError ("index out of range")
-        elif type (key) is slice:
+        elif isinstance (key, slice):
             name = ns.ndnSIM.ndn.Name ()
             for component in xrange (*key.indices (self.size ())):
                 name.append (self._name.get (component))
@@ -71,3 +75,5 @@ class Name ():
     def __repr__ (self):
         return "ndnSIM.Name('" + self._name.toUri () + "')"
 
+    def __str__ (self):
+        return self._name.toUri ()

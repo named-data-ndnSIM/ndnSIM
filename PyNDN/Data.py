@@ -19,6 +19,7 @@
 
 import ns.ndnSIM
 from Name import Name
+from SignedInfo import SignedInfo
 
 class DataError (Exception):
     pass
@@ -30,14 +31,14 @@ class Data (object):
                  name = None, content = None, signed_info = None,
                  data = None):
         if data:
-            if type (data) is Data:
+            if isinstance (data, Data):
                 self._data = data._data
-            elif type (data) is ns.ndnSIM.ndn.ContentObject:
+            elif isinstance (data, ns.ndnSIM.ndn.Data):
                 self._data = data
             else:
                 raise TypeError ("Invalid type supplied for 'data' parameter [%s]" % type (data))
         else:
-            self._data = ns.ndnSIM.ndn.ContentObject ()
+            self._data = ns.ndnSIM.ndn.Data ()
 
             self.name = name
             self.content = content
@@ -88,9 +89,9 @@ class Data (object):
             return object.__setattr__ (self, name, value)
 
         elif name == 'signedInfo':
-            if not value:
+            if value is None:
                 return
-            if type (value) is SignedInfo:
+            if isinstance (value, SignedInfo):
                 object.__setattr__ (self, name, value)
 
                 if value.timestamp:
@@ -103,18 +104,18 @@ class Data (object):
             else:
                 raise TypeError ("signedInfo can be assigned either None or SignedInfo object, [%s] supplied" % type (value))
         elif name == "name":
-            if not value:
+            if value is None:
                 return self._data.SetName (ns.ndnSIM.ndn.Name ())
-            elif type (value) is Name:
+            elif isinstance (value, Name):
                 return self._data.SetName (value._name)
-            elif type (value) is ns.ndnSIM.ndn.Name:
+            elif isinstance (value, ns.ndnSIM.ndn.Name):
                 return self._data.SetName (value)
-            elif type (value) is str:
+            elif isinstance (value, str):
                 return self._data.SetName (ns.ndnSIM.ndn.Name (value))
             else:
                 raise ValueError ("Invalid name parameter")
         elif name == "content":
-            if not value:
+            if value is None:
                 pkt = ns.network.Packet ()
                 self._data.SetPayload (pkt)
             else:
@@ -125,27 +126,3 @@ class Data (object):
 
     def __repr__(self):
         return "ndn.Data(%s)" % str (self._data)
-
-class SignedInfo (object):
-    def __init__(self, keyLocator = None, freshness = None, timestamp = None):
-
-        self.timestamp = timestamp
-        self.freshnessSeconds = freshness
-        self.keyLocator = keyLocator
-
-    def __repr__(self):
-        args = []
-
-        if self.keyLocator is not None:
-            args += ["keyLocator=%r" % self.keyLocator]
-        if self.freshnessSeconds is not None:
-            args += ["freshness=%r" % self.freshnessSeconds]
-        if self.timeStamp is not None:
-            args += ["timestamp=%r" % self.timestamp]
-
-        return "ndn.SignedInfo(%s)" % ", ".join(args)
-
-class ContentObject (Data):
-    """For backwards compatibility"""
-    pass
-

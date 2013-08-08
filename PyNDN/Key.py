@@ -21,7 +21,7 @@ import ns.core
 import ns.ndnSIM
 from Name import Name
 
-class Key(object):
+class Key (object):
     def __init__ (self):
         # self.publicKeyID = None # SHA256 hash
         self.fakeKey = None
@@ -81,18 +81,3 @@ class Key(object):
         key = Key ()
         key.fakeKey = context
         return key
-
-
-class KeyLocator(object):
-    def __init__(self, keyName = None):
-        self.keyName = keyName
-
-    @staticmethod
-    def getDefaultKeyLocator():
-        context = ns.core.Simulator.GetContext ()
-        keyLocator = ns.ndnSIM.ndn.Name ()
-        keyLocator.\
-            append ("default-key").\
-            append (str (context))
-
-        return Name (keyLocator)

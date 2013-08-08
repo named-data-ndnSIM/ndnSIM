@@ -96,3 +96,38 @@ def py2ccn_time(value):
     inttime = int(value * 4096 + 0.5)
     bintime = struct.pack("!Q", inttime)
     return bintime.lstrip(b'\x00')
+
+class Const (object):
+    def __init__ (self, obj):
+        object.__setattr__ (self, "__internal_object", obj)
+        object.__setattr__ (self, "__bases__", type(obj))
+
+    def __getattribute__ (self, name):
+        if name != "__bases__":
+            return object.__getattribute__ (self, "__internal_object").__getattribute__ (name)
+        else:
+            return object.__getattribute__ (self, name)
+
+    def __getitem__(self, key):
+        return object.__getattribute__ (self, "__internal_object").__getitem__ (key)
+
+    def __setattr__ (self, name, value):
+        raise TypeError ("Const %s cannot be modified" % type (object.__getattribute__ (self, "__internal_object")))
+
+    def __repr__ (self):
+        return "const %s" % object.__getattribute__ (self, "__internal_object").__repr__ ()
+
+    def __str__(self):
+       return object.__getattribute__ (self, "__internal_object").__str__ ()
+
+    def __add__(self, other):
+        raise TypeError ("Const %s cannot be modified" % type (object.__getattribute__ (self, "__internal_object")))
+
+    def __delattr__ (self, name, value):
+        raise TypeError ("Const %s cannot be modified" % type (object.__getattribute__ (self, "__internal_object")))
+
+    def __setitem__(self, key, value):
+        raise TypeError ("Const %s cannot be modified" % type (object.__getattribute__ (self, "__internal_object")))
+
+    def __delitem__(self, key):
+        raise TypeError ("Const %s cannot be modified" % type (object.__getattribute__ (self, "__internal_object")))

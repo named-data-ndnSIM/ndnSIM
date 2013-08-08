@@ -32,7 +32,7 @@ class Wrapper(object):
         name = self.name + ndn.Name.num2seg(segment)
         self.signed_info.finalBlockID = ndn.Name.num2seg(segments - 1)
 
-        co = ndn.ContentObject(name = name, content = chunk, signed_info = self.signed_info)
+        co = ndn.Data(name = name, content = chunk, signed_info = self.signed_info)
         co.sign(self.key)
 
         return co
