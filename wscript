@@ -1,12 +1,12 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
-# 
+#
 # Copyright (c) 2011-2013, Regents of the University of California
 #                          Alexander Afanasyev
-# 
+#
 # GNU 3.0 license, See the LICENSE file for more information
-# 
+#
 # Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
-# 
+#
 
 import os
 from waflib import Logs, Utils, Options, TaskGen, Task
@@ -15,13 +15,17 @@ from waflib.Errors import WafError
 import wutils
 
 def options(opt):
+    opt = opt.add_option_group ('ndnSIM Options')
     opt.add_option('--enable-ndn-plugins',
-                   help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
+                   help="""Enable NDN plugins (may require patching).  topology plugin enabled by default""",
                    dest='enable_ndn_plugins')
 
     opt.add_option('--disable-ndn-plugins',
-                   help=("Enable NDN plugins (may require patching).  topology plugin enabled by default"),
+                   help="""Enable NDN plugins (may require patching).  topology plugin enabled by default""",
                    dest='disable_ndn_plugins')
+
+    opt.add_option('--pyndn-install-path', dest='pyndn_install_path',
+                   help="""Installation path for PyNDN (by default: into standard location under PyNDN folder""")
 
 REQUIRED_BOOST_LIBS = ['graph']
 
@@ -47,7 +51,7 @@ def configure(conf):
             present_boost_libs.append(boost_lib_name)
 
         missing_boost_libs = [lib for lib in REQUIRED_BOOST_LIBS if lib not in present_boost_libs]
-        
+
         if missing_boost_libs != []:
             conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                          "ndnSIM requires boost libraries: %s" % ' '.join(missing_boost_libs))
@@ -56,7 +60,7 @@ def configure(conf):
             Logs.error ("ndnSIM will not be build as it requires boost libraries: %s" % ' '.join(missing_boost_libs))
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
-            
+
         boost_version = conf.env.BOOST_VERSION.split('_')
         if int(boost_version[0]) < 1 or int(boost_version[1]) < 46:
             conf.report_optional_feature("ndnSIM", "ndnSIM", False,
@@ -73,6 +77,9 @@ def configure(conf):
 
     if Options.options.disable_ndn_plugins:
         conf.env['NDN_plugins'] = conf.env['NDN_plugins'] - Options.options.disable_ndn_plugins.split(',')
+
+    if Options.options.pyndn_install_path:
+        conf.env['PyNDN_install_path'] = Options.options.pyndn_install_path
 
     conf.env['ENABLE_NDNSIM']=True;
     conf.env['MODULES_BUILT'].append('ndnSIM')
@@ -201,10 +208,15 @@ def build(bld):
 
     bld.ns3_python_bindings()
 
-    bld (features = "pyext",
-         source = bld.path.ant_glob (["PyNDN/**/*.py"]),
-         install_from = "."
-         )
+    if bld.env['PyNDN_install_path']:
+        bld (features = "py",
+             source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+             install_from = "PyNDN",
+             install_path = bld.env['PyNDN_install_path'])
+    else:
+        bld (features = "py",
+             source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+             install_from = ".")
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')
