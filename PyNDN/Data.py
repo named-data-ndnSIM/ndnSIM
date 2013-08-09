@@ -35,13 +35,14 @@ class Data (object):
                 self._data = data._data
             elif isinstance (data, ns.ndnSIM.ndn.Data):
                 self._data = data
-                self.signedInfo = SignedInfo ()
-                # timestamp
-                self.signedInfo.freshnessSeconds = self._data.GetFreshness ().ToDouble (ns.core.Time.S)
-                if self._data.GetKeyLocator ():
-                    self.signedInfo.keyLocator = Name (name = self._data.GetKeyLocator ())
             else:
                 raise TypeError ("Invalid type supplied for 'data' parameter [%s]" % type (data))
+
+            self.signedInfo = SignedInfo ()
+            # timestamp
+            self.signedInfo.freshnessSeconds = self._data.GetFreshness ().ToDouble (ns.core.Time.S)
+            if self._data.GetKeyLocator ():
+                self.signedInfo.keyLocator = Name (name = self._data.GetKeyLocator ())
         else:
             self._data = ns.ndnSIM.ndn.Data ()
 

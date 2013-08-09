@@ -36,12 +36,8 @@ class Name (object):
             if value is not None:
                 if isinstance (value, Name):
                     self._name = ns.ndnSIM.ndn.Name (value._name)
-                elif isinstance (value, ns.ndnSIM.ndn.Name):
-                    self._name = ns.ndnSIM.ndn.Name (value)
-                elif isinstance (value, str):
-                    self._name = ns.ndnSIM.ndn.Name (value)
                 else:
-                    raise TypeError ("Not support tyupe [%s]" % type (value))
+                    self._name = ns.ndnSIM.ndn.Name (value)
             else:
                 self._name = ns.ndnSIM.ndn.Name ()
 
@@ -53,7 +49,10 @@ class Name (object):
         return ns.ndnSIM.ndn.Wire.FromName (self._name)
 
     def append (self, value):
-        self._name.append (value)
+        if isinstance (value, Name):
+            self._name.append (value._name)
+        else:
+            self._name.append (value)
         return self
     
     def __getattr__ (self, name):
@@ -84,6 +83,9 @@ class Name (object):
 
     def __str__ (self):
         return self._name.toUri ()
+
+    def __eq__ (self, other):
+        return self._name == other._name
 
     def isPrefixOf (self, other):
         return self[:] == other[:len(self)]
