@@ -118,18 +118,20 @@ struct timeouts_policy_traits
       inline void
       erase (typename parent_trie::iterator item)
       {
+        bool needRescheduling = false;
         if (policy_container::s_iterator_to (*item) == policy_container::begin ())
           {
             if (m_timeoutEvent.IsRunning ())
               {
                 Simulator::Remove (m_timeoutEvent); // just canceling would not clean up list of events
               }
+            needRescheduling = true;
           }
 
         // erase only if freshness is non zero (otherwise an item is not in the policy
         policy_container::erase (policy_container::s_iterator_to (*item));
 
-        if (!policy_container::empty ())
+        if (needRescheduling && !policy_container::empty ())
           {
             Time timeout = get_timeout (&*policy_container::begin ()) - Simulator::Now ();
             m_timeoutEvent = Simulator::Schedule (timeout, &type::ProcessTimeoutEntry, this, &*policy_container::begin ());
