@@ -34,6 +34,7 @@ Data::Data (Ptr<Packet> payload/* = Create<Packet> ()*/)
   : m_name (Create<Name> ())
   , m_signature (0)
   , m_payload (payload)
+  , m_keyLocator (0)
   , m_wire (0)
 {
   if (m_payload == 0) // just in case
@@ -50,6 +51,10 @@ Data::Data (const Data &other)
   , m_payload (other.GetPayload ()->Copy ())
   , m_wire (0)
 {
+  if (other.GetKeyLocator ())
+    {
+      m_keyLocator = Create<Name> (*other.GetKeyLocator ());
+    }
 }
 
 void
