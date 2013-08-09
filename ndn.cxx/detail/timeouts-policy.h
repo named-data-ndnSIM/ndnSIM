@@ -147,8 +147,7 @@ struct timeouts_policy_traits
       inline void
       ProcessTimeoutEntry (typename parent_trie::iterator item)
       {
-        if (!item->payload ()->m_timeoutCallback.IsNull ())
-          item->payload ()->m_timeoutCallback (item->payload ()->GetInterest ());
+        item->payload ()->ProcessOnTimeout (item->payload ()->GetInterest ());
 
         m_base.erase (item);
       }

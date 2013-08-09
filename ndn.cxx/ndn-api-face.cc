@@ -107,6 +107,7 @@ ApiFace::ExpressInterest (Ptr<Interest> interest,
     }
   
   // Record the callback
+  bool needToActuallyExpressInterest = false;
   PendingInterestContainer::iterator entry = m_this->m_pendingInterests.find_exact (interest->GetName ());
   if (entry == m_this->m_pendingInterests.end ())
     {
@@ -114,10 +115,15 @@ ApiFace::ExpressInterest (Ptr<Interest> interest,
         m_this->m_pendingInterests.insert (interest->GetName (), Create <PendingInterestEntry> (interest));
 
       entry = status.first;
+
+      needToActuallyExpressInterest = true;
     }
   entry->payload ()->AddCallbacks (onData, onTimeout);
 
-  ReceiveInterest (interest);
+  if (needToActuallyExpressInterest)
+    {
+      Simulator::ScheduleNow (&Face::ReceiveInterest, this, interest);
+    }
 }
 
 void
@@ -158,10 +164,8 @@ ApiFace::Put (Ptr<Data> data)
 {
   NS_LOG_INFO (">> D " << data->GetName ());
   
-  ReceiveData (data);
+  Simulator::ScheduleNow (&Face::ReceiveData, this, data);
 }
-
-
 
 
 ///////////////////////////////////////////////
@@ -197,8 +201,7 @@ ApiFace::SendData (Ptr<const Data> data)
 {
   // data has been send out from NDN stack towards the application
   NS_LOG_DEBUG ("<< D " << data->GetName ());
-
-  NS_LOG_FUNCTION (this << data);
+  // NS_LOG_FUNCTION (this << data);
 
   if (!IsUp ())
     {
@@ -213,8 +216,7 @@ ApiFace::SendData (Ptr<const Data> data)
 
   while (entry != m_this->m_pendingInterests.end ())
     {
-      if (!entry->payload ()->m_dataCallback.IsNull ())
-        entry->payload ()->m_dataCallback (entry->payload ()->GetInterest (), data);
+      entry->payload ()->ProcessOnData (entry->payload ()->GetInterest (), data);
       m_this->m_pendingInterests.erase (entry);
 
       entry = m_this->m_pendingInterests.longest_prefix_match (data->GetName ());

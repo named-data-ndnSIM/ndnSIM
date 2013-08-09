@@ -24,19 +24,19 @@ public:
   PendingInterestEntry (Ptr<const Interest> interest)
     : m_interest (interest)
   { }
-  
+
   void
   AddCallbacks (ApiFace::DataCallback onData, ApiFace::TimeoutCallback onTimeout)
   { 
-    m_dataCallback = onData;
-    m_timeoutCallback = onTimeout;
+    m_dataCallbacks.push_back (onData);
+    m_timeoutCallbacks.push_back (onTimeout);
   }
 
   void
   ClearCallbacks ()
   {
-    m_dataCallback = ApiFace::DataCallback ();
-    m_timeoutCallback = ApiFace::TimeoutCallback ();
+    m_dataCallbacks.clear ();
+    m_timeoutCallbacks.clear ();
   }
 
   Ptr<const Interest>
@@ -44,10 +44,32 @@ public:
   {
     return m_interest;
   }
+
+  void
+  ProcessOnData (Ptr<const Interest> interest, Ptr<const Data> data)
+  {
+    for (std::list<ApiFace::DataCallback>::iterator i = m_dataCallbacks.begin ();
+         i != m_dataCallbacks.end ();
+         i++)
+      {
+        (*i) (interest, data);
+      }
+  }
+
+  void
+  ProcessOnTimeout (Ptr<const Interest> interest)
+  {
+    for (std::list<ApiFace::TimeoutCallback>::iterator i = m_timeoutCallbacks.begin ();
+         i != m_timeoutCallbacks.end ();
+         i++)
+      {
+        (*i) (interest);
+      }
+  }
   
-public:
-  ApiFace::DataCallback m_dataCallback;
-  ApiFace::TimeoutCallback m_timeoutCallback;
+private:
+  std::list<ApiFace::DataCallback> m_dataCallbacks;
+  std::list<ApiFace::TimeoutCallback> m_timeoutCallbacks;
   Ptr<const Interest> m_interest;
 };
 
