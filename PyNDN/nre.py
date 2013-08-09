@@ -37,7 +37,7 @@ class BaseMatcher(object):
 
         if self._recursiveMatch(0, name, offset, len):
             for i in range(offset,  offset + len):
-                self.matchResult.append(name[i])
+                self.matchResult.append(str (name[i]))
             return True
         else:
             return False
@@ -72,7 +72,7 @@ class BaseMatcher(object):
 
         if self._aRecursiveMatch(0, name, offset, len):
             for i in range(offset,  offset + len):
-                self.matchResult.append(name[i])
+                self.matchResult.append(str (name[i]))
             return True
         else:
             return False
@@ -131,7 +131,7 @@ class ComponentMatcher(BaseMatcher):
         self.matchResult = []
 
         if "" == self.expr:
-            res = self.matchResult.append(name[offset])
+            res = self.matchResult.append(str (name[offset]))
             self._appendBackRef(res)
             _LOG.debug("Succeed " + self.__class__.__name__ + ".match() ")
             return True
@@ -141,14 +141,14 @@ class ComponentMatcher(BaseMatcher):
             res = matcher.match(str(name[offset]))
             if res:
                 self._appendBackRef(res)
-                self.matchResult.append(name[offset])
+                self.matchResult.append(str (name[offset]))
                 _LOG.debug("Succeed " + self.__class__.__name__ + ".match() ")
                 return True
         else:
             res = matcher.search(str(name[offset]))
             if res:
                 self._appendBackRef(res)
-                self.matchResult.append(name[offset])
+                self.matchResult.append(str (name[offset]))
                 return True
 
         return False
@@ -244,7 +244,7 @@ class ComponentSetMatcher(BaseMatcher):
                 break
 
         if(matched if self.include else (not matched)):
-            self.matchResult.append(name[offset])
+            self.matchResult.append(str (name[offset]))
             return True
         else:
             return False
@@ -454,7 +454,7 @@ class RepeatMatcher(BaseMatcher):
 
         if self._recursiveMatch(0, name, offset, len):
             for i in range(offset, offset+len):
-                self.matchResult.append(name[i])
+                self.matchResult.append(str (name[i]))
             return True
         else:
             return False
@@ -497,7 +497,7 @@ class RepeatMatcher(BaseMatcher):
 
         if self._aRecursiveMatch(0, name, offset, len):
             for i in range(offset, offset+len):
-                self.matchResult.append(name[i])
+                self.matchResult.append(str (name[i]))
             return True
         else:
             return False
