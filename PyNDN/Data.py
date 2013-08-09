@@ -101,7 +101,7 @@ class Data (object):
                     # ?
                     pass
                 if value.freshnessSeconds:
-                    self._data.SetFreshness (ns.core.Seconds (value))
+                    self._data.SetFreshness (ns.core.Seconds (value.freshnessSeconds))
                 if value.keyLocator:
                     self._data.SetKeyLocator (value._name)
             else:

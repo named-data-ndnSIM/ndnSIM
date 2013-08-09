@@ -23,8 +23,8 @@ from Name import Name
 
 class Key (object):
     def __init__ (self):
-        # self.publicKeyID = None # SHA256 hash
-        self.fakeKey = None
+        self.publicKeyID = None # SHA256 hash
+        self.fakeKey = 0
 
     def generateRSA(self, numbits):
         randVar = ns.core.UniformVariable ()
@@ -49,19 +49,19 @@ class Key (object):
 
     def fromDER(self, private = None, public = None):
         if private:
-            self.fakeKey = private
+            self.fakeKey = hash(private)
         elif public:
-            self.fakeKey = public
+            self.fakeKey = hash(public)
 
     def fromPEM(self, filename = None, private = None, public = None, password = None):
         if filename:
             f = open(filename, 'r')
-            self.fakeKey = f.read ()
+            self.fakeKey = hash(f.read ())
             f.close()
         elif private:
-            self.fakeKey = private
+            self.fakeKey = hash(private)
         elif public:
-            self.fakeKey = public
+            self.fakeKey = hash(public)
 
     @staticmethod
     def createFromDER (private = None, public = None):

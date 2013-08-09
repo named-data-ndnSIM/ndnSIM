@@ -30,12 +30,15 @@ CONTENT_LINK = ContentType.new_flag('CONTENT_LINK', 0x2C834A)
 CONTENT_NACK = ContentType.new_flag('CONTENT_NACK', 0x34008A)
 
 class SignedInfo (object):
-    def __init__(self, keyLocator = None, freshness = None, timestamp = None, type = CONTENT_DATA):
+    def __init__(self, keyLocator = None, freshness = None,
+                 timestamp = None, type = CONTENT_DATA, *kw, **kwargs):
 
         self.timestamp = timestamp
         self.freshnessSeconds = freshness
         self.keyLocator = keyLocator
         self.type = type
+
+        # all other parameters are silently ignored
 
     def __repr__(self):
         args = []
