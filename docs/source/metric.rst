@@ -19,15 +19,9 @@ Packet-level trace helpers
 
     .. code-block:: c++
 
-        // necessary includes
-	#include <ns3/ndnSIM/utils/tracers/ndn-l3-aggregate-tracer.h>
-
-	...
-
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3AggregateTracer> > >
-          aggTracers = ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (1.0));
+        ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (1.0));
 
         Simulator::Run ();
 
@@ -42,15 +36,9 @@ Packet-level trace helpers
 
     .. code-block:: c++
 
-        // necessary includes
-	#include <ns3/ndnSIM/utils/tracers/ndn-l3-rate-tracer.h>
-
-	...
-
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3RateTracer> > >
-          rateTracers = ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (1.0));
+        ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (1.0));
 
         Simulator::Run ();
 
@@ -58,22 +46,16 @@ Packet-level trace helpers
 
 - :ndnsim:`L2Tracer`
  
-   This tracer is similar in spirit to :ndnsim:`ndn::L3RateTracer`, but it currently traces only packet drop on layer 2 (e.g.,
-   due to transmission queue overflow).
+    This tracer is similar in spirit to :ndnsim:`ndn::L3RateTracer`, but it currently traces only packet drop on layer 2 (e.g.,
+    due to transmission queue overflow).
 
-   The following example enables tracing on all simulation nodes:
+    The following example enables tracing on all simulation nodes:
 
     .. code-block:: c++
 
-        // necessary includes
-	#include <ns3/ndnSIM/utils/tracers/l2-rate-tracer.h>
-
-	...
-
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > >
-            l2tracers = L2RateTracer::InstallAll ("drop-trace.txt", Seconds (0.5));
+        L2RateTracer::InstallAll ("drop-trace.txt", Seconds (0.5));
 
         Simulator::Run ();
 
@@ -132,9 +114,8 @@ Example simulation (``ndn-tree-tracers.cc``) scenario that utilizes trace helper
 .. literalinclude:: ../../examples/ndn-tree-tracers.cc
     :language: c++
     :linenos:
-    :lines: 21-34,67-
-    :emphasize-lines: 7-11,63-67
-
+    :lines: 21-28,61-
+    :emphasize-lines: 57-58
 
 To run this scenario, use the following command::
 
@@ -145,12 +126,12 @@ The successful run will create ``rate-trace.txt`` and ``aggregate-trace.txt`` fi
 For example, the following `R script <http://www.r-project.org/>`_ will build a number of nice graphs:
 
 .. image:: _static/root-rates.png
-   :alt: Interest/Data packet rates at the root node
-   :align: right
+    :alt: Interest/Data packet rates at the root node
+    :align: right
 
 .. image:: _static/root-5sec-counts.png
-   :alt: Interest/Data packet counts at the root node in 5-second intervals
-   :align: right
+    :alt: Interest/Data packet counts at the root node in 5-second intervals
+    :align: right
 
 .. literalinclude:: ../../examples/graphs/rate-graph.R
     :language: r
@@ -168,7 +149,9 @@ This example (``ndn-tree-with-l2tracer.cc``) demonstrates basic usage of :ref:`t
 In this scenario we will use a tree-like topology:
 
 .. image:: _static/topo-tree-25-node.png
-   :alt: 25-node tree topology
+    :alt: 25-node tree topology
+    :width: 600px
+    :align: right
 
 The corresponding topology file (``topo-tree-25-node.txt``):
 
@@ -183,7 +166,7 @@ Example simulation (``ndn-tree-with-l2tracer.cc``) scenario that utilizes trace 
     :language: c++
     :linenos:
     :lines: 1-
-    :emphasize-lines: 7-8,19,135-139
+    :emphasize-lines: 16,135
 
 To run this scenario, use the following command::
 
@@ -213,18 +196,9 @@ Content store trace helper
 
     .. code-block:: c++
 
-        // necessary includes
-        #include <ns3/ndnSIM/utils/tracers/ndn-cs-tracer.h>
-
-	...
-
-        // Select implementation of content store. By default, the following is applied:
-        // ndnHelper.SetContentStore ("ns3::ndn::cs::Stats::Lru", "MaxSize", "100");
-
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::CsTracer> > >
-           aggTracers = ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
+        ndn::CsTracer::InstallAll ("cs-trace.txt", Seconds (1));
 
         Simulator::Run ();
 
@@ -250,8 +224,8 @@ Example simulation (``ndn-tree-cs-tracers.cc``) scenario that utilizes trace hel
 .. literalinclude:: ../../examples/ndn-tree-cs-tracers.cc
     :language: c++
     :linenos:
-    :lines: 21-31,64-
-    :emphasize-lines: 7-11,25,43,45,62-63
+    :lines: 21-28,61-
+    :emphasize-lines: 59
 
 
 To run this scenario, use the following command::
@@ -272,15 +246,9 @@ Application-level trace helper
 
     .. code-block:: c++
 
-        // necessary includes
-        #include <ns3/ndnSIM/utils/tracers/ndn-app-delay-tracer.h>
-
-	...
-
         // the following should be put just before calling Simulator::Run in the scenario
 
-        boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::AppDelayTracer> > >
-           tracers = ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
+        ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
 
         Simulator::Run ();
 
@@ -337,8 +305,8 @@ Example simulation (``ndn-tree-app-delay-tracer.cc``) scenario that utilizes tra
 .. literalinclude:: ../../examples/ndn-tree-app-delay-tracer.cc
     :language: c++
     :linenos:
-    :lines: 21-31,64-
-    :emphasize-lines: 7-8,61-62
+    :lines: 21-28,61-
+    :emphasize-lines: 59
 
 
 To run this scenario, use the following command::
@@ -362,7 +330,7 @@ This example (``ndn-simple-with-pit-count-stats.cc``) shows how you can periodic
     :language: c++
     :linenos:
     :lines: 20-26,47-
-    :emphasize-lines: 9-20,43-46,61-63
+    :emphasize-lines: 9-20,43-46,59-61
 
 To run this scenario, use the following command::
 

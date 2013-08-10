@@ -56,7 +56,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    * 
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+  static void
   InstallAll (const std::string &file);
 
   /**
@@ -69,7 +69,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+  static void
   Install (const NodeContainer &nodes, const std::string &file);
 
   /**
@@ -83,7 +83,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+  static void
   Install (Ptr<Node> node, const std::string &file);
 
   /**

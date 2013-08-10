@@ -169,6 +169,19 @@ def build(bld):
         "utils/ndn-limits.h",
         "utils/ndn-rtt-estimator.h",
 
+        # "utils/tracers/ipv4-app-tracer.h",
+        # "utils/tracers/ipv4-l3-tracer.h",
+        # "utils/tracers/ipv4-rate-l3-tracer.h",
+        # "utils/tracers/ipv4-seqs-app-tracer.h",
+
+        "utils/tracers/l2-rate-tracer.h",
+        "utils/tracers/l2-tracer.h",
+        "utils/tracers/ndn-app-delay-tracer.h",
+        "utils/tracers/ndn-cs-tracer.h",
+        "utils/tracers/ndn-l3-aggregate-tracer.h",
+        "utils/tracers/ndn-l3-tracer.h",
+        "utils/tracers/ndn-l3-rate-tracer.h",
+
         "apps/callback-based-app.h",
         ]
 

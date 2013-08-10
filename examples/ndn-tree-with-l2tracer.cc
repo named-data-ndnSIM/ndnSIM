@@ -4,9 +4,6 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// for ndn::L2RateTracer
-#include <ns3/ndnSIM/utils/tracers/l2-rate-tracer.h>
-
 using namespace ns3;
 
 int
@@ -135,8 +132,7 @@ main (int argc, char *argv[])
   /****************************************************************************/
   //Tracer:
 
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > >
-   l2tracers = L2RateTracer::InstallAll ("drop-trace.txt", Seconds (0.5));
+  L2RateTracer::InstallAll ("drop-trace.txt", Seconds (0.5));
 
   Simulator::Run ();
   Simulator::Destroy ();

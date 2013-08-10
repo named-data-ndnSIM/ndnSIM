@@ -44,13 +44,15 @@ using namespace std;
 namespace ns3 {
 namespace ndn {
 
+static std::list< boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > > > g_tracers;
+
 template<class T>
 static inline void
 NullDeleter (T *ptr)
 {
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+void
 CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
@@ -64,7 +66,10 @@ CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds 
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -88,10 +93,10 @@ CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds 
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+void
 CsTracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
@@ -105,7 +110,10 @@ CsTracer::Install (const NodeContainer &nodes, const std::string &file, Time ave
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -129,10 +137,10 @@ CsTracer::Install (const NodeContainer &nodes, const std::string &file, Time ave
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+void
 CsTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
@@ -146,7 +154,10 @@ CsTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -165,14 +176,14 @@ CsTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
 
 Ptr<CsTracer>
 CsTracer::Install (Ptr<Node> node,
-                       boost::shared_ptr<std::ostream> outputStream,
-                       Time averagingPeriod/* = Seconds (0.5)*/)
+                   boost::shared_ptr<std::ostream> outputStream,
+                   Time averagingPeriod/* = Seconds (0.5)*/)
 {
   NS_LOG_DEBUG ("Node: " << node->GetId ());
 

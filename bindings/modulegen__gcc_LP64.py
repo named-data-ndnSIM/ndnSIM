@@ -170,6 +170,8 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::EventImpl', 'ns3::empty', 'ns3::DefaultDeleter<ns3::EventImpl>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Hash::Implementation, ns3::empty, ns3::DefaultDeleter<ns3::Hash::Implementation> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::Hash::Implementation', 'ns3::empty', 'ns3::DefaultDeleter<ns3::Hash::Implementation>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::L2Tracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::L2Tracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::NixVector', 'ns3::empty', 'ns3::DefaultDeleter<ns3::NixVector>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> > [class]
@@ -178,6 +180,10 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::TopologyReader', 'ns3::empty', 'ns3::DefaultDeleter<ns3::TopologyReader>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::TraceSourceAccessor', 'ns3::empty', 'ns3::DefaultDeleter<ns3::TraceSourceAccessor>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::AppDelayTracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::AppDelayTracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::CsTracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::CsTracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Data, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Data> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::Data', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::Data>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Exclude, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Exclude> > [class]
@@ -186,6 +192,8 @@ def register_types(module):
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::FaceContainer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::FaceContainer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Interest> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, import_from_module='ns.core', template_parameters=['ns3::ndn::Interest', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::Interest>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> > [class]
+    module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::L3Tracer', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::L3Tracer>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Name, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Name> > [class]
     module.add_class('SimpleRefCount', automatic_type_narrowing=True, template_parameters=['ns3::ndn::Name', 'ns3::empty', 'ns3::DefaultDeleter<ns3::ndn::Name>'], parent=root_module['ns3::empty'], memory_policy=cppclass.ReferenceCountingMethodsPolicy(incref_method='Ref', decref_method='Unref', peekref_method='GetReferenceCount'))
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::cs::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::cs::Entry> > [class]
@@ -256,6 +264,8 @@ def register_types(module):
     module.add_class('Ipv6PrefixChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## ipv6-address.h (module 'network'): ns3::Ipv6PrefixValue [class]
     module.add_class('Ipv6PrefixValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
+    ## l2-tracer.h (module 'ndnSIM'): ns3::L2Tracer [class]
+    module.add_class('L2Tracer', parent=root_module['ns3::SimpleRefCount< ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> >'])
     ## net-device.h (module 'network'): ns3::NetDevice [class]
     module.add_class('NetDevice', import_from_module='ns.network', parent=root_module['ns3::Object'])
     ## net-device.h (module 'network'): ns3::NetDevice::PacketType [enumeration]
@@ -290,6 +300,8 @@ def register_types(module):
     module.add_class('AddressChecker', import_from_module='ns.network', parent=root_module['ns3::AttributeChecker'])
     ## address.h (module 'network'): ns3::AddressValue [class]
     module.add_class('AddressValue', import_from_module='ns.network', parent=root_module['ns3::AttributeValue'])
+    ## l2-rate-tracer.h (module 'ndnSIM'): ns3::L2RateTracer [class]
+    module.add_class('L2RateTracer', parent=root_module['ns3::L2Tracer'])
     module.add_container('std::map< std::string, std::string >', ('std::string', 'std::string'), container_type='map')
     module.add_container('std::list< ns3::TopologyReader::Link >', 'ns3::TopologyReader::Link', container_type='list')
     typehandlers.add_type_alias('ns3::SequenceNumber< short unsigned int, short int >', 'ns3::SequenceNumber16')
@@ -370,16 +382,20 @@ def register_types_ns3_ndn(module):
     
     ## ndn-app.h (module 'ndnSIM'): ns3::ndn::App [class]
     module.add_class('App', parent=root_module['ns3::Application'])
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): ns3::ndn::AppDelayTracer [class]
+    module.add_class('AppDelayTracer', parent=root_module['ns3::SimpleRefCount< ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> >'])
     ## ndn-app-helper.h (module 'ndnSIM'): ns3::ndn::AppHelper [class]
     module.add_class('AppHelper')
     ## blob.h (module 'ndnSIM'): ns3::ndn::Blob [class]
     module.add_class('Blob')
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::Data [class]
-    module.add_class('Data', parent=root_module['ns3::SimpleRefCount< ns3::ndn::Data, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Data> >'])
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::DataException [class]
-    module.add_class('DataException')
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::ContentStore [class]
     module.add_class('ContentStore', parent=root_module['ns3::Object'])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::CsTracer [class]
+    module.add_class('CsTracer', parent=root_module['ns3::SimpleRefCount< ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> >'])
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::Data [class]
+    module.add_class('Data', parent=root_module['ns3::SimpleRefCount< ns3::ndn::Data, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Data> >'])
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::DataException [class]
+    module.add_class('DataException')
     ## exclude.h (module 'ndnSIM'): ns3::ndn::Exclude [class]
     module.add_class('Exclude', parent=root_module['ns3::SimpleRefCount< ns3::ndn::Exclude, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Exclude> >'])
     ## ndn-face.h (module 'ndnSIM'): ns3::ndn::Face [class]
@@ -408,6 +424,8 @@ def register_types_ns3_ndn(module):
     module.add_class('IpFacesHelper')
     ## ndn-l3-protocol.h (module 'ndnSIM'): ns3::ndn::L3Protocol [class]
     module.add_class('L3Protocol', parent=root_module['ns3::Object'])
+    ## ndn-l3-tracer.h (module 'ndnSIM'): ns3::ndn::L3Tracer [class]
+    module.add_class('L3Tracer', parent=root_module['ns3::SimpleRefCount< ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> >'])
     ## ndn-limits.h (module 'ndnSIM'): ns3::ndn::Limits [class]
     module.add_class('Limits', parent=root_module['ns3::Object'])
     ## ndn-link-control-helper.h (module 'ndnSIM'): ns3::ndn::LinkControlHelper [class]
@@ -438,6 +456,10 @@ def register_types_ns3_ndn(module):
     module.add_class('ApiFace', parent=root_module['ns3::ndn::Face'])
     ## ndn-app-face.h (module 'ndnSIM'): ns3::ndn::AppFace [class]
     module.add_class('AppFace', parent=root_module['ns3::ndn::Face'])
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): ns3::ndn::L3AggregateTracer [class]
+    module.add_class('L3AggregateTracer', parent=root_module['ns3::ndn::L3Tracer'])
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): ns3::ndn::L3RateTracer [class]
+    module.add_class('L3RateTracer', parent=root_module['ns3::ndn::L3Tracer'])
     module.add_container('std::vector< char >', 'char', container_type='vector')
     module.add_container('std::map< ns3::ndn::name::Component, bool, std::greater< ns3::ndn::name::Component >, std::allocator< std::pair< ns3::ndn::name::Component const, bool > > >', ('ns3::ndn::name::Component', 'bool'), container_type='map')
     module.add_container('std::vector< ns3::Ptr< ns3::ndn::Face > >', 'ns3::Ptr< ns3::ndn::Face >', container_type='vector')
@@ -502,6 +524,8 @@ def register_types_ns3_ndn_cs(module):
     
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::cs::Entry [class]
     module.add_class('Entry', parent=root_module['ns3::SimpleRefCount< ns3::ndn::cs::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::cs::Entry> >'])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::cs::Stats [struct]
+    module.add_class('Stats')
 
 def register_types_ns3_ndn_fib(module):
     root_module = module.get_root()
@@ -624,14 +648,18 @@ def register_methods(root_module):
     register_Ns3SimpleRefCount__Ns3CallbackImplBase_Ns3Empty_Ns3DefaultDeleter__lt__ns3CallbackImplBase__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::CallbackImplBase, ns3::empty, ns3::DefaultDeleter<ns3::CallbackImplBase> >'])
     register_Ns3SimpleRefCount__Ns3EventImpl_Ns3Empty_Ns3DefaultDeleter__lt__ns3EventImpl__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::EventImpl, ns3::empty, ns3::DefaultDeleter<ns3::EventImpl> >'])
     register_Ns3SimpleRefCount__Ns3HashImplementation_Ns3Empty_Ns3DefaultDeleter__lt__ns3HashImplementation__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Hash::Implementation, ns3::empty, ns3::DefaultDeleter<ns3::Hash::Implementation> >'])
+    register_Ns3SimpleRefCount__Ns3L2Tracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3L2Tracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> >'])
     register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >'])
     register_Ns3SimpleRefCount__Ns3Packet_Ns3Empty_Ns3DefaultDeleter__lt__ns3Packet__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::Packet, ns3::empty, ns3::DefaultDeleter<ns3::Packet> >'])
     register_Ns3SimpleRefCount__Ns3TopologyReader_Ns3Empty_Ns3DefaultDeleter__lt__ns3TopologyReader__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::TopologyReader, ns3::empty, ns3::DefaultDeleter<ns3::TopologyReader> >'])
     register_Ns3SimpleRefCount__Ns3TraceSourceAccessor_Ns3Empty_Ns3DefaultDeleter__lt__ns3TraceSourceAccessor__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::TraceSourceAccessor, ns3::empty, ns3::DefaultDeleter<ns3::TraceSourceAccessor> >'])
+    register_Ns3SimpleRefCount__Ns3NdnAppDelayTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnAppDelayTracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> >'])
+    register_Ns3SimpleRefCount__Ns3NdnCsTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnCsTracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> >'])
     register_Ns3SimpleRefCount__Ns3NdnData_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnData__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::Data, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Data> >'])
     register_Ns3SimpleRefCount__Ns3NdnExclude_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnExclude__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::Exclude, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Exclude> >'])
     register_Ns3SimpleRefCount__Ns3NdnFaceContainer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnFaceContainer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::FaceContainer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::FaceContainer> >'])
     register_Ns3SimpleRefCount__Ns3NdnInterest_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnInterest__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Interest> >'])
+    register_Ns3SimpleRefCount__Ns3NdnL3Tracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnL3Tracer__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> >'])
     register_Ns3SimpleRefCount__Ns3NdnName_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnName__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::Name, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Name> >'])
     register_Ns3SimpleRefCount__Ns3NdnCsEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnCsEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::cs::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::cs::Entry> >'])
     register_Ns3SimpleRefCount__Ns3NdnPitEntry_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnPitEntry__gt___methods(root_module, root_module['ns3::SimpleRefCount< ns3::ndn::pit::Entry, ns3::empty, ns3::DefaultDeleter<ns3::ndn::pit::Entry> >'])
@@ -665,6 +693,7 @@ def register_methods(root_module):
     register_Ns3Ipv6AddressValue_methods(root_module, root_module['ns3::Ipv6AddressValue'])
     register_Ns3Ipv6PrefixChecker_methods(root_module, root_module['ns3::Ipv6PrefixChecker'])
     register_Ns3Ipv6PrefixValue_methods(root_module, root_module['ns3::Ipv6PrefixValue'])
+    register_Ns3L2Tracer_methods(root_module, root_module['ns3::L2Tracer'])
     register_Ns3NetDevice_methods(root_module, root_module['ns3::NetDevice'])
     register_Ns3NixVector_methods(root_module, root_module['ns3::NixVector'])
     register_Ns3Node_methods(root_module, root_module['ns3::Node'])
@@ -680,17 +709,20 @@ def register_methods(root_module):
     register_Ns3UintegerValue_methods(root_module, root_module['ns3::UintegerValue'])
     register_Ns3AddressChecker_methods(root_module, root_module['ns3::AddressChecker'])
     register_Ns3AddressValue_methods(root_module, root_module['ns3::AddressValue'])
+    register_Ns3L2RateTracer_methods(root_module, root_module['ns3::L2RateTracer'])
     register_Ns3HashImplementation_methods(root_module, root_module['ns3::Hash::Implementation'])
     register_Ns3HashFunctionFnv1a_methods(root_module, root_module['ns3::Hash::Function::Fnv1a'])
     register_Ns3HashFunctionHash32_methods(root_module, root_module['ns3::Hash::Function::Hash32'])
     register_Ns3HashFunctionHash64_methods(root_module, root_module['ns3::Hash::Function::Hash64'])
     register_Ns3HashFunctionMurmur3_methods(root_module, root_module['ns3::Hash::Function::Murmur3'])
     register_Ns3NdnApp_methods(root_module, root_module['ns3::ndn::App'])
+    register_Ns3NdnAppDelayTracer_methods(root_module, root_module['ns3::ndn::AppDelayTracer'])
     register_Ns3NdnAppHelper_methods(root_module, root_module['ns3::ndn::AppHelper'])
     register_Ns3NdnBlob_methods(root_module, root_module['ns3::ndn::Blob'])
+    register_Ns3NdnContentStore_methods(root_module, root_module['ns3::ndn::ContentStore'])
+    register_Ns3NdnCsTracer_methods(root_module, root_module['ns3::ndn::CsTracer'])
     register_Ns3NdnData_methods(root_module, root_module['ns3::ndn::Data'])
     register_Ns3NdnDataException_methods(root_module, root_module['ns3::ndn::DataException'])
-    register_Ns3NdnContentStore_methods(root_module, root_module['ns3::ndn::ContentStore'])
     register_Ns3NdnExclude_methods(root_module, root_module['ns3::ndn::Exclude'])
     register_Ns3NdnFace_methods(root_module, root_module['ns3::ndn::Face'])
     register_Ns3NdnFaceContainer_methods(root_module, root_module['ns3::ndn::FaceContainer'])
@@ -702,6 +734,7 @@ def register_methods(root_module):
     register_Ns3NdnInterestException_methods(root_module, root_module['ns3::ndn::InterestException'])
     register_Ns3NdnIpFacesHelper_methods(root_module, root_module['ns3::ndn::IpFacesHelper'])
     register_Ns3NdnL3Protocol_methods(root_module, root_module['ns3::ndn::L3Protocol'])
+    register_Ns3NdnL3Tracer_methods(root_module, root_module['ns3::ndn::L3Tracer'])
     register_Ns3NdnLimits_methods(root_module, root_module['ns3::ndn::Limits'])
     register_Ns3NdnLinkControlHelper_methods(root_module, root_module['ns3::ndn::LinkControlHelper'])
     register_Ns3NdnName_methods(root_module, root_module['ns3::ndn::Name'])
@@ -716,7 +749,10 @@ def register_methods(root_module):
     register_Ns3NdnWire_methods(root_module, root_module['ns3::ndn::Wire'])
     register_Ns3NdnApiFace_methods(root_module, root_module['ns3::ndn::ApiFace'])
     register_Ns3NdnAppFace_methods(root_module, root_module['ns3::ndn::AppFace'])
+    register_Ns3NdnL3AggregateTracer_methods(root_module, root_module['ns3::ndn::L3AggregateTracer'])
+    register_Ns3NdnL3RateTracer_methods(root_module, root_module['ns3::ndn::L3RateTracer'])
     register_Ns3NdnCsEntry_methods(root_module, root_module['ns3::ndn::cs::Entry'])
+    register_Ns3NdnCsStats_methods(root_module, root_module['ns3::ndn::cs::Stats'])
     register_Ns3NdnFibEntry_methods(root_module, root_module['ns3::ndn::fib::Entry'])
     register_Ns3NdnFibEntryNoFaces_methods(root_module, root_module['ns3::ndn::fib::Entry::NoFaces'])
     register_Ns3NdnFibFaceMetric_methods(root_module, root_module['ns3::ndn::fib::FaceMetric'])
@@ -3202,6 +3238,18 @@ def register_Ns3SimpleRefCount__Ns3HashImplementation_Ns3Empty_Ns3DefaultDeleter
                    is_static=True)
     return
 
+def register_Ns3SimpleRefCount__Ns3L2Tracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3L2Tracer__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> >::SimpleRefCount(ns3::SimpleRefCount<ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter< ns3::L2Tracer > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::L2Tracer, ns3::empty, ns3::DefaultDeleter<ns3::L2Tracer> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3NixVector_Ns3Empty_Ns3DefaultDeleter__lt__ns3NixVector__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::NixVector, ns3::empty, ns3::DefaultDeleter<ns3::NixVector> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -3250,6 +3298,30 @@ def register_Ns3SimpleRefCount__Ns3TraceSourceAccessor_Ns3Empty_Ns3DefaultDelete
                    is_static=True)
     return
 
+def register_Ns3SimpleRefCount__Ns3NdnAppDelayTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnAppDelayTracer__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> >::SimpleRefCount(ns3::SimpleRefCount<ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter< ns3::ndn::AppDelayTracer > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::ndn::AppDelayTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::AppDelayTracer> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
+def register_Ns3SimpleRefCount__Ns3NdnCsTracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnCsTracer__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> >::SimpleRefCount(ns3::SimpleRefCount<ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter< ns3::ndn::CsTracer > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::ndn::CsTracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::CsTracer> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
 def register_Ns3SimpleRefCount__Ns3NdnData_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnData__gt___methods(root_module, cls):
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Data, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Data> >::SimpleRefCount() [constructor]
     cls.add_constructor([])
@@ -3292,6 +3364,18 @@ def register_Ns3SimpleRefCount__Ns3NdnInterest_Ns3Empty_Ns3DefaultDeleter__lt__n
     ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Interest> >::SimpleRefCount(ns3::SimpleRefCount<ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Interest> > const & o) [copy constructor]
     cls.add_constructor([param('ns3::SimpleRefCount< ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter< ns3::ndn::Interest > > const &', 'o')])
     ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::ndn::Interest, ns3::empty, ns3::DefaultDeleter<ns3::ndn::Interest> >::Cleanup() [member function]
+    cls.add_method('Cleanup', 
+                   'void', 
+                   [], 
+                   is_static=True)
+    return
+
+def register_Ns3SimpleRefCount__Ns3NdnL3Tracer_Ns3Empty_Ns3DefaultDeleter__lt__ns3NdnL3Tracer__gt___methods(root_module, cls):
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> >::SimpleRefCount() [constructor]
+    cls.add_constructor([])
+    ## simple-ref-count.h (module 'core'): ns3::SimpleRefCount<ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> >::SimpleRefCount(ns3::SimpleRefCount<ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> > const & o) [copy constructor]
+    cls.add_constructor([param('ns3::SimpleRefCount< ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter< ns3::ndn::L3Tracer > > const &', 'o')])
+    ## simple-ref-count.h (module 'core'): static void ns3::SimpleRefCount<ns3::ndn::L3Tracer, ns3::empty, ns3::DefaultDeleter<ns3::ndn::L3Tracer> >::Cleanup() [member function]
     cls.add_method('Cleanup', 
                    'void', 
                    [], 
@@ -4341,6 +4425,33 @@ def register_Ns3Ipv6PrefixValue_methods(root_module, cls):
                    [param('ns3::Ipv6Prefix const &', 'value')])
     return
 
+def register_Ns3L2Tracer_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## l2-tracer.h (module 'ndnSIM'): ns3::L2Tracer::L2Tracer(ns3::L2Tracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::L2Tracer const &', 'arg0')])
+    ## l2-tracer.h (module 'ndnSIM'): ns3::L2Tracer::L2Tracer(ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'node')])
+    ## l2-tracer.h (module 'ndnSIM'): void ns3::L2Tracer::Connect() [member function]
+    cls.add_method('Connect', 
+                   'void', 
+                   [])
+    ## l2-tracer.h (module 'ndnSIM'): void ns3::L2Tracer::Drop(ns3::Ptr<ns3::Packet const> arg0) [member function]
+    cls.add_method('Drop', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'arg0')], 
+                   is_pure_virtual=True, is_virtual=True)
+    ## l2-tracer.h (module 'ndnSIM'): void ns3::L2Tracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## l2-tracer.h (module 'ndnSIM'): void ns3::L2Tracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    return
+
 def register_Ns3NetDevice_methods(root_module, cls):
     ## net-device.h (module 'network'): ns3::NetDevice::NetDevice() [constructor]
     cls.add_constructor([])
@@ -5049,6 +5160,37 @@ def register_Ns3AddressValue_methods(root_module, cls):
                    [param('ns3::Address const &', 'value')])
     return
 
+def register_Ns3L2RateTracer_methods(root_module, cls):
+    ## l2-rate-tracer.h (module 'ndnSIM'): ns3::L2RateTracer::L2RateTracer(ns3::L2RateTracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::L2RateTracer const &', 'arg0')])
+    ## l2-rate-tracer.h (module 'ndnSIM'): ns3::L2RateTracer::L2RateTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## l2-rate-tracer.h (module 'ndnSIM'): void ns3::L2RateTracer::Drop(ns3::Ptr<ns3::Packet const> arg0) [member function]
+    cls.add_method('Drop', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'arg0')], 
+                   is_virtual=True)
+    ## l2-rate-tracer.h (module 'ndnSIM'): static void ns3::L2RateTracer::InstallAll(std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## l2-rate-tracer.h (module 'ndnSIM'): void ns3::L2RateTracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## l2-rate-tracer.h (module 'ndnSIM'): void ns3::L2RateTracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## l2-rate-tracer.h (module 'ndnSIM'): void ns3::L2RateTracer::SetAveragingPeriod(ns3::Time const & period) [member function]
+    cls.add_method('SetAveragingPeriod', 
+                   'void', 
+                   [param('ns3::Time const &', 'period')])
+    return
+
 def register_Ns3HashImplementation_methods(root_module, cls):
     ## hash-function.h (module 'core'): ns3::Hash::Implementation::Implementation(ns3::Hash::Implementation const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::Hash::Implementation const &', 'arg0')])
@@ -5201,6 +5343,40 @@ def register_Ns3NdnApp_methods(root_module, cls):
                    visibility='protected', is_virtual=True)
     return
 
+def register_Ns3NdnAppDelayTracer_methods(root_module, cls):
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): ns3::ndn::AppDelayTracer::AppDelayTracer(ns3::ndn::AppDelayTracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::AppDelayTracer const &', 'arg0')])
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): ns3::ndn::AppDelayTracer::AppDelayTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): ns3::ndn::AppDelayTracer::AppDelayTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): static void ns3::ndn::AppDelayTracer::Install(ns3::NodeContainer const & nodes, std::string const & file) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::NodeContainer const &', 'nodes'), param('std::string const &', 'file')], 
+                   is_static=True)
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): static void ns3::ndn::AppDelayTracer::Install(ns3::Ptr<ns3::Node> node, std::string const & file) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'file')], 
+                   is_static=True)
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::AppDelayTracer> ns3::ndn::AppDelayTracer::Install(ns3::Ptr<ns3::Node> node, boost::shared_ptr<std::ostream> outputStream) [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::ndn::AppDelayTracer >', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('boost::shared_ptr< std::ostream >', 'outputStream')], 
+                   is_static=True)
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): static void ns3::ndn::AppDelayTracer::InstallAll(std::string const & file) [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [param('std::string const &', 'file')], 
+                   is_static=True)
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): void ns3::ndn::AppDelayTracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    return
+
 def register_Ns3NdnAppHelper_methods(root_module, cls):
     ## ndn-app-helper.h (module 'ndnSIM'): ns3::ndn::AppHelper::AppHelper(ns3::ndn::AppHelper const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::AppHelper const &', 'arg0')])
@@ -5298,99 +5474,6 @@ def register_Ns3NdnBlob_methods(root_module, cls):
                    [param('ns3::ndn::Blob &', 'x')])
     return
 
-def register_Ns3NdnData_methods(root_module, cls):
-    cls.add_output_stream_operator()
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::Data::Data(ns3::Ptr<ns3::Packet> payload=ns3::Create( )) [constructor]
-    cls.add_constructor([param('ns3::Ptr< ns3::Packet >', 'payload', default_value='ns3::Create( )')])
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::Data::Data(ns3::ndn::Data const & other) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::Data const &', 'other')])
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Time ns3::ndn::Data::GetFreshness() const [member function]
-    cls.add_method('GetFreshness', 
-                   'ns3::Time', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Name const> ns3::ndn::Data::GetKeyLocator() const [member function]
-    cls.add_method('GetKeyLocator', 
-                   'ns3::Ptr< ns3::ndn::Name const >', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::Name const & ns3::ndn::Data::GetName() const [member function]
-    cls.add_method('GetName', 
-                   'ns3::ndn::Name const &', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Name const> ns3::ndn::Data::GetNamePtr() const [member function]
-    cls.add_method('GetNamePtr', 
-                   'ns3::Ptr< ns3::ndn::Name const >', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::Packet const> ns3::ndn::Data::GetPayload() const [member function]
-    cls.add_method('GetPayload', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): uint32_t ns3::ndn::Data::GetSignature() const [member function]
-    cls.add_method('GetSignature', 
-                   'uint32_t', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Time ns3::ndn::Data::GetTimestamp() const [member function]
-    cls.add_method('GetTimestamp', 
-                   'ns3::Time', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::Ptr<ns3::Packet const> ns3::ndn::Data::GetWire() const [member function]
-    cls.add_method('GetWire', 
-                   'ns3::Ptr< ns3::Packet const >', 
-                   [], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::Print(std::ostream & os) const [member function]
-    cls.add_method('Print', 
-                   'void', 
-                   [param('std::ostream &', 'os')], 
-                   is_const=True)
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetFreshness(ns3::Time const & freshness) [member function]
-    cls.add_method('SetFreshness', 
-                   'void', 
-                   [param('ns3::Time const &', 'freshness')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetKeyLocator(ns3::Ptr<ns3::ndn::Name> keyLocator) [member function]
-    cls.add_method('SetKeyLocator', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::ndn::Name >', 'keyLocator')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetName(ns3::Ptr<ns3::ndn::Name> name) [member function]
-    cls.add_method('SetName', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::ndn::Name >', 'name')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetName(ns3::ndn::Name const & name) [member function]
-    cls.add_method('SetName', 
-                   'void', 
-                   [param('ns3::ndn::Name const &', 'name')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetPayload(ns3::Ptr<ns3::Packet> payload) [member function]
-    cls.add_method('SetPayload', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet >', 'payload')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetSignature(uint32_t signature) [member function]
-    cls.add_method('SetSignature', 
-                   'void', 
-                   [param('uint32_t', 'signature')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetTimestamp(ns3::Time const & timestamp) [member function]
-    cls.add_method('SetTimestamp', 
-                   'void', 
-                   [param('ns3::Time const &', 'timestamp')])
-    ## ndn-content-object.h (module 'ndnSIM'): void ns3::ndn::Data::SetWire(ns3::Ptr<ns3::Packet const> packet) const [member function]
-    cls.add_method('SetWire', 
-                   'void', 
-                   [param('ns3::Ptr< ns3::Packet const >', 'packet')], 
-                   is_const=True)
-    return
-
-def register_Ns3NdnDataException_methods(root_module, cls):
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::DataException::DataException() [constructor]
-    cls.add_constructor([])
-    ## ndn-content-object.h (module 'ndnSIM'): ns3::ndn::DataException::DataException(ns3::ndn::DataException const & arg0) [copy constructor]
-    cls.add_constructor([param('ns3::ndn::DataException const &', 'arg0')])
-    return
-
 def register_Ns3NdnContentStore_methods(root_module, cls):
     cls.add_output_stream_operator()
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::ContentStore::ContentStore() [constructor]
@@ -5442,6 +5525,139 @@ def register_Ns3NdnContentStore_methods(root_module, cls):
                    'void', 
                    [param('std::ostream &', 'os')], 
                    is_pure_virtual=True, is_const=True, is_virtual=True)
+    return
+
+def register_Ns3NdnCsTracer_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::CsTracer::CsTracer(ns3::ndn::CsTracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::CsTracer const &', 'arg0')])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::CsTracer::CsTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::CsTracer::CsTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): static void ns3::ndn::CsTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::NodeContainer const &', 'nodes'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): static void ns3::ndn::CsTracer::Install(ns3::Ptr<ns3::Node> node, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::CsTracer> ns3::ndn::CsTracer::Install(ns3::Ptr<ns3::Node> node, boost::shared_ptr<std::ostream> outputStream, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::ndn::CsTracer >', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('boost::shared_ptr< std::ostream >', 'outputStream'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): static void ns3::ndn::CsTracer::InstallAll(std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): void ns3::ndn::CsTracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): void ns3::ndn::CsTracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    return
+
+def register_Ns3NdnData_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::Data::Data(ns3::Ptr<ns3::Packet> payload=ns3::Create( )) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Packet >', 'payload', default_value='ns3::Create( )')])
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::Data::Data(ns3::ndn::Data const & other) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::Data const &', 'other')])
+    ## ndn-data.h (module 'ndnSIM'): ns3::Time ns3::ndn::Data::GetFreshness() const [member function]
+    cls.add_method('GetFreshness', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Name const> ns3::ndn::Data::GetKeyLocator() const [member function]
+    cls.add_method('GetKeyLocator', 
+                   'ns3::Ptr< ns3::ndn::Name const >', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::Name const & ns3::ndn::Data::GetName() const [member function]
+    cls.add_method('GetName', 
+                   'ns3::ndn::Name const &', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::Ptr<ns3::ndn::Name const> ns3::ndn::Data::GetNamePtr() const [member function]
+    cls.add_method('GetNamePtr', 
+                   'ns3::Ptr< ns3::ndn::Name const >', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::Ptr<ns3::Packet const> ns3::ndn::Data::GetPayload() const [member function]
+    cls.add_method('GetPayload', 
+                   'ns3::Ptr< ns3::Packet const >', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): uint32_t ns3::ndn::Data::GetSignature() const [member function]
+    cls.add_method('GetSignature', 
+                   'uint32_t', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::Time ns3::ndn::Data::GetTimestamp() const [member function]
+    cls.add_method('GetTimestamp', 
+                   'ns3::Time', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): ns3::Ptr<ns3::Packet const> ns3::ndn::Data::GetWire() const [member function]
+    cls.add_method('GetWire', 
+                   'ns3::Ptr< ns3::Packet const >', 
+                   [], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True)
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetFreshness(ns3::Time const & freshness) [member function]
+    cls.add_method('SetFreshness', 
+                   'void', 
+                   [param('ns3::Time const &', 'freshness')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetKeyLocator(ns3::Ptr<ns3::ndn::Name> keyLocator) [member function]
+    cls.add_method('SetKeyLocator', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Name >', 'keyLocator')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetName(ns3::Ptr<ns3::ndn::Name> name) [member function]
+    cls.add_method('SetName', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Name >', 'name')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetName(ns3::ndn::Name const & name) [member function]
+    cls.add_method('SetName', 
+                   'void', 
+                   [param('ns3::ndn::Name const &', 'name')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetPayload(ns3::Ptr<ns3::Packet> payload) [member function]
+    cls.add_method('SetPayload', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet >', 'payload')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetSignature(uint32_t signature) [member function]
+    cls.add_method('SetSignature', 
+                   'void', 
+                   [param('uint32_t', 'signature')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetTimestamp(ns3::Time const & timestamp) [member function]
+    cls.add_method('SetTimestamp', 
+                   'void', 
+                   [param('ns3::Time const &', 'timestamp')])
+    ## ndn-data.h (module 'ndnSIM'): void ns3::ndn::Data::SetWire(ns3::Ptr<ns3::Packet const> packet) const [member function]
+    cls.add_method('SetWire', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Packet const >', 'packet')], 
+                   is_const=True)
+    return
+
+def register_Ns3NdnDataException_methods(root_module, cls):
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::DataException::DataException() [constructor]
+    cls.add_constructor([])
+    ## ndn-data.h (module 'ndnSIM'): ns3::ndn::DataException::DataException(ns3::ndn::DataException const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::DataException const &', 'arg0')])
     return
 
 def register_Ns3NdnExclude_methods(root_module, cls):
@@ -6129,6 +6345,86 @@ def register_Ns3NdnL3Protocol_methods(root_module, cls):
                    'void', 
                    [], 
                    visibility='protected', is_virtual=True)
+    return
+
+def register_Ns3NdnL3Tracer_methods(root_module, cls):
+    cls.add_output_stream_operator()
+    ## ndn-l3-tracer.h (module 'ndnSIM'): ns3::ndn::L3Tracer::L3Tracer(ns3::ndn::L3Tracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::L3Tracer const &', 'arg0')])
+    ## ndn-l3-tracer.h (module 'ndnSIM'): ns3::ndn::L3Tracer::L3Tracer(ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-l3-tracer.h (module 'ndnSIM'): ns3::ndn::L3Tracer::L3Tracer(std::string const & node) [constructor]
+    cls.add_constructor([param('std::string const &', 'node')])
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_pure_virtual=True, is_const=True, is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::Connect() [member function]
+    cls.add_method('Connect', 
+                   'void', 
+                   [], 
+                   visibility='protected')
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::DropData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::DropInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::DropNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::InData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::InInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::InNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::OutData(ns3::Ptr<ns3::ndn::Data const> arg0, bool fromCache, ns3::Ptr<const ns3::ndn::Face> arg2) [member function]
+    cls.add_method('OutData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('bool', 'fromCache'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg2')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::OutInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::OutNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::SatisfiedInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('SatisfiedInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-tracer.h (module 'ndnSIM'): void ns3::ndn::L3Tracer::TimedOutInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('TimedOutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   is_pure_virtual=True, visibility='protected', is_virtual=True)
     return
 
 def register_Ns3NdnLimits_methods(root_module, cls):
@@ -6872,6 +7168,209 @@ def register_Ns3NdnAppFace_methods(root_module, cls):
                    is_const=True, is_virtual=True)
     return
 
+def register_Ns3NdnL3AggregateTracer_methods(root_module, cls):
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): ns3::ndn::L3AggregateTracer::L3AggregateTracer(ns3::ndn::L3AggregateTracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::L3AggregateTracer const &', 'arg0')])
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): ns3::ndn::L3AggregateTracer::L3AggregateTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): ns3::ndn::L3AggregateTracer::L3AggregateTracer(boost::shared_ptr<std::ostream> os, std::string const & nodeName) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'nodeName')])
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3AggregateTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::NodeContainer const &', 'nodes'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3AggregateTracer::Install(ns3::Ptr<ns3::Node> node, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::L3AggregateTracer> ns3::ndn::L3AggregateTracer::Install(ns3::Ptr<ns3::Node> node, boost::shared_ptr<std::ostream> outputStream, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::ndn::L3AggregateTracer >', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('boost::shared_ptr< std::ostream >', 'outputStream'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3AggregateTracer::InstallAll(std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::DropData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::DropInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::DropNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::InData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::InInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::InNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::OutData(ns3::Ptr<ns3::ndn::Data const> arg0, bool fromCache, ns3::Ptr<const ns3::ndn::Face> arg2) [member function]
+    cls.add_method('OutData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('bool', 'fromCache'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg2')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::OutInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::OutNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::PeriodicPrinter() [member function]
+    cls.add_method('PeriodicPrinter', 
+                   'void', 
+                   [], 
+                   visibility='protected')
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::Reset() [member function]
+    cls.add_method('Reset', 
+                   'void', 
+                   [], 
+                   visibility='protected')
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::SatisfiedInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('SatisfiedInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::SetAveragingPeriod(ns3::Time const & period) [member function]
+    cls.add_method('SetAveragingPeriod', 
+                   'void', 
+                   [param('ns3::Time const &', 'period')], 
+                   visibility='protected')
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3AggregateTracer::TimedOutInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('TimedOutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   visibility='protected', is_virtual=True)
+    return
+
+def register_Ns3NdnL3RateTracer_methods(root_module, cls):
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): ns3::ndn::L3RateTracer::L3RateTracer(ns3::ndn::L3RateTracer const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::L3RateTracer const &', 'arg0')])
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): ns3::ndn::L3RateTracer::L3RateTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): ns3::ndn::L3RateTracer::L3RateTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
+    cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3RateTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::NodeContainer const &', 'nodes'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3RateTracer::Install(ns3::Ptr<ns3::Node> node, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static ns3::Ptr<ns3::ndn::L3RateTracer> ns3::ndn::L3RateTracer::Install(ns3::Ptr<ns3::Node> node, boost::shared_ptr<std::ostream> outputStream, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('Install', 
+                   'ns3::Ptr< ns3::ndn::L3RateTracer >', 
+                   [param('ns3::Ptr< ns3::Node >', 'node'), param('boost::shared_ptr< std::ostream >', 'outputStream'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3RateTracer::InstallAll(std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
+    cls.add_method('InstallAll', 
+                   'void', 
+                   [param('std::string const &', 'file'), param('ns3::Time', 'averagingPeriod', default_value='ns3::Seconds(0)')], 
+                   is_static=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::Print(std::ostream & os) const [member function]
+    cls.add_method('Print', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::PrintHeader(std::ostream & os) const [member function]
+    cls.add_method('PrintHeader', 
+                   'void', 
+                   [param('std::ostream &', 'os')], 
+                   is_const=True, is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::DropData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::DropInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::DropNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('DropNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::InData(ns3::Ptr<ns3::ndn::Data const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::InInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::InNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('InNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::OutData(ns3::Ptr<ns3::ndn::Data const> arg0, bool fromCache, ns3::Ptr<const ns3::ndn::Face> arg2) [member function]
+    cls.add_method('OutData', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Data const >', 'arg0'), param('bool', 'fromCache'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg2')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::OutInterests(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::OutNacks(ns3::Ptr<ns3::ndn::Interest const> arg0, ns3::Ptr<const ns3::ndn::Face> arg1) [member function]
+    cls.add_method('OutNacks', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::Interest const >', 'arg0'), param('ns3::Ptr< ns3::ndn::Face const >', 'arg1')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::SatisfiedInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('SatisfiedInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   visibility='protected', is_virtual=True)
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): void ns3::ndn::L3RateTracer::TimedOutInterests(ns3::Ptr<const ns3::ndn::pit::Entry> arg0) [member function]
+    cls.add_method('TimedOutInterests', 
+                   'void', 
+                   [param('ns3::Ptr< ns3::ndn::pit::Entry const >', 'arg0')], 
+                   visibility='protected', is_virtual=True)
+    return
+
 def register_Ns3NdnCsEntry_methods(root_module, cls):
     ## ndn-content-store.h (module 'ndnSIM'): ns3::ndn::cs::Entry::Entry(ns3::ndn::cs::Entry const & arg0) [copy constructor]
     cls.add_constructor([param('ns3::ndn::cs::Entry const &', 'arg0')])
@@ -6891,6 +7390,21 @@ def register_Ns3NdnCsEntry_methods(root_module, cls):
                    'ns3::ndn::Name const &', 
                    [], 
                    is_const=True)
+    return
+
+def register_Ns3NdnCsStats_methods(root_module, cls):
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::cs::Stats::Stats() [constructor]
+    cls.add_constructor([])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::cs::Stats::Stats(ns3::ndn::cs::Stats const & arg0) [copy constructor]
+    cls.add_constructor([param('ns3::ndn::cs::Stats const &', 'arg0')])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): void ns3::ndn::cs::Stats::Reset() [member function]
+    cls.add_method('Reset', 
+                   'void', 
+                   [])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::cs::Stats::m_cacheHits [variable]
+    cls.add_instance_attribute('m_cacheHits', 'double', is_const=False)
+    ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::cs::Stats::m_cacheMisses [variable]
+    cls.add_instance_attribute('m_cacheMisses', 'double', is_const=False)
     return
 
 def register_Ns3NdnFibEntry_methods(root_module, cls):

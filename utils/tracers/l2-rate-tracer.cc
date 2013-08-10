@@ -38,15 +38,36 @@ NS_LOG_COMPONENT_DEFINE ("L2RateTracer");
 
 namespace ns3 {
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > >
+static std::list< boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > > > g_tracers;
+
+template<class T>
+static inline void
+NullDeleter (T *ptr)
+{
+}
+
+void
 L2RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<L2RateTracer> > tracers;
-  boost::shared_ptr<std::ofstream> outputStream (new std::ofstream ());
-  outputStream->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
+  boost::shared_ptr<std::ostream> outputStream;
+  if (file != "-")
+    {
+      boost::shared_ptr<std::ofstream> os (new std::ofstream ());
+      os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
-  if (!outputStream->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+      if (!os->is_open ())
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
+
+      outputStream = os;
+    }
+  else
+    {
+      outputStream = boost::shared_ptr<std::ostream> (&std::cout, NullDeleter<std::ostream>);
+    }
 
   for (NodeList::Iterator node = NodeList::Begin ();
        node != NodeList::End ();
@@ -66,7 +87,7 @@ L2RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seco
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
 

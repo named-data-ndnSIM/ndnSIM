@@ -80,7 +80,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    * 
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+  static void
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
 
   /**
@@ -94,7 +94,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+  static void
   Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod = Seconds (0.5));
 
   /**
@@ -108,7 +108,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<CsTracer> > >
+  static void
   Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
 
   /**

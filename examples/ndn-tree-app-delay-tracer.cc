@@ -24,9 +24,6 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// for ndn::AppDelayTracer
-#include <ns3/ndnSIM/utils/tracers/ndn-app-delay-tracer.h>
-
 using namespace ns3;
 
 /**
@@ -111,8 +108,7 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (20.0));
 
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::AppDelayTracer> > >
-    tracers = ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
+  ndn::AppDelayTracer::InstallAll ("app-delays-trace.txt");
   
   Simulator::Run ();
   Simulator::Destroy ();

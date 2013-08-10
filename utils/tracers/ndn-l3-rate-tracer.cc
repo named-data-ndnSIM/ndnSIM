@@ -44,13 +44,15 @@ NS_LOG_COMPONENT_DEFINE ("ndn.L3RateTracer");
 namespace ns3 {
 namespace ndn {
 
+static std::list< boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > > > g_tracers;
+
 template<class T>
 static inline void
 NullDeleter (T *ptr)
 {
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
+void
 L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<L3RateTracer> > tracers;
@@ -61,7 +63,10 @@ L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seco
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-    return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -85,10 +90,10 @@ L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seco
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
+void
 L3RateTracer::Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
@@ -102,7 +107,10 @@ L3RateTracer::Install (const NodeContainer &nodes, const std::string &file, Time
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -126,10 +134,10 @@ L3RateTracer::Install (const NodeContainer &nodes, const std::string &file, Time
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
+void
 L3RateTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
@@ -143,7 +151,10 @@ L3RateTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPe
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -162,7 +173,7 @@ L3RateTracer::Install (Ptr<Node> node, const std::string &file, Time averagingPe
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
 

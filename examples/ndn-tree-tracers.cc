@@ -24,12 +24,6 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-// for ndn::L3AggregateTracer
-#include <ns3/ndnSIM/utils/tracers/ndn-l3-aggregate-tracer.h>
-
-// for ndn::L3RateTracer
-#include <ns3/ndnSIM/utils/tracers/ndn-l3-rate-tracer.h>
-
 using namespace ns3;
 
 /**
@@ -112,11 +106,8 @@ main (int argc, char *argv[])
 
   Simulator::Stop (Seconds (20.0));
 
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3AggregateTracer> > >
-    aggTracers = ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (0.5));
-
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<ndn::L3RateTracer> > >
-    rateTracers = ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (0.5));
+  ndn::L3AggregateTracer::InstallAll ("aggregate-trace.txt", Seconds (0.5));
+  ndn::L3RateTracer::InstallAll ("rate-trace.txt", Seconds (0.5));
   
   Simulator::Run ();
   Simulator::Destroy ();

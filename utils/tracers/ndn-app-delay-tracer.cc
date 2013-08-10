@@ -44,13 +44,15 @@ using namespace std;
 namespace ns3 {
 namespace ndn {
 
+static std::list< boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > > > g_tracers;
+
 template<class T>
 static inline void
 NullDeleter (T *ptr)
 {
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+void
 AppDelayTracer::InstallAll (const std::string &file)
 {
   using namespace boost;
@@ -64,7 +66,10 @@ AppDelayTracer::InstallAll (const std::string &file)
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -88,10 +93,10 @@ AppDelayTracer::InstallAll (const std::string &file)
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+void
 AppDelayTracer::Install (const NodeContainer &nodes, const std::string &file)
 {
   using namespace boost;
@@ -105,7 +110,10 @@ AppDelayTracer::Install (const NodeContainer &nodes, const std::string &file)
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -129,10 +137,10 @@ AppDelayTracer::Install (const NodeContainer &nodes, const std::string &file)
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
-boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer> > >
+void
 AppDelayTracer::Install (Ptr<Node> node, const std::string &file)
 {
   using namespace boost;
@@ -146,7 +154,10 @@ AppDelayTracer::Install (Ptr<Node> node, const std::string &file)
       os->open (file.c_str (), std::ios_base::out | std::ios_base::trunc);
 
       if (!os->is_open ())
-        return boost::make_tuple (outputStream, tracers);
+        {
+          NS_LOG_ERROR ("File " << file << " cannot be opened for writing. Tracing disabled");
+          return;
+        }
 
       outputStream = os;
     }
@@ -165,7 +176,7 @@ AppDelayTracer::Install (Ptr<Node> node, const std::string &file)
       *outputStream << "\n";
     }
 
-  return boost::make_tuple (outputStream, tracers);
+  g_tracers.push_back (boost::make_tuple (outputStream, tracers));
 }
 
 

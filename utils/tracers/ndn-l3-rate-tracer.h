@@ -43,6 +43,36 @@ class L3RateTracer : public L3Tracer
 {
 public:
   /**
+   * @brief Helper method to install tracers on all simulation nodes
+   *
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod Defines averaging period for the rate calculation,
+   *        as well as how often data will be written into the trace file (default, every half second)
+   */
+  static void
+  InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on the selected simulation nodes
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   */
+  static void
+  Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Helper method to install tracers on a specific simulation node
+   *
+   * @param nodes Nodes on which to install tracer
+   * @param file File to which traces will be written.  If filename is -, then std::out is used
+   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   */
+  static void
+  Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
+  
+  /**
    * @brief Trace constructor that attaches to the node using node pointer
    * @param os    reference to the output stream
    * @param node  pointer to the node
@@ -60,48 +90,6 @@ public:
    * @brief Destructor
    */
   virtual ~L3RateTracer ();
-
-  /**
-   * @brief Helper method to install tracers on all simulation nodes
-   *
-   * @param file File to which traces will be written.  If filename is -, then std::out is used
-   * @param averagingPeriod Defines averaging period for the rate calculation,
-   *        as well as how often data will be written into the trace file (default, every half second)
-   *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   *
-   */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
-  InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
-
-  /**
-   * @brief Helper method to install tracers on the selected simulation nodes
-   *
-   * @param nodes Nodes on which to install tracer
-   * @param file File to which traces will be written.  If filename is -, then std::out is used
-   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
-   *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   *
-   */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
-  Install (const NodeContainer &nodes, const std::string &file, Time averagingPeriod = Seconds (0.5));
-
-  /**
-   * @brief Helper method to install tracers on a specific simulation node
-   *
-   * @param nodes Nodes on which to install tracer
-   * @param file File to which traces will be written.  If filename is -, then std::out is used
-   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
-   *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   *
-   */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
-  Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
 
   /**
    * @brief Helper method to install tracers on a specific simulation node

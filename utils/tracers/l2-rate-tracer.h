@@ -58,7 +58,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
-  static boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer> > >
+  static void
   InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
 
   void
