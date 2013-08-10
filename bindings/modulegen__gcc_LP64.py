@@ -5165,6 +5165,11 @@ def register_Ns3L2RateTracer_methods(root_module, cls):
     cls.add_constructor([param('ns3::L2RateTracer const &', 'arg0')])
     ## l2-rate-tracer.h (module 'ndnSIM'): ns3::L2RateTracer::L2RateTracer(boost::shared_ptr<std::ostream> os, ns3::Ptr<ns3::Node> node) [constructor]
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
+    ## l2-rate-tracer.h (module 'ndnSIM'): static void ns3::L2RateTracer::Destroy() [member function]
+    cls.add_method('Destroy', 
+                   'void', 
+                   [], 
+                   is_static=True)
     ## l2-rate-tracer.h (module 'ndnSIM'): void ns3::L2RateTracer::Drop(ns3::Ptr<ns3::Packet const> arg0) [member function]
     cls.add_method('Drop', 
                    'void', 
@@ -5350,6 +5355,11 @@ def register_Ns3NdnAppDelayTracer_methods(root_module, cls):
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
     ## ndn-app-delay-tracer.h (module 'ndnSIM'): ns3::ndn::AppDelayTracer::AppDelayTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-app-delay-tracer.h (module 'ndnSIM'): static void ns3::ndn::AppDelayTracer::Destroy() [member function]
+    cls.add_method('Destroy', 
+                   'void', 
+                   [], 
+                   is_static=True)
     ## ndn-app-delay-tracer.h (module 'ndnSIM'): static void ns3::ndn::AppDelayTracer::Install(ns3::NodeContainer const & nodes, std::string const & file) [member function]
     cls.add_method('Install', 
                    'void', 
@@ -5535,6 +5545,11 @@ def register_Ns3NdnCsTracer_methods(root_module, cls):
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
     ## ndn-cs-tracer.h (module 'ndnSIM'): ns3::ndn::CsTracer::CsTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-cs-tracer.h (module 'ndnSIM'): static void ns3::ndn::CsTracer::Destroy() [member function]
+    cls.add_method('Destroy', 
+                   'void', 
+                   [], 
+                   is_static=True)
     ## ndn-cs-tracer.h (module 'ndnSIM'): static void ns3::ndn::CsTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
     cls.add_method('Install', 
                    'void', 
@@ -7175,6 +7190,11 @@ def register_Ns3NdnL3AggregateTracer_methods(root_module, cls):
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
     ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): ns3::ndn::L3AggregateTracer::L3AggregateTracer(boost::shared_ptr<std::ostream> os, std::string const & nodeName) [constructor]
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'nodeName')])
+    ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3AggregateTracer::Destroy() [member function]
+    cls.add_method('Destroy', 
+                   'void', 
+                   [], 
+                   is_static=True)
     ## ndn-l3-aggregate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3AggregateTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
     cls.add_method('Install', 
                    'void', 
@@ -7284,6 +7304,11 @@ def register_Ns3NdnL3RateTracer_methods(root_module, cls):
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('ns3::Ptr< ns3::Node >', 'node')])
     ## ndn-l3-rate-tracer.h (module 'ndnSIM'): ns3::ndn::L3RateTracer::L3RateTracer(boost::shared_ptr<std::ostream> os, std::string const & node) [constructor]
     cls.add_constructor([param('boost::shared_ptr< std::ostream >', 'os'), param('std::string const &', 'node')])
+    ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3RateTracer::Destroy() [member function]
+    cls.add_method('Destroy', 
+                   'void', 
+                   [], 
+                   is_static=True)
     ## ndn-l3-rate-tracer.h (module 'ndnSIM'): static void ns3::ndn::L3RateTracer::Install(ns3::NodeContainer const & nodes, std::string const & file, ns3::Time averagingPeriod=ns3::Seconds( )) [member function]
     cls.add_method('Install', 
                    'void', 

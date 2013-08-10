@@ -53,6 +53,12 @@ NullDeleter (T *ptr)
 }
 
 void
+L3RateTracer::Destroy ()
+{
+  g_tracers.clear ();
+}
+
+void
 L3RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<L3RateTracer> > tracers;

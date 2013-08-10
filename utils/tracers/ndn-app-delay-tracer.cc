@@ -53,6 +53,12 @@ NullDeleter (T *ptr)
 }
 
 void
+AppDelayTracer::Destroy ()
+{
+  g_tracers.clear ();
+}
+
+void
 AppDelayTracer::InstallAll (const std::string &file)
 {
   using namespace boost;

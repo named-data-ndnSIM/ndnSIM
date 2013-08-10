@@ -47,6 +47,12 @@ NullDeleter (T *ptr)
 }
 
 void
+L2RateTracer::Destroy ()
+{
+  g_tracers.clear ();
+}
+
+void
 L2RateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   std::list<Ptr<L2RateTracer> > tracers;

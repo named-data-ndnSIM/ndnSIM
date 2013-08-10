@@ -53,6 +53,12 @@ NullDeleter (T *ptr)
 }
 
 void
+CsTracer::Destroy ()
+{
+  g_tracers.clear ();
+}
+
+void
 CsTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;

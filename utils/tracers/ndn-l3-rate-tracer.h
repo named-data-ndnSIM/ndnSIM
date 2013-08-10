@@ -71,6 +71,15 @@ public:
    */
   static void
   Install (Ptr<Node> node, const std::string &file, Time averagingPeriod = Seconds (0.5));
+
+  /**
+   * @brief Explicit request to remove all statically created tracers
+   *
+   * This method can be helpful if simulation scenario contains several independent run,
+   * or if it is desired to do a postprocessing of the resulting data
+   */
+  static void
+  Destroy ();
   
   /**
    * @brief Trace constructor that attaches to the node using node pointer

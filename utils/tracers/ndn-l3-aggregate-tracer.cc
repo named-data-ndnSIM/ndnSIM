@@ -50,6 +50,12 @@ NullDeleter (T *ptr)
 }
 
 void
+L3AggregateTracer::Destroy ()
+{
+  g_tracers.clear ();
+}
+
+void
 L3AggregateTracer::InstallAll (const std::string &file, Time averagingPeriod/* = Seconds (0.5)*/)
 {
   using namespace boost;
