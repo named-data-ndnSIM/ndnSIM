@@ -14,19 +14,21 @@ Examples
 Simple scenario
 ---------------
 
+.. sidebar:: Topology
+
+    .. aafig::
+        :aspect: 60
+        :scale: 90
+
+          +----------+                +--------+                +----------+
+          |          |     1Mbps      |        |      1Mbps     |          |
+          | Consumer |<-------------->| Router |<-------------->| Producer |
+          |          |         10ms   |        |         10ms   |          |
+          +----------+                +--------+                +----------+
+
 The first example (``ndn-simple.cc``) shows very basics of ndnSIM.  In the simulated
 topology there are 3 nodes, connected with point-to-point links, one
 NDN consumer, and one NDN producer:
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-      +----------+                +--------+                +----------+
-      |          |     1Mbps      |        |      1Mbps     |          |
-      | Consumer |<-------------->| Router |<-------------->| Producer |
-      |          |         10ms   |        |         10ms   |          |
-      +----------+                +--------+                +----------+
 
 Consumer is simulated using :ndnsim:`ConsumerCbr` reference application and generates Interests towards the producer
 with frequency of 10 Interests per second (see :doc:`applications`).
@@ -57,28 +59,29 @@ simulation using the following command (in optimized mode nothing will be printe
 9-node grid example
 -------------------
 
+.. sidebar:: Topology
+
+    .. aafig::
+        :aspect: 60
+        :scale: 120
+
+        /--------\      /-\         /-\
+        |Consumer|<---->| |<------->| |
+        \--------/      \-/         \-/
+            ^            ^           ^
+            |            |           |   1Mbps/10ms delay
+            v            v           v
+           /-\          /-\         /-\
+           | |<-------->| |<------->| |
+           \-/          \-/         \-/
+            ^            ^           ^
+            |            |           |
+            v            v           v
+           /-\          /-\      /--------\
+           | |<-------->| |<---->|Producer|
+           \-/          \-/      \--------/
+
 This scenario (``ndn-grid.cc``) simulates a grid topology, which is constructed using PointToPointLayout NS-3 module
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-    /--------\	    /-\	        /-\
-    |Consumer|<---->| |<------->| |
-    \--------/	    \-/	        \-/
-	^   	     ^ 	         ^
-        |            |           |   1Mbps/10ms delay
-        v            v           v
-       /-\          /-\         /-\
-       | |<-------->| |<------->| |
-       \-/          \-/         \-/
-	^   	     ^ 	         ^
-        |            |           |
-        v            v           v
-       /-\	    /-\	     /--------\
-       | |<-------->| |<---->|Producer|
-       \-/          \-/      \--------/
-
 
 FIB is populated using :ndnsim:`GlobalRoutingHelper` (see :doc:`helpers`).
 
@@ -109,6 +112,28 @@ simulation using the following command (in optimized mode nothing will be printe
 9-node grid example using topology plugin
 -----------------------------------------
 
+.. sidebar:: Topology
+
+    .. aafig::
+        :aspect: 60
+        :scale: 120
+
+        /--------\      /-\         /-\
+        |Consumer|<---->| |<------->| |
+        \--------/      \-/         \-/
+            ^            ^           ^
+            |            |           |   1Mbps/10ms delay
+            v            v           v
+           /-\          /-\         /-\
+           | |<-------->| |<------->| |
+           \-/          \-/         \-/
+            ^            ^           ^
+            |            |           |
+            v            v           v
+           /-\          /-\      /--------\
+           | |<-------->| |<---->|Producer|
+           \-/          \-/      \--------/
+
 Instead of defining topology directly as in :ref:`simple-scenario` or using specialized helpers as in :ref:`9-node-grid-example`, ndnSIM provides experimental extended versions of TopologyReader classes: :ndnsim:`AnnotatedTopologyReader` and :ndnsim:`RocketfuelWeightsReader`.
 
 While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be used with `Rocketfuel <http://www.cs.washington.edu/research/networking/rocketfuel/>`_ topology and link weights files (examples will be provided later), :ndnsim:`AnnotatedTopologyReader` is a more general-use class that uses simple user-readable format.
@@ -123,26 +148,6 @@ While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be 
 
 
 This scenario (``ndn-grid-topo-plugin.cc``) duplicates the functionality of :ref:`9-node-grid-example` but with the use of :ndnsim:`AnnotatedTopologyReader`.
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-    /--------\	    /-\	        /-\
-    |Consumer|<---->| |<------->| |
-    \--------/	    \-/	        \-/
-	^   	     ^ 	         ^
-        |            |           |   1Mbps/10ms delay
-        v            v           v
-       /-\          /-\         /-\
-       | |<-------->| |<------->| |
-       \-/          \-/         \-/
-	^   	     ^ 	         ^
-        |            |           |
-        v            v           v
-       /-\	    /-\	     /--------\
-       | |<-------->| |<---->|Producer|
-       \-/          \-/      \--------/
 
 .. literalinclude:: ../../examples/ndn-grid-topo-plugin.cc
    :language: c++
@@ -170,23 +175,25 @@ If the topology file is placed into ``src/ndnSIM/examples/topologies/topo-grid-3
 6-node bottleneck topology
 --------------------------
 
+.. sidebar:: Topology
+
+    .. aafig::
+        :aspect: 60
+        :scale: 90
+
+        /------\                                                    /------\
+        | Src1 |<--+                                            +-->| Dst1 |
+        \------/    \                                          /    \------/
+                     \                                        /
+                      +-->/------\   "bottleneck"  /------\<-+
+                          | Rtr1 |<===============>| Rtr2 |
+                      +-->\------/                 \------/<-+
+                     /                                        \
+        /------\    /                                          \    /------\
+        | Src2 |<--+                                            +-->| Dst2 |
+        \------/                                                    \------/
+
 This scenario (``ndn-congestion-topo-plugin.cc``) can be used for congestion-related scenarios
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-    /------\	                                                /------\
-    | Src1 |<--+                                            +-->| Dst1 |
-    \------/    \                                          /    \------/
-	     	 \                                        /
-                  +-->/------\   "bottleneck"  /------\<-+
-                      | Rtr1 |<===============>| Rtr2 |
-                  +-->\------/                 \------/<-+
-                 /                                        \
-    /------\    /                                          \    /------\
-    | Src2 |<--+                                            +-->| Dst2 |
-    \------/                                                    \------/
 
 .. literalinclude:: ../../examples/topologies/topo-6-node.txt
     :language: bash
@@ -214,6 +221,37 @@ To run this scenario and see what is happening, use the following command::
 11-node 2-bottleneck topology with custom forwarding strategy
 -------------------------------------------------------------
 
+.. sidebar:: Topology
+
+    .. aafig::
+        :aspect: 60
+        :scale: 90
+
+         /------\ 0                                                 0 /------\
+         |  c1  |<-----+                                       +----->|  p1  |
+         \------/       \                                     /       \------/
+                         \              /-----\              /
+         /------\ 0       \         +==>| r12 |<==+         /       0 /------\
+         |  c2  |<--+      \       /    \-----/    \       /      +-->|  p2  |
+         \------/    \      \     |                 |     /      /    \------/
+                      \      |    |   1Mbps links   |    |      /
+                       \  1  v0   v5               1v   2v  3  /
+                        +->/------\                 /------\<-+
+                          2|  r1  |<===============>|  r2  |4
+                        +->\------/4               0\------/<-+
+                       /    3^                           ^5    \
+                      /      |                           |      \
+         /------\ 0  /      /                             \      \  0 /------\
+         |  c3  |<--+      /                               \      +-->|  p3  |
+         \------/         /                                 \         \------/
+                         /     "All consumer-router and"     \
+         /------\ 0     /      "router-producer links are"    \    0 /------\
+         |  c4  |<-----+       "10Mbps"                        +---->|  p4  |
+         \------/                                                    \------/
+
+         "Numbers near nodes denote face IDs. Face ID is assigned based on the order of link"
+         "definitions in the topology file"
+
 To effectively use the example :ref:`custom strategy <Writing your own custom strategy>`, we need to make sure that FIB entries contain at least two entries.
 In the current version of ndnSIM, this can be accomplished using manual route configuration.
 
@@ -221,34 +259,6 @@ The following example illustrates how the strategy can be used in simulation sce
 
 Let us first define a meaningful topology:
 
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-     /------\ 0                                                 0 /------\
-     |  c1  |<-----+                                       +----->|  p1  |
-     \------/       \                                     /       \------/
-                     \              /-----\              /
-     /------\ 0       \         +==>| r12 |<==+         /       0 /------\
-     |  c2  |<--+      \       /    \-----/    \       /      +-->|  p2  |
-     \------/    \      \     |                 |     /      /    \------/
-                  \      |    |   1Mbps links   |    |      /
-                   \  1  v0   v5               1v   2v  3  /
-                    +->/------\                 /------\<-+
-                      2|  r1  |<===============>|  r2  |4
-                    +->\------/4               0\------/<-+
-                   /    3^                           ^5    \
-                  /      |                           |      \
-     /------\ 0  /      /                             \      \  0 /------\
-     |  c3  |<--+      /                               \      +-->|  p3  |
-     \------/         /                                 \         \------/
-                     /     "All consumer-router and"     \
-     /------\ 0     /      "router-producer links are"    \    0 /------\
-     |  c4  |<-----+       "10Mbps"                        +---->|  p4  |
-     \------/                                                    \------/
-
-     "Numbers near nodes denote face IDs. Face ID is assigned based on the order of link"
-     "definitions in the topology file"
 
 The corresponding topology file (``topo-11-node-two-bottlenecks.txt``):
 

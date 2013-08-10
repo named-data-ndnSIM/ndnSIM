@@ -85,8 +85,6 @@ public:
    *
    * If the entry exists, metric will be updated. Otherwise, new entry will be created
    *
-   * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
-   *
    * @param name	Prefix
    * @param face	Forwarding face
    * @param metric	Routing metric
@@ -98,8 +96,6 @@ public:
    * \brief Add or update FIB entry using smart pointer to prefix
    *
    * If the entry exists, metric will be updated. Otherwise, new entry will be created
-   *
-   * Entries in FIB never deleted. They can be invalidated with metric==NETWORK_UNREACHABLE
    *
    * @param name	Smart pointer to prefix
    * @param face	Forwarding face
@@ -118,15 +114,6 @@ public:
    */
   virtual void
   Remove (const Ptr<const Name> &prefix) = 0;
-
-  // /**
-  //  * @brief Invalidate FIB entry ("Safe" version of Remove)
-  //  *
-  //  * All faces for the entry will be assigned maximum routing metric and NDN_FIB_RED status   
-  //  * @param name	Smart pointer to prefix
-  //  */
-  // virtual void
-  // Invalidate (const Ptr<const Name> &prefix) = 0;
 
   /**
    * @brief Invalidate all FIB entries

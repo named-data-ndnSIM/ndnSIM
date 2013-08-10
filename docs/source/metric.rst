@@ -45,7 +45,7 @@ Packet-level trace helpers
         ...
 
 - :ndnsim:`L2Tracer`
- 
+
     This tracer is similar in spirit to :ndnsim:`ndn::L3RateTracer`, but it currently traces only packet drop on layer 2 (e.g.,
     due to transmission queue overflow).
 
@@ -75,32 +75,34 @@ This example (``ndn-tree-tracers.cc``) demonstrates basic usage of :ref:`trace c
 
 In this scenario we will use a tree-like topology, where consumers are installed on leaf nodes and producer is in the root of the tree:
 
-.. aafig::
-    :aspect: 60
-    :scale: 120
+.. sidebar:: Topology
 
-     /--------\    /--------\    /--------\    /--------\
-     |"leaf-1"|    |"leaf-2"|    |"leaf-3"|    |"leaf-4"|
-     \--------/    \--------/    \--------/    \--------/
-           ^          ^                ^           ^
-           |          |                |           |
-      	    \        /                  \         /
-             \      /  			 \  	 /    10Mbps / 1ms
-              \    /  			  \ 	/
-               |  |  			   |   |
-      	       v  v                        v   v
-	    /-------\                    /-------\
-	    |"rtr-1"|                    |"rtr-2"|
-            \-------/                    \-------/
-                  ^                        ^
-		  |	 		   |
-		   \			  /  10 Mpbs / 1ms
-		    +--------\  /--------+
-			     |  |
-                             v  v
-			  /--------\
-			  | "root" |
-                          \--------/
+    .. aafig::
+        :aspect: 60
+        :scale: 100
+
+         /--------\    /--------\    /--------\    /--------\
+         |"leaf-1"|    |"leaf-2"|    |"leaf-3"|    |"leaf-4"|
+         \--------/    \--------/    \--------/    \--------/
+               ^          ^                ^           ^
+               |          |                |           |
+                \        /                  \         /
+                 \      /                    \       /    10Mbps / 1ms
+                  \    /                      \     /
+                   |  |                        |   |
+                   v  v                        v   v
+                /-------\                    /-------\
+                |"rtr-1"|                    |"rtr-2"|
+                \-------/                    \-------/
+                      ^                        ^
+                      |                        |
+                       \                      /  10 Mpbs / 1ms
+                        +--------\  /--------+
+                                 |  |
+                                 v  v
+                              /--------\
+                              | "root" |
+                              \--------/
 
 The corresponding topology file (``topo-tree.txt``):
 
@@ -123,15 +125,13 @@ To run this scenario, use the following command::
 
 The successful run will create ``rate-trace.txt`` and ``aggregate-trace.txt`` files in the current directly, which can be analyzed manually or used as input to some graph/stats packages.
 
-For example, the following `R script <http://www.r-project.org/>`_ will build a number of nice graphs:
+.. sidebar:: Graph build using the `R script <http://www.r-project.org/>`_
 
-.. image:: _static/root-rates.png
-    :alt: Interest/Data packet rates at the root node
-    :align: right
+    .. image:: _static/root-rates.png
+        :alt: Interest/Data packet rates at the root node
 
-.. image:: _static/root-5sec-counts.png
-    :alt: Interest/Data packet counts at the root node in 5-second intervals
-    :align: right
+    .. image:: _static/root-5sec-counts.png
+        :alt: Interest/Data packet counts at the root node in 5-second intervals
 
 .. literalinclude:: ../../examples/graphs/rate-graph.R
     :language: r
@@ -144,14 +144,13 @@ For more information about R and ggplot2, please refer to `R language manual <ht
 Example of packet drop tracer (L2Tracer)
 ----------------------------------------
 
+.. sidebar:: Topology
+
+    .. image:: _static/topo-tree-25-node.png
+        :alt: 25-node tree topology
+        :width: 550px
+
 This example (``ndn-tree-with-l2tracer.cc``) demonstrates basic usage of :ref:`trace classes`.
-
-In this scenario we will use a tree-like topology:
-
-.. image:: _static/topo-tree-25-node.png
-    :alt: 25-node tree topology
-    :width: 600px
-    :align: right
 
 The corresponding topology file (``topo-tree-25-node.txt``):
 

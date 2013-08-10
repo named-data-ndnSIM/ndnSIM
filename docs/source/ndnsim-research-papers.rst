@@ -43,7 +43,7 @@ Research papers that use ndnSIM
 
 - **M. Vahlenkamp, "Threats on Information-Centric Networking", Hamburg University of Applied Sciences, Technical Report, 2012.** (`PDF <http://inet.cpt.haw-hamburg.de/teaching/ws-2012-13/master-projekt/markus-vahlenkamp_seminar.pdf>`_)
 
-    The ICN approach aims for reﬂecting these changes in usage of the Internet and is thus dragging content awareness into the network, for instance to let the network itself decide where to acquire requested data from and thereby utilize content caches to increase the data dissemination efﬁciency. All this is backed by the use of the publish/subscribe paradigm that is utilised to announce content availability and request its delivery. Since the ICN paradigm is entirely different from todays Internet, new challenges arise within the area of network security. NDN/CCNx, as the most popular ICN approach, claims to solve a couple of different security ﬂaws which the actual Internet is suffering from. This raises the questions of which vulnerabilities still exist and if maybe new issues arise.
+    The ICN approach aims for reflecting these changes in usage of the Internet and is thus dragging content awareness into the network, for instance to let the network itself decide where to acquire requested data from and thereby utilize content caches to increase the data dissemination efficiency. All this is backed by the use of the publish/subscribe paradigm that is utilised to announce content availability and request its delivery. Since the ICN paradigm is entirely different from todays Internet, new challenges arise within the area of network security. NDN/CCNx, as the most popular ICN approach, claims to solve a couple of different security flaws which the actual Internet is suffering from. This raises the questions of which vulnerabilities still exist and if maybe new issues arise.
 
 - **C. Yi, A. Afanasyev, I. Moiseenko, L. Wang, B. Zhang, and L. Zhang, "A Case for Stateful Forwarding Plane," Computer Communications, vol. 36, no. 7, pp. 779–791, 2013. ISSN 0140-3664** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Yi/comcom-stateful-forwarding.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/380>`_, `simulation code <https://github.com/cawka/ndnSIM-comcom-stateful-fw>`_)
 
@@ -65,29 +65,29 @@ Research papers that use ndnSIM
 
 - **B. Zhou, C. Wu, X. Hong, and M. Jiang, "Algorithms for Distributed Programmable Controllers", Technical Report, March 2013.** (`PDF <http://hong.cs.ua.edu/DCP-techReport-March2013.pdf>`_)
 
-    A few works on SDN (Software-Deﬁned Networking) like those in Onix improve programmability of the distributed network control.
-    The asynchronism and Byzantine issues of the control challenge the re-conﬁgurability of the service that is to safely program the control in atomic so as to avoid the transient control issues like the routing loops and black holes.
-    We propose two important algorithms of the distributed control to enable the programmability: (1) the reconﬁguration primitive allows the network control of the services being able to safely react to an external event; and (2) the reuse primitive allows the control states of a service being accessible for all services. We give concepts and algorithms of two primitives.
-    In addition, we provide the concrete cases of the current approaches for ICN (Information-Centric Networking) and CDN (Content Distribution Networks) for quests of the reconﬁgurability and programmability.
+    A few works on SDN (Software-Defined Networking) like those in Onix improve programmability of the distributed network control.
+    The asynchronism and Byzantine issues of the control challenge the re-configurability of the service that is to safely program the control in atomic so as to avoid the transient control issues like the routing loops and black holes.
+    We propose two important algorithms of the distributed control to enable the programmability: (1) the reconfiguration primitive allows the network control of the services being able to safely react to an external event; and (2) the reuse primitive allows the control states of a service being accessible for all services. We give concepts and algorithms of two primitives.
+    In addition, we provide the concrete cases of the current approaches for ICN (Information-Centric Networking) and CDN (Content Distribution Networks) for quests of the reconfigurability and programmability.
     Then, we evaluate the performance of ICN in both simulation and the PlanetLab testbed.
     The evaluation results show that the layer improves the lowers 19.6% of the Interest delays in the ICN that is heavily congested and lowers 97% delays in the PlanetLab with 9 nodes on usual case.
     In addition, the evaluation of CDN on the PlanetLab shows that it reduces 81% request delay on usual case.
 
 - **M. Tortelli, L. A. Grieco, and G. Boggia, "Performance Assessment of Routing Strategies in Named Data Networking", in Proc. of GTTI 2013 Session on Telecommunication Networks, 2013** (`PDF <http://www.gtti.it/GTTI13/papers/Tortelli_et_al_GTTI2013.pdf>`_)
 
-    Information Centric Networking (ICN) architectures are currently being investigated to orient the Future Internet towards a content centric paradigm, thus allowing the provisioning of more secure, efﬁcient, and scalable services.
+    Information Centric Networking (ICN) architectures are currently being investigated to orient the Future Internet towards a content centric paradigm, thus allowing the provisioning of more secure, efficient, and scalable services.
     In this work, we focus on the Named Data Networking (NDN) proposal to analyze the impact of several routing and forwarding strategies, which play a fundamental role in ICN.
     In particular, thanks to the recently devised ns-3 based NDN simulator, namely ndnSIM, we conduce an extensive simulation campaign using the GEANT topology as a core network.
-    We monitor different distinctive metrics, such as ﬁle download time, server load reduction, hit ratio, hit distance, and communication overhead, in different topologies and trafﬁc conditions.
-    Simulation results show that the election of a single best forwarding strategy is a difﬁcult task.
-    Indeed, the pros and cons of each strategy are heavily inﬂuenced by the popularity distribution of contents, which, in turn, affects the effectiveness of the distributed caching mechanisms typically used in the NDN architecture.
+    We monitor different distinctive metrics, such as file download time, server load reduction, hit ratio, hit distance, and communication overhead, in different topologies and traffic conditions.
+    Simulation results show that the election of a single best forwarding strategy is a difficult task.
+    Indeed, the pros and cons of each strategy are heavily influenced by the popularity distribution of contents, which, in turn, affects the effectiveness of the distributed caching mechanisms typically used in the NDN architecture.
 
 - **S. Seo, J.-M. Kang, A. Leon-Garcia, Y. Han, and J. W.-K. Hong, "Secure and Efficient Context Data Collection using Content-Centric Networking", in Proc. of International Workshop on Smart Communication Protocols and Algorithms (SCPA), 2013** (`PDF <http://dpnm.postech.ac.kr/papers/SCPA/13/sesise/scpa13.pdf>`_)
 
     Context data collection is a fundamental and important process for realizing context-aware recommender or personalization systems.
     The existing context data collection approaches are based-on traditional TCP/IP that has several disadvantages such as lack of mobility and security.
-    On the other hand, Content-Centric Networking (CCN) provides advantages in terms of mobility, security, and bandwidth efﬁciency compared to TCP/IP.
-    In this paper, we propose a secure and efﬁcient context data collection and provision approach based on CCN.
+    On the other hand, Content-Centric Networking (CCN) provides advantages in terms of mobility, security, and bandwidth efficiency compared to TCP/IP.
+    In this paper, we propose a secure and efficient context data collection and provision approach based on CCN.
     Simulation results show that this approach can reduce bandwidth consumption by 52.7%–98.9% in comparison to a TCP/IP-based one.
 
 - **J. Ran, N. Lv, D. Zhang, Y. Ma, and Z. Xie, "On Performance of Cache Policies in Named Data Networking", in International Conference on Advanced Computer Science and Electronics Information (ICACSEI 2013), 2013** (`PDF <http://www.atlantis-press.com/php/download_paper.php?id=7640>`_)

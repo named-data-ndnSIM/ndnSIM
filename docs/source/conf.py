@@ -48,7 +48,7 @@ copyright = u'2011-2013 (c) Alexander Afanasyev, Ilya Moiseenko, and Lixia Zhang
 # built documents.
 #
 # The short X.Y version.
-version = '0.2.8'
+version = '0.5'
 # The full version, including alpha/beta/rc tags.
 release = 'Overall ndnSIM'
 
@@ -185,7 +185,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ndnSIM.tex', u'ndnSIM: NS-3 based Named Data Networking (NDN) simulator documentation',
+  ('tutorial', 'ndnSIM-tutorial.tex', u'ndnSIM: NS-3 based Named Data Networking (NDN) simulator documentation',
    u'Alexander Afanasyev, Ilya Moiseenko, and Lixia Zhang', 'manual'),
 ]
 
@@ -251,6 +251,6 @@ googleanalytics_id = "UA-21372502-8"
 
 googleanalytics_enabled = True
 
-# aafig_format = dict(latex='pdf', html='png', text=None)
+aafig_format = dict(latex='pdf', html='svg', text=None)
 
 # aafig_default_options = dict(Fixed=True)

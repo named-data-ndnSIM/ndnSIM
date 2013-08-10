@@ -1,9 +1,12 @@
 /* ns-3 changes to the default CSS from Doxygen and Sphinx */
 
-body, table, div, p, dl {
+body {
     font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
-    font-size: 12pt;
+    font-size: 11pt;
     color: black;
+}
+
+table, div, p, dl {
 }
 
 a {
@@ -28,7 +31,7 @@ div.body h6 {
 
 /* Doxygen side bar */
 #nav-tree {
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 #nav-tree a {
@@ -46,7 +49,7 @@ div.related h3 {
 
 div.related a {
     color: #91A501;
-    font-size: 14pt;
+    font-size: 13pt;
     font-weight: bold;
 }
 
@@ -66,7 +69,7 @@ div.related li.right {
 
 /* Sphinx side bar */
 div.sphinxsidebar {
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 div.sphinxsidebar a {
@@ -128,6 +131,10 @@ div.sphinxsidebar a {
 
 .highlight .hll {
 	background-color: #FFFF88;
+}
+
+.highlighttable {
+    font-size: 9pt;
 }
 
 .red {

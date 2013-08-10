@@ -1,12 +1,14 @@
 .. ndnSIM: NS-3 based NDN simulator
 .. ============================================================
 
-.. .. toctree::
-..    :maxdepth: 2
-
 ============
 Introduction
 ============
+
+.. sidebar:: ndnSIM components
+
+    .. image:: _static/ndnsim-components.*
+        :width: 100%
 
 The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (NDNx).
 
@@ -21,43 +23,6 @@ Following the NDN architecture, ndnSIM is implemented as a new network-layer pro
 The simulator is implemented in a modular fashion, using separate C++ classes to model behavior of each network-layer entity in NDN: :ndnsim:`pending Interest table (PIT) <Pit>`, :ndnsim:`forwarding information base (FIB) <Fib>`, :ndnsim:`content store <ContentStore>`, :ndnsim:`network <NetDeviceFace>` and :ndnsim:`application <AppFace>` interfaces, :ndnsim:`Interest forwarding strategies <ForwardingStrategy>`, etc.
 This modular structure allows any component to be easily modified or replaced with no or minimal impact on other components.
 In addition, the simulator provides an extensive collection of interfaces and helpers to perform detailed tracing behavior of every component, as well as NDN traffic flow.
-
-
-.. aafig::
-    :aspect: 60
-    :scale: 120
-
-             +----------------+			      +-----------+
-             | "Applications" |			      | NetDevice |
-             +----------------+			      +-----------+
-		     ^ 					    ^
-    .................|......................................|......................
-    .		     v			     	            v			  .
-    .         +----------------------+	     +----------------------+		  .
-    .         |      "Face"          |	     |        "Face"        |		  .
-    .         | "(AppFace, ApiFace)" |       |   "(NetDeviceFace)"  |		  .
-    .         +----------------------+       +----------------------+		  .
-    .		               ^                   ^				  .
-    .			       |                   |				  .
-    .			       v                   v				  .
-    .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
-    .			    XX                         XX			  .
-    .			    XX    Core NDN protocol    XX  			  .
-    .                       XX      "(L3Protocol)"     XX
-    .			    XX                         XX			  .
-    .			    XXXXXXXXXXXXXXXXXXXXXXXXXXXXX			  .
-    .			      ^       ^       ^       ^				  .
-    .			      |	      |	      |	      |				  .
-    .     +-------------------+   +---+       +---+   +------------+		  .
-    .	  | 		    	  |		  |    		   |		  .
-    .	  v			  v		  v		   v		  .
-    . +-------------------+      +-------+      +-------+        +-------------+  .
-    . |   "ContentStore"  |      |  PIT  |      |  FIB  |        | "Forwarding"|  .
-    . +-------------------+      +-------+      +-------+        | "Strategy"  |  .
-    .							         +-------------+  .
-    .										  .
-    ...............................................................................
-
 
 The current wire format for the Interest and Data packets used by ndnSIM is defined in :ref:`ndnSIM packet format`.
 ndnSIM also has an option to be compatible to wire format used by `NDNx implementation <http://named-data.net/>`_ (NDNx binary XML encoding).  However currently, this option is deprecated, but can be reintroduced in the future as an optional wire format.
