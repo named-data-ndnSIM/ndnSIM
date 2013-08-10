@@ -2,7 +2,7 @@
 
 body, table, div, p, dl {
     font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
-    font-size: 12px;
+    font-size: 12pt;
     color: black;
 }
 
@@ -28,7 +28,7 @@ div.body h6 {
 
 /* Doxygen side bar */
 #nav-tree {
-    font-size: 12px;
+    font-size: 12pt;
 }
 
 #nav-tree a {
@@ -46,7 +46,7 @@ div.related h3 {
 
 div.related a {
     color: #91A501;
-    font-size: 14px;
+    font-size: 14pt;
     font-weight: bold;
 }
 
@@ -66,7 +66,7 @@ div.related li.right {
 
 /* Sphinx side bar */
 div.sphinxsidebar {
-    font-size: 12px;
+    font-size: 12pt;
 }
 
 div.sphinxsidebar a {

@@ -4,10 +4,11 @@
 .. .. toctree::
 ..    :maxdepth: 2
 
+============
 Introduction
 ============
 
-The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (Project CCNx).
+The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (NDNx).
 
 Following the NDN architecture, ndnSIM is implemented as a new network-layer protocol model, which can run on top of any available link-layer protocol model (point-to-point, CSMA, wireless, etc.).
 
@@ -59,7 +60,7 @@ In addition, the simulator provides an extensive collection of interfaces and he
 
 
 The current wire format for the Interest and Data packets used by ndnSIM is defined in :ref:`ndnSIM packet format`.
-ndnSIM also has an option to be compatible to wire format used by `CCNx Project's NDN implementation <http://www.ccnx.org/>`_ (CCNx Binary Encoding).  However currently, this option is deprecated, but can be reintroduced in the future as an optional wire format.
+ndnSIM also has an option to be compatible to wire format used by `NDNx implementation <http://named-data.net/>`_ (NDNx binary XML encoding).  However currently, this option is deprecated, but can be reintroduced in the future as an optional wire format.
 
 More documentation
 ------------------
@@ -125,9 +126,3 @@ For example, logging of :ndnsim:`Face` and :ndnsim:`Consumer` shows everything w
 
 Refer to the source code and NS-3 documentation to see what logging interfaces are available and about details how enable one or more logging interfaces.
 
-
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`

@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% set title = _('ndnSIM documentation') %}
+
+{% block body %}
+    <h1>{{ docstitle|e }}</h1>
+    <p>
+The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (NDNx).
+    </p>
+
+    <p>
+We invite you to <a href="http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim" target="_blank">join our mailing list</a> to see and participate in discussions about ndnSIM implementation and simulations in general (<a href="http://www.lists.cs.ucla.edu/pipermail/ndnsim/" target="_blank">mailing list archives</a>).
+    </p>
+
+  {% block tables %}
+  <p><strong>Parts of the documentation:</strong></p>
+  <table class="contentstable" align="center"><tr>
+    <td width="50%" valign="top">
+      <p class="biglink"><a class="biglink" href="{{ pathto("tutorial") }}">ndnSIM tutorial</a><br/>
+         <div class="linkdescr" style="margin-left: 20px">
+           <p class="biglink"><a class="biglink" href="{{ pathto("intro") }}">Introduction</a><br/>
+             <span class="linkdescr">what is ndnSIM, how to get support, and what is in the package</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("getting-started") }}">Getting started</a><br/>
+             <span class="linkdescr">portability, requirements, downloading, compiling, simulating</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("helpers") }}">ndnSIM helpers</a><br/>
+             <span class="linkdescr">very important components of ndnSIM for writing simulation scenarios</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("cs") }}">Content Store</a><br/>
+             <span class="linkdescr">several different build-in content store implementations: LRU, LFU, and others</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("fw") }}">Forwarding Strategies</a><br/>
+             <span class="linkdescr">experimenting with differnet build-in and custom Interest/Data forwarding strategies</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("applications") }}">ndnSIM applications</a><br/>
+             <span class="linkdescr">reference applications for network-leverl evaluations</span></p>
+           <p class="biglink"><a class="biglink" href="{{ pathto("metric") }}">Obtaining metrics</a><br/>
+             <span class="linkdescr">obtaining and visualizing metrics from simulation runs</span></p>
+         </div>
+      </p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("examples") }}">Simulation examples</a><br/>
+          <span class="linkdescr">basic tutorial examples</span></p>
+
+    </td>
+    <td width="50%" valign="top">
+      <p class="biglink"><a class="biglink" href="doxygen/annotated.html">ndnSIM API documentation</a><br/>
+         <span class="linkdescr">doxygen-generated API documentation</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("faq") }}">FAQs</a><br/>
+         <span class="linkdescr">frequently asked questions (with answers!)</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("faq") }}">ndnSIM packet format</a><br/>
+         <span class="linkdescr">definition of the optimized default packet format</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("ndnsim-research-papers") }}">ndnSIM research papers</a><br/>
+         <span class="linkdescr">list of ndnSIM-related papers</span></p>
+    </td></tr>
+  </table>
+
+  <p><strong>Meta information:</strong></p>
+  <table class="contentstable" align="center"><tr>
+    <td width="50%" valign="top">
+      <p class="biglink"><a class="biglink" href="{{ pathto("meta/bugs") }}">Reporting bugs</a></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("meta/about") }}">About the documentation</a></p>
+    </td><td width="50%" valign="top">
+      <p class="biglink"><a class="biglink" href="{{ pathto("meta/license") }}">ndnSIM license</a></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("meta/copyright") }}">Copyright</a></p>
+    </td></tr>
+  </table>
+  {% endblock %}
+
+  <p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt>If you refer to ndnSIM in a published work, please cite the following paper, not just the ndnSIM website. Thank you!</dt>
+<dd><strong>A. Afanasyev, I. Moiseenko, and L. Zhang, &#8220;ndnSIM: NDN simulator for NS-3,&#8221; NDN, Technical Report NDN-0005, 2012</strong> (<a class="reference external" href="http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367">BibTex</a>)</dd>
+</dl>
+  </p>
+
+{% endblock %}
