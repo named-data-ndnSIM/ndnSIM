@@ -38,7 +38,7 @@ def configure(conf):
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                      "Required boost libraries not found")
-        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.46")
+        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
     else:
@@ -62,12 +62,12 @@ def configure(conf):
             return
 
         boost_version = conf.env.BOOST_VERSION.split('_')
-        if int(boost_version[0]) < 1 or int(boost_version[1]) < 46:
+        if int(boost_version[0]) < 1 or int(boost_version[1]) < 48:
             conf.report_optional_feature("ndnSIM", "ndnSIM", False,
-                                         "ndnSIM requires at least boost version 1.46")
+                                         "ndnSIM requires at least boost version 1.48")
             conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
 
-            Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.46")
+            Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 

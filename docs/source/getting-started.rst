@@ -4,7 +4,7 @@ Getting Started
 Portability
 ------------
 
-ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (stock gcc, boost 1.48), Mac OS 10.8 (gcc-4.2 apple/llvm, macports gcc 4.7, boost 1.49-1.52).
+ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (boost libraries **1.48**, with default version 1.46 compilation will probably fail), 12.10 (default version of boost 1.49), 13.04 (default version of boost 1.49), Fedora 18, Mac OS 10.7 and 10.8 (gcc-4.2 apple/llvm, macports gcc 4.7, boost 1.49-1.54).
 
 .. _requirements:
 
@@ -15,28 +15,39 @@ Requirements
 
 2. Boost libraries should be installed on the system:
 
-   * For Ubuntu (for Ubuntu 12.10 and later only):
+    * For Ubuntu
 
-       .. code-block:: bash
+        * 12.04
 
-           sudo aptitude install libboost-all-dev
+            .. code-block:: bash
 
-   * For Fedora (for Fedora 18 and later only):
+                sudo aptitude install libboost1.48-all-dev
 
-       .. code-block:: bash
+        * 12.10, 13.04, and newer versions
 
-           sudo yum install boost-devel
+            .. code-block:: bash
 
-   * For MacOS (macports):
+                sudo aptitude install libboost-all-dev
 
-       .. code-block:: bash
+    * For Fedora (for Fedora 18 and later only):
 
-           sudo port instal boost
+        .. code-block:: bash
+
+            sudo yum install boost-devel
+
+    * For MacOS (macports):
+
+        .. code-block:: bash
+
+            sudo port instal boost
 
 .. role:: red
 
 .. note::
-   :red:`!!! ndnSIM requires boost version at least 1.48.`   Many linux distribution (including Ubuntu 12.04.1 and Fedore 16, 17 at the time of this writing) ship an old version of boost, making it impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following :ref:`these simple instructions <Installing boost libraries>`.
+   :red:`!!! ndnSIM requires boost version at least 1.48.`   Many linux distribution (Fedora 16, 17 at the time of this writing) ship an old version of boost, making it impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following :ref:`these simple instructions <Installing boost libraries>`.
+
+.. note::
+   :red:`For Ubuntu 12.04`  Ubuntu 12.04 ships with two versions of boost libraries and it is known that if both are installed, then compilation of ndnSIM will most likely fail.  Please install ``libboost1.48-dev-all`` package and uninstall ``libboost-dev-all``.  If you want to install the latest version of boost libraries, then uninstall both ``libboost1.48-dev-all`` and ``libboost-dev-all``, so the libraries do not interfere with each other.
 
 .. note::
    !!! If you do not have root permissions to install boost, you can install it in your home folder.  However, you need to be make sure that `libboost_iostreams` library is successfully compiled and is installed.  Please refer to :ref:`the following example <Installing boost libraries>` for the hints how to successfully compile and install boost libraries on Ubuntu Linux.
@@ -45,7 +56,7 @@ Requirements
 3. If you are planning to use other modules, like visualizer, a number of additional dependencies should be installed.  For example, in
 order to run `visualizer`_ module, the following should be installed:
 
-   * For Ubuntu (tested on Ubuntu 12.04.1):
+   * For Ubuntu (tested on Ubuntu 12.04, 12.10, 13.04, should work on later versions as well):
 
        .. code-block:: bash
 
@@ -59,7 +70,7 @@ order to run `visualizer`_ module, the following should be installed:
 
            sudo yum install pygoocanvas python-kiwi graphviz-python
 
-           # easy_install method, since pygraphviz is not yet packaged into Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=740687)
+           # easy_install method, since pygraphviz is not (yet?) packaged into Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=740687)
            sudo yum install graphviz-devel
            sudo yum install python-pip
            sudo easy_install pygraphviz
@@ -181,7 +192,7 @@ For example, you can use the following template to write your extensions, simula
 
         git clone git://github.com/cawka/ndnSIM-scenario-template.git scenario
         cd scenario
-        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig 
+        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
         ./waf configure
@@ -193,22 +204,22 @@ For more detailed information, refer to `README file <https://github.com/cawka/n
 Examples of template-based simulations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. ndnSIM examples from `<http://ndnsim.net>`_ website and more: 
+1. ndnSIM examples from `<http://ndnsim.net>`_ website and more:
 
 - `<http://github.com/cawka/ndnSIM-examples>`_, or
 - `<http://code.google.com/p/ndnsim.ndnsim-examples/>`_
 
-2. Script scenarios and graph processing scripts for simulations used in "A Case for Stateful Forwarding Plane" paper by Yi et al. (`<http://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):  
+2. Script scenarios and graph processing scripts for simulations used in "A Case for Stateful Forwarding Plane" paper by Yi et al. (`<http://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):
 
 - `<http://github.com/cawka/ndnSIM-comcom-stateful-fw>`_, or
 - `<http://code.google.com/p/ndnsim.ndnsim-comcom/>`_
 
-3. Script scenarios and graph processing scripts for simulations used in "Rapid Traffic Information Dissemination Using Named Data" paper by Wang et al. (`<http://dx.doi.org/10.1145/2248361.2248365>`_): 
+3. Script scenarios and graph processing scripts for simulations used in "Rapid Traffic Information Dissemination Using Named Data" paper by Wang et al. (`<http://dx.doi.org/10.1145/2248361.2248365>`_):
 
 - `<http://github.com/cawka/ndnSIM-nom-rapid-car2car>`_, or
 - `<http://code.google.com/p/ndnsim.ndnsim-nom-rapid/>`_
 
-- Rocketfuel-based topology generator for ndnSIM preferred format (randomly assigned link delays and bandwidth, based on estimated types of connections between nodes): 
+- Rocketfuel-based topology generator for ndnSIM preferred format (randomly assigned link delays and bandwidth, based on estimated types of connections between nodes):
 
 - `<http://github.com/cawka/ndnSIM-sample-topologies>`_, or
 - `<http://code.google.com/p/ndnsim.ndnsim-sample-topo/>`_
