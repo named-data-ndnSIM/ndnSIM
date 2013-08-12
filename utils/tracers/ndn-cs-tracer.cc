@@ -29,6 +29,7 @@
 #include "ns3/ndn-app.h"
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-data.h"
+#include "ns3/ndn-content-store.h"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"
@@ -233,10 +234,9 @@ CsTracer::~CsTracer ()
 void
 CsTracer::Connect ()
 {
-  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheHits",
-                                 MakeCallback (&CsTracer::CacheHits, this));
-  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/$ns3::ndn::ContentStore/CacheMisses",
-                                 MakeCallback (&CsTracer::CacheMisses, this));
+  Ptr<ContentStore> cs = m_nodePtr->GetObject<ContentStore> ();
+  cs->TraceConnectWithoutContext ("CacheHits",   MakeCallback (&CsTracer::CacheHits,   this));
+  cs->TraceConnectWithoutContext ("CacheMisses", MakeCallback (&CsTracer::CacheMisses, this));
 
   Reset ();  
 }

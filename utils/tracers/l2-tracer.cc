@@ -24,6 +24,8 @@
 #include "ns3/names.h"
 #include "ns3/callback.h"
 
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/queue.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -47,8 +49,14 @@ L2Tracer::L2Tracer (Ptr<Node> node)
 void
 L2Tracer::Connect ()
 {
-  Config::ConnectWithoutContext ("/NodeList/"+m_node+"/DeviceList/*/TxQueue/Drop",
-                                 MakeCallback (&L2Tracer::Drop, this));
+  for (uint32_t devId = 0; devId < m_nodePtr->GetNDevices (); devId ++)
+    {
+      Ptr<PointToPointNetDevice> p2pnd = DynamicCast<PointToPointNetDevice> (m_nodePtr->GetDevice (devId));
+      if (p2pnd)
+        {
+          p2pnd->GetQueue ()->TraceConnectWithoutContext ("Drop", MakeCallback (&L2Tracer::Drop, this));
+        }
+    }
 }
 
 } // namespace ns3
