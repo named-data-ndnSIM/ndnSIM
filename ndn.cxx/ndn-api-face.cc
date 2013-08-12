@@ -51,7 +51,7 @@ public:
     : m_rand (0, std::numeric_limits<uint32_t>::max ())
   {
   }
-  
+
   ns3::UniformVariable m_rand; // nonce generator
 
   PendingInterestContainer m_pendingInterests;
@@ -63,6 +63,8 @@ ApiFace::ApiFace (Ptr<Node> node)
   : Face (node)
   , m_this (new ApiFacePriv ())
 {
+  NS_LOG_FUNCTION (this << boost::cref (*this));
+
   NS_ASSERT_MSG (GetNode ()->GetObject<L3Protocol> () != 0,
                  "NDN stack should be installed on the node " << GetNode ());
 
@@ -73,19 +75,21 @@ ApiFace::ApiFace (Ptr<Node> node)
 
 ApiFace::~ApiFace ()
 {
+  NS_LOG_FUNCTION (this << boost::cref (*this));
+
   delete m_this;
 }
 
 void
 ApiFace::Shutdown ()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << boost::cref (*this));
 
   if (!IsUp ())
     {
       return;
     }
-  
+
   this->SetUp (false);
 
   m_this->m_pendingInterests.clear ();
@@ -105,7 +109,7 @@ ApiFace::ExpressInterest (Ptr<Interest> interest,
     {
       interest->SetNonce (m_this->m_rand.GetValue ());
     }
-  
+
   // Record the callback
   bool needToActuallyExpressInterest = false;
   PendingInterestContainer::iterator entry = m_this->m_pendingInterests.find_exact (interest->GetName ());
@@ -163,7 +167,7 @@ void
 ApiFace::Put (Ptr<Data> data)
 {
   NS_LOG_INFO (">> D " << data->GetName ());
-  
+
   Simulator::ScheduleNow (&Face::ReceiveData, this, data);
 }
 
@@ -178,7 +182,7 @@ ApiFace::SendInterest (Ptr<const Interest> interest)
   NS_LOG_FUNCTION (this << interest);
 
   NS_LOG_DEBUG ("<< I " << interest->GetName ());
-  
+
   if (!IsUp ())
     {
       return false;
@@ -222,7 +226,7 @@ ApiFace::SendData (Ptr<const Data> data)
       entry = m_this->m_pendingInterests.longest_prefix_match (data->GetName ());
     }
   m_this->m_pendingInterests.erase (entry);
-  
+
   return true;
 }
 

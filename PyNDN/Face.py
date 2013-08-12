@@ -27,19 +27,20 @@ from Name import Name
 import functools
 import traceback
 
-deleteList = []
+class Face (object):
+    deleteList = []
 
-class Face (ns.ndnSIM.ndn.ApiFace):
     def __init__(self):
         self.nodeId = ns.core.Simulator.GetContext ()
         self.node = ns.network.NodeList.GetNode (self.nodeId)
-        super(Face, self).__init__ (self.node)
+        self._face = ns.ndnSIM.ndn.ApiFace (self.node)
+        # super(Face, self).__init__ (self.node)
 
     def connect (self):
         pass
 
     def disconnect (self):
-        self.Shutdown ()
+        self._face.Shutdown ()
 
     def defer_verification (self, deferVerification = True):
         pass
@@ -55,9 +56,7 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         interest.name = name
 
         converter = ExpressInterestConverter (onData, onTimeout)
-        deleteList.append (converter)
-
-        self.ExpressInterest (interest._interest, converter.handleOnData, converter.handleOnTimeout)
+        self._face.ExpressInterest (interest._interest, converter.handleOnData, converter.handleOnTimeout)
 
     def setInterestFilter (self, name, onInterest, flags = None):
         """
@@ -71,10 +70,7 @@ class Face (ns.ndnSIM.ndn.ApiFace):
         else:
             raise TypeError ("Wrong type for 'name' parameter [%s]" % type (name))
 
-        converter = OnInterestConvert (onInterest)
-        deleteList.append (converter)
-
-        self.SetInterestFilter (name, converter)
+        self._face.SetInterestFilter (name, OnInterestConvert (onInterest))
 
     def clearInterestFilter (self, name):
         if isinstance (name, Name):
@@ -85,24 +81,18 @@ class Face (ns.ndnSIM.ndn.ApiFace):
             raise TypeError ("Wrong type for 'name' parameter [%s]" % type (name))
 
         # @bug: memory leak, deleteList need to remove previosly set callback... but how?
-        self.ClearInterestFilter (name)
+        self._face.ClearInterestFilter (name)
 
     def get (self, name, template = None, timeoutms = 3000):
         raise NotImplementedError ("NS-3 simulation cannot have syncrhonous operations")
 
     def put (self, data):
         if isinstance (data, Data):
-            self.Put (data._data)
+            self._face.Put (data._data)
         elif isinstance (data, ns.ndnSIM.ndn.Data):
-            self.Put (data)
+            self._face.Put (data)
         else:
             raise TypeError ("Unsupported type to publish data [%s]" % type (data))
-
-def removeFromDeleteList (object):
-    try:
-        deleteList.remove (object)
-    except:
-        pass
 
 class ExpressInterestConverter:
     def __init__ (self, onData, onTimeout):
@@ -110,7 +100,6 @@ class ExpressInterestConverter:
         self.onTimeout = onTimeout
 
     def handleOnData (self, interest, data):
-        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
         try:
             if self.onData:
                 return self.onData (Interest (interest=interest), Data (data = data))
@@ -118,7 +107,6 @@ class ExpressInterestConverter:
             traceback.print_exc()
 
     def handleOnTimeout (self, interest):
-        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
         try:
             if self.onTimeout:
                 self.onTimeout (Interest (interest=interest))
@@ -128,8 +116,8 @@ class ExpressInterestConverter:
 class OnInterestConvert (object):
     def __init__ (self, onInterest):
         self.onInterest = onInterest
+
     def __call__ (self, name, interest):
-        ns.core.Simulator.ScheduleNow (removeFromDeleteList, self)
         try:
             if self.onInterest:
                 self.onInterest (Name (name = name), Interest (interest = interest))

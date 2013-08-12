@@ -23,7 +23,12 @@ struct PendingInterestEntry : public SimpleRefCount< PendingInterestEntry >
 public:
   PendingInterestEntry (Ptr<const Interest> interest)
     : m_interest (interest)
-  { }
+  {
+  }
+
+  virtual ~PendingInterestEntry ()
+  {
+  }
 
   void
   AddCallbacks (ApiFace::DataCallback onData, ApiFace::TimeoutCallback onTimeout)

@@ -75,7 +75,7 @@ Face::Face (Ptr<Node> node)
   , m_metric (0)
   , m_flags (0)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << node);
 
   NS_ASSERT_MSG (node != 0, "node cannot be NULL. Check the code");
 }
