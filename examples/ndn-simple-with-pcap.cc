@@ -58,6 +58,10 @@ main (int argc, char *argv[])
 
   Config::SetGlobal ("ndn::WireFormat", StringValue ("1"));
 
+  // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
+  CommandLine cmd;
+  cmd.Parse (argc, argv);
+  
   // Creating nodes
   NodeContainer nodes;
   nodes.Create (3);
