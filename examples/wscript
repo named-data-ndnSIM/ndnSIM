@@ -101,3 +101,8 @@ def build(bld):
 
         obj = bld.create_ns3_program('ndn-simple-udp', all_modules)
         obj.source = 'ndn-simple-udp.cc'
+
+
+    if 'ns3-wifi' in bld.env['NS3_ENABLED_MODULES']:
+        obj = bld.create_ns3_program('ndn-simple-wifi', all_modules)
+        obj.source = 'ndn-simple-wifi.cc'
