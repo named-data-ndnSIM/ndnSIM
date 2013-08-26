@@ -24,13 +24,13 @@ General papers about ndnSIM
 Research papers that use ndnSIM
 -------------------------------
 
-- **L. Wang, A. Afanasyev, R. Kuntz, R. Vuyyuru, R. Wakikawa, and L. Zhang, "Rapid Traffic Information Dissemination Using Named Data," in Proceedings of the 1st ACM workshop on Emerging Name-Oriented Mobile Networking Design - Architecture, Algorithms, and Applications (NoM'12), Hilton Head Island, South Carolina, June 2012, pp. 7–12.** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Wang/nom.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/365>`_, `simulation code <https://github.com/cawka/ndnSIM-nom-rapid-car2car>`_)
+#. **L. Wang, A. Afanasyev, R. Kuntz, R. Vuyyuru, R. Wakikawa, and L. Zhang, "Rapid Traffic Information Dissemination Using Named Data," in Proceedings of the 1st ACM workshop on Emerging Name-Oriented Mobile Networking Design - Architecture, Algorithms, and Applications (NoM'12), Hilton Head Island, South Carolina, June 2012, pp. 7–12.** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Wang/nom.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/365>`_, `simulation code <https://github.com/cawka/ndnSIM-nom-rapid-car2car>`_)
 
     Our previous work applied the Named Data Networking approach to vehicle-to-vehicle (V2V) communications and developed a simple design for traffic information dissemination applications. This paper uses simulations to evaluate the feasibility of the design as described in [1].
     Our results show that data names can greatly facilitate the forwarding process for Interest and data packets.
     With adequate vehicle density, data can propagate over long distances robustly at tens of kilometers per second and a requester can retrieve the desired traffic information 10km away in a matter of seconds.
 
-- **Z. Zhu, C. Bian, A. Afanasyev, V. Jacobson, and L. Zhang, "Chronos: Serverless Multi-User Chat Over NDN," NDN, Technical Report NDN-0008, 2012.** (`PDF <http://named-data.net/techreport/TR008-chronos.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/371>`_)
+#. **Z. Zhu, C. Bian, A. Afanasyev, V. Jacobson, and L. Zhang, "Chronos: Serverless Multi-User Chat Over NDN," NDN, Technical Report NDN-0008, 2012.** (`PDF <http://named-data.net/techreport/TR008-chronos.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/371>`_)
 
     Multi-user applications are commonly implemented using a centralized server.
     This paper presents a new design for multi-user chat applications (Chronos) that works in a distributed, serverless fashion over Named Data Networking.
@@ -41,11 +41,11 @@ Research papers that use ndnSIM
     Our results demonstrate Chronos' robustness and efficiency in data dissemination.
     Chronos' approach of replacing centralized servers by distributed data synchronization can be applied to a variety of distributed applications to simplify design and ease deployment.
 
-- **M. Vahlenkamp, "Threats on Information-Centric Networking", Hamburg University of Applied Sciences, Technical Report, 2012.** (`PDF <http://inet.cpt.haw-hamburg.de/teaching/ws-2012-13/master-projekt/markus-vahlenkamp_seminar.pdf>`_)
+#. **M. Vahlenkamp, "Threats on Information-Centric Networking", Hamburg University of Applied Sciences, Technical Report, 2012.** (`PDF <http://inet.cpt.haw-hamburg.de/teaching/ws-2012-13/master-projekt/markus-vahlenkamp_seminar.pdf>`_)
 
     The ICN approach aims for reflecting these changes in usage of the Internet and is thus dragging content awareness into the network, for instance to let the network itself decide where to acquire requested data from and thereby utilize content caches to increase the data dissemination efficiency. All this is backed by the use of the publish/subscribe paradigm that is utilised to announce content availability and request its delivery. Since the ICN paradigm is entirely different from todays Internet, new challenges arise within the area of network security. NDN/CCNx, as the most popular ICN approach, claims to solve a couple of different security flaws which the actual Internet is suffering from. This raises the questions of which vulnerabilities still exist and if maybe new issues arise.
 
-- **C. Yi, A. Afanasyev, I. Moiseenko, L. Wang, B. Zhang, and L. Zhang, "A Case for Stateful Forwarding Plane," Computer Communications, vol. 36, no. 7, pp. 779–791, 2013. ISSN 0140-3664** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Yi/comcom-stateful-forwarding.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/380>`_, `simulation code <https://github.com/cawka/ndnSIM-comcom-stateful-fw>`_)
+#. **C. Yi, A. Afanasyev, I. Moiseenko, L. Wang, B. Zhang, and L. Zhang, "A Case for Stateful Forwarding Plane," Computer Communications, vol. 36, no. 7, pp. 779–791, 2013. ISSN 0140-3664** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Yi/comcom-stateful-forwarding.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/380>`_, `simulation code <https://github.com/cawka/ndnSIM-comcom-stateful-fw>`_)
 
     In Named Data Networking (NDN), packets carry data names instead of source and destination addresses.
     This paradigm shift leads to a new network forwarding plane: data consumers send *Interest* packets to request desired data, routers forward Interest packets and maintain the state of all pending Interests, which is then used to guide *Data* packets back to the consumers.
@@ -54,7 +54,7 @@ Research papers that use ndnSIM
     Our results show that this stateful forwarding plane can successfully circumvent prefix hijackers, avoid failed links, and utilize multiple paths to mitigate congestion.
     We also compare NDN's performance with that of IP-based solutions to highlight the advantages of a stateful forwarding plane.
 
-- **A. Afanasyev, P. Mahadevan, I. Moiseenko, E. Uzun, and L. Zhang, "Interest Flooding Attack and Countermeasures in Named Data Networking," in Proc. of IFIP Networking 2013, May 2013.** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Afanasyev/ifip-interest-flooding-ndn.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/381>`_, `simulation code <https://github.com/cawka/ndnSIM-ddos-interest-flooding>`_)
+#. **A. Afanasyev, P. Mahadevan, I. Moiseenko, E. Uzun, and L. Zhang, "Interest Flooding Attack and Countermeasures in Named Data Networking," in Proc. of IFIP Networking 2013, May 2013.** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Afanasyev/ifip-interest-flooding-ndn.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/381>`_, `simulation code <https://github.com/cawka/ndnSIM-ddos-interest-flooding>`_)
 
     Distributed Denial of Service (DDoS) attacks are an ongoing problem in today's Internet, where packets from a large number of compromised hosts thwart the paths to the victim site and/or overload the victim machines.
     In a newly proposed future Internet architecture, Named Data Networking (NDN), end users request desired data by sending Interest packets, and the network delivers Data packets upon request only, effectively eliminating many existing DDoS attacks.
@@ -63,7 +63,7 @@ Research papers that use ndnSIM
     We show that NDN's inherent properties of storing per packet state on each router and maintaining flow balance (i.e., one Interest packet retrieves at most one Data packet) provides the  basis for effective DDoS mitigation algorithms.
     Our evaluation through simulations shows that the solution can quickly and effectively respond and mitigate Interest flooding.
 
-- **B. Zhou, C. Wu, X. Hong, and M. Jiang, "Algorithms for Distributed Programmable Controllers", Technical Report, March 2013.** (`PDF <http://hong.cs.ua.edu/DCP-techReport-March2013.pdf>`_)
+#. **B. Zhou, C. Wu, X. Hong, and M. Jiang, "Algorithms for Distributed Programmable Controllers", Technical Report, March 2013.** (`PDF <http://hong.cs.ua.edu/DCP-techReport-March2013.pdf>`_)
 
     A few works on SDN (Software-Defined Networking) like those in Onix improve programmability of the distributed network control.
     The asynchronism and Byzantine issues of the control challenge the re-configurability of the service that is to safely program the control in atomic so as to avoid the transient control issues like the routing loops and black holes.
@@ -73,7 +73,7 @@ Research papers that use ndnSIM
     The evaluation results show that the layer improves the lowers 19.6% of the Interest delays in the ICN that is heavily congested and lowers 97% delays in the PlanetLab with 9 nodes on usual case.
     In addition, the evaluation of CDN on the PlanetLab shows that it reduces 81% request delay on usual case.
 
-- **M. Tortelli, L. A. Grieco, and G. Boggia, "Performance Assessment of Routing Strategies in Named Data Networking", in Proc. of GTTI 2013 Session on Telecommunication Networks, 2013** (`PDF <http://www.gtti.it/GTTI13/papers/Tortelli_et_al_GTTI2013.pdf>`_)
+#. **M. Tortelli, L. A. Grieco, and G. Boggia, "Performance Assessment of Routing Strategies in Named Data Networking", in Proc. of GTTI 2013 Session on Telecommunication Networks, 2013** (`PDF <http://www.gtti.it/GTTI13/papers/Tortelli_et_al_GTTI2013.pdf>`_)
 
     Information Centric Networking (ICN) architectures are currently being investigated to orient the Future Internet towards a content centric paradigm, thus allowing the provisioning of more secure, efficient, and scalable services.
     In this work, we focus on the Named Data Networking (NDN) proposal to analyze the impact of several routing and forwarding strategies, which play a fundamental role in ICN.
@@ -82,7 +82,7 @@ Research papers that use ndnSIM
     Simulation results show that the election of a single best forwarding strategy is a difficult task.
     Indeed, the pros and cons of each strategy are heavily influenced by the popularity distribution of contents, which, in turn, affects the effectiveness of the distributed caching mechanisms typically used in the NDN architecture.
 
-- **S. Seo, J.-M. Kang, A. Leon-Garcia, Y. Han, and J. W.-K. Hong, "Secure and Efficient Context Data Collection using Content-Centric Networking", in Proc. of International Workshop on Smart Communication Protocols and Algorithms (SCPA), 2013** (`PDF <http://dpnm.postech.ac.kr/papers/SCPA/13/sesise/scpa13.pdf>`_)
+#. **S. Seo, J.-M. Kang, A. Leon-Garcia, Y. Han, and J. W.-K. Hong, "Secure and Efficient Context Data Collection using Content-Centric Networking", in Proc. of International Workshop on Smart Communication Protocols and Algorithms (SCPA), 2013** (`PDF <http://dpnm.postech.ac.kr/papers/SCPA/13/sesise/scpa13.pdf>`_)
 
     Context data collection is a fundamental and important process for realizing context-aware recommender or personalization systems.
     The existing context data collection approaches are based-on traditional TCP/IP that has several disadvantages such as lack of mobility and security.
@@ -90,7 +90,7 @@ Research papers that use ndnSIM
     In this paper, we propose a secure and efficient context data collection and provision approach based on CCN.
     Simulation results show that this approach can reduce bandwidth consumption by 52.7%–98.9% in comparison to a TCP/IP-based one.
 
-- **J. Ran, N. Lv, D. Zhang, Y. Ma, and Z. Xie, "On Performance of Cache Policies in Named Data Networking", in International Conference on Advanced Computer Science and Electronics Information (ICACSEI 2013), 2013** (`PDF <http://www.atlantis-press.com/php/download_paper.php?id=7640>`_)
+#. **J. Ran, N. Lv, D. Zhang, Y. Ma, and Z. Xie, "On Performance of Cache Policies in Named Data Networking", in International Conference on Advanced Computer Science and Electronics Information (ICACSEI 2013), 2013** (`PDF <http://www.atlantis-press.com/php/download_paper.php?id=7640>`_)
 
     Named Data Network (NDN) is gaining increasingly concerns, as an important direction of the future Internet architecture research centered on content.
     Content caching has played a key role in NDN.
@@ -102,7 +102,7 @@ Research papers that use ndnSIM
     Moreover, it also shows the performance under different sizes of content store.
     The effectiveness of the CCP strategy is proved during the simulation.
 
-- **M. Wahlisch, T.C. Schmidt, and M. Vahlenkamp, "Backscatter from the Data Plane--Threats to Stability and Security in Information-Centric Network Infrastructure", in Computer Networks, 2013** (`DOI 10.1016/j.comnet.2013.07.009 <http://dx.doi.org/10.1016/j.comnet.2013.07.009>`_)
+#. **M. Wahlisch, T.C. Schmidt, and M. Vahlenkamp, "Backscatter from the Data Plane--Threats to Stability and Security in Information-Centric Network Infrastructure", in Computer Networks, 2013** (`DOI 10.1016/j.comnet.2013.07.009 <http://dx.doi.org/10.1016/j.comnet.2013.07.009>`_)
 
     Information-centric networking (ICN) raises data objects to first class routable entities in the network and changes the Internet paradigm from host-centric connectivity to data-oriented delivery.
     However, current approaches to content routing heavily rely on data-driven protocol events and thereby introduce a strong coupling of the control to the data plane in the underlying routing infrastructure.
@@ -111,3 +111,35 @@ Research papers that use ndnSIM
     We further show how state-based forwarding tends to degrade by decorrelating resources.
     We identify intrinsic attack vectors present in current content-centric routing, as well as possibilities and limitations to mitigate them.
     Our overall findings suggest that major architectural refinements are required prior to global ICN deployment in the real world.
+
+#. **Xiaoke Jiang and Jun Bi, "Technical Report: Named Content Delivery Network", 2013** (`PDF <http://netarchlab.tsinghua.edu.cn/~shock/THU-NetArchLab-ICN-TR-nCDN-20130730.pdf>`_)
+
+    CDN (Content Delivery Network) focuses on delivering requested data to users, no matter where the data comes from; but the fundamental goal of IP is to connect hosts.
+    The essential mismatching leads to complexity and inefficiency.
+    More specifically,
+    1) CDN has to build components to map what to where, which is resource consuming;
+    2) CDN has to monitor real-time network state on the application layer, which is complex and not accurate.
+    In contrast, NDN (Named Data Networking), provides the information and function that traditional CDN devotes a great deal of effort to achieve, since NDN routes by name, its routing plane holds the "what", information of content distribution, and its stateful forwarding plane can detect and adapt to dynamic of the Internet.
+    Thus this work enhances current CDN with NDN, here dubbed Named Content Delivery Network, or nCDN.
+    In nCDN, CDN itself focuses on services such as accounting, data analysis etc; NDN runs over IP and takes charge of content routing and delivery.
+    nCDN is more adaptive to the dynamic of the Internet and improves the performance, especially in a scenario where content copies are hosted in several hosts.
+    nCDN makes it easier to implement optimization solutions and CDN Interconnecting. Our simulations demonstrate that nCDN is better than traditional CDN on almost all aspects, including the scalability, reliability, and QoS.
+
+#. **Xiaoke Jiang, Jun Bi, Youchao Wang, and You Wang, "Interest Set Mechanism to Improve the Transport of Named Data Networking", in proceedings of ACM SIGCOMM13 (poster), Hongkong, China, 2013** (`PDF <http://netarchlab.tsinghua.edu.cn/~junbi/SIGCOMM2013-1.pdf>`_)
+
+    Named Data Networking (NDN) is currently a hot research topic promising to be one of the most advanced developments in future Internet architectures. 
+    Researches have built real software systems over NDN which work on speciﬁed scenarios. 
+    In this paper, we proposal an new mechanism which aggregate similar Interest packets to improve the efficient of transport of NDN. 
+    Firstly we prove the optimal chunk size which simultaneously minimize the latency and maximize the valid payload ratio during a complete data acquiring process. 
+    That's why we aggregate the Interest packet but not increase the size of Data packet. 
+    Secondly we introduce the Interest Set mechanism that which is able to maintain a conversational "channel" between the data consumer and provider to cover the space and time uncertainty of data packet generating and at the same time reduces the number of FIB lookups and compresses the PIT.
+
+#. **Z. Zhu and A. Afanasyev, "Let's ChronoSync: Decentralized Dataset State Synchronization in Named Data Networking," in Proceedings of the 21st IEEE International Conference on Network Protocols (ICNP 2013), Goettingen, Germany, October 2013** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Zhu/chronosync-icnp2013.pdf>`_)
+
+    In supporting many distributed applications, such as group text messaging, file sharing, and joint editing, a basic requirement is the efficient and robust synchronization of knowledge about the dataset such as text messages, changes to the shared folder, or document edits. 
+    We propose ChronoSync protocol, which exploits the features of the Named Data Networking architecture to efficiently synchronize the state of a dataset among a distributed group of users. 
+    Using appropriate naming rules, ChronoSync summarizes the state of a dataset in a condensed cryptographic digest form and exchange it among the distributed parties.
+    Differences of the dataset can be inferred from the digests and disseminated efficiently to all parties.  
+    With the complete and up-to-date knowledge of the dataset changes, applications can decide whether or when to fetch which pieces of the data.
+    We implemented ChronoSync as a C++ library and developed two distributed application prototypes based on it.
+    We show through simulations that ChronoSync is effective and efficient in synchronization dataset state, and is robust against packet losses and network partitions.
