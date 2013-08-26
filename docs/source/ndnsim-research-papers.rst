@@ -143,3 +143,14 @@ Research papers that use ndnSIM
     With the complete and up-to-date knowledge of the dataset changes, applications can decide whether or when to fetch which pieces of the data.
     We implemented ChronoSync as a C++ library and developed two distributed application prototypes based on it.
     We show through simulations that ChronoSync is effective and efficient in synchronization dataset state, and is robust against packet losses and network partitions.
+
+#. **Y. Wang, N. Rozhnova, A. Narayanan, D. Oran, and I. Rhee, "An improved hop-by-hop interest shaper for congestion control in named data networking". In Proceedings of the 3rd ACM SIGCOMM workshop on Information-centric networking, 2013** (`PDF <http://conferences.sigcomm.org/sigcomm/2013/papers/icn/p55.pdf>`_)
+
+    Hop-by-hop interest shaping has been proposed as a viable congestion control mechanism in Named Data Networking (NDN). 
+    Interest shaping exploits the strict receiver-driven traffc pattern and the symmetric bidirectional forwarding in NDN to control the returning data rate. 
+    In this paper, we point out that both interests and contents contribute to congestion and their interdependence must be considered in any interest shaping algorithm. 
+    We first analyze this issue mathematically by formulating it as an optimization problem to obtain the optimal shaping rate. 
+    Then a practical interest shaping algorithm is proposed to achieve high link utilization without congestive data loss. 
+    We further note that ﬂow differentiation in NDN is complicated and design our scheme independently of traffc ﬂows. 
+    We demonstrate our hopby-hop interest shaper in conjunction with simple AdditiveIncrease-Multiplicative-Decrease (AIMD) clients using the ns3-based NDN simulator (ndnSIM). 
+    Our results show that the proposed shaping algorithm can effectively control congestion and achieve near-optimal throughput.
