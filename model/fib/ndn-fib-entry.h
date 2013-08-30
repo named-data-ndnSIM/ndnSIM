@@ -142,6 +142,24 @@ public:
   }
 
   /**
+   * @brief Get current estimate for smoothed RTT value
+   */
+  Time
+  GetSRtt () const
+  {
+    return m_sRtt;
+  }
+
+  /**
+   * @brief Get current estimate for the RTT variation
+   */
+  Time
+  GetRttVar () const
+  {
+    return m_rttVar;
+  }
+  
+  /**
    * @brief Get real propagation delay to the producer, calculated based on NS-3 p2p link delays
    */
   Time
