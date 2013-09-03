@@ -220,11 +220,13 @@ size_t
 Ccnb::SerializeName (Buffer::Iterator &start, const Name &name)
 {
   size_t written = 0;
+  written += AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);
   BOOST_FOREACH (const name::Component &component, name)
     {
       written += AppendTaggedBlob (start, CcnbParser::CCN_DTAG_Component,
                                    reinterpret_cast<const uint8_t*>(component.buf ()), component.size());
     }
+  written += AppendCloser (start);
   return written;
 }
 
@@ -232,10 +234,12 @@ size_t
 Ccnb::SerializedSizeName (const Name &name)
 {
   size_t written = 0;
+  written += EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);
   BOOST_FOREACH (const name::Component &component, name)
     {
       written += EstimateTaggedBlob (CcnbParser::CCN_DTAG_Component, component.size ());
     }
+  written += 1;
   return written;
 }
 

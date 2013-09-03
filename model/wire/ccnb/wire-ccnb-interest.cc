@@ -115,9 +115,9 @@ Interest::Serialize (Buffer::Iterator start) const
 {
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Interest, CcnbParser::CCN_DTAG); // <Interest>
   
-  Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG); // <Name>
+  // Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG); // <Name>
   Ccnb::SerializeName (start, m_interest->GetName());                // <Component>...</Component>...
-  Ccnb::AppendCloser (start);                               // </Name>
+  // Ccnb::AppendCloser (start);                               // </Name>
 
   // if (m_interest->GetMinSuffixComponents() >= 0)
   //   {
@@ -182,9 +182,9 @@ Interest::GetSerializedSize () const
   size_t written = 0;
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Interest); // <Interest>
   
-  written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name); // <Name>
+  // written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name); // <Name>
   written += Ccnb::SerializedSizeName (m_interest->GetName()); // <Component>...</Component>...
-  written += 1; // </Name>
+  // written += 1; // </Name>
 
   // if (m_interest->GetMinSuffixComponents() >= 0)
   //   {

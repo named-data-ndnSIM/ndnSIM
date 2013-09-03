@@ -194,9 +194,9 @@ Data::Serialize (Buffer::Iterator start) const
   Ccnb::AppendTaggedBlobWithPadding (start, CcnbParser::CCN_DTAG_SignatureBits, 16, m_data->GetSignature ()); // <SignatureBits />
   Ccnb::AppendCloser (start);                                    // </Signature>
 
-  Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
+  // Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);    // <Name>
   Ccnb::SerializeName (start, m_data->GetName());                                      //   <Component>...</Component>...
-  Ccnb::AppendCloser (start);                                                          // </Name>
+  // Ccnb::AppendCloser (start);                                                          // </Name>
 
   // fake signature
   Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_SignedInfo, CcnbParser::CCN_DTAG); // <SignedInfo>
@@ -234,9 +234,9 @@ Data::Serialize (Buffer::Iterator start) const
       {
         Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_KeyName, CcnbParser::CCN_DTAG);    // <KeyName>
         {
-          Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);       // <Name>
+          // Ccnb::AppendBlockHeader (start, CcnbParser::CCN_DTAG_Name, CcnbParser::CCN_DTAG);       // <Name>
           Ccnb::SerializeName (start, *m_data->GetKeyLocator ());         //   <Component>...</Component>...
-          Ccnb::AppendCloser (start);                                     // </Name>
+          // Ccnb::AppendCloser (start);                                     // </Name>
         }
         Ccnb::AppendCloser (start);                                     // </KeyName>
       }
@@ -276,9 +276,9 @@ Data::GetSerializedSize () const
   // written += Ccnb::EstimateTaggedBlob (CcnbParser::CCN_DTAG_SignatureBits, sizeof (m_data->GetSignature ()));      // <SignatureBits />
   written += 1;                                    // </Signature>
 
-  written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>
+  //written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);    // <Name>
   written += Ccnb::SerializedSizeName (m_data->GetName ()); //   <Component>...</Component>...
-  written += 1;                                  // </Name>
+  //written += 1;                                  // </Name>
 
   // fake signature
   written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_SignedInfo); // <SignedInfo>
@@ -313,9 +313,9 @@ Data::GetSerializedSize () const
       {
         written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_KeyName);    // <KeyName>
         {
-          written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);       // <Name>
+          //written += Ccnb::EstimateBlockHeader (CcnbParser::CCN_DTAG_Name);       // <Name>
           written += Ccnb::SerializedSizeName (*m_data->GetKeyLocator ());        //   <Component>...</Component>...
-          written += 1;                                               // </Name>
+          //written += 1;                                               // </Name>
         }
         written += 1;                                               // </KeyName>
       }
