@@ -154,3 +154,11 @@ Research papers that use ndnSIM
     We further note that ﬂow differentiation in NDN is complicated and design our scheme independently of traffc ﬂows. 
     We demonstrate our hopby-hop interest shaper in conjunction with simple AdditiveIncrease-Multiplicative-Decrease (AIMD) clients using the ns3-based NDN simulator (ndnSIM). 
     Our results show that the proposed shaping algorithm can effectively control congestion and achieve near-optimal throughput.
+
+#. **S. Arianfar, P. Sarolahti, and J. Ott, "Deadline-based Resource Management for Information-Centric Networks". In Proceedings of the 3rd ACM SIGCOMM workshop on Information-centric networking, 2013** (`doi 10.1145/2491224.2491226 <http://dx.doi.org/10.1145/2491224.2491226>`_)
+
+    Unlike in traditional IP-based end-to-end network sessions, in information-centric networks the data source may change during a communication session.
+    Therefore the response time to subsequent data requests may vary signiﬁcantly depending on whether data comes from nearby cache, or a distant source.
+    This is a complication for designing resource management, reliability and other algorithms, that traditionally use RTT measurements for determining when data is considered lost and should be retransmitted (along with related congestion control adjustments). 
+    This paper discusses a different approach for designing resource management in information-centric networks: data packets are assigned with a lifetime, that is used as a basis for scheduling and resource management in the network, and for congestion control and retransmission logic at the end hosts. 
+    We demonstrate an initial evaluation of this approach based on ns-3 simulations on CCN framework
