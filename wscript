@@ -221,15 +221,16 @@ def build(bld):
 
     bld.ns3_python_bindings()
 
-    if bld.env['PyNDN_install_path']:
-        bld (features = "py",
-             source = bld.path.ant_glob (["PyNDN/**/*.py"]),
-             install_from = "PyNDN",
-             install_path = bld.env['PyNDN_install_path'])
-    else:
-        bld (features = "py",
-             source = bld.path.ant_glob (["PyNDN/**/*.py"]),
-             install_from = ".")
+    if bld.env['ENABLE_PYTHON_BINDINGS']:
+        if bld.env['PyNDN_install_path']:
+            bld (features = "py",
+                 source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+                 install_from = "PyNDN",
+                 install_path = bld.env['PyNDN_install_path'])
+        else:
+            bld (features = "py",
+                 source = bld.path.ant_glob (["PyNDN/**/*.py"]),
+                 install_from = ".")
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')
