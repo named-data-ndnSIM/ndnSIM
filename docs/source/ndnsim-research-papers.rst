@@ -162,3 +162,32 @@ Research papers that use ndnSIM
     This is a complication for designing resource management, reliability and other algorithms, that traditionally use RTT measurements for determining when data is considered lost and should be retransmitted (along with related congestion control adjustments). 
     This paper discusses a different approach for designing resource management in information-centric networks: data packets are assigned with a lifetime, that is used as a basis for scheduling and resource management in the network, and for congestion control and retransmission logic at the end hosts. 
     We demonstrate an initial evaluation of this approach based on ns-3 simulations on CCN framework
+
+#. **M. Conti, P. Gasti, M. Teoli, "A lightweight mechanism for detection of cache pollution attacks in Named Data Networking". Computer Networks, 2013** (`doi 10.1016/j.comnet.2013.07.034 <http://dx.doi.org/10.1016/j.comnet.2013.07.034>`_)
+
+    Content-Centric Networking (CCN) is an emerging paradigm being considered as a possible replacement for the current IP-based host-centric Internet infrastructure. 
+    In CCN, named content---rather than addressable hosts---becomes a first-class entity.
+    Content is therefore decoupled from its location.
+    This allows, among other things, the implementation of ubiquitous caching.
+    
+    Named-Data Networking (NDN) is a prominent example of CCN.
+    In NDN, all nodes (i.e., hosts, routers) are allowed to have a local cache, used to satisfy incoming requests for content.
+    This makes NDN a good architecture for efficient large scale content distribution.
+    However, reliance on caching allows an adversary to perform attacks that are very effective and relatively easy to implement.
+    Such attacks include cache poisoning (i.e., introducing malicious content into caches) and cache pollution (i.e., disrupting cache locality).
+    
+    This paper focuses on cache pollution attacks, where the adversary’s goal is to disrupt cache locality to increase link utilization and cache misses for honest consumers.
+    We show, via simulations, that such attacks can be implemented in NDN using limited resources, and that their effectiveness is not limited to small topologies.
+    We then illustrate that existing proactive countermeasures are ineffective against realistic adversaries. Finally, we introduce a new technique for detecting pollution attacks.
+    Our technique detects high and low rate attacks on different topologies with high accuracy.
+
+#. **G. Mauri and G. Verticale, "Distributing key revocation status in Named Data Networking". Advances in Communication Networking, pages 310–313. Springer, 2013** (`doi 10.1007/978-3-642-40552-5_31 <http://dx.doi.org/10.1007/978-3-642-40552-5_31>`_)
+
+    Content Centric Networking (CCN) is a new network paradigm designed to satisfy user needs considering the growth of data demand. 
+    Named Data Networking (NDN) is a research project that is developing the future Internet architecture using the principles behind CCN. 
+    In this novel architecture, the contents are addressed by their name and not by their location. 
+    Thus, the attention is shifted from user to content, resulting in a caching network that is more efficient and flexible than an IP network for content distribution and management with beneficial effects on timely delivery. 
+    In NDN, the content objects are divided into chunks, each digitally signed by its producer, and most papers assume that verification is made only by the content consumer. 
+    In order to perform signature verification, a node needs the signer’s key, which can be easily retrieved by issuing a standard interest message. 
+    Although content verification at the end node prevents disruptive attacks in which false data is delivered to applications, the verification of key validity is also necessary. 
+    Otherwise, false data would be cached and forwarded instead of correct data resulting in a denial of service and paving the way for more sophisticated attacks.
