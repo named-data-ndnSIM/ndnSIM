@@ -154,7 +154,7 @@ Forwarding strategy
 
 A desired :ndnsim:`forwarding strategy <ForwardingStrategy>` parameter need to be set before installing stack on a node.
 
-To select a particular forwarding strategy implementation and configure its parameters, use :ndnsim:`SetForwardingStrategy <ndn::StackHelper::SetContentStore>` helper method:
+To select a particular forwarding strategy implementation and configure its parameters, use :ndnsim:`SetForwardingStrategy <ndn::StackHelper::SetForwardingStrategy>` helper method:
 
       .. code-block:: c++
 
