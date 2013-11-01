@@ -61,7 +61,7 @@ int main (int argc, char**argv)
       cerr << "ERROR: topology needs to be specified" << endl;
       cerr << endl;
 
-      cerr << cmd;
+      cmd.PrintHelp (cerr);
       return 1;
     }
 
@@ -70,7 +70,7 @@ int main (int argc, char**argv)
       cerr << "ERROR: output needs to be specified" << endl;
       cerr << endl;
 
-      cerr << cmd;
+      cmd.PrintHelp (cerr);
       return 1;
     }
 
@@ -79,7 +79,7 @@ int main (int argc, char**argv)
       cerr << "ERROR: run needs to be specified" << endl;
       cerr << endl;
 
-      cerr << cmd;
+      cmd.PrintHelp (cerr);
       return 1;
     }
 
@@ -88,7 +88,7 @@ int main (int argc, char**argv)
       cerr << "ERROR: clients needs to be specified" << endl;
       cerr << endl;
 
-      cerr << cmd;
+      cmd.PrintHelp (cerr);
       return 1;
     }
 
