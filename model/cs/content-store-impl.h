@@ -118,6 +118,12 @@ public:
   virtual Ptr<Entry>
   Next (Ptr<Entry>);
 
+  const typename super::policy_container &
+  GetPolicy () const { return super::getPolicy (); }
+
+  typename super::policy_container &
+  GetPolicy () { return super::getPolicy (); }
+  
 private:
   void
   SetMaxSize (uint32_t maxSize);
