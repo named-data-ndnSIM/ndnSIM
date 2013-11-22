@@ -287,7 +287,7 @@ Application-level trace helper
     |                 |                                                                     |
     |                 | One consequence is that Interests satisfied by an app will have     |
     |                 | even hop count (min hop count = 2), and Interests satisfied from    |
-    |                 | caches will have off hop count (min hop count = 1)                  |
+    |                 | caches will have odd hop count (min hop count = 1)                  |
     +-----------------+---------------------------------------------------------------------+
 
 .. _app delay trace helper example:
