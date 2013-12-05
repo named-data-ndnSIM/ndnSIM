@@ -165,13 +165,14 @@ Data::FromWire (Ptr<Packet> packet)
   static DataTrailer trailer;
 
   Ptr<ndn::Data> data = Create<ndn::Data> ();
-  data->SetWire (packet->Copy ());
+  Ptr<Packet> wire = packet->Copy ();
 
   Data wireEncoding (data);
   packet->RemoveHeader (wireEncoding);
   packet->RemoveTrailer (trailer);
 
   data->SetPayload (packet);
+  data->SetWire (wire);
 
   return data;
 }

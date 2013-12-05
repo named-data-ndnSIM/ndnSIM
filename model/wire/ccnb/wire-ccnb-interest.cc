@@ -100,12 +100,13 @@ Ptr<ndn::Interest>
 Interest::FromWire (Ptr<Packet> packet)
 {
   Ptr<ndn::Interest> interest = Create<ndn::Interest> ();
-  interest->SetWire (packet->Copy ());
+  Ptr<Packet> wire = packet->Copy ();
 
   Interest wireEncoding (interest);
   packet->RemoveHeader (wireEncoding);
 
   interest->SetPayload (packet);
+  interest->SetWire (wire);
 
   return interest;
 }
