@@ -98,11 +98,11 @@ struct serialized_size_policy_traits
 
         if (item->payload ()->GetInterest ()->GetWire ())
           {
-            get_order (item) = item->payload ()->GetInterest ()->GetWire ()->GetSize ();
+            policy::get_size (item) = item->payload ()->GetInterest ()->GetWire ()->GetSize ();
           }
         else
           {
-            get_order (item) = 0;
+            policy::get_size (item) = 0;
           }
         current_space_used_ += get_size (item); // this operation can violate policy constraint, so in some case
                                                 // it may be necessary to remove some other element
@@ -133,7 +133,7 @@ struct serialized_size_policy_traits
             return false;
           }
 
-        get_size (item) = interestSize;
+        policy::get_size (item) = interestSize;
         current_space_used_ += interestSize;
 
         policy_container::insert (*item);
@@ -151,7 +151,7 @@ struct serialized_size_policy_traits
       {
         NS_LOG_DEBUG ("Erasing entry with name: " << item->payload ()->GetPrefix ());
 
-        current_space_used_ -= get_size (item);
+        current_space_used_ -= policy::get_size (item);
         policy_container::erase (policy_container::s_iterator_to (*item));
       }
 
