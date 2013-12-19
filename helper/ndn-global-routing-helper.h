@@ -97,19 +97,23 @@ public:
 
   /**
    * @brief Calculate for every node shortest path trees and install routes to all prefix origins
+   *
+   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps as is
    */
   static void
-  CalculateRoutes ();
+  CalculateRoutes (bool invalidatedRoutes = true);
 
   /**
    * @brief Calculate all possible next-hop independent alternative routes
+   *
+   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps as is
    *
    * Refer to the implementation for more details.
    *
    * Note that this method is highly experimental and should be used with caution (very time consuming).
    */
   static void
-  CalculateAllPossibleRoutes ();
+  CalculateAllPossibleRoutes (bool invalidatedRoutes = true);
 
 private:
   void

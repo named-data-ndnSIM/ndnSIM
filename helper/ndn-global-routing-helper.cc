@@ -234,7 +234,7 @@ GlobalRoutingHelper::AddOriginsForAll ()
 }
 
 void
-GlobalRoutingHelper::CalculateRoutes ()
+GlobalRoutingHelper::CalculateRoutes (bool invalidatedRoutes/* = true*/)
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
@@ -278,7 +278,10 @@ GlobalRoutingHelper::CalculateRoutes ()
       // NS_LOG_DEBUG (predecessors.size () << ", " << distances.size ());
 
       Ptr<Fib>  fib  = source->GetObject<Fib> ();
-      fib->InvalidateAll ();
+      if (invalidatedRoutes)
+        {
+          fib->InvalidateAll ();
+        }
       NS_ASSERT (fib != 0);
 
       NS_LOG_DEBUG ("Reachability from Node: " << source->GetObject<Node> ()->GetId ());
@@ -324,7 +327,7 @@ GlobalRoutingHelper::CalculateRoutes ()
 }
 
 void
-GlobalRoutingHelper::CalculateAllPossibleRoutes ()
+GlobalRoutingHelper::CalculateAllPossibleRoutes (bool invalidatedRoutes/* = true*/)
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
@@ -350,7 +353,10 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes ()
 	}
 
       Ptr<Fib>  fib  = source->GetObject<Fib> ();
-      fib->InvalidateAll ();
+      if (invalidatedRoutes)
+        {
+          fib->InvalidateAll ();
+        }
       NS_ASSERT (fib != 0);
 
       NS_LOG_DEBUG ("===========");
