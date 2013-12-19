@@ -133,7 +133,7 @@ GlobalRoutingHelper::Install (Ptr<Node> node)
 	    }
 	  grChannel = ch->GetObject<GlobalRouter> ();
 
-	  gr->AddIncidency (0, grChannel);
+	  gr->AddIncidency (face, grChannel);
 	}
     }
 }
