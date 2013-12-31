@@ -132,6 +132,7 @@ Producer::OnInterest (Ptr<const Interest> interest)
   dataName->append (m_postfix);
   data->SetName (dataName);
   data->SetFreshness (m_freshness);
+  data->SetTimestamp (Simulator::Now());
 
   data->SetSignature (m_signature);
   if (m_keyLocator.size () > 0)
