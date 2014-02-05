@@ -33,8 +33,14 @@ public:
   void
   AddCallbacks (ApiFace::DataCallback onData, ApiFace::TimeoutCallback onTimeout)
   { 
-    m_dataCallbacks.push_back (onData);
-    m_timeoutCallbacks.push_back (onTimeout);
+    if (! onData.IsNull ())
+      {
+         m_dataCallbacks.push_back (onData);
+      }
+    if (! onTimeout.IsNull ())
+      {
+         m_timeoutCallbacks.push_back (onTimeout);
+      }
   }
 
   void
