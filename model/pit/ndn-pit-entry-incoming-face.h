@@ -60,12 +60,12 @@ public:
   /**
    * @brief Compare two PitEntryIncomingFace
    */
-  bool operator== (const IncomingFace &dst) { return *m_face==*(dst.m_face); }
+  bool operator== (const IncomingFace &dst) const { return *m_face==*(dst.m_face); }
 
   /**
    * @brief Compare PitEntryIncomingFace with Face
    */
-  bool operator== (Ptr<Face> face) { return *m_face==*face; }
+  bool operator== (Ptr<Face> face) const { return *m_face==*face; }
 
   /**
    * \brief Comparison operator used by boost::multi_index::identity<>
