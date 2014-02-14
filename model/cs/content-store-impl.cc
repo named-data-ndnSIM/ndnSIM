@@ -24,6 +24,8 @@
 #include "../../utils/trie/lru-policy.h"
 #include "../../utils/trie/fifo-policy.h"
 #include "../../utils/trie/lfu-policy.h"
+#include "../../utils/trie/multi-policy.h"
+#include "../../utils/trie/aggregate-stats-policy.h"
 
 #define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
   static struct X ## type ## templ ## RegistrationClass \
@@ -65,8 +67,29 @@ template class ContentStoreImpl<lfu_policy_traits>;
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lru_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, fifo_policy_traits);
-
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lfu_policy_traits);
+
+
+typedef multi_policy_traits< boost::mpl::vector2< lru_policy_traits,
+                                                  aggregate_stats_policy_traits > > LruWithCountsTraits;
+typedef multi_policy_traits< boost::mpl::vector2< random_policy_traits,
+                                                  aggregate_stats_policy_traits > > RandomWithCountsTraits;
+typedef multi_policy_traits< boost::mpl::vector2< fifo_policy_traits,
+                                                  aggregate_stats_policy_traits > > FifoWithCountsTraits;
+typedef multi_policy_traits< boost::mpl::vector2< lfu_policy_traits,
+                                                  aggregate_stats_policy_traits > > LfuWithCountsTraits;
+
+template class ContentStoreImpl<LruWithCountsTraits>;
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, LruWithCountsTraits);
+
+template class ContentStoreImpl<RandomWithCountsTraits>;
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, RandomWithCountsTraits);
+
+template class ContentStoreImpl<FifoWithCountsTraits>;
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, FifoWithCountsTraits);
+
+template class ContentStoreImpl<LfuWithCountsTraits>;
+NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, LfuWithCountsTraits);
 
 #ifdef DOXYGEN
 // /**
