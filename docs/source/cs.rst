@@ -64,6 +64,18 @@ Usage example:
 
     If ``MaxSize`` is set to 0, then no limit on ContentStore will be enforced
 
+Nocache
+~~~~~~~
+
+:ndnsim:`Trivial implementation <ndn::cs::Nocache>` of the ContentStore that does not really do any caching.
+
+Usage example:
+
+      .. code-block:: c++
+
+         ndnHelper.SetContentStore ("ns3::ndn::cs::Nocache");
+	 ...
+	 ndnHelper.Install (nodes);
 
 Content stores with entry lifetime tracking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
