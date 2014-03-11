@@ -28,6 +28,38 @@ Packet-level trace helpers
         ...
 
 
+    Output file format is tab-separated values, with first row specifying names of the columns.  Refer to the following table for the description of the columns:
+
+    +------------------+---------------------------------------------------------------------+
+    | Column           | Description                                                         |
+    +==================+=====================================================================+
+    | ``Time``         | simulation time                                                     |
+    +------------------+---------------------------------------------------------------------+
+    | ``Node``         | node id, globally unique                                            |
+    +------------------+---------------------------------------------------------------------+
+    | ``FaceId``       | interface ID (-1 for combined metric)                               |
+    +------------------+---------------------------------------------------------------------+
+    | ``Type``         | Type of measurements:                                               |
+    |                  |                                                                     |
+    |                  | - ``InInterests``  measurements of incoming Interests               |
+    |                  | - ``OutInterests``  measurements of outgoing Interests              |
+    |                  | - ``DropInterests``  measurements of dropped Interests              |
+    |                  | - ``InData``  measurements of incoming Data                         |
+    |                  | - ``OutData``  measurements of outgoing Data                        |
+    |                  | - ``DropData``  measurements of dropped Data                        |
+    |                  | - ``InNacks``  measurements of incoming NACKs                       |
+    |                  | - ``OutNacks``  measurements of outgoing NACKs                      |
+    |                  | - ``DropNacks``  measurements of dropped NACKs                      |
+    |                  | - ``SatisfiedInterests`` measurements of satisfied Interests        |
+    |                  | - ``TimedOutInterests`` measurements of timed out Interests         |
+    +------------------+---------------------------------------------------------------------+
+    | ``Packets``      | absolute number of packets within last averaging period             |
+    |                  | (number of packets).                                                |
+    +------------------+---------------------------------------------------------------------+
+    | ``Kilobytes``    | absolute number of kilobytes transferred within the last averaging  |
+    |                  | period  (number of packets).                                        |
+    +------------------+---------------------------------------------------------------------+
+
 - :ndnsim:`ndn::L3RateTracer`
 
     Tracing the rate in bytes and in number of packets of Interest/Data packets forwarded by an NDN node
@@ -43,6 +75,50 @@ Packet-level trace helpers
         Simulator::Run ();
 
         ...
+
+    Output file format is tab-separated values, with first row specifying names of the columns.  Refer to the following table for the description of the columns:
+
+    +------------------+---------------------------------------------------------------------+
+    | Column           | Description                                                         |
+    +==================+=====================================================================+
+    | ``Time``         | simulation time                                                     |
+    +------------------+---------------------------------------------------------------------+
+    | ``Node``         | node id, globally unique                                            |
+    +------------------+---------------------------------------------------------------------+
+    | ``FaceId``       | interface ID (-1 for combined metric)                               |
+    +------------------+---------------------------------------------------------------------+
+    | ``Type``         | Type of measurements:                                               |
+    |                  |                                                                     |
+    |                  | - ``InInterests``  measurements of incoming Interests               |
+    |                  | - ``OutInterests``  measurements of outgoing Interests              |
+    |                  | - ``DropInterests``  measurements of dropped Interests              |
+    |                  | - ``InData``  measurements of incoming Data                         |
+    |                  | - ``OutData``  measurements of outgoing Data                        |
+    |                  | - ``DropData``  measurements of dropped Data                        |
+    |                  | - ``InNacks``  measurements of incoming NACKs                       |
+    |                  | - ``OutNacks``  measurements of outgoing NACKs                      |
+    |                  | - ``DropNacks``  measurements of dropped NACKs                      |
+    |                  | - ``InSatisfiedInterests`` measurements of incoming satisfied       |
+    |                  |   Interests                                                         |
+    |                  | - ``InTimedOutInterests`` measurements of incoming timed out        |
+    |                  |   Interests                                                         |
+    |                  | - ``OutSatisfiedInterests`` measurements of outgoing satisfied      |
+    |                  |   Interests                                                         |
+    |                  | - ``OutTimedOutInterests`` measurements of outgoing satisfied       |
+    |                  |   Interests                                                         |
+    +------------------+---------------------------------------------------------------------+
+    | ``Packets``      | estimated rate (EWMA average) of packets within the last averaging  |
+    |                  | period (number of packets/s).                                       |
+    +------------------+---------------------------------------------------------------------+
+    | ``Kilobytes``    | estimated rate (EWMA average) within last averaging                 |
+    |                  | period (kilobytes/s)                                                |
+    +------------------+---------------------------------------------------------------------+
+    | ``PacketsRaw``   | absolute number of packets within last averaging period             |
+    |                  | (number of packets).                                                |
+    +------------------+---------------------------------------------------------------------+
+    | ``KilobytesRaw`` | absolute number of kilobytes transferred within the last averaging  |
+    |                  | period  (number of packets).                                        |
+    +------------------+---------------------------------------------------------------------+
 
 - :ndnsim:`L2Tracer`
 
@@ -60,6 +136,34 @@ Packet-level trace helpers
         Simulator::Run ();
 
         ...
+
+    Output file format is tab-separated values, with first row specifying names of the columns.  Refer to the following table for the description of the columns:
+
+    +------------------+---------------------------------------------------------------------+
+    | Column           | Description                                                         |
+    +==================+=====================================================================+
+    | ``Time``         | simulation time                                                     |
+    +------------------+---------------------------------------------------------------------+
+    | ``Node``         | node id, globally unique                                            |
+    +------------------+---------------------------------------------------------------------+
+    | ``Interface``    | interface name (currently only "combined")                          |
+    +------------------+---------------------------------------------------------------------+
+    | ``Type``         | Type of measurements:                                               |
+    |                  |                                                                     |
+    |                  | - ``Drop``  measurements of dropped packets                         |
+    +------------------+---------------------------------------------------------------------+
+    | ``Packets``      | estimated rate (EWMA average) of packets within the last averaging  |
+    |                  | period (number of packets/s).                                       |
+    +------------------+---------------------------------------------------------------------+
+    | ``Kilobytes``    | estimated rate (EWMA average) within last averaging                 |
+    |                  | period (kilobytes/s)                                                |
+    +------------------+---------------------------------------------------------------------+
+    | ``PacketsRaw``   | absolute number of packets within last averaging period             |
+    |                  | (number of packets).                                                |
+    +------------------+---------------------------------------------------------------------+
+    | ``KilobytesRaw`` | absolute number of kilobytes transferred within the last averaging  |
+    |                  | period  (number of packets).                                        |
+    +------------------+---------------------------------------------------------------------+
 
 .. note::
 
@@ -334,4 +438,3 @@ This example (``ndn-simple-with-pit-count-stats.cc``) shows how you can periodic
 To run this scenario, use the following command::
 
         ./waf --run=ndn-simple-with-pit-count-stats
-
