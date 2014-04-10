@@ -233,7 +233,7 @@ ForwardingStrategy::OnData (Ptr<Face> inFace,
     {
       bool cached = false;
 
-      if (m_cacheUnsolicitedData || (m_cacheUnsolicitedDataFromApps && (inFace->GetFlags () | Face::APPLICATION)))
+      if (m_cacheUnsolicitedData || (m_cacheUnsolicitedDataFromApps && (inFace->GetFlags () & Face::APPLICATION)))
         {
           // Optimistically add or update entry in the content store
           cached = m_contentStore->Add (data);
