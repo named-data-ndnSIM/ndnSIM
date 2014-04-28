@@ -245,7 +245,7 @@ GlobalRoutingHelper::CalculateRoutes (bool invalidatedRoutes/* = true*/)
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< NdnGlobalRouterGraph > ));
 
   NdnGlobalRouterGraph graph;
-  typedef graph_traits < NdnGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
+  // typedef graph_traits < NdnGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
 
   // For now we doing Dijkstra for every node.  Can be replaced with Bellman-Ford or Floyd-Warshall.
   // Other algorithms should be faster, but they need additional EdgeListGraph concept provided by the graph, which
@@ -338,7 +338,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes (bool invalidatedRoutes/* = true
   BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept< NdnGlobalRouterGraph > ));
 
   NdnGlobalRouterGraph graph;
-  typedef graph_traits < NdnGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
+  // typedef graph_traits < NdnGlobalRouterGraph >::vertex_descriptor vertex_descriptor;
 
   // For now we doing Dijkstra for every node.  Can be replaced with Bellman-Ford or Floyd-Warshall.
   // Other algorithms should be faster, but they need additional EdgeListGraph concept provided by the graph, which
