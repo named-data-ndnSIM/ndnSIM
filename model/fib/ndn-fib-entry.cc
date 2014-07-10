@@ -67,8 +67,8 @@ FaceMetric::UpdateRtt (const Time &rttSample)
     }
   else
     {
-      m_rttVar = Time ((1 - NDN_RTO_BETA) * m_rttVar + NDN_RTO_BETA * Abs(m_sRtt - rttSample));
-      m_sRtt = Time ((1 - NDN_RTO_ALPHA) * m_sRtt + NDN_RTO_ALPHA * rttSample);
+      m_rttVar = Time ((1 - NDN_RTO_BETA) * m_rttVar + 1.0 * NDN_RTO_BETA * Abs(m_sRtt - rttSample));
+      m_sRtt = Time ((1 - NDN_RTO_ALPHA) * m_sRtt + 1.0 * NDN_RTO_ALPHA * rttSample);
     }
 }
 

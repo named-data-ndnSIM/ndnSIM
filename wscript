@@ -227,10 +227,6 @@ def build(bld):
                  source = bld.path.ant_glob (["PyNDN/**/*.py"]),
                  install_from = "PyNDN",
                  install_path = bld.env['PyNDN_install_path'])
-        else:
-            bld (features = "py",
-                 source = bld.path.ant_glob (["PyNDN/**/*.py"]),
-                 install_from = ".")
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')
@@ -258,4 +254,3 @@ def apply_ns3fullmoduleheaders(self):
             task.set_outputs([dst_node])
         else:
             task.header_to_remove = dst_node
-
