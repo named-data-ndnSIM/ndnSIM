@@ -127,55 +127,55 @@ Research papers that use ndnSIM
 
 #. **Xiaoke Jiang, Jun Bi, Youchao Wang, and You Wang, "Interest Set Mechanism to Improve the Transport of Named Data Networking", in proceedings of ACM SIGCOMM13 (poster), Hongkong, China, 2013** (`PDF <http://netarchlab.tsinghua.edu.cn/~junbi/SIGCOMM2013-1.pdf>`_)
 
-    Named Data Networking (NDN) is currently a hot research topic promising to be one of the most advanced developments in future Internet architectures. 
-    Researches have built real software systems over NDN which work on speciﬁed scenarios. 
-    In this paper, we proposal an new mechanism which aggregate similar Interest packets to improve the efficient of transport of NDN. 
-    Firstly we prove the optimal chunk size which simultaneously minimize the latency and maximize the valid payload ratio during a complete data acquiring process. 
-    That's why we aggregate the Interest packet but not increase the size of Data packet. 
+    Named Data Networking (NDN) is currently a hot research topic promising to be one of the most advanced developments in future Internet architectures.
+    Researches have built real software systems over NDN which work on speciﬁed scenarios.
+    In this paper, we proposal an new mechanism which aggregate similar Interest packets to improve the efficient of transport of NDN.
+    Firstly we prove the optimal chunk size which simultaneously minimize the latency and maximize the valid payload ratio during a complete data acquiring process.
+    That's why we aggregate the Interest packet but not increase the size of Data packet.
     Secondly we introduce the Interest Set mechanism that which is able to maintain a conversational "channel" between the data consumer and provider to cover the space and time uncertainty of data packet generating and at the same time reduces the number of FIB lookups and compresses the PIT.
 
 #. **Z. Zhu and A. Afanasyev, "Let's ChronoSync: Decentralized Dataset State Synchronization in Named Data Networking," in Proceedings of the 21st IEEE International Conference on Network Protocols (ICNP 2013), Goettingen, Germany, October 2013** (`PDF <http://lasr.cs.ucla.edu/afanasyev/data/files/Zhu/chronosync-icnp2013.pdf>`_)
 
-    In supporting many distributed applications, such as group text messaging, file sharing, and joint editing, a basic requirement is the efficient and robust synchronization of knowledge about the dataset such as text messages, changes to the shared folder, or document edits. 
-    We propose ChronoSync protocol, which exploits the features of the Named Data Networking architecture to efficiently synchronize the state of a dataset among a distributed group of users. 
+    In supporting many distributed applications, such as group text messaging, file sharing, and joint editing, a basic requirement is the efficient and robust synchronization of knowledge about the dataset such as text messages, changes to the shared folder, or document edits.
+    We propose ChronoSync protocol, which exploits the features of the Named Data Networking architecture to efficiently synchronize the state of a dataset among a distributed group of users.
     Using appropriate naming rules, ChronoSync summarizes the state of a dataset in a condensed cryptographic digest form and exchange it among the distributed parties.
-    Differences of the dataset can be inferred from the digests and disseminated efficiently to all parties.  
+    Differences of the dataset can be inferred from the digests and disseminated efficiently to all parties.
     With the complete and up-to-date knowledge of the dataset changes, applications can decide whether or when to fetch which pieces of the data.
     We implemented ChronoSync as a C++ library and developed two distributed application prototypes based on it.
     We show through simulations that ChronoSync is effective and efficient in synchronization dataset state, and is robust against packet losses and network partitions.
 
 #. **Y. Wang, N. Rozhnova, A. Narayanan, D. Oran, and I. Rhee, "An improved hop-by-hop interest shaper for congestion control in named data networking". In Proceedings of the 3rd ACM SIGCOMM workshop on Information-centric networking, 2013** (`PDF <http://conferences.sigcomm.org/sigcomm/2013/papers/icn/p55.pdf>`_)
 
-    Hop-by-hop interest shaping has been proposed as a viable congestion control mechanism in Named Data Networking (NDN). 
-    Interest shaping exploits the strict receiver-driven traffc pattern and the symmetric bidirectional forwarding in NDN to control the returning data rate. 
-    In this paper, we point out that both interests and contents contribute to congestion and their interdependence must be considered in any interest shaping algorithm. 
-    We first analyze this issue mathematically by formulating it as an optimization problem to obtain the optimal shaping rate. 
-    Then a practical interest shaping algorithm is proposed to achieve high link utilization without congestive data loss. 
-    We further note that ﬂow differentiation in NDN is complicated and design our scheme independently of traffc ﬂows. 
-    We demonstrate our hopby-hop interest shaper in conjunction with simple AdditiveIncrease-Multiplicative-Decrease (AIMD) clients using the ns3-based NDN simulator (ndnSIM). 
+    Hop-by-hop interest shaping has been proposed as a viable congestion control mechanism in Named Data Networking (NDN).
+    Interest shaping exploits the strict receiver-driven traffc pattern and the symmetric bidirectional forwarding in NDN to control the returning data rate.
+    In this paper, we point out that both interests and contents contribute to congestion and their interdependence must be considered in any interest shaping algorithm.
+    We first analyze this issue mathematically by formulating it as an optimization problem to obtain the optimal shaping rate.
+    Then a practical interest shaping algorithm is proposed to achieve high link utilization without congestive data loss.
+    We further note that ﬂow differentiation in NDN is complicated and design our scheme independently of traffc ﬂows.
+    We demonstrate our hopby-hop interest shaper in conjunction with simple AdditiveIncrease-Multiplicative-Decrease (AIMD) clients using the ns3-based NDN simulator (ndnSIM).
     Our results show that the proposed shaping algorithm can effectively control congestion and achieve near-optimal throughput.
 
 #. **S. Arianfar, P. Sarolahti, and J. Ott, "Deadline-based Resource Management for Information-Centric Networks". In Proceedings of the 3rd ACM SIGCOMM workshop on Information-centric networking, 2013** (`doi 10.1145/2491224.2491226 <http://dx.doi.org/10.1145/2491224.2491226>`_)
 
     Unlike in traditional IP-based end-to-end network sessions, in information-centric networks the data source may change during a communication session.
     Therefore the response time to subsequent data requests may vary signiﬁcantly depending on whether data comes from nearby cache, or a distant source.
-    This is a complication for designing resource management, reliability and other algorithms, that traditionally use RTT measurements for determining when data is considered lost and should be retransmitted (along with related congestion control adjustments). 
-    This paper discusses a different approach for designing resource management in information-centric networks: data packets are assigned with a lifetime, that is used as a basis for scheduling and resource management in the network, and for congestion control and retransmission logic at the end hosts. 
+    This is a complication for designing resource management, reliability and other algorithms, that traditionally use RTT measurements for determining when data is considered lost and should be retransmitted (along with related congestion control adjustments).
+    This paper discusses a different approach for designing resource management in information-centric networks: data packets are assigned with a lifetime, that is used as a basis for scheduling and resource management in the network, and for congestion control and retransmission logic at the end hosts.
     We demonstrate an initial evaluation of this approach based on ns-3 simulations on CCN framework
 
 #. **M. Conti, P. Gasti, M. Teoli, "A lightweight mechanism for detection of cache pollution attacks in Named Data Networking". Computer Networks, 2013** (`doi 10.1016/j.comnet.2013.07.034 <http://dx.doi.org/10.1016/j.comnet.2013.07.034>`_)
 
-    Content-Centric Networking (CCN) is an emerging paradigm being considered as a possible replacement for the current IP-based host-centric Internet infrastructure. 
+    Content-Centric Networking (CCN) is an emerging paradigm being considered as a possible replacement for the current IP-based host-centric Internet infrastructure.
     In CCN, named content---rather than addressable hosts---becomes a first-class entity.
     Content is therefore decoupled from its location.
     This allows, among other things, the implementation of ubiquitous caching.
-    
+
     Named-Data Networking (NDN) is a prominent example of CCN.
     In NDN, all nodes (i.e., hosts, routers) are allowed to have a local cache, used to satisfy incoming requests for content.
     This makes NDN a good architecture for efficient large scale content distribution.
     However, reliance on caching allows an adversary to perform attacks that are very effective and relatively easy to implement.
     Such attacks include cache poisoning (i.e., introducing malicious content into caches) and cache pollution (i.e., disrupting cache locality).
-    
+
     This paper focuses on cache pollution attacks, where the adversary’s goal is to disrupt cache locality to increase link utilization and cache misses for honest consumers.
     We show, via simulations, that such attacks can be implemented in NDN using limited resources, and that their effectiveness is not limited to small topologies.
     We then illustrate that existing proactive countermeasures are ineffective against realistic adversaries. Finally, we introduce a new technique for detecting pollution attacks.
@@ -183,11 +183,19 @@ Research papers that use ndnSIM
 
 #. **G. Mauri and G. Verticale, "Distributing key revocation status in Named Data Networking". Advances in Communication Networking, pages 310–313. Springer, 2013** (`doi 10.1007/978-3-642-40552-5_31 <http://dx.doi.org/10.1007/978-3-642-40552-5_31>`_)
 
-    Content Centric Networking (CCN) is a new network paradigm designed to satisfy user needs considering the growth of data demand. 
-    Named Data Networking (NDN) is a research project that is developing the future Internet architecture using the principles behind CCN. 
-    In this novel architecture, the contents are addressed by their name and not by their location. 
-    Thus, the attention is shifted from user to content, resulting in a caching network that is more efficient and flexible than an IP network for content distribution and management with beneficial effects on timely delivery. 
-    In NDN, the content objects are divided into chunks, each digitally signed by its producer, and most papers assume that verification is made only by the content consumer. 
-    In order to perform signature verification, a node needs the signer’s key, which can be easily retrieved by issuing a standard interest message. 
-    Although content verification at the end node prevents disruptive attacks in which false data is delivered to applications, the verification of key validity is also necessary. 
+    Content Centric Networking (CCN) is a new network paradigm designed to satisfy user needs considering the growth of data demand.
+    Named Data Networking (NDN) is a research project that is developing the future Internet architecture using the principles behind CCN.
+    In this novel architecture, the contents are addressed by their name and not by their location.
+    Thus, the attention is shifted from user to content, resulting in a caching network that is more efficient and flexible than an IP network for content distribution and management with beneficial effects on timely delivery.
+    In NDN, the content objects are divided into chunks, each digitally signed by its producer, and most papers assume that verification is made only by the content consumer.
+    In order to perform signature verification, a node needs the signer’s key, which can be easily retrieved by issuing a standard interest message.
+    Although content verification at the end node prevents disruptive attacks in which false data is delivered to applications, the verification of key validity is also necessary.
     Otherwise, false data would be cached and forwarded instead of correct data resulting in a denial of service and paving the way for more sophisticated attacks.
+
+#. **W. Drira and F. Filali, "A Pub/Sub extension to NDN for efficient data collection and dissemination in V2X networks". In First International Workshop on Smart Vehicles: Connectivity Technologies and ITS Applications (2014) (SmartVehicles'14), Sydney, Australia, June 2014.** (`PDF <https://drive.google.com/file/d/0B-Qgl9lKNlsXLWRvWllGdElHMTQ>`_)
+
+    Named Data Networking Networking (NDN) gives more importance to content instead of its location. On the other hand, V2X networks carry a wide variety of content such as events, traffic information and infotainment content. Therefore, NDN native capabilities in terms of caching and multicast can reduce traffic load in V2X networks and consequently decrease congestion risk. However, the communication in NDN is based on a request-response pattern while it is event based in V2X. Thus, this paper extends NDN with a Pub/Sub capability in order to provide an efficient data collection and dissemination in V2X networks. In this paper, we study the limitations of using NDN and the challenges of extending it with Pub/Sub and propose a new protocol that handles V2X characteristics. Simulation results of data dissemination shows that the number of Subscribe messages generated in vehicles present at most the one tenth of the total received Publish messages (TPub) while, in NDN, the number of Interests will be equal to the number of Data messages without considering message losses.
+
+#. **W. Drira and F. Filali, "NDN-Q: an NDN query mechanism for efficient V2X data collection in smart cities". In Self-Organizing Wireless Access Networks for Smart City (SWANSITY) part of SECON 2014 (SWANSITY 2014), Singapore, Singapore, June 2014.** (`PDF <https://drive.google.com/file/d/0B-Qgl9lKNlsXZWhwVmtxdUVUNXc>`_)
+
+    Collecting data from V2X networks is important to monitor, control and manage road traffic. However, efficient collection of the needed data is quite challenging due to vehicles mobility and the tremendous amount of events and data generated. Named Data Networking (NDN), a future internet architecture, gives more importance to content instead of its location. It has some inner capabilities of caching and multicast that can reduce traffic load in V2X networks and consequently decrease congestion risk. The communication in NDN is based on a request-response pattern where a consumer requests a specific content using its associated name. In this paper, an NDN query mechanism is proposed to use dynamic names to collect dynamic data built on the fly in one or many nodes. Then, it is merged and aggregated hop by hop to provide the response cooperatively to the consumer.
