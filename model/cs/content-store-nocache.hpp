@@ -22,6 +22,8 @@
 #ifndef NDN_CONTENT_STORE_NOCACHE_H
 #define NDN_CONTENT_STORE_NOCACHE_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ndnSIM/model/cs/ndn-content-store.hpp"
 
 namespace ns3 {
@@ -52,11 +54,11 @@ public:
    */
   virtual ~Nocache();
 
-  virtual Ptr<Data>
-  Lookup(Ptr<const Interest> interest);
+  virtual shared_ptr<Data>
+  Lookup(shared_ptr<const Interest> interest);
 
   virtual bool
-  Add(Ptr<const Data> data);
+  Add(shared_ptr<const Data> data);
 
   virtual void
   Print(std::ostream& os) const;

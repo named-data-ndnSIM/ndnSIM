@@ -22,11 +22,12 @@
 #ifndef NDN_IP_FACE_STACK_H
 #define NDN_IP_FACE_STACK_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/application.h"
 #include "ns3/socket.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ptr.h"
-#include "ns3/ndn-name.hpp"
 
 #include <map>
 

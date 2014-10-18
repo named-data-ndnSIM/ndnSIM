@@ -21,6 +21,8 @@
 #ifndef NDN_NET_DEVICE_FACE_H
 #define NDN_NET_DEVICE_FACE_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-face.hpp"
 #include "ns3/net-device.h"
 

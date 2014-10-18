@@ -26,8 +26,6 @@
 #include "ns3/callback.h"
 
 #include "ns3/ndn-app.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"

@@ -29,7 +29,6 @@
 #include "ns3/ndn-l3-protocol.hpp"
 #include "../model/ndn-net-device-face.hpp"
 #include "../model/ndn-global-router.hpp"
-#include "ns3/ndn-name.hpp"
 #include "ns3/ndn-fib.hpp"
 
 #include "ns3/node.h"
@@ -179,7 +178,7 @@ GlobalRoutingHelper::AddOrigin(const std::string& prefix, Ptr<Node> node)
   Ptr<GlobalRouter> gr = node->GetObject<GlobalRouter>();
   NS_ASSERT_MSG(gr != 0, "GlobalRouter is not installed on the node");
 
-  Ptr<Name> name = Create<Name>(boost::lexical_cast<Name>(prefix));
+  auto name = make_shared<Name>(prefix);
   gr->AddLocalPrefix(name);
 }
 
@@ -267,7 +266,7 @@ GlobalRoutingHelper::CalculateRoutes(bool invalidatedRoutes /* = true*/)
           // cout << " is unreachable" << endl;
         }
         else {
-          BOOST_FOREACH (const Ptr<const Name>& prefix, i->first->GetLocalPrefixes()) {
+          BOOST_FOREACH (const std::shared_ptr<const Name>& prefix, i->first->GetLocalPrefixes()) {
             NS_LOG_DEBUG(" prefix " << prefix << " reachable via face " << *i->second.get<0>()
                                     << " with distance " << i->second.get<1>() << " with delay "
                                     << i->second.get<2>());
@@ -371,7 +370,8 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes(bool invalidatedRoutes /* = true
             // cout << " is unreachable" << endl;
           }
           else {
-            BOOST_FOREACH (const Ptr<const Name>& prefix, i->first->GetLocalPrefixes()) {
+            BOOST_FOREACH (const std::shared_ptr<const Name>& prefix,
+                           i->first->GetLocalPrefixes()) {
               NS_LOG_DEBUG(" prefix " << *prefix << " reachable via face " << *i->second.get<0>()
                                       << " with distance " << i->second.get<1>() << " with delay "
                                       << i->second.get<2>());

@@ -31,7 +31,6 @@
 // #include "ns3/address.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/channel.h"
-#include "ns3/ndn-name.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.NetDeviceFace");
 

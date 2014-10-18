@@ -21,6 +21,8 @@
 #ifndef TRIE_H_
 #define TRIE_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 
 #include <boost/intrusive/unordered_set.hpp>

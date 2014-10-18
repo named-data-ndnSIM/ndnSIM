@@ -21,6 +21,8 @@
 #ifndef NDN_CONSUMER_ZIPF_MANDELBROT_H_
 #define NDN_CONSUMER_ZIPF_MANDELBROT_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-consumer.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"

@@ -21,6 +21,8 @@
 #ifndef NDN_L3_PROTOCOL_H
 #define NDN_L3_PROTOCOL_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include <list>
 #include <vector>
 

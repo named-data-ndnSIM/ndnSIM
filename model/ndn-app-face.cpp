@@ -31,9 +31,6 @@
 #include "ns3/ndn-header-helper.hpp"
 #include "ns3/ndn-app.hpp"
 
-#include "ndn-interest.hpp"
-#include "ndn-data.hpp"
-
 NS_LOG_COMPONENT_DEFINE("ndn.AppFace");
 
 namespace ns3 {
@@ -80,7 +77,7 @@ AppFace::operator= (const AppFace &)
 }
 
 bool
-AppFace::SendInterest(Ptr<const Interest> interest)
+AppFace::SendInterest(shared_ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION(this << interest);
 
@@ -88,16 +85,13 @@ AppFace::SendInterest(Ptr<const Interest> interest)
     return false;
   }
 
-  if (interest->GetNack() > 0)
-    m_app->OnNack(interest);
-  else
-    m_app->OnInterest(interest);
+  m_app->OnInterest(interest);
 
   return true;
 }
 
 bool
-AppFace::SendData(Ptr<const Data> data)
+AppFace::SendData(shared_ptr<const Data> data)
 {
   NS_LOG_FUNCTION(this << data);
 

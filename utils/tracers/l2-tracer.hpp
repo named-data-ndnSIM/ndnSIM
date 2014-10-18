@@ -21,6 +21,8 @@
 #ifndef L2_TRACER_H
 #define L2_TRACER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include "ns3/packet.h"

@@ -21,6 +21,8 @@
 #ifndef FRESHNESS_POLICY_H_
 #define FRESHNESS_POLICY_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 

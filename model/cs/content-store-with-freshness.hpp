@@ -21,7 +21,7 @@
 #ifndef NDN_CONTENT_STORE_WITH_FRESHNESS_H_
 #define NDN_CONTENT_STORE_WITH_FRESHNESS_H_
 
-#include "content-store-impl.h"
+#include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "content-store-impl.hpp"
 
@@ -57,7 +57,7 @@ public:
   Print(std::ostream& os) const;
 
   virtual inline bool
-  Add(Ptr<const Data> data);
+  Add(shared_ptr<const Data> data);
 
 private:
   inline void
@@ -98,7 +98,7 @@ ContentStoreWithFreshness<Policy>::GetTypeId()
 
 template<class Policy>
 inline bool
-ContentStoreWithFreshness<Policy>::Add(Ptr<const Data> data)
+ContentStoreWithFreshness<Policy>::Add(shared_ptr<const Data> data)
 {
   bool ok = super::Add(data);
   if (!ok)

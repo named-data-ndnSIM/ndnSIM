@@ -22,6 +22,8 @@
 #ifndef NDN_IP_FACES_HELPER_H
 #define NDN_IP_FACES_HELPER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/nstime.h"
 #include "ns3/ipv4-address.h"

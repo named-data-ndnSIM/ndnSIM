@@ -22,6 +22,8 @@
 #ifndef NDN_APP_FACE_H
 #define NDN_APP_FACE_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-face.hpp"
 #include "ns3/traced-callback.h"
 
@@ -30,12 +32,6 @@ namespace ns3 {
 class Packet;
 
 namespace ndn {
-
-class Interest;
-class Data;
-
-typedef Interest InterestHeader;
-typedef Data DataHeader;
 
 class App;
 
@@ -63,10 +59,10 @@ public:
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from Face
   virtual bool
-  SendInterest(Ptr<const Interest> interest);
+  SendInterest(shared_ptr<const Interest> interest);
 
   virtual bool
-  SendData(Ptr<const Data> data);
+  SendData(shared_ptr<const Data> data);
 
 public:
   virtual std::ostream&
@@ -76,6 +72,7 @@ public:
 private:
   AppFace();
   AppFace(const AppFace&); ///< \brief Disabled copy constructor
+
   AppFace&
   operator=(const AppFace&); ///< \brief Disabled copy operator
 

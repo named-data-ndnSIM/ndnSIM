@@ -22,6 +22,8 @@
 #ifndef NDN_CONSUMER_WINDOW_H
 #define NDN_CONSUMER_WINDOW_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-consumer.hpp"
 #include "ns3/traced-value.h"
 
@@ -48,13 +50,13 @@ public:
 
   // From App
   // virtual void
-  // OnInterest (const Ptr<const Interest> &interest);
+  // OnInterest (const shared_ptr<const Interest> &interest);
 
   virtual void
-  OnNack(Ptr<const Interest> interest);
+  OnNack(shared_ptr<const Interest> interest);
 
   virtual void
-  OnData(Ptr<const Data> contentObject);
+  OnData(shared_ptr<const Data> contentObject);
 
   virtual void
   OnTimeout(uint32_t sequenceNumber);

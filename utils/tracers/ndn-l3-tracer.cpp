@@ -29,8 +29,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "ns3/ndn-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndn-pit-entry.hpp"
 
 using namespace std;

@@ -27,8 +27,6 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ns3/ndn-data.hpp"
-#include "ns3/ndn-interest.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerWindow");
 
@@ -183,7 +181,7 @@ ConsumerWindow::ScheduleNextPacket()
 ///////////////////////////////////////////////////
 
 void
-ConsumerWindow::OnData(Ptr<const Data> contentObject)
+ConsumerWindow::OnData(shared_ptr<const Data> contentObject)
 {
   Consumer::OnData(contentObject);
 
@@ -197,7 +195,7 @@ ConsumerWindow::OnData(Ptr<const Data> contentObject)
 }
 
 void
-ConsumerWindow::OnNack(Ptr<const Interest> interest)
+ConsumerWindow::OnNack(shared_ptr<const Interest> interest)
 {
   Consumer::OnNack(interest);
 

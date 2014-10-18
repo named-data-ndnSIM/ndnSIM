@@ -22,6 +22,8 @@
 #ifndef NDN_CONSUMER_CBR_H
 #define NDN_CONSUMER_CBR_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-consumer.hpp"
 
 namespace ns3 {
@@ -45,13 +47,13 @@ public:
 
   // From NdnApp
   // virtual void
-  // OnInterest (const Ptr<const Interest> &interest);
+  // OnInterest (const shared_ptr<const Interest> &interest);
 
   // virtual void
-  // OnNack (const Ptr<const Interest> &interest);
+  // OnNack (const shared_ptr<const Interest> &interest);
 
   // virtual void
-  // OnData (const Ptr<const Data> &contentObject,
+  // OnData (const shared_ptr<const Data> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
 protected:

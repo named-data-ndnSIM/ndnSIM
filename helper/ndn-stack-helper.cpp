@@ -42,11 +42,9 @@
 #include "ns3/ndn-forwarding-strategy.hpp"
 #include "ns3/ndn-fib.hpp"
 #include "ns3/ndn-pit.hpp"
-#include "ns3/ndn-name.hpp"
 #include "ns3/ndn-content-store.hpp"
 
 #include "ns3/node-list.h"
-// #include "ns3/loopback-net-device.h"
 
 #include "ns3/data-rate.h"
 

@@ -21,11 +21,11 @@
 #ifndef NDN_CONTENT_STORE_IMPL_H_
 #define NDN_CONTENT_STORE_IMPL_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-content-store.hpp"
 
 #include "ns3/packet.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
 #include <boost/foreach.hpp>
 
 #include "ns3/log.h"
@@ -48,7 +48,7 @@ public:
   typedef Entry base_type;
 
 public:
-  EntryImpl(Ptr<ContentStore> cs, Ptr<const Data> data)
+  EntryImpl(Ptr<ContentStore> cs, shared_ptr<const Data> data)
     : Entry(cs, data)
     , item_(0)
   {
@@ -103,14 +103,14 @@ public:
 
   // from ContentStore
 
-  virtual inline Ptr<Data>
-  Lookup(Ptr<const Interest> interest);
+  virtual inline shared_ptr<Data>
+  Lookup(shared_ptr<const Interest> interest);
 
   virtual inline bool
-  Add(Ptr<const Data> data);
+  Add(shared_ptr<const Data> data);
 
   // virtual bool
-  // Remove (Ptr<Interest> header);
+  // Remove (shared_ptr<Interest> header);
 
   virtual inline void
   Print(std::ostream& os) const;
@@ -200,8 +200,8 @@ private:
 };
 
 template<class Policy>
-Ptr<Data>
-ContentStoreImpl<Policy>::Lookup(Ptr<const Interest> interest)
+shared_ptr<Data>
+ContentStoreImpl<Policy>::Lookup(shared_ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION(this << interest->GetName());
 
@@ -217,7 +217,7 @@ ContentStoreImpl<Policy>::Lookup(Ptr<const Interest> interest)
   if (node != this->end()) {
     this->m_cacheHitsTrace(interest, node->payload()->GetData());
 
-    Ptr<Data> copy = Create<Data>(*node->payload()->GetData());
+    shared_ptr<Data> copy = make_shared<Data>(*node->payload()->GetData());
     ConstCast<Packet>(copy->GetPayload())->RemoveAllPacketTags();
     return copy;
   }
@@ -229,7 +229,7 @@ ContentStoreImpl<Policy>::Lookup(Ptr<const Interest> interest)
 
 template<class Policy>
 bool
-ContentStoreImpl<Policy>::Add(Ptr<const Data> data)
+ContentStoreImpl<Policy>::Add(shared_ptr<const Data> data)
 {
   NS_LOG_FUNCTION(this << data->GetName());
 

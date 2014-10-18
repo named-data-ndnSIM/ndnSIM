@@ -23,8 +23,9 @@
 #ifndef DUMB_REQUESTER_H_
 #define DUMB_REQUESTER_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ndn-app.hpp"
-#include "ns3/ndn-name.hpp"
 
 namespace ns3 {
 

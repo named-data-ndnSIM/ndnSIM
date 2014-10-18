@@ -29,8 +29,6 @@
 #include "ns3/string.h"
 
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 
 NS_LOG_COMPONENT_DEFINE("DumbRequester");
 

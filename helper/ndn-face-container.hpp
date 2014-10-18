@@ -21,6 +21,8 @@
 #ifndef NDN_FACE_CONTAINER_H
 #define NDN_FACE_CONTAINER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include <stdint.h>
 #include <vector>
 

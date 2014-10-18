@@ -27,8 +27,6 @@
 #include "ns3/callback.h"
 
 #include "ns3/ndn-app.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndn-content-store.hpp"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
@@ -271,13 +269,13 @@ CsTracer::Print(std::ostream& os) const
 }
 
 void
-CsTracer::CacheHits(Ptr<const Interest>, Ptr<const Data>)
+CsTracer::CacheHits(shared_ptr<const Interest>, shared_ptr<const Data>)
 {
   m_stats.m_cacheHits++;
 }
 
 void
-CsTracer::CacheMisses(Ptr<const Interest>)
+CsTracer::CacheMisses(shared_ptr<const Interest>)
 {
   m_stats.m_cacheMisses++;
 }

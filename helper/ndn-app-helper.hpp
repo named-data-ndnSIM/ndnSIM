@@ -21,6 +21,8 @@
 #ifndef NDN_APP_HELPER_H
 #define NDN_APP_HELPER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/object-factory.h"
 #include "ns3/attribute.h"
 #include "ns3/node-container.h"

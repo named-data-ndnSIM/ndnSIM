@@ -21,6 +21,8 @@
 #ifndef CCNX_APP_DELAY_TRACER_H
 #define CCNX_APP_DELAY_TRACER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include <ns3/nstime.h>

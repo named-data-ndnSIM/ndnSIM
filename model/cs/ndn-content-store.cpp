@@ -57,7 +57,7 @@ namespace cs {
 
 //////////////////////////////////////////////////////////////////////
 
-Entry::Entry(Ptr<ContentStore> cs, Ptr<const Data> data)
+Entry::Entry(Ptr<ContentStore> cs, shared_ptr<const Data> data)
   : m_cs(cs)
   , m_data(data)
 {
@@ -69,7 +69,7 @@ Entry::GetName() const
   return m_data->GetName();
 }
 
-Ptr<const Data>
+shared_ptr<const Data>
 Entry::GetData() const
 {
   return m_data;

@@ -23,8 +23,6 @@
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndn-l3-protocol.hpp"
 #include "ns3/ndn-fib.hpp"
 #include "ns3/ndn-app-face.hpp"
@@ -47,9 +45,6 @@ App::GetTypeId(void)
 
                         .AddTraceSource("ReceivedInterests", "ReceivedInterests",
                                         MakeTraceSourceAccessor(&App::m_receivedInterests))
-
-                        .AddTraceSource("ReceivedNacks", "ReceivedNacks",
-                                        MakeTraceSourceAccessor(&App::m_receivedNacks))
 
                         .AddTraceSource("ReceivedDatas", "ReceivedDatas",
                                         MakeTraceSourceAccessor(&App::m_receivedDatas))
@@ -93,24 +88,17 @@ App::GetId() const
 }
 
 void
-App::OnInterest(Ptr<const Interest> interest)
+App::OnInterest(shared_ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION(this << interest);
   m_receivedInterests(interest, this, m_face);
 }
 
 void
-App::OnNack(Ptr<const Interest> interest)
+App::OnData(shared_ptr<const Data> data)
 {
-  NS_LOG_FUNCTION(this << interest);
-  m_receivedNacks(interest, this, m_face);
-}
-
-void
-App::OnData(Ptr<const Data> contentObject)
-{
-  NS_LOG_FUNCTION(this << contentObject);
-  m_receivedDatas(contentObject, this, m_face);
+  NS_LOG_FUNCTION(this << data);
+  m_receivedDatas(data, this, m_face);
 }
 
 // Application Methods

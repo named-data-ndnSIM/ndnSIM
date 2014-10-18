@@ -27,8 +27,6 @@
 #include "ns3/packet.h"
 
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 
 #include "ns3/ndn-fib.hpp"
 #include "ns3/random-variable.h"

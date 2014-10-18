@@ -21,6 +21,8 @@
 #ifndef NDN_CONSUMER_BATCHES_H
 #define NDN_CONSUMER_BATCHES_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-consumer.hpp"
 #include "ns3/traced-value.h"
 #include "../utils/batches.hpp"
@@ -44,13 +46,13 @@ public:
 
   // From App
   // virtual void
-  // OnInterest (const Ptr<const Interest> &interest);
+  // OnInterest (const shared_ptr<const Interest> &interest);
 
   // virtual void
-  // OnNack (const Ptr<const Interest> &interest);
+  // OnNack (const shared_ptr<const Interest> &interest);
 
   // virtual void
-  // OnData (const Ptr<const Data> &contentObject,
+  // OnData (const shared_ptr<const Data> &contentObject,
   //                  const Ptr<const Packet> &payload);
 
   // virtual void

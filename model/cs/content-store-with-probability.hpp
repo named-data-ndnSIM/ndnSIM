@@ -21,7 +21,7 @@
 #ifndef NDN_CONTENT_STORE_WITH_PROBABILITY_H_
 #define NDN_CONTENT_STORE_WITH_PROBABILITY_H_
 
-#include "content-store-impl.h"
+#include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "content-store-impl.hpp"
 

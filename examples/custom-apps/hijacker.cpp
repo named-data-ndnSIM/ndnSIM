@@ -21,7 +21,6 @@
 // hijacker.cc
 
 #include "hijacker.hpp"
-#include "ns3/ndn-name.hpp"
 
 NS_LOG_COMPONENT_DEFINE("Hijacker");
 

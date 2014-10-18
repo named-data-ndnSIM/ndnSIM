@@ -21,6 +21,8 @@
 #ifndef NDN_UDP_FACE_H
 #define NDN_UDP_FACE_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ndn-face.hpp"
 #include "ns3/socket.h"
 #include "ns3/ptr.h"

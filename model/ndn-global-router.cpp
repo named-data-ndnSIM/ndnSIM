@@ -22,11 +22,8 @@
 
 #include "ns3/ndn-l3-protocol.hpp"
 #include "ns3/ndn-face.hpp"
-#include "ns3/ndn-name.hpp"
 
 #include "ns3/channel.h"
-
-using namespace boost;
 
 namespace ns3 {
 namespace ndn {
@@ -70,7 +67,7 @@ GlobalRouter::GetL3Protocol() const
 }
 
 void
-GlobalRouter::AddLocalPrefix(Ptr<Name> prefix)
+GlobalRouter::AddLocalPrefix(shared_ptr<Name> prefix)
 {
   m_localPrefixes.push_back(prefix);
 }
@@ -78,7 +75,7 @@ GlobalRouter::AddLocalPrefix(Ptr<Name> prefix)
 void
 GlobalRouter::AddIncidency(Ptr<Face> face, Ptr<GlobalRouter> gr)
 {
-  m_incidencies.push_back(make_tuple(this, face, gr));
+  m_incidencies.push_back(boost::make_tuple(this, face, gr));
 }
 
 GlobalRouter::IncidencyList&

@@ -1,12 +1,21 @@
-/** -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
-/*
- * Copyright (c) 2013, Regents of the University of California
- *                     Alexander Afanasyev
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/**
+ * Copyright (c) 2011-2014  Regents of the University of California.
  *
- * BSD license, See the doc/LICENSE file for more information
+ * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
+ * contributors.
  *
- * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
- */
+ * ndnSIM is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * ndnSIM is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
+ **/
 
 #ifndef NDN_COMMON_H
 #define NDN_COMMON_H
@@ -14,40 +23,34 @@
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
 
-#define NDNSIM_MODE 1
+#include "ndn-ns3.hpp"
 
-#define NDN_NAMESPACE_BEGIN                                                                        \
-  namespace ns3 {                                                                                  \
-  namespace ndn {
-#define NDN_NAMESPACE_END                                                                          \
-  } /*ndn*/                                                                                        \
-  } /*ns3*/
+#include <ndn-cxx/interest.hpp>
+#include <ndn-cxx/encoding/block.hpp>
+#include <ndn-cxx/signature.hpp>
+#include <ndn-cxx/signature-info.hpp>
+#include <ndn-cxx/name.hpp>
+#include <ndn-cxx/data.hpp>
+#include <ndn-cxx/security/key-chain.hpp>
 
-/**
- * @brief NS-3 namespace
- */
 namespace ns3 {
-
-/**
- * @brief ndnSIM namespace
- */
 namespace ndn {
-}
-}
 
-NDN_NAMESPACE_BEGIN
+using ::ndn::Name;
+namespace name = ::ndn::name;
 
-typedef Time TimeInterval;
+using std::shared_ptr;
+using std::make_shared;
 
-namespace time {
+using ::ndn::Interest;
+using ::ndn::Data;
+using ::ndn::KeyLocator;
+using ::ndn::Signature;
+using ::ndn::SignatureInfo;
+using ::ndn::Block;
+using ::ndn::KeyChain;
 
-inline Time
-NowUnixTimestamp()
-{
-  return Simulator::Now();
-}
-}
-
-NDN_NAMESPACE_END
+} // namespace ndn
+} // namespace ns3
 
 #endif // NDN_COMMON_H

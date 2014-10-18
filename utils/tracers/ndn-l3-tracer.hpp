@@ -21,6 +21,8 @@
 #ifndef NDN_L3_TRACER_H
 #define NDN_L3_TRACER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 
@@ -41,9 +43,6 @@ class Entry;
 }
 
 class Face;
-
-class Interest;
-class Data;
 
 /**
  * @ingroup ndn-tracers
@@ -89,31 +88,31 @@ protected:
   Connect();
 
   virtual void
-  OutInterests(Ptr<const Interest>, Ptr<const Face>) = 0;
+  OutInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  InInterests(Ptr<const Interest>, Ptr<const Face>) = 0;
+  InInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  DropInterests(Ptr<const Interest>, Ptr<const Face>) = 0;
+  DropInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  OutNacks(Ptr<const Interest>, Ptr<const Face>) = 0;
+  OutNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  InNacks(Ptr<const Interest>, Ptr<const Face>) = 0;
+  InNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  DropNacks(Ptr<const Interest>, Ptr<const Face>) = 0;
+  DropNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
 
   virtual void
-  OutData(Ptr<const Data>, bool fromCache, Ptr<const Face>) = 0;
+  OutData(shared_ptr<const Data>, bool fromCache, Ptr<const Face>) = 0;
 
   virtual void
-  InData(Ptr<const Data>, Ptr<const Face>) = 0;
+  InData(shared_ptr<const Data>, Ptr<const Face>) = 0;
 
   virtual void
-  DropData(Ptr<const Data>, Ptr<const Face>) = 0;
+  DropData(shared_ptr<const Data>, Ptr<const Face>) = 0;
 
   virtual void
   SatisfiedInterests(Ptr<const pit::Entry>) = 0;

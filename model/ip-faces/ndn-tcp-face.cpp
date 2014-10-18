@@ -30,8 +30,6 @@
 #include "ns3/pointer.h"
 #include "ns3/tcp-socket-factory.h"
 
-#include "ns3/ndn-name.hpp"
-
 using namespace std;
 
 NS_LOG_COMPONENT_DEFINE("ndn.TcpFace");

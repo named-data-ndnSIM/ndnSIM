@@ -21,6 +21,8 @@
 #ifndef NDN_GLOBAL_ROUTING_HELPER_H
 #define NDN_GLOBAL_ROUTING_HELPER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 
 namespace ns3 {

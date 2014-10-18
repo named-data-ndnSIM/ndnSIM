@@ -21,8 +21,6 @@
 
 #include "ndn-producer.hpp"
 #include "ns3/log.h"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/packet.h"
@@ -115,7 +113,7 @@ Producer::StopApplication()
 }
 
 void
-Producer::OnInterest(Ptr<const Interest> interest)
+Producer::OnInterest(shared_ptr<const Interest> interest)
 {
   App::OnInterest(interest); // tracing inside
 
@@ -124,8 +122,8 @@ Producer::OnInterest(Ptr<const Interest> interest)
   if (!m_active)
     return;
 
-  Ptr<Data> data = Create<Data>(Create<Packet>(m_virtualPayloadSize));
-  Ptr<Name> dataName = Create<Name>(interest->GetName());
+  shared_ptr<Data> data = make_shared<Data>(Create<Packet>(m_virtualPayloadSize));
+  shared_ptr<Name> dataName = make_shared<Name>(interest->GetName());
   dataName->append(m_postfix);
   data->SetName(dataName);
   data->SetFreshness(m_freshness);
@@ -133,7 +131,7 @@ Producer::OnInterest(Ptr<const Interest> interest)
 
   data->SetSignature(m_signature);
   if (m_keyLocator.size() > 0) {
-    data->SetKeyLocator(Create<Name>(m_keyLocator));
+    data->SetKeyLocator(make_shared<Name>(m_keyLocator));
   }
 
   NS_LOG_INFO("node(" << GetNode()->GetId() << ") respodning with Data: " << data->GetName());

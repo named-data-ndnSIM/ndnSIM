@@ -26,8 +26,6 @@
 #include "ns3/callback.h"
 #include "ns3/ndn-app.hpp"
 #include "ns3/ndn-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndn-pit-entry.hpp"
 
 #include "ns3/simulator.h"
@@ -288,7 +286,7 @@ L3AggregateTracer::Print(std::ostream& os) const
 }
 
 void
-L3AggregateTracer::OutInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3AggregateTracer::OutInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outInterests++;
   if (interest->GetWire()) {
@@ -297,7 +295,7 @@ L3AggregateTracer::OutInterests(Ptr<const Interest> interest, Ptr<const Face> fa
 }
 
 void
-L3AggregateTracer::InInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3AggregateTracer::InInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inInterests++;
   if (interest->GetWire()) {
@@ -306,7 +304,7 @@ L3AggregateTracer::InInterests(Ptr<const Interest> interest, Ptr<const Face> fac
 }
 
 void
-L3AggregateTracer::DropInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3AggregateTracer::DropInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropInterests++;
   if (interest->GetWire()) {
@@ -315,7 +313,7 @@ L3AggregateTracer::DropInterests(Ptr<const Interest> interest, Ptr<const Face> f
 }
 
 void
-L3AggregateTracer::OutNacks(Ptr<const Interest> nack, Ptr<const Face> face)
+L3AggregateTracer::OutNacks(shared_ptr<const Interest> nack, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outNacks++;
   if (nack->GetWire()) {
@@ -324,7 +322,7 @@ L3AggregateTracer::OutNacks(Ptr<const Interest> nack, Ptr<const Face> face)
 }
 
 void
-L3AggregateTracer::InNacks(Ptr<const Interest> nack, Ptr<const Face> face)
+L3AggregateTracer::InNacks(shared_ptr<const Interest> nack, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inNacks++;
   if (nack->GetWire()) {
@@ -333,7 +331,7 @@ L3AggregateTracer::InNacks(Ptr<const Interest> nack, Ptr<const Face> face)
 }
 
 void
-L3AggregateTracer::DropNacks(Ptr<const Interest> nack, Ptr<const Face> face)
+L3AggregateTracer::DropNacks(shared_ptr<const Interest> nack, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropNacks++;
   if (nack->GetWire()) {
@@ -342,7 +340,7 @@ L3AggregateTracer::DropNacks(Ptr<const Interest> nack, Ptr<const Face> face)
 }
 
 void
-L3AggregateTracer::OutData(Ptr<const Data> data, bool fromCache, Ptr<const Face> face)
+L3AggregateTracer::OutData(shared_ptr<const Data> data, bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outData++;
   if (data->GetWire()) {
@@ -351,7 +349,7 @@ L3AggregateTracer::OutData(Ptr<const Data> data, bool fromCache, Ptr<const Face>
 }
 
 void
-L3AggregateTracer::InData(Ptr<const Data> data, Ptr<const Face> face)
+L3AggregateTracer::InData(shared_ptr<const Data> data, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inData++;
   if (data->GetWire()) {
@@ -360,7 +358,7 @@ L3AggregateTracer::InData(Ptr<const Data> data, Ptr<const Face> face)
 }
 
 void
-L3AggregateTracer::DropData(Ptr<const Data> data, Ptr<const Face> face)
+L3AggregateTracer::DropData(shared_ptr<const Data> data, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropData++;
   if (data->GetWire()) {

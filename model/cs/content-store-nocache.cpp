@@ -52,15 +52,15 @@ Nocache::~Nocache()
 {
 }
 
-Ptr<Data>
-Nocache::Lookup(Ptr<const Interest> interest)
+shared_ptr<Data>
+Nocache::Lookup(shared_ptr<const Interest> interest)
 {
   this->m_cacheMissesTrace(interest);
   return 0;
 }
 
 bool
-Nocache::Add(Ptr<const Data> data)
+Nocache::Add(shared_ptr<const Data> data)
 {
   return false;
 }

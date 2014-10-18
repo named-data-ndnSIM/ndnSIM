@@ -21,6 +21,9 @@
 #ifndef NDN_APP_H
 #define NDN_APP_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/model/ndn-app-face.hpp"
+
 #include "ns3/application.h"
 #include "ns3/ptr.h"
 #include "ns3/callback.h"
@@ -31,11 +34,6 @@ namespace ns3 {
 class Packet;
 
 namespace ndn {
-
-class Interest;
-class Data;
-
-class Face;
 
 /**
  * \ingroup ndn
@@ -72,14 +70,7 @@ public:
    *                 may be useful to get packet tags
    */
   virtual void
-  OnInterest(Ptr<const Interest> interest);
-
-  /**
-   * @brief Method that will be called every time new NACK arrives
-   * @param interest Interest header
-   */
-  virtual void
-  OnNack(Ptr<const Interest> interest);
+  OnInterest(shared_ptr<const Interest> interest);
 
   /**
    * @brief Method that will be called every time new Data arrives
@@ -88,7 +79,7 @@ public:
    * original packet)
    */
   virtual void
-  OnData(Ptr<const Data> contentObject);
+  OnData(shared_ptr<const Data> data);
 
 protected:
   /**
@@ -110,19 +101,16 @@ protected:
   Ptr<Face> m_face; ///< @brief automatically created application face through which application
   /// communicates
 
-  TracedCallback<Ptr<const Interest>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Interest>, Ptr<App>, Ptr<Face>>
     m_receivedInterests; ///< @brief App-level trace of received Interests
 
-  TracedCallback<Ptr<const Interest>, Ptr<App>, Ptr<Face>>
-    m_receivedNacks; ///< @brief App-level trace of received NACKs
+  TracedCallbackshared_ptr<const Data>, Ptr<App>,
+    Ptr<Face>> m_receivedDatas; ///< @brief App-level trace of received Data
 
-  TracedCallback<Ptr<const Data>, Ptr<App>, Ptr<Face>>
-    m_receivedDatas; ///< @brief App-level trace of received Data
-
-  TracedCallback<Ptr<const Interest>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Interest>, Ptr<App>, Ptr<Face>>
     m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<Ptr<const Data>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Data>, Ptr<App>, Ptr<Face>>
     m_transmittedDatas; ///< @brief App-level trace of transmitted Data
 };
 

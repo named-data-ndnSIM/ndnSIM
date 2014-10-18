@@ -22,9 +22,10 @@
 #ifndef NDN_CONSUMER_H
 #define NDN_CONSUMER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-app.hpp"
 #include "ns3/random-variable.h"
-#include "ns3/ndn-name.hpp"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
 #include "ns3/ndn-rtt-estimator.hpp"
@@ -58,13 +59,13 @@ public:
 
   // From App
   // virtual void
-  // OnInterest (const Ptr<const Interest> &interest);
+  // OnInterest (const shared_ptr<const Interest> &interest);
 
   virtual void
-  OnNack(Ptr<const Interest> interest);
+  OnNack(shared_ptr<const Interest> interest);
 
   virtual void
-  OnData(Ptr<const Data> contentObject);
+  OnData(shared_ptr<const Data> contentObject);
 
   /**
    * @brief Timeout event

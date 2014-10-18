@@ -31,8 +31,6 @@
 #include "ns3/double.h"
 
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerCbr");
 
@@ -128,14 +126,14 @@ ConsumerCbr::GetRandomize() const
 ///////////////////////////////////////////////////
 
 // void
-// Consumer::OnData (const Ptr<const Data> &contentObject,
+// Consumer::OnData (const shared_ptr<const Data> &contentObject,
 //                                const Ptr<const Packet> &payload)
 // {
 //   Consumer::OnData (contentObject, payload); // tracing inside
 // }
 
 // void
-// Consumer::OnNack (const Ptr<const Interest> &interest)
+// Consumer::OnNack (const shared_ptr<const Interest> &interest)
 // {
 //   Consumer::OnNack (interest); // tracing inside
 // }

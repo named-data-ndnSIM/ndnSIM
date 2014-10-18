@@ -31,14 +31,10 @@
 #include "ns3/double.h"
 
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 #include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.hpp"
 
 #include <boost/ref.hpp>
-
-#include "ns3/names.h"
 
 NS_LOG_COMPONENT_DEFINE("ndn.Consumer");
 
@@ -183,11 +179,11 @@ Consumer::SendPacket()
   }
 
   //
-  Ptr<Name> nameWithSequence = Create<Name>(m_interestName);
+  shared_ptr<Name> nameWithSequence = make_shared<Name>(m_interestName);
   nameWithSequence->appendSeqNum(seq);
   //
 
-  Ptr<Interest> interest = Create<Interest>();
+  shared_ptr<Interest> interest = make_shared<Interest>();
   interest->SetNonce(m_rand.GetValue());
   interest->SetName(nameWithSequence);
   interest->SetInterestLifetime(m_interestLifeTime);
@@ -211,7 +207,7 @@ Consumer::SendPacket()
 ///////////////////////////////////////////////////
 
 void
-Consumer::OnData(Ptr<const Data> data)
+Consumer::OnData(shared_ptr<const Data> data)
 {
   if (!m_active)
     return;
@@ -253,7 +249,7 @@ Consumer::OnData(Ptr<const Data> data)
 }
 
 void
-Consumer::OnNack(Ptr<const Interest> interest)
+Consumer::OnNack(shared_ptr<const Interest> interest)
 {
   if (!m_active)
     return;

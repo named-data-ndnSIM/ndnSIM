@@ -33,8 +33,6 @@
 #include "ns3/random-variable.h"
 
 #include "ns3/ndn-pit.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 
 #include "ns3/ndn-face.hpp"
 #include "ns3/ndn-forwarding-strategy.hpp"

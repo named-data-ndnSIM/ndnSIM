@@ -21,6 +21,8 @@
 #ifndef CCNX_RATE_L3_TRACER_H
 #define CCNX_RATE_L3_TRACER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-l3-tracer.hpp"
 
 #include "ns3/nstime.h"
@@ -128,31 +130,31 @@ public:
 protected:
   // from L3Tracer
   virtual void
-  OutInterests(Ptr<const Interest>, Ptr<const Face>);
+  OutInterests(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  InInterests(Ptr<const Interest>, Ptr<const Face>);
+  InInterests(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  DropInterests(Ptr<const Interest>, Ptr<const Face>);
+  DropInterests(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  OutNacks(Ptr<const Interest>, Ptr<const Face>);
+  OutNacks(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  InNacks(Ptr<const Interest>, Ptr<const Face>);
+  InNacks(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  DropNacks(Ptr<const Interest>, Ptr<const Face>);
+  DropNacks(shared_ptr<const Interest>, Ptr<const Face>);
 
   virtual void
-  OutData(Ptr<const Data>, bool fromCache, Ptr<const Face>);
+  OutData(shared_ptr<const Data>, bool fromCache, Ptr<const Face>);
 
   virtual void
-  InData(Ptr<const Data>, Ptr<const Face>);
+  InData(shared_ptr<const Data>, Ptr<const Face>);
 
   virtual void
-  DropData(Ptr<const Data>, Ptr<const Face>);
+  DropData(shared_ptr<const Data>, Ptr<const Face>);
 
   virtual void
   SatisfiedInterests(Ptr<const pit::Entry>);

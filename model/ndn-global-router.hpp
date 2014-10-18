@@ -21,6 +21,8 @@
 #ifndef NDN_GLOBAL_ROUTER_H
 #define NDN_GLOBAL_ROUTER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 
@@ -35,9 +37,6 @@ namespace ndn {
 
 class L3Protocol;
 class Face;
-class Name;
-
-typedef Name NameComponents;
 
 /**
  * @ingroup ndn
@@ -56,7 +55,7 @@ public:
   /**
    * @brief List of locally exported prefixes
    */
-  typedef std::list<Ptr<Name>> LocalPrefixList;
+  typedef std::list<shared_ptr<Name>> LocalPrefixList;
 
   /**
    * \brief Interface ID
@@ -88,7 +87,7 @@ public:
    * @param prefix Prefix
    */
   void
-  AddLocalPrefix(Ptr<Name> prefix);
+  AddLocalPrefix(shared_ptr<Name> prefix);
 
   /**
    * @brief Add edge to the node

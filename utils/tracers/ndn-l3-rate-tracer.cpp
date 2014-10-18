@@ -29,8 +29,6 @@
 
 #include "ns3/ndn-app.hpp"
 #include "ns3/ndn-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 #include "ns3/ndn-pit-entry.hpp"
 
 #include <fstream>
@@ -312,7 +310,7 @@ L3RateTracer::Print(std::ostream& os) const
 }
 
 void
-L3RateTracer::OutInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::OutInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outInterests++;
   if (interest->GetWire()) {
@@ -321,7 +319,7 @@ L3RateTracer::OutInterests(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::InInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::InInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inInterests++;
   if (interest->GetWire()) {
@@ -330,7 +328,7 @@ L3RateTracer::InInterests(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::DropInterests(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::DropInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropInterests++;
   if (interest->GetWire()) {
@@ -339,7 +337,7 @@ L3RateTracer::DropInterests(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::OutNacks(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::OutNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outNacks++;
   if (interest->GetWire()) {
@@ -348,7 +346,7 @@ L3RateTracer::OutNacks(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::InNacks(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::InNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inNacks++;
   if (interest->GetWire()) {
@@ -357,7 +355,7 @@ L3RateTracer::InNacks(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::DropNacks(Ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::DropNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropNacks++;
   if (interest->GetWire()) {
@@ -366,7 +364,7 @@ L3RateTracer::DropNacks(Ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::OutData(Ptr<const Data> data, bool fromCache, Ptr<const Face> face)
+L3RateTracer::OutData(shared_ptr<const Data> data, bool fromCache, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outData++;
   if (data->GetWire()) {
@@ -375,7 +373,7 @@ L3RateTracer::OutData(Ptr<const Data> data, bool fromCache, Ptr<const Face> face
 }
 
 void
-L3RateTracer::InData(Ptr<const Data> data, Ptr<const Face> face)
+L3RateTracer::InData(shared_ptr<const Data> data, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inData++;
   if (data->GetWire()) {
@@ -384,7 +382,7 @@ L3RateTracer::InData(Ptr<const Data> data, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::DropData(Ptr<const Data> data, Ptr<const Face> face)
+L3RateTracer::DropData(shared_ptr<const Data> data, Ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropData++;
   if (data->GetWire()) {

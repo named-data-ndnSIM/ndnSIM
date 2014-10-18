@@ -22,6 +22,8 @@
 #ifndef NDN_PRODUCER_H
 #define NDN_PRODUCER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ndn-app.hpp"
 
 #include "ns3/ptr.h"
@@ -49,7 +51,7 @@ public:
 
   // inherited from NdnApp
   void
-  OnInterest(Ptr<const Interest> interest);
+  OnInterest(shared_ptr<const Interest> interest);
 
 protected:
   // inherited from Application base class.

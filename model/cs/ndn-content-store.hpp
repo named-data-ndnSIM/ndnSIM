@@ -22,6 +22,8 @@
 #ifndef NDN_CONTENT_STORE_H
 #define NDN_CONTENT_STORE_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 #include "ns3/traced-callback.h"
@@ -65,7 +67,7 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  Entry(Ptr<ContentStore> cs, Ptr<const Data> data);
+  Entry(Ptr<ContentStore> cs, shared_ptr<const Data> data);
 
   /**
    * \brief Get prefix of the stored entry
@@ -78,7 +80,7 @@ public:
    * \brief Get Data of the stored entry
    * \returns Data of the stored entry
    */
-  Ptr<const Data>
+  shared_ptr<const Data>
   GetData() const;
 
   /**
@@ -89,7 +91,7 @@ public:
 
 private:
   Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
-  Ptr<const Data> m_data; ///< \brief non-modifiable Data
+  shared_ptr<const Data> m_data; ///< \brief non-modifiable Data
 };
 
 } // namespace cs
@@ -124,8 +126,8 @@ public:
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
    */
-  virtual Ptr<Data>
-  Lookup(Ptr<const Interest> interest) = 0;
+  virtual shared_ptr<Data>
+  Lookup(shared_ptr<const Interest> interest) = 0;
 
   /**
    * \brief Add a new content to the content store.
@@ -136,7 +138,7 @@ public:
    * @returns true if an existing entry was updated, false otherwise
    */
   virtual bool
-  Add(Ptr<const Data> data) = 0;
+  Add(shared_ptr<const Data> data) = 0;
 
   // /*
   //  * \brief Add a new content to the content store.
@@ -145,7 +147,7 @@ public:
   //  * @returns true if an existing entry was removed, false otherwise
   //  */
   // virtual bool
-  // Remove (Ptr<Interest> header) = 0;
+  // Remove (shared_ptr<Interest> header) = 0;
 
   /**
    * \brief Print out content store entries
@@ -187,10 +189,10 @@ public:
   GetContentStore(Ptr<Object> node);
 
 protected:
-  TracedCallback<Ptr<const Interest>,
-                 Ptr<const Data>> m_cacheHitsTrace; ///< @brief trace of cache hits
+  TracedCallback<shared_ptr<const Interest>,
+                 shared_ptr<const Data>> m_cacheHitsTrace; ///< @brief trace of cache hits
 
-  TracedCallback<Ptr<const Interest>> m_cacheMissesTrace; ///< @brief trace of cache misses
+  TracedCallback<shared_ptr<const Interest>> m_cacheMissesTrace; ///< @brief trace of cache misses
 };
 
 inline std::ostream&

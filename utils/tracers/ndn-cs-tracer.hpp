@@ -22,6 +22,8 @@
 #ifndef CCNX_CS_TRACER_H
 #define CCNX_CS_TRACER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
 #include <ns3/nstime.h>
@@ -39,12 +41,6 @@ class Node;
 class Packet;
 
 namespace ndn {
-
-class Interest;
-class Data;
-
-typedef Interest InterestHeader;
-typedef Data DataHeader;
 
 namespace cs {
 
@@ -180,10 +176,10 @@ private:
   Connect();
 
   void
-  CacheHits(Ptr<const Interest>, Ptr<const Data>);
+  CacheHits(shared_ptr<const Interest>, shared_ptr<const Data>);
 
   void
-  CacheMisses(Ptr<const Interest>);
+  CacheMisses(shared_ptr<const Interest>);
 
 private:
   void

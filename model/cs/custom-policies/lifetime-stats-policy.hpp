@@ -21,6 +21,8 @@
 #ifndef LIFETIME_STATS_POLICY_H_
 #define LIFETIME_STATS_POLICY_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 

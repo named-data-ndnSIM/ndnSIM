@@ -22,6 +22,8 @@
 #ifndef NDN_STACK_HELPER_H
 #define NDN_STACK_HELPER_H
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
 #include "ns3/object-factory.h"

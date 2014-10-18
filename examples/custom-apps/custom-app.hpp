@@ -23,6 +23,8 @@
 #ifndef CUSTOM_APP_H_
 #define CUSTOM_APP_H_
 
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
 #include "ns3/ndn-app.hpp"
 
 namespace ns3 {

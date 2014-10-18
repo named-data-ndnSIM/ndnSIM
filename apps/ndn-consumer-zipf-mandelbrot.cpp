@@ -21,8 +21,6 @@
 #include "ndn-consumer-zipf-mandelbrot.hpp"
 
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-interest.hpp"
-#include "ns3/ndn-data.hpp"
 
 #include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 
@@ -171,11 +169,11 @@ ConsumerZipfMandelbrot::SendPacket()
   // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << seq << "\n";
 
   //
-  Ptr<Name> nameWithSequence = Create<Name>(m_interestName);
+  shared_ptr<Name> nameWithSequence = make_shared<Name>(m_interestName);
   nameWithSequence->appendSeqNum(seq);
   //
 
-  Ptr<Interest> interest = Create<Interest>();
+  shared_ptr<Interest> interest = make_shared<Interest>();
   interest->SetNonce(m_rand.GetValue());
   interest->SetName(nameWithSequence);
 
