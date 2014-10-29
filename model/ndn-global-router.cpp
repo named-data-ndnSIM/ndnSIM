@@ -20,8 +20,8 @@
 
 #include "ndn-global-router.hpp"
 
-#include "ns3/ndn-l3-protocol.hpp"
-#include "ns3/ndn-face.hpp"
+#include "ndn-l3-protocol.hpp"
+#include "ndn-face.hpp"
 
 #include "ns3/channel.h"
 
@@ -73,7 +73,7 @@ GlobalRouter::AddLocalPrefix(shared_ptr<Name> prefix)
 }
 
 void
-GlobalRouter::AddIncidency(Ptr<Face> face, Ptr<GlobalRouter> gr)
+GlobalRouter::AddIncidency(shared_ptr<Face> face, Ptr<GlobalRouter> gr)
 {
   m_incidencies.push_back(boost::make_tuple(this, face, gr));
 }

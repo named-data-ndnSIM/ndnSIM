@@ -88,31 +88,16 @@ protected:
   Connect();
 
   virtual void
-  OutInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
+  OutInterests(shared_ptr<const Interest>, shared_ptr<const Face>) = 0;
 
   virtual void
-  InInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
+  InInterests(shared_ptr<const Interest>, shared_ptr<const Face>) = 0;
 
   virtual void
-  DropInterests(shared_ptr<const Interest>, Ptr<const Face>) = 0;
+  OutData(shared_ptr<const Data>, bool fromCache, shared_ptr<const Face>) = 0;
 
   virtual void
-  OutNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
-
-  virtual void
-  InNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
-
-  virtual void
-  DropNacks(shared_ptr<const Interest>, Ptr<const Face>) = 0;
-
-  virtual void
-  OutData(shared_ptr<const Data>, bool fromCache, Ptr<const Face>) = 0;
-
-  virtual void
-  InData(shared_ptr<const Data>, Ptr<const Face>) = 0;
-
-  virtual void
-  DropData(shared_ptr<const Data>, Ptr<const Face>) = 0;
+  InData(shared_ptr<const Data>, shared_ptr<const Face>) = 0;
 
   virtual void
   SatisfiedInterests(Ptr<const pit::Entry>) = 0;
@@ -130,13 +115,8 @@ protected:
     {
       m_inInterests = 0;
       m_outInterests = 0;
-      m_dropInterests = 0;
-      m_inNacks = 0;
-      m_outNacks = 0;
-      m_dropNacks = 0;
       m_inData = 0;
       m_outData = 0;
-      m_dropData = 0;
       m_satisfiedInterests = 0;
       m_timedOutInterests = 0;
 
@@ -146,13 +126,8 @@ protected:
 
     double m_inInterests;
     double m_outInterests;
-    double m_dropInterests;
-    double m_inNacks;
-    double m_outNacks;
-    double m_dropNacks;
     double m_inData;
     double m_outData;
-    double m_dropData;
     double m_satisfiedInterests;
     double m_timedOutInterests;
     double m_outSatisfiedInterests;

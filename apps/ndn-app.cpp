@@ -24,9 +24,7 @@
 #include "ns3/packet.h"
 
 #include "ns3/ndn-l3-protocol.hpp"
-#include "ns3/ndn-fib.hpp"
 #include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-forwarding-strategy.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.App");
 

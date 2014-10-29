@@ -130,31 +130,31 @@ public:
 protected:
   // from L3Tracer
   virtual void
-  OutInterests(shared_ptr<const Interest>, Ptr<const Face>);
+  OutInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  InInterests(shared_ptr<const Interest>, Ptr<const Face>);
+  InInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  DropInterests(shared_ptr<const Interest>, Ptr<const Face>);
+  DropInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  OutNacks(shared_ptr<const Interest>, Ptr<const Face>);
+  OutNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  InNacks(shared_ptr<const Interest>, Ptr<const Face>);
+  InNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  DropNacks(shared_ptr<const Interest>, Ptr<const Face>);
+  DropNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
 
   virtual void
-  OutData(shared_ptr<const Data>, bool fromCache, Ptr<const Face>);
+  OutData(shared_ptr<const Data>, bool fromCache, shared_ptr<const Face>);
 
   virtual void
-  InData(shared_ptr<const Data>, Ptr<const Face>);
+  InData(shared_ptr<const Data>, shared_ptr<const Face>);
 
   virtual void
-  DropData(shared_ptr<const Data>, Ptr<const Face>);
+  DropData(shared_ptr<const Data>, shared_ptr<const Face>);
 
   virtual void
   SatisfiedInterests(Ptr<const pit::Entry>);
@@ -177,7 +177,7 @@ private:
   Time m_period;
   EventId m_printEvent;
 
-  mutable std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>> m_stats;
+  mutable std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>> m_stats;
 };
 
 } // namespace ndn

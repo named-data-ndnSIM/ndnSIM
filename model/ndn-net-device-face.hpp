@@ -45,9 +45,6 @@ namespace ndn {
  */
 class NetDeviceFace : public Face {
 public:
-  static TypeId
-  GetTypeId();
-
   /**
    * \brief Constructor
    *
@@ -58,26 +55,11 @@ public:
   NetDeviceFace(Ptr<Node> node, const Ptr<NetDevice>& netDevice);
   virtual ~NetDeviceFace();
 
-  ////////////////////////////////////////////////////////////////////
-  // methods overloaded from NdnFace
-  virtual void
-  RegisterProtocolHandlers(const InterestHandler& interestHandler, const DataHandler& dataHandler);
-
-  virtual void
-  UnRegisterProtocolHandlers();
-
 protected:
   virtual bool
   Send(Ptr<Packet> p);
 
 public:
-  /**
-   * @brief Print out name of the NdnFace to the stream
-   */
-  virtual std::ostream&
-  Print(std::ostream& os) const;
-  ////////////////////////////////////////////////////////////////////
-
   /**
    * \brief Get NetDevice associated with the face
    *
@@ -87,10 +69,6 @@ public:
   GetNetDevice() const;
 
 private:
-  NetDeviceFace(const NetDeviceFace&); ///< \brief Disabled copy constructor
-  NetDeviceFace&
-  operator=(const NetDeviceFace&); ///< \brief Disabled copy operator
-
   /// \brief callback from lower layers
   void
   ReceiveFromNetDevice(Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,

@@ -47,7 +47,7 @@ public:
   /**
    * @brief Graph edge
    */
-  typedef boost::tuple<Ptr<GlobalRouter>, Ptr<Face>, Ptr<GlobalRouter>> Incidency;
+  typedef boost::tuple<Ptr<GlobalRouter>, shared_ptr<Face>, Ptr<GlobalRouter>> Incidency;
   /**
    * @brief List of graph edges
    */
@@ -95,7 +95,7 @@ public:
    * @param ndn GlobalRouter of another node
    */
   void
-  AddIncidency(Ptr<Face> face, Ptr<GlobalRouter> ndn);
+  AddIncidency(shared_ptr<Face> face, Ptr<GlobalRouter> ndn);
 
   /**
    * @brief Get list of edges that are connected to this node

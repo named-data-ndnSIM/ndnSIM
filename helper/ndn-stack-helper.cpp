@@ -39,11 +39,6 @@
 #include "../model/ndn-net-device-face.hpp"
 #include "../model/ndn-l3-protocol.hpp"
 
-#include "ns3/ndn-forwarding-strategy.hpp"
-#include "ns3/ndn-fib.hpp"
-#include "ns3/ndn-pit.hpp"
-#include "ns3/ndn-content-store.hpp"
-
 #include "ns3/node-list.h"
 
 #include "ns3/data-rate.h"
@@ -218,17 +213,17 @@ StackHelper::Install(Ptr<Node> node) const
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
 
   // Create and aggregate FIB
-  Ptr<Fib> fib = m_fibFactory.Create<Fib>();
-  ndn->AggregateObject(fib);
+  // Ptr<Fib> fib = m_fibFactory.Create<Fib> ();
+  // ndn->AggregateObject (fib);
 
   // Create and aggregate PIT
-  ndn->AggregateObject(m_pitFactory.Create<Pit>());
+  // ndn->AggregateObject (m_pitFactory.Create<Pit> ());
 
   // Create and aggregate forwarding strategy
-  ndn->AggregateObject(m_strategyFactory.Create<ForwardingStrategy>());
+  // ndn->AggregateObject (m_strategyFactory.Create<ForwardingStrategy> ());
 
   // Create and aggregate content store
-  ndn->AggregateObject(m_contentStoreFactory.Create<ContentStore>());
+  // ndn->AggregateObject (m_contentStoreFactory.Create<ContentStore> ());
 
   // Aggregate L3Protocol on node
   node->AggregateObject(ndn);
@@ -240,7 +235,7 @@ StackHelper::Install(Ptr<Node> node) const
     // if (DynamicCast<LoopbackNetDevice> (device) != 0)
     //   continue; // don't create face for a LoopbackNetDevice
 
-    Ptr<NetDeviceFace> face;
+    shared_ptr<NetDeviceFace> face;
 
     for (std::list<std::pair<TypeId, NetDeviceFaceCreateCallback>>::const_iterator item =
            m_netDeviceCallbacks.begin();
@@ -301,13 +296,13 @@ StackHelper::RemoveNetDeviceFaceCreateCallback(TypeId netDeviceType,
   }
 }
 
-Ptr<NetDeviceFace>
+shared_ptr<NetDeviceFace>
 StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                       Ptr<NetDevice> netDevice) const
 {
   NS_LOG_DEBUG("Creating default NetDeviceFace on node " << node->GetId());
 
-  Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace>(node, netDevice);
+  shared_ptr<NetDeviceFace> face = CreateObject<NetDeviceFace>(node, netDevice);
 
   ndn->AddFace(face);
   NS_LOG_LOGIC("Node " << node->GetId() << ": added NetDeviceFace as face #" << *face);
@@ -315,24 +310,25 @@ StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
   return face;
 }
 
-Ptr<NetDeviceFace>
+shared_ptr<NetDeviceFace>
 StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                            Ptr<NetDevice> device) const
 {
   NS_LOG_DEBUG("Creating point-to-point NetDeviceFace on node " << node->GetId());
 
-  Ptr<NetDeviceFace> face = CreateObject<NetDeviceFace>(node, device);
+  shared_ptr<NetDeviceFace> face = CreateObject<NetDeviceFace>(node, device);
 
   ndn->AddFace(face);
   NS_LOG_LOGIC("Node " << node->GetId() << ": added NetDeviceFace as face #" << *face);
 
   if (m_limitsEnabled) {
-    Ptr<Limits> limits = face->GetObject<Limits>();
-    if (limits == 0) {
-      NS_FATAL_ERROR("Limits are enabled, but the selected forwarding strategy does not support "
-                     "limits. Please revise your scenario");
-      exit(1);
-    }
+    // Ptr<Limits> limits = face->GetObject<Limits> ();
+    /*if (limits == 0)
+    {
+        NS_FATAL_ERROR ("Limits are enabled, but the selected forwarding strategy does not support
+    limits. Please revise your scenario");
+        exit (1);
+    }*/
 
     NS_LOG_INFO("Limits are enabled");
     Ptr<PointToPointNetDevice> p2p = DynamicCast<PointToPointNetDevice>(device);
@@ -352,11 +348,12 @@ StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
         1.0 * dataRate.Get().GetBitRate() / 8.0 / (m_avgDataSize + m_avgInterestSize);
       // NS_LOG_INFO ("Max packets per second: " << maxInterestPackets);
       // NS_LOG_INFO ("Max burst: " << m_avgRtt.ToDouble (Time::S) * maxInterestPackets);
-      NS_LOG_INFO("MaxLimit: " << (int)(m_avgRtt.ToDouble(Time::S) * maxInterestPackets));
-
+      //         NS_LOG_INFO ("MaxLimit: " << (int)(m_avgRtt.ToDouble (Time::S) *
+      //         maxInterestPackets));
+      /*
       // Set max to BDP
-      limits->SetLimits(maxInterestPackets, m_avgRtt.ToDouble(Time::S));
-      limits->SetLinkDelay(linkDelay.Get().ToDouble(Time::S));
+      limits->SetLimits (maxInterestPackets, m_avgRtt.ToDouble (Time::S));
+      limits->SetLinkDelay (linkDelay.Get ().ToDouble (Time::S)); */
     }
   }
 
@@ -371,16 +368,17 @@ StackHelper::Install(const std::string& nodeName) const
 }
 
 void
-StackHelper::AddRoute(Ptr<Node> node, const std::string& prefix, Ptr<Face> face, int32_t metric)
+StackHelper::AddRoute(Ptr<Node> node, const std::string& prefix, shared_ptr<Face> face, int32_t metric)
 {
   NS_LOG_LOGIC("[" << node->GetId() << "]$ route add " << prefix << " via " << *face << " metric "
                    << metric);
 
-  Ptr<Fib> fib = node->GetObject<Fib>();
+  // Ptr<Fib>  fib  = node->GetObject<Fib> ();
 
-  NameValue prefixValue;
-  prefixValue.DeserializeFromString(prefix, MakeNameChecker());
-  fib->Add(prefixValue.Get(), face, metric);
+  // NameValue prefixValue;
+  // prefixValue.DeserializeFromString (prefix, MakeNameChecker ());
+  ::ndn::Name name(prefix);
+  // fib->Add (name, face, metric);
 }
 
 void
@@ -389,7 +387,7 @@ StackHelper::AddRoute(Ptr<Node> node, const std::string& prefix, uint32_t faceId
   Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
   NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
 
-  Ptr<Face> face = ndn->GetFace(faceId);
+  shared_ptr<Face> face = ndn->GetFace(faceId);
   NS_ASSERT_MSG(face != 0, "Face with ID [" << faceId << "] does not exist on node ["
                                             << node->GetId() << "]");
 
@@ -406,7 +404,7 @@ StackHelper::AddRoute(const std::string& nodeName, const std::string& prefix, ui
   Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
   NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
 
-  Ptr<Face> face = ndn->GetFace(faceId);
+  shared_ptr<Face> face = ndn->GetFace(faceId);
   NS_ASSERT_MSG(face != 0, "Face with ID [" << faceId << "] does not exist on node [" << nodeName
                                             << "]");
 
@@ -432,7 +430,7 @@ StackHelper::AddRoute(Ptr<Node> node, const std::string& prefix, Ptr<Node> other
       Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
       NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
 
-      Ptr<Face> face = ndn->GetFaceByNetDevice(netDevice);
+      shared_ptr<Face> face = ndn->GetFaceByNetDevice(netDevice);
       NS_ASSERT_MSG(face != 0, "There is no face associated with the p2p link");
 
       AddRoute(node, prefix, face, metric);

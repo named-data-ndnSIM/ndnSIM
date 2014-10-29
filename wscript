@@ -83,13 +83,18 @@ def build(bld):
 
     module_dirs = ['NFD', 'apps', 'helper', 'model', 'utils']
     
-    module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs])
+    module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
+                                      excl=['model/ip-faces/*',
+                                            'model/cs/*',
+                                            'apps/*',
+                                            'helper/*',
+                                            'utils/**/*'])
 
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob(
         ['%s/**/*.hpp' % dir for dir in module_dirs])]
 
-    if bld.env.ENABLE_EXAMPLES:
-        bld.recurse ('examples')
+    # if bld.env.ENABLE_EXAMPLES:
+    #     bld.recurse('examples')
 
     bld.ns3_python_bindings()
 

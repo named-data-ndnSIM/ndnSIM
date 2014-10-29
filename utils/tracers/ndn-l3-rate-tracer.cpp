@@ -240,7 +240,7 @@ L3RateTracer::PrintHeader(std::ostream& os) const
 void
 L3RateTracer::Reset()
 {
-  for (std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+  for (std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
          m_stats.begin();
        stats != m_stats.end(); stats++) {
     stats->second.get<0>().Reset();
@@ -274,7 +274,7 @@ L3RateTracer::Print(std::ostream& os) const
 {
   Time time = Simulator::Now();
 
-  for (std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+  for (std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
          m_stats.begin();
        stats != m_stats.end(); stats++) {
     if (!stats->first)
@@ -300,8 +300,8 @@ L3RateTracer::Print(std::ostream& os) const
   }
 
   {
-    std::map<Ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
-      m_stats.find(Ptr<const Face>(0));
+    std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+      m_stats.find(shared_ptr<const Face>(0));
     if (stats != m_stats.end()) {
       PRINTER("SatisfiedInterests", m_satisfiedInterests);
       PRINTER("TimedOutInterests", m_timedOutInterests);
@@ -310,7 +310,7 @@ L3RateTracer::Print(std::ostream& os) const
 }
 
 void
-L3RateTracer::OutInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::OutInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outInterests++;
   if (interest->GetWire()) {
@@ -319,7 +319,7 @@ L3RateTracer::OutInterests(shared_ptr<const Interest> interest, Ptr<const Face> 
 }
 
 void
-L3RateTracer::InInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::InInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inInterests++;
   if (interest->GetWire()) {
@@ -328,7 +328,7 @@ L3RateTracer::InInterests(shared_ptr<const Interest> interest, Ptr<const Face> f
 }
 
 void
-L3RateTracer::DropInterests(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::DropInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropInterests++;
   if (interest->GetWire()) {
@@ -337,7 +337,7 @@ L3RateTracer::DropInterests(shared_ptr<const Interest> interest, Ptr<const Face>
 }
 
 void
-L3RateTracer::OutNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::OutNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outNacks++;
   if (interest->GetWire()) {
@@ -346,7 +346,7 @@ L3RateTracer::OutNacks(shared_ptr<const Interest> interest, Ptr<const Face> face
 }
 
 void
-L3RateTracer::InNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::InNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inNacks++;
   if (interest->GetWire()) {
@@ -355,7 +355,7 @@ L3RateTracer::InNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::DropNacks(shared_ptr<const Interest> interest, Ptr<const Face> face)
+L3RateTracer::DropNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropNacks++;
   if (interest->GetWire()) {
@@ -364,7 +364,7 @@ L3RateTracer::DropNacks(shared_ptr<const Interest> interest, Ptr<const Face> fac
 }
 
 void
-L3RateTracer::OutData(shared_ptr<const Data> data, bool fromCache, Ptr<const Face> face)
+L3RateTracer::OutData(shared_ptr<const Data> data, bool fromCache, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_outData++;
   if (data->GetWire()) {
@@ -373,7 +373,7 @@ L3RateTracer::OutData(shared_ptr<const Data> data, bool fromCache, Ptr<const Fac
 }
 
 void
-L3RateTracer::InData(shared_ptr<const Data> data, Ptr<const Face> face)
+L3RateTracer::InData(shared_ptr<const Data> data, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_inData++;
   if (data->GetWire()) {
@@ -382,7 +382,7 @@ L3RateTracer::InData(shared_ptr<const Data> data, Ptr<const Face> face)
 }
 
 void
-L3RateTracer::DropData(shared_ptr<const Data> data, Ptr<const Face> face)
+L3RateTracer::DropData(shared_ptr<const Data> data, shared_ptr<const Face> face)
 {
   m_stats[face].get<0>().m_dropData++;
   if (data->GetWire()) {

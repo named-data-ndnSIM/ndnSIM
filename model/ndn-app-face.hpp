@@ -47,9 +47,6 @@ class App;
  */
 class AppFace : public Face {
 public:
-  static TypeId
-  GetTypeId();
-
   /**
    * \brief Default constructor
    */
@@ -63,18 +60,6 @@ public:
 
   virtual bool
   SendData(shared_ptr<const Data> data);
-
-public:
-  virtual std::ostream&
-  Print(std::ostream& os) const;
-  ////////////////////////////////////////////////////////////////////
-
-private:
-  AppFace();
-  AppFace(const AppFace&); ///< \brief Disabled copy constructor
-
-  AppFace&
-  operator=(const AppFace&); ///< \brief Disabled copy operator
 
 private:
   Ptr<App> m_app;

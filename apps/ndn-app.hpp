@@ -98,19 +98,19 @@ protected:
 protected:
   bool m_active; ///< @brief Flag to indicate that application is active (set by StartApplication
   /// and StopApplication)
-  Ptr<Face> m_face; ///< @brief automatically created application face through which application
+  shared_ptr<Face> m_face; ///< @brief automatically created application face through which application
   /// communicates
 
-  TracedCallback<shared_ptr<const Interest>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
     m_receivedInterests; ///< @brief App-level trace of received Interests
 
-  TracedCallbackshared_ptr<const Data>, Ptr<App>,
-    Ptr<Face>> m_receivedDatas; ///< @brief App-level trace of received Data
+  TracedCallback<shared_ptr<const Data>, Ptr<App>,
+    shared_ptr<Face>> m_receivedDatas; ///< @brief App-level trace of received Data
 
-  TracedCallback<shared_ptr<const Interest>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
     m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
 
-  TracedCallback<shared_ptr<const Data>, Ptr<App>, Ptr<Face>>
+  TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
     m_transmittedDatas; ///< @brief App-level trace of transmitted Data
 };
 

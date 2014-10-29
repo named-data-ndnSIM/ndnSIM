@@ -20,11 +20,19 @@
 #ifndef NDNSIM_NDN_FACE_HPP
 #define NDNSIM_NDN_FACE_HPP
 
+#include <boost/noncopyable.hpp>
+
 namespace ns3 {
 namespace ndn {
 
-class Face {
+class Face : boost::noncopyable {
 };
+
+inline std::ostream&
+operator<<(std::ostream& os, const Face& face)
+{
+  return os;
+}
 
 } // namespace ndn
 } // namespace ns3

@@ -28,31 +28,20 @@
 #include "ns3/assert.h"
 #include "ns3/simulator.h"
 
-#include "ns3/ndn-header-helper.hpp"
-#include "ns3/ndn-app.hpp"
+#include "apps/ndn-app.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.AppFace");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED(AppFace);
-
-TypeId
-AppFace::GetTypeId()
-{
-  static TypeId tid = TypeId("ns3::ndn::AppFace").SetParent<Face>().SetGroupName("Ndn");
-  return tid;
-}
-
 AppFace::AppFace(Ptr<App> app)
-  : Face(app->GetNode())
-  , m_app(app)
+  // : Face(app->GetNode())
+  : m_app(app)
 {
   NS_LOG_FUNCTION(this << app);
 
   NS_ASSERT(m_app != 0);
-  SetFlags(Face::APPLICATION);
 }
 
 AppFace::~AppFace()
@@ -60,54 +49,18 @@ AppFace::~AppFace()
   NS_LOG_FUNCTION_NOARGS();
 }
 
-AppFace::AppFace()
-  : Face(0)
-{
-}
-
-AppFace::AppFace(const AppFace&)
-  : Face(0)
-{
-}
-
-AppFace&
-AppFace::operator= (const AppFace &)
-{
-  return *((AppFace*)0);
-}
-
 bool
 AppFace::SendInterest(shared_ptr<const Interest> interest)
 {
   NS_LOG_FUNCTION(this << interest);
-
-  if (!IsUp()) {
-    return false;
-  }
-
-  m_app->OnInterest(interest);
-
-  return true;
+  return false;
 }
 
 bool
 AppFace::SendData(shared_ptr<const Data> data)
 {
   NS_LOG_FUNCTION(this << data);
-
-  if (!IsUp()) {
-    return false;
-  }
-
-  m_app->OnData(data);
-  return true;
-}
-
-std::ostream&
-AppFace::Print(std::ostream& os) const
-{
-  os << "dev=local(" << GetId() << ")";
-  return os;
+  return false;
 }
 
 } // namespace ndn

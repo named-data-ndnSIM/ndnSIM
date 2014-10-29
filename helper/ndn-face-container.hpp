@@ -44,7 +44,7 @@ namespace ndn {
  */
 class FaceContainer : public SimpleRefCount<FaceContainer> {
 private:
-  typedef std::vector<Ptr<Face>> Container;
+  typedef std::vector<shared_ptr<Face>> Container;
 
 public:
   typedef Container::const_iterator Iterator; ///< \brief Iterator over FaceContainer
@@ -128,7 +128,7 @@ public:
    * @see Face
    */
   void
-  Add(const Ptr<Face>& face);
+  Add(const shared_ptr<Face>& face);
 
   /**
    * Get a smart pointer to Face-derived object stored in the container
@@ -139,7 +139,7 @@ public:
    *
    * @see Face
    */
-  Ptr<Face>
+  shared_ptr<Face>
   Get(Iterator i) const;
 
 private:

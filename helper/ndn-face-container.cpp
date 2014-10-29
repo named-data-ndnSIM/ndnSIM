@@ -87,12 +87,12 @@ FaceContainer::GetN(void) const
 // }
 
 void
-FaceContainer::Add(const Ptr<Face>& face)
+FaceContainer::Add(const shared_ptr<Face>& face)
 {
   m_faces.push_back(face);
 }
 
-Ptr<Face>
+shared_ptr<Face>
 FaceContainer::Get(FaceContainer::Iterator i) const
 {
   return *i;

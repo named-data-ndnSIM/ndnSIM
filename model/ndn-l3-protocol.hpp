@@ -40,7 +40,6 @@ class Header;
 namespace ndn {
 
 class Face;
-class ForwardingStrategy;
 
 /**
  * \defgroup ndn ndnSIM: NDN simulation module
@@ -65,7 +64,7 @@ class ForwardingStrategy;
  */
 class L3Protocol : public Object {
 public:
-  typedef std::vector<Ptr<Face>> FaceList;
+  typedef std::vector<shared_ptr<Face>> FaceList;
 
   /**
    * \brief Interface ID
@@ -95,7 +94,7 @@ public:
    * \see NdnLocalFace, NdnNetDeviceFace, NdnUdpFace
    */
   virtual uint32_t
-  AddFace(const Ptr<Face>& face);
+  AddFace(const shared_ptr<Face>& face);
 
   /**
    * \brief Get current number of faces added to Ndn stack
@@ -110,7 +109,7 @@ public:
    * \param face The face number (number in face list)
    * \returns The NdnFace associated with the Ndn face number.
    */
-  virtual Ptr<Face>
+  virtual shared_ptr<Face>
   GetFace(uint32_t face) const;
 
   /**
@@ -118,19 +117,19 @@ public:
    * \param face The face ID number
    * \returns The NdnFace associated with the Ndn face number.
    */
-  virtual Ptr<Face>
+  virtual shared_ptr<Face>
   GetFaceById(uint32_t face) const;
 
   /**
    * \brief Remove face from ndn stack (remove callbacks)
    */
   virtual void
-  RemoveFace(Ptr<Face> face);
+  RemoveFace(shared_ptr<Face> face);
 
   /**
    * \brief Get face for NetDevice
    */
-  virtual Ptr<Face>
+  virtual shared_ptr<Face>
   GetFaceByNetDevice(Ptr<NetDevice> netDevice) const;
 
 protected:
@@ -148,18 +147,12 @@ protected:
 
 private:
   L3Protocol(const L3Protocol&); ///< copy constructor is disabled
+
   L3Protocol&
   operator=(const L3Protocol&); ///< copy operator is disabled
 
 private:
-  uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to
-  /// the stack
-  FaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
-
-  // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
-  Ptr<ForwardingStrategy>
-    m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 };
 
 } // namespace ndn
