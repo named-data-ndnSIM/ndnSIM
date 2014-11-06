@@ -27,29 +27,16 @@
 #include "ns3/log.h"
 #include "ns3/node-list.h"
 
-#include "ns3/ndn-app.hpp"
-#include "ns3/ndn-face.hpp"
-#include "ns3/ndn-pit-entry.hpp"
-
 #include <fstream>
 #include <boost/lexical_cast.hpp>
-
-using namespace boost;
-using namespace std;
 
 NS_LOG_COMPONENT_DEFINE("ndn.L3RateTracer");
 
 namespace ns3 {
 namespace ndn {
 
-static std::list<boost::tuple<boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer>>>>
+static std::list<std::tuple<shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer>>>>
   g_tracers;
-
-template<class T>
-static inline void
-NullDeleter(T* ptr)
-{
-}
 
 void
 L3RateTracer::Destroy()
@@ -61,9 +48,9 @@ void
 L3RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seconds (0.5)*/)
 {
   std::list<Ptr<L3RateTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -74,7 +61,7 @@ L3RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seco
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   for (NodeList::Iterator node = NodeList::Begin(); node != NodeList::End(); node++) {
@@ -88,7 +75,7 @@ L3RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seco
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 void
@@ -99,9 +86,9 @@ L3RateTracer::Install(const NodeContainer& nodes, const std::string& file,
   using namespace std;
 
   std::list<Ptr<L3RateTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -112,7 +99,7 @@ L3RateTracer::Install(const NodeContainer& nodes, const std::string& file,
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   for (NodeContainer::Iterator node = nodes.Begin(); node != nodes.End(); node++) {
@@ -126,7 +113,7 @@ L3RateTracer::Install(const NodeContainer& nodes, const std::string& file,
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 void
@@ -137,9 +124,9 @@ L3RateTracer::Install(Ptr<Node> node, const std::string& file,
   using namespace std;
 
   std::list<Ptr<L3RateTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -150,7 +137,7 @@ L3RateTracer::Install(Ptr<Node> node, const std::string& file,
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   Ptr<L3RateTracer> trace = Install(node, outputStream, averagingPeriod);
@@ -162,11 +149,11 @@ L3RateTracer::Install(Ptr<Node> node, const std::string& file,
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 Ptr<L3RateTracer>
-L3RateTracer::Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream,
+L3RateTracer::Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream,
                       Time averagingPeriod /* = Seconds (0.5)*/)
 {
   NS_LOG_DEBUG("Node: " << node->GetId());
@@ -177,14 +164,14 @@ L3RateTracer::Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStre
   return trace;
 }
 
-L3RateTracer::L3RateTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node)
+L3RateTracer::L3RateTracer(shared_ptr<std::ostream> os, Ptr<Node> node)
   : L3Tracer(node)
   , m_os(os)
 {
   SetAveragingPeriod(Seconds(1.0));
 }
 
-L3RateTracer::L3RateTracer(boost::shared_ptr<std::ostream> os, const std::string& node)
+L3RateTracer::L3RateTracer(shared_ptr<std::ostream> os, const std::string& node)
   : L3Tracer(node)
   , m_os(os)
 {
@@ -240,17 +227,17 @@ L3RateTracer::PrintHeader(std::ostream& os) const
 void
 L3RateTracer::Reset()
 {
-  for (std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+  for (std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
          m_stats.begin();
        stats != m_stats.end(); stats++) {
-    stats->second.get<0>().Reset();
-    stats->second.get<1>().Reset();
+    std::get<0>(stats->second).Reset();
+    std::get<1>(stats->second).Reset();
   }
 }
 
 const double alpha = 0.8;
 
-#define STATS(INDEX) stats->second.get<INDEX>()
+#define STATS(INDEX) std::get<INDEX>(stats->second)
 #define RATE(INDEX, fieldName) STATS(INDEX).fieldName / m_period.ToDouble(Time::S)
 
 #define PRINTER(printName, fieldName)                                                              \
@@ -260,8 +247,8 @@ const double alpha = 0.8;
                        + /*old value*/ (1 - alpha) * STATS(3).fieldName;                           \
                                                                                                    \
   os << time.ToDouble(Time::S) << "\t" << m_node << "\t";                                          \
-  if (stats->first) {                                                                              \
-    os << stats->first->GetId() << "\t" << *stats->first << "\t";                                  \
+  if (stats->first != nullptr) {                                                                   \
+    os << stats->first->getId() << "\t" << stats->first->getLocalUri() << "\t";                    \
   }                                                                                                \
   else {                                                                                           \
     os << "-1\tall\t";                                                                             \
@@ -274,155 +261,116 @@ L3RateTracer::Print(std::ostream& os) const
 {
   Time time = Simulator::Now();
 
-  for (std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+  for (std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
          m_stats.begin();
        stats != m_stats.end(); stats++) {
-    if (!stats->first)
+    if (stats->first == nullptr)
       continue;
 
     PRINTER("InInterests", m_inInterests);
     PRINTER("OutInterests", m_outInterests);
-    PRINTER("DropInterests", m_dropInterests);
-
-    PRINTER("InNacks", m_inNacks);
-    PRINTER("OutNacks", m_outNacks);
-    PRINTER("DropNacks", m_dropNacks);
 
     PRINTER("InData", m_inData);
     PRINTER("OutData", m_outData);
-    PRINTER("DropData", m_dropData);
 
-    PRINTER("InSatisfiedInterests", m_satisfiedInterests);
-    PRINTER("InTimedOutInterests", m_timedOutInterests);
+    // PRINTER("InSatisfiedInterests", m_satisfiedInterests);
+    // PRINTER("InTimedOutInterests", m_timedOutInterests);
 
-    PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
-    PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
+    // PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
+    // PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
   }
 
   {
-    std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
-      m_stats.find(shared_ptr<const Face>(0));
-    if (stats != m_stats.end()) {
-      PRINTER("SatisfiedInterests", m_satisfiedInterests);
-      PRINTER("TimedOutInterests", m_timedOutInterests);
-    }
+    // std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
+    //   m_stats.find(shared_ptr<const Face>(0));
+    // if (stats != m_stats.end()) {
+    //   PRINTER("SatisfiedInterests", m_satisfiedInterests);
+    //   PRINTER("TimedOutInterests", m_timedOutInterests);
+    // }
   }
 }
 
 void
-L3RateTracer::OutInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
+L3RateTracer::OutInterests(const Interest& interest, const Face& face)
 {
-  m_stats[face].get<0>().m_outInterests++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_outInterests += interest->GetWire()->GetSize();
+  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outInterests++;
+  if (interest.hasWire()) {
+    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outInterests +=
+      interest.wireEncode().size();
   }
 }
 
 void
-L3RateTracer::InInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
+L3RateTracer::InInterests(const Interest& interest, const Face& face)
 {
-  m_stats[face].get<0>().m_inInterests++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_inInterests += interest->GetWire()->GetSize();
+  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inInterests++;
+  if (interest.hasWire()) {
+    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inInterests +=
+      interest.wireEncode().size();
   }
 }
 
 void
-L3RateTracer::DropInterests(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
+L3RateTracer::OutData(const Data& data, const Face& face)
 {
-  m_stats[face].get<0>().m_dropInterests++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_dropInterests += interest->GetWire()->GetSize();
+  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outData++;
+  if (data.hasWire()) {
+    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outData +=
+      data.wireEncode().size();
   }
 }
 
 void
-L3RateTracer::OutNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
+L3RateTracer::InData(const Data& data, const Face& face)
 {
-  m_stats[face].get<0>().m_outNacks++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_outNacks += interest->GetWire()->GetSize();
+  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inData++;
+  if (data.hasWire()) {
+    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inData +=
+      data.wireEncode().size();
   }
 }
 
-void
-L3RateTracer::InNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
-{
-  m_stats[face].get<0>().m_inNacks++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_inNacks += interest->GetWire()->GetSize();
-  }
-}
+// void
+// L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry> entry)
+// {
+//   m_stats[0].std::get<0> ().m_satisfiedInterests ++;
+//   // no "size" stats
 
-void
-L3RateTracer::DropNacks(shared_ptr<const Interest> interest, shared_ptr<const Face> face)
-{
-  m_stats[face].get<0>().m_dropNacks++;
-  if (interest->GetWire()) {
-    m_stats[face].get<1>().m_dropNacks += interest->GetWire()->GetSize();
-  }
-}
+//   for (::nfd::pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
+//        i != entry->GetIncoming ().end ();
+//        i++)
+//     {
+//       m_stats[i->m_face].std::get<0> ().m_satisfiedInterests ++;
+// }
 
-void
-L3RateTracer::OutData(shared_ptr<const Data> data, bool fromCache, shared_ptr<const Face> face)
-{
-  m_stats[face].get<0>().m_outData++;
-  if (data->GetWire()) {
-    m_stats[face].get<1>().m_outData += data->GetWire()->GetSize();
-  }
-}
+//   for (::nfd::pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
+//        i != entry->GetOutgoing ().end ();
+//        i++)
+//     {
+//       m_stats[i->m_face].std::get<0> ().m_outSatisfiedInterests ++;
+//     }
+// }
 
-void
-L3RateTracer::InData(shared_ptr<const Data> data, shared_ptr<const Face> face)
-{
-  m_stats[face].get<0>().m_inData++;
-  if (data->GetWire()) {
-    m_stats[face].get<1>().m_inData += data->GetWire()->GetSize();
-  }
-}
+// void
+// L3RateTracer::TimedOutInterests (Ptr<const pit::Entry> entry)
+// {
+//   m_stats[0].std::get<0> ().m_timedOutInterests ++;
+//   // no "size" stats
 
-void
-L3RateTracer::DropData(shared_ptr<const Data> data, shared_ptr<const Face> face)
-{
-  m_stats[face].get<0>().m_dropData++;
-  if (data->GetWire()) {
-    m_stats[face].get<1>().m_dropData += data->GetWire()->GetSize();
-  }
-}
+//   for (pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
+//        i != entry->GetIncoming ().end ();
+//        i++)
+//     {
+//       m_stats[i->m_face].std::get<0> ().m_timedOutInterests ++;
+// }
 
-void
-L3RateTracer::SatisfiedInterests(Ptr<const pit::Entry> entry)
-{
-  m_stats[0].get<0>().m_satisfiedInterests++;
-  // no "size" stats
-
-  for (pit::Entry::in_container::const_iterator i = entry->GetIncoming().begin();
-       i != entry->GetIncoming().end(); i++) {
-    m_stats[i->m_face].get<0>().m_satisfiedInterests++;
-  }
-
-  for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing().begin();
-       i != entry->GetOutgoing().end(); i++) {
-    m_stats[i->m_face].get<0>().m_outSatisfiedInterests++;
-  }
-}
-
-void
-L3RateTracer::TimedOutInterests(Ptr<const pit::Entry> entry)
-{
-  m_stats[0].get<0>().m_timedOutInterests++;
-  // no "size" stats
-
-  for (pit::Entry::in_container::const_iterator i = entry->GetIncoming().begin();
-       i != entry->GetIncoming().end(); i++) {
-    m_stats[i->m_face].get<0>().m_timedOutInterests++;
-  }
-
-  for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing().begin();
-       i != entry->GetOutgoing().end(); i++) {
-    m_stats[i->m_face].get<0>().m_outTimedOutInterests++;
-  }
-}
+//   for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
+//        i != entry->GetOutgoing ().end ();
+//        i++)
+//     {
+//       m_stats[i->m_face].std::get<0> ().m_outTimedOutInterests ++;
+//     }
+// }
 
 } // namespace ndn
 } // namespace ns3

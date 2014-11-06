@@ -27,10 +27,9 @@
 
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
-#include <ns3/node-container.h>
+#include "ns3/node-container.h"
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
+#include <tuple>
 #include <map>
 #include <list>
 
@@ -90,14 +89,14 @@ public:
    * @param os    reference to the output stream
    * @param node  pointer to the node
    */
-  L3RateTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  L3RateTracer(shared_ptr<std::ostream> os, Ptr<Node> node);
 
   /**
    * @brief Trace constructor that attaches to the node using node name
    * @param os        reference to the output stream
    * @param nodeName  name of the node registered using Names::Add
    */
-  L3RateTracer(boost::shared_ptr<std::ostream> os, const std::string& node);
+  L3RateTracer(shared_ptr<std::ostream> os, const std::string& node);
 
   /**
    * @brief Destructor
@@ -117,7 +116,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    */
   static Ptr<L3RateTracer>
-  Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream,
+  Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream,
           Time averagingPeriod = Seconds(0.5));
 
   // from L3Tracer
@@ -130,37 +129,22 @@ public:
 protected:
   // from L3Tracer
   virtual void
-  OutInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
+  OutInterests(const Interest& interest, const Face& face);
 
   virtual void
-  InInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
+  InInterests(const Interest& interest, const Face& face);
 
   virtual void
-  DropInterests(shared_ptr<const Interest>, shared_ptr<const Face>);
+  OutData(const Data& data, const Face& face);
 
   virtual void
-  OutNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
+  InData(const Data& data, const Face& face);
 
-  virtual void
-  InNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
+  // virtual void
+  // SatisfiedInterests(Ptr<const pit::Entry>);
 
-  virtual void
-  DropNacks(shared_ptr<const Interest>, shared_ptr<const Face>);
-
-  virtual void
-  OutData(shared_ptr<const Data>, bool fromCache, shared_ptr<const Face>);
-
-  virtual void
-  InData(shared_ptr<const Data>, shared_ptr<const Face>);
-
-  virtual void
-  DropData(shared_ptr<const Data>, shared_ptr<const Face>);
-
-  virtual void
-  SatisfiedInterests(Ptr<const pit::Entry>);
-
-  virtual void
-  TimedOutInterests(Ptr<const pit::Entry>);
+  // virtual void
+  // TimedOutInterests(Ptr<const pit::Entry>);
 
 private:
   void
@@ -173,11 +157,11 @@ private:
   Reset();
 
 private:
-  boost::shared_ptr<std::ostream> m_os;
+  shared_ptr<std::ostream> m_os;
   Time m_period;
   EventId m_printEvent;
 
-  mutable std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>> m_stats;
+  mutable std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>> m_stats;
 };
 
 } // namespace ndn

@@ -29,8 +29,7 @@
 #include <ns3/event-id.h>
 #include <ns3/node-container.h>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
+#include <tuple>
 #include <list>
 
 namespace ns3 {
@@ -104,7 +103,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    */
   static Ptr<AppDelayTracer>
-  Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream);
+  Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream);
 
   /**
    * @brief Explicit request to remove all statically created tracers
@@ -120,14 +119,14 @@ public:
    * @param os    reference to the output stream
    * @param node  pointer to the node
    */
-  AppDelayTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  AppDelayTracer(shared_ptr<std::ostream> os, Ptr<Node> node);
 
   /**
    * @brief Trace constructor that attaches to all applications on the node using node's name
    * @param os        reference to the output stream
    * @param nodeName  name of the node registered using Names::Add
    */
-  AppDelayTracer(boost::shared_ptr<std::ostream> os, const std::string& node);
+  AppDelayTracer(shared_ptr<std::ostream> os, const std::string& node);
 
   /**
    * @brief Destructor
@@ -157,7 +156,7 @@ private:
   std::string m_node;
   Ptr<Node> m_nodePtr;
 
-  boost::shared_ptr<std::ostream> m_os;
+  shared_ptr<std::ostream> m_os;
 };
 
 } // namespace ndn

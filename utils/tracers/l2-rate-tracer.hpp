@@ -26,8 +26,7 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
+#include <tuple>
 #include <map>
 
 namespace ns3 {
@@ -43,7 +42,7 @@ public:
   /**
    * @brief Network layer tracer constructor
    */
-  L2RateTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  L2RateTracer(std::shared_ptr<std::ostream> os, Ptr<Node> node);
   virtual ~L2RateTracer();
 
   /**
@@ -91,11 +90,11 @@ private:
   Reset();
 
 private:
-  boost::shared_ptr<std::ostream> m_os;
+  std::shared_ptr<std::ostream> m_os;
   Time m_period;
   EventId m_printEvent;
 
-  mutable boost::tuple<Stats, Stats, Stats, Stats> m_stats;
+  mutable std::tuple<Stats, Stats, Stats, Stats> m_stats;
 };
 
 } // namespace ns3

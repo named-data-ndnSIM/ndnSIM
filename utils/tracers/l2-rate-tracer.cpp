@@ -19,6 +19,7 @@
  */
 
 #include "l2-rate-tracer.hpp"
+
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/config.h"
@@ -31,21 +32,12 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
-using namespace boost;
-using namespace std;
-
 NS_LOG_COMPONENT_DEFINE("L2RateTracer");
 
 namespace ns3 {
 
-static std::list<boost::tuple<boost::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer>>>>
+static std::list<std::tuple<std::shared_ptr<std::ostream>, std::list<Ptr<L2RateTracer>>>>
   g_tracers;
-
-template<class T>
-static inline void
-NullDeleter(T* ptr)
-{
-}
 
 void
 L2RateTracer::Destroy()
@@ -57,9 +49,9 @@ void
 L2RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seconds (0.5)*/)
 {
   std::list<Ptr<L2RateTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  std::shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    std::shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -70,11 +62,11 @@ L2RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seco
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = std::shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   for (NodeList::Iterator node = NodeList::Begin(); node != NodeList::End(); node++) {
-    NS_LOG_DEBUG("Node: " << lexical_cast<string>((*node)->GetId()));
+    NS_LOG_DEBUG("Node: " << boost::lexical_cast<std::string>((*node)->GetId()));
 
     Ptr<L2RateTracer> trace = Create<L2RateTracer>(outputStream, *node);
     trace->SetAveragingPeriod(averagingPeriod);
@@ -87,10 +79,10 @@ L2RateTracer::InstallAll(const std::string& file, Time averagingPeriod /* = Seco
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
-L2RateTracer::L2RateTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node)
+L2RateTracer::L2RateTracer(std::shared_ptr<std::ostream> os, Ptr<Node> node)
   : L2Tracer(node)
   , m_os(os)
 {
@@ -144,13 +136,13 @@ L2RateTracer::PrintHeader(std::ostream& os) const
 void
 L2RateTracer::Reset()
 {
-  m_stats.get<0>().Reset();
-  m_stats.get<1>().Reset();
+  std::get<0>(m_stats).Reset();
+  std::get<1>(m_stats).Reset();
 }
 
 const double alpha = 0.8;
 
-#define STATS(INDEX) m_stats.get<INDEX>()
+#define STATS(INDEX) std::get<INDEX>(m_stats)
 #define RATE(INDEX, fieldName) STATS(INDEX).fieldName / m_period.ToDouble(Time::S)
 
 #define PRINTER(printName, fieldName, interface)                                                   \
@@ -176,8 +168,8 @@ L2RateTracer::Drop(Ptr<const Packet> packet)
 {
   // no interface information... this should be part of this L2Tracer object data
 
-  m_stats.get<0>().m_drop++;
-  m_stats.get<1>().m_drop += packet->GetSize();
+  std::get<0>(m_stats).m_drop++;
+  std::get<1>(m_stats).m_drop += packet->GetSize();
 }
 
 } // namespace ns3

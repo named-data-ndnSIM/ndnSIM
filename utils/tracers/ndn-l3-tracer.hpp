@@ -22,14 +22,10 @@
 #define NDN_L3_TRACER_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/model/ndn-face.hpp"
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
-
-/**
- * @ingroup ndn-helpers
- * @defgroup ndn-tracers Helpers to simplify metric collection
- */
 
 namespace ns3 {
 
@@ -37,12 +33,6 @@ class Node;
 class Packet;
 
 namespace ndn {
-
-namespace pit {
-class Entry;
-}
-
-class Face;
 
 /**
  * @ingroup ndn-tracers
@@ -88,22 +78,22 @@ protected:
   Connect();
 
   virtual void
-  OutInterests(shared_ptr<const Interest>, shared_ptr<const Face>) = 0;
+  OutInterests(const Interest&, const Face&) = 0;
 
   virtual void
-  InInterests(shared_ptr<const Interest>, shared_ptr<const Face>) = 0;
+  InInterests(const Interest&, const Face&) = 0;
 
   virtual void
-  OutData(shared_ptr<const Data>, bool fromCache, shared_ptr<const Face>) = 0;
+  OutData(const Data&, const Face&) = 0;
 
   virtual void
-  InData(shared_ptr<const Data>, shared_ptr<const Face>) = 0;
+  InData(const Data&, const Face&) = 0;
 
-  virtual void
-  SatisfiedInterests(Ptr<const pit::Entry>) = 0;
+  // virtual void
+  // SatisfiedInterests(Ptr<const pit::Entry>) = 0;
 
-  virtual void
-  TimedOutInterests(Ptr<const pit::Entry>) = 0;
+  // virtual void
+  // TimedOutInterests(Ptr<const pit::Entry>) = 0;
 
 protected:
   std::string m_node;
@@ -117,21 +107,21 @@ protected:
       m_outInterests = 0;
       m_inData = 0;
       m_outData = 0;
-      m_satisfiedInterests = 0;
-      m_timedOutInterests = 0;
+      // m_satisfiedInterests = 0;
+      // m_timedOutInterests = 0;
 
-      m_outSatisfiedInterests = 0;
-      m_outTimedOutInterests = 0;
+      // m_outSatisfiedInterests = 0;
+      // m_outTimedOutInterests = 0;
     }
 
     double m_inInterests;
     double m_outInterests;
     double m_inData;
     double m_outData;
-    double m_satisfiedInterests;
-    double m_timedOutInterests;
-    double m_outSatisfiedInterests;
-    double m_outTimedOutInterests;
+    // double m_satisfiedInterests;
+    // double m_timedOutInterests;
+    // double m_outSatisfiedInterests;
+    // double m_outTimedOutInterests;
   };
 };
 

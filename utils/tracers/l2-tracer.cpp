@@ -19,6 +19,7 @@
  */
 
 #include "l2-tracer.hpp"
+
 #include "ns3/node.h"
 #include "ns3/config.h"
 #include "ns3/names.h"
@@ -28,18 +29,16 @@
 #include "ns3/queue.h"
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-
 namespace ns3 {
 
 L2Tracer::L2Tracer(Ptr<Node> node)
   : m_nodePtr(node)
 {
-  m_node = boost::lexical_cast<string>(m_nodePtr->GetId());
+  m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
 
   Connect();
 
-  string name = Names::FindName(node);
+  std::string name = Names::FindName(node);
   if (!name.empty()) {
     m_node = name;
   }

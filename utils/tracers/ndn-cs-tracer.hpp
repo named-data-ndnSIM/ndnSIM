@@ -30,8 +30,7 @@
 #include <ns3/event-id.h>
 #include <ns3/node-container.h>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
+#include <tuple>
 #include <map>
 #include <list>
 
@@ -124,7 +123,7 @@ public:
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    */
   static Ptr<CsTracer>
-  Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream,
+  Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream,
           Time averagingPeriod = Seconds(0.5));
 
   /**
@@ -141,14 +140,14 @@ public:
    * @param os    reference to the output stream
    * @param node  pointer to the node
    */
-  CsTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  CsTracer(shared_ptr<std::ostream> os, Ptr<Node> node);
 
   /**
    * @brief Trace constructor that attaches to the node using node name
    * @param os        reference to the output stream
    * @param nodeName  name of the node registered using Names::Add
    */
-  CsTracer(boost::shared_ptr<std::ostream> os, const std::string& node);
+  CsTracer(shared_ptr<std::ostream> os, const std::string& node);
 
   /**
    * @brief Destructor
@@ -195,7 +194,7 @@ private:
   std::string m_node;
   Ptr<Node> m_nodePtr;
 
-  boost::shared_ptr<std::ostream> m_os;
+  shared_ptr<std::ostream> m_os;
 
   Time m_period;
   EventId m_printEvent;

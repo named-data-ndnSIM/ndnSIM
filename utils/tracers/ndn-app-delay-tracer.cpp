@@ -25,7 +25,7 @@
 #include "ns3/names.h"
 #include "ns3/callback.h"
 
-#include "ns3/ndn-app.hpp"
+#include "apps/ndn-app.hpp"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"
@@ -37,19 +37,11 @@
 
 NS_LOG_COMPONENT_DEFINE("ndn.AppDelayTracer");
 
-using namespace std;
-
 namespace ns3 {
 namespace ndn {
 
-static std::list<boost::tuple<boost::shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer>>>>
+static std::list<std::tuple<shared_ptr<std::ostream>, std::list<Ptr<AppDelayTracer>>>>
   g_tracers;
-
-template<class T>
-static inline void
-NullDeleter(T* ptr)
-{
-}
 
 void
 AppDelayTracer::Destroy()
@@ -64,9 +56,9 @@ AppDelayTracer::InstallAll(const std::string& file)
   using namespace std;
 
   std::list<Ptr<AppDelayTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -77,7 +69,7 @@ AppDelayTracer::InstallAll(const std::string& file)
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   for (NodeList::Iterator node = NodeList::Begin(); node != NodeList::End(); node++) {
@@ -91,7 +83,7 @@ AppDelayTracer::InstallAll(const std::string& file)
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 void
@@ -101,9 +93,9 @@ AppDelayTracer::Install(const NodeContainer& nodes, const std::string& file)
   using namespace std;
 
   std::list<Ptr<AppDelayTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -114,7 +106,7 @@ AppDelayTracer::Install(const NodeContainer& nodes, const std::string& file)
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   for (NodeContainer::Iterator node = nodes.Begin(); node != nodes.End(); node++) {
@@ -128,7 +120,7 @@ AppDelayTracer::Install(const NodeContainer& nodes, const std::string& file)
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 void
@@ -138,9 +130,9 @@ AppDelayTracer::Install(Ptr<Node> node, const std::string& file)
   using namespace std;
 
   std::list<Ptr<AppDelayTracer>> tracers;
-  boost::shared_ptr<std::ostream> outputStream;
+  shared_ptr<std::ostream> outputStream;
   if (file != "-") {
-    boost::shared_ptr<std::ofstream> os(new std::ofstream());
+    shared_ptr<std::ofstream> os(new std::ofstream());
     os->open(file.c_str(), std::ios_base::out | std::ios_base::trunc);
 
     if (!os->is_open()) {
@@ -151,7 +143,7 @@ AppDelayTracer::Install(Ptr<Node> node, const std::string& file)
     outputStream = os;
   }
   else {
-    outputStream = boost::shared_ptr<std::ostream>(&std::cout, NullDeleter<std::ostream>);
+    outputStream = shared_ptr<std::ostream>(&std::cout, std::bind([]{}));
   }
 
   Ptr<AppDelayTracer> trace = Install(node, outputStream);
@@ -163,11 +155,11 @@ AppDelayTracer::Install(Ptr<Node> node, const std::string& file)
     *outputStream << "\n";
   }
 
-  g_tracers.push_back(boost::make_tuple(outputStream, tracers));
+  g_tracers.push_back(std::make_tuple(outputStream, tracers));
 }
 
 Ptr<AppDelayTracer>
-AppDelayTracer::Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream)
+AppDelayTracer::Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream)
 {
   NS_LOG_DEBUG("Node: " << node->GetId());
 
@@ -180,21 +172,21 @@ AppDelayTracer::Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputSt
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-AppDelayTracer::AppDelayTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node)
+AppDelayTracer::AppDelayTracer(shared_ptr<std::ostream> os, Ptr<Node> node)
   : m_nodePtr(node)
   , m_os(os)
 {
-  m_node = boost::lexical_cast<string>(m_nodePtr->GetId());
+  m_node = boost::lexical_cast<std::string>(m_nodePtr->GetId());
 
   Connect();
 
-  string name = Names::FindName(node);
+  std::string name = Names::FindName(node);
   if (!name.empty()) {
     m_node = name;
   }
 }
 
-AppDelayTracer::AppDelayTracer(boost::shared_ptr<std::ostream> os, const std::string& node)
+AppDelayTracer::AppDelayTracer(shared_ptr<std::ostream> os, const std::string& node)
   : m_node(node)
   , m_os(os)
 {
