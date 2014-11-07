@@ -28,7 +28,7 @@
 #include "ns3/ptr.h"
 
 #include <list>
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 
 namespace ns3 {
 
@@ -47,7 +47,7 @@ public:
   /**
    * @brief Graph edge
    */
-  typedef boost::tuple<Ptr<GlobalRouter>, shared_ptr<Face>, Ptr<GlobalRouter>> Incidency;
+  typedef std::tuple<Ptr<GlobalRouter>, shared_ptr<Face>, Ptr<GlobalRouter>> Incidency;
   /**
    * @brief List of graph edges
    */
@@ -113,7 +113,7 @@ public:
 protected:
   virtual void
   NotifyNewAggregate(); ///< @brief Notify when the object is aggregated to another object (e.g.,
-  /// Node)
+                        /// Node)
 
 private:
   uint32_t m_id;
@@ -128,7 +128,8 @@ private:
 inline bool
 operator==(const GlobalRouter::Incidency& a, const GlobalRouter::Incidency& b)
 {
-  return a.get<0>() == b.get<0>() && a.get<1>() == b.get<1>() && a.get<2>() == b.get<2>();
+  return std::get<0>(a) == std::get<0>(b) && std::get<1>(a) == std::get<1>(b)
+         && std::get<2>(a) == std::get<2>(b);
 }
 
 inline bool

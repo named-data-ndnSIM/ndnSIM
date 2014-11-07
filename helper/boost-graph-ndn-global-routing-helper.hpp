@@ -29,11 +29,12 @@
 #include <boost/graph/properties.hpp>
 #include <boost/ref.hpp>
 
-#include "ns3/ndn-face.hpp"
-#include "ns3/ndn-limits.hpp"
+#include "ns3/ndnSIM/model/ndn-face.hpp"
+#include "ns3/ndnSIM/model/ndn-global-router.hpp"
+
 #include "ns3/node-list.h"
 #include "ns3/channel-list.h"
-#include "../model/ndn-global-router.hpp"
+
 #include <list>
 #include <map>
 
@@ -103,13 +104,13 @@ namespace boost {
 inline graph_traits<NdnGlobalRouterGraph>::vertex_descriptor
 source(graph_traits<NdnGlobalRouterGraph>::edge_descriptor e, const NdnGlobalRouterGraph& g)
 {
-  return e.get<0>();
+  return std::get<0>(e);
 }
 
 inline graph_traits<NdnGlobalRouterGraph>::vertex_descriptor
 target(graph_traits<NdnGlobalRouterGraph>::edge_descriptor e, const NdnGlobalRouterGraph& g)
 {
-  return e.get<2>();
+  return std::get<2>(e);
 }
 
 inline std::pair<graph_traits<NdnGlobalRouterGraph>::vertex_iterator,
@@ -176,8 +177,8 @@ struct property_map<NdnGlobalRouterGraph, vertex_index_t> {
 template<>
 struct property_traits<EdgeWeights> {
   // Metric property map
-  typedef tuple<ns3::Ptr<ns3::ndn::Face>, uint16_t, double> value_type;
-  typedef tuple<ns3::Ptr<ns3::ndn::Face>, uint16_t, double> reference;
+  typedef std::tuple<std::shared_ptr<nfd::Face>, uint16_t, double> value_type;
+  typedef std::tuple<std::shared_ptr<nfd::Face>, uint16_t, double> reference;
   typedef ns3::ndn::GlobalRouter::Incidency key_type;
   typedef readable_property_map_tag category;
 };
@@ -189,16 +190,16 @@ const property_traits<EdgeWeights>::value_type
 struct WeightCompare : public std::binary_function<property_traits<EdgeWeights>::reference,
                                                    property_traits<EdgeWeights>::reference, bool> {
   bool
-  operator()(tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double> a,
-             tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double> b) const
+  operator()(std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> a,
+             std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> b) const
   {
-    return a.get<1>() < b.get<1>();
+    return std::get<1>(a) < std::get<1>(b);
   }
 
   bool
   operator()(property_traits<EdgeWeights>::reference a, uint32_t b) const
   {
-    return a.get<1>() < b;
+    return std::get<1>(a) < b;
   }
 
   bool
@@ -213,17 +214,19 @@ struct WeightCombine
   uint32_t
   operator()(uint32_t a, property_traits<EdgeWeights>::reference b) const
   {
-    return a + b.get<1>();
+    return a + std::get<1>(b);
   }
 
-  tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double>
-  operator()(tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double> a,
+  std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double>
+  operator()(std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> a,
              property_traits<EdgeWeights>::reference b) const
   {
-    if (a.get<0>() == 0)
-      return make_tuple(b.get<0>(), a.get<1>() + b.get<1>(), a.get<2>() + b.get<2>());
+    if (std::get<0>(a) == 0)
+      return std::make_tuple(std::get<0>(b), std::get<1>(a) + std::get<1>(b),
+                             std::get<2>(a) + std::get<2>(b));
     else
-      return make_tuple(a.get<0>(), a.get<1>() + b.get<1>(), a.get<2>() + b.get<2>());
+      return std::make_tuple(std::get<0>(a), std::get<1>(a) + std::get<1>(b),
+                             std::get<2>(a) + std::get<2>(b));
   }
 };
 
@@ -267,17 +270,13 @@ get(const boost::VertexIds&, ns3::Ptr<ns3::ndn::GlobalRouter>& gr)
 inline property_traits<EdgeWeights>::reference
 get(const boost::EdgeWeights&, ns3::ndn::GlobalRouter::Incidency& edge)
 {
-  if (edge.get<1>() == 0)
+  if (std::get<1>(edge) == 0)
     return property_traits<EdgeWeights>::reference(0, 0, 0.0);
   else {
-    ns3::Ptr<ns3::ndn::Limits> limits = edge.get<1>()->GetObject<ns3::ndn::Limits>();
-    double delay = 0.0;
-    if (limits != 0) // valid limits object
-    {
-      delay = limits->GetLinkDelay();
-    }
-    return property_traits<EdgeWeights>::reference(edge.get<1>(), edge.get<1>()->GetMetric(),
-                                                   delay);
+    return property_traits<EdgeWeights>::reference(std::get<1>(edge),
+                                                   static_cast<uint16_t>(
+                                                     std::get<1>(edge)->getMetric()),
+                                                   0.0);
   }
 }
 
@@ -295,26 +294,25 @@ struct property_traits<reference_wrapper<PredecessorsMap>> {
 };
 
 struct DistancesMap : public std::map<ns3::Ptr<ns3::ndn::GlobalRouter>,
-                                      tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double>> {
+                                      std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double>> {
 };
 
 template<>
 struct property_traits<reference_wrapper<DistancesMap>> {
   // Metric property map
-  typedef tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double> value_type;
-  typedef tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double> reference;
+  typedef std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> value_type;
+  typedef std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> reference;
   typedef ns3::Ptr<ns3::ndn::GlobalRouter> key_type;
   typedef read_write_property_map_tag category;
 };
 
-inline tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double>
+inline std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double>
 get(DistancesMap& map, ns3::Ptr<ns3::ndn::GlobalRouter> key)
 {
   boost::DistancesMap::iterator i = map.find(key);
   if (i == map.end())
-    return tuple<ns3::Ptr<ns3::ndn::Face>, uint32_t, double>(0,
-                                                             std::numeric_limits<uint32_t>::max(),
-                                                             0.0);
+    return std::tuple<std::shared_ptr<nfd::Face>, uint32_t,
+                      double>(0, std::numeric_limits<uint32_t>::max(), 0.0);
   else
     return i->second;
 }
