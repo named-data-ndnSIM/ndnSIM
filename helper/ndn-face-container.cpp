@@ -22,8 +22,6 @@
 
 #include <algorithm>
 
-#include "ns3/ndn-face.hpp"
-
 namespace ns3 {
 namespace ndn {
 
