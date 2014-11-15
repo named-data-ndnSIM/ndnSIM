@@ -25,7 +25,7 @@
 
 #include "internal-face.hpp"
 #include "core/logger.hpp"
-#include "core/global-io.hpp"
+#include "core/scheduler.hpp"
 
 namespace nfd {
 
@@ -43,8 +43,8 @@ InternalFace::sendInterest(const Interest& interest)
 
   // Invoke .processInterest a bit later,
   // to avoid potential problems in forwarding pipelines.
-  getGlobalIoService().post(bind(&InternalFace::processInterest,
-                                 this, interest.shared_from_this()));
+  scheduler::schedule(time::seconds(0),
+                      bind(&InternalFace::processInterest, this, interest.shared_from_this()));
 }
 
 void
