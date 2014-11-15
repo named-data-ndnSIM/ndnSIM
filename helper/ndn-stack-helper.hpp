@@ -303,6 +303,10 @@ private:
   PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                 Ptr<NetDevice> netDevice) const;
 
+public:
+  void
+  setCustomNdnCxxClocks();
+
 private:
   StackHelper(const StackHelper&);
   StackHelper&

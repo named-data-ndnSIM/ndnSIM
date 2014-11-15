@@ -61,6 +61,8 @@ StackHelper::StackHelper()
   : m_limitsEnabled(false)
   , m_needSetDefaultRoutes(false)
 {
+  setCustomNdnCxxClocks();
+
   m_ndnFactory.SetTypeId("ns3::ndn::L3Protocol");
   m_strategyFactory.SetTypeId("ns3::ndn::fw::Flooding");
   m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
@@ -82,6 +84,13 @@ StackHelper::getKeyChain()
 {
   static ::ndn::DummyKeyChain keyChain;
   return keyChain;
+}
+
+void
+StackHelper::setCustomNdnCxxClocks()
+{
+  ::ndn::time::setCustomClocks(make_shared<ns3::ndn::time::CustomSteadyClock>(),
+                               make_shared<ns3::ndn::time::CustomSystemClock>());
 }
 
 void

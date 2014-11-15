@@ -43,7 +43,9 @@ namespace name = ::ndn::name;
 
 ATTRIBUTE_HELPER_HEADER(Name);
 
-namespace time = ::ndn::time;
+namespace time {
+using namespace ::ndn::time;
+}
 
 using ::ndn::Exclude;
 
