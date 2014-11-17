@@ -60,13 +60,14 @@ NetDeviceFace::NetDeviceFace(Ptr<Node> node, const Ptr<NetDevice>& netDevice)
 NetDeviceFace::~NetDeviceFace()
 {
   NS_LOG_FUNCTION_NOARGS();
-
-  m_node->UnregisterProtocolHandler(MakeCallback(&NetDeviceFace::receiveFromNetDevice, this));
+  close();
 }
 
 void
 NetDeviceFace::close()
 {
+  m_node->UnregisterProtocolHandler(MakeCallback(&NetDeviceFace::receiveFromNetDevice, this));
+  this->fail("Close connection");
 }
 
 Ptr<NetDevice>

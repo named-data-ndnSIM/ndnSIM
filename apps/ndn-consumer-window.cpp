@@ -195,24 +195,6 @@ ConsumerWindow::OnData(shared_ptr<const Data> contentObject)
 }
 
 void
-ConsumerWindow::OnNack(shared_ptr<const Interest> interest)
-{
-  Consumer::OnNack(interest);
-
-  if (m_inFlight > static_cast<uint32_t>(0))
-    m_inFlight--;
-
-  if (m_window > static_cast<uint32_t>(0)) {
-    // m_window = 0.5 * m_window;//m_window - 1;
-    m_window = std::max<uint32_t>(0, m_window - 1);
-  }
-
-  NS_LOG_DEBUG("Window: " << m_window << ", InFlight: " << m_inFlight);
-
-  ScheduleNextPacket();
-}
-
-void
 ConsumerWindow::OnTimeout(uint32_t sequenceNumber)
 {
   if (m_inFlight > static_cast<uint32_t>(0))

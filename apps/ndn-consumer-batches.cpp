@@ -28,7 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
-#include "../utils/batches.hpp"
+#include "utils/batches.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerBatches");
 
@@ -67,8 +67,8 @@ ConsumerBatches::StartApplication()
 
   // std::cout << "Batches: " << batches << "\n";
   for (Batches::const_iterator i = m_batches.begin(); i != m_batches.end(); i++) {
-    Simulator::ScheduleWithContext(GetNode()->GetId(), i->get<0>(), &ConsumerBatches::AddBatch,
-                                   this, i->get<1>());
+    Simulator::ScheduleWithContext(GetNode()->GetId(), std::get<0>(*i), &ConsumerBatches::AddBatch,
+                                   this, std::get<1>(*i));
   }
 }
 
@@ -95,10 +95,6 @@ ConsumerBatches::ScheduleNextPacket()
     m_sendEvent = Simulator::Schedule(delay, &Consumer::SendPacket, this);
   }
 }
-
-///////////////////////////////////////////////////
-//          Process incoming packets             //
-///////////////////////////////////////////////////
 
 } // namespace ndn
 } // namespace ns3

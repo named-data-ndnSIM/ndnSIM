@@ -20,9 +20,8 @@
 
 #include "ndn-consumer-zipf-mandelbrot.hpp"
 
-#include "ns3/ndn-app-face.hpp"
-
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
+#include "model/ndn-app-face.hpp"
+#include "utils/ndn-fw-hop-count-tag.hpp"
 
 #include <math.h>
 
@@ -170,15 +169,15 @@ ConsumerZipfMandelbrot::SendPacket()
 
   //
   shared_ptr<Name> nameWithSequence = make_shared<Name>(m_interestName);
-  nameWithSequence->appendSeqNum(seq);
+  nameWithSequence->appendSequenceNumber(seq);
   //
 
   shared_ptr<Interest> interest = make_shared<Interest>();
-  interest->SetNonce(m_rand.GetValue());
-  interest->SetName(nameWithSequence);
+  interest->setNonce(m_rand.GetValue());
+  interest->setName(*nameWithSequence);
 
   // NS_LOG_INFO ("Requesting Interest: \n" << *interest);
-  NS_LOG_INFO("> Interest for " << seq << ", Total: " << m_seq << ", face: " << m_face->GetId());
+  NS_LOG_INFO("> Interest for " << seq << ", Total: " << m_seq << ", face: " << m_face->getId());
   NS_LOG_DEBUG("Trying to add " << seq << " with " << Simulator::Now() << ". already "
                                 << m_seqTimeouts.size() << " items");
 
@@ -192,11 +191,8 @@ ConsumerZipfMandelbrot::SendPacket()
 
   m_rtt->SentSeq(SequenceNumber32(seq), 1);
 
-  FwHopCountTag hopCountTag;
-  interest->GetPayload()->AddPacketTag(hopCountTag);
-
   m_transmittedInterests(interest, this, m_face);
-  m_face->ReceiveInterest(interest);
+  m_face->onReceiveInterest(*interest);
 
   ConsumerZipfMandelbrot::ScheduleNextPacket();
 }

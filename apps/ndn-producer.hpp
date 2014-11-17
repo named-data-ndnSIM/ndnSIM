@@ -25,10 +25,10 @@
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "ndn-app.hpp"
+#include "ns3/ndnSIM/model/ndn-common.hpp"
 
+#include "ns3/nstime.h"
 #include "ns3/ptr.h"
-#include "ns3/ndn-name.hpp"
-#include "ns3/ndn-data.hpp"
 
 namespace ns3 {
 namespace ndn {
@@ -50,7 +50,7 @@ public:
   Producer();
 
   // inherited from NdnApp
-  void
+  virtual void
   OnInterest(shared_ptr<const Interest> interest);
 
 protected:

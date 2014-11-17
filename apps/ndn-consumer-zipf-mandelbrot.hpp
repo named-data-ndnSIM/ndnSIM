@@ -24,6 +24,8 @@
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "ndn-consumer.hpp"
+#include "ndn-consumer-cbr.hpp"
+
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -32,7 +34,6 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ndn-consumer-cbr.hpp"
 #include "ns3/random-variable.h"
 
 namespace ns3 {

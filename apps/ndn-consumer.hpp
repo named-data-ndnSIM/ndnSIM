@@ -25,10 +25,14 @@
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "ndn-app.hpp"
+
 #include "ns3/random-variable.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
-#include "ns3/ndn-rtt-estimator.hpp"
+
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/utils/ndn-rtt-estimator.hpp"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 
 #include <set>
 #include <map>
@@ -58,12 +62,6 @@ public:
   virtual ~Consumer(){};
 
   // From App
-  // virtual void
-  // OnInterest (const shared_ptr<const Interest> &interest);
-
-  virtual void
-  OnNack(shared_ptr<const Interest> interest);
-
   virtual void
   OnData(shared_ptr<const Data> contentObject);
 

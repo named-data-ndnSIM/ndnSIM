@@ -22,7 +22,8 @@
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/names.h"
-#include "ns3/ndn-app.hpp"
+
+#include "apps/ndn-app.hpp"
 
 #ifdef NS3_MPI
 #include "ns3/mpi-interface.h"

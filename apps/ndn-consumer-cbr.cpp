@@ -30,7 +30,7 @@
 #include "ns3/integer.h"
 #include "ns3/double.h"
 
-#include "ns3/ndn-app-face.hpp"
+#include "model/ndn-app-face.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerCbr");
 
@@ -120,23 +120,6 @@ ConsumerCbr::GetRandomize() const
 {
   return m_randomType;
 }
-
-///////////////////////////////////////////////////
-//          Process incoming packets             //
-///////////////////////////////////////////////////
-
-// void
-// Consumer::OnData (const shared_ptr<const Data> &contentObject,
-//                                const Ptr<const Packet> &payload)
-// {
-//   Consumer::OnData (contentObject, payload); // tracing inside
-// }
-
-// void
-// Consumer::OnNack (const shared_ptr<const Interest> &interest)
-// {
-//   Consumer::OnNack (interest); // tracing inside
-// }
 
 } // namespace ndn
 } // namespace ns3

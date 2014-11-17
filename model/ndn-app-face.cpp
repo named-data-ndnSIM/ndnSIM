@@ -53,6 +53,7 @@ AppFace::~AppFace()
 void
 AppFace::close()
 {
+  this->fail("Close connection");
 }
 
 void

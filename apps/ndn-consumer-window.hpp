@@ -49,12 +49,6 @@ public:
   ConsumerWindow();
 
   // From App
-  // virtual void
-  // OnInterest (const shared_ptr<const Interest> &interest);
-
-  virtual void
-  OnNack(shared_ptr<const Interest> interest);
-
   virtual void
   OnData(shared_ptr<const Data> contentObject);
 

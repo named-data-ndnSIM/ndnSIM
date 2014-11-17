@@ -26,15 +26,12 @@
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 
-#include "ns3/ndn-app-face.hpp"
-#include "ns3/ndn-fib.hpp"
+#include "model/ndn-app-face.hpp"
+#include "model/ndn-ns3.hpp"
+#include "model/ndn-l3-protocol.hpp"
+#include "helper/ndn-fib-helper.hpp"
 
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
-
-#include <boost/ref.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-namespace ll = boost::lambda;
+#include <memory>
 
 NS_LOG_COMPONENT_DEFINE("ndn.Producer");
 
@@ -76,7 +73,7 @@ Producer::GetTypeId(void)
 
 Producer::Producer()
 {
-  // NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION_NOARGS();
 }
 
 // inherited from Application base class.
@@ -84,30 +81,15 @@ void
 Producer::StartApplication()
 {
   NS_LOG_FUNCTION_NOARGS();
-  NS_ASSERT(GetNode()->GetObject<Fib>() != 0);
-
   App::StartApplication();
 
-  NS_LOG_DEBUG("NodeID: " << GetNode()->GetId());
-
-  Ptr<Fib> fib = GetNode()->GetObject<Fib>();
-
-  Ptr<fib::Entry> fibEntry = fib->Add(m_prefix, m_face, 0);
-
-  fibEntry->UpdateStatus(m_face, fib::FaceMetric::NDN_FIB_GREEN);
-
-  // // make face green, so it will be used primarily
-  // StaticCast<fib::FibImpl> (fib)->modify (fibEntry,
-  //                                        ll::bind (&fib::Entry::UpdateStatus,
-  //                                                  ll::_1, m_face,
-  //                                                  fib::FaceMetric::NDN_FIB_GREEN));
+  FibHelper::AddRoute(GetNode(), m_prefix, m_face, 0);
 }
 
 void
 Producer::StopApplication()
 {
   NS_LOG_FUNCTION_NOARGS();
-  NS_ASSERT(GetNode()->GetObject<Fib>() != 0);
 
   App::StopApplication();
 }
@@ -122,28 +104,35 @@ Producer::OnInterest(shared_ptr<const Interest> interest)
   if (!m_active)
     return;
 
-  shared_ptr<Data> data = make_shared<Data>(Create<Packet>(m_virtualPayloadSize));
-  shared_ptr<Name> dataName = make_shared<Name>(interest->GetName());
-  dataName->append(m_postfix);
-  data->SetName(dataName);
-  data->SetFreshness(m_freshness);
-  data->SetTimestamp(Simulator::Now());
+  Name dataName(interest->getName());
+  // dataName.append(m_postfix);
+  // dataName.appendVersion();
 
-  data->SetSignature(m_signature);
+  auto data = make_shared<Data>();
+  data->setName(dataName);
+  data->setFreshnessPeriod(::ndn::time::milliseconds(m_freshness.GetMilliSeconds()));
+
+  data->setContent(make_shared<::ndn::Buffer>(m_virtualPayloadSize));
+
+  Signature signature;
+  SignatureInfo signatureInfo(static_cast<::ndn::tlv::SignatureTypeValue>(255));
+
   if (m_keyLocator.size() > 0) {
-    data->SetKeyLocator(make_shared<Name>(m_keyLocator));
+    signatureInfo.setKeyLocator(m_keyLocator);
   }
 
-  NS_LOG_INFO("node(" << GetNode()->GetId() << ") respodning with Data: " << data->GetName());
+  signature.setInfo(signatureInfo);
+  signature.setValue(Block(&m_signature, sizeof(m_signature)));
 
-  // Echo back FwHopCountTag if exists
-  FwHopCountTag hopCountTag;
-  if (interest->GetPayload()->PeekPacketTag(hopCountTag)) {
-    data->GetPayload()->AddPacketTag(hopCountTag);
-  }
+  data->setSignature(signature);
 
-  m_face->ReceiveData(data);
+  NS_LOG_INFO("node(" << GetNode()->GetId() << ") respodning with Data: " << data->getName());
+
+  // to create real wire encoding
+  data->wireEncode();
+
   m_transmittedDatas(data, this, m_face);
+  m_face->onReceiveData(*data);
 }
 
 } // namespace ndn

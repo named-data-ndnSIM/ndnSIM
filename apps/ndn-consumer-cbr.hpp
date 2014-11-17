@@ -45,17 +45,6 @@ public:
   ConsumerCbr();
   virtual ~ConsumerCbr();
 
-  // From NdnApp
-  // virtual void
-  // OnInterest (const shared_ptr<const Interest> &interest);
-
-  // virtual void
-  // OnNack (const shared_ptr<const Interest> &interest);
-
-  // virtual void
-  // OnData (const shared_ptr<const Data> &contentObject,
-  //                  const Ptr<const Packet> &payload);
-
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
@@ -77,19 +66,6 @@ protected:
    */
   std::string
   GetRandomize() const;
-
-private:
-  // void
-  // UpdateMean ();
-
-  // virtual void
-  // SetPayloadSize (uint32_t payload);
-
-  // void
-  // SetDesiredRate (DataRate rate);
-
-  // DataRate
-  // GetDesiredRate () const;
 
 protected:
   double m_frequency; // Frequency of interest packets (in hertz)

@@ -28,7 +28,7 @@ std::ostream&
 operator<<(std::ostream& os, const Batches& batch)
 {
   for (Batches::const_iterator i = batch.begin(); i != batch.end(); i++)
-    os << i->get<0>() << " " << i->get<1>() << " ";
+    os << std::get<0>(*i) << " " << std::get<1>(*i) << " ";
 
   return os;
 }

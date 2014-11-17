@@ -30,10 +30,11 @@
 #include "ns3/integer.h"
 #include "ns3/double.h"
 
-#include "ns3/ndn-app-face.hpp"
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
-#include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.hpp"
+#include "utils/ndn-ns3-packet-tag.hpp"
+#include "model/ndn-app-face.hpp"
+#include "utils/ndn-rtt-mean-deviation.hpp"
 
+#include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 
 NS_LOG_COMPONENT_DEFINE("ndn.Consumer");
@@ -180,24 +181,23 @@ Consumer::SendPacket()
 
   //
   shared_ptr<Name> nameWithSequence = make_shared<Name>(m_interestName);
-  nameWithSequence->appendSeqNum(seq);
+  nameWithSequence->appendSequenceNumber(seq);
   //
 
+  // shared_ptr<Interest> interest = make_shared<Interest> ();
   shared_ptr<Interest> interest = make_shared<Interest>();
-  interest->SetNonce(m_rand.GetValue());
-  interest->SetName(nameWithSequence);
-  interest->SetInterestLifetime(m_interestLifeTime);
+  interest->setNonce(m_rand.GetValue());
+  interest->setName(*nameWithSequence);
+  time::milliseconds interestLifeTime(m_interestLifeTime.GetMilliSeconds());
+  interest->setInterestLifetime(interestLifeTime);
 
   // NS_LOG_INFO ("Requesting Interest: \n" << *interest);
   NS_LOG_INFO("> Interest for " << seq);
 
   WillSendOutInterest(seq);
 
-  FwHopCountTag hopCountTag;
-  interest->GetPayload()->AddPacketTag(hopCountTag);
-
   m_transmittedInterests(interest, this, m_face);
-  m_face->ReceiveInterest(interest);
+  m_face->onReceiveInterest(*interest);
 
   ScheduleNextPacket();
 }
@@ -218,13 +218,18 @@ Consumer::OnData(shared_ptr<const Data> data)
 
   // NS_LOG_INFO ("Received content object: " << boost::cref(*data));
 
-  uint32_t seq = data->GetName().get(-1).toSeqNum();
+  // This could be a problem......
+  uint32_t seq = data->getName().at(-1).toSequenceNumber();
   NS_LOG_INFO("< DATA for " << seq);
 
   int hopCount = -1;
-  FwHopCountTag hopCountTag;
-  if (data->GetPayload()->PeekPacketTag(hopCountTag)) {
-    hopCount = hopCountTag.Get();
+  auto ns3PacketTag = data->getTag<Ns3PacketTag>();
+  if (ns3PacketTag != nullptr) {
+    FwHopCountTag hopCountTag;
+    if (ns3PacketTag->getPacket()->PeekPacketTag(hopCountTag)) {
+      hopCount = hopCountTag.Get();
+      NS_LOG_DEBUG("Hop count: " << hopCount);
+    }
   }
 
   SeqTimeoutsContainer::iterator entry = m_seqLastDelay.find(seq);
@@ -234,8 +239,7 @@ Consumer::OnData(shared_ptr<const Data> data)
 
   entry = m_seqFullDelay.find(seq);
   if (entry != m_seqFullDelay.end()) {
-    m_firstInterestDataDelay(this, seq, Simulator::Now() - entry->time, m_seqRetxCounts[seq],
-                             hopCount);
+    m_firstInterestDataDelay(this, seq, Simulator::Now() - entry->time, m_seqRetxCounts[seq], hopCount);
   }
 
   m_seqRetxCounts.erase(seq);
@@ -246,34 +250,6 @@ Consumer::OnData(shared_ptr<const Data> data)
   m_retxSeqs.erase(seq);
 
   m_rtt->AckSeq(SequenceNumber32(seq));
-}
-
-void
-Consumer::OnNack(shared_ptr<const Interest> interest)
-{
-  if (!m_active)
-    return;
-
-  App::OnNack(interest); // tracing inside
-
-  // NS_LOG_DEBUG ("Nack type: " << interest->GetNack ());
-
-  // NS_LOG_FUNCTION (interest->GetName ());
-
-  // NS_LOG_INFO ("Received NACK: " << boost::cref(*interest));
-  uint32_t seq = interest->GetName().get(-1).toSeqNum();
-  NS_LOG_INFO("< NACK for " << seq);
-  // std::cout << Simulator::Now ().ToDouble (Time::S) << "s -> " << "NACK for " << seq << "\n";
-
-  // put in the queue of interests to be retransmitted
-  // NS_LOG_INFO ("Before: " << m_retxSeqs.size ());
-  m_retxSeqs.insert(seq);
-  // NS_LOG_INFO ("After: " << m_retxSeqs.size ());
-
-  m_seqTimeouts.erase(seq);
-
-  m_rtt->IncreaseMultiplier(); // Double the next RTO ??
-  ScheduleNextPacket();
 }
 
 void

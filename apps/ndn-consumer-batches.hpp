@@ -25,7 +25,7 @@
 
 #include "ndn-consumer.hpp"
 #include "ns3/traced-value.h"
-#include "../utils/batches.hpp"
+#include "ns3/ndnSIM/utils/batches.hpp"
 
 namespace ns3 {
 namespace ndn {
@@ -43,20 +43,6 @@ public:
    * \brief Default constructor
    */
   ConsumerBatches();
-
-  // From App
-  // virtual void
-  // OnInterest (const shared_ptr<const Interest> &interest);
-
-  // virtual void
-  // OnNack (const shared_ptr<const Interest> &interest);
-
-  // virtual void
-  // OnData (const shared_ptr<const Data> &contentObject,
-  //                  const Ptr<const Packet> &payload);
-
-  // virtual void
-  // OnTimeout (uint32_t sequenceNumber);
 
 private:
   virtual void

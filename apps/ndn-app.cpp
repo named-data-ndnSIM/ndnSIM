@@ -23,8 +23,8 @@
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 
-#include "ns3/ndn-l3-protocol.hpp"
-#include "ns3/ndn-app-face.hpp"
+#include "model/ndn-l3-protocol.hpp"
+#include "model/ndn-app-face.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.App");
 
@@ -82,7 +82,7 @@ App::GetId() const
   if (m_face == 0)
     return (uint32_t)-1;
   else
-    return m_face->GetId();
+    return m_face->getId();
 }
 
 void
@@ -112,13 +112,10 @@ App::StartApplication() // Called at time specified by Start
                 "Ndn stack should be installed on the node " << GetNode());
 
   // step 1. Create a face
-  m_face = CreateObject<AppFace>(/*Ptr<App> (this)*/ this);
+  m_face = std::make_shared<AppFace>(this);
 
   // step 2. Add face to the Ndn stack
-  GetNode()->GetObject<L3Protocol>()->AddFace(m_face);
-
-  // step 3. Enable face
-  m_face->SetUp(true);
+  GetNode()->GetObject<L3Protocol>()->addFace(m_face);
 }
 
 void
@@ -129,26 +126,9 @@ App::StopApplication() // Called at time specified by Stop
   if (!m_active)
     return; // don't assert here, just return
 
-  NS_ASSERT(GetNode()->GetObject<L3Protocol>() != 0);
-
   m_active = false;
 
-  // step 1. Disable face
-  m_face->SetUp(false);
-
-  // step 2. Remove face from Ndn stack
-  GetNode()->GetObject<L3Protocol>()->RemoveFace(m_face);
-
-  // step 3. Destroy face
-  if (m_face->GetReferenceCount() != 1) {
-    NS_LOG_ERROR("Please a bug report on https://github.com/NDN-Routing/ndnSIM/issues");
-    NS_LOG_ERROR("At this point, nobody else should have referenced this face, but we have "
-                 << m_face->GetReferenceCount() << " references");
-  }
-  // NS_ASSERT_MSG (m_face->GetReferenceCount ()==2,
-  //               "At this point, nobody else should have referenced this face, but we have "
-  //               << m_face->GetReferenceCount () << " references");
-  m_face = 0;
+  m_face->close();
 }
 
 } // namespace ndn
