@@ -89,7 +89,8 @@ def build(bld):
                                             'helper/*',
                                             'utils/*/*'])
     module.source += bld.path.ant_glob(['helper/ndn-face-container.cpp',
-                                        'helper/ndn-stack-helper.cpp'])
+                                        'helper/ndn-stack-helper.cpp',
+                                        'helper/ndn-fib-helper.cpp'])
 
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob(
         ['%s/**/*.hpp' % dir for dir in module_dirs])]

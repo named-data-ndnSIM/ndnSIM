@@ -40,6 +40,7 @@ namespace ns3 {
 namespace ndn {
 
 StackHelper::StackHelper()
+  : m_needSetDefaultRoutes(false)
 {
   setCustomNdnCxxClocks();
 
@@ -68,6 +69,13 @@ StackHelper::setCustomNdnCxxClocks()
 {
   ::ndn::time::setCustomClocks(make_shared<ns3::ndn::time::CustomSteadyClock>(),
                                make_shared<ns3::ndn::time::CustomSystemClock>());
+}
+
+void
+StackHelper::SetDefaultRoutes(bool needSet)
+{
+  NS_LOG_FUNCTION(this << needSet);
+  m_needSetDefaultRoutes = needSet;
 }
 
 Ptr<FaceContainer>
@@ -124,6 +132,11 @@ StackHelper::Install(Ptr<Node> node) const
 
     if (face == 0) {
       face = DefaultNetDeviceCallback(node, ndn, device);
+    }
+
+    if (m_needSetDefaultRoutes) {
+      // default route with lowest priority possible
+      FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
     }
 
     faces->Add(face);

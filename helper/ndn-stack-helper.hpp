@@ -30,6 +30,7 @@
 #include "ns3/node-container.h"
 
 #include "ndn-face-container.hpp"
+#include "ndn-fib-helper.hpp"
 
 namespace ns3 {
 
@@ -166,6 +167,12 @@ public:
    */
   Ptr<FaceContainer>
   InstallAll() const;
+
+  /**
+   * \brief Set flag indicating necessity to install default routes in FIB
+   */
+  void
+  SetDefaultRoutes(bool needSet);
 
   static KeyChain&
   getKeyChain();
