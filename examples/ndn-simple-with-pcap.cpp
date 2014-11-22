@@ -23,7 +23,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 class PcapWriter {
 public:
@@ -53,8 +53,6 @@ main(int argc, char* argv[])
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
   Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
-
-  Config::SetGlobal("ndn::WireFormat", StringValue("1"));
 
   // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;
@@ -102,4 +100,12 @@ main(int argc, char* argv[])
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

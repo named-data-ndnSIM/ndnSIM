@@ -38,7 +38,7 @@ public:
 
   // Receive all Interests but do nothing in response
   void
-  OnInterest(Ptr<const ndn::Interest> interest);
+  OnInterest(shared_ptr<const ndn::Interest> interest);
 
 protected:
   // inherited from Application base class.

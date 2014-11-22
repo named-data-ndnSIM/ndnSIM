@@ -26,9 +26,8 @@
 #include "ns3/simulator.h"
 #include "ns3/packet.h"
 
-#include "ns3/ndn-app-face.hpp"
+#include "ns3/ndnSIM/helper/ndn-fib-helper.hpp"
 
-#include "ns3/ndn-fib.hpp"
 #include "ns3/random-variable.h"
 
 NS_LOG_COMPONENT_DEFINE("CustomApp");
@@ -52,22 +51,17 @@ CustomApp::StartApplication()
   // initialize ndn::App
   ndn::App::StartApplication();
 
+  Simulator::Schedule(Seconds(1.0), &CustomApp::SendInterest, this);
+
   // Create a name components object for name ``/prefix/sub``
-  Ptr<ndn::Name> prefix = Create<ndn::Name>(); // now prefix contains ``/``
-  prefix->append("prefix");                    // now prefix contains ``/prefix``
-  prefix->append("sub");                       // now prefix contains ``/prefix/sub``
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Creating FIB entry that ensures that we will receive incoming Interests //
-  /////////////////////////////////////////////////////////////////////////////
-
-  // Get FIB object
-  Ptr<ndn::Fib> fib = GetNode()->GetObject<ndn::Fib>();
+  shared_ptr<Name> prefix = make_shared<Name>(); // now prefix contains ``/``
+  prefix->append("prefix");                      // now prefix contains ``/prefix``
+  prefix->append("sub");                         // now prefix contains ``/prefix/sub``
 
   // Add entry to FIB
-  // Note that ``m_face`` is cretaed by ndn::App
-  Ptr<ndn::fib::Entry> fibEntry = fib->Add(*prefix, m_face, 0);
+  ndn::FibHelper::AddRoute(node, *prefix, m_face, 0);
 
+  // Schedule send of first interest
   Simulator::Schedule(Seconds(1.0), &CustomApp::SendInterest, this);
 }
 
@@ -86,55 +80,53 @@ CustomApp::SendInterest()
   // Sending one Interest packet out //
   /////////////////////////////////////
 
-  Ptr<ndn::Name> prefix = Create<ndn::Name>("/prefix/sub"); // another way to create name
+  auto prefix = make_shared<Name>("/prefix/sub"); // another way to create name
 
   // Create and configure ndn::Interest
-  Ptr<ndn::Interest> interest = Create<ndn::Interest>();
+  auto interest = make_shared<Interest>();
   UniformVariable rand(0, std::numeric_limits<uint32_t>::max());
-  interest->SetNonce(rand.GetValue());
-  interest->SetName(prefix);
-  interest->SetInterestLifetime(Seconds(1.0));
+  interest->setNonce(rand.GetValue());
+  interest->setName(*prefix);
+  interest->setInterestLifetime(time::seconds(1));
 
   NS_LOG_DEBUG("Sending Interest packet for " << *prefix);
 
   // Call trace (for logging purposes)
   m_transmittedInterests(interest, this, m_face);
 
-  m_face->ReceiveInterest(interest);
+  m_face->onReceiveInterest(*interest);
 }
 
 // Callback that will be called when Interest arrives
 void
-CustomApp::OnInterest(Ptr<const ndn::Interest> interest)
+CustomApp::OnInterest(shared_ptr<const ndn::Interest> interest)
 {
   ndn::App::OnInterest(interest);
 
-  NS_LOG_DEBUG("Received Interest packet for " << interest->GetName());
-
-  // Create and configure ndn::Data and ndn::DataTail
-  // (header is added in front of the packet, tail is added at the end of the packet)
+  NS_LOG_DEBUG("Received Interest packet for " << interest->getName());
 
   // Note that Interests send out by the app will not be sent back to the app !
 
-  Ptr<ndn::Data> data = Create<ndn::Data>(Create<Packet>(1024));
-  data->SetName(
-    Create<ndn::Name>(interest->GetName())); // data will have the same name as Interests
+  auto data = make_shared<ndn::Data>(interest->getName());
+  data->setFreshnessPeriod(ndn::time::milliseconds(uint64_t(1000)));
+  data->setContent(make_shared<::ndn::Buffer>(1024));
+  StackHelper::getKeyChain().sign(*data);
 
-  NS_LOG_DEBUG("Sending Data packet for " << data->GetName());
+  NS_LOG_DEBUG("Sending Data packet for " << data->getName());
 
   // Call trace (for logging purposes)
   m_transmittedDatas(data, this, m_face);
 
-  m_face->ReceiveData(data);
+  m_face->onReceiveData(*data);
 }
 
 // Callback that will be called when Data arrives
 void
-CustomApp::OnData(Ptr<const ndn::Data> contentObject)
+CustomApp::OnData(shared_ptr<const ndn::Data> contentObject)
 {
-  NS_LOG_DEBUG("Receiving Data packet for " << contentObject->GetName());
+  NS_LOG_DEBUG("Receiving Data packet for " << contentObject->getName());
 
-  std::cout << "DATA received for name " << contentObject->GetName() << std::endl;
+  std::cout << "DATA received for name " << contentObject->getName() << std::endl;
 }
 
 } // namespace ns3

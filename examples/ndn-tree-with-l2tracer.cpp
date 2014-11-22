@@ -4,7 +4,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 int
 main(int argc, char* argv[])
@@ -17,15 +17,15 @@ main(int argc, char* argv[])
   topologyReader.Read();
 
   /****************************************************************************/
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "1000");
-  ccnxHelper.SetForwardingStrategy("ns3::ndn::fw::BestRoute");
-  ccnxHelper.InstallAll();
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.SetContentStoreChoice(false);
+  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "1000");
+  ndnHelper.InstallAll();
   /****************************************************************************/
   // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll();
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll();
   /****************************************************************************/
   // Getting containers for the consumer/producer
   Ptr<Node> consumer1 = Names::Find<Node>("Src1");
@@ -87,45 +87,45 @@ main(int argc, char* argv[])
   /****************************************************************************/
   // Register /dst1 to /dst9 prefix with global routing controller and
   // install producer that will satisfy Interests in /dst1 to /dst9 namespace
-  ccnxGlobalRoutingHelper.AddOrigins("/dst1", producer1);
+  ndnGlobalRoutingHelper.AddOrigins("/dst1", producer1);
   producerHelper.SetPrefix("/dst1");
   producerHelper.Install(producer1);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst2", producer2);
+  ndnGlobalRoutingHelper.AddOrigins("/dst2", producer2);
   producerHelper.SetPrefix("/dst2");
   producerHelper.Install(producer2);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst3", producer3);
+  ndnGlobalRoutingHelper.AddOrigins("/dst3", producer3);
   producerHelper.SetPrefix("/dst3");
   producerHelper.Install(producer3);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst4", producer4);
+  ndnGlobalRoutingHelper.AddOrigins("/dst4", producer4);
   producerHelper.SetPrefix("/dst4");
   producerHelper.Install(producer4);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst5", producer5);
+  ndnGlobalRoutingHelper.AddOrigins("/dst5", producer5);
   producerHelper.SetPrefix("/dst5");
   producerHelper.Install(producer5);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst6", producer6);
+  ndnGlobalRoutingHelper.AddOrigins("/dst6", producer6);
   producerHelper.SetPrefix("/dst6");
   producerHelper.Install(producer6);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst7", producer7);
+  ndnGlobalRoutingHelper.AddOrigins("/dst7", producer7);
   producerHelper.SetPrefix("/dst7");
   producerHelper.Install(producer7);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst8", producer8);
+  ndnGlobalRoutingHelper.AddOrigins("/dst8", producer8);
   producerHelper.SetPrefix("/dst8");
   producerHelper.Install(producer8);
 
-  ccnxGlobalRoutingHelper.AddOrigins("/dst9", producer9);
+  ndnGlobalRoutingHelper.AddOrigins("/dst9", producer9);
   producerHelper.SetPrefix("/dst9");
   producerHelper.Install(producer9);
 
   /*****************************************************************************/
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes();
+  ndn::GlobalRoutingHelper::CalculateRoutes();
 
   Simulator::Stop(Seconds(10.0));
 
@@ -138,4 +138,12 @@ main(int argc, char* argv[])
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

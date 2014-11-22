@@ -85,14 +85,12 @@ DumbRequester::SendInterest()
   // Sending one Interest packet out //
   /////////////////////////////////////
 
-  Ptr<ndn::Name> prefix = Create<ndn::Name>(m_name); // another way to create name
-
   // Create and configure ndn::Interest
-  Ptr<ndn::Interest> interest = Create<ndn::Interest>();
+  auto interest = make_shared<ndn::Interest>(*m_name);
   UniformVariable rand(0, std::numeric_limits<uint32_t>::max());
-  interest->SetNonce(rand.GetValue());
-  interest->SetName(prefix);
-  interest->SetInterestLifetime(Seconds(1.0));
+  interest->setNonce(rand.GetValue());
+  interest->setName(*prefix);
+  interest->setInterestLifetime(time::seconds(1));
 
   NS_LOG_DEBUG("Sending Interest packet for " << *prefix);
 
@@ -100,15 +98,15 @@ DumbRequester::SendInterest()
   m_transmittedInterests(interest, this, m_face);
 
   // Forward packet to lower (network) layer
-  m_face->ReceiveInterest(interest);
+  m_face->onReceiveInterest(*interest);
 
   Simulator::Schedule(Seconds(1.0), &DumbRequester::SendInterest, this);
 }
 
 void
-DumbRequester::OnData(Ptr<const ndn::Data> contentObject)
+DumbRequester::OnData(shared_ptr<const ndn::Data> contentObject)
 {
-  NS_LOG_DEBUG("Receiving Data packet for " << contentObject->GetName());
+  NS_LOG_DEBUG("Receiving Data packet for " << contentObject->getName());
 }
 
 } // namespace ns3

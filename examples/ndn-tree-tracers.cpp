@@ -24,7 +24,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 /**
  * This scenario simulates a tree topology (using topology reader module)
@@ -34,22 +34,22 @@ using namespace ns3;
  *    \------/      \------/      \------/      \------/
  *         ^          ^                ^           ^
  *         |          |                |           |
- *    	    \        /                  \         /
- *           \      /  			 \  	 /    10Mbps / 1ms
- *            \    /  			  \ 	/
- *             |  |  			   |   |
- *    	       v  v                        v   v
+ *          \        /                  \         /
+ *           \      /                    \       /    10Mbps / 1ms
+ *            \    /                      \     /
+ *             |  |                        |   |
+ *             v  v                        v   v
  *          /-------\                    /-------\
  *          | rtr-1 |                    | rtr-2 |
  *          \-------/                    \-------/
  *                ^                        ^
- *      	  |	 		   |
- *      	   \			  /  10 Mpbs / 1ms
- *      	    +--------+  +--------+
- *      		     |  |
+ *                |                        |
+ *                 \                      /  10 Mpbs / 1ms
+ *                  +--------+  +--------+
+ *                           |  |
  *                           v  v
- *      		  /--------\
- *      		  |  root  |
+ *                        /--------\
+ *                        |  root  |
  *                        \--------/
  *
  *
@@ -68,14 +68,16 @@ main(int argc, char* argv[])
   topologyReader.SetFileName("src/ndnSIM/examples/topologies/topo-tree.txt");
   topologyReader.Read();
 
-  // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy("ns3::ndn::fw::BestRoute");
-  ccnxHelper.InstallAll();
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.InstallAll();
+
+  // Choosing forwarding strategy
+  ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/best-route");
 
   // Installing global routing interface on all nodes
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll();
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll();
 
   // Getting containers for the consumer/producer
   Ptr<Node> consumers[4] = {Names::Find<Node>("leaf-1"), Names::Find<Node>("leaf-2"),
@@ -96,20 +98,27 @@ main(int argc, char* argv[])
 
   // Register /root prefix with global routing controller and
   // install producer that will satisfy Interests in /root namespace
-  ccnxGlobalRoutingHelper.AddOrigins("/root", producer);
+  ndnGlobalRoutingHelper.AddOrigins("/root", producer);
   producerHelper.SetPrefix("/root");
   producerHelper.Install(producer);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes();
+  ndn::GlobalRoutingHelper::CalculateRoutes();
 
   Simulator::Stop(Seconds(20.0));
 
-  ndn::L3AggregateTracer::InstallAll("aggregate-trace.txt", Seconds(0.5));
   ndn::L3RateTracer::InstallAll("rate-trace.txt", Seconds(0.5));
 
   Simulator::Run();
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

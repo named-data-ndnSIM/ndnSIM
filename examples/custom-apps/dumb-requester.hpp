@@ -25,7 +25,7 @@
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
-#include "ns3/ndn-app.hpp"
+#include "ns3/ndnSIM/apps/ndn-app.hpp"
 
 namespace ns3 {
 
@@ -52,7 +52,7 @@ public:
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnData(Ptr<const ndn::Data> contentObject);
+  OnData(shared_ptr<const ndn::Data> contentObject);
 
 private:
   void

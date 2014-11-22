@@ -24,14 +24,14 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 /**
- * This scenario simulates a one-node two-app scenario:
+ * This scenario simulates a one-node two-custom-app scenario:
  *
- *      +------+ <-----> (CustomApp1)
- *      | Node |
- *      +------+ <-----> (CustomApp2)
+ *   +------+ <-----> (CustomApp1)
+ *   | Node |
+ *   +------+ <-----> (CustomApp2)
  *
  *     NS_LOG=CustomApp ./waf --run=ndn-simple-with-custom-app
  */
@@ -47,8 +47,8 @@ main(int argc, char* argv[])
   Ptr<Node> node = CreateObject<Node>();
 
   // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.InstallAll();
+  ndn::StackHelper ndnHelper;
+  ndnHelper.InstallAll();
 
   // Installing applications
 
@@ -68,4 +68,12 @@ main(int argc, char* argv[])
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

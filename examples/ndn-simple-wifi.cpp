@@ -28,14 +28,13 @@
 #include "ns3/ndnSIM-module.h"
 
 using namespace std;
-using namespace ns3;
+namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE("ndn.WifiExample");
 
 //
 // DISCLAIMER:  Note that this is an extremely simple example, containing just 2 wifi nodes
-// communicating
-//              directly over AdHoc channel.
+// communicating directly over AdHoc channel.
 //
 
 // Ptr<ndn::NetDeviceFace>
@@ -107,10 +106,13 @@ main(int argc, char* argv[])
   ndn::StackHelper ndnHelper;
   // ndnHelper.AddNetDeviceFaceCreateCallback (WifiNetDevice::GetTypeId (), MakeCallback
   // (MyNetDeviceFaceCallback));
-  ndnHelper.SetForwardingStrategy("ns3::ndn::fw::BestRoute");
+  ndnHelper.SetContentStoreChoice(false);
   ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "1000");
   ndnHelper.SetDefaultRoutes(true);
   ndnHelper.Install(nodes);
+
+  // Set BestRoute strategy
+  ndn::StrategyChoiceHelper::Install(nodes, "/", "/localhost/nfd/strategy/best-route");
 
   // 4. Set up applications
   NS_LOG_INFO("Installing Applications");
@@ -133,4 +135,12 @@ main(int argc, char* argv[])
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

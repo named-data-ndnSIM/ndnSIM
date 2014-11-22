@@ -24,7 +24,7 @@
 #include "ns3/point-to-point-layout-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 /**
  * This scenario simulates a grid topology (using PointToPointGrid module)
@@ -69,15 +69,18 @@ main(int argc, char* argv[])
   grid.BoundingBox(100, 100, 200, 200);
 
   // Install CCNx stack on all nodes
-  ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy("ns3::ndn::fw::SmartFlooding");
-  ccnxHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "10");
-  ccnxHelper.InstallAll();
+  ndn::StackHelper ndnHelper;
+  // ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
+  // ndnHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "10");
+  ndnHelper.InstallAll();
+
+  // Choosing forwarding strategy
+  ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/ncc");
 
   // Installing global routing interface on all nodes
-  // ndn::CbisGlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll();
+  // ndn::CbisGlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll();
 
   // Getting containers for the consumer/producer
   Ptr<Node> producer = grid.GetNode(2, 2);
@@ -99,15 +102,23 @@ main(int argc, char* argv[])
   producerHelper.SetPrefix(prefix);
   producerHelper.SetAttribute("PayloadSize", StringValue("100"));
   producerHelper.Install(producer);
-  ccnxGlobalRoutingHelper.AddOrigins(prefix, producer);
+  ndnGlobalRoutingHelper.AddOrigins(prefix, producer);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes();
+  ndn::GlobalRoutingHelper::CalculateRoutes();
 
-  Simulator::Stop(Seconds(10.0));
+  Simulator::Stop(Seconds(1.0));
 
   Simulator::Run();
   Simulator::Destroy();
 
   return 0;
+}
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }

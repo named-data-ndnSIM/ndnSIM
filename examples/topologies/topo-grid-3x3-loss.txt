@@ -46,7 +46,7 @@ link
 # delay:  link delay
 # queue:  MaxPackets for transmission queue on the link (both directions)
 # error:  comma-separated list, specifying class for ErrorModel and necessary attributes
-Node0       Node1       1Mbps       1       10ms    10      ns3::RateErrorModel,ErrorUnit=ERROR_UNIT_PACKET,ErrorRate=0.9
+Node0       Node1       1Mbps       1       10ms    10 ns3::RateErrorModel,ErrorUnit=ERROR_UNIT_PACKET,ErrorRate=0.9
 Node0       Node3       1Mbps       1       10ms    10
 Node1       Node2       1Mbps       1       10ms    10
 Node1       Node4       1Mbps       1       10ms    10
@@ -58,4 +58,3 @@ Node4       Node7       1Mbps       1       10ms    10
 Node5       Node8       1Mbps       1       10ms    10
 Node6       Node7       1Mbps       1       10ms    10
 Node7       Node8       1Mbps       1       10ms    10
-

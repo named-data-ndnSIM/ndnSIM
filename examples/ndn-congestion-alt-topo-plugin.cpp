@@ -24,7 +24,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-using namespace ns3;
+namespace ns3 {
 
 /**
  *
@@ -70,10 +70,13 @@ main(int argc, char* argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetForwardingStrategy("ns3::ndn::fw::CustomStrategy");
+  ndnHelper.SetContentStoreChoice(false);
   ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize",
                             "1"); // ! Attention ! If set to 0, then MaxSize is infinite
   ndnHelper.InstallAll();
+
+  // Set BestRoute strategy
+  ndn::StrategyChoiceHelper::InstallAll("/", "/localhost/nfd/strategy/best-route");
 
   // Getting containers for the consumer/producer
   Ptr<Node> consumers[4] = {Names::Find<Node>("c1"), Names::Find<Node>("c2"),
@@ -115,20 +118,20 @@ main(int argc, char* argv[])
   }
 
   // Manually configure FIB routes
-  ndn::StackHelper::AddRoute("c1", "/data", "n1", 1); // link to n1
-  ndn::StackHelper::AddRoute("c2", "/data", "n1", 1); // link to n1
-  ndn::StackHelper::AddRoute("c3", "/data", "n1", 1); // link to n1
-  ndn::StackHelper::AddRoute("c4", "/data", "n1", 1); // link to n1
+  ndn::FibHelper::AddRoute("c1", "/data", "n1", 1); // link to n1
+  ndn::FibHelper::AddRoute("c2", "/data", "n1", 1); // link to n1
+  ndn::FibHelper::AddRoute("c3", "/data", "n1", 1); // link to n1
+  ndn::FibHelper::AddRoute("c4", "/data", "n1", 1); // link to n1
 
-  ndn::StackHelper::AddRoute("n1", "/data", "n2", 1);  // link to n2
-  ndn::StackHelper::AddRoute("n1", "/data", "n12", 2); // link to n12
+  ndn::FibHelper::AddRoute("n1", "/data", "n2", 1);  // link to n2
+  ndn::FibHelper::AddRoute("n1", "/data", "n12", 2); // link to n12
 
-  ndn::StackHelper::AddRoute("n12", "/data", "n2", 1); // link to n2
+  ndn::FibHelper::AddRoute("n12", "/data", "n2", 1); // link to n2
 
-  ndn::StackHelper::AddRoute("n2", "/data/p1", "p1", 1); // link to p1
-  ndn::StackHelper::AddRoute("n2", "/data/p2", "p2", 1); // link to p2
-  ndn::StackHelper::AddRoute("n2", "/data/p3", "p3", 1); // link to p3
-  ndn::StackHelper::AddRoute("n2", "/data/p4", "p4", 1); // link to p4
+  ndn::FibHelper::AddRoute("n2", "/data/p1", "p1", 1); // link to p1
+  ndn::FibHelper::AddRoute("n2", "/data/p2", "p2", 1); // link to p2
+  ndn::FibHelper::AddRoute("n2", "/data/p3", "p3", 1); // link to p3
+  ndn::FibHelper::AddRoute("n2", "/data/p4", "p4", 1); // link to p4
 
   // Schedule simulation time and run the simulation
   Simulator::Stop(Seconds(20.0));
@@ -136,4 +139,13 @@ main(int argc, char* argv[])
   Simulator::Destroy();
 
   return 0;
+}
+
+
+} // namespace ns3
+
+int
+main(int argc, char* argv[])
+{
+  return ns3::main(argc, argv);
 }
