@@ -31,6 +31,7 @@
 
 #include "ndn-face-container.hpp"
 #include "ndn-fib-helper.hpp"
+#include "ndn-strategy-choice-helper.hpp"
 
 namespace ns3 {
 
