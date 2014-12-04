@@ -128,7 +128,7 @@ class trie_point_iterator;
 template<typename FullKey, typename PayloadTraits, typename PolicyHook>
 class trie {
 public:
-  typedef typename FullKey::partial_type Key;
+  typedef typename FullKey::value_type Key;
 
   typedef trie* iterator;
   typedef const trie* const_iterator;

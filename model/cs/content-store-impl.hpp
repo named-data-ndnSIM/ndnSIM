@@ -203,22 +203,21 @@ template<class Policy>
 shared_ptr<Data>
 ContentStoreImpl<Policy>::Lookup(shared_ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION(this << interest->GetName());
+  NS_LOG_FUNCTION(this << interest->getName());
 
   typename super::const_iterator node;
-  if (interest->GetExclude() == 0) {
-    node = this->deepest_prefix_match(interest->GetName());
+  if (interest->getExclude().empty()) {
+    node = this->deepest_prefix_match(interest->getName());
   }
   else {
-    node = this->deepest_prefix_match_if_next_level(interest->GetName(),
-                                                    isNotExcluded(*interest->GetExclude()));
+    node = this->deepest_prefix_match_if_next_level(interest->getName(),
+                                                    isNotExcluded(interest->getExclude()));
   }
 
   if (node != this->end()) {
     this->m_cacheHitsTrace(interest, node->payload()->GetData());
 
     shared_ptr<Data> copy = make_shared<Data>(*node->payload()->GetData());
-    ConstCast<Packet>(copy->GetPayload())->RemoveAllPacketTags();
     return copy;
   }
   else {
@@ -231,10 +230,10 @@ template<class Policy>
 bool
 ContentStoreImpl<Policy>::Add(shared_ptr<const Data> data)
 {
-  NS_LOG_FUNCTION(this << data->GetName());
+  NS_LOG_FUNCTION(this << data->getName());
 
   Ptr<entry> newEntry = Create<entry>(this, data);
-  std::pair<typename super::iterator, bool> result = super::insert(data->GetName(), newEntry);
+  std::pair<typename super::iterator, bool> result = super::insert(data->getName(), newEntry);
 
   if (result.first != super::end()) {
     if (result.second) {
@@ -259,7 +258,7 @@ ContentStoreImpl<Policy>::Print(std::ostream& os) const
 {
   for (typename super::policy_container::const_iterator item = this->getPolicy().begin();
        item != this->getPolicy().end(); item++) {
-    os << item->payload()->GetName() << std::endl;
+    os << item->payload ()->GetName () << std::endl;
   }
 }
 

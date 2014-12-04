@@ -31,11 +31,17 @@
 #include <ndn-cxx/data.hpp>
 #include <ndn-cxx/security/key-chain.hpp>
 
+#include <ndn-cxx/util/time.hpp>
+
 namespace ns3 {
 namespace ndn {
 
 using ::ndn::Name;
 namespace name = ::ndn::name;
+
+namespace time = ::ndn::time;
+
+using ::ndn::Exclude;
 
 using std::shared_ptr;
 using std::make_shared;

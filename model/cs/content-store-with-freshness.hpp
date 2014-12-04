@@ -104,7 +104,7 @@ ContentStoreWithFreshness<Policy>::Add(shared_ptr<const Data> data)
   if (!ok)
     return false;
 
-  NS_LOG_DEBUG(data->GetName() << " added to cache");
+  NS_LOG_DEBUG(data->getName() << " added to cache");
   RescheduleCleaning();
   return true;
 }

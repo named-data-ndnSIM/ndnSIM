@@ -36,9 +36,6 @@ class Packet;
 
 namespace ndn {
 
-class Data;
-class Interest;
-class Name;
 class ContentStore;
 
 /**
@@ -90,7 +87,7 @@ public:
   GetContentStore();
 
 private:
-  Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
+  Ptr<ContentStore> m_cs;        ///< \brief content store to which entry is added
   shared_ptr<const Data> m_data; ///< \brief non-modifiable Data
 };
 
@@ -210,5 +207,15 @@ ContentStore::GetContentStore(Ptr<Object> node)
 
 } // namespace ndn
 } // namespace ns3
+
+#include <boost/functional/hash.hpp>
+namespace boost {
+inline std::size_t
+hash_value(const ::ndn::name::Component component)
+{
+  return boost::hash_range(component.wireEncode().wire(),
+                           component.wireEncode().wire() + component.wireEncode().size());
+}
+}
 
 #endif // NDN_CONTENT_STORE_H

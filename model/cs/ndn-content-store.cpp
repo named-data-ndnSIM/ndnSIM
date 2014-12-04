@@ -66,7 +66,7 @@ Entry::Entry(Ptr<ContentStore> cs, shared_ptr<const Data> data)
 const Name&
 Entry::GetName() const
 {
-  return m_data->GetName();
+  return m_data->getName();
 }
 
 shared_ptr<const Data>

@@ -85,7 +85,6 @@ def build(bld):
     
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=['model/ip-faces/*',
-                                            'model/cs/*',
                                             'apps/*',
                                             'helper/*',
                                             'utils/**/*'])

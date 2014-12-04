@@ -105,7 +105,7 @@ struct freshness_policy_traits {
       insert(typename parent_trie::iterator item)
       {
         // get_time (item) = Simulator::Now ();
-        Time freshness = item->payload()->GetData()->GetFreshness();
+        Time freshness = MilliSeconds(item->payload()->GetData()->getFreshnessPeriod().count());
         if (!freshness.IsZero()) {
           get_freshness(item) = Simulator::Now() + freshness;
 
@@ -128,7 +128,7 @@ struct freshness_policy_traits {
       inline void
       erase(typename parent_trie::iterator item)
       {
-        if (!item->payload()->GetData()->GetFreshness().IsZero()) {
+        if (item->payload()->GetData()->getFreshnessPeriod() != time::milliseconds::zero()) {
           // erase only if freshness is non zero (otherwise an item is not in the policy
           policy_container::erase(policy_container::s_iterator_to(*item));
         }
