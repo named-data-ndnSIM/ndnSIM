@@ -37,6 +37,8 @@
 #include "table/strategy-choice.hpp"
 #include "table/dead-nonce-list.hpp"
 
+#include "ns3/ndnSIM/model/cs/ndn-content-store.hpp"
+
 namespace nfd {
 
 namespace fw {
@@ -103,6 +105,10 @@ public: // forwarding entrypoints and tables
 
   DeadNonceList&
   getDeadNonceList();
+
+public: // allow enabling ndnSIM content store (will be removed in the future)
+  void
+  setCsFromNdnSim(ns3::Ptr<ns3::ndn::ContentStore> cs);
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE: // pipelines
   /** \brief incoming Interest pipeline
@@ -199,6 +205,8 @@ private:
   StrategyChoice m_strategyChoice;
   DeadNonceList  m_deadNonceList;
 
+  ns3::Ptr<ns3::ndn::ContentStore> m_csFromNdnSim;
+
   static const Name LOCALHOST_NAME;
 
   // allow Strategy (base class) to enter pipelines
@@ -281,6 +289,12 @@ inline DeadNonceList&
 Forwarder::getDeadNonceList()
 {
   return m_deadNonceList;
+}
+
+inline void
+Forwarder::setCsFromNdnSim(ns3::Ptr<ns3::ndn::ContentStore> cs)
+{
+  m_csFromNdnSim = cs;
 }
 
 #ifdef WITH_TESTS

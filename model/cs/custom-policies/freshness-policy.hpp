@@ -104,15 +104,14 @@ struct freshness_policy_traits {
       inline bool
       insert(typename parent_trie::iterator item)
       {
-        // get_time (item) = Simulator::Now ();
-        Time freshness = MilliSeconds(item->payload()->GetData()->getFreshnessPeriod().count());
-        if (!freshness.IsZero()) {
-          get_freshness(item) = Simulator::Now() + freshness;
+        time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
+        if (freshness > time::milliseconds::zero()) {
+          get_freshness(item) = Simulator::Now() + MilliSeconds(freshness.count());
 
-          // push item only if freshness is non zero. otherwise, this payload is not controlled by
-          // the policy
-          // note that .size() on this policy would return only number of items with non-infinite
-          // freshness policy
+          // push item only if freshness is non zero. otherwise, this payload is not
+          // controlled by the policy.
+          // Note that .size() on this policy would return only the number of items with
+          // non-infinite freshness policy
           policy_container::insert(*item);
         }
 
@@ -128,8 +127,9 @@ struct freshness_policy_traits {
       inline void
       erase(typename parent_trie::iterator item)
       {
-        if (item->payload()->GetData()->getFreshnessPeriod() != time::milliseconds::zero()) {
-          // erase only if freshness is non zero (otherwise an item is not in the policy
+        time::milliseconds freshness = item->payload()->GetData()->getFreshnessPeriod();
+        if (freshness > time::milliseconds::zero()) {
+          // erase only if freshness is positive (otherwise an item is not in the policy)
           policy_container::erase(policy_container::s_iterator_to(*item));
         }
       }

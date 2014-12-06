@@ -36,6 +36,7 @@
 
 #include "ndn-net-device-face.hpp"
 #include "../helper/ndn-stack-helper.hpp"
+#include "cs/ndn-content-store.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -93,6 +94,8 @@ private:
   shared_ptr<nfd::FaceManager> m_faceManager;
   shared_ptr<nfd::StrategyChoiceManager> m_strategyChoiceManager;
   shared_ptr<nfd::StatusServer> m_statusServer;
+
+  Ptr<ContentStore> m_csFromNdnSim;
 };
 
 L3Protocol::L3Protocol()
@@ -107,11 +110,11 @@ L3Protocol::~L3Protocol()
 }
 
 void
-L3Protocol::initialize()
+L3Protocol::initialize(bool shouldUseNfdCs)
 {
   m_impl->m_forwarder = make_shared<nfd::Forwarder>();
 
-  initializeManagement();
+  initializeManagement(shouldUseNfdCs);
 
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(), nfd::FACEID_NULL);
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(
@@ -120,7 +123,7 @@ L3Protocol::initialize()
 }
 
 void
-L3Protocol::initializeManagement()
+L3Protocol::initializeManagement(bool shouldUseNfdCs)
 {
   m_impl->m_internalFace = make_shared<nfd::InternalFace>();
 
@@ -185,6 +188,11 @@ L3Protocol::NotifyNewAggregate()
   if (m_node == nullptr) {
     m_node = GetObject<Node>();
     if (m_node != nullptr) {
+      NS_ASSERT(m_impl->m_forwarder != nullptr);
+      m_impl->m_csFromNdnSim = GetObject<ContentStore>();
+      if (m_impl->m_csFromNdnSim != nullptr) {
+        m_impl->m_forwarder->setCsFromNdnSim(m_impl->m_csFromNdnSim);
+      }
     }
   }
 

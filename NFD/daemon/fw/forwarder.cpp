@@ -92,7 +92,14 @@ Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
   bool isPending = inRecords.begin() != inRecords.end();
   if (!isPending) {
     // CS lookup
-    const Data* csMatch = m_cs.find(interest);
+    const Data* csMatch;
+    shared_ptr<Data> match;
+    if (m_csFromNdnSim == nullptr)
+      csMatch = m_cs.find(interest);
+    else {
+      match = m_csFromNdnSim->Lookup(interest.shared_from_this());
+      csMatch = match.get();
+    }
     if (csMatch != 0) {
       const_cast<Data*>(csMatch)->setIncomingFaceId(FACEID_CONTENT_STORE);
       // XXX should we lookup PIT for other Interests that also match csMatch?
@@ -268,7 +275,10 @@ Forwarder::onIncomingData(Face& inFace, const Data& data)
   }
 
   // CS insert
-  m_cs.insert(data);
+  if (m_csFromNdnSim == nullptr)
+    m_cs.insert(data);
+  else
+    m_csFromNdnSim->Add(data.shared_from_this());
 
   std::set<shared_ptr<Face> > pendingDownstreams;
   // foreach PitEntry
@@ -321,7 +331,10 @@ Forwarder::onDataUnsolicited(Face& inFace, const Data& data)
   bool acceptToCache = inFace.isLocal();
   if (acceptToCache) {
     // CS insert
-    m_cs.insert(data, true);
+    if (m_csFromNdnSim == nullptr)
+      m_cs.insert(data, true);
+    else
+      m_csFromNdnSim->Add(data.shared_from_this());
   }
 
   NFD_LOG_DEBUG("onDataUnsolicited face=" << inFace.getId() <<

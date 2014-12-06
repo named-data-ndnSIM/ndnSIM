@@ -84,6 +84,31 @@ public:
                      const std::string& attr3 = "", const std::string& value3 = "",
                      const std::string& attr4 = "", const std::string& value4 = "");
 
+  /**
+   * @brief Set content store class and its attributes
+   * @param contentStoreClass string, representing class of the content store
+   */
+  void
+  SetContentStore(const std::string& contentStoreClass, const std::string& attr1 = "",
+                  const std::string& value1 = "", const std::string& attr2 = "",
+                  const std::string& value2 = "", const std::string& attr3 = "",
+                  const std::string& value3 = "", const std::string& attr4 = "",
+                  const std::string& value4 = "");
+
+  /**
+   * @brief Set to use native NFD's content store or ndnSIM provided CS implementations
+   *
+   * @note ndnSIM CS implementations have limited support for NDN selectors
+   */
+  void
+  SetContentStoreChoice(const bool shouldUseNfdCs);
+
+  /**
+   * @brief Check if stack is using native NFD content store implementation
+   */
+  bool
+  shouldUseNfdCs() const;
+
   typedef Callback<shared_ptr<NetDeviceFace>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
     NetDeviceFaceCreateCallback;
 
@@ -200,6 +225,7 @@ private:
   ObjectFactory m_contentStoreFactory;
 
   bool m_needSetDefaultRoutes;
+  bool m_shouldUseNfdCs;
 
   typedef std::list<std::pair<TypeId, NetDeviceFaceCreateCallback>> NetDeviceCallbackList;
   NetDeviceCallbackList m_netDeviceCallbacks;

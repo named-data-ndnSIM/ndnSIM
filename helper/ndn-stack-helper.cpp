@@ -23,12 +23,14 @@
 
 #include "ns3/log.h"
 #include "ns3/names.h"
+#include "ns3/string.h"
 #include "ns3/point-to-point-net-device.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-face.hpp"
 #include "utils/ndn-time.hpp"
 #include "utils/dummy-keychain.hpp"
+#include "model/cs/ndn-content-store.hpp"
 
 #include <limits>
 #include <map>
@@ -41,11 +43,12 @@ namespace ndn {
 
 StackHelper::StackHelper()
   : m_needSetDefaultRoutes(false)
+  , m_shouldUseNfdCs(true)
 {
   setCustomNdnCxxClocks();
 
   m_ndnFactory.SetTypeId("ns3::ndn::L3Protocol");
-  // m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
+  m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
 
   m_netDeviceCallbacks.push_back(
     std::make_pair(PointToPointNetDevice::GetTypeId(),
@@ -78,6 +81,55 @@ StackHelper::SetDefaultRoutes(bool needSet)
   m_needSetDefaultRoutes = needSet;
 }
 
+void
+StackHelper::SetStackAttributes(const std::string& attr1, const std::string& value1,
+                                const std::string& attr2, const std::string& value2,
+                                const std::string& attr3, const std::string& value3,
+                                const std::string& attr4, const std::string& value4)
+{
+  if (attr1 != "")
+    m_ndnFactory.Set(attr1, StringValue(value1));
+  if (attr2 != "")
+    m_ndnFactory.Set(attr2, StringValue(value2));
+  if (attr3 != "")
+    m_ndnFactory.Set(attr3, StringValue(value3));
+  if (attr4 != "")
+    m_ndnFactory.Set(attr4, StringValue(value4));
+}
+
+void
+StackHelper::SetContentStore(const std::string& contentStore, const std::string& attr1,
+                             const std::string& value1, const std::string& attr2,
+                             const std::string& value2, const std::string& attr3,
+                             const std::string& value3, const std::string& attr4,
+                             const std::string& value4)
+{
+  NS_ASSERT_MSG(m_shouldUseNfdCs == false,
+                "First choose not to use NFD's CS and then select the replacement policy");
+
+  m_contentStoreFactory.SetTypeId(contentStore);
+  if (attr1 != "")
+    m_contentStoreFactory.Set(attr1, StringValue(value1));
+  if (attr2 != "")
+    m_contentStoreFactory.Set(attr2, StringValue(value2));
+  if (attr3 != "")
+    m_contentStoreFactory.Set(attr3, StringValue(value3));
+  if (attr4 != "")
+    m_contentStoreFactory.Set(attr4, StringValue(value4));
+}
+
+void
+StackHelper::SetContentStoreChoice(bool shouldUseNfdCs)
+{
+  m_shouldUseNfdCs = shouldUseNfdCs;
+}
+
+bool
+StackHelper::shouldUseNfdCs() const
+{
+  return m_shouldUseNfdCs;
+}
+
 Ptr<FaceContainer>
 StackHelper::Install(const NodeContainer& c) const
 {
@@ -106,11 +158,16 @@ StackHelper::Install(Ptr<Node> node) const
   }
 
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
-  // Aggregate L3Protocol on node
-  node->AggregateObject(ndn);
 
   // NFD initialization
-  ndn->initialize();
+  ndn->initialize(m_shouldUseNfdCs);
+
+  // Create and aggregate content store if NFD's contest store has been disabled
+  if (!m_shouldUseNfdCs)
+    ndn->AggregateObject(m_contentStoreFactory.Create<ContentStore>());
+
+  // Aggregate L3Protocol on node (must be after setting ndnSIM CS)
+  node->AggregateObject(ndn);
 
   for (uint32_t index = 0; index < node->GetNDevices(); index++) {
     Ptr<NetDevice> device = node->GetDevice(index);

@@ -91,7 +91,7 @@ public:
    * \brief Initialize NFD instance
    */
   void
-  initialize();
+  initialize(bool shouldUseNfdCs);
 
   /**
    * \brief Get smart pointer to nfd::Forwarder installed on the node
@@ -158,7 +158,7 @@ protected:
 
 private:
   void
-  initializeManagement();
+  initializeManagement(bool isNfd);
 
 private:
   class Impl;
