@@ -45,6 +45,7 @@
 
 #include "ndn-face-container.hpp"
 #include "ndn-stack-helper.hpp"
+#include "utils/dummy-keychain.hpp"
 
 #include <limits>
 #include <map>
@@ -74,6 +75,13 @@ StackHelper::StackHelper()
 
 StackHelper::~StackHelper()
 {
+}
+
+KeyChain&
+StackHelper::getKeyChain()
+{
+  static ::ndn::DummyKeyChain keyChain;
+  return keyChain;
 }
 
 void

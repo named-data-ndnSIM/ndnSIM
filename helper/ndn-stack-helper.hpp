@@ -292,6 +292,9 @@ public:
   void
   SetDefaultRoutes(bool needSet);
 
+  static KeyChain&
+  getKeyChain();
+
 private:
   shared_ptr<NetDeviceFace>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
