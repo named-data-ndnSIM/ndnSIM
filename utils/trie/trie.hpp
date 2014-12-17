@@ -20,6 +20,8 @@
 #ifndef TRIE_H_
 #define TRIE_H_
 
+/// @cond include_hidden
+
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include "ns3/ptr.h"
@@ -770,5 +772,7 @@ private:
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // TRIE_H_

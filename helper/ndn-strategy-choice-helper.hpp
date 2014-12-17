@@ -48,6 +48,14 @@ namespace ndn {
 
 using ::ndn::nfd::ControlParameters;
 
+/**
+ * @ingroup ndn-helpers
+ * @brief NFD Strategy Choice Helper (FIB) helper
+ *
+ * The Strategy Choice helper interacts with the Strategy Choice manager of NFD by sending
+ * special Interest commands to the manager in order to specify the desired per-name
+ * prefix forwarding strategy for one, more or all the nodes of a topology.
+ */
 class StrategyChoiceHelper {
 public:
   static void

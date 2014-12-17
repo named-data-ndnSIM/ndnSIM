@@ -20,6 +20,8 @@
 #ifndef FRESHNESS_POLICY_H_
 #define FRESHNESS_POLICY_H_
 
+/// @cond include_hidden
+
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include <boost/intrusive/options.hpp>
@@ -165,5 +167,7 @@ struct freshness_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // LIFETIME_STATS_POLICY_H

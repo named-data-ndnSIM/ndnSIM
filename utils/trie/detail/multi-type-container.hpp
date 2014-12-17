@@ -20,6 +20,8 @@
 #ifndef MULTI_TYPE_CONTAINER_H_
 #define MULTI_TYPE_CONTAINER_H_
 
+/// @cond include_hidden
+
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/inherit.hpp>
 #include <boost/mpl/at.hpp>
@@ -78,5 +80,7 @@ struct multi_type_container
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @cond include_hidden
 
 #endif // MULTI_TYPE_CONTAINER_H_

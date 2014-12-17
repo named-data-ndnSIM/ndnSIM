@@ -20,6 +20,8 @@
 #ifndef EMPTY_POLICY_H_
 #define EMPTY_POLICY_H_
 
+/// @cond include_hidden
+
 namespace ns3 {
 namespace ndn {
 namespace ndnSIM {
@@ -75,5 +77,7 @@ struct empty_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // EMPTY_POLICY_H_

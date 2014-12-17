@@ -27,6 +27,8 @@ namespace ns3 {
 namespace ndn {
 namespace ndnSIM {
 
+/// @cond include_hidden
+
 /**
  * @brief Traits for policy that just keeps track of number of elements
  * It's doing a rather expensive job, but just in case it needs to be extended later
@@ -158,5 +160,7 @@ struct aggregate_stats_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // AGGREGATE_STATS_POLICY_H_

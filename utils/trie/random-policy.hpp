@@ -20,6 +20,8 @@
 #ifndef RANDOM_POLICY_H_
 #define RANDOM_POLICY_H_
 
+/// @cond include_hidden
+
 #include "ns3/random-variable.h"
 
 #include <boost/intrusive/options.hpp>
@@ -164,5 +166,7 @@ struct random_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // RANDOM_POLICY_H

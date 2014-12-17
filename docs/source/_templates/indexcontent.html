@@ -1,11 +1,17 @@
 {% extends "layout.html" %}
-{% set title = _('ndnSIM documentation') %}
+{% set title = _('ndnSIM 2.0 documentation') %}
 
 {% block body %}
     <h1>{{ docstitle|e }}</h1>
-    <p>
-The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (NDNx).
-    </p>
+
+<p>ndnSIM 2.0 is a new release of <a class="reference external" href="http://ndnsim.net/1.0/">NS-3 based Named Data Networking (NDN) simulator</a> that went through extensive refactoring and rewriting.  The key new features of the new version:</p>
+
+<ul class="simple">
+<li>ndnSIM no longer re-implements basic NDN primitives and directly uses implementation from <a class="reference external" href="http://named-data.net/doc/ndn-cxx/">ndn-cxx library (NDN C++ library with eXperimental eXtensions)</a>.</li>
+<li>All NDN forwarding and management is implemented directly using source code of <a class="reference external" href="http://named-data.net/doc/NFD/">Named
+Data Networking Forwarding Daemon (NFD)</a></li>
+<li>Packet format changed to <a class="reference external" href="http://named-data.net/doc/ndn-tlv/">NDN-TLV</a></li>
+</ul>
 
     <p>
 We invite you to <a href="http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim" target="_blank">join our mailing list</a> to see and participate in discussions about ndnSIM implementation and simulations in general (<a href="http://www.lists.cs.ucla.edu/pipermail/ndnsim/" target="_blank">mailing list archives</a>).
@@ -15,7 +21,7 @@ We invite you to <a href="http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim" 
   <p><strong>Parts of the documentation:</strong></p>
   <table class="contentstable" align="center"><tr>
     <td width="50%" valign="top">
-      <p class="biglink"><a class="biglink" href="{{ pathto("tutorial") }}">ndnSIM tutorial</a><br/>
+      <p class="biglink"><a class="biglink" href="{{ pathto("tutorial") }}">ndnSIM 2.0 tutorial</a><br/>
          <div class="linkdescr" style="margin-left: 20px">
            <p class="biglink"><a class="biglink" href="{{ pathto("intro") }}">Introduction</a><br/>
              <span class="linkdescr">what is ndnSIM, how to get support, and what is in the package</span></p>
@@ -42,8 +48,6 @@ We invite you to <a href="http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim" 
          <span class="linkdescr">doxygen-generated API documentation</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("faq") }}">FAQs</a><br/>
          <span class="linkdescr">frequently asked questions (with answers!)</span></p>
-      <p class="biglink"><a class="biglink" href="{{ pathto("ndnsim-packet-formats") }}">ndnSIM packet format</a><br/>
-         <span class="linkdescr">definition of the optimized default packet format</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("ndnsim-research-papers") }}">ndnSIM research papers</a><br/>
          <span class="linkdescr">list of ndnSIM-related papers</span></p>
     </td></tr>

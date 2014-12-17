@@ -3,298 +3,173 @@
 Forwarding Strategies
 =====================
 
-ndnSIM provides simple ways to experiment with custom Interest/Data forwarding strategies.
-A new forwarding strategy can be implement completely different processing or override just specific actions/events of the :ndnsim:`forwarding strategy interface <ndn::ForwardingStrategy>`.
-Please refer to :ndnsim:`API documentation <ndn::ForwardingStrategy>` of the forwarding strategy interface, which lists all default actions/events.
+ndnSIM through its integration with NFD provides simple ways to experiment with the custom
+Interest/Data forwarding strategies of NFD.
+
+A new forwarding strategy can be implement completely different processing or override just
+specific actions/events of the :nfd:`forwarding strategy interface <nfd::fw::Strategy>`.  NFD
+offers the maximum flexibility by allowing per-namespace selection of each specific forwarding
+strategy.
+
+Please refer to :nfd:`API documentation <nfd::fw::Strategy>` of the forwarding strategy
+interface, which lists all default actions/events. For a more detailed specification, you can
+read `NFD Developer's Guide
+<http://named-data.net/wp-content/uploads/2014/07/NFD-developer-guide.pdf>`_, section 5.
 
 Available forwarding strategies
 +++++++++++++++++++++++++++++++
 
-Basic forwarding strategies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
++--------------------------------------------+----------------------------------------------------------------------------------------------+
+| Strategy Name                              | Description                                                                                  |
++============================================+==============================================================================================+
+| ``/localhost/nfd/strategy/best-route``     | :nfd:`Best Route Strategy <nfd::fw::BestRouteStrategy2>` **(default)**                       |
+|                                            |                                                                                              |
+|                                            | The best route strategy forwards an Interest to the                                          |
+|                                            | upstream with lowest routing cost.                                                           |
++--------------------------------------------+----------------------------------------------------------------------------------------------+
++--------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``/localhost/nfd/strategy/ncc``            | :nfd:`NCC Strategy <nfd::fw::NccStrategy>`                                                   |
+|                                            |                                                                                              |
+|                                            | The NCC strategy is an reimplementation of CCNx 0.7.2                                        |
+|                                            | default strategy. It has similar algorithm but is not                                        |
+|                                            | guaranteed to be equivalent.                                                                 |
++--------------------------------------------+----------------------------------------------------------------------------------------------+
++--------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``/localhost/nfd/strategy/broadcast``      |  :nfd:`Broadcast Strategy <nfd::fw::BroadcastStrategy>`                                      |
+|                                            |                                                                                              |
+|                                            |  The broadcast strategy forwards every Interest to all                                       |
+|                                            |  upstreams, indicated by the supplied FIB entry.                                             |
++--------------------------------------------+----------------------------------------------------------------------------------------------+
++--------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``/localhost/nfd/strategy/client-control`` | :nfd:`Client Control Strategy <nfd::fw::ClientControlStrategy>`                              |
+|                                            |                                                                                              |
+|                                            | The client control strategy allows a local consumer                                          |
+|                                            | application to choose the outgoing face of each Interest.                                    |
++--------------------------------------------+----------------------------------------------------------------------------------------------+
 
-Flooding
-########
 
-Interests will be forwarded to all available faces available for a route (FIB entry).
-If there are no available GREEN or YELLOW faces, interests is dropped.
+.. note::
 
-Implementation name: :ndnsim:`ns3::ndn::fw::Flooding` (default)
+    ndnSIM 2.0 exactly like NFD allows different namespaces to be associated with different
+    forwarding strategies.  By default, the following forwarding strategy configuration is
+    defined:
 
-Usage example:
+    +--------------------+-----------------------------------------------+
+    | Namespace          | Strategy Name                                 |
+    +====================+===============================================+
+    | ``/``              | ``/localhost/nfd/strategy/best-route``        |
+    +--------------------+-----------------------------------------------+
+    | ``/localhost``     | ``/localhost/nfd/strategy/broadcast``         |
+    +--------------------+-----------------------------------------------+
+    | ``/localhost/nfd`` | ``/localhost/nfd/strategy/best-route``        |
+    +--------------------+-----------------------------------------------+
+    | ``/ndn/broadcast`` | ``/localhost/nfd/strategy/broadcast``         |
+    +--------------------+-----------------------------------------------+
 
-      .. code-block:: c++
 
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
-	 ...
-	 ndnHelper.Install (nodes);
 
-SmartFlooding
-#############
-
-If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
-If there are no available GREEN or YELLOW faces, interests is dropped.
-
-Implementation name :ndnsim:`ns3::ndn::fw::SmartFlooding`
-
-Usage example:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
-	 ...
-	 ndnHelper.Install (nodes);
-
-BestRoute
-#########
-
-If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-If not, Interest will be forwarded to the highest-ranked YELLOW face.
-If there are no available GREEN or YELLOW faces, interests is dropped.
-
-Implementation name: :ndnsim:`ns3::ndn::fw::BestRoute`
-
-Usage example:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-	 ...
-	 ndnHelper.Install (nodes);
-
-Strategies with Interest limits
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The following strategies enforce different granularities of Interest limits.  Each strategy is an extension of the basic one (custom strategies can also be extended with limits, refer to the source code).
-
-Currently, ndnSIM implements two types of Interest limit enforcements, both based on a Token Bucket approach:
-
-   - :ndnsim:`ns3::ndn::Limits::Window` (default)
-
-        Interest token is borrowed when Interest is send out.  The token is returned only when Interest is satisfied or times out.
-
-   - :ndnsim:`ns3::ndn::Limits::Rate`
-
-        Interest token is borrowed when Interest is send out.  The token is returned periodically based on link capacity.
-
-In both cases, limit is set according to the following equation:
-
-.. math::
-
-    \mathrm{Interest\ Limit} = Delay\ [s] \cdot
-       \frac{\mathrm{Bandwidth\ [Bytes/s]}}
-       {\mathrm{Data\ packet\ size\ [Bytes]} + \mathrm{Interest\ packet\ size\ [Bytes]}}
-
-To configure packet sizes and delay parameters, use the following :ndnsim:`ndn::StackHelper` method:
+Examples:
 
       .. code-block:: c++
 
-         // ndnHelper.EnableLimits (true, <delay>, <average interest packet size>, <average data packet size>);
-         ndnHelper.EnableLimits (true, Seconds (0.2), 40, 1100);
-	 ...
-	 ndnHelper.Install (nodes);
+         StrategyChoiceHelper::Install(nodes, prefix,
+                                       "/localhost/nfd/strategy/broadcast");
 
-Usage examples
-##############
-
-Per outgoing Face limits
-%%%%%%%%%%%%%%%%%%%%%%%%
-
-- :ndnsim:`ns3::ndn::fw::Flooding::PerOutFaceLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
-
-- :ndnsim:`ns3::ndn::fw::SmartFlooding::PerOutFaceLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
-
-- :ndnsim:`ns3::ndn::fw::BestRoute::PerOutFaceLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-Per FIB entry, per outgoing face limits
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-- :ndnsim:`ns3::ndn::fw::Flooding::PerOutFaceLimits::PerFibLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
-
-- :ndnsim:`ns3::ndn::fw::SmartFlooding::PerOutFaceLimits::PerFibLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
-
-- :ndnsim:`ns3::ndn::fw::BestRoute::PerOutFaceLimits::PerFibLimits`
-
-    With :ndnsim:`Limits::Window`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Window");
-	 ...
-	 ndnHelper.Install (nodes);
-
-
-    With :ndnsim:`Limits::Rate`:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute::PerOutFaceLimits::PerFibLimits"
-                                          "Limit", "ns3::ndn::Limits::Rate");
-	 ...
-	 ndnHelper.Install (nodes);
 
 .. _Writing your own custom strategy:
 
 Writing your own custom strategy
 ++++++++++++++++++++++++++++++++
 
-First step in creating your own strategy is to decide which existing strategy you want to extend.  You can either use realize :ndnsim:`forwarding strategy interface <ndn::ForwardingStrategy>` (:ndnsim:`ndn::ForwardingStrategy::DoPropagateInterest` call must be implemented) or extended one of the available forwarding strategies (:ndnsim:`fw::BestRoute` or :ndnsim:`fw::Flooding`).
-The following example assumes that we are realizing :ndnsim:`forwarding strategy interface <ndn::ForwardingStrategy>`.
+One of the objectives and features of ndnSIM 2.0 is that it uses NFD codebase for packet
+forwarding.  Therefore, writing strategy in ndnSIM is almost exactly the same process as
+outlined in `Section 5.3 of the NFD Developer's Guide
+<http://named-data.net/wp-content/uploads/2014/07/NFD-developer-guide.pdf>`_.
 
-The follwoing are template strategy h/cc files:
+The purpose of the strategy is to decides how to forward Interests and it is not intended to
+override any processing steps in the forwarding pipelines of NFD.  If it is desired to support
+a new packet type (other than Interest and Data), a new field in Interest or Data packets, or
+override some actions in the pipelines (e.g., disable ContentStore lookup), it can be
+accomplished by modification of the forwarding pipelines in :nfd:`nfd::Forwarder` class.
 
-.. literalinclude:: ../../examples/custom-strategies/custom-strategy.h
+The initial step in creating a new strategy is to create a class, say ``MyStrategy`` that is
+derived from :nfd:`nfd::fw::Strategy`. This subclass must at least override the triggers that are
+marked pure virtual and may override other available triggers that are marked just virtual.
+
+If the strategy needs to store information, it is needed to decide whether the information
+is related to a namespace or an Interest. Information related to a namespace but not
+specific to an Interest should be stored in Measurements entries; information related to an
+Interest should be stored in PIT entries, PIT downstream records, or PIT upstream records.
+After this decision is made, a data structure derived from StrategyInfo class needs to be
+declared. In the existing implementation, such data structures are declared as nested
+classes as it provides natural grouping and scope protection of the strategy-specific
+entity, but it is not required to follow the same model. If timers are needed, EventId
+fields needs to be added to such data structure(s).
+
+.. image:: _static/nfd-forwarding-overview.png
+    :alt: Packet processing in NFD/ndnSIM is broken into a number of small “pipelines” and
+          strategy callbacks
+
+The final step is to implement one or more of the triggers with the desired strategy logic.
+These triggers are listed below:
+
+- :nfd:`After Receive Interest Trigger <nfd::fw::Strategy::afterReceiveInterest()>`
+
+    When an Interest is received, passes necessary checks, and needs to be forwarded, Incoming
+    Interest pipeline (Section 4.2.1) invokes this trigger with the PIT entry, incoming Interest
+    packet, and FIB entry. At that time, the following conditions hold for the Interest:
+
+    - The Interest does not violate ``/localhost`` scope.
+    - The Interest is not looped.
+    - The Interest cannot be satisfied by ContentStore.
+    - The Interest is under a namespace managed by this strategy.
+
+    After being triggered, the strategy should decide whether and where to forward this
+    Interest. If the strategy decides to forward this Interest, it should invoke send Interest
+    action at least once. If the strategy concludes that this Interest cannot be forwarded, it
+    should invoke reject pending Interest action, so that the PIT entry will be deleted
+    shortly.
+
+- :nfd:`Before Satisfy Interest Trigger <nfd::fw::Strategy::beforeSatisfyInterest()>`
+
+    This method will be triggered just before the pending Interest is being satisfied.  It may
+    be useful override this method, e.g., to measure data plane performance.
+
+- :nfd:`Before Expire Interest Trigger <nfd::fw::Strategy::beforeExpirePendingInterest()>`
+
+    This method will be triggered just before the pending Interest is timed out.  Same as with
+    the before satisfy interest trigger, this method may be useful o measure data plane
+    performance.
+
+Example
+^^^^^^^
+
+The following code implements a random load balancing forwarding strategy. This strategy
+was created by Steve DiBenedetto and was found in one of his `GitHub repository
+<https://github.com/dibenede/ndn-tutorial-gec21>`_.
+
+.. literalinclude:: ../../examples/ndn-load-balancer/random-load-balancer-strategy.hpp
    :language: c++
    :linenos:
-   :lines: 1-36,51-55,59-
+   :lines: 26-
 
-.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
+.. literalinclude:: ../../examples/ndn-load-balancer/random-load-balancer-strategy.cpp
    :language: c++
    :linenos:
-   :lines: 1-40,42-50,75-76,115-
-   :emphasize-lines: 21,27
+   :lines: 26-
 
-After having the template, we can fill the necesasry functionality.
+This forwarding strategy can be enabled for a specific name prefix when developing the
+simulation scenario as follows:
 
-Let us say, that we want Interest be forwarded to first two best-metric faces specified by FIB.
-That is, if node has two or more alternative paths to forward the Interests, this Interest will be forwarded to the best two neighbors.
-The following implementation of CustomStrategy::DoPropagateInterest accomplishes the task:
+      .. code-block:: c++
 
-.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
-   :language: c++
-   :linenos:
-   :lines: 45-75
-   :emphasize-lines: 7-30
+         #include "random-load-balancer-strategy.hpp"
 
-After the compilation, you can use ``"ns3::ndn::fw::CustomStrategy"`` as a parameter to :ndnsim:`ndn::StackHelper::SetForwardingStrategy` helper method.
+         ...
 
- .. as well as NS_LOG=ndn.fw.CustomStrategy when running in a debug mode
-
-Extending strategy
-++++++++++++++++++
-
-If you need more customization for the forwarding strategy, there are many forwarding strategy events that can be overriden.
-For example, if we want to perform special logging of all forwarded, timed out, and satisfied Intersts, we can override the following events (for more events, refer to :ndnsim:`ForwardingStrategy API documentation <ForwardingStrategy>`):
-
-- :ndnsim:`DidSendOutInterest <ForwardingStrategy::DidSendOutInterest>`, which fired just after forwarding the Interest
-
-- :ndnsim:`WillEraseTimedOutPendingInterest <ForwardingStrategy::WillEraseTimedOutPendingInterest>`, which fired just before PIT entry is removed by timeout
-
-- :ndnsim:`WillSatisfyPendingInterest <ForwardingStrategy::WillSatisfyPendingInterest>`, which fired just before Interest will be satisfied.
-
-The highlighted ares of the following code demonstrates how it can be impelmented:
-
-.. literalinclude:: ../../examples/custom-strategies/custom-strategy.h
-   :language: c++
-   :linenos:
-   :emphasize-lines: 37-50,56-58
-
-.. literalinclude:: ../../examples/custom-strategies/custom-strategy.cc
-   :language: c++
-   :linenos:
-   :emphasize-lines: 41,77-114
-
+         StrategyChoiceHelper::Install<nfd::fw::RandomLoadBalancerStrategy>(nodes, prefix);
 
 Example of using custom strategy
-++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Please refer to :ref:`this example <11-node 2-bottleneck topology with custom forwarding strategy>`.
-
+Please refer to :ref:`6-node topology with custom NFD forwarding strategy` .

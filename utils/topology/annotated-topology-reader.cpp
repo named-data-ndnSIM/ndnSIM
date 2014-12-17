@@ -495,6 +495,8 @@ AnnotatedTopologyReader::SaveTopology(const std::string& file)
   }
 }
 
+/// @cond include_hidden
+
 template<class Names>
 class name_writer {
 public:
@@ -521,6 +523,8 @@ make_name_writer(Names n)
 {
   return name_writer<Names>(n);
 }
+
+/// @endcond
 
 void
 AnnotatedTopologyReader::SaveGraphviz(const std::string& file)
@@ -560,4 +564,5 @@ AnnotatedTopologyReader::SaveGraphviz(const std::string& file)
   boost::property_map<Graph, boost::vertex_name_t>::type names = get(boost::vertex_name, graph);
   write_graphviz(of, graph, make_name_writer(names));
 }
+
 }

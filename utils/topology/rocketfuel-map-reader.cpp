@@ -560,6 +560,8 @@ RocketfuelMapReader::SaveTopology(const std::string& file)
   }
 }
 
+/// @cond include_hidden
+
 template<class Names, class Colors>
 class name_color_writer {
 public:
@@ -588,6 +590,8 @@ make_name_color_writer(Names n, Colors c)
 {
   return name_color_writer<Names, Colors>(n, c);
 }
+
+/// @endcond
 
 void
 RocketfuelMapReader::SaveGraphviz(const std::string& file)

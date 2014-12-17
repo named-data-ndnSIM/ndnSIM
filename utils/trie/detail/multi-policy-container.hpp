@@ -20,6 +20,8 @@
 #ifndef MULTI_POLICY_CONTAINER_H_
 #define MULTI_POLICY_CONTAINER_H_
 
+/// @cond include_hidden
+
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/at.hpp>
 
@@ -206,5 +208,7 @@ struct multi_policy_container
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // MULTI_POLICY_CONTAINER_H_

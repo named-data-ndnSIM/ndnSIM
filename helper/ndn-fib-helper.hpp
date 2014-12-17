@@ -34,6 +34,14 @@ namespace ndn {
 
 using ::ndn::nfd::ControlParameters;
 
+/**
+ * @ingroup ndn-helpers
+ * @brief Forwarding Information Base (FIB) helper
+ *
+ * The FIB helper interacts with the FIB manager of NFD by sending special Interest
+ * commands to the manager in order to add/remove a next hop from FIB entries or add
+ * routes to the FIB manually (manual configuration of FIB).
+ */
 class FibHelper {
 public:
   /**

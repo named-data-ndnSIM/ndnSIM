@@ -20,6 +20,8 @@
 #ifndef PAYLOAD_WITH_INDEX_H_
 #define PAYLOAD_WITH_INDEX_H_
 
+/// @cond include_hidden
+
 namespace ns3 {
 namespace ndn {
 namespace ndnSIM {
@@ -99,5 +101,7 @@ private:
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // PAYLOAD_WITH_POLICY_H_

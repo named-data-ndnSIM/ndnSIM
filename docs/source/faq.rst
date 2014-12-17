@@ -129,11 +129,7 @@ Code questions
 
     How can I fail a link between to NDN nodes?
 
-
-Right now, NS-3 does not provide ability to actually "break" the link between nodes in NS-3.
-However, exactly the same effect can be achieved by making an interface (:ndnsim:`ndn::Face`) up or down (:ndnsim:`ndn::Face::SetUp(true)` or :ndnsim:`ndn::Face::SetUp(false)`).
-
-You can use :ndnsim:`ndn::LinkControlHelper` to schedule failing links.  For example, refer to :ref:`Simple scenario with link failures` example.
+Refer to :ref:`Link Control Helper`.
 
 General questions
 -----------------
@@ -142,4 +138,6 @@ General questions
 
     I found an error in the documentation / bug in the code. What should I do?
 
-Please create an issue for the documentation error or code bug on `github <http://github.com/NDN-Routing/ndnSIM>`_, or tell us about the error on `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .
+Please submit a bug report on `redmine <http://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
+or tell us about the error on `our mailing list
+<http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .

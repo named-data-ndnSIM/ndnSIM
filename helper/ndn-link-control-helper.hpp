@@ -31,7 +31,7 @@ namespace ndn {
 /**
  * @ingroup ndn-helpers
  * @brief Helper class to control the up or down statuss of an NDN link connecting two specific
- * nodes
+ *        nodes
  */
 class LinkControlHelper {
 public:

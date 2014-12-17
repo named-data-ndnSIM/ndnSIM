@@ -20,6 +20,8 @@
 #ifndef FUNCTOR_HOOK_H_
 #define FUNCTOR_HOOK_H_
 
+/// @cond include_hidden
+
 #include <boost/intrusive/parent_from_member.hpp>
 
 namespace ns3 {
@@ -72,5 +74,7 @@ struct FunctorHook {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // FUNCTOR_HOOK_H_

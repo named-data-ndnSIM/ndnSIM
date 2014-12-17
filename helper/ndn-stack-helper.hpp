@@ -41,25 +41,12 @@ class NetDeviceFace;
 class L3Protocol;
 
 /**
- * \ingroup ndn
- * \defgroup ndn-helpers Helpers
+ * @ingroup ndn
+ * @defgroup ndn-helpers Helpers
  */
 /**
- * \ingroup ndn-helpers
- * \brief Adding Ndn functionality to existing Nodes.
- *
- * This helper enables pcap and ascii tracing of events in the ndn stack
- * associated with a node.  This is substantially similar to the tracing that
- * happens in device helpers, but the important difference is that, well, there
- * is no device.  This means that the creation of output file names will change,
- * and also the user-visible methods will not reference devices and therefore
- * the number of trace enable methods is reduced.
- *
- * Normally we eschew multiple inheritance, however, the classes
- * PcapUserHelperForNdn and AsciiTraceUserHelperForNdn are treated as
- * "mixins".  A mixin is a self-contained class that encapsulates a general
- * attribute or a set of functionality that may be of interest to many other
- * classes.
+ * @ingroup ndn-helpers
+ * @brief Helper class to install NDN stack and configure its parameters
  */
 class StackHelper : boost::noncopyable {
 public:
@@ -83,8 +70,16 @@ public:
                      const std::string& attr4 = "", const std::string& value4 = "");
 
   /**
-   * @brief Set content store class and its attributes
+   * @brief Set maximum size for NFD's Content Store (in number of packets)
+   */
+  void
+  setCsSize(size_t maxSize);
+
+  /**
+   * @brief Set ndnSIM 1.0 content store implementation and its attributes
    * @param contentStoreClass string, representing class of the content store
+   * @note ndnSIM 1.0 content store implementation have limited support for Interest selectors
+   *       Do not use these implementations if your scenario relies on proper selector processing.
    */
   void
   SetOldContentStore(const std::string& contentStoreClass, const std::string& attr1 = "",
@@ -92,9 +87,6 @@ public:
                   const std::string& value2 = "", const std::string& attr3 = "",
                   const std::string& value3 = "", const std::string& attr4 = "",
                   const std::string& value4 = "");
-
-  void
-  setCsSize(size_t maxSize);
 
   typedef Callback<shared_ptr<NetDeviceFace>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
     NetDeviceFaceCreateCallback;

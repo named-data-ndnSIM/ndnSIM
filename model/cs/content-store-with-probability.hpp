@@ -35,7 +35,8 @@ namespace cs {
 
 /**
  * @ingroup ndn-cs
- * @brief Special content store realization that honors Freshness parameter in Data packets
+ * @brief Special content store realization that probabilistically accepts data packet
+ *        into CS (placement policy)
  */
 template<class Policy>
 class ContentStoreWithProbability

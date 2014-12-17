@@ -20,6 +20,8 @@
 #ifndef COUNTING_POLICY_H_
 #define COUNTING_POLICY_H_
 
+/// @cond include_hidden
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
@@ -107,5 +109,7 @@ struct counting_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // COUNTING_POLICY_H_

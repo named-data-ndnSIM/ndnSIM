@@ -20,6 +20,8 @@
 #ifndef MULTI_POLICY_H_
 #define MULTI_POLICY_H_
 
+/// @cond include_hidden
+
 #include "detail/multi-type-container.hpp"
 #include "detail/multi-policy-container.hpp"
 #include "detail/functor-hook.hpp"
@@ -188,5 +190,7 @@ struct multi_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // MULTI_POLICY_H_

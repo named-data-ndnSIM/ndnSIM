@@ -20,6 +20,8 @@
 #ifndef PERSISTENT_POLICY_H_
 #define PERSISTENT_POLICY_H_
 
+/// @cond include_hidden
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
@@ -125,5 +127,7 @@ struct persistent_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // PERSISTENT_POLICY_H_

@@ -34,12 +34,12 @@ namespace ndn {
 
 /**
  * @ingroup ndn-helpers
- * \brief A pool for Ndn faces
+ * @brief A pool for Ndn faces
  *
- * Provides tools to perform basic manipulation on faces, such as
- * setting metrics and states on faces
+ * Provides tools to perform basic manipulation on faces, such as setting metrics and
+ * states on faces
  *
- * \see NdnStackHelper
+ * @see ndn::StackHelper
  */
 class FaceContainer : public SimpleRefCount<FaceContainer> {
 private:

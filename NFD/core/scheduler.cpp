@@ -27,6 +27,8 @@
 
 namespace ns3 {
 
+/// @cond include_hidden
+
 template<>
 struct EventMemberImplObjTraits<std::function<void()>> {
   typedef std::function<void()> T;
@@ -36,6 +38,8 @@ struct EventMemberImplObjTraits<std::function<void()>> {
     return p;
   }
 };
+
+/// @endcond
 
 } // namespace ns3
 

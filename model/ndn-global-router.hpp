@@ -38,7 +38,7 @@ namespace ndn {
 class L3Protocol;
 
 /**
- * @ingroup ndn
+ * @ingroup ndn-helpers
  * @brief Class representing global router interface for ndnSIM
  */
 class GlobalRouter : public Object {

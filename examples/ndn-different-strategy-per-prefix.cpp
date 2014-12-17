@@ -30,7 +30,6 @@ using ns3::ndn::StackHelper;
 using ns3::ndn::AppHelper;
 using ns3::ndn::GlobalRoutingHelper;
 using ns3::ndn::StrategyChoiceHelper;
-;
 
 /**
  * This scenario simulates a grid topology (using PointToPointGrid module)
@@ -95,9 +94,8 @@ main(int argc, char* argv[])
   std::string prefix2 = "/prefix2";
 
   // Install different forwarding strategies for prefix1, prefix2
-  StrategyChoiceHelper strategyChoiceHelper;
-  strategyChoiceHelper.InstallAll(prefix1, "/localhost/nfd/strategy/broadcast");
-  strategyChoiceHelper.InstallAll(prefix2, "/localhost/nfd/strategy/best-route");
+  StrategyChoiceHelper::InstallAll(prefix1, "/localhost/nfd/strategy/broadcast");
+  StrategyChoiceHelper::InstallAll(prefix2, "/localhost/nfd/strategy/best-route");
 
   // Install NDN applications
   AppHelper consumerHelper("ns3::ndn::ConsumerCbr");

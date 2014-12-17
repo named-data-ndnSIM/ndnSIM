@@ -33,8 +33,8 @@ namespace ndn {
 
 /**
  * @ingroup ndn-helpers
- * \brief A helper to make it easier to instantiate an ns3::NdnConsumer Application
- * on a set of nodes.
+ * @brief A helper to make it easier to instantiate an ns3::ndn::App applications
+ *        on a set of nodes
  */
 class AppHelper {
 public:

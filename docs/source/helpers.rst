@@ -1,53 +1,83 @@
 ndnSIM helpers
 ==============
 
-Helpers are very important components of ndnSIM, especially for writing simulation scenarios.
-The following summarizes helpers and their basic usage.
+Helpers are very important components of ndnSIM, especially for writing simulation
+scenarios.  The following summarizes helpers and their basic usage.
 
-StackHelper
----------------
+NDN Stack Helpers
+-----------------
 
-:ndnsim:`StackHelper` is used to install ndnSIM network stack on requested nodes, as well to provide a simple way configure several important parameters of NDN simulation.
+:ndnsim:`StackHelper` is used to install ndnSIM network stack on requested nodes, as well
+        to provide a simple way configure several important parameters of NDN simulation.
 
 Example:
 
 .. code-block:: c++
 
-        ndn::StackHelper ndnHelper;
+        StackHelper ndnHelper;
         NodeContainer nodes;
         ...
-        ndnHelper.Install (nodes);
+        ndnHelper.Install(nodes);
 
 Routing
 +++++++
 
-All forwarding strategies require knowledge of where Interests can be forwarded (Forwarding Information Base).
-Unlike IP routing, this knowledge may be imprecise, but without such knowledge forwarding strategies will not be able to make any decision and will drop any Interests.
+All forwarding strategies require knowledge of where Interests can be forwarded
+(Forwarding Information Base).
 
 .. note::
-   By default, all nodes have empty FIB.  You need either to manually configure routes, use global routing controller, or (not recommended) enable default routes.
+   By default, all nodes have empty FIB.  You need either to manually configure routes,
+   use global routing controller, or (not recommended) enable default routes.
 
-Manually routes
-^^^^^^^^^^^^^^^
+Manually routes (FIB Helper)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Routes can be configured manually using :ndnsim:`StackHelper::AddRoute` static methods of :ndnsim:`StackHelper`.
+The :ndnsim:`FIB helper <FibHelper>` interacts with the FIB manager of NFD by sending
+special Interest commands to the manager in order to add/remove a next hop from FIB
+entries or add routes to the FIB manually (manual configuration of FIB).
 
-These routes **should** be created **after** installing NDN stack on a node:
+Adding a route to the FIB manually:
 
-  .. code-block:: c++
+    .. code-block:: c++
 
-     ndnHelper.Install (nodes);
-     ...
-     Ptr<Node> node = ...     // FIB entry will be added to FIB on this node
-     std::string prefix = ... // some prefix
-     Ptr<ndn::Face> face = ... // NDN face that belongs to the node and through which prefix is accessible
-     int32_t metric = ...     // some routing metric
-     ndn::StackHelper::AddRoute (node, prefix, face, metric);
+       Ptr<Node> node = ...     // some node
+       std::string prefix = ... // some prefix
+       Ptr<ndn::Face> face = ... // NDN face that belongs to the node and through which prefix is accessible
+       int32_t metric = ...     // some routing metric
+       FibHelper::AddRoute(node, prefix, face, metric);
 
-Global routing controller
-^^^^^^^^^^^^^^^^^^^^^^^^^
+:ndnsim:`FIB helper <FibHelper>` has few other AddRoute overloads that may be easier to
+        use.  For example, when setting up manual routes between nodes connected with
+        PointToPointNetDevice's, it is simpler to use the overload that accepts two nodes
+        (face will be automatically determined by the helper).
 
-To simplify FIB management in large topologies, ndnSIM contains a global routing controller (:ndnsim:`helper <GlobalRoutingHelper>` and :ndnsim:`special interface <GlobalRouter>`), similar in spirit to ``Ipv4GlobalRoutingHelper``.
+.. @todo Implement RemoveRoute and add documentation about it
+
+..
+   Adding a next hop to a FIB entry (if any) that matches a given name prefix for a topology node:
+
+       .. code-block:: c++
+
+          Ptr<Node> node = .. // Get the desired node
+          FibHelper::AddRoute(parameters, node);
+
+..
+   Removing a next hop from a FIB entry (if any) that matches a given name prefix for a topology node:
+
+       .. code-block:: c++
+
+          Ptr<Node> node = // Get the desired node
+          nfd::ControlParameters parameters;
+          parameters.setName(prefix);
+          FibHelper::RemoveNextHop(parameters, node);
+
+
+Automatic Shortest Path Routes (Global Routing Helper)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To simplify FIB management in large topologies, ndnSIM contains a global routing
+controller (:ndnsim:`helper <GlobalRoutingHelper>` and :ndnsim:`special interface
+<GlobalRouter>`), similar in spirit to ``Ipv4GlobalRoutingHelper``.
 
 There are several necessary steps, in order to take advantage of the global routing controller:
 
@@ -57,8 +87,8 @@ There are several necessary steps, in order to take advantage of the global rout
 
      NodeContainer nodes;
      ...
-     ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
-     ndnGlobalRoutingHelper.Install (nodes);
+     GlobalRoutingHelper ndnGlobalRoutingHelper;
+     ndnGlobalRoutingHelper.Install(nodes);
 
 * specify which node exports which prefix using :ndnsim:`GlobalRoutingHelper::AddOrigins`
 
@@ -67,150 +97,98 @@ There are several necessary steps, in order to take advantage of the global rout
      Ptr<Node> producer; // producer node that exports prefix
      std::string prefix; // exported prefix
      ...
-     ndnGlobalRoutingHelper.AddOrigins (prefix, producer);
+     ndnGlobalRoutingHelper.AddOrigins(prefix, producer);
 
 * calculate and install FIBs on every node using :ndnsim:`GlobalRoutingHelper::CalculateRoutes`
 
    .. code-block:: c++
 
-     cdnGlobalRoutingHelper.CalculateRoutes ();
+     GlobalRoutingHelper::CalculateRoutes();
 
-Default routes
-^^^^^^^^^^^^^^
+Forwarding Strategy
++++++++++++++++++++
 
-In simple topologies, like in :doc:`examples <examples>`, or when
-simulating broadcast environment, it is possible to set up *default*
-FIB entries using :ndnsim:`StackHelper::SetDefaultRoutes` call.
-More specifically, every installed NDN stack will have a FIB entry to ``/`` prefix, containing all available faces.
+ndnSIM 2.0 exactly like NFD allows different namespaces to be associated with different
+forwarding strategies.  By default, the following forwarding strategy configuration is defined:
 
-The following should be done before installing stack on a node:
++--------------------+------------------------------+-----------------------------------------------+
+| Namespace          | Strategy                     | Strategy Name                                 |
++====================+==============================+===============================================+
+| ``/``              | :nfd:`fw::BestRouteStrategy` | ``/localhost/nfd/strategy/best-route``        |
++--------------------+------------------------------+-----------------------------------------------+
+| ``/localhost``     | :nfd:`fw::BroadcastStrategy` | ``/localhost/nfd/strategy/broadcast``         |
++--------------------+------------------------------+-----------------------------------------------+
+| ``/localhost/nfd`` | :nfd:`fw::BestRouteStrategy` | ``/localhost/nfd/strategy/best-route``        |
++--------------------+------------------------------+-----------------------------------------------+
+| ``/ndn/broadcast`` | :nfd:`fw::BroadcastStrategy` | ``/localhost/nfd/strategy/broadcast``         |
++--------------------+------------------------------+-----------------------------------------------+
 
-  .. code-block:: c++
 
-     ndnHelper.SetDefaultRoutes (true);
-     ...
-     ndnHelper.Install (nodes);
 
+
+The :ndnsim:`Strategy Choice helper <StrategyChoiceHelper>` interacts with the Strategy
+Choice manager of NFD by sending special Interest commands to the manager in order to
+specify the desired per-name prefix forwarding strategy for one, more or all the nodes of a topology.
+
+This helper should be used as follows:
+
+    .. code-block:: c++
+
+       StrategyChoiceHelper::Install(nodes, prefix, strategyName);
+
+or (for a forwarding strategy to be installed in all the topology nodes):
+
+    .. code-block:: c++
+
+       StrategyChoiceHelper::InstallAll(prefix, strategyName);
 
 Content Store
 +++++++++++++
 
-ndnSIM comes with several different in-memory :ndnsim:`content store <ndn::ContentStore>` implementations, featuring different cache replacement policies.
-
-To select a particular content store and configure its capacity, use :ndnsim:`SetContentStore <ndn::StackHelper::SetContentStore>` helper method:
-
-      .. code-block:: c++
-
-         ndnHelper.SetContentStore ("<content store implementation>",
-                                    ["<optional parameter>", "<optional parameter's value>" [, ...]]);
-	 ...
-	 ndnHelper.Install (nodes);
-
-In simulation scenarios it is possible to select one of :ref:`the existing implementations of the content store or implement your own <content store>`.
-
-
-Pending Interest Table
-++++++++++++++++++++++
-
-The current version of ndnSIM provides :ndnsim:`templated realizations <ndn::pit::PitImpl>` of :ndnsim:`PIT abstraction <ndn::Pit>`, allowing optional bounding the number of PIT entries and different replacement policies (i.e., perform different actions when limit on number of PIT entries is reached).
-
-To select a particular PIT implementation and configure its policies, use :ndnsim:`SetPit <ndn::StackHelper::SetPit>` helper method:
-
-- :ndnsim:`persistent <ndn::pit::Persistent>` (default):
-
-    New entries will be rejected if PIT size reached its limit
+ndnSIM uses NFD's content store implementation, maximum size of which can be controlled using
+:ndnsim:`StackHelper::setCsSize()`:
 
       .. code-block:: c++
 
-         ndnHelper.SetPit ("ns3::ndn::pit::Persistent",
-                           "MaxSize", "0");
-	 ...
-	 ndnHelper.Install (nodes);
+         ndnHelper.setCsSize(<max-size-in-packets>);
+         ...
+         ndnHelper.Install(nodes);
 
-- :ndnsim:`random <ndn::pit::Random>`:
+.. note::
 
-    when PIT reaches its limit, random entry (could be the newly created one) will be removed from PIT;
+    Unless specified in the simulation scenario, default maximum size of the content store is
+    100 Data packets.
 
-      .. code-block:: c++
+.. note::
 
-         ndnHelper.SetPit ("ns3::ndn::pit::Random",
-                           "MaxSize", "0");
-	 ...
-	 ndnHelper.Install (nodes);
+    NFD's content store implementation takes full consideration of Interest selectors, however
+    is not yet flexible when it comes to cache replacement policies.  Feature to extend CS
+    flexibility is currently in active development (refer to `Issue #2219 on NFD Redmine
+    <http://redmine.named-data.net/issues/2219>`_) and for the time being, we have ported the
+    old ndnSIM 1.0 content store implementations to the new code base.  These implementations
+    feature different cache replacement policies, but have very limited support for Interest
+    selectors.  If your scenario relies on proper selector processing, do not use these
+    implementations as the simulation results most likely be incorrect.
 
-- :ndnsim:`least-recently-used <ndn::pit::Lru>`:
+    To select old content store implementations, use :ndnsim:`SetOldContentStore
+    <StackHelper::SetOldContentStore>` StackHelper method:
 
-    the least recently used entry (the oldest entry with minimum number of incoming faces) will be removed when PIT size reached its limit.
+          .. code-block:: c++
 
-      .. code-block:: c++
+             ndnHelper.SetOldContentStore("<content store implementation>",
+                                         ["<optional parameter>", "<optional parameter's value>" [, ...]]);
+             ...
+             ndnHelper.Install (nodes);
 
-         ndnHelper.SetPit ("ns3::ndn::pit::Lru",
-                           "MaxSize", "0");
-	 ...
-	 ndnHelper.Install (nodes);
-
-Forwarding strategy
-+++++++++++++++++++
-
-A desired :ndnsim:`forwarding strategy <ForwardingStrategy>` parameter need to be set before installing stack on a node.
-
-To select a particular forwarding strategy implementation and configure its parameters, use :ndnsim:`SetForwardingStrategy <ndn::StackHelper::SetForwardingStrategy>` helper method:
-
-      .. code-block:: c++
-
-         ndnHelper.SetForwardingStrategy ("<forwarding strategy implementation>",
-                                          ["<optional parameter>", "<optional parameter's value>" [, ...]]);
-	 ...
-	 ndnHelper.Install (nodes);
-
-In simulation scenarios it is possible to select one of :ref:`the existing implementations of the forwarding strategy or implement your own <forwarding strategies>`.
+    In simulation scenarios it is possible to select one of :ref:`the existing implementations
+    of the content store or implement your own <content store>`.
 
 
-.. Currently, there are following forwarding strategies that can be used in simulations:
+Application Helper
+------------------
 
-..   - :ndnsim:`Flooding` (default)
-
-..       Interests will be forwarded to all available faces available for a route (FIB entry).
-..       If there are no available GREEN or YELLOW faces, interests is dropped.
-
-..       .. code-block:: c++
-
-..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::Flooding");
-.. 	 ...
-.. 	 ndnHelper.Install (nodes);
-
-
-..   - :ndnsim:`SmartFlooding`
-
-..       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-..       If not, Interest will be forwarded to all available faces available for a route (FIB entry)/
-..       If there are no available GREEN or YELLOW faces, interests is dropped.
-
-..       .. code-block:: c++
-
-..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
-.. 	 ...
-.. 	 ndnHelper.Install (nodes);
-
-..   - :ndnsim:`BestRoute`
-
-..       If GREEN face is available, Interest will be sent to the highest-ranked GREEN face.
-..       If not, Interest will be forwarded to the highest-ranked YELLOW face.
-..       If there are no available GREEN or YELLOW faces, interests is dropped.
-
-..       .. code-block:: c++
-
-..          ndnHelper.SetForwardingStrategy ("ns3::ndn::fw::BestRoute");
-.. 	 ...
-.. 	 ndnHelper.Install (nodes);
-
-
-
-
-AppHelper
----------------
-
-:ndnsim:`AppHelper` simplifies task of creating, configuring, and installing ndnSIM applications.
+:ndnsim:`AppHelper` simplifies task of creating, configuring, and installing ndnSIM
+applications.
 
 
 The basic usage of the :ndnsim:`AppHelper`:
@@ -220,20 +198,21 @@ The basic usage of the :ndnsim:`AppHelper`:
    .. code-block:: c++
 
       // Create helper for the consumer generating Interests with constant rate
-      ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
+      AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
 
-* Assign prefix on which application operates (either generating Interests using this name or satisfying Interests for this name) using :ndnsim:`AppHelper::SetPrefix`:
+* Assign prefix on which application operates (either generating Interests using this name
+  or satisfying Interests for this name) using :ndnsim:`AppHelper::SetPrefix`:
 
    .. code-block:: c++
 
-      consumerHelper.SetPrefix (prefix);
+      consumerHelper.SetPrefix(prefix);
 
 * Assign application-specific attributes using :ndnsim:`AppHelper::SetAttribute`:
 
    .. code-block:: c++
 
       // Set frequency parameter
-      consumerHelper.SetAttribute ("Frequency", StringValue ("10")); // 10 interests a second
+      consumerHelper.SetAttribute("Frequency", StringValue ("10")); // 10 interests a second
 
 * Install application on one or more nodes:
 
@@ -241,7 +220,29 @@ The basic usage of the :ndnsim:`AppHelper`:
 
       NodeContainer nodes;
       ...
-      consumerHelper.Install (nodes)
+      consumerHelper.Install(nodes)
+
+.. _Link Control Helper:
+
+Link Control Helper
+-------------------
+
+Some scenarios require failing certain links between NDN nodes at certain times.  NS-3 does not
+provide ability to actually "break" the link between nodes.  However, it provides facility to
+set up a loss model to simulate packet drops in the channel.  Using the properly set up loss
+model on both sides of the point-to-point link, it is possible to emulate link breakage.
+
+To simplify these operations, ndnSIM includes :ndnsim:`ndn::LinkControlHelper` that allows
+scheduling of link failures and failure recoveries:
 
 
-In simulation scenarios it is possible to select one of :ref:`the existing applications or implement your own <applications>`.
+    .. code-block:: c++
+
+        #include "ns3/ndnSIM/helper/ndn-link-control-helper.hpp"
+
+        ...
+
+        Simulator::Schedule(Seconds(10.0), ndn::LinkControlHelper::FailLink, node1, node2);
+        Simulator::Schedule(Seconds(15.0), ndn::LinkControlHelper::UpLink, node1, node2);
+
+Usage of this helper is demonstrated in :ref:`Simple scenario with link failures`.

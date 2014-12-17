@@ -20,6 +20,8 @@
 #ifndef LRU_POLICY_H_
 #define LRU_POLICY_H_
 
+/// @cond include_hidden
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
@@ -127,5 +129,7 @@ struct lru_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif

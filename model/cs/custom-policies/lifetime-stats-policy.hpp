@@ -20,6 +20,8 @@
 #ifndef LIFETIME_STATS_POLICY_H_
 #define LIFETIME_STATS_POLICY_H_
 
+/// @cond include_hidden
+
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
 #include <boost/intrusive/options.hpp>
@@ -159,5 +161,7 @@ struct lifetime_stats_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // LIFETIME_STATS_POLICY_H

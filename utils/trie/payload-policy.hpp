@@ -20,6 +20,8 @@
 #ifndef PAYLOAD_POLICY_H_
 #define PAYLOAD_POLICY_H_
 
+/// @cond include_hidden
+
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
@@ -121,5 +123,7 @@ struct payload_policy_traits {
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // PAYLOAD_POLICY_H

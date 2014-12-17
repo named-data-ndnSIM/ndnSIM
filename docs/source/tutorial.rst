@@ -3,9 +3,15 @@
 Welcome
 =======
 
-The ndnSIM is NS-3 module that implements Named Data Networking (NDN) communication model, the clean slate Internet design. ndnSIM is specially optimized for simulation purposes and has a cleaner and more extensible internal structure comparing to the existing NDN implementation (NDNx).
+The ndnSIM 2.0 is NS-3 module that implements Named Data Networking (NDN) communication
+model, the clean slate Internet design. ndnSIM is specially optimized for simulation
+purposes and has a cleaner and more extensible internal structure comparing to the
+existing NDN implementation (NDNx).
 
-We invite you to `join our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in discussions about ndnSIM implementation and simulations in general (`mailing list archives <http://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_).
+We invite you to `join our mailing list
+<http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
+discussions about ndnSIM implementation and simulations in general (`mailing list archives
+<http://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_).
 
 Contents:
 
@@ -24,7 +30,6 @@ Contents:
 
     examples
     metric
-    ndnsim-packet-formats
     faq
     ndnsim-research-papers
 
@@ -32,7 +37,6 @@ Contents:
     :hidden:
     :glob:
 
-    new-packet-formats
     meta/*
 
 

@@ -9,14 +9,14 @@ Reference applications
 ++++++++++++++++++++++
 
 ConsumerCbr
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^
 
 :ndnsim:`ConsumerCbr` an application that generates Interest traffic with predefined pattern (constant frequency, constant average rate with inter-Interest gap distributed uniformly at random, exponentially at random, etc.).
 
 .. code-block:: c++
 
    // Create application using the app helper
-   ndn::AppHelper helper ("ns3::ndn::ConsumerCbr");
+   AppHelper helper("ns3::ndn::ConsumerCbr");
 
 This applications has the following attributes:
 
@@ -30,7 +30,7 @@ This applications has the following attributes:
   .. code-block:: c++
 
      // Set attribute using the app helper
-     helper.SetAttribute ("Frequency", DoubleValue (1.0));
+     helper.SetAttribute("Frequency", DoubleValue (1.0));
 
 * ``Randomize``
 
@@ -48,7 +48,7 @@ This applications has the following attributes:
   .. code-block:: c++
 
      // Set attribute using the app helper
-     helper.SetAttribute ("Randomize", StringValue ("uniform"));
+     helper.SetAttribute("Randomize", StringValue("uniform"));
 
 ConsumerZipfMandelbrot
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -62,7 +62,7 @@ This class is a subclass of :ndnsim:`ConsumerCbr`.
 .. code-block:: c++
 
    // Create application using the app helper
-   ndn::AppHelper helper ("ns3::ndn::ConsumerZipfMandelbrot");
+   ndn::AppHelper helper("ns3::ndn::ConsumerZipfMandelbrot");
 
 ``Frequency`` and ``Randomize`` attributes can be used in the same way as in the base :ndnsim:`ConsumerCbr` applications.
 
@@ -99,7 +99,7 @@ ConsumerBatches
 .. code-block:: c++
 
    // Create application using the app helper
-   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerBatches");
+   ndn::AppHelper consumerHelper("ns3::ndn::ConsumerBatches");
 
 This applications has the following attributes:
 
@@ -114,18 +114,18 @@ This applications has the following attributes:
   .. code-block:: c++
 
      // Set attribute using the app helper
-     helper.SetAttribute ("Batches", StringValue ("1s 1 2s 5 10s 2"));
+     helper.SetAttribute("Batches", StringValue("1s 1 2s 5 10s 2"));
 
 
 ConsumerWindow
 ^^^^^^^^^^^^^^^^^^
 
-:ndnsim:`ConsumerWindow` is an application generating a variable rate Interest traffic. It relies on an optional NACK-Interest feature and implements a simple sliding-window-based Interest generation mechanism.
+:ndnsim:`ConsumerWindow` is an application generating a variable rate Interest traffic. It implements a simple sliding-window-based Interest generation mechanism.
 
 .. code-block:: c++
 
    // Create application using the app helper
-   ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerWindow");
+   AppHelper consumerHelper("ns3::ndn::ConsumerWindow");
 
 
 This applications has the following attributes:
@@ -161,7 +161,7 @@ Producer
 .. code-block:: c++
 
    // Create application using the app helper
-   ndn::AppHelper consumerHelper ("ns3::ndn::Producer");
+   AppHelper consumerHelper("ns3::ndn::Producer");
 
 .. _Custom applications:
 
@@ -183,39 +183,37 @@ The following code shows how a simple ndnSIM application can be created, and how
 When this application starts it sets "interest filter" (install FIB entry) for /prefix/sub, as well as sends Interest for this prefix.
 When an Interest is received, it is replied with a ContentObject with 1024-byte fake payload.
 
-For more details refer ``examples/custom-apps/custom-app.h``, ``examples/custom-apps/custom-app.cc`` and API documentation of ndnSIM and NS-3.
+For more details refer ``examples/ndn-custom-apps/custom-app.hpp``, ``examples/ndn-custom-apps/custom-app.cpp`` and API documentation of ndnSIM and NS-3.
 
-Header file ``examples/custom-apps/custom-app.h``:
+Header file ``examples/ndn-custom-apps/custom-app.hpp``:
 
-.. literalinclude:: ../../examples/custom-apps/custom-app.h
+.. literalinclude:: ../../examples/ndn-custom-apps/custom-app.hpp
     :language: c++
     :linenos:
-    :lines: 21-29,40-
+    :lines: 20-28,39-
 
-Source file ``examples/custom-apps/custom-app.cc``:
+Source file ``examples/ndn-custom-apps/custom-app.cpp``:
 
-.. literalinclude:: ../../examples/custom-apps/custom-app.cc
+.. literalinclude:: ../../examples/ndn-custom-apps/custom-app.cpp
     :language: c++
     :linenos:
-    :lines: 21-
+    :lines: 20-
 
-Example how to use custom app in a scenario (``ndn-simple-with-custom-app.cc``):
+Example how to use custom app in a scenario (``ndn-simple-with-custom-app.cpp``):
 
  .. *      +------+ <-----> (CustomApp1)
  .. *      | Node |
  .. *      +------+ <-----> (CustomApp2)
  .. *
 
-.. literalinclude:: ../../examples/ndn-simple-with-custom-app.cc
+.. literalinclude:: ../../examples/ndn-custom-apps.cpp
     :language: c++
     :linenos:
-    :lines: 21-28,39-
-    :emphasize-lines: 26-31
-
+    :lines: 20-27,37-
 
 To run this scenario, use the following command::
 
-        NS_LOG=CustomApp ./waf --run=ndn-simple-with-custom-app
+        NS_LOG=CustomApp ./waf --run=ndn-custom-apps
 
 
 Producer example (Interest hijacker)
@@ -223,19 +221,19 @@ Producer example (Interest hijacker)
 
 The following code demonstrates how to implement a basic producer application that "hijacks" all incoming Interests.
 
-Header file ``examples/custom-apps/hijacker.h``:
+Header file ``examples/ndn-custom-apps/hijacker.hpp``:
 
-.. literalinclude:: ../../examples/custom-apps/hijacker.h
+.. literalinclude:: ../../examples/ndn-custom-apps/hijacker.hpp
     :language: c++
     :linenos:
-    :lines: 21-
+    :lines: 20-
 
-Source file ``examples/custom-apps/hijacker.cc``:
+Source file ``examples/ndn-custom-apps/hijacker.cpp``:
 
-.. literalinclude:: ../../examples/custom-apps/hijacker.cc
+.. literalinclude:: ../../examples/ndn-custom-apps/hijacker.cpp
     :language: c++
     :linenos:
-    :lines: 21-
+    :lines: 20-
 
 
 After defining this class, you can use it with :ndnsim:`ndn::AppHelper`. For example:
@@ -243,27 +241,6 @@ After defining this class, you can use it with :ndnsim:`ndn::AppHelper`. For exa
 .. code-block:: c++
 
     ...
-    ndn::AppHelper producerHelper ("Hijacker");
-    producerHelper.Install (producerNode);
+    ndn::AppHelper producerHelper("Hijacker");
+    producerHelper.Install(producerNode);
     ...
-
-Dumb requester
-^^^^^^^^^^^^^^
-
-This application continually requests the same Data packet.
-
-Header file ``examples/custom-apps/dumb-requester.h``:
-
-.. literalinclude:: ../../examples/custom-apps/dumb-requester.h
-    :language: c++
-    :linenos:
-    :lines: 21-
-
-Source file ``examples/custom-apps/dumb-requester.cc``:
-
-.. literalinclude:: ../../examples/custom-apps/dumb-requester.cc
-    :language: c++
-    :linenos:
-    :lines: 21-
-
-

@@ -85,6 +85,11 @@ main(int argc, char* argv[])
   // Install NDN applications
   std::string prefix = "/ucla/hello";
 
+  // Install random-load-balancer forwarding strategy in
+  // node UCLA-HUB
+  StrategyChoiceHelper::Install<nfd::fw::RandomLoadBalancerStrategy>(Names::Find<Node>("UCLA-HUB"),
+                                                                     prefix);
+
   AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
   consumerHelper.SetPrefix(prefix);
   consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
@@ -95,12 +100,6 @@ main(int argc, char* argv[])
   producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
   producerHelper.Install(producer1);
   producerHelper.Install(producer2);
-
-  // Install random-load-balancer forwarding strategy in
-  // node UCLA-HUB
-  StrategyChoiceHelper strategyChoiceHelper;
-  strategyChoiceHelper.Install<nfd::fw::RandomLoadBalancerStrategy>(Names::Find<Node>("UCLA-HUB"),
-                                                                    prefix);
 
   // Add /prefix origins to ndn::GlobalRouter
   ndnGlobalRoutingHelper.AddOrigins(prefix, producer1);

@@ -20,6 +20,8 @@
 #ifndef TRIE_WITH_POLICY_H_
 #define TRIE_WITH_POLICY_H_
 
+/// @cond include_hidden
+
 #include "trie.hpp"
 
 namespace ns3 {
@@ -298,5 +300,7 @@ private:
 } // ndnSIM
 } // ndn
 } // ns3
+
+/// @endcond
 
 #endif // TRIE_WITH_POLICY_H_
