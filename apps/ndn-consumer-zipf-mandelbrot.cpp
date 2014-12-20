@@ -18,13 +18,13 @@
  * Author: Xiaoke Jiang <shock.jiang@gmail.com>
  */
 
-#include "ndn-consumer-zipf-mandelbrot.h"
+#include "ndn-consumer-zipf-mandelbrot.hpp"
 
-#include "ns3/ndn-app-face.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
+#include "ns3/ndn-app-face.hpp"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
 
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 
 #include <math.h>
 

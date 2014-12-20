@@ -21,7 +21,7 @@
 #ifndef _NDN_LIMITS_WINDOW_H_
 #define	_NDN_LIMITS_WINDOW_H_
 
-#include "ndn-limits.h"
+#include "ndn-limits.hpp"
 
 namespace ns3 {
 namespace ndn {

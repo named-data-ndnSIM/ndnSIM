@@ -19,7 +19,7 @@
  *       : Saran Tarnoi <saran.tarnoi@gmail.com>
  */
 
-#include "ndn-link-control-helper.h"
+#include "ndn-link-control-helper.hpp"
 
 #include "ns3/assert.h"
 #include "ns3/names.h"
@@ -28,8 +28,8 @@
 #include "ns3/channel.h"
 #include "ns3/log.h"
 
-#include "ns3/ndn-l3-protocol.h"
-#include "ns3/ndn-net-device-face.h"
+#include "ns3/ndn-l3-protocol.hpp"
+#include "ns3/ndn-net-device-face.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.LinkControlHelper");
 

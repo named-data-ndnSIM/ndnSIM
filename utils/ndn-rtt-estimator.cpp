@@ -28,7 +28,7 @@
 
 #include <iostream>
 
-#include "ndn-rtt-estimator.h"
+#include "ndn-rtt-estimator.hpp"
 #include "ns3/simulator.h"
 #include "ns3/double.h"
 #include "ns3/integer.h"

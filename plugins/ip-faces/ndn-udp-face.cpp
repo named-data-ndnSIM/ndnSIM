@@ -19,8 +19,8 @@
  *
  */
 
-#include "ndn-udp-face.h"
-#include "ns3/ndn-l3-protocol.h"
+#include "ndn-udp-face.hpp"
+#include "ns3/ndn-l3-protocol.hpp"
 
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -28,7 +28,7 @@
 #include "ns3/pointer.h"
 #include "ns3/udp-socket-factory.h"
 
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-name.hpp"
 
 using namespace std;
 

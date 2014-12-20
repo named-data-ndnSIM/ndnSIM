@@ -21,7 +21,7 @@
 #ifndef TRIE_WITH_POLICY_H_
 #define TRIE_WITH_POLICY_H_
 
-#include "trie.h"
+#include "trie.hpp"
 
 namespace ns3 {
 namespace ndn {

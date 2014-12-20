@@ -29,7 +29,7 @@
 #include "ns3/nstime.h"
 #include "ns3/type-id.h"
 #include "ns3/traced-callback.h"
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-name.hpp"
 
 namespace ns3 {
 

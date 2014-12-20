@@ -25,7 +25,7 @@
 #include "ns3/ndnSIM-module.h"
 
 // for LinkStatusControl::FailLinks and LinkStatusControl::UpLinks
-#include "ns3/ndn-link-control-helper.h"
+#include "ns3/ndn-link-control-helper.hpp"
 
 using namespace ns3;
 

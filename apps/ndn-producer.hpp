@@ -22,11 +22,11 @@
 #ifndef NDN_PRODUCER_H
 #define NDN_PRODUCER_H
 
-#include "ndn-app.h"
+#include "ndn-app.hpp"
 
 #include "ns3/ptr.h"
-#include "ns3/ndn-name.h"
-#include "ns3/ndn-data.h"
+#include "ns3/ndn-name.hpp"
+#include "ns3/ndn-data.hpp"
 
 namespace ns3 {
 namespace ndn {

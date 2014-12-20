@@ -19,7 +19,7 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "rocketfuel-weights-reader.h"
+#include "rocketfuel-weights-reader.hpp"
 
 #include "ns3/nstime.h"
 #include "ns3/log.h"

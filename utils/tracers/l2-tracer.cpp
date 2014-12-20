@@ -18,7 +18,7 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "l2-tracer.h"
+#include "l2-tracer.hpp"
 #include "ns3/node.h"
 #include "ns3/config.h"
 #include "ns3/names.h"

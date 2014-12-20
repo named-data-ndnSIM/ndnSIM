@@ -18,11 +18,11 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-global-router.h"
+#include "ndn-global-router.hpp"
 
-#include "ns3/ndn-l3-protocol.h"
-#include "ns3/ndn-face.h"
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-l3-protocol.hpp"
+#include "ns3/ndn-face.hpp"
+#include "ns3/ndn-name.hpp"
 
 #include "ns3/channel.h"
 

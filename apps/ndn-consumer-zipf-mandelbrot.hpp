@@ -22,7 +22,7 @@
 #ifndef NDN_CONSUMER_ZIPF_MANDELBROT_H_
 #define NDN_CONSUMER_ZIPF_MANDELBROT_H_
 
-#include "ndn-consumer.h"
+#include "ndn-consumer.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -31,7 +31,7 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ndn-consumer-cbr.h"
+#include "ndn-consumer-cbr.hpp"
 #include "ns3/random-variable.h"
 
 namespace ns3 {

@@ -18,11 +18,11 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ndn-app-helper.h"
+#include "ndn-app-helper.hpp"
 #include "ns3/log.h"
 #include "ns3/string.h"
 #include "ns3/names.h"
-#include "ns3/ndn-app.h"
+#include "ns3/ndn-app.hpp"
 
 #ifdef NS3_MPI
 #include "ns3/mpi-interface.h"

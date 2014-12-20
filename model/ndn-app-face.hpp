@@ -22,7 +22,7 @@
 #ifndef NDN_APP_FACE_H
 #define NDN_APP_FACE_H
 
-#include "ndn-face.h"
+#include "ndn-face.hpp"
 #include "ns3/traced-callback.h"
 
 namespace ns3 {

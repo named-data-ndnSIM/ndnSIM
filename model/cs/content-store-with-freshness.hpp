@@ -23,8 +23,10 @@
 
 #include "content-store-impl.h"
 
-#include "../../utils/trie/multi-policy.h"
-#include "custom-policies/freshness-policy.h"
+#include "content-store-impl.hpp"
+
+#include "../../utils/trie/multi-policy.hpp"
+#include "custom-policies/freshness-policy.hpp"
 
 namespace ns3 {
 namespace ndn {

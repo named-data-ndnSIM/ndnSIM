@@ -21,7 +21,7 @@
 #ifndef NDN_TCP_FACE_H
 #define NDN_TCP_FACE_H
 
-#include "ns3/ndn-face.h"
+#include "ns3/ndn-face.hpp"
 #include "ns3/socket.h"
 #include "ns3/ptr.h"
 #include "ns3/callback.h"

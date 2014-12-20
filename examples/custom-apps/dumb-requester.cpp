@@ -20,7 +20,7 @@
 
 // dumb-requester.cc
 
-#include "dumb-requester.h"
+#include "dumb-requester.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -28,9 +28,9 @@
 #include "ns3/random-variable.h"
 #include "ns3/string.h"
 
-#include "ns3/ndn-app-face.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
+#include "ns3/ndn-app-face.hpp"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("DumbRequester");
 

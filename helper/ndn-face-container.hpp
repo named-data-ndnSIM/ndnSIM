@@ -26,7 +26,7 @@
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
-#include "ns3/ndn-face.h"
+#include "ns3/ndn-face.hpp"
 
 namespace ns3 {
 namespace ndn {

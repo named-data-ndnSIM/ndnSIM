@@ -21,9 +21,9 @@
 #ifndef NDN_CONSUMER_BATCHES_H
 #define NDN_CONSUMER_BATCHES_H
 
-#include "ndn-consumer.h"
+#include "ndn-consumer.hpp"
 #include "ns3/traced-value.h"
-#include "../utils/batches.h"
+#include "../utils/batches.hpp"
 
 namespace ns3 {
 namespace ndn {

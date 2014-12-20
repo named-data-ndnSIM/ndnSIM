@@ -20,12 +20,10 @@
  *         
  */
 
-#include "ndn-content-store.h"
+#include "ndn-content-store.hpp"
+
 #include "ns3/log.h"
 #include "ns3/packet.h"
-#include "ns3/ndn-name.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.cs.ContentStore");
 

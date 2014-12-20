@@ -18,17 +18,17 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-app.h"
+#include "ndn-app.hpp"
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
-#include "ns3/ndn-l3-protocol.h"
-#include "ns3/ndn-fib.h"
-#include "ns3/ndn-app-face.h"
-#include "ns3/ndn-forwarding-strategy.h"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
+#include "ns3/ndn-l3-protocol.hpp"
+#include "ns3/ndn-fib.hpp"
+#include "ns3/ndn-app-face.hpp"
+#include "ns3/ndn-forwarding-strategy.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.App");
 

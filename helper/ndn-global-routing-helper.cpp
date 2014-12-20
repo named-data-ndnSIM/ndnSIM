@@ -24,13 +24,13 @@
 #pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
 #endif
 
-#include "ndn-global-routing-helper.h"
+#include "ndn-global-routing-helper.hpp"
 
-#include "ns3/ndn-l3-protocol.h"
-#include "../model/ndn-net-device-face.h"
-#include "../model/ndn-global-router.h"
-#include "ns3/ndn-name.h"
-#include "ns3/ndn-fib.h"
+#include "ns3/ndn-l3-protocol.hpp"
+#include "../model/ndn-net-device-face.hpp"
+#include "../model/ndn-global-router.hpp"
+#include "ns3/ndn-name.hpp"
+#include "ns3/ndn-fib.hpp"
 
 #include "ns3/node.h"
 #include "ns3/node-container.h"
@@ -50,7 +50,7 @@
 // #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
-#include "boost-graph-ndn-global-routing-helper.h"
+#include "boost-graph-ndn-global-routing-helper.hpp"
 
 #include <math.h>
 

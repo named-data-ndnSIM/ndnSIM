@@ -25,7 +25,7 @@
 // Georgia Tech Network Simulator - Round Trip Time Estimation Class
 // George F. Riley.  Georgia Tech, Spring 2002
 
-#include "ndn-rtt-mean-deviation.h"
+#include "ndn-rtt-mean-deviation.hpp"
 #include "ns3/simulator.h"
 #include "ns3/double.h"
 #include "ns3/integer.h"

@@ -29,7 +29,7 @@
 #ifndef NDN_RTT_MEAN_DEVIATION_H
 #define NDN_RTT_MEAN_DEVIATION_H
 
-#include <ns3/ndnSIM/utils/ndn-rtt-estimator.h>
+#include "ndn-rtt-estimator.hpp"
 
 namespace ns3 {
 namespace ndn {

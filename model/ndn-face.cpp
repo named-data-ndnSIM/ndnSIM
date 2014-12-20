@@ -19,7 +19,7 @@
  *
  */
 
-#include "ndn-face.h"
+#include "ndn-face.hpp"
 
 #include "ns3/packet.h"
 #include "ns3/log.h"
@@ -32,8 +32,8 @@
 #include "ns3/random-variable.h"
 #include "ns3/pointer.h"
 
-#include "ns3/ndn-header-helper.h"
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
+#include "ns3/ndn-header-helper.hpp"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 
 #include "ns3/ndn-wire.h"
 

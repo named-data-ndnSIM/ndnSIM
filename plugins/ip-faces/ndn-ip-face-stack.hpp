@@ -26,7 +26,7 @@
 #include "ns3/socket.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/ptr.h"
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-name.hpp"
 
 #include <map>
 

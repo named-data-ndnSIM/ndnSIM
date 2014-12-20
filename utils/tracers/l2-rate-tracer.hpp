@@ -21,7 +21,7 @@
 #ifndef L2_RATE_TRACER_H
 #define L2_RATE_TRACER_H
 
-#include "l2-tracer.h"
+#include "l2-tracer.hpp"
 
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"

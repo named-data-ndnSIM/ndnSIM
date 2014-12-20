@@ -18,7 +18,7 @@
  * Author: Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ndn-consumer.h"
+#include "ndn-consumer.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -30,11 +30,11 @@
 #include "ns3/integer.h"
 #include "ns3/double.h"
 
-#include "ns3/ndn-app-face.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.h"
-#include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.h"
+#include "ns3/ndn-app-face.hpp"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
+#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
+#include "ns3/ndnSIM/utils/ndn-rtt-mean-deviation.hpp"
 
 #include <boost/ref.hpp>
 

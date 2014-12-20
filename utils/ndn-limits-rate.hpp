@@ -21,7 +21,7 @@
 #ifndef _NDN_LIMITS_RATE_H_
 #define	_NDN_LIMITS_RATE_H_
 
-#include "ndn-limits.h"
+#include "ndn-limits.hpp"
 #include <ns3/nstime.h>
 
 namespace ns3 {

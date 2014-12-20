@@ -18,14 +18,14 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "content-store-impl.h"
+#include "content-store-impl.hpp"
 
-#include "../../utils/trie/random-policy.h"
-#include "../../utils/trie/lru-policy.h"
-#include "../../utils/trie/fifo-policy.h"
-#include "../../utils/trie/lfu-policy.h"
-#include "../../utils/trie/multi-policy.h"
-#include "../../utils/trie/aggregate-stats-policy.h"
+#include "../../utils/trie/random-policy.hpp"
+#include "../../utils/trie/lru-policy.hpp"
+#include "../../utils/trie/fifo-policy.hpp"
+#include "../../utils/trie/lfu-policy.hpp"
+#include "../../utils/trie/multi-policy.hpp"
+#include "../../utils/trie/aggregate-stats-policy.hpp"
 
 #define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
   static struct X ## type ## templ ## RegistrationClass \

@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "batches.h"
+#include "batches.hpp"
 
 namespace ns3 {
 

@@ -19,15 +19,15 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-ip-faces-helper.h"
-#include "ndn-ip-face-stack.h"
+#include "ndn-ip-faces-helper.hpp"
+#include "ndn-ip-face-stack.hpp"
 
-#include "ns3/ndn-stack-helper.h"
+#include "ns3/ndn-stack-helper.hpp"
 #include "ns3/node-container.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
-#include "ndn-tcp-face.h"
-#include "ndn-udp-face.h"
+#include "ndn-tcp-face.hpp"
+#include "ndn-udp-face.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.IpFacesHelper");
 

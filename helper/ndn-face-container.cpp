@@ -18,11 +18,11 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-face-container.h"
+#include "ndn-face-container.hpp"
 
 #include <algorithm>
 
-#include "ns3/ndn-face.h"
+#include "ns3/ndn-face.hpp"
 
 namespace ns3 {
 namespace ndn {

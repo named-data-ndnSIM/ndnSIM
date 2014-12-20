@@ -19,8 +19,8 @@
  *
  */
 
-#include "ndn-net-device-face.h"
-#include "ndn-l3-protocol.h"
+#include "ndn-net-device-face.hpp"
+#include "ndn-l3-protocol.hpp"
 
 #include "ns3/net-device.h"
 #include "ns3/log.h"
@@ -31,7 +31,7 @@
 // #include "ns3/address.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/channel.h"
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-name.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.NetDeviceFace");
 

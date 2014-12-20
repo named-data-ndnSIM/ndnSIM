@@ -36,22 +36,22 @@
 #include "ns3/point-to-point-helper.h"
 #include "ns3/callback.h"
 
-#include "../model/ndn-net-device-face.h"
-#include "../model/ndn-l3-protocol.h"
+#include "../model/ndn-net-device-face.hpp"
+#include "../model/ndn-l3-protocol.hpp"
 
-#include "ns3/ndn-forwarding-strategy.h"
-#include "ns3/ndn-fib.h"
-#include "ns3/ndn-pit.h"
-#include "ns3/ndn-name.h"
-#include "ns3/ndn-content-store.h"
+#include "ns3/ndn-forwarding-strategy.hpp"
+#include "ns3/ndn-fib.hpp"
+#include "ns3/ndn-pit.hpp"
+#include "ns3/ndn-name.hpp"
+#include "ns3/ndn-content-store.hpp"
 
 #include "ns3/node-list.h"
 // #include "ns3/loopback-net-device.h"
 
 #include "ns3/data-rate.h"
 
-#include "ndn-face-container.h"
-#include "ndn-stack-helper.h"
+#include "ndn-face-container.hpp"
+#include "ndn-stack-helper.hpp"
 
 #include <limits>
 #include <map>

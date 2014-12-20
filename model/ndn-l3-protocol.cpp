@@ -19,7 +19,7 @@
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
  */
 
-#include "ndn-l3-protocol.h"
+#include "ndn-l3-protocol.hpp"
 
 #include "ns3/packet.h"
 #include "ns3/node.h"
@@ -32,14 +32,14 @@
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 
-#include "ns3/ndn-pit.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
+#include "ns3/ndn-pit.hpp"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
 
-#include "ns3/ndn-face.h"
-#include "ns3/ndn-forwarding-strategy.h"
+#include "ns3/ndn-face.hpp"
+#include "ns3/ndn-forwarding-strategy.hpp"
 
-#include "ndn-net-device-face.h"
+#include "ndn-net-device-face.hpp"
 
 #include <boost/foreach.hpp>
 

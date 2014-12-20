@@ -21,7 +21,7 @@
  *
  */
 
-#include "rocketfuel-map-reader.h"
+#include "rocketfuel-map-reader.hpp"
 
 #include "ns3/nstime.h"
 #include "ns3/log.h"

@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-consumer-batches.h"
+#include "ndn-consumer-batches.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -28,7 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
-#include "../utils/batches.h"
+#include "../utils/batches.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerBatches");
 

@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-fw-hop-count-tag.h"
+#include "ndn-fw-hop-count-tag.hpp"
 
 namespace ns3 {
 namespace ndn {

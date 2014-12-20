@@ -18,7 +18,7 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "l2-rate-tracer.h"
+#include "l2-rate-tracer.hpp"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/config.h"

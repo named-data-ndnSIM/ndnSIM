@@ -18,11 +18,11 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-ip-face-stack.h"
-#include "ndn-tcp-face.h"
-#include "ndn-udp-face.h"
+#include "ndn-ip-face-stack.hpp"
+#include "ndn-tcp-face.hpp"
+#include "ndn-udp-face.hpp"
 
-#include "ns3/ndn-l3-protocol.h"
+#include "ns3/ndn-l3-protocol.hpp"
 
 #include "ns3/log.h"
 #include "ns3/assert.h"

@@ -21,9 +21,9 @@
 #ifndef MULTI_POLICY_H_
 #define MULTI_POLICY_H_
 
-#include "detail/multi-type-container.h"
-#include "detail/multi-policy-container.h"
-#include "detail/functor-hook.h"
+#include "detail/multi-type-container.hpp"
+#include "detail/multi-policy-container.hpp"
+#include "detail/functor-hook.hpp"
 
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/at.hpp>

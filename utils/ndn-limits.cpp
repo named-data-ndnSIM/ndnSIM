@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-limits.h"
+#include "ndn-limits.hpp"
 
 #include "ns3/log.h"
 #include "ns3/simulator.h"

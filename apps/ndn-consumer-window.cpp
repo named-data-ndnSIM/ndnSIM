@@ -18,7 +18,7 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-consumer-window.h"
+#include "ndn-consumer-window.hpp"
 #include "ns3/ptr.h"
 #include "ns3/log.h"
 #include "ns3/simulator.h"
@@ -27,8 +27,8 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ns3/ndn-data.h"
-#include "ns3/ndn-interest.h"
+#include "ns3/ndn-data.hpp"
+#include "ns3/ndn-interest.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerWindow");
 

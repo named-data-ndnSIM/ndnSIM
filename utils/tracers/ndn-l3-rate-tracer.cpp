@@ -18,7 +18,7 @@
  * Author:  Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#include "ndn-l3-rate-tracer.h"
+#include "ndn-l3-rate-tracer.hpp"
 #include "ns3/node.h"
 #include "ns3/packet.h"
 #include "ns3/config.h"
@@ -27,11 +27,11 @@
 #include "ns3/log.h"
 #include "ns3/node-list.h"
 
-#include "ns3/ndn-app.h"
-#include "ns3/ndn-face.h"
-#include "ns3/ndn-interest.h"
-#include "ns3/ndn-data.h"
-#include "ns3/ndn-pit-entry.h"
+#include "ns3/ndn-app.hpp"
+#include "ns3/ndn-face.hpp"
+#include "ns3/ndn-interest.hpp"
+#include "ns3/ndn-data.hpp"
+#include "ns3/ndn-pit-entry.hpp"
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>

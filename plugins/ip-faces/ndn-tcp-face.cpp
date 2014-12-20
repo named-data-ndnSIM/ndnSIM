@@ -19,10 +19,10 @@
  *
  */
 
-#include "ndn-tcp-face.h"
-#include "ndn-ip-face-stack.h"
+#include "ndn-tcp-face.hpp"
+#include "ndn-ip-face-stack.hpp"
 
-#include "ns3/ndn-l3-protocol.h"
+#include "ns3/ndn-l3-protocol.hpp"
 
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -30,7 +30,7 @@
 #include "ns3/pointer.h"
 #include "ns3/tcp-socket-factory.h"
 
-#include "ns3/ndn-name.h"
+#include "ns3/ndn-name.hpp"
 
 using namespace std;
 

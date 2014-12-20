@@ -22,7 +22,7 @@
 #ifndef NDN_CONSUMER_WINDOW_H
 #define NDN_CONSUMER_WINDOW_H
 
-#include "ndn-consumer.h"
+#include "ndn-consumer.hpp"
 #include "ns3/traced-value.h"
 
 namespace ns3 {

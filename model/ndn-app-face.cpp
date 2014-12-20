@@ -20,7 +20,7 @@
  *
  */
 
-#include "ndn-app-face.h"
+#include "ndn-app-face.hpp"
 
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -28,11 +28,11 @@
 #include "ns3/assert.h"
 #include "ns3/simulator.h"
 
-#include "ns3/ndn-header-helper.h"
-#include "ns3/ndn-app.h"
+#include "ns3/ndn-header-helper.hpp"
+#include "ns3/ndn-app.hpp"
 
-#include "ndn-interest.h"
-#include "ndn-data.h"
+#include "ndn-interest.hpp"
+#include "ndn-data.hpp"
 
 NS_LOG_COMPONENT_DEFINE ("ndn.AppFace");
 

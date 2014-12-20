@@ -23,8 +23,10 @@
 
 #include "content-store-impl.h"
 
-#include "../../utils/trie/multi-policy.h"
-#include "custom-policies/lifetime-stats-policy.h"
+#include "content-store-impl.hpp"
+
+#include "../../utils/trie/multi-policy.hpp"
+#include "custom-policies/lifetime-stats-policy.hpp"
 
 namespace ns3 {
 namespace ndn {
