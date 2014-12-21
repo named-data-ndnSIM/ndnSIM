@@ -139,25 +139,6 @@ private:
   void
   onConfig(const ConfigSection& configSection, bool isDryRun, const std::string& filename);
 
-  void
-  processSectionUnix(const ConfigSection& configSection, bool isDryRun);
-
-  void
-  processSectionTcp(const ConfigSection& configSection, bool isDryRun);
-
-  void
-  processSectionUdp(const ConfigSection& configSection,
-                    bool isDryRun,
-                    const std::vector<NetworkInterfaceInfo>& nicList);
-
-  void
-  processSectionEther(const ConfigSection& configSection,
-                      bool isDryRun,
-                      const std::vector<NetworkInterfaceInfo>& nicList);
-
-  void
-  processSectionWebSocket(const ConfigSection& configSection, bool isDryRun);
-
   /** \brief parse a config option that can be either "yes" or "no"
    *  \throw ConfigFile::Error value is neither "yes" nor "no"
    *  \return true if "yes", false if "no"
