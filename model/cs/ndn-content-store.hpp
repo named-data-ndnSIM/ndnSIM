@@ -28,7 +28,7 @@
 #include "ns3/ptr.h"
 #include "ns3/traced-callback.h"
 
-#include <boost/tuple/tuple.hpp>
+#include <tuple>
 
 namespace ns3 {
 

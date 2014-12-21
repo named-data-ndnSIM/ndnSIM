@@ -57,7 +57,7 @@ public:
   // {
   //   iterator foundItem, lastItem;
   //   bool reachLast;
-  //   boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
+  //   std::tie (foundItem, reachLast, lastItem) = trie_.find (key);
 
   //   if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
   //     return; // nothing to invalidate
