@@ -29,7 +29,7 @@
 #include "ndn-tcp-face.hpp"
 #include "ndn-udp-face.hpp"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.IpFacesHelper");
+NS_LOG_COMPONENT_DEFINE("ndn.IpFacesHelper");
 
 using namespace std;
 
@@ -37,44 +37,40 @@ namespace ns3 {
 namespace ndn {
 
 void
-IpFacesHelper::Install (Ptr<Node> node)
+IpFacesHelper::Install(Ptr<Node> node)
 {
-  Ptr<IpFaceStack> stack = CreateObject<IpFaceStack> ();
-  node->AggregateObject (stack);
+  Ptr<IpFaceStack> stack = CreateObject<IpFaceStack>();
+  node->AggregateObject(stack);
 }
 
 void
-IpFacesHelper::Install (const NodeContainer &nodes)
+IpFacesHelper::Install(const NodeContainer& nodes)
 {
-  for (NodeContainer::Iterator node = nodes.Begin ();
-       node != nodes.End ();
-       node ++)
-    {
-      Install (*node);
-    }
+  for (NodeContainer::Iterator node = nodes.Begin(); node != nodes.End(); node++) {
+    Install(*node);
+  }
 }
 
 void
-IpFacesHelper::InstallAll ()
+IpFacesHelper::InstallAll()
 {
-  Install (NodeContainer::GetGlobal ());
+  Install(NodeContainer::GetGlobal());
 }
 
-
-struct TcpPrefixRegistrator : SimpleRefCount<TcpPrefixRegistrator>
-{
-  TcpPrefixRegistrator (Ptr<Node> node, const std::string &prefix, int16_t metric)
-    : m_node (node)
-    , m_prefix (prefix)
-    , m_metric (metric)
+struct TcpPrefixRegistrator : SimpleRefCount<TcpPrefixRegistrator> {
+  TcpPrefixRegistrator(Ptr<Node> node, const std::string& prefix, int16_t metric)
+    : m_node(node)
+    , m_prefix(prefix)
+    , m_metric(metric)
   {
   }
 
   void
-  Run (Ptr<Face> face)
+  Run(Ptr<Face> face)
   {
-    ndn::StackHelper::AddRoute (m_node, m_prefix, face, m_metric);
+    ndn::StackHelper::AddRoute(m_node, m_prefix, face, m_metric);
   }
+
 private:
   Ptr<Node> m_node;
   std::string m_prefix;
@@ -82,43 +78,45 @@ private:
 };
 
 static void
-ScheduledCreateTcp (Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric)
+ScheduledCreateTcp(Ptr<Node> node, Ipv4Address address, const std::string& prefix, int16_t metric)
 {
-  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack> ();
-  NS_ASSERT_MSG (stack != 0, "ndn::IpFaceStack needs to be installed on the node");
+  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack>();
+  NS_ASSERT_MSG(stack != 0, "ndn::IpFaceStack needs to be installed on the node");
 
-  Ptr<Face> face = stack->GetTcpFaceByAddress (address);
-  if (face == 0)
-    {
-      Ptr<TcpPrefixRegistrator> registrator = Create<TcpPrefixRegistrator> (node, prefix, metric);
-      stack->CreateOrGetTcpFace (address, MakeCallback (&TcpPrefixRegistrator::Run, registrator));
-    }
-  else
-    {
-      ndn::StackHelper::AddRoute (node, prefix, face, metric);
-    }
+  Ptr<Face> face = stack->GetTcpFaceByAddress(address);
+  if (face == 0) {
+    Ptr<TcpPrefixRegistrator> registrator = Create<TcpPrefixRegistrator>(node, prefix, metric);
+    stack->CreateOrGetTcpFace(address, MakeCallback(&TcpPrefixRegistrator::Run, registrator));
+  }
+  else {
+    ndn::StackHelper::AddRoute(node, prefix, face, metric);
+  }
 }
 
 void
-IpFacesHelper::CreateTcpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric/* = 1*/)
+IpFacesHelper::CreateTcpFace(const Time& when, Ptr<Node> node, Ipv4Address address,
+                             const std::string& prefix, int16_t metric /* = 1*/)
 {
-  Simulator::ScheduleWithContext (node->GetId (), when, ScheduledCreateTcp, node, address, prefix, metric);
+  Simulator::ScheduleWithContext(node->GetId(), when, ScheduledCreateTcp, node, address, prefix,
+                                 metric);
 }
 
 static void
-ScheduledCreateUdp (Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric)
+ScheduledCreateUdp(Ptr<Node> node, Ipv4Address address, const std::string& prefix, int16_t metric)
 {
-  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack> ();
-  NS_ASSERT_MSG (stack != 0, "ndn::IpFaceStack needs to be installed on the node");
+  Ptr<IpFaceStack> stack = node->GetObject<IpFaceStack>();
+  NS_ASSERT_MSG(stack != 0, "ndn::IpFaceStack needs to be installed on the node");
 
-  Ptr<Face> face = stack->CreateOrGetUdpFace (address);
-  ndn::StackHelper::AddRoute (node, prefix, face, metric);
+  Ptr<Face> face = stack->CreateOrGetUdpFace(address);
+  ndn::StackHelper::AddRoute(node, prefix, face, metric);
 }
 
 void
-IpFacesHelper::CreateUdpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric/* = 1*/)
+IpFacesHelper::CreateUdpFace(const Time& when, Ptr<Node> node, Ipv4Address address,
+                             const std::string& prefix, int16_t metric /* = 1*/)
 {
-  Simulator::ScheduleWithContext (node->GetId (), when, ScheduledCreateUdp, node, address, prefix, metric);
+  Simulator::ScheduleWithContext(node->GetId(), when, ScheduledCreateUdp, node, address, prefix,
+                                 metric);
 }
 
 } // namespace ndn

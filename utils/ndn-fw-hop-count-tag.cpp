@@ -24,41 +24,39 @@ namespace ns3 {
 namespace ndn {
 
 TypeId
-FwHopCountTag::GetTypeId ()
+FwHopCountTag::GetTypeId()
 {
-  static TypeId tid = TypeId("ns3::ndn::FwHopCountTag")
-    .SetParent<Tag>()
-    .AddConstructor<FwHopCountTag>()
-    ;
+  static TypeId tid =
+    TypeId("ns3::ndn::FwHopCountTag").SetParent<Tag>().AddConstructor<FwHopCountTag>();
   return tid;
 }
 
 TypeId
-FwHopCountTag::GetInstanceTypeId () const
+FwHopCountTag::GetInstanceTypeId() const
 {
-  return FwHopCountTag::GetTypeId ();
+  return FwHopCountTag::GetTypeId();
 }
 
 uint32_t
-FwHopCountTag::GetSerializedSize () const
+FwHopCountTag::GetSerializedSize() const
 {
   return sizeof(uint32_t);
 }
 
 void
-FwHopCountTag::Serialize (TagBuffer i) const
+FwHopCountTag::Serialize(TagBuffer i) const
 {
-  i.WriteU32 (m_hopCount);
-}
-  
-void
-FwHopCountTag::Deserialize (TagBuffer i)
-{
-  m_hopCount = i.ReadU32 ();
+  i.WriteU32(m_hopCount);
 }
 
 void
-FwHopCountTag::Print (std::ostream &os) const
+FwHopCountTag::Deserialize(TagBuffer i)
+{
+  m_hopCount = i.ReadU32();
+}
+
+void
+FwHopCountTag::Print(std::ostream& os) const
 {
   os << m_hopCount;
 }

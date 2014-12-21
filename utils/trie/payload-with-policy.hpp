@@ -25,32 +25,29 @@ namespace ns3 {
 namespace ndn {
 namespace ndnSIM {
 
-template<typename PayloadTraits,
-         typename IndexTraits>
-class payload_with_index
-{
+template<typename PayloadTraits, typename IndexTraits>
+class payload_with_index {
 public:
   typedef PayloadTraits::pointer_type iterator;
-  
-  typedef typename IndexTraits::template index<
-    PayloadTraits,
-    typename IndexTraits::template container_hook<parent_trie>::type >::type index_container;
 
-  inline
-  payload_with_index ()
-    : index_ (*this)
+  typedef typename IndexTraits::
+    template index<PayloadTraits,
+                   typename IndexTraits::template container_hook<parent_trie>::type>::type
+      index_container;
+
+  inline payload_with_index()
+    : index_(*this)
   {
   }
 
-  inline std::pair< iterator, bool >
-  insert (typename iterator payload)
+  inline std::pair<iterator, bool>
+  insert(typename iterator payload)
   {
-    bool ok = policy_.insert (s_iterator_to (item.first));
-    if (!ok)
-      {
-        item.first->erase (); // cannot insert
-        return std::make_pair (end (), false);
-      }
+    bool ok = policy_.insert(s_iterator_to(item.first));
+    if (!ok) {
+      item.first->erase(); // cannot insert
+      return std::make_pair(end(), false);
+    }
 
     return item;
   }
@@ -61,7 +58,7 @@ public:
   //   iterator foundItem, lastItem;
   //   bool reachLast;
   //   boost::tie (foundItem, reachLast, lastItem) = trie_.find (key);
-    
+
   //   if (!reachLast || lastItem->payload () == PayloadTraits::empty_payload)
   //     return; // nothing to invalidate
 

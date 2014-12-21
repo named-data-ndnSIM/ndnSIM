@@ -32,70 +32,72 @@ namespace ndn {
  * @ingroup ndn-apps
  * \brief Ndn application for sending out Interest packets (window-based)
  *
- * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the simulator.
+ * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the
+ *simulator.
  * Behavior may be unpredictable if used incorrectly.
  */
-class ConsumerWindow: public Consumer
-{
+class ConsumerWindow : public Consumer {
 public:
-  static TypeId GetTypeId ();
+  static TypeId
+  GetTypeId();
 
   /**
    * \brief Default constructor
    */
-  ConsumerWindow ();
+  ConsumerWindow();
 
   // From App
   // virtual void
   // OnInterest (const Ptr<const Interest> &interest);
 
   virtual void
-  OnNack (Ptr<const Interest> interest);
+  OnNack(Ptr<const Interest> interest);
 
   virtual void
-  OnData (Ptr<const Data> contentObject);
+  OnData(Ptr<const Data> contentObject);
 
   virtual void
-  OnTimeout (uint32_t sequenceNumber);
+  OnTimeout(uint32_t sequenceNumber);
 
   virtual void
-  WillSendOutInterest (uint32_t sequenceNumber);
+  WillSendOutInterest(uint32_t sequenceNumber);
 
 protected:
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
+   * protocol
    */
   virtual void
-  ScheduleNextPacket ();
+  ScheduleNextPacket();
 
 private:
   virtual void
-  SetWindow (uint32_t window);
+  SetWindow(uint32_t window);
 
   uint32_t
-  GetWindow () const;
+  GetWindow() const;
 
   virtual void
-  SetPayloadSize (uint32_t payload);
+  SetPayloadSize(uint32_t payload);
 
   uint32_t
-  GetPayloadSize () const;
+  GetPayloadSize() const;
 
   double
-  GetMaxSize () const;
+  GetMaxSize() const;
 
   void
-  SetMaxSize (double size);
+  SetMaxSize(double size);
 
   uint32_t
-  GetSeqMax () const;
+  GetSeqMax() const;
 
   void
-  SetSeqMax (uint32_t seqMax);
+  SetSeqMax(uint32_t seqMax);
 
 private:
   uint32_t m_payloadSize; // expected payload size
-  double   m_maxSize; // max size to request
+  double m_maxSize;       // max size to request
 
   uint32_t m_initialWindow;
   bool m_setInitialWindowOnTimeout;

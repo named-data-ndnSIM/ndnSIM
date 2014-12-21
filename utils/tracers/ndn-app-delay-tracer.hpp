@@ -44,20 +44,20 @@ class App;
  * @ingroup ndn-tracers
  * @brief Tracer to obtain application-level delays
  */
-class AppDelayTracer : public SimpleRefCount<AppDelayTracer>
-{
+class AppDelayTracer : public SimpleRefCount<AppDelayTracer> {
 public:
   /**
    * @brief Helper method to install tracers on all simulation nodes
    *
    * @param file File to which traces will be written.  If filename is -, then std::out is used
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
+   *tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   * 
+   *
    */
   static void
-  InstallAll (const std::string &file);
+  InstallAll(const std::string& file);
 
   /**
    * @brief Helper method to install tracers on the selected simulation nodes
@@ -65,39 +65,44 @@ public:
    * @param nodes Nodes on which to install tracer
    * @param file File to which traces will be written.  If filename is -, then std::out is used
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
+   *tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
   static void
-  Install (const NodeContainer &nodes, const std::string &file);
+  Install(const NodeContainer& nodes, const std::string& file);
 
   /**
    * @brief Helper method to install tracers on a specific simulation node
    *
    * @param nodes Nodes on which to install tracer
    * @param file File to which traces will be written.  If filename is -, then std::out is used
-   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   * @param averagingPeriod How often data will be written into the trace file (default, every half
+   *second)
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
+   *tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
   static void
-  Install (Ptr<Node> node, const std::string &file);
+  Install(Ptr<Node> node, const std::string& file);
 
   /**
    * @brief Helper method to install tracers on a specific simulation node
    *
    * @param nodes Nodes on which to install tracer
    * @param outputStream Smart pointer to a stream
-   * @param averagingPeriod How often data will be written into the trace file (default, every half second)
+   * @param averagingPeriod How often data will be written into the trace file (default, every half
+   *second)
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
+   *tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    */
   static Ptr<AppDelayTracer>
-  Install (Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream);
+  Install(Ptr<Node> node, boost::shared_ptr<std::ostream> outputStream);
 
   /**
    * @brief Explicit request to remove all statically created tracers
@@ -106,26 +111,26 @@ public:
    * or if it is desired to do a postprocessing of the resulting data
    */
   static void
-  Destroy ();
-  
+  Destroy();
+
   /**
    * @brief Trace constructor that attaches to all applications on the node using node's pointer
    * @param os    reference to the output stream
    * @param node  pointer to the node
    */
-  AppDelayTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  AppDelayTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
 
   /**
    * @brief Trace constructor that attaches to all applications on the node using node's name
    * @param os        reference to the output stream
    * @param nodeName  name of the node registered using Names::Add
    */
-  AppDelayTracer (boost::shared_ptr<std::ostream> os, const std::string &node);
+  AppDelayTracer(boost::shared_ptr<std::ostream> os, const std::string& node);
 
   /**
    * @brief Destructor
    */
-  ~AppDelayTracer ();
+  ~AppDelayTracer();
 
   /**
    * @brief Print head of the trace (e.g., for post-processing)
@@ -133,18 +138,19 @@ public:
    * @param os reference to output stream
    */
   void
-  PrintHeader (std::ostream &os) const;
-  
+  PrintHeader(std::ostream& os) const;
+
 private:
   void
-  Connect ();
+  Connect();
 
-  void 
-  LastRetransmittedInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount);
-  
-  void 
-  FirstInterestDataDelay (Ptr<App> app, uint32_t seqno, Time delay, uint32_t rextCount, int32_t hopCount);
-  
+  void
+  LastRetransmittedInterestDataDelay(Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount);
+
+  void
+  FirstInterestDataDelay(Ptr<App> app, uint32_t seqno, Time delay, uint32_t rextCount,
+                         int32_t hopCount);
+
 private:
   std::string m_node;
   Ptr<Node> m_nodePtr;

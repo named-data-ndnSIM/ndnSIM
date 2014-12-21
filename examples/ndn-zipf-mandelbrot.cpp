@@ -51,63 +51,63 @@ using namespace ns3;
  */
 
 int
-main (int argc, char *argv[])
+main(int argc, char* argv[])
 {
-  //LogComponentEnable("ndn.CbisGlobalRoutingHelper", LOG_LEVEL_INFO);
+  // LogComponentEnable("ndn.CbisGlobalRoutingHelper", LOG_LEVEL_INFO);
   // Setting default parameters for PointToPoint links and channels
-  Config::SetDefault ("ns3::PointToPointNetDevice::DataRate", StringValue ("1Mbps"));
-  Config::SetDefault ("ns3::PointToPointChannel::Delay", StringValue ("1ms"));
-  Config::SetDefault ("ns3::DropTailQueue::MaxPackets", StringValue ("10"));
+  Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("1Mbps"));
+  Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("1ms"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("10"));
 
   // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;
-  cmd.Parse (argc, argv);
+  cmd.Parse(argc, argv);
 
   // Creating 3x3 topology
   PointToPointHelper p2p;
-  PointToPointGridHelper grid (3, 3, p2p);
-  grid.BoundingBox(100,100,200,200);
+  PointToPointGridHelper grid(3, 3, p2p);
+  grid.BoundingBox(100, 100, 200, 200);
 
   // Install CCNx stack on all nodes
   ndn::StackHelper ccnxHelper;
-  ccnxHelper.SetForwardingStrategy ("ns3::ndn::fw::SmartFlooding");
-  ccnxHelper.SetContentStore ("ns3::ndn::cs::Lru", "MaxSize", "10");
-  ccnxHelper.InstallAll ();
+  ccnxHelper.SetForwardingStrategy("ns3::ndn::fw::SmartFlooding");
+  ccnxHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "10");
+  ccnxHelper.InstallAll();
 
   // Installing global routing interface on all nodes
-  //ndn::CbisGlobalRoutingHelper ccnxGlobalRoutingHelper;
+  // ndn::CbisGlobalRoutingHelper ccnxGlobalRoutingHelper;
   ndn::GlobalRoutingHelper ccnxGlobalRoutingHelper;
-  ccnxGlobalRoutingHelper.InstallAll ();
+  ccnxGlobalRoutingHelper.InstallAll();
 
   // Getting containers for the consumer/producer
-  Ptr<Node> producer = grid.GetNode (2, 2);
+  Ptr<Node> producer = grid.GetNode(2, 2);
   NodeContainer consumerNodes;
-  consumerNodes.Add (grid.GetNode (0,0));
+  consumerNodes.Add(grid.GetNode(0, 0));
 
   // Install CCNx applications
   std::string prefix = "/prefix";
 
-  ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerZipfMandelbrot");
-  //ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetPrefix (prefix);
-  consumerHelper.SetAttribute ("Frequency", StringValue ("100")); // 100 interests a second
-  consumerHelper.SetAttribute ("NumberOfContents", StringValue ("100")); // 10 different contents
-  //consumerHelper.SetAttribute ("Randomize", StringValue ("uniform")); // 100 interests a second
-  consumerHelper.Install (consumerNodes);
+  ndn::AppHelper consumerHelper("ns3::ndn::ConsumerZipfMandelbrot");
+  // ndn::AppHelper consumerHelper ("ns3::ndn::ConsumerCbr");
+  consumerHelper.SetPrefix(prefix);
+  consumerHelper.SetAttribute("Frequency", StringValue("100"));        // 100 interests a second
+  consumerHelper.SetAttribute("NumberOfContents", StringValue("100")); // 10 different contents
+  // consumerHelper.SetAttribute ("Randomize", StringValue ("uniform")); // 100 interests a second
+  consumerHelper.Install(consumerNodes);
 
-  ndn::AppHelper producerHelper ("ns3::ndn::Producer");
-  producerHelper.SetPrefix (prefix);
-  producerHelper.SetAttribute ("PayloadSize", StringValue("100"));
-  producerHelper.Install (producer);
-  ccnxGlobalRoutingHelper.AddOrigins (prefix, producer);
+  ndn::AppHelper producerHelper("ns3::ndn::Producer");
+  producerHelper.SetPrefix(prefix);
+  producerHelper.SetAttribute("PayloadSize", StringValue("100"));
+  producerHelper.Install(producer);
+  ccnxGlobalRoutingHelper.AddOrigins(prefix, producer);
 
   // Calculate and install FIBs
-  ccnxGlobalRoutingHelper.CalculateRoutes ();
+  ccnxGlobalRoutingHelper.CalculateRoutes();
 
-  Simulator::Stop (Seconds (10.0));
+  Simulator::Stop(Seconds(10.0));
 
-  Simulator::Run ();
-  Simulator::Destroy ();
+  Simulator::Run();
+  Simulator::Destroy();
 
   return 0;
 }

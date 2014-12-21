@@ -30,69 +30,70 @@
 
 #include "../utils/batches.hpp"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerBatches");
+NS_LOG_COMPONENT_DEFINE("ndn.ConsumerBatches");
 
 namespace ns3 {
 namespace ndn {
-    
-NS_OBJECT_ENSURE_REGISTERED (ConsumerBatches);
-    
-TypeId
-ConsumerBatches::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::ndn::ConsumerBatches")
-    .SetGroupName ("Ndn")
-    .SetParent<Consumer> ()
-    .AddConstructor<ConsumerBatches> ()
 
-    .AddAttribute ("Batches", "Batches to schedule. Should be vector, containing pairs of time and amount",
-                   // TypeId::ATTR_SET, 
-                   StringValue (""),
-                   MakeBatchesAccessor (&ConsumerBatches::m_batches),
-                   MakeBatchesChecker ())
-    ;
+NS_OBJECT_ENSURE_REGISTERED(ConsumerBatches);
+
+TypeId
+ConsumerBatches::GetTypeId(void)
+{
+  static TypeId tid =
+    TypeId("ns3::ndn::ConsumerBatches")
+      .SetGroupName("Ndn")
+      .SetParent<Consumer>()
+      .AddConstructor<ConsumerBatches>()
+
+      .AddAttribute("Batches",
+                    "Batches to schedule. Should be vector, containing pairs of time and amount",
+                    // TypeId::ATTR_SET,
+                    StringValue(""), MakeBatchesAccessor(&ConsumerBatches::m_batches),
+                    MakeBatchesChecker());
 
   return tid;
 }
 
-ConsumerBatches::ConsumerBatches ()
-  : m_initial (true)
+ConsumerBatches::ConsumerBatches()
+  : m_initial(true)
 {
 }
 
 void
-ConsumerBatches::StartApplication ()
+ConsumerBatches::StartApplication()
 {
-  Consumer::StartApplication ();
-  
+  Consumer::StartApplication();
+
   // std::cout << "Batches: " << batches << "\n";
-  for (Batches::const_iterator i = m_batches.begin (); i != m_batches.end (); i++)
-    {
-      Simulator::ScheduleWithContext (GetNode ()->GetId (), i->get<0> (), &ConsumerBatches::AddBatch, this, i->get<1> ());
-    }
+  for (Batches::const_iterator i = m_batches.begin(); i != m_batches.end(); i++) {
+    Simulator::ScheduleWithContext(GetNode()->GetId(), i->get<0>(), &ConsumerBatches::AddBatch,
+                                   this, i->get<1>());
+  }
 }
 
 void
-ConsumerBatches::AddBatch (uint32_t amount)
+ConsumerBatches::AddBatch(uint32_t amount)
 {
   // std::cout << Simulator::Now () << " adding batch of " << amount << "\n";
   m_seqMax += amount;
-  m_rtt->ClearSent (); // this is important, otherwise RTT estimation for the new batch will be affected by previous batch history
+  m_rtt->ClearSent(); // this is important, otherwise RTT estimation for the new batch will be
+                      // affected by previous batch history
   m_initial = true;
-  ScheduleNextPacket ();
+  ScheduleNextPacket();
 }
 
 void
-ConsumerBatches::ScheduleNextPacket ()
+ConsumerBatches::ScheduleNextPacket()
 {
-  if (!m_sendEvent.IsRunning ())
-    {
-      Time delay = Seconds (0);
-      if (!m_initial) delay = m_rtt->RetransmitTimeout ();
-      
-      m_initial = false;
-      m_sendEvent = Simulator::Schedule (delay, &Consumer::SendPacket, this);
-    }
+  if (!m_sendEvent.IsRunning()) {
+    Time delay = Seconds(0);
+    if (!m_initial)
+      delay = m_rtt->RetransmitTimeout();
+
+    m_initial = false;
+    m_sendEvent = Simulator::Schedule(delay, &Consumer::SendPacket, this);
+  }
 }
 
 ///////////////////////////////////////////////////

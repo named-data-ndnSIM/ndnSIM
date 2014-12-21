@@ -31,32 +31,31 @@ namespace ns3 {
 /**
  * @brief A dumb requester application
  *
- * This app keeps requesting every second the same content object 
+ * This app keeps requesting every second the same content object
  */
-class DumbRequester : public ndn::App
-{
+class DumbRequester : public ndn::App {
 public:
   // register NS-3 type "DumbRequester"
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
-  DumbRequester ();
-  
+  DumbRequester();
+
   // (overridden from ndn::App) Processing upon start of the application
   virtual void
-  StartApplication ();
+  StartApplication();
 
   // (overridden from ndn::App) Processing when application is stopped
   virtual void
-  StopApplication ();
+  StopApplication();
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnData (Ptr<const ndn::Data> contentObject);
-  
+  OnData(Ptr<const ndn::Data> contentObject);
+
 private:
   void
-  SendInterest ();
+  SendInterest();
 
 private:
   bool m_isRunning;

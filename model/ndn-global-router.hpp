@@ -43,53 +43,52 @@ typedef Name NameComponents;
  * @ingroup ndn
  * @brief Class representing global router interface for ndnSIM
  */
-class GlobalRouter : public Object
-{
+class GlobalRouter : public Object {
 public:
   /**
    * @brief Graph edge
    */
-  typedef boost::tuple< Ptr< GlobalRouter >, Ptr< Face >, Ptr< GlobalRouter > > Incidency;
+  typedef boost::tuple<Ptr<GlobalRouter>, Ptr<Face>, Ptr<GlobalRouter>> Incidency;
   /**
    * @brief List of graph edges
    */
-  typedef std::list< Incidency > IncidencyList;
+  typedef std::list<Incidency> IncidencyList;
   /**
    * @brief List of locally exported prefixes
    */
-  typedef std::list< Ptr<Name> > LocalPrefixList;
-  
+  typedef std::list<Ptr<Name>> LocalPrefixList;
+
   /**
    * \brief Interface ID
    *
    * \return interface ID
    */
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
   /**
    * @brief Default constructor
    */
-  GlobalRouter ();
+  GlobalRouter();
 
   /**
    * @brief Get numeric ID of the node (internally assigned)
    */
   uint32_t
-  GetId () const;
+  GetId() const;
 
   /**
    * @brief Helper function to get smart pointer to ndn::L3Protocol object (basically, self)
    */
   Ptr<L3Protocol>
-  GetL3Protocol () const;
+  GetL3Protocol() const;
 
   /**
    * @brief Add new locally exported prefix
    * @param prefix Prefix
    */
   void
-  AddLocalPrefix (Ptr< Name > prefix);
+  AddLocalPrefix(Ptr<Name> prefix);
 
   /**
    * @brief Add edge to the node
@@ -97,28 +96,29 @@ public:
    * @param ndn GlobalRouter of another node
    */
   void
-  AddIncidency (Ptr< Face > face, Ptr< GlobalRouter > ndn);
+  AddIncidency(Ptr<Face> face, Ptr<GlobalRouter> ndn);
 
   /**
    * @brief Get list of edges that are connected to this node
    */
-  IncidencyList &
-  GetIncidencies ();
+  IncidencyList&
+  GetIncidencies();
 
   /**
    * @brief Get list of locally exported prefixes
    */
-  const LocalPrefixList &
-  GetLocalPrefixes () const;
+  const LocalPrefixList&
+  GetLocalPrefixes() const;
 
   // ??
 protected:
   virtual void
-  NotifyNewAggregate (); ///< @brief Notify when the object is aggregated to another object (e.g., Node)
-  
+  NotifyNewAggregate(); ///< @brief Notify when the object is aggregated to another object (e.g.,
+  /// Node)
+
 private:
   uint32_t m_id;
-  
+
   Ptr<L3Protocol> m_ndn;
   LocalPrefixList m_localPrefixes;
   IncidencyList m_incidencies;
@@ -127,19 +127,15 @@ private:
 };
 
 inline bool
-operator == (const GlobalRouter::Incidency &a,
-             const GlobalRouter::Incidency &b)
+operator==(const GlobalRouter::Incidency& a, const GlobalRouter::Incidency& b)
 {
-  return a.get<0> () == b.get<0> () &&
-    a.get<1> () == b.get<1> () &&
-    a.get<2> () == b.get<2> ();
+  return a.get<0>() == b.get<0>() && a.get<1>() == b.get<1>() && a.get<2>() == b.get<2>();
 }
 
 inline bool
-operator != (const GlobalRouter::Incidency &a,
-             const GlobalRouter::Incidency &b)
+operator!=(const GlobalRouter::Incidency& a, const GlobalRouter::Incidency& b)
 {
-  return ! (a == b);
+  return !(a == b);
 }
 
 } // namespace ndn

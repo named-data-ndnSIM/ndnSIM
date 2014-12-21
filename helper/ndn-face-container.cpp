@@ -27,57 +27,55 @@
 namespace ns3 {
 namespace ndn {
 
-FaceContainer::FaceContainer ()
+FaceContainer::FaceContainer()
 {
 }
 
-FaceContainer::FaceContainer (const FaceContainer &other)
+FaceContainer::FaceContainer(const FaceContainer& other)
 {
-  AddAll (other);
+  AddAll(other);
 }
 
 FaceContainer&
 FaceContainer::operator= (const FaceContainer &other)
 {
-  m_faces.clear ();
-  AddAll (other);
+  m_faces.clear();
+  AddAll(other);
 
   return *this;
 }
 
-  
 void
-FaceContainer::AddAll (Ptr<FaceContainer> other)
+FaceContainer::AddAll(Ptr<FaceContainer> other)
 {
-  AddAll (*other);
+  AddAll(*other);
 }
 
 void
-FaceContainer::AddAll (const FaceContainer &other)
+FaceContainer::AddAll(const FaceContainer& other)
 {
-  m_faces.insert (m_faces.end (),
-                  other.m_faces.begin (), other.m_faces.end ());
+  m_faces.insert(m_faces.end(), other.m_faces.begin(), other.m_faces.end());
 }
 
 FaceContainer::Iterator
-FaceContainer::Begin (void) const
+FaceContainer::Begin(void) const
 {
-  return m_faces.begin ();
+  return m_faces.begin();
 }
 
 FaceContainer::Iterator
-FaceContainer::End (void) const
+FaceContainer::End(void) const
 {
-  return m_faces.end ();
+  return m_faces.end();
 }
 
 uint32_t
-FaceContainer::GetN (void) const
+FaceContainer::GetN(void) const
 {
-  return m_faces.size ();
+  return m_faces.size();
 }
 
-// void 
+// void
 // FaceContainer::SetMetricToAll (uint16_t metric)
 // {
 //   for (FaceContainer::iterator it=m_faces.begin ();
@@ -88,14 +86,14 @@ FaceContainer::GetN (void) const
 //     }
 // }
 
-void 
-FaceContainer::Add (const Ptr<Face> &face)
+void
+FaceContainer::Add(const Ptr<Face>& face)
 {
-  m_faces.push_back (face);
+  m_faces.push_back(face);
 }
 
 Ptr<Face>
-FaceContainer::Get (FaceContainer::Iterator i) const
+FaceContainer::Get(FaceContainer::Iterator i) const
 {
   return *i;
 }

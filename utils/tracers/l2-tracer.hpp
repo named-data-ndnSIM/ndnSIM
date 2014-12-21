@@ -35,23 +35,22 @@ class Node;
  *
  * @todo Finish implementation
  */
-class L2Tracer : public SimpleRefCount<L2Tracer>
-{
+class L2Tracer : public SimpleRefCount<L2Tracer> {
 public:
-  L2Tracer (Ptr<Node> node);
-  virtual ~L2Tracer () { };
+  L2Tracer(Ptr<Node> node);
+  virtual ~L2Tracer(){};
 
   void
-  Connect ();
+  Connect();
 
   virtual void
-  PrintHeader (std::ostream &os) const = 0;
+  PrintHeader(std::ostream& os) const = 0;
 
   virtual void
-  Print (std::ostream &os) const = 0;
+  Print(std::ostream& os) const = 0;
 
   virtual void
-  Drop (Ptr<const Packet>) = 0;
+  Drop(Ptr<const Packet>) = 0;
 
   // Rx/Tx is NetDevice specific
   // please refer to pyviz.cc in order to extend this tracer
@@ -60,9 +59,9 @@ protected:
   std::string m_node;
   Ptr<Node> m_nodePtr;
 
-  struct Stats
-  {
-    void Reset ()
+  struct Stats {
+    void
+    Reset()
     {
       m_in = 0;
       m_out = 0;
@@ -76,12 +75,12 @@ protected:
 };
 
 inline std::ostream&
-operator << (std::ostream &os, const L2Tracer &tracer)
+operator<<(std::ostream& os, const L2Tracer& tracer)
 {
   os << "# ";
-  tracer.PrintHeader (os);
+  tracer.PrintHeader(os);
   os << "\n";
-  tracer.Print (os);
+  tracer.Print(os);
   return os;
 }
 

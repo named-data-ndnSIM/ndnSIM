@@ -28,75 +28,72 @@
 #include "ns3/mpi-interface.h"
 #endif
 
-NS_LOG_COMPONENT_DEFINE ("ndn.AppHelper");
+NS_LOG_COMPONENT_DEFINE("ndn.AppHelper");
 
 namespace ns3 {
 namespace ndn {
 
-AppHelper::AppHelper (const std::string &app)
+AppHelper::AppHelper(const std::string& app)
 {
-  m_factory.SetTypeId (app);
+  m_factory.SetTypeId(app);
 }
 
 void
-AppHelper::SetPrefix (const std::string &prefix)
+AppHelper::SetPrefix(const std::string& prefix)
 {
-  m_factory.Set ("Prefix", StringValue(prefix));
+  m_factory.Set("Prefix", StringValue(prefix));
 }
 
-void 
-AppHelper::SetAttribute (std::string name, const AttributeValue &value)
+void
+AppHelper::SetAttribute(std::string name, const AttributeValue& value)
 {
-  m_factory.Set (name, value);
+  m_factory.Set(name, value);
 }
-    
+
 ApplicationContainer
-AppHelper::Install (Ptr<Node> node)
+AppHelper::Install(Ptr<Node> node)
 {
   ApplicationContainer apps;
-  Ptr<Application> app = InstallPriv (node);
+  Ptr<Application> app = InstallPriv(node);
   if (app != 0)
-    apps.Add (app);
-  
+    apps.Add(app);
+
   return apps;
 }
-    
+
 ApplicationContainer
-AppHelper::Install (std::string nodeName)
+AppHelper::Install(std::string nodeName)
 {
-  Ptr<Node> node = Names::Find<Node> (nodeName);
-  return Install (node);
+  Ptr<Node> node = Names::Find<Node>(nodeName);
+  return Install(node);
 }
-    
+
 ApplicationContainer
-AppHelper::Install (NodeContainer c)
+AppHelper::Install(NodeContainer c)
 {
   ApplicationContainer apps;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); ++i)
-    {
-      Ptr<Application> app = InstallPriv (*i);
-      if (app != 0)
-        apps.Add (app);
-    }
-    
+  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+    Ptr<Application> app = InstallPriv(*i);
+    if (app != 0)
+      apps.Add(app);
+  }
+
   return apps;
 }
-    
+
 Ptr<Application>
-AppHelper::InstallPriv (Ptr<Node> node)
+AppHelper::InstallPriv(Ptr<Node> node)
 {
 #ifdef NS3_MPI
-  if (MpiInterface::IsEnabled () &&
-      node->GetSystemId () != MpiInterface::GetSystemId ())
-    {
-      // don't create an app if MPI is enabled and node is not in the correct partition
-      return 0;
-    }
+  if (MpiInterface::IsEnabled() && node->GetSystemId() != MpiInterface::GetSystemId()) {
+    // don't create an app if MPI is enabled and node is not in the correct partition
+    return 0;
+  }
 #endif
-  
-  Ptr<Application> app = m_factory.Create<Application> ();        
-  node->AddApplication (app);
-        
+
+  Ptr<Application> app = m_factory.Create<Application>();
+  node->AddApplication(app);
+
   return app;
 }
 

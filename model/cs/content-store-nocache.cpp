@@ -17,7 +17,7 @@
  *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  *         Ilya Moiseenko <iliamo@cs.ucla.edu>
- *         
+ *
  */
 
 #include "content-store-nocache.hpp"
@@ -25,72 +25,70 @@
 #include "ns3/log.h"
 #include "ns3/packet.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.cs.Nocache");
+NS_LOG_COMPONENT_DEFINE("ndn.cs.Nocache");
 
 namespace ns3 {
 namespace ndn {
 namespace cs {
 
-NS_OBJECT_ENSURE_REGISTERED (Nocache);
+NS_OBJECT_ENSURE_REGISTERED(Nocache);
 
-TypeId 
-Nocache::GetTypeId (void)
+TypeId
+Nocache::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::cs::Nocache")
-    .SetGroupName ("Ndn")
-    .SetParent<ContentStore> ()
-    .AddConstructor< Nocache > ()
-    ;
+  static TypeId tid = TypeId("ns3::ndn::cs::Nocache")
+                        .SetGroupName("Ndn")
+                        .SetParent<ContentStore>()
+                        .AddConstructor<Nocache>();
 
   return tid;
 }
 
-Nocache::Nocache ()
+Nocache::Nocache()
 {
 }
 
-Nocache::~Nocache () 
+Nocache::~Nocache()
 {
 }
 
 Ptr<Data>
-Nocache::Lookup (Ptr<const Interest> interest)
+Nocache::Lookup(Ptr<const Interest> interest)
 {
-  this->m_cacheMissesTrace (interest);
+  this->m_cacheMissesTrace(interest);
   return 0;
 }
 
 bool
-Nocache::Add (Ptr<const Data> data)
+Nocache::Add(Ptr<const Data> data)
 {
   return false;
 }
 
 void
-Nocache::Print (std::ostream &os) const
+Nocache::Print(std::ostream& os) const
 {
 }
 
 uint32_t
-Nocache::GetSize () const
+Nocache::GetSize() const
 {
   return 0;
 }
 
 Ptr<cs::Entry>
-Nocache::Begin ()
+Nocache::Begin()
 {
   return 0;
 }
 
 Ptr<cs::Entry>
-Nocache::End ()
+Nocache::End()
 {
   return 0;
 }
 
-Ptr<cs::Entry>
-Nocache::Next (Ptr<cs::Entry>)
+Ptr<cs::Entry> Nocache::Next(Ptr<cs::Entry>)
 {
   return 0;
 }

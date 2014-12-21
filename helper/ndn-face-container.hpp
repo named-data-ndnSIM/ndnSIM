@@ -34,30 +34,30 @@ namespace ndn {
 /**
  * @ingroup ndn-helpers
  * \brief A pool for Ndn faces
- * 
+ *
  * Provides tools to perform basic manipulation on faces, such as
  * setting metrics and states on faces
  *
  * \see NdnStackHelper
  */
-class FaceContainer : public SimpleRefCount<FaceContainer>
-{
+class FaceContainer : public SimpleRefCount<FaceContainer> {
 private:
-  typedef std::vector< Ptr<Face> > Container;
+  typedef std::vector<Ptr<Face>> Container;
+
 public:
   typedef Container::const_iterator Iterator; ///< \brief Iterator over FaceContainer
 
   /**
    * \brief Create an empty FaceContainer.
    */
-  FaceContainer ();
+  FaceContainer();
 
   /**
    * \brief Copy constructor for FaceContainer. Calls AddAll method
    *
    * \see FaceContainer::AddAll
    */
-  FaceContainer (const FaceContainer &other);
+  FaceContainer(const FaceContainer& other);
 
   /**
    * \brief Copy operator for FaceContainer. Empties vector and calls AddAll method
@@ -66,21 +66,24 @@ public:
    *
    * \see FaceContainer::AddAll
    */
-  FaceContainer& operator= (const FaceContainer &other);
-  
+  FaceContainer&
+  operator=(const FaceContainer& other);
+
   /**
    * \brief Add all entries from other container
    *
    * \param other smart pointer to a container
    */
-  void AddAll (Ptr<FaceContainer> other);
+  void
+  AddAll(Ptr<FaceContainer> other);
 
   /**
    * \brief Add all entries from other container
    *
    * \param other container
    */
-  void AddAll (const FaceContainer &other);
+  void
+  AddAll(const FaceContainer& other);
 
   /**
    * \brief Get an iterator which refers to the first pair in the
@@ -88,22 +91,25 @@ public:
    *
    * \returns an iterator which refers to the first pair in the container.
    */
-  Iterator Begin () const;
+  Iterator
+  Begin() const;
 
   /**
-   * \brief Get an iterator which indicates past-the-last Node in the 
+   * \brief Get an iterator which indicates past-the-last Node in the
    * container.
    *
    * \returns an iterator which indicates an ending condition for a loop.
    */
-  Iterator End () const;
+  Iterator
+  End() const;
 
   /**
    * \brief Get the number of faces stored in this container
    *
    * \returns the number of faces stored in this container
    */
-  uint32_t GetN () const;
+  uint32_t
+  GetN() const;
 
   // /**
   //  * \brief Set a metric for all faces in the container
@@ -119,7 +125,8 @@ public:
    *
    * @see Face
    */
-  void Add (const Ptr<Face> &face);
+  void
+  Add(const Ptr<Face>& face);
 
   /**
    * Get a smart pointer to Face-derived object stored in the container
@@ -130,7 +137,8 @@ public:
    *
    * @see Face
    */
-  Ptr<Face> Get (Iterator i) const;
+  Ptr<Face>
+  Get(Iterator i) const;
 
 private:
   Container m_faces;

@@ -30,54 +30,51 @@ namespace ndn {
 namespace ndnSIM {
 namespace detail {
 
-template <class T>
-struct wrap
-{
+template<class T>
+struct wrap {
   T value_;
 };
 
-template< class Vector >
+template<class Vector>
 struct multi_type_container
-  : public boost::mpl::inherit_linearly< Vector, boost::mpl::inherit<wrap<boost::mpl::_2>, boost::mpl::_1 >
-  >::type
-{
+  : public boost::mpl::inherit_linearly<Vector, boost::mpl::inherit<wrap<boost::mpl::_2>,
+                                                                    boost::mpl::_1>>::type {
   template<int N>
-  struct index
-  {
+  struct index {
     typedef typename boost::mpl::at_c<Vector, N>::type type;
   };
-  
+
   template<class T>
-  T &
-  get ()
+  T&
+  get()
   {
-    return static_cast< wrap<T> &> (*this).value_;
+    return static_cast<wrap<T>&>(*this).value_;
   }
 
   template<class T>
-  const T &
-  get () const
+  const T&
+  get() const
   {
-    return static_cast< const wrap<T> &> (*this).value_;
-  }
-  
-  template<int N>
-  typename boost::mpl::at_c<Vector, N>::type &
-  get ()
-  {
-    typedef typename boost::mpl::at_c<Vector, N>::type T;
-    return static_cast< wrap<T> &> (*this).value_;
+    return static_cast<const wrap<T>&>(*this).value_;
   }
 
   template<int N>
-  const typename boost::mpl::at_c<Vector, N>::type &
-  get () const
+  typename boost::mpl::at_c<Vector, N>::type&
+  get()
   {
     typedef typename boost::mpl::at_c<Vector, N>::type T;
-    return static_cast< const wrap<T> &> (*this).value_;
+    return static_cast<wrap<T>&>(*this).value_;
+  }
+
+  template<int N>
+  const typename boost::mpl::at_c<Vector, N>::type&
+  get() const
+  {
+    typedef typename boost::mpl::at_c<Vector, N>::type T;
+    return static_cast<const wrap<T>&>(*this).value_;
   }
 };
-  
+
 } // detail
 } // ndnSIM
 } // ndn

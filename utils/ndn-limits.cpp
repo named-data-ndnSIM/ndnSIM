@@ -24,44 +24,40 @@
 #include "ns3/simulator.h"
 #include "ns3/random-variable.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.Limits");
+NS_LOG_COMPONENT_DEFINE("ndn.Limits");
 
 namespace ns3 {
 namespace ndn {
 
 TypeId
-Limits::GetTypeId ()
+Limits::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::ndn::Limits")
-    .SetGroupName ("Ndn")
-    .SetParent <Object> ()
-    
+  static TypeId tid = TypeId("ns3::ndn::Limits").SetGroupName("Ndn").SetParent<Object>()
+
     ;
   return tid;
 }
 
-Limits::Limits ()
-  : m_maxRate (-1)
-  , m_maxDelay (1.0)
-  , m_handler (MakeNullCallback<void> ())
-  , m_linkDelay (0)
+Limits::Limits()
+  : m_maxRate(-1)
+  , m_maxDelay(1.0)
+  , m_handler(MakeNullCallback<void>())
+  , m_linkDelay(0)
 {
 }
 
-
 void
-Limits::RegisterAvailableSlotCallback (CallbackHandler handler)
+Limits::RegisterAvailableSlotCallback(CallbackHandler handler)
 {
   m_handler = handler;
 }
 
 void
-Limits::FireAvailableSlotCallback ()
+Limits::FireAvailableSlotCallback()
 {
-  if (!m_handler.IsNull ())
-    m_handler ();
+  if (!m_handler.IsNull())
+    m_handler();
 }
-
 
 } // namespace ndn
 } // namespace ns3

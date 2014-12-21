@@ -19,7 +19,7 @@
  */
 
 #ifndef _NDN_LIMITS_RATE_H_
-#define	_NDN_LIMITS_RATE_H_
+#define _NDN_LIMITS_RATE_H_
 
 #include "ndn-limits.hpp"
 #include <ns3/nstime.h>
@@ -31,74 +31,74 @@ namespace ndn {
  * \ingroup ndn-fw
  * \brief Structure to manage limits for outstanding interests
  */
-class LimitsRate :
-    public Limits
-{
+class LimitsRate : public Limits {
 public:
   typedef Limits super;
 
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
   /**
    * \brief Constructor
    * \param prefix smart pointer to the prefix for the FIB entry
    */
-  LimitsRate ()
-    : m_isLeakScheduled (false)
-    , m_bucketMax (0)
-    , m_bucketLeak (1)
-    , m_bucket (0)
-  { }
+  LimitsRate()
+    : m_isLeakScheduled(false)
+    , m_bucketMax(0)
+    , m_bucketLeak(1)
+    , m_bucket(0)
+  {
+  }
 
-  virtual
-  ~LimitsRate () { }
+  virtual ~LimitsRate()
+  {
+  }
 
   virtual void
-  SetLimits (double rate, double delay);
+  SetLimits(double rate, double delay);
 
-  virtual
-  double
-  GetMaxLimit () const
+  virtual double
+  GetMaxLimit() const
   {
-    return GetMaxRate ();
+    return GetMaxRate();
   }
 
   /**
    * @brief Check if Interest limit is reached (token bucket is not empty)
    */
   virtual bool
-  IsBelowLimit ();
+  IsBelowLimit();
 
   /**
    * @brief Get token from the bucket
    */
   virtual void
-  BorrowLimit ();
+  BorrowLimit();
 
   /**
    * @brief Does nothing (token bucket leakage is time-dependent only)
    */
   virtual void
-  ReturnLimit ();
+  ReturnLimit();
 
   /**
-   * @brief Update normalized amount that should be leaked every second (token bucket leak rate) and leak rate
+   * @brief Update normalized amount that should be leaked every second (token bucket leak rate) and
+   * leak rate
    */
   virtual void
-  UpdateCurrentLimit (double limit);
+  UpdateCurrentLimit(double limit);
 
   /**
    * @brief Get normalized amount that should be leaked every second (token bucket leak rate)
    */
   virtual double
-  GetCurrentLimit () const
+  GetCurrentLimit() const
   {
     return m_bucketLeak;
   }
 
   virtual double
-  GetCurrentLimitRate () const
+  GetCurrentLimitRate() const
   {
     return m_bucketLeak;
   }
@@ -106,7 +106,7 @@ public:
 protected:
   // from Node
   void
-  NotifyNewAggregate ();
+  NotifyNewAggregate();
 
 private:
   /**
@@ -115,18 +115,20 @@ private:
    * @param interval Time interval for leakage. Used to calculate size of the leak
    */
   void
-  LeakBucket (double interval);
+  LeakBucket(double interval);
 
 private:
   bool m_isLeakScheduled;
 
-  double m_bucketMax;   ///< \brief Maximum Interest allowance for this face (maximum tokens that can be issued at the same time)
-  double m_bucketLeak;  ///< \brief Normalized amount that should be leaked every second (token bucket leak rate)
-  double m_bucket;      ///< \brief Value representing current size of the Interest allowance for this face (current size of token bucket)
+  double m_bucketMax; ///< \brief Maximum Interest allowance for this face (maximum tokens that can
+  /// be issued at the same time)
+  double m_bucketLeak; ///< \brief Normalized amount that should be leaked every second (token
+  /// bucket leak rate)
+  double m_bucket; ///< \brief Value representing current size of the Interest allowance for this
+  /// face (current size of token bucket)
 
   Time m_leakRandomizationInteral;
 };
-
 
 } // namespace ndn
 } // namespace ns3

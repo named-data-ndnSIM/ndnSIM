@@ -55,12 +55,10 @@ class Data;
  *
  * \see ndn::AppFace, ndn::NetDeviceFace
  */
-class Face :
-    public Object
-{
+class Face : public Object {
 public:
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
   /**
    * \brief NDN protocol handlers
@@ -68,20 +66,20 @@ public:
    * \param face Face from which packet has been received
    * \param packet Original packet
    */
-  typedef Callback<void, Ptr<Face>, Ptr<Interest> > InterestHandler;
-  typedef Callback<void, Ptr<Face>, Ptr<Data> > DataHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<Interest>> InterestHandler;
+  typedef Callback<void, Ptr<Face>, Ptr<Data>> DataHandler;
 
   /**
    * \brief Default constructor
    */
-  Face (Ptr<Node> node);
+  Face(Ptr<Node> node);
   virtual ~Face();
 
   /**
    * @brief Get node to which this face is associated
    */
   Ptr<Node>
-  GetNode () const;
+  GetNode() const;
 
   ////////////////////////////////////////////////////////////////////
 
@@ -91,7 +89,7 @@ public:
    * This method should call protocol-dependent registration function
    */
   virtual void
-  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
+  RegisterProtocolHandlers(const InterestHandler& interestHandler, const DataHandler& dataHandler);
 
   /**
    * \brief Un-Register callback to call when new packet arrives on the face
@@ -99,7 +97,7 @@ public:
    * This method should call protocol-dependent registration function
    */
   virtual void
-  UnRegisterProtocolHandlers ();
+  UnRegisterProtocolHandlers();
 
   /**
    * @brief Send out interest through the face
@@ -109,7 +107,7 @@ public:
    * @returns true if interest is considered to be send out (enqueued)
    */
   virtual bool
-  SendInterest (Ptr<const Interest> interest);
+  SendInterest(Ptr<const Interest> interest);
 
   /**
    * @brief Send out Dat packet through the face
@@ -119,7 +117,7 @@ public:
    * @returns true if Data packet is considered to be send out (enqueued)
    */
   virtual bool
-  SendData (Ptr<const Data> data);
+  SendData(Ptr<const Data> data);
 
   /**
    * \brief Receive interest from application or another node and forward it up to the NDN stack
@@ -127,7 +125,7 @@ public:
    * By default it is called from inside Receive method, but can be used directly, if appropriate
    */
   virtual bool
-  ReceiveInterest (Ptr<Interest> interest);
+  ReceiveInterest(Ptr<Interest> interest);
 
   /**
    * \brief Receive Data packet from application or another node and forward it up to the NDN stack
@@ -135,7 +133,7 @@ public:
    * By default it is called from inside Receive method, but can be used directly, if appropriate
    */
   virtual bool
-  ReceiveData (Ptr<Data> data);
+  ReceiveData(Ptr<Data> data);
   ////////////////////////////////////////////////////////////////////
 
   /**
@@ -144,7 +142,7 @@ public:
    * \param metric configured routing metric (cost) of this face
    */
   virtual void
-  SetMetric (uint16_t metric);
+  SetMetric(uint16_t metric);
 
   /**
    * \brief Get routing/forwarding metric assigned to the face
@@ -152,7 +150,7 @@ public:
    * \returns configured routing/forwarding metric (cost) of this face
    */
   virtual uint16_t
-  GetMetric (void) const;
+  GetMetric(void) const;
 
   /**
    * These are face states and may be distinct from actual lower-layer
@@ -164,39 +162,39 @@ public:
    * \brief Enable or disable this face
    */
   inline void
-  SetUp (bool up = true);
+  SetUp(bool up = true);
 
   /**
    * \brief Returns true if this face is enabled, false otherwise.
    */
   inline bool
-  IsUp () const;
+  IsUp() const;
 
   /**
    * @brief Get face flags
    *
-   * Face flags may indicate various properties of the face.  For example, if the face is an application face,
+   * Face flags may indicate various properties of the face.  For example, if the face is an
+   *application face,
    * than the returned flags have Face::APPLICATION bit set.
    *
    * @see ndn::Face::Flags for the list of currently defined face flags
    */
   inline uint32_t
-  GetFlags () const;
+  GetFlags() const;
 
   /**
    * @brief List of currently defined face flags
    */
-  enum Flags
-    {
-      APPLICATION = 1 ///< @brief An application face
-    };
+  enum Flags {
+    APPLICATION = 1 ///< @brief An application face
+  };
 
   /**
    * @brief Print information about the face into the stream
    * @param os stream to write information to
    */
   virtual std::ostream&
-  Print (std::ostream &os) const;
+  Print(std::ostream& os) const;
 
   /**
    * \brief Set face Id
@@ -206,7 +204,7 @@ public:
    * \param id id to set
    */
   inline void
-  SetId (uint32_t id);
+  SetId(uint32_t id);
 
   /**
    * \brief Get face Id
@@ -216,7 +214,7 @@ public:
    * \returns id id to set
    */
   inline uint32_t
-  GetId () const;
+  GetId() const;
 
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -224,7 +222,7 @@ public:
    * Internal index is used for comparison.
    */
   bool
-  operator== (const Face &face) const;
+  operator==(const Face& face) const;
 
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -232,7 +230,7 @@ public:
    * Internal index is used for comparison.
    */
   inline bool
-  operator!= (const Face &face) const;
+  operator!=(const Face& face) const;
 
   /**
    * \brief Compare two faces. Only two faces on the same node could be compared.
@@ -240,30 +238,31 @@ public:
    * Internal index is used for comparison.
    */
   bool
-  operator< (const Face &face) const;
+  operator<(const Face& face) const;
 
 protected:
   /**
    * @brief Send packet down to the stack (towards app or network)
    */
   virtual bool
-  Send (Ptr<Packet> packet);
+  Send(Ptr<Packet> packet);
 
   /**
    * @brief Send packet up to the stack (towards forwarding strategy)
    */
   virtual bool
-  Receive (Ptr<const Packet> p);
+  Receive(Ptr<const Packet> p);
 
   /**
    * @brief Set face flags
    */
   void
-  SetFlags (uint32_t flags);
+  SetFlags(uint32_t flags);
 
 private:
-  Face (const Face &); ///< \brief Disabled copy constructor
-  Face& operator= (const Face &); ///< \brief Disabled copy operator
+  Face(const Face&); ///< \brief Disabled copy constructor
+  Face&
+  operator=(const Face&); ///< \brief Disabled copy operator
 
 protected:
   Ptr<Node> m_node; ///< \brief Smart pointer to Node
@@ -272,46 +271,46 @@ private:
   InterestHandler m_upstreamInterestHandler;
   DataHandler m_upstreamDataHandler;
   bool m_ifup;
-  uint32_t m_id; ///< \brief id of the interface in NDN stack (per-node uniqueness)
+  uint32_t m_id;     ///< \brief id of the interface in NDN stack (per-node uniqueness)
   uint16_t m_metric; ///< \brief metric of the face
-  uint32_t m_flags; ///< @brief faces flags (e.g., APPLICATION)
+  uint32_t m_flags;  ///< @brief faces flags (e.g., APPLICATION)
 };
 
 std::ostream&
-operator<< (std::ostream& os, const Face &face);
+operator<<(std::ostream& os, const Face& face);
 
 inline bool
-Face::IsUp (void) const
+Face::IsUp(void) const
 {
   return m_ifup;
 }
 
 inline void
-Face::SetUp (bool up/* = true*/)
+Face::SetUp(bool up /* = true*/)
 {
   m_ifup = up;
 }
 
 inline uint32_t
-Face::GetFlags () const
+Face::GetFlags() const
 {
   return m_flags;
 }
 
 inline bool
-operator < (const Ptr<Face> &lhs, const Ptr<Face> &rhs)
+operator<(const Ptr<Face>& lhs, const Ptr<Face>& rhs)
 {
   return *lhs < *rhs;
 }
 
 void
-Face::SetId (uint32_t id)
+Face::SetId(uint32_t id)
 {
   m_id = id;
 }
 
 uint32_t
-Face::GetId () const
+Face::GetId() const
 {
   return m_id;
 }

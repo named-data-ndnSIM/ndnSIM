@@ -26,7 +26,7 @@
 
 namespace ns3 {
 namespace ndn {
-  
+
 /**
  * \ingroup ndn-face
  * \brief Implementation of layer-2 (Ethernet) Ndn face
@@ -41,11 +41,10 @@ namespace ndn {
  *
  * \see NdnAppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
  */
-class NetDeviceFace  : public Face
-{
+class NetDeviceFace : public Face {
 public:
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
   /**
    * \brief Constructor
@@ -54,27 +53,27 @@ public:
    * @param netDevice a smart pointer to NetDevice object to which
    * this face will be associate
    */
-  NetDeviceFace (Ptr<Node> node, const Ptr<NetDevice> &netDevice);
+  NetDeviceFace(Ptr<Node> node, const Ptr<NetDevice>& netDevice);
   virtual ~NetDeviceFace();
 
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from NdnFace
   virtual void
-  RegisterProtocolHandlers (const InterestHandler &interestHandler, const DataHandler &dataHandler);
+  RegisterProtocolHandlers(const InterestHandler& interestHandler, const DataHandler& dataHandler);
 
   virtual void
-  UnRegisterProtocolHandlers ();
-  
+  UnRegisterProtocolHandlers();
+
 protected:
   virtual bool
-  Send (Ptr<Packet> p);
+  Send(Ptr<Packet> p);
 
 public:
   /**
    * @brief Print out name of the NdnFace to the stream
    */
   virtual std::ostream&
-  Print (std::ostream &os) const;
+  Print(std::ostream& os) const;
   ////////////////////////////////////////////////////////////////////
 
   /**
@@ -82,19 +81,18 @@ public:
    *
    * \returns smart pointer to NetDevice associated with the face
    */
-  Ptr<NetDevice> GetNetDevice () const;
+  Ptr<NetDevice>
+  GetNetDevice() const;
 
 private:
-  NetDeviceFace (const NetDeviceFace &); ///< \brief Disabled copy constructor
-  NetDeviceFace& operator= (const NetDeviceFace &); ///< \brief Disabled copy operator
+  NetDeviceFace(const NetDeviceFace&); ///< \brief Disabled copy constructor
+  NetDeviceFace&
+  operator=(const NetDeviceFace&); ///< \brief Disabled copy operator
 
   /// \brief callback from lower layers
-  void ReceiveFromNetDevice (Ptr<NetDevice> device,
-                             Ptr<const Packet> p,
-                             uint16_t protocol,
-                             const Address &from,
-                             const Address &to,
-                             NetDevice::PacketType packetType);
+  void
+  ReceiveFromNetDevice(Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
+                       const Address& from, const Address& to, NetDevice::PacketType packetType);
 
 private:
   Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
@@ -103,4 +101,4 @@ private:
 } // namespace ndn
 } // namespace ns3
 
-#endif //NDN_NET_DEVICE_FACE_H
+#endif // NDN_NET_DEVICE_FACE_H

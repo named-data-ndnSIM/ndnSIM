@@ -53,7 +53,7 @@ class ForwardingStrategy;
  * the NDN stack implementation:
  * -# register a face (Face-derived object) for use by the NDN
  *    layer
- * 
+ *
  * Each Face-derived object has conceptually a single NDN
  * interface associated with it.
  *
@@ -61,18 +61,17 @@ class ForwardingStrategy;
  *
  * \see Face, ForwardingStrategy
  */
-class L3Protocol :
-    public Object
-{
+class L3Protocol : public Object {
 public:
-  typedef std::vector<Ptr<Face> > FaceList;
+  typedef std::vector<Ptr<Face>> FaceList;
 
   /**
    * \brief Interface ID
    *
    * \return interface ID
    */
-  static TypeId GetTypeId ();
+  static TypeId
+  GetTypeId();
 
   static const uint16_t ETHERNET_FRAME_TYPE; ///< @brief Ethernet Frame Type of Ndn
   static const uint16_t IP_STACK_PORT;       ///< @brief TCP/UDP port for NDN stack
@@ -82,7 +81,7 @@ public:
    * \brief Default constructor. Creates an empty stack without forwarding strategy set
    */
   L3Protocol();
-  virtual ~L3Protocol ();
+  virtual ~L3Protocol();
 
   /**
    * \brief Add face to Ndn stack
@@ -90,19 +89,19 @@ public:
    * \param face smart pointer to NdnFace-derived object
    * (NdnLocalFace, NdnNetDeviceFace, NdnUdpFace) \returns the
    * index of the Ndn interface added.
-   * 
+   *
    * \see NdnLocalFace, NdnNetDeviceFace, NdnUdpFace
    */
   virtual uint32_t
-  AddFace (const Ptr<Face> &face);
-  
+  AddFace(const Ptr<Face>& face);
+
   /**
    * \brief Get current number of faces added to Ndn stack
    *
    * \returns the number of faces
    */
   virtual uint32_t
-  GetNFaces () const;
+  GetNFaces() const;
 
   /**
    * \brief Get face by face index
@@ -110,48 +109,55 @@ public:
    * \returns The NdnFace associated with the Ndn face number.
    */
   virtual Ptr<Face>
-  GetFace (uint32_t face) const;
-  
+  GetFace(uint32_t face) const;
+
   /**
    * \brief Get face by face ID
    * \param face The face ID number
    * \returns The NdnFace associated with the Ndn face number.
    */
   virtual Ptr<Face>
-  GetFaceById (uint32_t face) const;
+  GetFaceById(uint32_t face) const;
 
   /**
    * \brief Remove face from ndn stack (remove callbacks)
    */
   virtual void
-  RemoveFace (Ptr<Face> face);
+  RemoveFace(Ptr<Face> face);
 
   /**
    * \brief Get face for NetDevice
    */
   virtual Ptr<Face>
-  GetFaceByNetDevice (Ptr<NetDevice> netDevice) const;
+  GetFaceByNetDevice(Ptr<NetDevice> netDevice) const;
 
 protected:
-  virtual void DoDispose (void); ///< @brief Do cleanup
+  virtual void
+  DoDispose(void); ///< @brief Do cleanup
 
   /**
-   * This function will notify other components connected to the node that a new stack member is now connected
-   * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them together.
+   * This function will notify other components connected to the node that a new stack member is now
+   * connected
+   * This will be used to notify Layer 3 protocol of layer 4 protocol stack to connect them
+   * together.
    */
-  virtual void NotifyNewAggregate ();
+  virtual void
+  NotifyNewAggregate();
 
 private:
-  L3Protocol(const L3Protocol &); ///< copy constructor is disabled
-  L3Protocol &operator = (const L3Protocol &); ///< copy operator is disabled
-  
+  L3Protocol(const L3Protocol&); ///< copy constructor is disabled
+  L3Protocol&
+  operator=(const L3Protocol&); ///< copy operator is disabled
+
 private:
-  uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to the stack
+  uint32_t m_faceCounter; ///< \brief counter of faces. Increased every time a new face is added to
+  /// the stack
   FaceList m_faces; ///< \brief list of faces that belongs to ndn stack on this node
 
   // These objects are aggregated, but for optimization, get them here
   Ptr<Node> m_node; ///< \brief node on which ndn stack is installed
-  Ptr<ForwardingStrategy> m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
+  Ptr<ForwardingStrategy>
+    m_forwardingStrategy; ///< \brief smart pointer to the selected forwarding strategy
 };
 
 } // namespace ndn

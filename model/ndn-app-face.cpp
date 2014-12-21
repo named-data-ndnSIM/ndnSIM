@@ -34,45 +34,42 @@
 #include "ndn-interest.hpp"
 #include "ndn-data.hpp"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.AppFace");
+NS_LOG_COMPONENT_DEFINE("ndn.AppFace");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (AppFace);
+NS_OBJECT_ENSURE_REGISTERED(AppFace);
 
 TypeId
-AppFace::GetTypeId ()
+AppFace::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::ndn::AppFace")
-    .SetParent<Face> ()
-    .SetGroupName ("Ndn")
-    ;
+  static TypeId tid = TypeId("ns3::ndn::AppFace").SetParent<Face>().SetGroupName("Ndn");
   return tid;
 }
 
-AppFace::AppFace (Ptr<App> app)
-  : Face (app->GetNode ())
-  , m_app (app)
+AppFace::AppFace(Ptr<App> app)
+  : Face(app->GetNode())
+  , m_app(app)
 {
-  NS_LOG_FUNCTION (this << app);
-  
-  NS_ASSERT (m_app != 0);
-  SetFlags (Face::APPLICATION);
+  NS_LOG_FUNCTION(this << app);
+
+  NS_ASSERT(m_app != 0);
+  SetFlags(Face::APPLICATION);
 }
 
-AppFace::~AppFace ()
+AppFace::~AppFace()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION_NOARGS();
 }
 
-AppFace::AppFace ()
-  : Face (0)
+AppFace::AppFace()
+  : Face(0)
 {
 }
 
-AppFace::AppFace (const AppFace &)
-  : Face (0)
+AppFace::AppFace(const AppFace&)
+  : Face(0)
 {
 }
 
@@ -83,39 +80,37 @@ AppFace::operator= (const AppFace &)
 }
 
 bool
-AppFace::SendInterest (Ptr<const Interest> interest)
+AppFace::SendInterest(Ptr<const Interest> interest)
 {
-  NS_LOG_FUNCTION (this << interest);
+  NS_LOG_FUNCTION(this << interest);
 
-  if (!IsUp ())
-    {
-      return false;
-    }
+  if (!IsUp()) {
+    return false;
+  }
 
-  if (interest->GetNack () > 0)
-    m_app->OnNack (interest);
+  if (interest->GetNack() > 0)
+    m_app->OnNack(interest);
   else
-    m_app->OnInterest (interest);
-  
+    m_app->OnInterest(interest);
+
   return true;
 }
 
 bool
-AppFace::SendData (Ptr<const Data> data)
+AppFace::SendData(Ptr<const Data> data)
 {
-  NS_LOG_FUNCTION (this << data);
+  NS_LOG_FUNCTION(this << data);
 
-  if (!IsUp ())
-    {
-      return false;
-    }
+  if (!IsUp()) {
+    return false;
+  }
 
-  m_app->OnData (data);
+  m_app->OnData(data);
   return true;
 }
 
 std::ostream&
-AppFace::Print (std::ostream& os) const
+AppFace::Print(std::ostream& os) const
 {
   os << "dev=local(" << GetId() << ")";
   return os;
@@ -123,4 +118,3 @@ AppFace::Print (std::ostream& os) const
 
 } // namespace ndn
 } // namespace ns3
-

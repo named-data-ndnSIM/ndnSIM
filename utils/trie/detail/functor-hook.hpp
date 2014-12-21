@@ -29,36 +29,43 @@ namespace ndnSIM {
 namespace detail {
 
 template<class BaseHook, class ValueType, int N>
-struct FunctorHook
-{
+struct FunctorHook {
   typedef typename BaseHook::template index<N>::type hook_type;
-  typedef hook_type*            hook_ptr;
-  typedef const hook_type*      const_hook_ptr;
-  
-  typedef ValueType             value_type;
-  typedef value_type*           pointer;
-  typedef const value_type*     const_pointer;
-  
-  //Required static functions
-  static hook_ptr to_hook_ptr (value_type &value)
-  {  return &value.policy_hook_.template get<N> (); }
-  
-  static const_hook_ptr to_hook_ptr(const value_type &value)
-  {  return &value.policy_hook_.template get<N> (); }
-  
-  static pointer to_value_ptr(hook_ptr n)
+  typedef hook_type* hook_ptr;
+  typedef const hook_type* const_hook_ptr;
+
+  typedef ValueType value_type;
+  typedef value_type* pointer;
+  typedef const value_type* const_pointer;
+
+  // Required static functions
+  static hook_ptr
+  to_hook_ptr(value_type& value)
   {
-    return
-      boost::intrusive::get_parent_from_member<value_type>
-      (static_cast<BaseHook*> (boost::intrusive::get_parent_from_member< wrap<hook_type> >(n, &wrap<hook_type>::value_)),
-       &value_type::policy_hook_);
+    return &value.policy_hook_.template get<N>();
   }
-  static const_pointer to_value_ptr(const_hook_ptr n)
+
+  static const_hook_ptr
+  to_hook_ptr(const value_type& value)
   {
-    return
-      boost::intrusive::get_parent_from_member<value_type>
-      (static_cast<const BaseHook*> (boost::intrusive::get_parent_from_member< wrap<hook_type> >(n, &wrap<hook_type>::value_)),
-       &value_type::policy_hook_);
+    return &value.policy_hook_.template get<N>();
+  }
+
+  static pointer
+  to_value_ptr(hook_ptr n)
+  {
+    return boost::intrusive::get_parent_from_member<value_type>(
+      static_cast<BaseHook*>(
+        boost::intrusive::get_parent_from_member<wrap<hook_type>>(n, &wrap<hook_type>::value_)),
+      &value_type::policy_hook_);
+  }
+  static const_pointer
+  to_value_ptr(const_hook_ptr n)
+  {
+    return boost::intrusive::get_parent_from_member<value_type>(
+      static_cast<const BaseHook*>(
+        boost::intrusive::get_parent_from_member<wrap<hook_type>>(n, &wrap<hook_type>::value_)),
+      &value_type::policy_hook_);
   }
 };
 

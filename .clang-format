@@ -1,0 +1,33 @@
+# This style requires customized clang-format from https://github.com/cawka/clang
+#
+BasedOnStyle: GNU
+---
+Language: Cpp
+AlwaysBreakAfterDefinitionReturnType: true
+AlwaysBreakAfterDeclarationReturnType: true
+ColumnLimit: 100
+SpaceBeforeParens: ControlStatements
+Cpp11BracedListStyle: true
+BreakBeforeBraces: Stroustrup
+PointerAlignment: Left
+PenaltyReturnTypeOnItsOwnLine: 0
+AllowShortBlocksOnASingleLine: false
+# AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+BreakConstructorInitializersBeforeComma: true
+NamespaceIndentation: None
+Standard: Cpp11
+
+AlwaysBreakTemplateDeclarations: true
+IndentWidth: 2
+PenaltyBreakBeforeFirstCallParameter: 500
+SpacesBeforeTrailingComments: 1
+UseTab: Never
+ConstructorInitializerIndentWidth: 2
+
+SpaceBetweenTemplateAndOpeningAngle: false
+BreakBeforeBinaryOperators: NonAssignment
+ContinuationIndentWidth: 2

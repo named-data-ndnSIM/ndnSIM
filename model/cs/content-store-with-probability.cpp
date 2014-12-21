@@ -25,14 +25,14 @@
 #include "../../utils/trie/fifo-policy.hpp"
 #include "../../utils/trie/lfu-policy.hpp"
 
-#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
-  static struct X ## type ## templ ## RegistrationClass \
-  {                                                     \
-    X ## type ## templ ## RegistrationClass () {        \
-      ns3::TypeId tid = type<templ>::GetTypeId ();      \
-      tid.GetParent ();                                 \
-    }                                                   \
-  } x_ ## type ## templ ## RegistrationVariable
+#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)                                             \
+  static struct X##type##templ##RegistrationClass {                                                \
+    X##type##templ##RegistrationClass()                                                            \
+    {                                                                                              \
+      ns3::TypeId tid = type<templ>::GetTypeId();                                                  \
+      tid.GetParent();                                                                             \
+    }                                                                                              \
+  } x_##type##templ##RegistrationVariable
 
 namespace ns3 {
 namespace ndn {
@@ -62,7 +62,6 @@ template class ContentStoreWithProbability<fifo_policy_traits>;
  **/
 template class ContentStoreWithProbability<lfu_policy_traits>;
 
-
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithProbability, lru_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithProbability, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithProbability, fifo_policy_traits);
@@ -73,25 +72,28 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithProbability, lfu_policy_traits
 // /**
 //  * \brief Content Store with freshness implementing LRU cache replacement policy
 //  */
-class Probability::Lru : public ContentStoreWithProbability<lru_policy_traits> { };
+class Probability::Lru : public ContentStoreWithProbability<lru_policy_traits> {
+};
 
 /**
  * \brief Content Store with freshness implementing FIFO cache replacement policy
  */
-class Probability::Fifo : public ContentStoreWithProbability<fifo_policy_traits> { };
+class Probability::Fifo : public ContentStoreWithProbability<fifo_policy_traits> {
+};
 
 /**
  * \brief Content Store with freshness implementing Random cache replacement policy
  */
-class Probability::Random : public ContentStoreWithProbability<random_policy_traits> { };
+class Probability::Random : public ContentStoreWithProbability<random_policy_traits> {
+};
 
 /**
  * \brief Content Store with freshness implementing Least Frequently Used cache replacement policy
  */
-class Probability::Lfu : public ContentStoreWithProbability<lfu_policy_traits> { };
+class Probability::Lfu : public ContentStoreWithProbability<lfu_policy_traits> {
+};
 
 #endif
-
 
 } // namespace cs
 } // namespace ndn

@@ -26,7 +26,7 @@
 #include "ns3/net-device-container.h"
 
 namespace ns3 {
-    
+
 // ------------------------------------------------------------
 // --------------------------------------------
 /**
@@ -36,15 +36,14 @@ namespace ns3 {
  *
  * Only weights and latencies file is supported
  */
-class RocketfuelWeightsReader : public AnnotatedTopologyReader
-{
+class RocketfuelWeightsReader : public AnnotatedTopologyReader {
 public:
-  RocketfuelWeightsReader (const std::string &path="", double scale=1.0);
-  virtual ~RocketfuelWeightsReader ();
+  RocketfuelWeightsReader(const std::string& path = "", double scale = 1.0);
+  virtual ~RocketfuelWeightsReader();
 
   void
-  SetFileType (uint8_t inputType);
-  
+  SetFileType(uint8_t inputType);
+
   /**
    * \brief Main topology reading function.
    *
@@ -55,69 +54,62 @@ public:
    *
    * \return the container of the nodes created (or empty container if there was an error)
    */
-  virtual NodeContainer 
-  Read (void);
+  virtual NodeContainer
+  Read(void);
 
   void
-  Commit ();
+  Commit();
 
-  enum
-    {
-      LINKS,
-      WEIGHTS,
-      LATENCIES,
-      POSITIONS
-    };
+  enum { LINKS, WEIGHTS, LATENCIES, POSITIONS };
 
   inline void
-  SetDefaultBandwidth (const std::string &bw);
+  SetDefaultBandwidth(const std::string& bw);
 
   inline std::string
-  GetDefaultBandwidth () const;
+  GetDefaultBandwidth() const;
 
   inline void
-  SetDefaultQueue (const std::string &queue);
+  SetDefaultQueue(const std::string& queue);
 
   inline std::string
-  GetDefaultQueue () const;
-  
+  GetDefaultQueue() const;
+
 private:
-  RocketfuelWeightsReader (const RocketfuelWeightsReader&);
-  RocketfuelWeightsReader& operator= (const RocketfuelWeightsReader&);
-  
+  RocketfuelWeightsReader(const RocketfuelWeightsReader&);
+  RocketfuelWeightsReader&
+  operator=(const RocketfuelWeightsReader&);
+
 private:
   uint8_t m_inputType;
   std::string m_defaultBandwidth; // since the topology files don't provide bandwidth parameter
   std::string m_queue;
-  
+
 }; // end class RocketfuelWeightsReader
 
 inline void
-RocketfuelWeightsReader::SetDefaultBandwidth (const std::string &bw)
+RocketfuelWeightsReader::SetDefaultBandwidth(const std::string& bw)
 {
   m_defaultBandwidth = bw;
 }
 
 inline std::string
-RocketfuelWeightsReader::GetDefaultBandwidth () const
+RocketfuelWeightsReader::GetDefaultBandwidth() const
 {
   return m_defaultBandwidth;
 }
 
 inline void
-RocketfuelWeightsReader::SetDefaultQueue (const std::string &queue)
+RocketfuelWeightsReader::SetDefaultQueue(const std::string& queue)
 {
   m_queue = queue;
 }
 
 inline std::string
-RocketfuelWeightsReader::GetDefaultQueue () const
+RocketfuelWeightsReader::GetDefaultQueue() const
 {
   return m_queue;
 }
 
-
 }; // end namespace ns3
-
 
 #endif /* ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H */

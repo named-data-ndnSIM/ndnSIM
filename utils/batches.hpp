@@ -31,15 +31,15 @@ namespace ns3 {
 
 /**
  * @ingroup ndn-apps
- * @brief Class representing sets of (time, number) tuples with support of reading writing to streams
+ * @brief Class representing sets of (time, number) tuples with support of reading writing to
+ * streams
  */
-class Batches : public std::list<boost::tuple<Time, uint32_t> >
-{
+class Batches : public std::list<boost::tuple<Time, uint32_t>> {
 public:
   /**
    * @brief Default constructor
    */
-  Batches () { };
+  Batches(){};
 
   /**
    * @brief Add tuple
@@ -47,28 +47,28 @@ public:
    * @param amount number for the tuple
    */
   void
-  Add (const Time &when, uint32_t amount)
+  Add(const Time& when, uint32_t amount)
   {
-    push_back (boost::make_tuple<Time, uint32_t> (when, amount));
+    push_back(boost::make_tuple<Time, uint32_t>(when, amount));
   }
 };
 
-ATTRIBUTE_HELPER_HEADER (Batches);
+ATTRIBUTE_HELPER_HEADER(Batches);
 
 /**
  * @brief Output contents of the Batches to the std::ostream
  * @param os reference to std::ostream
  * @param batch constant reference to Batch object
  */
-std::ostream &
-operator << (std::ostream &os, const Batches &batch);
+std::ostream&
+operator<<(std::ostream& os, const Batches& batch);
 
 /**
  * \brief Read components from input and add them to components. Will read input stream till eof
  * Substrings separated by slashes will become separate components
  */
-std::istream &
-operator >> (std::istream &is, Batches &batch);
+std::istream&
+operator>>(std::istream& is, Batches& batch);
 
 } // namespace ns3
 

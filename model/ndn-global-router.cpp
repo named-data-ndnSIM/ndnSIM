@@ -33,66 +33,62 @@ namespace ndn {
 
 uint32_t GlobalRouter::m_idCounter = 0;
 
-NS_OBJECT_ENSURE_REGISTERED (GlobalRouter);
+NS_OBJECT_ENSURE_REGISTERED(GlobalRouter);
 
-TypeId 
-GlobalRouter::GetTypeId ()
+TypeId
+GlobalRouter::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::ndn::GlobalRouter")
-    .SetGroupName ("Ndn")
-    .SetParent<Object> ()
-  ;
+  static TypeId tid = TypeId("ns3::ndn::GlobalRouter").SetGroupName("Ndn").SetParent<Object>();
   return tid;
 }
 
-GlobalRouter::GlobalRouter ()
+GlobalRouter::GlobalRouter()
 {
   m_id = m_idCounter;
-  m_idCounter ++;
+  m_idCounter++;
 }
 
 void
-GlobalRouter::NotifyNewAggregate ()
+GlobalRouter::NotifyNewAggregate()
 {
-  if (m_ndn == 0)
-    {
-      m_ndn = GetObject<L3Protocol> ();
-    }
-  Object::NotifyNewAggregate ();
+  if (m_ndn == 0) {
+    m_ndn = GetObject<L3Protocol>();
+  }
+  Object::NotifyNewAggregate();
 }
 
 uint32_t
-GlobalRouter::GetId () const
+GlobalRouter::GetId() const
 {
   return m_id;
 }
 
 Ptr<L3Protocol>
-GlobalRouter::GetL3Protocol () const
+GlobalRouter::GetL3Protocol() const
 {
   return m_ndn;
 }
 
 void
-GlobalRouter::AddLocalPrefix (Ptr< Name > prefix)
+GlobalRouter::AddLocalPrefix(Ptr<Name> prefix)
 {
-  m_localPrefixes.push_back (prefix);
+  m_localPrefixes.push_back(prefix);
 }
 
 void
-GlobalRouter::AddIncidency (Ptr< Face > face, Ptr< GlobalRouter > gr)
+GlobalRouter::AddIncidency(Ptr<Face> face, Ptr<GlobalRouter> gr)
 {
-  m_incidencies.push_back (make_tuple (this, face, gr));
+  m_incidencies.push_back(make_tuple(this, face, gr));
 }
 
-GlobalRouter::IncidencyList &
-GlobalRouter::GetIncidencies ()
+GlobalRouter::IncidencyList&
+GlobalRouter::GetIncidencies()
 {
   return m_incidencies;
 }
 
-const GlobalRouter::LocalPrefixList &
-GlobalRouter::GetLocalPrefixes () const
+const GlobalRouter::LocalPrefixList&
+GlobalRouter::GetLocalPrefixes() const
 {
   return m_localPrefixes;
 }

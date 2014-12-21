@@ -38,28 +38,29 @@ namespace ns3 {
  *
  * @todo Finish implementation
  */
-class L2RateTracer : public L2Tracer
-{
+class L2RateTracer : public L2Tracer {
 public:
   /**
    * @brief Network layer tracer constructor
    */
-  L2RateTracer (boost::shared_ptr<std::ostream> os, Ptr<Node> node);
-  virtual ~L2RateTracer ();
+  L2RateTracer(boost::shared_ptr<std::ostream> os, Ptr<Node> node);
+  virtual ~L2RateTracer();
 
   /**
    * @brief Helper method to install tracers on all simulation nodes
    *
    * @param file File to which traces will be written
    * @param averagingPeriod Defines averaging period for the rate calculation,
-   *        as well as how often data will be written into the trace file (default, every half second)
+   *        as well as how often data will be written into the trace file (default, every half
+   *second)
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This tuple needs to be preserved
+   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
+   *tuple needs to be preserved
    *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
   static void
-  InstallAll (const std::string &file, Time averagingPeriod = Seconds (0.5));
+  InstallAll(const std::string& file, Time averagingPeriod = Seconds(0.5));
 
   /**
    * @brief Explicit request to remove all statically created tracers
@@ -68,26 +69,26 @@ public:
    * or if it is desired to do a postprocessing of the resulting data
    */
   static void
-  Destroy ();
+  Destroy();
 
   void
-  SetAveragingPeriod (const Time &period);
+  SetAveragingPeriod(const Time& period);
 
   virtual void
-  PrintHeader (std::ostream &os) const;
+  PrintHeader(std::ostream& os) const;
 
   virtual void
-  Print (std::ostream &os) const;
+  Print(std::ostream& os) const;
 
   virtual void
-  Drop (Ptr<const Packet>);
+  Drop(Ptr<const Packet>);
 
 private:
   void
-  PeriodicPrinter ();
+  PeriodicPrinter();
 
   void
-  Reset ();
+  Reset();
 
 private:
   boost::shared_ptr<std::ostream> m_os;

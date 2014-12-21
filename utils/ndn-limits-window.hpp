@@ -19,7 +19,7 @@
  */
 
 #ifndef _NDN_LIMITS_WINDOW_H_
-#define	_NDN_LIMITS_WINDOW_H_
+#define _NDN_LIMITS_WINDOW_H_
 
 #include "ndn-limits.hpp"
 
@@ -30,83 +30,81 @@ namespace ndn {
  * \ingroup ndn-fw
  * \brief Structure to manage limits for outstanding interests (window-based limiting)
  */
-class LimitsWindow :
-    public Limits
-{
+class LimitsWindow : public Limits {
 public:
   typedef Limits super;
-  
+
   static TypeId
-  GetTypeId ();
-  
+  GetTypeId();
+
   /**
    * @brief Default Constructor
    */
-  LimitsWindow ()
-  : m_outstanding (0)
-  { }
+  LimitsWindow()
+    : m_outstanding(0)
+  {
+  }
 
   /**
    * @brief Virtual destructor
    */
-  virtual
-  ~LimitsWindow () { }
+  virtual ~LimitsWindow()
+  {
+  }
 
   // from ndn::Limits
 
   virtual void
-  SetLimits (double rate, double delay)
+  SetLimits(double rate, double delay)
   {
-    super::SetLimits (rate, delay);
+    super::SetLimits(rate, delay);
 
-    m_curMaxLimit = GetMaxRate () * GetMaxDelay ();
+    m_curMaxLimit = GetMaxRate() * GetMaxDelay();
   }
 
-  virtual
-  double
-  GetMaxLimit () const
-  {
-    return GetMaxRate () * GetMaxDelay ();
-  }
-  
-  virtual void
-  UpdateCurrentLimit (double limit);
-  
   virtual double
-  GetCurrentLimit () const
+  GetMaxLimit() const
+  {
+    return GetMaxRate() * GetMaxDelay();
+  }
+
+  virtual void
+  UpdateCurrentLimit(double limit);
+
+  virtual double
+  GetCurrentLimit() const
   {
     return m_curMaxLimit;
   }
 
   virtual double
-  GetCurrentLimitRate () const
+  GetCurrentLimitRate() const
   {
-    return m_curMaxLimit / GetMaxDelay ();
+    return m_curMaxLimit / GetMaxDelay();
   }
-  
+
   /**
-   * @brief Check if current interest window (number of pending interests) if less than maximum 
+   * @brief Check if current interest window (number of pending interests) if less than maximum
    */
   virtual bool
-  IsBelowLimit ();
+  IsBelowLimit();
 
   /**
    * @brief Increase current window of outstanding interests
    */
   virtual void
-  BorrowLimit ();
+  BorrowLimit();
 
   /**
    * @brief Decrease current window of outstanding interests
    */
   virtual void
-  ReturnLimit ();
-  
+  ReturnLimit();
+
 private:
-  TracedValue< double > m_curMaxLimit;
-  TracedValue< double > m_outstanding;
+  TracedValue<double> m_curMaxLimit;
+  TracedValue<double> m_outstanding;
 };
-  
 
 } // namespace ndn
 } // namespace ns3

@@ -32,20 +32,17 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("ndn.UdpFace");
+NS_LOG_COMPONENT_DEFINE("ndn.UdpFace");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (UdpFace);
+NS_OBJECT_ENSURE_REGISTERED(UdpFace);
 
 TypeId
-UdpFace::GetTypeId ()
+UdpFace::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::ndn::UdpFace")
-    .SetParent<Face> ()
-    .SetGroupName ("Ndn")
-    ;
+  static TypeId tid = TypeId("ns3::ndn::UdpFace").SetParent<Face>().SetGroupName("Ndn");
   return tid;
 }
 
@@ -53,17 +50,17 @@ UdpFace::GetTypeId ()
  * By default, Ndn face are created in the "down" state.  Before
  * becoming useable, the user must invoke SetUp on the face
  */
-UdpFace::UdpFace (Ptr<Node> node, Ptr<Socket> socket, Ipv4Address address)
-  : Face (node)
-  , m_socket (socket)
-  , m_address (address)
+UdpFace::UdpFace(Ptr<Node> node, Ptr<Socket> socket, Ipv4Address address)
+  : Face(node)
+  , m_socket(socket)
+  , m_address(address)
 {
-  SetMetric (1); // default metric
+  SetMetric(1); // default metric
 }
 
-UdpFace::~UdpFace ()
+UdpFace::~UdpFace()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION_NOARGS();
 }
 
 UdpFace& UdpFace::operator= (const UdpFace &)
@@ -72,35 +69,34 @@ UdpFace& UdpFace::operator= (const UdpFace &)
 }
 
 bool
-UdpFace::ReceiveFromUdp (Ptr<const Packet> p)
+UdpFace::ReceiveFromUdp(Ptr<const Packet> p)
 {
-  return Face::Receive (p);
+  return Face::Receive(p);
 }
 
 bool
-UdpFace::Send (Ptr<Packet> packet)
+UdpFace::Send(Ptr<Packet> packet)
 {
-  if (!Face::Send (packet))
-    {
-      return false;
-    }
-  
-  NS_LOG_FUNCTION (this << packet);
-  m_socket->Send (packet);
+  if (!Face::Send(packet)) {
+    return false;
+  }
+
+  NS_LOG_FUNCTION(this << packet);
+  m_socket->Send(packet);
 
   return true;
 }
 
 Ipv4Address
-UdpFace::GetAddress () const
+UdpFace::GetAddress() const
 {
   return m_address;
 }
 
 std::ostream&
-UdpFace::Print (std::ostream& os) const
+UdpFace::Print(std::ostream& os) const
 {
-  os << "dev=udp(" << GetId () << "," << GetAddress () << ")";
+  os << "dev=udp(" << GetId() << "," << GetAddress() << ")";
   return os;
 }
 

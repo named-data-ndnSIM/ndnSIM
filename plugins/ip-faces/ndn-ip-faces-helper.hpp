@@ -38,32 +38,32 @@ namespace ndn {
  * @ingroup ndn-helpers
  * @brief Helper for NDN IP-based face creation
  */
-class IpFacesHelper
-{
+class IpFacesHelper {
 public:
   /**
    * @brief Install IpFaceStack interface on a node
    * @param node Node to install IpFaceStack interface
    */
   static void
-  Install (Ptr<Node> node);
+  Install(Ptr<Node> node);
 
   /**
    * @brief Install IpFaceStack interface on nodes
    * @param nodes NodeContainer to install IpFaceStack interface
    */
   static void
-  Install (const NodeContainer &nodes);
+  Install(const NodeContainer& nodes);
 
   /**
    * @brief Install IpFaceStack interface on all nodes
    */
   static void
-  InstallAll ();
+  InstallAll();
 
   /**
    * @brief Create TCP face
-   * @param when    Time when to create face (use `Seconds (0)' if face should be created right away)
+   * @param when    Time when to create face (use `Seconds (0)' if face should be created right
+   *away)
    * @param node    Node to add TCP face (will initiate connection)
    * @param address IP address to connect (using standard 9695 port)
    * @param prefix  Prefix to associate with the face
@@ -76,13 +76,15 @@ public:
    * update FIB with requested prefix
    */
   static void
-  CreateTcpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric = 1);
+  CreateTcpFace(const Time& when, Ptr<Node> node, Ipv4Address address, const std::string& prefix,
+                int16_t metric = 1);
 
   /**
    * @brief Create TCP face
    */
   static void
-  CreateUdpFace (const Time &when, Ptr<Node> node, Ipv4Address address, const std::string &prefix, int16_t metric = 1);
+  CreateUdpFace(const Time& when, Ptr<Node> node, Ipv4Address address, const std::string& prefix,
+                int16_t metric = 1);
 };
 
 } // namespace ndn

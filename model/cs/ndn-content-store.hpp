@@ -20,7 +20,7 @@
  */
 
 #ifndef NDN_CONTENT_STORE_H
-#define	NDN_CONTENT_STORE_H
+#define NDN_CONTENT_STORE_H
 
 #include "ns3/object.h"
 #include "ns3/ptr.h"
@@ -54,8 +54,7 @@ namespace cs {
  * @ingroup ndn-cs
  * @brief NDN content store entry
  */
-class Entry : public SimpleRefCount<Entry>
-{
+class Entry : public SimpleRefCount<Entry> {
 public:
   /**
    * \brief Construct content store entry
@@ -66,27 +65,27 @@ public:
    * The constructor will make a copy of the supplied packet and calls
    * RemoveHeader and RemoveTail on the copy.
    */
-  Entry (Ptr<ContentStore> cs, Ptr<const Data> data);
+  Entry(Ptr<ContentStore> cs, Ptr<const Data> data);
 
   /**
    * \brief Get prefix of the stored entry
    * \returns prefix of the stored entry
    */
   const Name&
-  GetName () const;
+  GetName() const;
 
   /**
    * \brief Get Data of the stored entry
    * \returns Data of the stored entry
    */
   Ptr<const Data>
-  GetData () const;
+  GetData() const;
 
   /**
    * @brief Get pointer to access store, to which this entry is added
    */
   Ptr<ContentStore>
-  GetContentStore ();
+  GetContentStore();
 
 private:
   Ptr<ContentStore> m_cs; ///< \brief content store to which entry is added
@@ -95,29 +94,26 @@ private:
 
 } // namespace cs
 
-
 /**
  * @ingroup ndn-cs
  * \brief Base class for NDN content store
  *
  * Particular implementations should implement Lookup, Add, and Print methods
  */
-class ContentStore : public Object
-{
+class ContentStore : public Object {
 public:
   /**
    * \brief Interface ID
    *
    * \return interface ID
    */
-  static
-  TypeId GetTypeId ();
+  static TypeId
+  GetTypeId();
 
   /**
    * @brief Virtual destructor
    */
-  virtual
-  ~ContentStore ();
+  virtual ~ContentStore();
 
   /**
    * \brief Find corresponding CS entry for the given interest
@@ -129,7 +125,7 @@ public:
    * used entries index, \see m_contentStore
    */
   virtual Ptr<Data>
-  Lookup (Ptr<const Interest> interest) = 0;
+  Lookup(Ptr<const Interest> interest) = 0;
 
   /**
    * \brief Add a new content to the content store.
@@ -140,7 +136,7 @@ public:
    * @returns true if an existing entry was updated, false otherwise
    */
   virtual bool
-  Add (Ptr<const Data> data) = 0;
+  Add(Ptr<const Data> data) = 0;
 
   // /*
   //  * \brief Add a new content to the content store.
@@ -155,32 +151,30 @@ public:
    * \brief Print out content store entries
    */
   virtual void
-  Print (std::ostream &os) const = 0;
-
+  Print(std::ostream& os) const = 0;
 
   /**
    * @brief Get number of entries in content store
    */
   virtual uint32_t
-  GetSize () const = 0;
+  GetSize() const = 0;
 
   /**
    * @brief Return first element of content store (no order guaranteed)
    */
   virtual Ptr<cs::Entry>
-  Begin () = 0;
+  Begin() = 0;
 
   /**
    * @brief Return item next after last (no order guaranteed)
    */
   virtual Ptr<cs::Entry>
-  End () = 0;
+  End() = 0;
 
   /**
    * @brief Advance the iterator
    */
-  virtual Ptr<cs::Entry>
-  Next (Ptr<cs::Entry>) = 0;
+  virtual Ptr<cs::Entry> Next(Ptr<cs::Entry>) = 0;
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -190,28 +184,27 @@ public:
    * @brief Static call to cheat python bindings
    */
   static inline Ptr<ContentStore>
-  GetContentStore (Ptr<Object> node);
+  GetContentStore(Ptr<Object> node);
 
 protected:
   TracedCallback<Ptr<const Interest>,
-                 Ptr<const Data> > m_cacheHitsTrace; ///< @brief trace of cache hits
+                 Ptr<const Data>> m_cacheHitsTrace; ///< @brief trace of cache hits
 
-  TracedCallback<Ptr<const Interest> > m_cacheMissesTrace; ///< @brief trace of cache misses
+  TracedCallback<Ptr<const Interest>> m_cacheMissesTrace; ///< @brief trace of cache misses
 };
 
 inline std::ostream&
-operator<< (std::ostream &os, const ContentStore &cs)
+operator<<(std::ostream& os, const ContentStore& cs)
 {
-  cs.Print (os);
+  cs.Print(os);
   return os;
 }
 
 inline Ptr<ContentStore>
-ContentStore::GetContentStore (Ptr<Object> node)
+ContentStore::GetContentStore(Ptr<Object> node)
 {
-  return node->GetObject<ContentStore> ();
+  return node->GetObject<ContentStore>();
 }
-
 
 } // namespace ndn
 } // namespace ns3

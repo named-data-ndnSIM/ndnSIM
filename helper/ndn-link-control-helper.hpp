@@ -30,10 +30,10 @@ namespace ndn {
 
 /**
  * @ingroup ndn-helpers
- * @brief Helper class to control the up or down statuss of an NDN link connecting two specific nodes
+ * @brief Helper class to control the up or down statuss of an NDN link connecting two specific
+ * nodes
  */
-class LinkControlHelper
-{ 
+class LinkControlHelper {
 public:
   /**
    * @brief Fail NDN link between two nodes
@@ -47,7 +47,7 @@ public:
    * @param node2 another node
    */
   static void
-  FailLink (Ptr<Node> node1, Ptr<Node> node2);
+  FailLink(Ptr<Node> node1, Ptr<Node> node2);
 
   /**
    * @brief Fail NDN link between two nodes
@@ -63,7 +63,7 @@ public:
    * @param node2 another node's name
    */
   static void
-  FailLinkByName (const std::string &node1, const std::string &node2);
+  FailLinkByName(const std::string& node1, const std::string& node2);
 
   /**
    * @brief Re-enable NDN link between two nodes
@@ -77,8 +77,8 @@ public:
    * @param node2 another node
    */
   static void
-  UpLink (Ptr<Node> node1, Ptr<Node> node2);
-  
+  UpLink(Ptr<Node> node1, Ptr<Node> node2);
+
   /**
    * @brief Re-enable NDN link between two nodes
    *
@@ -93,9 +93,8 @@ public:
    * @param node2 another node's name
    */
   static void
-  UpLinkByName (const std::string &node1, const std::string &node2);
+  UpLinkByName(const std::string& node1, const std::string& node2);
 }; // end: LinkControlHelper
-
 
 } // ndn
 } // ns3

@@ -32,80 +32,84 @@ namespace ndnSIM {
  * @brief Traits for policy that just keeps track of number of elements
  * It's doing a rather expensive job, but just in case it needs to be extended later
  */
-struct aggregate_stats_policy_traits
-{
+struct aggregate_stats_policy_traits {
   /// @brief Name that can be used to identify the policy (for NS-3 object model and logging)
-  static std::string GetName () { return "AggregateStats"; }
-  struct policy_hook_type { };
-
-  template<class Container>
-  struct container_hook
+  static std::string
+  GetName()
   {
-    struct type { };
+    return "AggregateStats";
+  }
+  struct policy_hook_type {
   };
 
-  template<class Base,
-           class Container,
-           class Hook>
-  struct policy
-  {
+  template<class Container>
+  struct container_hook {
+    struct type {
+    };
+  };
+
+  template<class Base, class Container, class Hook>
+  struct policy {
     // typedef typename boost::intrusive::list< Container, Hook > policy_container;
 
     // could be just typedef
-    class type
-    {
+    class type {
     public:
       typedef Container parent_trie;
 
-      type (Base &base)
-        : base_ (base)
-        , m_updates (0)
-        , m_inserts (0)
-        , m_lookups (0)
-        , m_erases (0)
+      type(Base& base)
+        : base_(base)
+        , m_updates(0)
+        , m_inserts(0)
+        , m_lookups(0)
+        , m_erases(0)
       {
       }
 
       inline void
-      update (typename parent_trie::iterator item)
+      update(typename parent_trie::iterator item)
       {
-        m_updates ++;
+        m_updates++;
         // do nothing
       }
 
       inline bool
-      insert (typename parent_trie::iterator item)
+      insert(typename parent_trie::iterator item)
       {
-        m_inserts ++;
+        m_inserts++;
         return true;
       }
 
       inline void
-      lookup (typename parent_trie::iterator item)
+      lookup(typename parent_trie::iterator item)
       {
-        m_lookups ++;
+        m_lookups++;
       }
 
       inline void
-      erase (typename parent_trie::iterator item)
+      erase(typename parent_trie::iterator item)
       {
-        m_erases ++;
+        m_erases++;
       }
 
-      inline void
-      set_max_size (uint32_t) {}
+      inline void set_max_size(uint32_t)
+      {
+      }
 
       inline uint32_t
-      get_max_size () const { return 0; }
+      get_max_size() const
+      {
+        return 0;
+      }
 
       inline void
-      clear ()
+      clear()
       {
         // is called only at the end of simulation
       }
 
       inline void
-      ResetStats ()
+      ResetStats()
       {
         m_updates = 0;
         m_inserts = 0;
@@ -114,23 +118,36 @@ struct aggregate_stats_policy_traits
       }
 
       inline uint64_t
-      GetUpdates () const { return m_updates; }
+      GetUpdates() const
+      {
+        return m_updates;
+      }
 
       inline uint64_t
-      GetInserts () const { return m_inserts; }
+      GetInserts() const
+      {
+        return m_inserts;
+      }
 
       inline uint64_t
-      GetLookups () const { return m_lookups; }
+      GetLookups() const
+      {
+        return m_lookups;
+      }
 
       inline uint64_t
-      GetErases () const { return m_erases; }
+      GetErases() const
+      {
+        return m_erases;
+      }
 
     private:
-      type () : base_(*((Base*)0)) { };
+      type()
+        : base_(*((Base*)0)){};
 
     private:
-      Base &base_;
-      
+      Base& base_;
+
       uint64_t m_updates;
       uint64_t m_inserts;
       uint64_t m_lookups;

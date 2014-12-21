@@ -35,220 +35,222 @@
 #include "ns3/uinteger.h"
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.RttEstimator");
+NS_LOG_COMPONENT_DEFINE("ndn.RttEstimator");
 
 namespace ns3 {
 
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (RttEstimator);
+NS_OBJECT_ENSURE_REGISTERED(RttEstimator);
 
 TypeId
-RttEstimator::GetTypeId (void)
+RttEstimator::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::RttEstimator")
-    .SetParent<Object> ()
-    .AddAttribute ("MaxMultiplier",
-                   "Maximum RTO Multiplier",
-                   UintegerValue (64),
-                   MakeUintegerAccessor (&RttEstimator::m_maxMultiplier),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("InitialEstimation",
-                   "Initial RTT estimation",
-                   TimeValue (Seconds (1.0)),
-                   MakeTimeAccessor (&RttEstimator::m_initialEstimatedRtt),
-                   MakeTimeChecker ())
-    .AddAttribute ("MinRTO",
-                   "Minimum retransmit timeout value",
-                   TimeValue (Seconds (0.2)), // RFC2988 says min RTO=1 sec, but Linux uses 200ms. See http://www.postel.org/pipermail/end2end-interest/2004-November/004402.html
-                   MakeTimeAccessor (&RttEstimator::SetMinRto,
-                                     &RttEstimator::GetMinRto),
-                   MakeTimeChecker ())
-    .AddAttribute ("MaxRTO",
-                   "Maximum retransmit timeout value",
-                   TimeValue (Seconds (200.0)),
-                   MakeTimeAccessor (&RttEstimator::SetMaxRto,
-                                     &RttEstimator::GetMaxRto),
-                   MakeTimeChecker ())
-  ;
+  static TypeId tid =
+    TypeId("ns3::ndn::RttEstimator")
+      .SetParent<Object>()
+      .AddAttribute("MaxMultiplier", "Maximum RTO Multiplier", UintegerValue(64),
+                    MakeUintegerAccessor(&RttEstimator::m_maxMultiplier),
+                    MakeUintegerChecker<uint16_t>())
+      .AddAttribute("InitialEstimation", "Initial RTT estimation", TimeValue(Seconds(1.0)),
+                    MakeTimeAccessor(&RttEstimator::m_initialEstimatedRtt), MakeTimeChecker())
+      .AddAttribute("MinRTO", "Minimum retransmit timeout value",
+                    TimeValue(
+                      Seconds(0.2)), // RFC2988 says min RTO=1 sec, but Linux uses 200ms. See
+                    // http://www.postel.org/pipermail/end2end-interest/2004-November/004402.html
+                    MakeTimeAccessor(&RttEstimator::SetMinRto, &RttEstimator::GetMinRto),
+                    MakeTimeChecker())
+      .AddAttribute("MaxRTO", "Maximum retransmit timeout value", TimeValue(Seconds(200.0)),
+                    MakeTimeAccessor(&RttEstimator::SetMaxRto, &RttEstimator::GetMaxRto),
+                    MakeTimeChecker());
   return tid;
 }
 
 void
-RttEstimator::SetMinRto (Time minRto)
+RttEstimator::SetMinRto(Time minRto)
 {
-  NS_LOG_FUNCTION (this << minRto);
+  NS_LOG_FUNCTION(this << minRto);
   m_minRto = minRto;
 }
 Time
-RttEstimator::GetMinRto (void) const
+RttEstimator::GetMinRto(void) const
 {
   return m_minRto;
 }
 
 void
-RttEstimator::SetMaxRto (Time maxRto)
+RttEstimator::SetMaxRto(Time maxRto)
 {
-  NS_LOG_FUNCTION (this << maxRto);
+  NS_LOG_FUNCTION(this << maxRto);
   m_maxRto = maxRto;
 }
 Time
-RttEstimator::GetMaxRto (void) const
+RttEstimator::GetMaxRto(void) const
 {
   return m_maxRto;
 }
 
 void
-RttEstimator::SetCurrentEstimate (Time estimate)
+RttEstimator::SetCurrentEstimate(Time estimate)
 {
-  NS_LOG_FUNCTION (this << estimate);
+  NS_LOG_FUNCTION(this << estimate);
   m_currentEstimatedRtt = estimate;
 }
 Time
-RttEstimator::GetCurrentEstimate (void) const
+RttEstimator::GetCurrentEstimate(void) const
 {
   return m_currentEstimatedRtt;
 }
 
-
-//RttHistory methods
-RttHistory::RttHistory (SequenceNumber32 s, uint32_t c, Time t)
-  : seq (s), count (c), time (t), retx (false)
+// RttHistory methods
+RttHistory::RttHistory(SequenceNumber32 s, uint32_t c, Time t)
+  : seq(s)
+  , count(c)
+  , time(t)
+  , retx(false)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
 }
 
-RttHistory::RttHistory (const RttHistory& h)
-  : seq (h.seq), count (h.count), time (h.time), retx (h.retx)
+RttHistory::RttHistory(const RttHistory& h)
+  : seq(h.seq)
+  , count(h.count)
+  , time(h.time)
+  , retx(h.retx)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
 }
 
 // Base class methods
 
-RttEstimator::RttEstimator ()
-  : m_next (1),
-    m_nSamples (0),
-    m_multiplier (1),
-    m_history ()
+RttEstimator::RttEstimator()
+  : m_next(1)
+  , m_nSamples(0)
+  , m_multiplier(1)
+  , m_history()
 {
-  NS_LOG_FUNCTION (this);
-  //note next=1 everywhere since first segment will have sequence 1
+  NS_LOG_FUNCTION(this);
+  // note next=1 everywhere since first segment will have sequence 1
 
   // We need attributes initialized here, not later, so use the
   // ConstructSelf() technique documented in the manual
-  ObjectBase::ConstructSelf (AttributeConstructionList ());
+  ObjectBase::ConstructSelf(AttributeConstructionList());
   m_currentEstimatedRtt = m_initialEstimatedRtt;
-  NS_LOG_DEBUG ("Initialize m_currentEstimatedRtt to " << m_currentEstimatedRtt.GetSeconds () << " sec.");
+  NS_LOG_DEBUG("Initialize m_currentEstimatedRtt to " << m_currentEstimatedRtt.GetSeconds()
+                                                      << " sec.");
 }
 
-RttEstimator::RttEstimator (const RttEstimator& c)
-  : Object (c), m_next (c.m_next),
-    m_maxMultiplier (c.m_maxMultiplier),
-    m_initialEstimatedRtt (c.m_initialEstimatedRtt),
-    m_currentEstimatedRtt (c.m_currentEstimatedRtt), m_minRto (c.m_minRto), m_maxRto (c.m_maxRto),
-    m_nSamples (c.m_nSamples), m_multiplier (c.m_multiplier),
-    m_history (c.m_history)
+RttEstimator::RttEstimator(const RttEstimator& c)
+  : Object(c)
+  , m_next(c.m_next)
+  , m_maxMultiplier(c.m_maxMultiplier)
+  , m_initialEstimatedRtt(c.m_initialEstimatedRtt)
+  , m_currentEstimatedRtt(c.m_currentEstimatedRtt)
+  , m_minRto(c.m_minRto)
+  , m_maxRto(c.m_maxRto)
+  , m_nSamples(c.m_nSamples)
+  , m_multiplier(c.m_multiplier)
+  , m_history(c.m_history)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
 }
 
-RttEstimator::~RttEstimator ()
+RttEstimator::~RttEstimator()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
 }
 
 TypeId
-RttEstimator::GetInstanceTypeId (void) const
+RttEstimator::GetInstanceTypeId(void) const
 {
-  return GetTypeId ();
+  return GetTypeId();
 }
 
-void RttEstimator::SentSeq (SequenceNumber32 seq, uint32_t size)
+void
+RttEstimator::SentSeq(SequenceNumber32 seq, uint32_t size)
 {
-  NS_LOG_FUNCTION (this << seq << size);
+  NS_LOG_FUNCTION(this << seq << size);
   // Note that a particular sequence has been sent
-  if (seq == m_next)
-    { // This is the next expected one, just log at end
-      m_history.push_back (RttHistory (seq, size, Simulator::Now () ));
-      m_next = seq + SequenceNumber32 (size); // Update next expected
-    }
-  else
-    { // This is a retransmit, find in list and mark as re-tx
-      for (RttHistory_t::iterator i = m_history.begin (); i != m_history.end (); ++i)
-        {
-          if ((seq >= i->seq) && (seq < (i->seq + SequenceNumber32 (i->count))))
-            { // Found it
-              i->retx = true;
-              // One final test..be sure this re-tx does not extend "next"
-              if ((seq + SequenceNumber32 (size)) > m_next)
-                {
-                  m_next = seq + SequenceNumber32 (size);
-                  i->count = ((seq + SequenceNumber32 (size)) - i->seq); // And update count in hist
-                }
-              break;
-            }
+  if (seq == m_next) { // This is the next expected one, just log at end
+    m_history.push_back(RttHistory(seq, size, Simulator::Now()));
+    m_next = seq + SequenceNumber32(size); // Update next expected
+  }
+  else { // This is a retransmit, find in list and mark as re-tx
+    for (RttHistory_t::iterator i = m_history.begin(); i != m_history.end(); ++i) {
+      if ((seq >= i->seq) && (seq < (i->seq + SequenceNumber32(i->count)))) { // Found it
+        i->retx = true;
+        // One final test..be sure this re-tx does not extend "next"
+        if ((seq + SequenceNumber32(size)) > m_next) {
+          m_next = seq + SequenceNumber32(size);
+          i->count = ((seq + SequenceNumber32(size)) - i->seq); // And update count in hist
         }
+        break;
+      }
     }
+  }
 }
 
-Time RttEstimator::AckSeq (SequenceNumber32 ackSeq)
+Time
+RttEstimator::AckSeq(SequenceNumber32 ackSeq)
 {
-  NS_LOG_FUNCTION (this << ackSeq);
+  NS_LOG_FUNCTION(this << ackSeq);
   // An ack has been received, calculate rtt and log this measurement
   // Note we use a linear search (O(n)) for this since for the common
   // case the ack'ed packet will be at the head of the list
-  Time m = Seconds (0.0);
-  if (m_history.size () == 0) return (m);    // No pending history, just exit
-  RttHistory& h = m_history.front ();
-  if (!h.retx && ackSeq >= (h.seq + SequenceNumber32 (h.count)))
-    { // Ok to use this sample
-      m = Simulator::Now () - h.time; // Elapsed time
-      Measurement (m);                // Log the measurement
-      ResetMultiplier ();             // Reset multiplier on valid measurement
-    }
+  Time m = Seconds(0.0);
+  if (m_history.size() == 0)
+    return (m); // No pending history, just exit
+  RttHistory& h = m_history.front();
+  if (!h.retx && ackSeq >= (h.seq + SequenceNumber32(h.count))) { // Ok to use this sample
+    m = Simulator::Now() - h.time;                                // Elapsed time
+    Measurement(m);                                               // Log the measurement
+    ResetMultiplier(); // Reset multiplier on valid measurement
+  }
   // Now delete all ack history with seq <= ack
-  while(m_history.size () > 0)
-    {
-      RttHistory& h = m_history.front ();
-      if ((h.seq + SequenceNumber32 (h.count)) > ackSeq) break;               // Done removing
-      m_history.pop_front (); // Remove
-    }
+  while (m_history.size() > 0) {
+    RttHistory& h = m_history.front();
+    if ((h.seq + SequenceNumber32(h.count)) > ackSeq)
+      break;               // Done removing
+    m_history.pop_front(); // Remove
+  }
   return m;
 }
 
-void RttEstimator::ClearSent ()
+void
+RttEstimator::ClearSent()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
   // Clear all history entries
   m_next = 1;
-  m_history.clear ();
+  m_history.clear();
 }
 
-void RttEstimator::IncreaseMultiplier ()
+void
+RttEstimator::IncreaseMultiplier()
 {
-  NS_LOG_FUNCTION (this);
-  m_multiplier = (m_multiplier*2 < m_maxMultiplier) ? m_multiplier*2 : m_maxMultiplier;
-  NS_LOG_DEBUG ("Multiplier increased to " << m_multiplier);
+  NS_LOG_FUNCTION(this);
+  m_multiplier = (m_multiplier * 2 < m_maxMultiplier) ? m_multiplier * 2 : m_maxMultiplier;
+  NS_LOG_DEBUG("Multiplier increased to " << m_multiplier);
 }
 
-void RttEstimator::ResetMultiplier ()
+void
+RttEstimator::ResetMultiplier()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
   m_multiplier = 1;
 }
 
-void RttEstimator::Reset ()
+void
+RttEstimator::Reset()
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION(this);
   // Reset to initial state
   m_next = 1;
   m_currentEstimatedRtt = m_initialEstimatedRtt;
-  m_history.clear ();         // Remove all info from the history
+  m_history.clear(); // Remove all info from the history
   m_nSamples = 0;
-  ResetMultiplier ();
+  ResetMultiplier();
 }
-
 
 } // namespace ndn
 } // namespace ns3

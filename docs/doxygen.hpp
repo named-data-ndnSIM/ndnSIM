@@ -20,4 +20,3 @@ template class ContentStoreImpl<random_policy_traits>;
  * @brief ContentStore with FIFO cache replacement policy
  */
 template class ContentStoreImpl<fifo_policy_traits>;
-

@@ -49,35 +49,35 @@ class App;
  *
  * \see AppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
  */
-class AppFace  : public Face
-{
+class AppFace : public Face {
 public:
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
   /**
    * \brief Default constructor
    */
-  AppFace (Ptr<App> app);
+  AppFace(Ptr<App> app);
   virtual ~AppFace();
-  
+
   ////////////////////////////////////////////////////////////////////
   // methods overloaded from Face
   virtual bool
-  SendInterest (Ptr<const Interest> interest);
+  SendInterest(Ptr<const Interest> interest);
 
   virtual bool
-  SendData (Ptr<const Data> data);
+  SendData(Ptr<const Data> data);
 
 public:
   virtual std::ostream&
-  Print (std::ostream &os) const;
+  Print(std::ostream& os) const;
   ////////////////////////////////////////////////////////////////////
- 
+
 private:
-  AppFace ();
-  AppFace (const AppFace &); ///< \brief Disabled copy constructor
-  AppFace& operator= (const AppFace &); ///< \brief Disabled copy operator
+  AppFace();
+  AppFace(const AppFace&); ///< \brief Disabled copy constructor
+  AppFace&
+  operator=(const AppFace&); ///< \brief Disabled copy operator
 
 private:
   Ptr<App> m_app;

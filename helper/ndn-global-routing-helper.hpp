@@ -35,8 +35,7 @@ namespace ndn {
  * @ingroup ndn-helpers
  * @brief Helper for GlobalRouter interface
  */
-class GlobalRoutingHelper
-{
+class GlobalRoutingHelper {
 public:
   /**
    * @brief Install GlobalRouter interface on a node
@@ -46,8 +45,7 @@ public:
    * @param node Node to install GlobalRouter interface
    */
   void
-  Install (Ptr<Node> node);
-
+  Install(Ptr<Node> node);
 
   /**
    * @brief Install GlobalRouter interface on nodes
@@ -57,13 +55,13 @@ public:
    * @param nodes NodeContainer to install GlobalRouter interface
    */
   void
-  Install (const NodeContainer &nodes);
+  Install(const NodeContainer& nodes);
 
   /**
    * @brief Install GlobalRouter interface on all nodes
    */
   void
-  InstallAll ();
+  InstallAll();
 
   /**
    * @brief Add `prefix' as origin on `node'
@@ -71,7 +69,7 @@ public:
    * @param node   Pointer to a node
    */
   void
-  AddOrigin (const std::string &prefix, Ptr<Node> node);
+  AddOrigin(const std::string& prefix, Ptr<Node> node);
 
   /**
    * @brief Add `prefix' as origin on all `nodes'
@@ -79,7 +77,7 @@ public:
    * @param nodes NodeContainer
    */
   void
-  AddOrigins (const std::string &prefix, const NodeContainer &nodes);
+  AddOrigins(const std::string& prefix, const NodeContainer& nodes);
 
   /**
    * @brief Add `prefix' as origin on node `nodeName'
@@ -87,37 +85,40 @@ public:
    * @param nodeName   Name of the node that is associated with Ptr<Node> using ns3::Names
    */
   void
-  AddOrigin (const std::string &prefix, const std::string &nodeName);
+  AddOrigin(const std::string& prefix, const std::string& nodeName);
 
   /**
    * @brief Add origin to each node based on the node's name (using Names class)
    */
   void
-  AddOriginsForAll ();
+  AddOriginsForAll();
 
   /**
    * @brief Calculate for every node shortest path trees and install routes to all prefix origins
    *
-   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps as is
+   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps
+   *as is
    */
   static void
-  CalculateRoutes (bool invalidatedRoutes = true);
+  CalculateRoutes(bool invalidatedRoutes = true);
 
   /**
    * @brief Calculate all possible next-hop independent alternative routes
    *
-   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps as is
+   * @param invalidatedRoutes flag indicating whether existing routes should be invalidated or keps
+   *as is
    *
    * Refer to the implementation for more details.
    *
-   * Note that this method is highly experimental and should be used with caution (very time consuming).
+   * Note that this method is highly experimental and should be used with caution (very time
+   *consuming).
    */
   static void
-  CalculateAllPossibleRoutes (bool invalidatedRoutes = true);
+  CalculateAllPossibleRoutes(bool invalidatedRoutes = true);
 
 private:
   void
-  Install (Ptr<Channel> channel);
+  Install(Ptr<Channel> channel);
 };
 
 } // namespace ndn

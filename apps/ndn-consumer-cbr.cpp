@@ -34,104 +34,94 @@
 #include "ns3/ndn-interest.hpp"
 #include "ns3/ndn-data.hpp"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.ConsumerCbr");
+NS_LOG_COMPONENT_DEFINE("ndn.ConsumerCbr");
 
 namespace ns3 {
 namespace ndn {
-    
-NS_OBJECT_ENSURE_REGISTERED (ConsumerCbr);
-    
+
+NS_OBJECT_ENSURE_REGISTERED(ConsumerCbr);
+
 TypeId
-ConsumerCbr::GetTypeId (void)
+ConsumerCbr::GetTypeId(void)
 {
-  static TypeId tid = TypeId ("ns3::ndn::ConsumerCbr")
-    .SetGroupName ("Ndn")
-    .SetParent<Consumer> ()
-    .AddConstructor<ConsumerCbr> ()
+  static TypeId tid =
+    TypeId("ns3::ndn::ConsumerCbr")
+      .SetGroupName("Ndn")
+      .SetParent<Consumer>()
+      .AddConstructor<ConsumerCbr>()
 
-    .AddAttribute ("Frequency", "Frequency of interest packets",
-                   StringValue ("1.0"),
-                   MakeDoubleAccessor (&ConsumerCbr::m_frequency),
-                   MakeDoubleChecker<double> ())
-    
-    .AddAttribute ("Randomize", "Type of send time randomization: none (default), uniform, exponential",
-                   StringValue ("none"),
-                   MakeStringAccessor (&ConsumerCbr::SetRandomize, &ConsumerCbr::GetRandomize),
-                   MakeStringChecker ())
+      .AddAttribute("Frequency", "Frequency of interest packets", StringValue("1.0"),
+                    MakeDoubleAccessor(&ConsumerCbr::m_frequency), MakeDoubleChecker<double>())
 
-    .AddAttribute ("MaxSeq",
-                   "Maximum sequence number to request",
-                   IntegerValue (std::numeric_limits<uint32_t>::max ()),
-                   MakeIntegerAccessor (&ConsumerCbr::m_seqMax),
-                   MakeIntegerChecker<uint32_t> ())
+      .AddAttribute("Randomize",
+                    "Type of send time randomization: none (default), uniform, exponential",
+                    StringValue("none"),
+                    MakeStringAccessor(&ConsumerCbr::SetRandomize, &ConsumerCbr::GetRandomize),
+                    MakeStringChecker())
+
+      .AddAttribute("MaxSeq", "Maximum sequence number to request",
+                    IntegerValue(std::numeric_limits<uint32_t>::max()),
+                    MakeIntegerAccessor(&ConsumerCbr::m_seqMax), MakeIntegerChecker<uint32_t>())
 
     ;
 
   return tid;
 }
-    
-ConsumerCbr::ConsumerCbr ()
-  : m_frequency (1.0)
-  , m_firstTime (true)
-  , m_random (0)
+
+ConsumerCbr::ConsumerCbr()
+  : m_frequency(1.0)
+  , m_firstTime(true)
+  , m_random(0)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-  m_seqMax = std::numeric_limits<uint32_t>::max ();
+  NS_LOG_FUNCTION_NOARGS();
+  m_seqMax = std::numeric_limits<uint32_t>::max();
 }
 
-ConsumerCbr::~ConsumerCbr ()
+ConsumerCbr::~ConsumerCbr()
 {
   if (m_random)
     delete m_random;
 }
 
 void
-ConsumerCbr::ScheduleNextPacket ()
+ConsumerCbr::ScheduleNextPacket()
 {
   // double mean = 8.0 * m_payloadSize / m_desiredRate.GetBitRate ();
   // std::cout << "next: " << Simulator::Now().ToDouble(Time::S) + mean << "s\n";
 
-  if (m_firstTime)
-    {
-      m_sendEvent = Simulator::Schedule (Seconds (0.0),
-                                         &Consumer::SendPacket, this);
-      m_firstTime = false;
-    }
-  else if (!m_sendEvent.IsRunning ())
-    m_sendEvent = Simulator::Schedule (
-                                       (m_random == 0) ?
-                                         Seconds(1.0 / m_frequency)
-                                       :
-                                         Seconds(m_random->GetValue ()),
-                                       &Consumer::SendPacket, this);
+  if (m_firstTime) {
+    m_sendEvent = Simulator::Schedule(Seconds(0.0), &Consumer::SendPacket, this);
+    m_firstTime = false;
+  }
+  else if (!m_sendEvent.IsRunning())
+    m_sendEvent = Simulator::Schedule((m_random == 0) ? Seconds(1.0 / m_frequency)
+                                                      : Seconds(m_random->GetValue()),
+                                      &Consumer::SendPacket, this);
 }
 
 void
-ConsumerCbr::SetRandomize (const std::string &value)
+ConsumerCbr::SetRandomize(const std::string& value)
 {
   if (m_random)
     delete m_random;
 
-  if (value == "uniform")
-    {
-      m_random = new UniformVariable (0.0, 2 * 1.0 / m_frequency);
-    }
-  else if (value == "exponential")
-    {
-      m_random = new ExponentialVariable (1.0 / m_frequency, 50 * 1.0 / m_frequency);
-    }
+  if (value == "uniform") {
+    m_random = new UniformVariable(0.0, 2 * 1.0 / m_frequency);
+  }
+  else if (value == "exponential") {
+    m_random = new ExponentialVariable(1.0 / m_frequency, 50 * 1.0 / m_frequency);
+  }
   else
     m_random = 0;
 
-  m_randomType = value;  
+  m_randomType = value;
 }
 
 std::string
-ConsumerCbr::GetRandomize () const
+ConsumerCbr::GetRandomize() const
 {
   return m_randomType;
 }
-
 
 ///////////////////////////////////////////////////
 //          Process incoming packets             //

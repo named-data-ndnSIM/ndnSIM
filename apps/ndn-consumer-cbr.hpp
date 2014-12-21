@@ -31,17 +31,17 @@ namespace ndn {
  * @ingroup ndn-apps
  * @brief Ndn application for sending out Interest packets at a "constant" rate (Poisson process)
  */
-class ConsumerCbr: public Consumer
-{
-public: 
-  static TypeId GetTypeId ();
-        
+class ConsumerCbr : public Consumer {
+public:
+  static TypeId
+  GetTypeId();
+
   /**
-   * \brief Default constructor 
+   * \brief Default constructor
    * Sets up randomizer function and packet sequence number
    */
-  ConsumerCbr ();
-  virtual ~ConsumerCbr ();
+  ConsumerCbr();
+  virtual ~ConsumerCbr();
 
   // From NdnApp
   // virtual void
@@ -56,25 +56,26 @@ public:
 
 protected:
   /**
-   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN protocol
+   * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN
+   * protocol
    */
   virtual void
-  ScheduleNextPacket ();
+  ScheduleNextPacket();
 
   /**
    * @brief Set type of frequency randomization
    * @param value Either 'none', 'uniform', or 'exponential'
    */
   void
-  SetRandomize (const std::string &value);
+  SetRandomize(const std::string& value);
 
   /**
    * @brief Get type of frequency randomization
    * @returns either 'none', 'uniform', or 'exponential'
    */
   std::string
-  GetRandomize () const;
-  
+  GetRandomize() const;
+
 private:
   // void
   // UpdateMean ();
@@ -87,12 +88,12 @@ private:
 
   // DataRate
   // GetDesiredRate () const;
-  
+
 protected:
-  double              m_frequency; // Frequency of interest packets (in hertz)
-  bool                m_firstTime;
-  RandomVariable      *m_random;
-  std::string         m_randomType;
+  double m_frequency; // Frequency of interest packets (in hertz)
+  bool m_firstTime;
+  RandomVariable* m_random;
+  std::string m_randomType;
 };
 
 } // namespace ndn

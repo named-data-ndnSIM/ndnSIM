@@ -1,10 +1,10 @@
 /** -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
-/* 
+/*
  * Copyright (c) 2013, Regents of the University of California
  *                     Alexander Afanasyev
- * 
+ *
  * BSD license, See the doc/LICENSE file for more information
- * 
+ *
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
@@ -16,8 +16,12 @@
 
 #define NDNSIM_MODE 1
 
-#define NDN_NAMESPACE_BEGIN  namespace ns3 { namespace ndn {
-#define NDN_NAMESPACE_END    } /*ndn*/ } /*ns3*/ 
+#define NDN_NAMESPACE_BEGIN                                                                        \
+  namespace ns3 {                                                                                  \
+  namespace ndn {
+#define NDN_NAMESPACE_END                                                                          \
+  } /*ndn*/                                                                                        \
+  } /*ns3*/
 
 /**
  * @brief NS-3 namespace
@@ -29,22 +33,19 @@ namespace ns3 {
  */
 namespace ndn {
 }
-
 }
 
 NDN_NAMESPACE_BEGIN
 
 typedef Time TimeInterval;
 
-namespace time
-{
+namespace time {
 
 inline Time
-NowUnixTimestamp ()
+NowUnixTimestamp()
 {
-  return Simulator::Now ();
+  return Simulator::Now();
 }
-
 }
 
 NDN_NAMESPACE_END

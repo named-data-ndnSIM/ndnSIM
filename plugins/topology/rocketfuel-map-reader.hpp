@@ -35,26 +35,25 @@ using namespace std;
 
 namespace ns3 {
 
-struct RocketfuelParams
-{
+struct RocketfuelParams {
   double averageRtt;
-  int    clientNodeDegrees;
+  int clientNodeDegrees;
 
-  //parameters for links Backbone <->Backbone
+  // parameters for links Backbone <->Backbone
   string minb2bBandwidth;
   string minb2bDelay;
 
   string maxb2bBandwidth;
   string maxb2bDelay;
 
-  //parameters for links Backbone<->Gateway and Gateway <-> Gateway
+  // parameters for links Backbone<->Gateway and Gateway <-> Gateway
   string minb2gBandwidth;
   string minb2gDelay;
 
   string maxb2gBandwidth;
   string maxb2gDelay;
 
-  //parameters for links Gateway <-> Customer
+  // parameters for links Gateway <-> Customer
   string ming2cBandwidth;
   string ming2cDelay;
 
@@ -69,33 +68,37 @@ struct RocketfuelParams
  *
  * Only map file (.cch) is supported
  *
- * In addition to reading specified topology from the .cch file, this class divides nodes into three categories:
+ * In addition to reading specified topology from the .cch file, this class divides nodes into three
+ *categories:
  * - client nodes (nodes with degrees less or equal to RocketfuelParams.clientNodeDegrees
  * - gateway nodes (nodes that directly connected to client nodes)
  * - backbone nodes (all the rest)
  *
- * As some of the .cch files do not give a connected network graph, this reader also allows to keep only the largest connected
+ * As some of the .cch files do not give a connected network graph, this reader also allows to keep
+ *only the largest connected
  * network graph component.
  */
-class RocketfuelMapReader : public AnnotatedTopologyReader
-{
+class RocketfuelMapReader : public AnnotatedTopologyReader {
 public:
-  RocketfuelMapReader (const std::string &path="", double scale=1.0, const string &referenceOspfRate="100Mbps");
-  virtual ~RocketfuelMapReader ();
+  RocketfuelMapReader(const std::string& path = "", double scale = 1.0,
+                      const string& referenceOspfRate = "100Mbps");
+  virtual ~RocketfuelMapReader();
 
   /**
-   * @brief Deprecated call. Read (RocketfuelParams params, bool keepOneComponent=true, bool connectBackbones=true) should be used instead
+   * @brief Deprecated call. Read (RocketfuelParams params, bool keepOneComponent=true, bool
+   * connectBackbones=true) should be used instead
    */
-  virtual
-  NodeContainer
-  Read ();
+  virtual NodeContainer
+  Read();
 
   /**
    * \brief Main topology reading function.
    *
-   * @param params parameters specifying range from which link bandwidths and delays should be assigned
+   * @param params parameters specifying range from which link bandwidths and delays should be
+   *assigned
    * @param keepOneComponent if true, then only the largest connected component will be kept
-   * @param connectBackbones if true, then extra links will be added to ensure connectivity of estimated backbone
+   * @param connectBackbones if true, then extra links will be added to ensure connectivity of
+   *estimated backbone
    *
    * This method opens an input stream and reads the Rocketfuel-format file.
    * Every row represents a topology link (the ids of a couple of nodes),
@@ -105,7 +108,7 @@ public:
    * \return the container of the nodes created (or empty container if there was an error)
    */
   virtual NodeContainer
-  Read (RocketfuelParams params, bool keepOneComponent=true, bool connectBackbones=true);
+  Read(RocketfuelParams params, bool keepOneComponent = true, bool connectBackbones = true);
 
   const NodeContainer&
   GetBackboneRouters() const;
@@ -117,31 +120,31 @@ public:
   GetCustomerRouters() const;
 
   virtual void
-  SaveTopology (const std::string &file);
+  SaveTopology(const std::string& file);
 
   virtual void
-  SaveGraphviz (const std::string &file);
+  SaveGraphviz(const std::string& file);
 
 private:
-  RocketfuelMapReader (const RocketfuelMapReader&);
-  RocketfuelMapReader& operator= (const RocketfuelMapReader&);
+  RocketfuelMapReader(const RocketfuelMapReader&);
+  RocketfuelMapReader&
+  operator=(const RocketfuelMapReader&);
 
   // NodeContainer
   void
-  GenerateFromMapsFile (int argc, char *argv[]);
+  GenerateFromMapsFile(int argc, char* argv[]);
 
   void
-  CreateLink (string nodeName1, string nodeName2,
-              double averageRtt,
-              const string &minBw, const string &maxBw,
-              const string &minDelay, const string &maxDelay);
+  CreateLink(string nodeName1, string nodeName2, double averageRtt, const string& minBw,
+             const string& maxBw, const string& minDelay, const string& maxDelay);
   void
-  KeepOnlyBiggestConnectedComponent ();
-
-  void AssignClients(uint32_t clientDegree, uint32_t gwDegree);
+  KeepOnlyBiggestConnectedComponent();
 
   void
-  ConnectBackboneRouters ();
+  AssignClients(uint32_t clientDegree, uint32_t gwDegree);
+
+  void
+  ConnectBackboneRouters();
 
 private:
   UniformVariable m_randVar;
@@ -152,33 +155,33 @@ private:
 
   typedef boost::adjacency_list_traits<boost::setS, boost::setS, boost::undirectedS> Traits;
 
-  enum node_type_t {UNKNOWN = 0, CLIENT = 1, GATEWAY = 2, BACKBONE = 3};
+  enum node_type_t { UNKNOWN = 0, CLIENT = 1, GATEWAY = 2, BACKBONE = 3 };
 
-  typedef boost::property< boost::vertex_name_t, std::string, boost::property
-                           < boost::vertex_index_t, uint32_t, boost::property
-                             < boost::vertex_rank_t, node_type_t, boost::property
-                               < boost::vertex_color_t, std::string > > > > nodeProperty;
+  typedef boost::
+    property<boost::vertex_name_t, std::string,
+             boost::property<boost::vertex_index_t, uint32_t,
+                             boost::property<boost::vertex_rank_t, node_type_t,
+                                             boost::property<boost::vertex_color_t, std::string>>>>
+      nodeProperty;
 
   typedef boost::no_property edgeProperty;
 
-  typedef boost::adjacency_list< boost::setS, boost::setS, boost::undirectedS,
-                                 nodeProperty, edgeProperty > Graph;
+  typedef boost::adjacency_list<boost::setS, boost::setS, boost::undirectedS, nodeProperty,
+                                edgeProperty> Graph;
 
   typedef map<string, Traits::vertex_descriptor> node_map_t;
   node_map_t m_graphNodes;
 
-  Graph      m_graph;
-  uint32_t     m_maxNodeId;
+  Graph m_graph;
+  uint32_t m_maxNodeId;
 
   const DataRate m_referenceOspfRate; // reference rate of OSPF metric calculation
 
-
 private:
   void
-  assignGw (Traits::vertex_descriptor vertex, uint32_t degree, node_type_t nodeType);
+  assignGw(Traits::vertex_descriptor vertex, uint32_t degree, node_type_t nodeType);
 }; // end class RocketfuelMapReader
 
 }; // end namespace ns3
-
 
 #endif /* ROCKETFUEL_MAP_READER_H */

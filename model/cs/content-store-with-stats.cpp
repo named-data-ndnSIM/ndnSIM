@@ -25,14 +25,14 @@
 #include "../../utils/trie/fifo-policy.hpp"
 #include "../../utils/trie/lfu-policy.hpp"
 
-#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
-  static struct X ## type ## templ ## RegistrationClass \
-  {                                                     \
-    X ## type ## templ ## RegistrationClass () {        \
-      ns3::TypeId tid = type<templ>::GetTypeId ();      \
-      tid.GetParent ();                                 \
-    }                                                   \
-  } x_ ## type ## templ ## RegistrationVariable
+#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)                                             \
+  static struct X##type##templ##RegistrationClass {                                                \
+    X##type##templ##RegistrationClass()                                                            \
+    {                                                                                              \
+      ns3::TypeId tid = type<templ>::GetTypeId();                                                  \
+      tid.GetParent();                                                                             \
+    }                                                                                              \
+  } x_##type##templ##RegistrationVariable
 
 namespace ns3 {
 namespace ndn {
@@ -68,30 +68,32 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, fifo_policy_traits);
 
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreWithStats, lfu_policy_traits);
 
-
 #ifdef DOXYGEN
 // /**
 //  * \brief Content Store with stats implementing LRU cache replacement policy
 //  */
-class Stats::Lru : public ContentStoreWithStats<lru_policy_traits> { };
+class Stats::Lru : public ContentStoreWithStats<lru_policy_traits> {
+};
 
 /**
  * \brief Content Store with stats implementing FIFO cache replacement policy
  */
-class Stats::Fifo : public ContentStoreWithStats<fifo_policy_traits> { };
+class Stats::Fifo : public ContentStoreWithStats<fifo_policy_traits> {
+};
 
 /**
  * \brief Content Store with stats implementing Random cache replacement policy
  */
-class Stats::Random : public ContentStoreWithStats<random_policy_traits> { };
+class Stats::Random : public ContentStoreWithStats<random_policy_traits> {
+};
 
 /**
  * \brief Content Store with stats implementing Least Frequently Used cache replacement policy
  */
-class Stats::Lfu : public ContentStoreWithStats<lfu_policy_traits> { };
+class Stats::Lfu : public ContentStoreWithStats<lfu_policy_traits> {
+};
 
 #endif
-
 
 } // namespace cs
 } // namespace ndn

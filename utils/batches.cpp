@@ -22,13 +22,13 @@
 
 namespace ns3 {
 
-ATTRIBUTE_HELPER_CPP (Batches);
+ATTRIBUTE_HELPER_CPP(Batches);
 
-std::ostream &
-operator << (std::ostream &os, const Batches &batch)
+std::ostream&
+operator<<(std::ostream& os, const Batches& batch)
 {
-  for (Batches::const_iterator i = batch.begin (); i != batch.end (); i++)
-    os << i->get<0> () << " " << i->get<1> () << " ";
+  for (Batches::const_iterator i = batch.begin(); i != batch.end(); i++)
+    os << i->get<0>() << " " << i->get<1>() << " ";
 
   return os;
 }
@@ -37,21 +37,18 @@ operator << (std::ostream &os, const Batches &batch)
  * \brief Read components from input and add them to components. Will read input stream till eof
  * Substrings separated by slashes will become separate components
  */
-std::istream &
-operator >> (std::istream &is, Batches &batch)
+std::istream&
+operator>>(std::istream& is, Batches& batch)
 {
   Time time;
   uint32_t amount;
-  while (!is.eof ())
-    {
-      is >> time >> amount;
-      batch.Add (time, amount);
-      // std::cout << time << ", " << amount << ". \n";
-    }
-  
-  is.clear ();
+  while (!is.eof()) {
+    is >> time >> amount;
+    batch.Add(time, amount);
+    // std::cout << time << ", " << amount << ". \n";
+  }
+
+  is.clear();
   return is;
 }
-
-
 }

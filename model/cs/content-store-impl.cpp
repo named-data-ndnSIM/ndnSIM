@@ -27,14 +27,14 @@
 #include "../../utils/trie/multi-policy.hpp"
 #include "../../utils/trie/aggregate-stats-policy.hpp"
 
-#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)  \
-  static struct X ## type ## templ ## RegistrationClass \
-  {                                                     \
-    X ## type ## templ ## RegistrationClass () {        \
-      ns3::TypeId tid = type<templ>::GetTypeId ();      \
-      tid.GetParent ();                                 \
-    }                                                   \
-  } x_ ## type ## templ ## RegistrationVariable
+#define NS_OBJECT_ENSURE_REGISTERED_TEMPL(type, templ)                                             \
+  static struct X##type##templ##RegistrationClass {                                                \
+    X##type##templ##RegistrationClass()                                                            \
+    {                                                                                              \
+      ns3::TypeId tid = type<templ>::GetTypeId();                                                  \
+      tid.GetParent();                                                                             \
+    }                                                                                              \
+  } x_##type##templ##RegistrationVariable
 
 namespace ns3 {
 namespace ndn {
@@ -69,15 +69,15 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, random_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, fifo_policy_traits);
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, lfu_policy_traits);
 
-
-typedef multi_policy_traits< boost::mpl::vector2< lru_policy_traits,
-                                                  aggregate_stats_policy_traits > > LruWithCountsTraits;
-typedef multi_policy_traits< boost::mpl::vector2< random_policy_traits,
-                                                  aggregate_stats_policy_traits > > RandomWithCountsTraits;
-typedef multi_policy_traits< boost::mpl::vector2< fifo_policy_traits,
-                                                  aggregate_stats_policy_traits > > FifoWithCountsTraits;
-typedef multi_policy_traits< boost::mpl::vector2< lfu_policy_traits,
-                                                  aggregate_stats_policy_traits > > LfuWithCountsTraits;
+typedef multi_policy_traits<boost::mpl::vector2<lru_policy_traits, aggregate_stats_policy_traits>>
+  LruWithCountsTraits;
+typedef multi_policy_traits<boost::mpl::vector2<random_policy_traits,
+                                                aggregate_stats_policy_traits>>
+  RandomWithCountsTraits;
+typedef multi_policy_traits<boost::mpl::vector2<fifo_policy_traits, aggregate_stats_policy_traits>>
+  FifoWithCountsTraits;
+typedef multi_policy_traits<boost::mpl::vector2<lfu_policy_traits, aggregate_stats_policy_traits>>
+  LfuWithCountsTraits;
 
 template class ContentStoreImpl<LruWithCountsTraits>;
 NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, LruWithCountsTraits);
@@ -95,24 +95,27 @@ NS_OBJECT_ENSURE_REGISTERED_TEMPL(ContentStoreImpl, LfuWithCountsTraits);
 // /**
 //  * \brief Content Store implementing LRU cache replacement policy
 //  */
-class Lru : public ContentStoreImpl<lru_policy_traits> { };
+class Lru : public ContentStoreImpl<lru_policy_traits> {
+};
 
 /**
  * \brief Content Store implementing FIFO cache replacement policy
  */
-class Fifo : public ContentStoreImpl<fifo_policy_traits> { };
+class Fifo : public ContentStoreImpl<fifo_policy_traits> {
+};
 
 /**
  * \brief Content Store implementing Random cache replacement policy
  */
-class Random : public ContentStoreImpl<random_policy_traits> { };
+class Random : public ContentStoreImpl<random_policy_traits> {
+};
 
 /**
  * \brief Content Store implementing Least Frequently Used cache replacement policy
  */
-class Lfu : public ContentStoreImpl<lfu_policy_traits> { };
+class Lfu : public ContentStoreImpl<lfu_policy_traits> {
+};
 #endif
-
 
 } // namespace cs
 } // namespace ndn

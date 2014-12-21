@@ -40,24 +40,24 @@ namespace ndn {
  * size and name same as in Interest.cation, which replying every incoming Interest
  * with Data packet with a specified size and name same as in Interest.
  */
-class Producer : public App
-{
+class Producer : public App {
 public:
   static TypeId
-  GetTypeId (void);
+  GetTypeId(void);
 
-  Producer ();
+  Producer();
 
   // inherited from NdnApp
-  void OnInterest (Ptr<const Interest> interest);
+  void
+  OnInterest(Ptr<const Interest> interest);
 
 protected:
   // inherited from Application base class.
   virtual void
-  StartApplication ();    // Called at time specified by Start
+  StartApplication(); // Called at time specified by Start
 
   virtual void
-  StopApplication ();     // Called at time specified by Stop
+  StopApplication(); // Called at time specified by Stop
 
 private:
   Name m_prefix;

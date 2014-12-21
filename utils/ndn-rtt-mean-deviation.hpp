@@ -25,7 +25,6 @@
 // Georgia Tech Network Simulator - Round Trip Time Estimation Class
 // George F. Riley.  Georgia Tech, Spring 2002
 
-
 #ifndef NDN_RTT_MEAN_DEVIATION_H
 #define NDN_RTT_MEAN_DEVIATION_H
 
@@ -37,7 +36,8 @@ namespace ndn {
 /**
  * \ingroup ndn-apps
  *
- * \brief The modified version of "Mean--Deviation" RTT estimator, as discussed by Van Jacobson that better suits NDN communication model
+ * \brief The modified version of "Mean--Deviation" RTT estimator, as discussed by Van Jacobson that
+ *better suits NDN communication model
  *
  * This class implements the "Mean--Deviation" RTT estimator, as discussed
  * by Van Jacobson and Michael J. Karels, in
@@ -46,25 +46,34 @@ namespace ndn {
  */
 class RttMeanDeviation : public RttEstimator {
 public:
-  static TypeId GetTypeId (void);
+  static TypeId
+  GetTypeId(void);
 
-  RttMeanDeviation ();
-  RttMeanDeviation (const RttMeanDeviation&);
+  RttMeanDeviation();
+  RttMeanDeviation(const RttMeanDeviation&);
 
-  virtual TypeId GetInstanceTypeId (void) const;
+  virtual TypeId
+  GetInstanceTypeId(void) const;
 
-  void SentSeq (SequenceNumber32 seq, uint32_t size);
-  Time AckSeq (SequenceNumber32 ackSeq);
-  void Measurement (Time measure);
-  Time RetransmitTimeout ();
-  Ptr<RttEstimator> Copy () const;
-  void Reset ();
-  void Gain (double g);
+  void
+  SentSeq(SequenceNumber32 seq, uint32_t size);
+  Time
+  AckSeq(SequenceNumber32 ackSeq);
+  void
+  Measurement(Time measure);
+  Time
+  RetransmitTimeout();
+  Ptr<RttEstimator>
+  Copy() const;
+  void
+  Reset();
+  void
+  Gain(double g);
 
 private:
-  double       m_gain;       // Filter gain
-  double       m_gain2;      // Filter gain
-  Time         m_variance;   // Current variance
+  double m_gain;   // Filter gain
+  double m_gain2;  // Filter gain
+  Time m_variance; // Current variance
 };
 
 } // namespace ndn

@@ -29,25 +29,24 @@
 
 namespace ns3 {
 
-class Hijacker : public ndn::App
-{
+class Hijacker : public ndn::App {
 public:
   static TypeId
-  GetTypeId ();
+  GetTypeId();
 
-  Hijacker ();
+  Hijacker();
 
   // Receive all Interests but do nothing in response
   void
-  OnInterest (Ptr<const ndn::Interest> interest);
+  OnInterest(Ptr<const ndn::Interest> interest);
 
 protected:
   // inherited from Application base class.
   virtual void
-  StartApplication ();
+  StartApplication();
 
   virtual void
-  StopApplication ();
+  StopApplication();
 };
 
 } // namespace ns3

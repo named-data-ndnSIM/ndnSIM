@@ -39,34 +39,33 @@ namespace cs {
  * @brief Special content store realization that honors Freshness parameter in Data packets
  */
 template<class Policy>
-class ContentStoreWithProbability :
-    public ContentStoreImpl< ndnSIM::multi_policy_traits< boost::mpl::vector2< ndnSIM::probability_policy_traits, Policy > > >
-{
+class ContentStoreWithProbability
+  : public ContentStoreImpl<ndnSIM::multi_policy_traits<boost::mpl::
+                                                          vector2<ndnSIM::probability_policy_traits,
+                                                                  Policy>>> {
 public:
-  typedef ContentStoreImpl< ndnSIM::multi_policy_traits< boost::mpl::vector2< ndnSIM::probability_policy_traits, Policy > > > super;
+  typedef ContentStoreImpl<ndnSIM::multi_policy_traits<boost::mpl::
+                                                         vector2<ndnSIM::probability_policy_traits,
+                                                                 Policy>>> super;
 
   typedef typename super::policy_container::template index<0>::type probability_policy_container;
 
-  ContentStoreWithProbability () {};
-  
-  static TypeId
-  GetTypeId ();
-private:
+  ContentStoreWithProbability(){};
 
-  void SetCacheProbability (double probability)
+  static TypeId
+  GetTypeId();
+
+private:
+  void
+  SetCacheProbability(double probability)
   {
-    this->getPolicy ()
-      .template get<probability_policy_container> ()
-      .set_probability (probability);
+    this->getPolicy().template get<probability_policy_container>().set_probability(probability);
   }
 
   double
-  GetCacheProbability () const
+  GetCacheProbability() const
   {
-    return 
-      this->getPolicy ()
-      .template get<probability_policy_container> ()
-      .get_probability ();
+    return this->getPolicy().template get<probability_policy_container>().get_probability();
   }
 };
 
@@ -76,25 +75,24 @@ private:
 
 template<class Policy>
 TypeId
-ContentStoreWithProbability< Policy >::GetTypeId ()
+ContentStoreWithProbability<Policy>::GetTypeId()
 {
-  static TypeId tid = TypeId (("ns3::ndn::cs::Probability::"+Policy::GetName ()).c_str ())
-    .SetGroupName ("Ndn")
-    .SetParent<super> ()
-    .template AddConstructor< ContentStoreWithProbability< Policy > > ()
+  static TypeId tid =
+    TypeId(("ns3::ndn::cs::Probability::" + Policy::GetName()).c_str())
+      .SetGroupName("Ndn")
+      .SetParent<super>()
+      .template AddConstructor<ContentStoreWithProbability<Policy>>()
 
-    .AddAttribute ("CacheProbability",
-                   "Set probability of caching in ContentStore. "
-                   "If 1, every content is cached. If 0, no content is cached.",
-                   DoubleValue (1.0),//(+)
-                   MakeDoubleAccessor (&ContentStoreWithProbability< Policy >::GetCacheProbability,
-                                       &ContentStoreWithProbability< Policy >::SetCacheProbability),
-                   MakeDoubleChecker<double> ())
-    ;
+      .AddAttribute("CacheProbability",
+                    "Set probability of caching in ContentStore. "
+                    "If 1, every content is cached. If 0, no content is cached.",
+                    DoubleValue(1.0), //(+)
+                    MakeDoubleAccessor(&ContentStoreWithProbability<Policy>::GetCacheProbability,
+                                       &ContentStoreWithProbability<Policy>::SetCacheProbability),
+                    MakeDoubleChecker<double>());
 
   return tid;
 }
-
 
 } // namespace cs
 } // namespace ndn

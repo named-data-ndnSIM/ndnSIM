@@ -22,66 +22,68 @@
 
 #include "ns3/log.h"
 
-NS_LOG_COMPONENT_DEFINE ("ndn.Limits.Window");
+NS_LOG_COMPONENT_DEFINE("ndn.Limits.Window");
 
 namespace ns3 {
 namespace ndn {
 
-NS_OBJECT_ENSURE_REGISTERED (LimitsWindow);
+NS_OBJECT_ENSURE_REGISTERED(LimitsWindow);
 
 TypeId
-LimitsWindow::GetTypeId ()
+LimitsWindow::GetTypeId()
 {
-  static TypeId tid = TypeId ("ns3::ndn::Limits::Window")
-    .SetGroupName ("Ndn")
-    .SetParent <Limits> () 
-    .AddConstructor <LimitsWindow> ()
-    
-    .AddTraceSource ("CurMaxLimit",
-                     "Current maximum limit",
-                     MakeTraceSourceAccessor (&LimitsWindow::m_curMaxLimit))
+  static TypeId tid = TypeId("ns3::ndn::Limits::Window")
+                        .SetGroupName("Ndn")
+                        .SetParent<Limits>()
+                        .AddConstructor<LimitsWindow>()
 
-    .AddTraceSource ("Outstanding",
-                     "Number of outstanding interests",
-                     MakeTraceSourceAccessor (&LimitsWindow::m_outstanding))
-    ;
+                        .AddTraceSource("CurMaxLimit", "Current maximum limit",
+                                        MakeTraceSourceAccessor(&LimitsWindow::m_curMaxLimit))
+
+                        .AddTraceSource("Outstanding", "Number of outstanding interests",
+                                        MakeTraceSourceAccessor(&LimitsWindow::m_outstanding));
   return tid;
 }
 
 void
-LimitsWindow::UpdateCurrentLimit (double limit)
+LimitsWindow::UpdateCurrentLimit(double limit)
 {
-  NS_ASSERT_MSG (limit >= 0.0, "Limit should be greater or equal to zero");
-  
-  m_curMaxLimit = std::min (limit, GetMaxRate () * GetMaxDelay ());
+  NS_ASSERT_MSG(limit >= 0.0, "Limit should be greater or equal to zero");
+
+  m_curMaxLimit = std::min(limit, GetMaxRate() * GetMaxDelay());
 }
 
 bool
-LimitsWindow::IsBelowLimit ()
+LimitsWindow::IsBelowLimit()
 {
-  if (!IsEnabled ()) return true;
+  if (!IsEnabled())
+    return true;
 
   return (m_curMaxLimit - m_outstanding >= 1.0);
 }
 
 void
-LimitsWindow::BorrowLimit ()
+LimitsWindow::BorrowLimit()
 {
-  if (!IsEnabled ()) return; 
+  if (!IsEnabled())
+    return;
 
-  NS_ASSERT_MSG (m_curMaxLimit - m_outstanding >= 1.0, "Should not be possible, unless we IsBelowLimit was not checked correctly");
+  NS_ASSERT_MSG(m_curMaxLimit - m_outstanding >= 1.0,
+                "Should not be possible, unless we IsBelowLimit was not checked correctly");
   m_outstanding += 1;
 }
 
 void
-LimitsWindow::ReturnLimit ()
+LimitsWindow::ReturnLimit()
 {
-  if (!IsEnabled ()) return; 
+  if (!IsEnabled())
+    return;
 
-  NS_ASSERT_MSG (m_outstanding >= (uint32_t)1, "Should not be possible, unless we decreasing this number twice somewhere");
+  NS_ASSERT_MSG(m_outstanding >= (uint32_t)1,
+                "Should not be possible, unless we decreasing this number twice somewhere");
   m_outstanding -= 1;
 
-  FireAvailableSlotCallback ();
+  FireAvailableSlotCallback();
 }
 
 } // namespace ndn
