@@ -1,31 +1,10 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
-#
-# Copyright (c) 2011-2013, Regents of the University of California
-#                          Alexander Afanasyev
-#
-# GNU 3.0 license, See the LICENSE file for more information
-#
-# Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
-#
 
 import os
 from waflib import Logs, Utils, Options, TaskGen, Task
 from waflib.Errors import WafError
 
 import wutils
-
-def options(opt):
-    opt = opt.add_option_group ('ndnSIM Options')
-    opt.add_option('--enable-ndn-plugins',
-                   help="""Enable NDN plugins (may require patching).  topology plugin enabled by default""",
-                   dest='enable_ndn_plugins')
-
-    opt.add_option('--disable-ndn-plugins',
-                   help="""Enable NDN plugins (may require patching).  topology plugin enabled by default""",
-                   dest='disable_ndn_plugins')
-
-    opt.add_option('--pyndn-install-path', dest='pyndn_install_path',
-                   help="""Installation path for PyNDN (by default: into standard location under PyNDN folder""")
 
 REQUIRED_BOOST_LIBS = ['graph']
 
@@ -34,6 +13,9 @@ def required_boost_libs(conf):
 
 def configure(conf):
     conf.env['ENABLE_NDNSIM']=False;
+
+    conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'],
+                   uselib_store='NDN_CXX', mandatory=True)
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
@@ -71,162 +53,45 @@ def configure(conf):
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 
-    conf.env['NDN_plugins'] = ['topology', 'ip-faces']
-    if Options.options.enable_ndn_plugins:
-        conf.env['NDN_plugins'] = conf.env['NDN_plugins'] + Options.options.enable_ndn_plugins.split(',')
-
-    if Options.options.disable_ndn_plugins:
-        conf.env['NDN_plugins'] = conf.env['NDN_plugins'] - Options.options.disable_ndn_plugins.split(',')
-
-    if Options.options.pyndn_install_path:
-        conf.env['PyNDN_install_path'] = Options.options.pyndn_install_path
-
     conf.env['ENABLE_NDNSIM']=True;
     conf.env['MODULES_BUILT'].append('ndnSIM')
 
     conf.report_optional_feature("ndnSIM", "ndnSIM", True, "")
 
 def build(bld):
-    deps = ['core', 'network', 'point-to-point']
-    deps.append ('internet') # Until RttEstimator is moved to network module
+    deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
-        deps.append ('visualizer')
+        deps.append('visualizer')
 
-    if 'topology' in bld.env['NDN_plugins']:
-        deps.append ('topology-read')
-        deps.append ('mobility')
-
-    if 'mobility' in bld.env['NDN_plugins']:
-        deps.append ('mobility')
+    if bld.env.ENABLE_EXAMPLES:
+        deps += ['point-to-point-layout', 'csma', 'applications']
 
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders'
-    module.uselib = 'BOOST BOOST_IOSTREAMS'
+    module.uselib = 'NDN_CXX BOOST'
+    module.includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
+    module.export_includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
 
     headers = bld (features='ns3header')
     headers.module = 'ndnSIM'
+    headers.source = ["ndn-all.hpp"]
 
     if not bld.env['ENABLE_NDNSIM']:
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
-    module.source = bld.path.ant_glob(['model/**/*.cc',
-                                       'apps/*.cc',
-                                       'utils/**/*.cc',
-                                       'helper/**/*.cc',
-                                       'ndn.cxx/**/*.cc',
-                                       ])
-    module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob([
-                           'utils/**/*.h',
-                           'model/**/*.h',
-                           'apps/**/*.h',
-                           'helper/**/*.h',
-                           'ndn.cxx/**/*.h',
-                           ])]
+    module_dirs = ['NFD', 'apps', 'helper', 'model', 'utils']
+    
+    module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs])
 
-    headers.source = [
-        "helper/ndn-stack-helper.h",
-        "helper/ndn-app-helper.h",
-        "helper/ndn-header-helper.h",
-        "helper/ndn-face-container.h",
-        "helper/ndn-global-routing-helper.h",
-        "helper/ndn-link-control-helper.h",
-
-        "apps/ndn-app.h",
-
-        "model/ndn-common.h",
-        "model/ndn-l3-protocol.h",
-        "model/ndn-face.h",
-        "model/ndn-app-face.h",
-        "model/ndn-net-device-face.h",
-        "model/ndn-interest.h",
-        "model/ndn-data.h",
-        "model/ndn-name-components.h",
-        "model/ndn-name.h",
-
-        "ndn.cxx/blob.h",
-        "ndn.cxx/name-component.h",
-        "ndn.cxx/name.h",
-        "ndn.cxx/exclude.h",
-        "ndn.cxx/ndn-api-face.h",
-
-        "model/cs/ndn-content-store.h",
-
-        "model/fib/ndn-fib.h",
-        "model/fib/ndn-fib-entry.h",
-
-        "model/pit/ndn-pit.h",
-        "model/pit/ndn-pit-entry.h",
-        "model/pit/ndn-pit-entry-incoming-face.h",
-        "model/pit/ndn-pit-entry-outgoing-face.h",
-
-        "model/fw/ndn-forwarding-strategy.h",
-        "model/fw/ndn-fw-tag.h",
-
-        "model/wire/ndn-wire.h",
-
-        "utils/ndn-limits.h",
-        "utils/ndn-rtt-estimator.h",
-
-        # "utils/tracers/ipv4-app-tracer.h",
-        # "utils/tracers/ipv4-l3-tracer.h",
-        # "utils/tracers/ipv4-rate-l3-tracer.h",
-        # "utils/tracers/ipv4-seqs-app-tracer.h",
-
-        "utils/tracers/l2-rate-tracer.h",
-        "utils/tracers/l2-tracer.h",
-        "utils/tracers/ndn-app-delay-tracer.h",
-        "utils/tracers/ndn-cs-tracer.h",
-        "utils/tracers/ndn-l3-aggregate-tracer.h",
-        "utils/tracers/ndn-l3-tracer.h",
-        "utils/tracers/ndn-l3-rate-tracer.h",
-
-        "apps/callback-based-app.h",
-        ]
-
-    if 'topology' in bld.env['NDN_plugins']:
-        headers.source.extend ([
-            "plugins/topology/rocketfuel-weights-reader.h",
-            "plugins/topology/annotated-topology-reader.h",
-            ])
-        module.source.extend (bld.path.ant_glob(['plugins/topology/*.cc']))
-        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/topology/**/*.h'])])
-
-    if 'mobility' in bld.env['NDN_plugins']:
-        headers.source.extend ([
-            "plugins/mobility/spring-mobility-model.h",
-            "plugins/mobility/spring-mobility-helper.h",
-            ])
-        module.source.extend (bld.path.ant_glob(['plugins/mobility/*.cc']))
-        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/mobility/**/*.h'])])
-
-    if 'ip-faces' in bld.env['NDN_plugins']:
-        headers.source.extend ([
-            "plugins/ip-faces/ndn-ip-faces-helper.h",
-            ])
-        module.source.extend (bld.path.ant_glob(['plugins/ip-faces/*.cc']))
-        module.full_headers.extend ([p.path_from(bld.path) for p in bld.path.ant_glob(['plugins/ip-faces/**/*.h'])])
-
-    # bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM' % (wutils.APPNAME, wutils.VERSION), ndnSIM_headers, relative_trick=True)
-    # bld.install_files('$PREFIX/include', ndnSIM_headers)
-
-    tests = bld.create_ns3_module_test_library('ndnSIM')
-    tests.source = bld.path.ant_glob('test/*.cc')
+    module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob(
+        ['%s/**/*.hpp' % dir for dir in module_dirs])]
 
     if bld.env.ENABLE_EXAMPLES:
         bld.recurse ('examples')
 
-    bld.recurse ('tools')
-
     bld.ns3_python_bindings()
-
-    if bld.env['ENABLE_PYTHON_BINDINGS']:
-        if bld.env['PyNDN_install_path']:
-            bld (features = "py",
-                 source = bld.path.ant_glob (["PyNDN/**/*.py"]),
-                 install_from = "PyNDN",
-                 install_path = bld.env['PyNDN_install_path'])
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')

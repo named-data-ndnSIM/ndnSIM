@@ -1,108 +1,14 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
-# 
-# Copyright (c) 2011-2013, Regents of the University of California
-#                          Alexander Afanasyev
-# 
-# GNU 3.0 license, See the LICENSE file for more information
-# 
-# Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
-# 
+
+from waflib import Utils, Logs
 
 def build(bld):
     # This may be necessary for visualizer to work
     all_modules = [mod[len("ns3-"):] for mod in bld.env['NS3_ENABLED_MODULES']]
 
-    obj = bld.create_ns3_program('ndn-simple', all_modules)
-    obj.source = 'ndn-simple.cc'
+    for i in bld.path.ant_glob(['*.cpp']):
+        name = str(i)[:-len(".cpp")]
+        obj = bld.create_ns3_program(name, all_modules)
+        obj.source = [i] + bld.path.ant_glob(['%s/**/*.cpp' % name])
+        obj.includes += " .. ../NFD"
 
-    obj = bld.create_ns3_program('ndn-csma', all_modules)
-    obj.source = 'ndn-csma.cc'
-
-    obj = bld.create_ns3_program('ndn-grid', all_modules)
-    obj.source = 'ndn-grid.cc'
-
-    obj = bld.create_ns3_program('ndn-zipf-mandelbrot', all_modules)
-    obj.source = 'ndn-zipf-mandelbrot.cc'
-
-
-    obj = bld.create_ns3_program('ndn-simple-with-content-freshness', all_modules)
-    obj.source = ['ndn-simple-with-content-freshness.cc',
-                  'custom-apps/dumb-requester.cc']
-
-    obj = bld.create_ns3_program('ndn-simple-with-custom-app', all_modules)
-    obj.source = ['ndn-simple-with-custom-app.cc',
-                  'custom-apps/custom-app.cc',
-                  'custom-apps/hijacker.cc']
-
-    if 'topology' in bld.env['NDN_plugins']:
-        obj = bld.create_ns3_program('ndn-grid-topo-plugin', all_modules)
-        obj.source = 'ndn-grid-topo-plugin.cc'
-
-        obj = bld.create_ns3_program('ndn-grid-topo-plugin-loss', all_modules)
-        obj.source = 'ndn-grid-topo-plugin-loss.cc'
-
-        obj = bld.create_ns3_program('ndn-grid-topo-plugin-red-queues', all_modules)
-        obj.source = 'ndn-grid-topo-plugin-red-queues.cc'
-
-        obj = bld.create_ns3_program('ndn-congestion-topo-plugin', all_modules)
-        obj.source = 'ndn-congestion-topo-plugin.cc'
-
-        obj = bld.create_ns3_program('ndn-congestion-alt-topo-plugin', all_modules)
-        obj.source = [
-            'custom-strategies/custom-strategy.cc',
-            'ndn-congestion-alt-topo-plugin.cc'
-            ]
-
-        obj = bld.create_ns3_program('ndn-tree-tracers', all_modules)
-        obj.source = 'ndn-tree-tracers.cc'
-
-        obj = bld.create_ns3_program('ndn-tree-cs-tracers', all_modules)
-        obj.source = 'ndn-tree-cs-tracers.cc'
-
-        obj = bld.create_ns3_program('ndn-tree-app-delay-tracer', all_modules)
-        obj.source = 'ndn-tree-app-delay-tracer.cc'
-
-        obj = bld.create_ns3_program('ndn-tree-with-l2tracer', all_modules)
-        obj.source = 'ndn-tree-with-l2tracer.cc'
-
-        obj = bld.create_ns3_program('ndn-triangle-calculate-routes', all_modules)
-        obj.source = 'ndn-triangle-calculate-routes.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-pit-policies', all_modules)
-    obj.source = 'ndn-simple-pit-policies.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-with-different-sizes-content-store', all_modules)
-    obj.source = 'ndn-simple-with-different-sizes-content-store.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-with-cs-lfu', all_modules)
-    obj.source = 'ndn-simple-with-cs-lfu.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-with-pcap', all_modules)
-    obj.source = 'ndn-simple-with-pcap.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-with-pit-operation-stats', all_modules)
-    obj.source = 'ndn-simple-with-pit-operation-stats.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-with-pit-count-stats', all_modules)
-    obj.source = 'ndn-simple-with-pit-count-stats.cc'
-
-    obj = bld.create_ns3_program('ndn-simple-api', all_modules)
-    obj.source = [
-        'ndn-simple-api.cc',
-        'custom-apps/ndn-api-app.cc'
-        ]
-
-    obj = bld.create_ns3_program('ndn-simple-with-link-failure', all_modules)
-    obj.source = 'ndn-simple-with-link-failure.cc'
-
-    if 'ip-faces' in bld.env['NDN_plugins']:
-        obj = bld.create_ns3_program('ndn-simple-tcp', all_modules)
-        obj.source = 'ndn-simple-tcp.cc'
-
-        obj = bld.create_ns3_program('ndn-simple-udp', all_modules)
-        obj.source = 'ndn-simple-udp.cc'
-
-
-    if 'ns3-wifi' in bld.env['NS3_ENABLED_MODULES']:
-        obj = bld.create_ns3_program('ndn-simple-wifi', all_modules)
-        obj.source = 'ndn-simple-wifi.cc'
