@@ -22,8 +22,8 @@
 #define NDN_NET_DEVICE_FACE_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/model/ndn-face.hpp"
 
-#include "ndn-face.hpp"
 #include "ns3/net-device.h"
 
 namespace ns3 {
@@ -53,11 +53,18 @@ public:
    * this face will be associate
    */
   NetDeviceFace(Ptr<Node> node, const Ptr<NetDevice>& netDevice);
+
   virtual ~NetDeviceFace();
 
-protected:
-  virtual bool
-  Send(Ptr<Packet> p);
+public: // from nfd::Face
+  virtual void
+  sendInterest(const Interest& interest);
+
+  virtual void
+  sendData(const Data& data);
+
+  virtual void
+  close();
 
 public:
   /**
@@ -69,12 +76,16 @@ public:
   GetNetDevice() const;
 
 private:
+  void
+  send(Ptr<Packet> packet);
+
   /// \brief callback from lower layers
   void
-  ReceiveFromNetDevice(Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
+  receiveFromNetDevice(Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t protocol,
                        const Address& from, const Address& to, NetDevice::PacketType packetType);
 
 private:
+  Ptr<Node> m_node;
   Ptr<NetDevice> m_netDevice; ///< \brief Smart pointer to NetDevice
 };
 

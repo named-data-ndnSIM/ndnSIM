@@ -22,6 +22,7 @@
 #define NDN_L3_PROTOCOL_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/model/ndn-face.hpp"
 
 #include <list>
 #include <vector>
@@ -33,13 +34,10 @@
 namespace ns3 {
 
 class Packet;
-class NetDevice;
 class Node;
 class Header;
 
 namespace ndn {
-
-class Face;
 
 /**
  * \defgroup ndn ndnSIM: NDN simulation module
@@ -64,8 +62,6 @@ class Face;
  */
 class L3Protocol : public Object {
 public:
-  typedef std::vector<shared_ptr<Face>> FaceList;
-
   /**
    * \brief Interface ID
    *

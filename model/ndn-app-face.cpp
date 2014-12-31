@@ -36,8 +36,9 @@ namespace ns3 {
 namespace ndn {
 
 AppFace::AppFace(Ptr<App> app)
-  // : Face(app->GetNode())
-  : m_app(app)
+  : LocalFace(FaceUri("appFace://"), FaceUri("appFace://"))
+  , m_node(app->GetNode())
+  , m_app(app)
 {
   NS_LOG_FUNCTION(this << app);
 
@@ -49,18 +50,31 @@ AppFace::~AppFace()
   NS_LOG_FUNCTION_NOARGS();
 }
 
-bool
-AppFace::SendInterest(shared_ptr<const Interest> interest)
+void
+AppFace::close()
 {
-  NS_LOG_FUNCTION(this << interest);
-  return false;
 }
 
-bool
-AppFace::SendData(shared_ptr<const Data> data)
+void
+AppFace::sendInterest(const Interest& interest)
 {
-  NS_LOG_FUNCTION(this << data);
-  return false;
+  NS_LOG_FUNCTION(this << &interest);
+
+  this->onSendInterest(interest);
+
+  // to decouple callbacks
+  Simulator::ScheduleNow(&App::OnInterest, m_app, interest.shared_from_this());
+}
+
+void
+AppFace::sendData(const Data& data)
+{
+  NS_LOG_FUNCTION(this << &data);
+
+  this->onSendData(data);
+
+  // to decouple callbacks
+  Simulator::ScheduleNow(&App::OnData, m_app, data.shared_from_this());
 }
 
 } // namespace ndn

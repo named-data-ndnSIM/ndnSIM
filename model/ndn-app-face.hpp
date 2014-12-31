@@ -23,13 +23,13 @@
 #define NDN_APP_FACE_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
-
-#include "ndn-face.hpp"
-#include "ns3/traced-callback.h"
+#include "ns3/ndnSIM/NFD/daemon/face/local-face.hpp"
+#include "ns3/ndnSIM/model/ndn-face.hpp"
 
 namespace ns3 {
 
 class Packet;
+class Node;
 
 namespace ndn {
 
@@ -43,25 +43,39 @@ class App;
  * component responsible for actual delivery of data packet to and
  * from Ndn stack
  *
- * \see AppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
+ * \see AppFace, NdnNetDeviceFace
  */
-class AppFace : public Face {
+class AppFace : public nfd::LocalFace {
 public:
   /**
    * \brief Default constructor
    */
   AppFace(Ptr<App> app);
+
   virtual ~AppFace();
 
-  ////////////////////////////////////////////////////////////////////
-  // methods overloaded from Face
-  virtual bool
-  SendInterest(shared_ptr<const Interest> interest);
+public: // from nfd::Face
+  /**
+   * @brief Send Interest towards application
+   *
+   * @note To send Interest from application, use `AppFace::onReceiveInterest(interest)`
+   */
+  virtual void
+  sendInterest(const Interest& interest);
 
-  virtual bool
-  SendData(shared_ptr<const Data> data);
+  /**
+   * @brief Send Data towards application
+   *
+   * @note To send Data from application, use `AppFace::onReceiveData(data)`
+   */
+  virtual void
+  sendData(const Data& data);
+
+  virtual void
+  close();
 
 private:
+  Ptr<Node> m_node;
   Ptr<App> m_app;
 };
 

@@ -20,21 +20,27 @@
 #ifndef NDNSIM_NDN_FACE_HPP
 #define NDNSIM_NDN_FACE_HPP
 
-#include <boost/noncopyable.hpp>
+#include "ns3/ndnSIM/NFD/daemon/face/face.hpp"
+#include <ndn-cxx/util/face-uri.hpp>
 
 namespace ns3 {
 namespace ndn {
 
-class Face : boost::noncopyable {
-};
+using nfd::Face;
+using ::ndn::util::FaceUri;
+
+} // namespace ndn
+} // namespace ns3
+
+namespace nfd {
 
 inline std::ostream&
 operator<<(std::ostream& os, const Face& face)
 {
+  os << face.getLocalUri();
   return os;
 }
 
-} // namespace ndn
-} // namespace ns3
+} // namespace nfd
 
 #endif // NDNSIM_NDN_FACE_HPP

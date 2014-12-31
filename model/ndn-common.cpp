@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2014  Regents of the University of California.
+ * Copyright (c) 2011-2015  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -17,48 +17,12 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_COMMON_H
-#define NDN_COMMON_H
-
-#include "ns3/nstime.h"
-#include "ns3/simulator.h"
-#include "ns3/attribute.h"
-#include "ns3/attribute-helper.h"
-
-#include <ndn-cxx/interest.hpp>
-#include <ndn-cxx/encoding/block.hpp>
-#include <ndn-cxx/signature.hpp>
-#include <ndn-cxx/signature-info.hpp>
-#include <ndn-cxx/name.hpp>
-#include <ndn-cxx/data.hpp>
-#include <ndn-cxx/security/key-chain.hpp>
-
-#include <ndn-cxx/util/time.hpp>
+#include "ndn-common.hpp"
 
 namespace ns3 {
 namespace ndn {
 
-using ::ndn::Name;
-namespace name = ::ndn::name;
-
-ATTRIBUTE_HELPER_HEADER(Name);
-
-namespace time = ::ndn::time;
-
-using ::ndn::Exclude;
-
-using std::shared_ptr;
-using std::make_shared;
-
-using ::ndn::Interest;
-using ::ndn::Data;
-using ::ndn::KeyLocator;
-using ::ndn::Signature;
-using ::ndn::SignatureInfo;
-using ::ndn::Block;
-using ::ndn::KeyChain;
+ATTRIBUTE_HELPER_CPP(Name);
 
 } // namespace ndn
 } // namespace ns3
-
-#endif // NDN_COMMON_H
