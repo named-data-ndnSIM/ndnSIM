@@ -123,6 +123,12 @@ public: // attributes
   virtual const std::string&
   getDescription() const;
 
+  void
+  setMetric(uint64_t metric);
+
+  uint64_t
+  getMetric() const;
+
   /** \brief Get whether face is connected to a local app
    */
   bool
@@ -200,6 +206,7 @@ private:
   FaceUri m_localUri;
   bool m_isOnDemand;
   bool m_isFailed;
+  uint64_t m_metric;
 
   // allow setting FaceId
   friend class FaceTable;
@@ -245,6 +252,18 @@ inline bool
 Face::isOnDemand() const
 {
   return m_isOnDemand;
+}
+
+inline void
+Face::setMetric(uint64_t metric)
+{
+  m_metric = metric;
+}
+
+inline uint64_t
+Face::getMetric() const
+{
+  return m_metric;
 }
 
 } // namespace nfd

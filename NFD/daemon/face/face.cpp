@@ -35,6 +35,7 @@ Face::Face(const FaceUri& remoteUri, const FaceUri& localUri, bool isLocal)
   , m_localUri(localUri)
   , m_isOnDemand(false)
   , m_isFailed(false)
+  , m_metric(0)
 {
   onReceiveInterest += [this](const ndn::Interest&) { ++m_counters.getNInInterests(); };
   onReceiveData     += [this](const ndn::Data&) {     ++m_counters.getNInDatas(); };
