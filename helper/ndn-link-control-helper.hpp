@@ -96,7 +96,11 @@ public:
    */
   static void
   UpLinkByName(const std::string& node1, const std::string& node2);
-}; // end: LinkControlHelper
+
+private:
+  static void
+  setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRate);
+}; // LinkControlHelper
 
 } // ndn
 } // ns3

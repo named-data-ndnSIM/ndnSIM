@@ -27,9 +27,16 @@
 #include "ns3/point-to-point-channel.h"
 #include "ns3/channel.h"
 #include "ns3/log.h"
+#include "ns3/error-model.h"
+#include "ns3/string.h"
+#include "ns3/boolean.h"
+#include "ns3/double.h"
+#include "ns3/pointer.h"
 
-#include "ns3/ndn-l3-protocol.hpp"
-#include "ns3/ndn-net-device-face.hpp"
+#include "model/ndn-l3-protocol.hpp"
+#include "model/ndn-net-device-face.hpp"
+
+#include "fw/forwarder.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.LinkControlHelper");
 
@@ -37,31 +44,30 @@ namespace ns3 {
 namespace ndn {
 
 void
-LinkControlHelper::FailLink(Ptr<Node> node1, Ptr<Node> node2)
+LinkControlHelper::setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRate)
 {
-  NS_LOG_FUNCTION(node1 << node2);
+  NS_LOG_FUNCTION(node1 << node2 << errorRate);
 
-  NS_ASSERT(node1 != 0);
-  NS_ASSERT(node2 != 0);
+  NS_ASSERT(node1 != nullptr && node2 != nullptr);
+  NS_ASSERT(errorRate <= 1.0);
 
   Ptr<ndn::L3Protocol> ndn1 = node1->GetObject<ndn::L3Protocol>();
   Ptr<ndn::L3Protocol> ndn2 = node2->GetObject<ndn::L3Protocol>();
 
-  NS_ASSERT(ndn1 != 0);
-  NS_ASSERT(ndn2 != 0);
+  NS_ASSERT(ndn1 != nullptr && ndn2 != nullptr);
 
   // iterate over all faces to find the right one
-  for (uint32_t faceId = 0; faceId < ndn1->GetNFaces(); faceId++) {
-    Ptr<ndn::NetDeviceFace> ndFace = ndn1->GetFace(faceId)->GetObject<ndn::NetDeviceFace>();
-    if (ndFace == 0)
+  for (const auto& face : ndn1->getForwarder()->getFaceTable()) {
+    shared_ptr<ndn::NetDeviceFace> ndFace = std::dynamic_pointer_cast<NetDeviceFace>(face);
+    if (ndFace == nullptr)
       continue;
 
     Ptr<PointToPointNetDevice> nd1 = ndFace->GetNetDevice()->GetObject<PointToPointNetDevice>();
-    if (nd1 == 0)
+    if (nd1 == nullptr)
       continue;
 
     Ptr<Channel> channel = nd1->GetChannel();
-    if (channel == 0)
+    if (channel == nullptr)
       continue;
 
     Ptr<PointToPointChannel> ppChannel = DynamicCast<PointToPointChannel>(channel);
@@ -70,16 +76,24 @@ LinkControlHelper::FailLink(Ptr<Node> node1, Ptr<Node> node2)
     if (nd2->GetNode() == node1)
       nd2 = ppChannel->GetDevice(1);
 
-    if (nd2->GetNode() == node2) {
-      Ptr<ndn::Face> face1 = ndn1->GetFaceByNetDevice(nd1);
-      Ptr<ndn::Face> face2 = ndn2->GetFaceByNetDevice(nd2);
-
-      face1->SetUp(false);
-      face2->SetUp(false);
-      break;
+    ObjectFactory errorFactory("ns3::RateErrorModel");
+    errorFactory.Set("ErrorUnit", StringValue("ERROR_UNIT_PACKET"));
+    errorFactory.Set("ErrorRate", DoubleValue(errorRate));
+    if (errorRate <= 0) {
+      errorFactory.Set("IsEnabled", BooleanValue(false));
     }
+
+    nd1->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
+    nd2->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
   }
 }
+
+void
+LinkControlHelper::FailLink(Ptr<Node> node1, Ptr<Node> node2)
+{
+  setErrorRate(node1, node2, 1.0);
+}
+
 void
 LinkControlHelper::FailLinkByName(const std::string& node1, const std::string& node2)
 {
@@ -89,46 +103,7 @@ LinkControlHelper::FailLinkByName(const std::string& node1, const std::string& n
 void
 LinkControlHelper::UpLink(Ptr<Node> node1, Ptr<Node> node2)
 {
-  NS_LOG_FUNCTION(node1 << node2);
-
-  NS_ASSERT(node1 != 0);
-  NS_ASSERT(node2 != 0);
-
-  Ptr<ndn::L3Protocol> ndn1 = node1->GetObject<ndn::L3Protocol>();
-  Ptr<ndn::L3Protocol> ndn2 = node2->GetObject<ndn::L3Protocol>();
-
-  NS_ASSERT(ndn1 != 0);
-  NS_ASSERT(ndn2 != 0);
-
-  // iterate over all faces to find the right one
-  for (uint32_t faceId = 0; faceId < ndn1->GetNFaces(); faceId++) {
-    Ptr<ndn::NetDeviceFace> ndFace = ndn1->GetFace(faceId)->GetObject<ndn::NetDeviceFace>();
-    if (ndFace == 0)
-      continue;
-
-    Ptr<PointToPointNetDevice> nd1 = ndFace->GetNetDevice()->GetObject<PointToPointNetDevice>();
-    if (nd1 == 0)
-      continue;
-
-    Ptr<Channel> channel = nd1->GetChannel();
-    if (channel == 0)
-      continue;
-
-    Ptr<PointToPointChannel> ppChannel = DynamicCast<PointToPointChannel>(channel);
-
-    Ptr<NetDevice> nd2 = ppChannel->GetDevice(0);
-    if (nd2->GetNode() == node1)
-      nd2 = ppChannel->GetDevice(1);
-
-    if (nd2->GetNode() == node2) {
-      Ptr<ndn::Face> face1 = ndn1->GetFaceByNetDevice(nd1);
-      Ptr<ndn::Face> face2 = ndn2->GetFaceByNetDevice(nd2);
-
-      face1->SetUp(true);
-      face2->SetUp(true);
-      break;
-    }
-  }
+  setErrorRate(node1, node2, -0.1); // this will ensure error model is disabled
 }
 
 void
@@ -136,5 +111,6 @@ LinkControlHelper::UpLinkByName(const std::string& node1, const std::string& nod
 {
   UpLink(Names::Find<Node>(node1), Names::Find<Node>(node2));
 }
-}
-}
+
+} // namespace ndn
+} // namespace ns3
