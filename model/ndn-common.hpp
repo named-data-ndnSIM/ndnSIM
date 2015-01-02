@@ -35,6 +35,9 @@
 
 #include <ndn-cxx/util/time.hpp>
 
+namespace nfd {
+}
+
 namespace ns3 {
 namespace ndn {
 
@@ -59,6 +62,8 @@ using ::ndn::Signature;
 using ::ndn::SignatureInfo;
 using ::ndn::Block;
 using ::ndn::KeyChain;
+
+namespace nfd = ::nfd;
 
 } // namespace ndn
 } // namespace ns3
