@@ -23,12 +23,13 @@
 #ifndef ROCKETFUEL_MAP_READER_H
 #define ROCKETFUEL_MAP_READER_H
 
-#include "ns3/annotated-topology-reader.hpp"
+#include "annotated-topology-reader.hpp"
+
 #include "ns3/net-device-container.h"
 #include "ns3/random-variable.h"
-#include <set>
 #include "ns3/data-rate.h"
 
+#include <set>
 #include <boost/graph/adjacency_list.hpp>
 
 using namespace std;

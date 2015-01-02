@@ -22,7 +22,7 @@
 #ifndef ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H
 #define ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H
 
-#include "annotated-topology-reader.hpp"
+#include "ns3/ndnSIM/utils/topology/annotated-topology-reader.hpp"
 #include "ns3/net-device-container.h"
 
 namespace ns3 {

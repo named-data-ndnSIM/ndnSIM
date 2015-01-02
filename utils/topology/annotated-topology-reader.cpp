@@ -38,12 +38,12 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/ndn-l3-protocol.hpp"
-#include "ns3/ndn-face.hpp"
 #include "ns3/random-variable.h"
 #include "ns3/error-model.h"
-
 #include "ns3/constant-position-mobility-model.h"
+
+#include "model/ndn-l3-protocol.hpp"
+#include "model/ndn-net-device-face.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -288,10 +288,10 @@ AnnotatedTopologyReader::ApplyOspfMetric()
 
       Ptr<ndn::L3Protocol> ndn = link.GetFromNode()->GetObject<ndn::L3Protocol>();
       if (ndn != 0) {
-        Ptr<ndn::Face> face = ndn->GetFaceByNetDevice(link.GetFromNetDevice());
+        shared_ptr<ndn::Face> face = ndn->getFaceByNetDevice(link.GetFromNetDevice());
         NS_ASSERT(face != 0);
 
-        face->SetMetric(metric);
+        face->setMetric(metric);
       }
     }
 
@@ -306,10 +306,10 @@ AnnotatedTopologyReader::ApplyOspfMetric()
 
       Ptr<ndn::L3Protocol> ndn = link.GetToNode()->GetObject<ndn::L3Protocol>();
       if (ndn != 0) {
-        Ptr<ndn::Face> face = ndn->GetFaceByNetDevice(link.GetToNetDevice());
+        shared_ptr<ndn::Face> face = ndn->getFaceByNetDevice(link.GetToNetDevice());
         NS_ASSERT(face != 0);
 
-        face->SetMetric(metric);
+        face->setMetric(metric);
       }
     }
   }
