@@ -351,5 +351,13 @@ L3Protocol::getFaceByNetDevice(Ptr<NetDevice> netDevice) const
   return nullptr;
 }
 
+Ptr<L3Protocol>
+L3Protocol::getL3Protocol(Ptr<Object> node)
+{
+  Ptr<L3Protocol> retval = node->GetObject<L3Protocol>();
+  NS_ASSERT_MSG(retval != nullptr, "L3Protocol is not aggregated on this object");
+  return retval;
+}
+
 } // namespace ndn
 } // namespace ns3
