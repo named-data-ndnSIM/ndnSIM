@@ -107,6 +107,15 @@ public:
   void
   parse(std::istream& input, bool isDryRun, const std::string& filename);
 
+  /**
+   * \param config ConfigSection that needs to be processed
+   * \param isDryRun true if performing a dry run of configuration, false otherwise
+   * \param filename optional convenience argument to provide more detailed error messages
+   * \throws ConfigFile::Error if parse error
+   */
+  void
+  parse(const ConfigSection& config, bool isDryRun, const std::string& filename);
+
 private:
 
   void
