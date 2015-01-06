@@ -82,7 +82,7 @@ def build(bld):
         return
 
     module_dirs = ['NFD', 'apps', 'helper', 'model', 'utils']
-    
+
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=['model/ip-faces/*'])
 
@@ -91,6 +91,9 @@ def build(bld):
 
     if bld.env.ENABLE_EXAMPLES:
         bld.recurse('examples')
+
+    if bld.env.ENABLE_TESTS:
+        bld.recurse('tests')
 
     bld.ns3_python_bindings()
 
