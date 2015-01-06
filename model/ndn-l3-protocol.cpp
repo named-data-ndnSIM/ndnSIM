@@ -36,7 +36,7 @@
 #include "../helper/ndn-stack-helper.hpp"
 #include "cs/ndn-content-store.hpp"
 
-#include <boost/foreach.hpp>
+#include <boost/property_tree/info_parser.hpp>
 
 #include "ns3/ndnSIM/NFD/daemon/fw/forwarder.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/internal-face.hpp"
@@ -83,6 +83,61 @@ L3Protocol::GetTypeId(void)
 
 class L3Protocol::Impl {
 private:
+  Impl()
+  {
+    // Do not modify initial config file. Use helpers to set specific NFD parameters
+    std::string initialConfig =
+      "general\n"
+      "{\n"
+      "}\n"
+      "\n"
+      "tables\n"
+      "{\n"
+      "  cs_max_packets 100\n"
+      "\n"
+      "  strategy_choice\n"
+      "  {\n"
+      "    /               /localhost/nfd/strategy/best-route\n"
+      "    /localhost      /localhost/nfd/strategy/broadcast\n"
+      "    /localhost/nfd  /localhost/nfd/strategy/best-route\n"
+      "    /ndn/broadcast  /localhost/nfd/strategy/broadcast\n"
+      "  }\n"
+      "}\n"
+      "\n"
+      // "face_system\n"
+      // "{\n"
+      // "}\n"
+      "\n"
+      "authorizations\n"
+      "{\n"
+      "  authorize\n"
+      "  {\n"
+      "    certfile any\n"
+      "    privileges\n"
+      "    {\n"
+      "      faces\n"
+      "      fib\n"
+      "      strategy-choice\n"
+      "    }\n"
+      "  }\n"
+      "}\n"
+      "\n"
+      "rib\n"
+      "{\n"
+      "  localhost_security\n"
+      "  {\n"
+      "    trust-anchor\n"
+      "    {\n"
+      "      type any\n"
+      "    }\n"
+      "  }\n"
+      "}\n"
+      "\n";
+
+    std::istringstream input(initialConfig);
+    boost::property_tree::read_info(input, m_config);
+  }
+
   friend class L3Protocol;
 
   shared_ptr<nfd::Forwarder> m_forwarder;
@@ -92,6 +147,8 @@ private:
   shared_ptr<nfd::FaceManager> m_faceManager;
   shared_ptr<nfd::StrategyChoiceManager> m_strategyChoiceManager;
   shared_ptr<nfd::StatusServer> m_statusServer;
+
+  nfd::ConfigSection m_config;
 
   Ptr<ContentStore> m_csFromNdnSim;
 };
@@ -108,11 +165,11 @@ L3Protocol::~L3Protocol()
 }
 
 void
-L3Protocol::initialize(bool shouldUseNfdCs)
+L3Protocol::initialize()
 {
   m_impl->m_forwarder = make_shared<nfd::Forwarder>();
 
-  initializeManagement(shouldUseNfdCs);
+  initializeManagement();
 
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(), nfd::FACEID_NULL);
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(
@@ -120,41 +177,75 @@ L3Protocol::initialize(bool shouldUseNfdCs)
                                                   nfd::FACEID_CONTENT_STORE);
 }
 
-void
-L3Protocol::initializeManagement(bool shouldUseNfdCs)
+class IgnoreSections
 {
-  m_impl->m_internalFace = make_shared<nfd::InternalFace>();
+public:
+  IgnoreSections(const std::vector<std::string>& ignored)
+    : m_ignored(ignored)
+  {
+  }
 
-  m_impl->m_fibManager =
-    make_shared<nfd::FibManager>(ref(m_impl->m_forwarder->getFib()),
-                                 bind(&nfd::Forwarder::getFace, m_impl->m_forwarder.get(), _1),
-                                 m_impl->m_internalFace, std::ref(StackHelper::getKeyChain()));
+  void
+  operator()(const std::string& filename, const std::string& sectionName,
+             const nfd::ConfigSection& section, bool isDryRun)
 
-  m_impl->m_faceManager =
-    make_shared<nfd::FaceManager>(ref(m_impl->m_forwarder->getFaceTable()), m_impl->m_internalFace,
-                                  std::ref(StackHelper::getKeyChain()));
+  {
+    if (std::find(m_ignored.begin(), m_ignored.end(), sectionName) == m_ignored.end()) {
+      nfd::ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
+    }
+  }
+private:
+  std::vector<std::string> m_ignored;
+};
+
+void
+L3Protocol::initializeManagement()
+{
+  auto keyChain = std::ref(StackHelper::getKeyChain());
+  auto& forwarder = m_impl->m_forwarder;
+  using namespace nfd;
+
+  m_impl->m_internalFace = make_shared<InternalFace>();
+
+  m_impl->m_fibManager = make_shared<FibManager>(std::ref(forwarder->getFib()),
+                                                 bind(&Forwarder::getFace, forwarder.get(), _1),
+                                                 m_impl->m_internalFace, keyChain);
+
+  m_impl->m_faceManager = make_shared<FaceManager>(std::ref(forwarder->getFaceTable()),
+                                                   m_impl->m_internalFace,
+                                                   keyChain);
 
   m_impl->m_strategyChoiceManager =
-    make_shared<nfd::StrategyChoiceManager>(ref(m_impl->m_forwarder->getStrategyChoice()),
-                                            m_impl->m_internalFace,
-                                            std::ref(StackHelper::getKeyChain()));
+    make_shared<StrategyChoiceManager>(std::ref(forwarder->getStrategyChoice()),
+                                       m_impl->m_internalFace,
+                                       keyChain);
 
-  m_impl->m_statusServer =
-    make_shared<nfd::StatusServer>(m_impl->m_internalFace, ref(*m_impl->m_forwarder),
-                                   std::ref(StackHelper::getKeyChain()));
+  m_impl->m_statusServer = make_shared<StatusServer>(m_impl->m_internalFace,
+                                                     ref(*forwarder),
+                                                     keyChain);
 
-  nfd::TablesConfigSection tablesConfig(m_impl->m_forwarder->getCs(),
-                                        m_impl->m_forwarder->getPit(),
-                                        m_impl->m_forwarder->getFib(),
-                                        m_impl->m_forwarder->getStrategyChoice(),
-                                        m_impl->m_forwarder->getMeasurements());
+  ConfigFile config((IgnoreSections({"general", "log", "rib"})));
 
-  m_impl->m_forwarder->getFaceTable().addReserved(m_impl->m_internalFace,
-                                                  nfd::FACEID_INTERNAL_FACE);
+  TablesConfigSection tablesConfig(forwarder->getCs(),
+                                   forwarder->getPit(),
+                                   forwarder->getFib(),
+                                   forwarder->getStrategyChoice(),
+                                   forwarder->getMeasurements());
+  tablesConfig.setConfigFile(config);
+
+  m_impl->m_internalFace->getValidator().setConfigFile(config);
+
+  forwarder->getFaceTable().addReserved(m_impl->m_internalFace, FACEID_INTERNAL_FACE);
+
+  m_impl->m_faceManager->setConfigFile(config);
+
+  // apply config
+  config.parse(m_impl->m_config, false, "ndnSIM.conf");
+
+  tablesConfig.ensureTablesAreConfigured();
 
   // add FIB entry for NFD Management Protocol
-  shared_ptr<::nfd::fib::Entry> entry =
-    m_impl->m_forwarder->getFib().insert("/localhost/nfd").first;
+  shared_ptr<fib::Entry> entry = forwarder->getFib().insert("/localhost/nfd").first;
   entry->addNextHop(m_impl->m_internalFace, 0);
 }
 
@@ -174,6 +265,12 @@ shared_ptr<nfd::StrategyChoiceManager>
 L3Protocol::getStrategyChoiceManager()
 {
   return m_impl->m_strategyChoiceManager;
+}
+
+nfd::ConfigSection&
+L3Protocol::getConfig()
+{
+  return m_impl->m_config;
 }
 
 /*

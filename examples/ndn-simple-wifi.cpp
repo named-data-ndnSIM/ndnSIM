@@ -105,8 +105,7 @@ main(int argc, char* argv[])
   ndn::StackHelper ndnHelper;
   // ndnHelper.AddNetDeviceFaceCreateCallback (WifiNetDevice::GetTypeId (), MakeCallback
   // (MyNetDeviceFaceCallback));
-  ndnHelper.SetContentStoreChoice(false);
-  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize", "1000");
+  ndnHelper.SetOldContentStore("ns3::ndn::cs::Lru", "MaxSize", "1000");
   ndnHelper.SetDefaultRoutes(true);
   ndnHelper.Install(nodes);
 

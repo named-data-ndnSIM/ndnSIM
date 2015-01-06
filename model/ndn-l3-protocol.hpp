@@ -31,10 +31,13 @@
 #include "ns3/nstime.h"
 #include "ns3/traced-callback.h"
 
+#include <boost/property_tree/ptree_fwd.hpp>
+
 namespace nfd {
 class Forwarder;
 class FibManager;
 class StrategyChoiceManager;
+typedef boost::property_tree::ptree ConfigSection;
 } // namespace nfd
 
 namespace ns3 {
@@ -90,7 +93,7 @@ public:
    * \brief Initialize NFD instance
    */
   void
-  initialize(bool shouldUseNfdCs);
+  initialize();
 
   /**
    * \brief Get smart pointer to nfd::Forwarder installed on the node
@@ -142,6 +145,12 @@ public:
   shared_ptr<Face>
   getFaceByNetDevice(Ptr<NetDevice> netDevice) const;
 
+  /**
+   * \brief Get NFD config (boost::property_tree)
+   */
+  nfd::ConfigSection&
+  getConfig();
+
 protected:
   virtual void
   DoDispose(void); ///< @brief Do cleanup
@@ -157,7 +166,7 @@ protected:
 
 private:
   void
-  initializeManagement(bool isNfd);
+  initializeManagement();
 
 private:
   class Impl;

@@ -39,7 +39,7 @@ StrategyChoiceHelper::sendCommand(const ControlParameters& parameters, Ptr<Node>
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
-  StackHelper::getKeyChain().signWithSha256(*command);
+  StackHelper::getKeyChain().sign(*command);
   Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
   auto strategyChoiceManager = L3protocol->getStrategyChoiceManager();
   strategyChoiceManager->onStrategyChoiceRequest(*command);

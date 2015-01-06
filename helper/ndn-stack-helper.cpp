@@ -41,7 +41,7 @@ namespace ndn {
 
 StackHelper::StackHelper()
   : m_needSetDefaultRoutes(false)
-  , m_shouldUseNfdCs(true)
+  , m_maxCsSize(100)
 {
   setCustomNdnCxxClocks();
 
@@ -96,14 +96,13 @@ StackHelper::SetStackAttributes(const std::string& attr1, const std::string& val
 }
 
 void
-StackHelper::SetContentStore(const std::string& contentStore, const std::string& attr1,
-                             const std::string& value1, const std::string& attr2,
-                             const std::string& value2, const std::string& attr3,
-                             const std::string& value3, const std::string& attr4,
-                             const std::string& value4)
+StackHelper::SetOldContentStore(const std::string& contentStore, const std::string& attr1,
+                                const std::string& value1, const std::string& attr2,
+                                const std::string& value2, const std::string& attr3,
+                                const std::string& value3, const std::string& attr4,
+                                const std::string& value4)
 {
-  NS_ASSERT_MSG(m_shouldUseNfdCs == false,
-                "First choose not to use NFD's CS and then select the replacement policy");
+  m_maxCsSize = 0;
 
   m_contentStoreFactory.SetTypeId(contentStore);
   if (attr1 != "")
@@ -117,15 +116,9 @@ StackHelper::SetContentStore(const std::string& contentStore, const std::string&
 }
 
 void
-StackHelper::SetContentStoreChoice(bool shouldUseNfdCs)
+StackHelper::setCsSize(size_t maxSize)
 {
-  m_shouldUseNfdCs = shouldUseNfdCs;
-}
-
-bool
-StackHelper::shouldUseNfdCs() const
-{
-  return m_shouldUseNfdCs;
+  m_maxCsSize = maxSize;
 }
 
 Ptr<FaceContainer>
@@ -157,12 +150,15 @@ StackHelper::Install(Ptr<Node> node) const
 
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
 
+  ndn->getConfig().put("tables.cs_max_packets", (m_maxCsSize == 0) ? 1 : m_maxCsSize);
+
   // NFD initialization
-  ndn->initialize(m_shouldUseNfdCs);
+  ndn->initialize();
 
   // Create and aggregate content store if NFD's contest store has been disabled
-  if (!m_shouldUseNfdCs)
+  if (m_maxCsSize == 0) {
     ndn->AggregateObject(m_contentStoreFactory.Create<ContentStore>());
+  }
 
   // Aggregate L3Protocol on node (must be after setting ndnSIM CS)
   node->AggregateObject(ndn);

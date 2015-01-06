@@ -67,11 +67,10 @@ main(int argc, char* argv[])
   topologyReader.SetFileName("src/ndnSIM/examples/topologies/topo-tree.txt");
   topologyReader.Read();
 
-  // Install CCNx stack on all nodes
+  // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetContentStoreChoice(false);
-  ndnHelper.SetContentStore("ns3::ndn::cs::Lru", "MaxSize",
-                            "100"); // default ContentStore parameters
+  ndnHelper.SetOldContentStore("ns3::ndn::cs::Lru", "MaxSize",
+                               "100"); // default ContentStore parameters
   ndnHelper.InstallAll();
 
   // Choosing forwarding strategy

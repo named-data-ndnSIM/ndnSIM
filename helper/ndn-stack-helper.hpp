@@ -61,7 +61,7 @@ class L3Protocol;
  * attribute or a set of functionality that may be of interest to many other
  * classes.
  */
-class StackHelper {
+class StackHelper : boost::noncopyable {
 public:
   /**
    * \brief Create a new NdnStackHelper with a default NDN_FLOODING forwarding stategy
@@ -87,25 +87,14 @@ public:
    * @param contentStoreClass string, representing class of the content store
    */
   void
-  SetContentStore(const std::string& contentStoreClass, const std::string& attr1 = "",
+  SetOldContentStore(const std::string& contentStoreClass, const std::string& attr1 = "",
                   const std::string& value1 = "", const std::string& attr2 = "",
                   const std::string& value2 = "", const std::string& attr3 = "",
                   const std::string& value3 = "", const std::string& attr4 = "",
                   const std::string& value4 = "");
 
-  /**
-   * @brief Set to use native NFD's content store or ndnSIM provided CS implementations
-   *
-   * @note ndnSIM CS implementations have limited support for NDN selectors
-   */
   void
-  SetContentStoreChoice(const bool shouldUseNfdCs);
-
-  /**
-   * @brief Check if stack is using native NFD content store implementation
-   */
-  bool
-  shouldUseNfdCs() const;
+  setCsSize(size_t maxSize);
 
   typedef Callback<shared_ptr<NetDeviceFace>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
     NetDeviceFaceCreateCallback;
@@ -214,16 +203,11 @@ public:
   setCustomNdnCxxClocks();
 
 private:
-  StackHelper(const StackHelper&);
-  StackHelper&
-  operator=(const StackHelper& o);
-
-private:
   ObjectFactory m_ndnFactory;
   ObjectFactory m_contentStoreFactory;
 
   bool m_needSetDefaultRoutes;
-  bool m_shouldUseNfdCs;
+  size_t m_maxCsSize;
 
   typedef std::list<std::pair<TypeId, NetDeviceFaceCreateCallback>> NetDeviceCallbackList;
   NetDeviceCallbackList m_netDeviceCallbacks;

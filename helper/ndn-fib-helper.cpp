@@ -59,7 +59,7 @@ FibHelper::AddNextHop(const ControlParameters& parameters, Ptr<Node> node)
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
-  StackHelper::getKeyChain().signWithSha256(*command);
+  StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
   shared_ptr<nfd::FibManager> fibManager = l3protocol->getFibManager();
@@ -77,7 +77,7 @@ FibHelper::RemoveNextHop(const ControlParameters& parameters, Ptr<Node> node)
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
-  StackHelper::getKeyChain().signWithSha256(*command);
+  StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
   shared_ptr<nfd::FibManager> fibManager = L3protocol->getFibManager();
