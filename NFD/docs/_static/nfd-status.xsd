@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="ndn:/localhost/nfd/status/1" xmlns:nfd="ndn:/localhost/nfd/status/1"
+elementFormDefault="qualified">
+
+<xs:complexType name="unidirectionalPacketCountersType">
+  <xs:sequence>
+    <xs:element type="xs:nonNegativeInteger" name="nInterests"/>
+    <xs:element type="xs:nonNegativeInteger" name="nDatas"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="bidirectionalPacketCountersType">
+  <xs:sequence>
+    <xs:element type="nfd:unidirectionalPacketCountersType" name="incomingPackets"/>
+    <xs:element type="nfd:unidirectionalPacketCountersType" name="outgoingPackets"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="bidirectionalByteCountersType">
+  <xs:sequence>
+    <xs:element type="xs:nonNegativeInteger" name="incomingBytes"/>
+    <xs:element type="xs:nonNegativeInteger" name="outgoingBytes"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="generalStatusType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="nfdId"/>
+    <xs:element type="xs:string" name="version"/>
+    <xs:element type="xs:dateTime" name="startTime"/>
+    <xs:element type="xs:dateTime" name="currentTime"/>
+    <xs:element type="xs:duration" name="uptime"/>
+    <xs:element type="xs:nonNegativeInteger" name="nNameTreeEntries"/>
+    <xs:element type="xs:nonNegativeInteger" name="nFibEntries"/>
+    <xs:element type="xs:nonNegativeInteger" name="nPitEntries"/>
+    <xs:element type="xs:nonNegativeInteger" name="nMeasurementsEntries"/>
+    <xs:element type="xs:nonNegativeInteger" name="nCsEntries"/>
+    <xs:element type="nfd:bidirectionalPacketCountersType" name="packetCounters"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="channelType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="localUri"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="channelsType">
+  <xs:sequence>
+    <xs:element type="nfd:channelType" name="channel" maxOccurs="unbounded" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="faceType">
+  <xs:sequence>
+    <xs:element type="xs:nonNegativeInteger" name="faceId"/>
+    <xs:element type="xs:anyURI" name="remoteUri"/>
+    <xs:element type="xs:anyURI" name="localUri"/>
+    <xs:element type="xs:duration" name="expirationPeriod" minOccurs="0"/>
+    <xs:element type="xs:string" name="faceScope"/>
+    <xs:element type="xs:string" name="facePersistency"/>
+    <xs:element type="xs:string" name="linkType"/>
+    <xs:element type="nfd:bidirectionalPacketCountersType" name="packetCounters"/>
+    <xs:element type="nfd:bidirectionalByteCountersType" name="byteCounters"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="facesType">
+  <xs:sequence>
+    <xs:element type="nfd:faceType" name="face" maxOccurs="unbounded" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="nextHopType">
+  <xs:sequence>
+    <xs:element type="xs:nonNegativeInteger" name="faceId"/>
+    <xs:element type="xs:nonNegativeInteger" name="cost"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="fibEntryType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="prefix"/>
+    <xs:element name="nextHops">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element type="nfd:nextHopType" name="nextHop" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="fibType">
+  <xs:sequence>
+    <xs:element type="nfd:fibEntryType" name="fibEntry" maxOccurs="unbounded" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ribFlagsType">
+  <xs:sequence>
+    <xs:element type="xs:string" name="childInherit" minOccurs="0"/>
+    <xs:element type="xs:string" name="ribCapture" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="routeType">
+  <xs:sequence>
+    <xs:element type="xs:nonNegativeInteger" name="faceId"/>
+    <xs:element type="xs:nonNegativeInteger" name="origin"/>
+    <xs:element type="xs:nonNegativeInteger" name="cost"/>
+    <xs:element type="nfd:ribFlagsType" name="flags"/>
+    <xs:element type="xs:duration" name="expirationPeriod" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ribEntryType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="prefix"/>
+    <xs:element name="routes">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element type="nfd:routeType" name="route" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ribType">
+  <xs:sequence>
+    <xs:element type="nfd:ribEntryType" name="ribEntry" maxOccurs="unbounded" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="strategyType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="name"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="strategyChoiceType">
+  <xs:sequence>
+    <xs:element type="xs:anyURI" name="namespace"/>
+    <xs:element type="nfd:strategyType" name="strategy"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="strategyChoicesType">
+  <xs:sequence>
+    <xs:element type="nfd:strategyChoiceType" name="strategyChoice"
+                maxOccurs="unbounded" minOccurs="0"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:element name="nfdStatus">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element type="nfd:generalStatusType" name="generalStatus"/>
+      <xs:element type="nfd:channelsType" name="channels"/>
+      <xs:element type="nfd:facesType" name="faces"/>
+      <xs:element type="nfd:fibType" name="fib"/>
+      <xs:element type="nfd:ribType" name="rib"/>
+      <xs:element type="nfd:strategyChoicesType" name="strategyChoices"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

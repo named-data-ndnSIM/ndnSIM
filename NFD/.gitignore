@@ -1,0 +1,8 @@
+.DS*
+.waf-1*
+.waf3-*
+.lock*
+**/*.pyc
+build/
+VERSION
+unit-tests.conf

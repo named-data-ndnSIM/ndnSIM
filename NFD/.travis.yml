@@ -1,0 +1,15 @@
+# For Ubuntu only
+language: cpp
+os:
+  - linux
+compiler:
+  - gcc
+notifications:
+  email:
+    on_success: always
+    on_failure: always
+before_install:
+  - travis_retry sudo apt-get update
+  - travis_retry sudo apt-get install -qq libssl-dev libpcap-dev libboost1.48-all-dev libcrypto++-dev libsqlite3-dev
+script:
+  - ./.jenkins

@@ -1,0 +1,85 @@
+{#
+    named_data_theme/layout.html
+    ~~~~~~~~~~~~~~~~~
+#}
+{% extends "basic/layout.html" %}
+
+{% block header %}
+    <!--headercontainer-->
+    <div id="header_container">
+
+        <!--header-->
+        <div class="row">
+             <div class="three columns">
+                  <div id="logo">
+                        <a href="http://named-data.net" title="A Future Internet Architecture"><img src="http://named-data.net/wp-content/uploads/cropped-20130722_Logo2.png" alt="" /></a>
+                  </div><!--logo end-->
+             </div>
+
+             <!--top menu-->
+             <div class="nine columns" id="menu_container" >
+               <h1><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a></h1>
+             </div>
+        </div>
+    </div><!--header container end-->
+
+{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+          {%- block document %}
+            {{ super() }}
+          {%- endblock %}
+        </div>
+        <div class="sidebar">
+          {%- block sidebartoc %}
+          <h3>{{ _('Table Of Contents') }}</h3>
+          {{ toctree(includehidden=True) }}
+
+          <h3>{{ _('Additional documenation') }}</h3>
+          <ul>
+            <li class="toctree-l1"><a class="reference external" href="http://redmine.named-data.net/projects/nfd/wiki">NFD Wiki</a></li>
+            <li class="toctree-l1"><a class="reference internal" href="doxygen/annotated.html">API documentation (doxygen)</a></li>
+          </ul>
+          {%- endblock %}
+          {%- block sidebarsearch %}
+          <h3 style="margin-top: 1.5em;">{{ _('Search') }}</h3>
+          <form class="search" action="{{ pathto('search') }}" method="get">
+            <input type="text" name="q" />
+            <input type="submit" value="{{ _('Go') }}" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+            {{ _('Enter search terms or a module, class or function name.') }}
+          </p>
+          {%- endblock %}
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div id="footer-container">
+        <!--footer container-->
+        <div class="row">
+        </div><!-- footer container-->
+    </div>
+
+    <div id="footer-info">
+        <!--footer container-->
+        <div class="row">
+            <div class="twelve columns">
+
+                <div id="copyright">This research is partially supported by NSF (Award <a href="http://www.nsf.gov/awardsearch/showAward?AWD_ID=1040868" target="_blank>">CNS-1040868</a>)<br/><br/><a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US" target="_blank">Creative Commons Attribution 3.0 Unported License</a> except where noted.</div>
+
+            </div>
+        </div>
+    </div><!--footer info end-->
+{% endblock %}
+
+{% block relbar1 %}{% endblock %}
+{% block relbar2 %}{% endblock %}
