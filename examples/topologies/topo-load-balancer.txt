@@ -1,23 +1,23 @@
 # topo-load-balancer.txt
 
 #
-#                           /----\
-#                           |CSU |
-#                  <---->   |HUB |  <---->
-#                 ^         \----/       ^
+#                          /-----\
+#                          | CSU |
+#                 +----->  | HUB |  <----+
+#                 |        \-----/       |
 #                 |                      |  1Mbps/10ms delay
 #                 v                      v
-#               /----\                /--------\
-#               |UCLA|                |Consumer|
-#               | HUB|                |  CSU-1 |
-#        <----> \----/  <---->        \--------/
-#       ^                     ^
-#       |                     |
-#       v                     v
-#   /--------\            /--------\
-#   |Producer|            |Producer|
-#   | UCLA-1 |            | UCLA-2 |
-#   \--------/            \--------/
+#               /------\               /----------\
+#               | UCLA |               | Consumer |
+#               | HUB  |               |   CSU-1  |
+#       +-----> \------/ <-----+       \----------/
+#       |                      |
+#       |                      |
+#       v                      v
+#   /----------\           /----------\
+#   | Producer |           | Producer |
+#   |  UCLA-1  |           |  UCLA-2  |
+#   \----------/           \----------/
 #
 
 # any empty lines and lines starting with '#' symbol is ignored

@@ -17,37 +17,51 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-// hijacker.hpp
+// dumb-requester.hpp
 
-#ifndef HIJACKER_H_
-#define HIJACKER_H_
+#ifndef DUMB_REQUESTER_H_
+#define DUMB_REQUESTER_H_
 
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/ndnSIM-module.h"
+#include "ns3/ndnSIM/model/ndn-common.hpp"
+
+#include "ns3/ndnSIM/apps/ndn-app.hpp"
 
 namespace ns3 {
 
-class Hijacker : public ndn::App {
+/**
+ * @brief A dumb requester application
+ *
+ * This app keeps requesting every second the same content object
+ */
+class OneInterestRequester : public ndn::App {
 public:
+  // register NS-3 type "OneInterestRequester"
   static TypeId
   GetTypeId();
 
-  Hijacker();
+  OneInterestRequester();
 
-  // Receive all Interests but do nothing in response
-  void
-  OnInterest(shared_ptr<const ndn::Interest> interest);
-
-protected:
-  // inherited from Application base class.
+  // (overridden from ndn::App) Processing upon start of the application
   virtual void
   StartApplication();
 
+  // (overridden from ndn::App) Processing when application is stopped
   virtual void
   StopApplication();
+
+  // (overridden from ndn::App) Callback that will be called when Data arrives
+  virtual void
+  OnData(std::shared_ptr<const ndn::Data> data);
+
+private:
+  void
+  SendInterest();
+
+private:
+  bool m_isRunning;
+  ndn::Name m_name;
 };
 
 } // namespace ns3
 
-#endif // HIJACKER_H_
+#endif // DUMB_REQUESTER_H_

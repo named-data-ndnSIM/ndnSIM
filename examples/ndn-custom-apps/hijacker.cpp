@@ -21,6 +21,8 @@
 
 #include "hijacker.hpp"
 
+#include "ns3/log.h"
+
 #include "ns3/ndnSIM/helper/ndn-fib-helper.hpp"
 
 NS_LOG_COMPONENT_DEFINE("Hijacker");
@@ -43,7 +45,7 @@ Hijacker::Hijacker()
 }
 
 void
-Hijacker::OnInterest(shared_ptr<const ndn::Interest> interest)
+Hijacker::OnInterest(std::shared_ptr<const ndn::Interest> interest)
 {
   ndn::App::OnInterest(interest); // forward call to perform app-level tracing
   // do nothing else (hijack interest)
@@ -56,8 +58,8 @@ Hijacker::StartApplication()
 {
   App::StartApplication();
 
-  // equivalent to setting interest filter for "/" prefix
-  ndn::FibHelper::AddRoute(GetNode(), "/", m_face, 0);
+  // equivalent to setting interest filter for "/prefix" prefix
+  ndn::FibHelper::AddRoute(GetNode(), "/prefix/sub", m_face, 0);
 }
 
 void

@@ -17,49 +17,31 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-// ndn-simple-with-pcap.cpp
+// ndn-simple-with-different-sizes-content-store.cc
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
 
-/**
- * This scenario demonstrates how to dump raw NDN packets into tcpdump-format
- *
- * Run scenario:
- *
- *     ./waf --run ndn-simple-with-pcap
- *
- * After simulation finishes, it produces `ndn-simple-trace.pcap` that can be read
- * using tcpdump or ndndump tools:
- *
- *    ndndump -r ndn-simple-trace.pcap not ip
- *    tcpdump -r ndn-simple-trace.pcap
- */
-
 namespace ns3 {
 
-class PcapWriter {
-public:
-  PcapWriter(const std::string& file)
-  {
-    PcapHelper helper;
-    m_pcap = helper.CreateFile(file, std::ios::out, PcapHelper::DLT_PPP);
-  }
-
-  void
-  TracePacket(Ptr<const Packet> packet)
-  {
-    static PppHeader pppHeader;
-    pppHeader.SetProtocol(0x0077);
-
-    m_pcap->Write(Simulator::Now(), pppHeader, packet);
-  }
-
-private:
-  Ptr<PcapFileWrapper> m_pcap;
-};
+/**
+ * This scenario simulates a very simple network topology:
+ *
+ *
+ *      +----------+     1Mbps      +--------+     1Mbps      +----------+
+ *      | consumer | <------------> | router | <------------> | producer |
+ *      +----------+         10ms   +--------+          10ms  +----------+
+ *
+ * This scenario demonstrates how to use content store that responds to Freshness parameter set in
+ *Datas.
+ * That is, if producer set Freshness field to 2 seconds, the corresponding content object will not
+ *be cached
+ * more than 2 seconds (can be cached for a shorter time, if entry is evicted earlier)
+ *
+ *     NS_LOG=ndn.Consumer ./waf --run ndn-simple-with-different-sizes-content-store
+ */
 
 int
 main(int argc, char* argv[])
@@ -85,7 +67,16 @@ main(int argc, char* argv[])
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetDefaultRoutes(true);
+  ndnHelper.SetOldContentStore(
+    "ns3::ndn::cs::Freshness::Lru"); // don't set up max size here, will use default value = 100
   ndnHelper.InstallAll();
+
+  // set up max sizes, after NDN stack is installed
+  Config::Set("/NodeList/0/$ns3::ndn::ContentStore/MaxSize",
+              UintegerValue(
+                1)); // number after nodeList is global ID of the node (= node->GetId ())
+  Config::Set("/NodeList/1/$ns3::ndn::ContentStore/MaxSize", UintegerValue(2));
+  Config::Set("/NodeList/2/$ns3::ndn::ContentStore/MaxSize", UintegerValue(200));
 
   // Installing applications
 
@@ -101,13 +92,7 @@ main(int argc, char* argv[])
   // Producer will reply to all requests starting with /prefix
   producerHelper.SetPrefix("/prefix");
   producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-  producerHelper.SetAttribute("Signature", UintegerValue(100));
-  producerHelper.SetAttribute("KeyLocator", StringValue("/unique/key/locator"));
   producerHelper.Install(nodes.Get(2)); // last node
-
-  PcapWriter trace("ndn-simple-trace.pcap");
-  Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/MacTx",
-                                MakeCallback(&PcapWriter::TracePacket, &trace));
 
   Simulator::Stop(Seconds(20.0));
 

@@ -17,15 +17,12 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-// ndn-simple-with-link-failure.cpp
+// ndn-simple-with-content-freshness.cpp
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/ndnSIM-module.h"
-
-// for LinkStatusControl::FailLinks and LinkStatusControl::UpLinks
-#include "ns3/ndnSIM/helper/ndn-link-control-helper.hpp"
 
 namespace ns3 {
 
@@ -37,16 +34,12 @@ namespace ns3 {
  *      | consumer | <------------> | router | <------------> | producer |
  *      +----------+         10ms   +--------+          10ms  +----------+
  *
+ * This scenario demonstrates how to use content store that responds to Freshness parameter set in
+ * data packets.  In other words, if the producer set FreshnessPeriod field to 2 seconds, the
+ * corresponding data packet will not be considered fresh for more than 2 seconds (can be cached
+ * for a shorter time, if entry is evicted earlier)
  *
- * Consumer requests data from producer with frequency 10 interests per second
- * (interests contain constantly increasing sequence number).
- *
- * For every received interest, producer replies with a data packet, containing
- * 1024 bytes of virtual payload.
- *
- * To run scenario and see what is happening, use the following command:
- *
- *     NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-simple-with-link-failure
+ *     NS_LOG=DumbRequester ./waf --run ndn-simple-with-content-freshness
  */
 
 int
@@ -70,39 +63,59 @@ main(int argc, char* argv[])
   p2p.Install(nodes.Get(0), nodes.Get(1));
   p2p.Install(nodes.Get(1), nodes.Get(2));
 
-  // Install NDN stack on all nodes
+  // Install Ndn stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetDefaultRoutes(true);
+  ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize",
+                               "2"); // allow just 2 entries to be cached
   ndnHelper.InstallAll();
 
   // Installing applications
 
   // Consumer
-  ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-  // Consumer will request /prefix/0, /prefix/1, ...
-  consumerHelper.SetPrefix("/prefix");
-  consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
-  consumerHelper.Install(nodes.Get(0));                        // first node
+  ndn::AppHelper consumerHelper("OneInterestRequester");
+
+  // /*
+  //   1) at time 1 second requests Data from a producer that does not specify freshness
+  //   2) at time 10 seconds requests the same Data packet as client 1
+
+  //   3) at time 2 seconds requests Data from a producer that specifies freshness set to 2 seconds
+  //   4) at time 12 seconds requests the same Data packet as client 3
+
+  //   Expectation:
+  //   Interests from 1, 3 and 4 will reach producers
+  //   Interset from 2 will be served from cache
+  //  */
+
+  consumerHelper.SetPrefix("/no-freshness");
+  consumerHelper.Install(nodes.Get(0)).Start(Seconds(1));
+  consumerHelper.Install(nodes.Get(0)).Start(Seconds(10));
+
+  consumerHelper.SetPrefix("/with-freshness");
+  consumerHelper.Install(nodes.Get(0)).Start(Seconds(2));
+  consumerHelper.Install(nodes.Get(0)).Start(Seconds(12));
 
   // Producer
   ndn::AppHelper producerHelper("ns3::ndn::Producer");
-  // Producer will reply to all requests starting with /prefix
-  producerHelper.SetPrefix("/prefix");
   producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+
+  producerHelper.SetAttribute("Freshness", TimeValue(Seconds(-1.0))); // unlimited freshness
+  producerHelper.SetPrefix("/no-freshness");
   producerHelper.Install(nodes.Get(2)); // last node
 
-  // The failure of the link connecting consumer and router will start from seconds 10.0 to 15.0
-  Simulator::Schedule(Seconds(10.0), ndn::LinkControlHelper::FailLink, nodes.Get(0), nodes.Get(1));
-  Simulator::Schedule(Seconds(15.0), ndn::LinkControlHelper::UpLink, nodes.Get(0), nodes.Get(1));
+  producerHelper.SetAttribute("Freshness", TimeValue(Seconds(2.0))); // freshness 2 seconds (!!!
+                                                                     // freshness granularity is 1
+                                                                     // seconds !!!)
+  producerHelper.SetPrefix("/with-freshness");
+  producerHelper.Install(nodes.Get(2)); // last node
 
-  Simulator::Stop(Seconds(20.0));
+  Simulator::Stop(Seconds(30.0));
 
   Simulator::Run();
   Simulator::Destroy();
 
   return 0;
 }
-
 } // namespace ns3
 
 int

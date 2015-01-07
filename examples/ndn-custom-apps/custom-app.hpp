@@ -22,8 +22,6 @@
 #ifndef CUSTOM_APP_H_
 #define CUSTOM_APP_H_
 
-#include "ns3/ndnSIM/model/ndn-common.hpp"
-
 #include "ns3/ndnSIM/apps/ndn-app.hpp"
 
 namespace ns3 {
@@ -54,11 +52,11 @@ public:
 
   // (overridden from ndn::App) Callback that will be called when Interest arrives
   virtual void
-  OnInterest(shared_ptr<const ndn::Interest> interest);
+  OnInterest(std::shared_ptr<const ndn::Interest> interest);
 
   // (overridden from ndn::App) Callback that will be called when Data arrives
   virtual void
-  OnData(shared_ptr<const ndn::Data> contentObject);
+  OnData(std::shared_ptr<const ndn::Data> contentObject);
 
 private:
   void
