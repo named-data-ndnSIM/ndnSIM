@@ -345,7 +345,8 @@ AnnotatedTopologyReader::ApplySettings()
       }
       catch (...) {
         typedef boost::tokenizer<boost::escaped_list_separator<char>> tokenizer;
-        tokenizer tok(link.GetAttribute("MaxPackets"));
+        std::string value = link.GetAttribute("MaxPackets");
+        tokenizer tok(value);
 
         tokenizer::iterator token = tok.begin();
         p2p.SetQueue(*token);
@@ -390,7 +391,8 @@ AnnotatedTopologyReader::ApplySettings()
       NS_LOG_INFO("LinkError = " + link.GetAttribute("LossRate"));
 
       typedef boost::tokenizer<boost::escaped_list_separator<char>> tokenizer;
-      tokenizer tok(link.GetAttribute("LossRate"));
+      std::string value = link.GetAttribute("LossRate");
+      tokenizer tok(value);
 
       tokenizer::iterator token = tok.begin();
       ObjectFactory factory(*token);
