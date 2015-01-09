@@ -45,6 +45,8 @@ namespace fw {
 class Strategy;
 } // namespace fw
 
+class NullFace;
+
 /** \brief main class of NFD
  *
  *  Forwarder owns all faces and tables, and implements forwarding pipelines.
@@ -109,6 +111,17 @@ public: // forwarding entrypoints and tables
 public: // allow enabling ndnSIM content store (will be removed in the future)
   void
   setCsFromNdnSim(ns3::Ptr<ns3::ndn::ContentStore> cs);
+
+public:
+  /** \brief trigger before PIT entry is satisfied
+   *  \sa Strategy::beforeSatisfyInterest
+   */
+  signal::Signal<Forwarder, pit::Entry, Face, Data> beforeSatisfyInterest;
+
+  /** \brief trigger before PIT entry expires
+   *  \sa Strategy::beforeExpirePendingInterest
+   */
+  signal::Signal<Forwarder, pit::Entry> beforeExpirePendingInterest;
 
 PUBLIC_WITH_TESTS_ELSE_PRIVATE: // pipelines
   /** \brief incoming Interest pipeline
@@ -204,6 +217,7 @@ private:
   Measurements   m_measurements;
   StrategyChoice m_strategyChoice;
   DeadNonceList  m_deadNonceList;
+  shared_ptr<NullFace> m_csFace;
 
   ns3::Ptr<ns3::ndn::ContentStore> m_csFromNdnSim;
 

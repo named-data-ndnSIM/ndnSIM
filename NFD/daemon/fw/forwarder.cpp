@@ -26,7 +26,9 @@
 #include "forwarder.hpp"
 #include "core/logger.hpp"
 #include "core/random.hpp"
+#include "face/null-face.hpp"
 #include "available-strategies.hpp"
+
 #include <boost/random/uniform_int_distribution.hpp>
 
 namespace nfd {
@@ -43,8 +45,10 @@ Forwarder::Forwarder()
   , m_pit(m_nameTree)
   , m_measurements(m_nameTree)
   , m_strategyChoice(m_nameTree, fw::makeDefaultStrategy(*this))
+  , m_csFace(make_shared<NullFace>(FaceUri("contentstore://")))
 {
   fw::installStrategies(*this);
+  getFaceTable().addReserved(m_csFace, FACEID_CONTENT_STORE);
 }
 
 Forwarder::~Forwarder()
@@ -104,6 +108,10 @@ Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
       const_cast<Data*>(csMatch)->setIncomingFaceId(FACEID_CONTENT_STORE);
       // XXX should we lookup PIT for other Interests that also match csMatch?
 
+      // invoke PIT satisfy callback
+      beforeSatisfyInterest(*pitEntry, *m_csFace, *csMatch);
+      this->dispatchToStrategy(pitEntry, bind(&Strategy::beforeSatisfyInterest, _1,
+                                              pitEntry, cref(*m_csFace), cref(*csMatch)));
       // set PIT straggler timer
       this->setStragglerTimer(pitEntry, true, csMatch->getFreshnessPeriod());
 
@@ -226,6 +234,7 @@ Forwarder::onInterestUnsatisfied(shared_ptr<pit::Entry> pitEntry)
   NFD_LOG_DEBUG("onInterestUnsatisfied interest=" << pitEntry->getName());
 
   // invoke PIT unsatisfied callback
+  beforeExpirePendingInterest(*pitEntry);
   this->dispatchToStrategy(pitEntry, bind(&Strategy::beforeExpirePendingInterest, _1,
                                           pitEntry));
 
@@ -298,6 +307,7 @@ Forwarder::onIncomingData(Face& inFace, const Data& data)
     }
 
     // invoke PIT satisfy callback
+    beforeSatisfyInterest(*pitEntry, inFace, data);
     this->dispatchToStrategy(pitEntry, bind(&Strategy::beforeSatisfyInterest, _1,
                                             pitEntry, cref(inFace), cref(data)));
 
