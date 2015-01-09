@@ -62,11 +62,12 @@ L3Tracer::Connect()
   l3->TraceConnectWithoutContext("OutData", MakeCallback(&L3Tracer::OutData, this));
   l3->TraceConnectWithoutContext("InData", MakeCallback(&L3Tracer::InData, this));
 
-  // // satisfied/timed out PIs
-  // l3->TraceConnectWithoutContext("SatisfiedInterests",
-  //                                MakeCallback(&L3Tracer::SatisfiedInterests, this));
-  // l3->TraceConnectWithoutContext("TimedOutInterests",
-  //                                MakeCallback(&L3Tracer::TimedOutInterests, this));
+  // satisfied/timed out PIs
+  l3->TraceConnectWithoutContext("SatisfiedInterests",
+                                 MakeCallback(&L3Tracer::SatisfiedInterests, this));
+
+  l3->TraceConnectWithoutContext("TimedOutInterests",
+                                 MakeCallback(&L3Tracer::TimedOutInterests, this));
 }
 
 } // namespace ndn

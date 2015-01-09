@@ -26,6 +26,8 @@
 #include "ns3/log.h"
 #include "ns3/node-list.h"
 
+#include "daemon/table/pit-entry.hpp"
+
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 
@@ -226,17 +228,15 @@ L3RateTracer::PrintHeader(std::ostream& os) const
 void
 L3RateTracer::Reset()
 {
-  for (std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
-         m_stats.begin();
-       stats != m_stats.end(); stats++) {
-    std::get<0>(stats->second).Reset();
-    std::get<1>(stats->second).Reset();
+  for (auto& stats : m_stats) {
+    std::get<0>(stats.second).Reset();
+    std::get<1>(stats.second).Reset();
   }
 }
 
 const double alpha = 0.8;
 
-#define STATS(INDEX) std::get<INDEX>(stats->second)
+#define STATS(INDEX) std::get<INDEX>(stats.second)
 #define RATE(INDEX, fieldName) STATS(INDEX).fieldName / m_period.ToDouble(Time::S)
 
 #define PRINTER(printName, fieldName)                                                              \
@@ -246,8 +246,8 @@ const double alpha = 0.8;
                        + /*old value*/ (1 - alpha) * STATS(3).fieldName;                           \
                                                                                                    \
   os << time.ToDouble(Time::S) << "\t" << m_node << "\t";                                          \
-  if (stats->first != nullptr) {                                                                   \
-    os << stats->first->getId() << "\t" << stats->first->getLocalUri() << "\t";                    \
+  if (stats.first != nullptr) {                                                                    \
+    os << stats.first->getId() << "\t" << stats.first->getLocalUri() << "\t";                      \
   }                                                                                                \
   else {                                                                                           \
     os << "-1\tall\t";                                                                             \
@@ -260,10 +260,8 @@ L3RateTracer::Print(std::ostream& os) const
 {
   Time time = Simulator::Now();
 
-  for (std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
-         m_stats.begin();
-       stats != m_stats.end(); stats++) {
-    if (stats->first == nullptr)
+  for (auto& stats : m_stats) {
+    if (stats.first == nullptr)
       continue;
 
     PRINTER("InInterests", m_inInterests);
@@ -272,29 +270,29 @@ L3RateTracer::Print(std::ostream& os) const
     PRINTER("InData", m_inData);
     PRINTER("OutData", m_outData);
 
-    // PRINTER("InSatisfiedInterests", m_satisfiedInterests);
-    // PRINTER("InTimedOutInterests", m_timedOutInterests);
+    PRINTER("InSatisfiedInterests", m_satisfiedInterests);
+    PRINTER("InTimedOutInterests", m_timedOutInterests);
 
-    // PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
-    // PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
+    PRINTER("OutSatisfiedInterests", m_outSatisfiedInterests);
+    PRINTER("OutTimedOutInterests", m_outTimedOutInterests);
   }
 
   {
-    // std::map<shared_ptr<const Face>, boost::tuple<Stats, Stats, Stats, Stats>>::iterator stats =
-    //   m_stats.find(shared_ptr<const Face>(0));
-    // if (stats != m_stats.end()) {
-    //   PRINTER("SatisfiedInterests", m_satisfiedInterests);
-    //   PRINTER("TimedOutInterests", m_timedOutInterests);
-    // }
+    auto i = m_stats.find(nullptr);
+    if (i != m_stats.end()) {
+      auto& stats = *i;
+      PRINTER("SatisfiedInterests", m_satisfiedInterests);
+      PRINTER("TimedOutInterests", m_timedOutInterests);
+    }
   }
 }
 
 void
 L3RateTracer::OutInterests(const Interest& interest, const Face& face)
 {
-  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outInterests++;
+  std::get<0>(m_stats[face.shared_from_this()]).m_outInterests++;
   if (interest.hasWire()) {
-    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outInterests +=
+    std::get<1>(m_stats[face.shared_from_this()]).m_outInterests +=
       interest.wireEncode().size();
   }
 }
@@ -302,9 +300,9 @@ L3RateTracer::OutInterests(const Interest& interest, const Face& face)
 void
 L3RateTracer::InInterests(const Interest& interest, const Face& face)
 {
-  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inInterests++;
+  std::get<0>(m_stats[face.shared_from_this()]).m_inInterests++;
   if (interest.hasWire()) {
-    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inInterests +=
+    std::get<1>(m_stats[face.shared_from_this()]).m_inInterests +=
       interest.wireEncode().size();
   }
 }
@@ -312,9 +310,9 @@ L3RateTracer::InInterests(const Interest& interest, const Face& face)
 void
 L3RateTracer::OutData(const Data& data, const Face& face)
 {
-  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outData++;
+  std::get<0>(m_stats[face.shared_from_this()]).m_outData++;
   if (data.hasWire()) {
-    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_outData +=
+    std::get<1>(m_stats[face.shared_from_this()]).m_outData +=
       data.wireEncode().size();
   }
 }
@@ -322,54 +320,42 @@ L3RateTracer::OutData(const Data& data, const Face& face)
 void
 L3RateTracer::InData(const Data& data, const Face& face)
 {
-  std::get<0>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inData++;
+  std::get<0>(m_stats[face.shared_from_this()]).m_inData++;
   if (data.hasWire()) {
-    std::get<1>(m_stats[(const_cast<Face*>(&face))->shared_from_this()]).m_inData +=
+    std::get<1>(m_stats[face.shared_from_this()]).m_inData +=
       data.wireEncode().size();
   }
 }
 
-// void
-// L3RateTracer::SatisfiedInterests (Ptr<const pit::Entry> entry)
-// {
-//   m_stats[0].std::get<0> ().m_satisfiedInterests ++;
-//   // no "size" stats
+void
+L3RateTracer::SatisfiedInterests(const nfd::pit::Entry& entry, const Face&, const Data&)
+{
+  std::get<0>(m_stats[nullptr]).m_satisfiedInterests++;
+  // no "size" stats
 
-//   for (::nfd::pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
-//        i != entry->GetIncoming ().end ();
-//        i++)
-//     {
-//       m_stats[i->m_face].std::get<0> ().m_satisfiedInterests ++;
-// }
+  for (const auto& in : entry.getInRecords()) {
+    std::get<0>(m_stats[in.getFace()]).m_satisfiedInterests ++;
+  }
 
-//   for (::nfd::pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
-//        i != entry->GetOutgoing ().end ();
-//        i++)
-//     {
-//       m_stats[i->m_face].std::get<0> ().m_outSatisfiedInterests ++;
-//     }
-// }
+  for (const auto& out : entry.getOutRecords()) {
+    std::get<0>(m_stats[out.getFace()]).m_outSatisfiedInterests ++;
+  }
+}
 
-// void
-// L3RateTracer::TimedOutInterests (Ptr<const pit::Entry> entry)
-// {
-//   m_stats[0].std::get<0> ().m_timedOutInterests ++;
-//   // no "size" stats
+void
+L3RateTracer::TimedOutInterests(const nfd::pit::Entry& entry)
+{
+  std::get<0>(m_stats[nullptr]).m_timedOutInterests++;
+  // no "size" stats
 
-//   for (pit::Entry::in_container::const_iterator i = entry->GetIncoming ().begin ();
-//        i != entry->GetIncoming ().end ();
-//        i++)
-//     {
-//       m_stats[i->m_face].std::get<0> ().m_timedOutInterests ++;
-// }
+  for (const auto& in : entry.getInRecords()) {
+    std::get<0>(m_stats[in.getFace()]).m_timedOutInterests++;
+  }
 
-//   for (pit::Entry::out_container::const_iterator i = entry->GetOutgoing ().begin ();
-//        i != entry->GetOutgoing ().end ();
-//        i++)
-//     {
-//       m_stats[i->m_face].std::get<0> ().m_outTimedOutInterests ++;
-//     }
-// }
+  for (const auto& out : entry.getOutRecords()) {
+    std::get<0>(m_stats[out.getFace()]).m_outTimedOutInterests++;
+  }
+}
 
 } // namespace ndn
 } // namespace ns3

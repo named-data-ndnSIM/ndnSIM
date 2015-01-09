@@ -38,6 +38,9 @@ class Forwarder;
 class FibManager;
 class StrategyChoiceManager;
 typedef boost::property_tree::ptree ConfigSection;
+namespace pit {
+class Entry;
+} // namespace pit
 } // namespace nfd
 
 namespace ns3 {
@@ -186,6 +189,9 @@ private:
 
   TracedCallback<const Data&, const Face&> m_outData; ///< @brief trace of outgoing Data
   TracedCallback<const Data&, const Face&> m_inData;  ///< @brief trace of incoming Data
+
+  TracedCallback<const nfd::pit::Entry&, const Face&/*in face*/, const Data&> m_satisfiedInterests;
+  TracedCallback<const nfd::pit::Entry&> m_timedOutInterests;
 };
 
 } // namespace ndn

@@ -77,7 +77,15 @@ L3Protocol::GetTypeId(void)
       ////////////////////////////////////////////////////////////////////
 
       .AddTraceSource("OutData", "OutData", MakeTraceSourceAccessor(&L3Protocol::m_outData))
-      .AddTraceSource("InData", "InData", MakeTraceSourceAccessor(&L3Protocol::m_inData));
+      .AddTraceSource("InData", "InData", MakeTraceSourceAccessor(&L3Protocol::m_inData))
+
+      ////////////////////////////////////////////////////////////////////
+
+      .AddTraceSource("SatisfiedInterests", "SatisfiedInterests",
+                      MakeTraceSourceAccessor(&L3Protocol::m_satisfiedInterests))
+      .AddTraceSource("TimedOutInterests", "TimedOutInterests",
+                      MakeTraceSourceAccessor(&L3Protocol::m_timedOutInterests))
+    ;
   return tid;
 }
 
@@ -172,9 +180,9 @@ L3Protocol::initialize()
   initializeManagement();
 
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(), nfd::FACEID_NULL);
-  m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(
-                                                    FaceUri("contentstore://")),
-                                                  nfd::FACEID_CONTENT_STORE);
+
+  m_impl->m_forwarder->beforeSatisfyInterest.connect(std::ref(m_satisfiedInterests));
+  m_impl->m_forwarder->beforeExpirePendingInterest.connect(std::ref(m_timedOutInterests));
 }
 
 class IgnoreSections

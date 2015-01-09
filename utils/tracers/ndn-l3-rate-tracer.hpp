@@ -139,11 +139,11 @@ protected:
   virtual void
   InData(const Data& data, const Face& face);
 
-  // virtual void
-  // SatisfiedInterests(Ptr<const pit::Entry>);
+  virtual void
+  SatisfiedInterests(const nfd::pit::Entry&, const Face&, const Data&);
 
-  // virtual void
-  // TimedOutInterests(Ptr<const pit::Entry>);
+  virtual void
+  TimedOutInterests(const nfd::pit::Entry&);
 
 private:
   void
