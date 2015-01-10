@@ -199,3 +199,94 @@ Research papers that use ndnSIM
 #. **W. Drira and F. Filali, "NDN-Q: an NDN query mechanism for efficient V2X data collection in smart cities". In Self-Organizing Wireless Access Networks for Smart City (SWANSITY) part of SECON 2014 (SWANSITY 2014), Singapore, Singapore, June 2014.** (`PDF <https://drive.google.com/file/d/0B-Qgl9lKNlsXZWhwVmtxdUVUNXc>`_)
 
     Collecting data from V2X networks is important to monitor, control and manage road traffic. However, efficient collection of the needed data is quite challenging due to vehicles mobility and the tremendous amount of events and data generated. Named Data Networking (NDN), a future internet architecture, gives more importance to content instead of its location. It has some inner capabilities of caching and multicast that can reduce traffic load in V2X networks and consequently decrease congestion risk. The communication in NDN is based on a request-response pattern where a consumer requests a specific content using its associated name. In this paper, an NDN query mechanism is proposed to use dynamic names to collect dynamic data built on the fly in one or many nodes. Then, it is merged and aggregated hop by hop to provide the response cooperatively to the consumer.
+
+#. **Marica Amadeo, Claudia Campolo, Antonella Molinaro, Nathalie Mitton. "Named Data
+   Networking: a Natural Design for Data Collection in Wireless Sensor Networks", IFIP Wireless
+   Days 2013, Valencia, Spain.** (`DOI: 10.1109/WD.2013.6686486
+   <http://dx.doi.org/10.1109/WD.2013.6686486>`_, `PDF
+   <https://www.academia.edu/attachments/34272952/download_file?st=MTQwNjEzNTQxOSw3OC4xNS4yMC40NSw3NjQ1Nzc%3D&>`_)
+
+    Named Data Networking (NDN) is a promising paradigm for the future Internet architecture
+    that also opens new perspectives in the way data can be retrieved in Wireless Sensor
+    Networks (WSNs).  In this paper, we explore the potentialities of the NDN paradigm applied
+    to WSNs and propose enhancements to the NDN forwarding strategy by including principles
+    inspired by traditional data-centric routing schemes.  Results achieved through the ndnSIM
+    simulator confirm the viability and effectiveness of the proposal.
+
+
+#. **Marica Amadeo, Claudia Campolo, Antonella Molinaro. "Forwarding Strategies in Named Data
+   Wireless Ad hoc Networks: Design and Evaluation", Elsevier Journal of Network and Computer
+   Applications (JNCA), 2014.** (`DOI: 10.1016/j.jnca.2014.06.007
+   <http://www.sciencedirect.com/science/article/pii/S1084804514001404>`_, `PDF
+   <https://www.academia.edu/attachments/34272694/download_file?st=MTQwNjEzNTk1Miw3OC4xNS4yMC40NSw3NjQ1Nzc%3D&>`_)
+
+    Named Data Networking (NDN) is a promising information-centric architecture for the future
+    Internet that is also gaining momentum in wireless ad hoc networks as an alternative
+    paradigm to traditional IP networking.  NDN shares with other information-centric proposals
+    the same innovative concepts, such as named content, name-based routing, and in-network
+    content caching.  These principles and the simple and robust communication model, based on
+    Interest and Data packets exchange, make NDN especially appealing for deployment in
+    wireless ad hoc environments, characterized by a broadcast error-prone channel and
+    time-varying topologies.  Nevertheless, making NDN-based solutions really effective in ad
+    hoc networks requires rethinking some of the basic NDN forwarding principles to cope with
+    wireless links and node mobility.  In this paper, we analyse two classes of forwarding
+    approaches: (i) a minimalist, provider-blind forwarding strategy, only aimed at keeping
+    packet redundancy on the broadcast wireless medium under control, without any knowledge
+    about the neighbourhood and the identity of the content sources; and (ii) a provider-aware
+    strategy, which leverages soft state information about the content sources, piggybacked in
+    Interest and Data packets and locally kept by nodes, to facilitate content retrieval.
+
+    Performance evaluation is carried by means of ndnSIM, the official NDN simulator, that is
+    overhauled for use in realistic wireless ad-hoc environments.  Results collected under
+    variable traffic loads and topologies provide insights into the behaviour of both
+    forwarding approaches and help to derive a set of recommendations that are crucial to the
+    successful design of a forwarding strategy for named data ad-hoc wireless networking.
+
+#. **S. Tarnoi, K. Suksomboon, and Y. Ji, "Cooperative Routing for Content-Centric Networking,"
+   IEEE Conference on Local Computer Networks (IEEE LCN), Sydney, Australia, October 2013.**
+   (`DOI:10.1109/LCN.2013.6761314 <http://dx.doi.org/10.1109/LCN.2013.6761314>`_)
+
+    A typical Forwarding Information Based (FIB) construction in the Content Centric Networking
+    (CCN) architecture relies on the name prefix dissemination following the shortest path
+    manner. However, routing based on the shortest path may not fully exploit the benefits of
+    forwarding and data planes of the CCN architecture since different content requester
+    routers may use disjoint paths to forward their interest packets, even though these packets
+    aim at the same content. To exploit this opportunity, we propose a cooperative routing
+    protocol for CCN, which focuses on a FIB reconstruction based on the content retrieval
+    statistics to improve the in-network caching utilization. A binary linear optimization
+    problem is formulated for calculating the optimal path for the cooperative routing. The
+    simulation results show an improvement in the server load and round-trip time provided by
+    the cooperative routing scheme compared with that of the conventional shortest path routing
+    scheme.
+
+#. **S. Tarnoi, K. Suksomboon, W. Kumwilaisak, and Y. Ji, "Performance of probabilistic caching
+   and cache replacement policies for content-centric networks", IEEE LCN, Edmonton, Canada,
+   September 2014.** (`DOI:10.1109/LCN.2014.6925761
+   <http://dx.doi.org/10.1109/LCN.2014.6925761>`_)
+
+    The Content-Centric Networking (CCN) architecture exploits a universal caching strategy
+    whose inefficiency has been confirmed by research communities. Various caching schemes have
+    been proposed to overcome some drawbacks of the universal caching strategy but they come
+    with additional complexity and overheads. Besides those sophisticated caching schemes,
+    there is a probabilistic caching scheme that is more efficient than the universal caching
+    strategy and adds a modest complexity to a network. The probabilistic caching scheme was
+    treated as a benchmark and the insights into its behavior have never been studied despite
+    its promising performance and feasibility in practical use. In this paper we study the
+    probabilistic caching scheme by means of computer simulation to explore the behavior of the
+    probabilistic caching scheme when it works with various cache replacement policies. The
+    simulation results show the different behavioral characteristics of the probabilistic
+    caching scheme as a function of the cache replacement policy.
+
+#. **S. Tarnoi, W. Kumwilaisak, and Y. Ji, "Optimal cooperative routing protocol based on
+   prefix popularity for content centric networking", IEEE LCN, Edmonton, Canada, September
+   2014.** (`DOI:10.1109/LCN.2014.6925805 <http://dx.doi.org/10.1109/LCN.2014.6925805>`_)
+
+    This paper presents an optimal cooperative routing protocol (OCRP) for Content Centric
+    Networking (CCN) aiming to improve the in-network cache utilization. The objective of OCRP
+    is to selectively aggregate the multiple flows of interest messages onto the same
+    path. This improves the cache utilization while mitigating the cache contention in the
+    Content Store (CS) of CCN routers on the routing path. The optimal routing path is obtained
+    by binary linear optimization under threes constraints: flow conservation constraint, cache
+    contention mitigating constraint, and path length constraint. Our simulation results of
+    OCRP show the reduction in the server load and round-trip hop distance in comparison to
+    those of the shortest path routing and our previously proposed cooperative routing schemes.
