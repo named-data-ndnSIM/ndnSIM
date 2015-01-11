@@ -41,7 +41,7 @@ master_doc = 'tutorial'
 
 # General information about the project.
 project = u''
-copyright = u'2011-2015 (c) Alexander Afanasyev, Spyros Mastorakis, Ilya Moiseenko, and Lixia Zhang'
+copyright = u'2011-2015 (c) Alexander Afanasyev, Spyridon Mastorakis, Ilya Moiseenko, and Lixia Zhang'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -186,7 +186,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('tutorial', 'ndnSIM-tutorial.tex', u'ndnSIM 2.0: NS-3 based Named Data Networking (NDN) simulator documentation',
-   u'Alexander Afanasyev, Spyros Mastorakis, Ilya Moiseenko, and Lixia Zhang', 'manual'),
+   u'Alexander Afanasyev, Spyridon Mastorakis, Ilya Moiseenko, and Lixia Zhang', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,7 +216,7 @@ latex_domain_indices = False
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'ndnSIM', u'ndnSIM 2.0: NS-3 based Named Data Networking (NDN) simulator documentation',
-     [u'Alexander Afanasyev, Spyros Mastorakis, Ilya Moiseenko, and Lixia Zhang'], 1)
+     [u'Alexander Afanasyev, Spyridon Mastorakis, Ilya Moiseenko, and Lixia Zhang'], 1)
 ]
 
 # If true, show URL addresses after external links.
