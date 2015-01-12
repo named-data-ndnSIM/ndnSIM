@@ -19,7 +19,7 @@ new features of the new version:
   <http://named-data.net/doc/ndn-cxx/>`_.
 - All NDN forwarding and management is implemented directly using source code of `Named
   Data Networking Forwarding Daemon (NFD) <http://named-data.net/doc/NFD/>`_
-- Packet format changed to `NDN-TLV <http://named-data.net/doc/ndn-tlv/>`_
+- Packet format changed to the `NDN packet format <http://named-data.net/doc/ndn-tlv/>`_
 
 .. note::
    Please note that ndnSIM 2.0 has major refactoring and simulation scenario written for
