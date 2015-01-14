@@ -4,6 +4,5 @@
 Reporting bugs
 ==============
 
-To file a bug report, please use `GitHub Issues <https://github.com/NDN-Routing/ndnSIM/issues>`_ or `NDN Redmine <http://redmine.named-data.net/projects/ndnsim>`_.
-
-To create new feature, please fork the code and submit Pull Request on GitHub.
+Please submit bug reports and feature requests on `redmine <http://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
+or tell us about them on `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .

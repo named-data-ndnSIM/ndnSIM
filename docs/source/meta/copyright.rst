@@ -4,9 +4,9 @@ Copyright
 
 ndnSIM and this documentation is:
 
-Copyright © 2011-2013 University of California, Los Angeles
+Copyright © 2011-2015 University of California, Los Angeles
 
-Copyright © 2011-2013 Alexander Afanasyev
+Copyright © 2011-2015 Alexander Afanasyev
 
 -------
 

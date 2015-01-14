@@ -23,7 +23,7 @@ Requirements
 
                 sudo aptitude install libboost1.48-all-dev
 
-        * 12.10, 13.04, and newer versions
+        * >12.04
 
             .. code-block:: bash
 
@@ -62,7 +62,7 @@ order to run `visualizer`_ module, the following should be installed:
 
            sudo apt-get install python-dev python-pygraphviz python-kiwi
            sudo apt-get install python-pygoocanvas python-gnome2
-           sudo apt-get install python-gnomedesktop python-rsvg ipython
+           sudo apt-get install python-rsvg ipython
 
    * For Fedora (tested on Fedora 16):
 
@@ -94,21 +94,12 @@ Download a custom branch of NS-3 that contains all necessary patches, python bin
 
 	mkdir ndnSIM
 	cd ndnSIM
-	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+	git clone -b ndnSIM-v1 git://github.com/cawka/ns-3-dev-ndnSIM ns-3
 	git clone git://github.com/cawka/pybindgen.git pybindgen
-	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+	git clone -b master-v1 git://github.com:named-data/ndnSIM.git ns-3/src/ndnSIM
 
 There are quite a few modification to the base NS-3 code that are necessary to run ndnSIM, and the code is periodically synchronized with the official developer branch.  Eventually, all the changes will be merged to the official branch, but for the time being, it is necessary to use the customized branch.
 
-If you have problems connecting to github, you can try to clone from google servers:
-
-.. code-block:: bash
-
-        mkdir ndnSIM
-        cd ndnSIM
-        git clone https://code.google.com/p/ndnsim.ns3-base/ ns-3
-        git clone https://code.google.com/p/ndnsim.pybindgen/ pybindgen
-        git clone https://code.google.com/p/ndnsim/ ns-3/src/ndnSIM
 
 Compiling and running ndnSIM
 ----------------------------
@@ -178,9 +169,9 @@ For example, you can use the following template to write your extensions, simula
 
 	mkdir ndnSIM
 	cd ndnSIM
-	git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+	git clone -b ndnSIM-v1 git://github.com/cawka/ns-3-dev-ndnSIM ns-3
 	git clone git://github.com/cawka/pybindgen.git pybindgen
-	git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+	git clone -b master-v1 git://github.com:named-data/ndnSIM.git ns-3/src/ndnSIM
 
         # Build and install NS-3 and ndnSIM
         cd ns-3
@@ -207,19 +198,15 @@ Examples of template-based simulations
 1. ndnSIM examples from `<http://ndnsim.net>`_ website and more:
 
 - `<http://github.com/cawka/ndnSIM-examples>`_, or
-- `<http://code.google.com/p/ndnsim.ndnsim-examples/>`_
 
 2. Script scenarios and graph processing scripts for simulations used in "A Case for Stateful Forwarding Plane" paper by Yi et al. (`<http://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):
 
 - `<http://github.com/cawka/ndnSIM-comcom-stateful-fw>`_, or
-- `<http://code.google.com/p/ndnsim.ndnsim-comcom/>`_
 
 3. Script scenarios and graph processing scripts for simulations used in "Rapid Traffic Information Dissemination Using Named Data" paper by Wang et al. (`<http://dx.doi.org/10.1145/2248361.2248365>`_):
 
 - `<http://github.com/cawka/ndnSIM-nom-rapid-car2car>`_, or
-- `<http://code.google.com/p/ndnsim.ndnsim-nom-rapid/>`_
 
 - Rocketfuel-based topology generator for ndnSIM preferred format (randomly assigned link delays and bandwidth, based on estimated types of connections between nodes):
 
 - `<http://github.com/cawka/ndnSIM-sample-topologies>`_, or
-- `<http://code.google.com/p/ndnsim.ndnsim-sample-topo/>`_

@@ -804,7 +804,7 @@ HTML_FOOTER            = ns3_html_theme/ns3_doxy_footer.html
 # the style sheet file to the HTML output directory, so don't put your own
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = ns3_html_theme/static/ns3_stylesheet.css
+# HTML_STYLESHEET        = ns3_html_theme/static/ns3_stylesheet.css
 
 HTML_EXTRA_FILES       = ns3_html_theme/static/doxygen.css \
                          ns3_html_theme/static/bar-top.png \

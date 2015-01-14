@@ -41,13 +41,10 @@ Do not forget to check mailling list `archives <http://www.lists.cs.ucla.edu/pip
 Support
 -------
 
-The code of ndnSIM is in active development.  Bug reports (issues) as well as new feature implementation are always welcome. 
+The code of ndnSIM is in active development.
 
-To file a bug report, please use `GitHub Issues <https://github.com/NDN-Routing/ndnSIM/issues>`_.
-
-To create new feature, please fork the code and submit Pull Request on GitHub.
-
-And of course, `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ is the best way to communicate with and get support from ndnSIM team and other users of ndnSIM.
+Please submit bug reports and feature requests on `ndnISM Redmine <http://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
+or tell us about the error on `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .
 
 A very short guide to the code
 ------------------------------
