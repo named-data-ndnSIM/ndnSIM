@@ -38,6 +38,7 @@ Contents:
     :glob:
 
     meta/*
+    RELEASE_NOTES
 
 
 -------
