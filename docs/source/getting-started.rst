@@ -4,9 +4,30 @@ Getting Started
 Portability
 ------------
 
-ndnSIM has been successfully compiled and used under Ubuntu Linux 12.04 (only with boost
-libraries **1.48**), 14.04 (default version of boost), OS X 10.10 (Xcode 6.1.1, macports boost
-1.56-1.57).
+ndnSIM 2.0 has been successfully compiled and used on following platforms:
+
+- Ubuntu Linux 12.04 (see the note)
+- Ubuntu Linux 14.04
+- OS X 10.10
+
+.. note::
+    ndnSIM is currently cannot be compiled on Ubuntu Linux 12.04 with the packaged boost
+    libraries (there is an `issue with boost 1.48 and gcc 4.6
+    <https://svn.boost.org/trac/boost/ticket/6153>`_).  It is still possible to compile ndnSIM
+    on this platform, but either compiler or boost libraries (or both) need to get upgraded.
+
+    More recent version of boost can be installed from "Boost C++ Libraries" team PPA::
+
+        sudo apt-get install python-software-properties
+        sudo add-apt-repository ppa:boost-latest/ppa
+        sudo apt-get update
+        sudo apt-get install libboost1.55-all-dev
+
+        # add  --boost-libs=/usr/lib/x86_64-linux-gnu  to ./waf configure for ndn-cxx and ns3
+        # ./waf configure --boost-libs=/usr/lib/x86_64-linux-gnu
+
+    Make sure that all other version of boost libraries (``-dev`` packages) are removed,
+    otherwise compilation will fail.
 
 .. _requirements:
 
@@ -19,17 +40,10 @@ Prerequisites
 .. role:: red
 
 .. note::
-   :red:`!!! ndn-cxx and ndnSIM requires boost version at least 1.48.` Many linux distribution
+   :red:`!!! ndnSIM requires boost version at least 1.49.` Many linux distribution
    (Fedora 16, 17 at the time of this writing) ship an old version of boost, making it
    impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following
    :ref:`these simple instructions <Installing boost libraries>`.
-
-.. note::
-   :red:`For Ubuntu 12.04` Ubuntu 12.04 ships with two versions of boost libraries and it is
-   known that if both are installed, then compilation of ndnSIM will most likely fail.  Please
-   install ``libboost1.48-dev-all`` package and uninstall ``libboost-dev-all``.  If you want to
-   install the latest version of boost libraries, then uninstall both ``libboost1.48-dev-all``
-   and ``libboost-dev-all``, so the libraries do not interfere with each other.
 
 .. note::
    !!! If you do not have root permissions to install boost, you can install it in your home
@@ -43,7 +57,7 @@ Prerequisites
 dependencies should be installed.  For example, in order to run `visualizer`_ module, the
 following should be installed:
 
-   * For Ubuntu (tested on Ubuntu 14.04, should work on later versions as well):
+   * For Ubuntu:
 
        .. code-block:: bash
 
@@ -51,7 +65,7 @@ following should be installed:
            sudo apt-get install python-pygoocanvas python-gnome2
            sudo apt-get install python-gnomedesktop python-rsvg ipython
 
-   * For Fedora (tested on Fedora 16):
+   * For Fedora:
 
        .. code-block:: bash
 
@@ -62,7 +76,7 @@ following should be installed:
            sudo yum install python-pip
            sudo easy_install pygraphviz
 
-   * For MacOS (macports):
+   * For OS X with MacPorts:
 
        .. code-block:: bash
 
@@ -93,6 +107,9 @@ The following commands download all pieces from GitHub repositories:
     mkdir ndnSIM
     cd ndnSIM
     git clone https://github.com/named-data/ndn-cxx.git ndn-cxx
+    cd ndn-cxx
+    git checkout 81a6c5dea60cea97c60dab0d78576c0d3b4e29ed
+    cd ..
     git clone https://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
     git clone https://github.com/cawka/pybindgen.git pybindgen
     git clone https://github.com/named-data/ndnSIM.git ns-3/src/ndnSIM

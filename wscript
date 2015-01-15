@@ -11,8 +11,16 @@ REQUIRED_BOOST_LIBS = ['graph']
 def required_boost_libs(conf):
     conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
 
+def options(opt):
+    opt.load(['dependency-checker',
+              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'],
+             tooldir=['%s/.waf-tools' % opt.path.abspath()])
+
 def configure(conf):
-    conf.env['ENABLE_NDNSIM']=False;
+    conf.load(['dependency-checker',
+               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'])
+
+    conf.env['ENABLE_NDNSIM']=False
 
     conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'],
                    uselib_store='NDN_CXX', mandatory=True)

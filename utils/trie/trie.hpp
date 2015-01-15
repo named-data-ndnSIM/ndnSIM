@@ -152,7 +152,7 @@ public:
                                              // container
     , children_(bucket_traits(buckets_.get(), bucketSize_))
     , payload_(PayloadTraits::empty_payload)
-    , parent_(0)
+    , parent_(nullptr)
   {
   }
 

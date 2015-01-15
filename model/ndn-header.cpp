@@ -82,14 +82,14 @@ PacketHeader<Pkt>::GetSerializedSize(void) const
 
 template<class Pkt>
 void
-PacketHeader<Pkt>::Serialize(Buffer::Iterator start) const
+PacketHeader<Pkt>::Serialize(ns3::Buffer::Iterator start) const
 {
   start.Write(m_packet->wireEncode().wire(), m_packet->wireEncode().size());
 }
 
 class Ns3BufferIteratorSource : public io::source {
 public:
-  Ns3BufferIteratorSource(Buffer::Iterator& is)
+  Ns3BufferIteratorSource(ns3::Buffer::Iterator& is)
     : m_is(is)
   {
   }
@@ -110,12 +110,12 @@ public:
   }
 
 private:
-  Buffer::Iterator& m_is;
+  ns3::Buffer::Iterator& m_is;
 };
 
 template<class Pkt>
 uint32_t
-PacketHeader<Pkt>::Deserialize(Buffer::Iterator start)
+PacketHeader<Pkt>::Deserialize(ns3::Buffer::Iterator start)
 {
   auto packet = make_shared<Pkt>();
   io::stream<Ns3BufferIteratorSource> is(start);

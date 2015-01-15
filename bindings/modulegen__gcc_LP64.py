@@ -154,8 +154,8 @@ def register_methods(root_module):
         cls.add_method('AddOrigin', 'void', [param('const std::string&', 'prefix'), param('const std::string&', 'nodeName')])
         cls.add_method('AddOrigins', 'void', [param('const std::string&', 'prefix'), param('const ns3::NodeContainer&', 'nodes')])
         cls.add_method('AddOriginsForAll', 'void', [])
-        cls.add_method('CalculateRoutes', 'void', [param('bool', 'invalidatedRoutes', default_value='true')])
-        cls.add_method('CalculateAllPossibleRoutes', 'void', [param('bool', 'invalidatedRoutes', default_value='true')])
+        cls.add_method('CalculateRoutes', 'void', [])
+        cls.add_method('CalculateAllPossibleRoutes', 'void', [])
     reg_GlobalRoutingHelper(root_module['ns3::ndn::GlobalRoutingHelper'])
 
     def reg_Name(root_module, cls):

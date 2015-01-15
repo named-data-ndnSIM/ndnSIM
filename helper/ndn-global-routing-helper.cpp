@@ -213,7 +213,7 @@ GlobalRoutingHelper::AddOriginsForAll()
 }
 
 void
-GlobalRoutingHelper::CalculateRoutes(bool invalidatedRoutes /* = true*/)
+GlobalRoutingHelper::CalculateRoutes()
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
@@ -253,19 +253,6 @@ GlobalRoutingHelper::CalculateRoutes(bool invalidatedRoutes /* = true*/)
     Ptr<L3Protocol> L3protocol = (*node)->GetObject<L3Protocol>();
     shared_ptr<nfd::Forwarder> forwarder = L3protocol->getForwarder();
 
-    if (invalidatedRoutes) {
-      std::vector<::nfd::fib::NextHop> NextHopList;
-      for (nfd::Fib::const_iterator fibIt = forwarder->getFib().begin();
-           fibIt != forwarder->getFib().end();) {
-        NextHopList.clear();
-        NextHopList = fibIt->getNextHops();
-        ++fibIt;
-        for (int i = 0; i < NextHopList.size(); i++) {
-          NextHopList[i].setCost(std::numeric_limits<uint64_t>::max());
-        }
-      }
-    }
-
     NS_LOG_DEBUG("Reachability from Node: " << source->GetObject<Node>()->GetId());
     for (const auto& dist : distances) {
       if (dist.first == source)
@@ -291,7 +278,7 @@ GlobalRoutingHelper::CalculateRoutes(bool invalidatedRoutes /* = true*/)
 }
 
 void
-GlobalRoutingHelper::CalculateAllPossibleRoutes(bool invalidatedRoutes /* = true*/)
+GlobalRoutingHelper::CalculateAllPossibleRoutes()
 {
   /**
    * Implementation of route calculation is heavily based on Boost Graph Library
@@ -317,19 +304,6 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes(bool invalidatedRoutes /* = true
 
     Ptr<L3Protocol> L3protocol = (*node)->GetObject<L3Protocol>();
     shared_ptr<nfd::Forwarder> forwarder = L3protocol->getForwarder();
-
-    if (invalidatedRoutes) {
-      std::vector<::nfd::fib::NextHop> NextHopList;
-      for (nfd::Fib::const_iterator fibIt = forwarder->getFib().begin();
-           fibIt != forwarder->getFib().end();) {
-        NextHopList.clear();
-        NextHopList = fibIt->getNextHops();
-        ++fibIt;
-        for (int i = 0; i < NextHopList.size(); i++) {
-          NextHopList[i].setCost(std::numeric_limits<uint64_t>::max());
-        }
-      }
-    }
 
     NS_LOG_DEBUG("Reachability from Node: " << source->GetObject<Node>()->GetId() << " ("
                                             << Names::FindName(source->GetObject<Node>()) << ")");

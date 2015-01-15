@@ -110,10 +110,10 @@ Producer::OnInterest(shared_ptr<const Interest> interest)
   data->setName(dataName);
   data->setFreshnessPeriod(::ndn::time::milliseconds(m_freshness.GetMilliSeconds()));
 
-  data->setContent(make_shared<::ndn::Buffer>(m_virtualPayloadSize));
+  data->setContent(make_shared< ::ndn::Buffer>(m_virtualPayloadSize));
 
   Signature signature;
-  SignatureInfo signatureInfo(static_cast<::ndn::tlv::SignatureTypeValue>(255));
+  SignatureInfo signatureInfo(static_cast< ::ndn::tlv::SignatureTypeValue>(255));
 
   if (m_keyLocator.size() > 0) {
     signatureInfo.setKeyLocator(m_keyLocator);

@@ -22,6 +22,7 @@
 
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
+#include <memory>
 
 namespace ns3 {
 namespace ndn {

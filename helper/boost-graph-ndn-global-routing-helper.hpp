@@ -182,9 +182,9 @@ struct property_traits<EdgeWeights> {
   typedef readable_property_map_tag category;
 };
 
-const property_traits<EdgeWeights>::value_type WeightZero(0, 0, 0.0);
+const property_traits<EdgeWeights>::value_type WeightZero(nullptr, 0, 0.0);
 const property_traits<EdgeWeights>::value_type
-  WeightInf(0, std::numeric_limits<uint16_t>::max(), 0.0);
+  WeightInf(nullptr, std::numeric_limits<uint16_t>::max(), 0.0);
 
 struct WeightCompare : public std::binary_function<property_traits<EdgeWeights>::reference,
                                                    property_traits<EdgeWeights>::reference, bool> {
@@ -220,7 +220,7 @@ struct WeightCombine
   operator()(std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> a,
              property_traits<EdgeWeights>::reference b) const
   {
-    if (std::get<0>(a) == 0)
+    if (std::get<0>(a) == nullptr)
       return std::make_tuple(std::get<0>(b), std::get<1>(a) + std::get<1>(b),
                              std::get<2>(a) + std::get<2>(b));
     else
@@ -270,7 +270,7 @@ inline property_traits<EdgeWeights>::reference
 get(const boost::EdgeWeights&, ns3::ndn::GlobalRouter::Incidency& edge)
 {
   if (std::get<1>(edge) == 0)
-    return property_traits<EdgeWeights>::reference(0, 0, 0.0);
+    return property_traits<EdgeWeights>::reference(nullptr, 0, 0.0);
   else {
     return property_traits<EdgeWeights>::reference(std::get<1>(edge),
                                                    static_cast<uint16_t>(
@@ -305,13 +305,31 @@ struct property_traits<reference_wrapper<DistancesMap>> {
   typedef read_write_property_map_tag category;
 };
 
+} // boost
+
+namespace std {
+template<>
+class numeric_limits<std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double>>
+{
+public:
+  typedef std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double> value;
+  static value
+  max()
+  {
+    return boost::WeightInf;
+  }
+};
+}
+
+namespace boost {
+
 inline std::tuple<std::shared_ptr<nfd::Face>, uint32_t, double>
 get(DistancesMap& map, ns3::Ptr<ns3::ndn::GlobalRouter> key)
 {
   boost::DistancesMap::iterator i = map.find(key);
   if (i == map.end())
     return std::tuple<std::shared_ptr<nfd::Face>, uint32_t,
-                      double>(0, std::numeric_limits<uint32_t>::max(), 0.0);
+                      double>(nullptr, std::numeric_limits<uint32_t>::max(), 0.0);
   else
     return i->second;
 }
