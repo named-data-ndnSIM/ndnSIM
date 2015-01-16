@@ -7,8 +7,6 @@ BUILD="no"
 if [ ! -d ndn-cxx ]; then
     git clone git://github.com/named-data/ndn-cxx
     cd ndn-cxx
-    # TEMPORARY, the following must be removed after issue if fixed
-    git checkout 81a6c5dea60cea97c60dab0d78576c0d3b4e29ed
     BUILD="yes"
 else
     cd ndn-cxx
@@ -16,8 +14,6 @@ else
     sudo rm -Rf latest-version
     git clone git://github.com/named-data/ndn-cxx latest-version
     cd latest-version
-    # TEMPORARY, the following must be removed after issue if fixed
-    git checkout 81a6c5dea60cea97c60dab0d78576c0d3b4e29ed
     LATEST_VERSION=`git rev-parse HEAD || echo UNKNOWN`
     cd ..
     rm -Rf latest-version
@@ -38,6 +34,11 @@ if [ "$BUILD" = "yes" ]; then
     sudo ./waf distclean -j1 --color=yes
 fi
 
-./waf configure -j1 --color=yes --without-osx-keychain
+IS_UBUNTU_12_04=$( python -c "print 'yes' if 'Ubuntu-12.04' in '$NODE_LABELS'.strip().split(' ') else 'no'" )
+if [[ $IS_UBUNTU_12_04 == "yes" ]]; then
+    EXTRA_FLAGS=" --boost-libs=/usr/lib/x86_64-linux-gnu"
+fi
+
+./waf configure -j1 --color=yes --without-osx-keychain $EXTRA_FLAGS
 ./waf -j1 --color=yes
 sudo ./waf install -j1 --color=yes

@@ -62,6 +62,17 @@ static const uint8_t DUMMY_SIGNATURE[] =
    0x81, 0x91, 0x0b, 0x91, 0x9f, 0x3a, 0x04, 0xa2, 0x44, 0x28, 0x19, 0xa1, 0x38, 0x21, 0x4f, 0x25,
    0x59, 0x8a, 0x48, 0xc2};
 
+const std::string DummyPublicInfo::SCHEME = "pib-dummy";
+const std::string DummyTpm::SCHEME = "tpm-dummy";
+
+NDN_CXX_KEYCHAIN_REGISTER_PIB(DummyPublicInfo, "pib-dummy", "dummy");
+NDN_CXX_KEYCHAIN_REGISTER_TPM(DummyTpm, "tpm-dummy", "dummy");
+
+DummyPublicInfo::DummyPublicInfo(const std::string& locator)
+  : SecPublicInfo(locator)
+{
+}
+
 bool
 DummyPublicInfo::doesIdentityExist(const Name& identityName)
 {
@@ -226,10 +237,33 @@ DummyPublicInfo::setDefaultCertificateNameForKeyInternal(const Name& certificate
 {
 }
 
+void
+DummyPublicInfo::setTpmLocator(const std::string& tpmLocator)
+{
+  m_tpmLocator = tpmLocator;
+}
+
+std::string
+DummyPublicInfo::getTpmLocator()
+{
+  return m_tpmLocator;
+}
+
+std::string
+DummyPublicInfo::getScheme()
+{
+  return DummyPublicInfo::SCHEME;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
+
+DummyTpm::DummyTpm(const std::string& locator)
+  : SecTpm(locator)
+{
+}
 
 void
 DummyTpm::setTpmPassword(const uint8_t* password, size_t passwordLength)
@@ -341,6 +375,12 @@ bool
 DummyTpm::importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buffer, size_t bufferSize)
 {
   return false;
+}
+
+std::string
+DummyTpm::getScheme()
+{
+  return DummyTpm::SCHEME;
 }
 
 } // namespace security

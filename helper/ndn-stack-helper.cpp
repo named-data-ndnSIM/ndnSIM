@@ -61,7 +61,7 @@ StackHelper::~StackHelper()
 KeyChain&
 StackHelper::getKeyChain()
 {
-  static ::ndn::DummyKeyChain keyChain;
+  static ::ndn::KeyChain keyChain("pib-dummy", "tpm-dummy");
   return keyChain;
 }
 

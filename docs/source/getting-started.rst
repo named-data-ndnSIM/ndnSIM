@@ -63,7 +63,7 @@ following should be installed:
 
            sudo apt-get install python-dev python-pygraphviz python-kiwi
            sudo apt-get install python-pygoocanvas python-gnome2
-           sudo apt-get install python-gnomedesktop python-rsvg ipython
+           sudo apt-get install python-rsvg ipython
 
    * For Fedora:
 
@@ -87,6 +87,13 @@ following should be installed:
            # you will be able to install another useful python module
            # sudo port install py27-kiwi
 
+   * For OS X with HomeBrew
+
+       .. code-block:: bash
+
+           brew install boost cryptopp pkg-config libxml2
+           brew link --force libxml2
+
 .. _visualizer: http://www.nsnam.org/wiki/index.php/PyViz
 
 Downloading ndnSIM source
@@ -107,9 +114,6 @@ The following commands download all pieces from GitHub repositories:
     mkdir ndnSIM
     cd ndnSIM
     git clone https://github.com/named-data/ndn-cxx.git ndn-cxx
-    cd ndn-cxx
-    git checkout 81a6c5dea60cea97c60dab0d78576c0d3b4e29ed
-    cd ..
     git clone https://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
     git clone https://github.com/cawka/pybindgen.git pybindgen
     git clone https://github.com/named-data/ndnSIM.git ns-3/src/ndnSIM

@@ -27,6 +27,8 @@ namespace security {
 
 class DummyPublicInfo : public SecPublicInfo {
 public:
+  DummyPublicInfo(const std::string& locator);
+
   virtual bool
   doesIdentityExist(const Name& identityName);
 
@@ -90,6 +92,12 @@ public:
   virtual void
   deleteIdentityInfo(const Name& identity);
 
+  virtual void
+  setTpmLocator(const std::string& tpmLocator);
+
+  virtual std::string
+  getTpmLocator();
+
 protected:
   virtual void
   setDefaultIdentityInternal(const Name& identityName);
@@ -99,6 +107,15 @@ protected:
 
   virtual void
   setDefaultCertificateNameForKeyInternal(const Name& certificateName);
+
+  virtual std::string
+  getScheme();
+
+public:
+  static const std::string SCHEME;
+
+private:
+  std::string m_tpmLocator;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +123,8 @@ protected:
 
 class DummyTpm : public SecTpm {
 public:
+  DummyTpm(const std::string& locator);
+
   virtual void
   setTpmPassword(const uint8_t* password, size_t passwordLength);
 
@@ -155,6 +174,9 @@ public:
   virtual void
   addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl);
 
+  virtual std::string
+  getScheme();
+
 protected:
   virtual ConstBufferPtr
   exportPrivateKeyPkcs8FromTpm(const Name& keyName);
@@ -164,20 +186,12 @@ protected:
 
   virtual bool
   importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buffer, size_t bufferSize);
-};
 
-typedef KeyChainTraits<DummyPublicInfo, DummyTpm> DummyKeyChainTraits;
+public:
+  static const std::string SCHEME;
+};
 
 } // namespace security
-
-class DummyKeyChain : public KeyChain {
-public:
-  DummyKeyChain()
-    : KeyChain(security::DummyKeyChainTraits())
-  {
-  }
-};
-
 } // namespace ndn
 
 #endif // NDNSIM_UTILS_DUMMY_KEYCHAIN_HPP

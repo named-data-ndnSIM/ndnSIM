@@ -7,12 +7,16 @@ set -e
 # git submodule update
 
 # COVERAGE=$( python -c "print '--with-coverage' if 'code-coverage' in '$JOB_NAME' else ''" )
+IS_UBUNTU_12_04=$( python -c "print 'yes' if 'Ubuntu-12.04' in '$NODE_LABELS'.strip().split(' ') else 'no'" )
+if [[ $IS_UBUNTU_12_04 == "yes" ]]; then
+    EXTRA_FLAGS=" --boost-libs=/usr/lib/x86_64-linux-gnu"
+fi
 
 # Cleanup
 sudo ./waf -j1 distclean
 
 # Configure/build in debug mode
-./waf -j1 configure --enable-examples --enable-tests
+./waf -j1 configure --enable-examples --enable-tests $EXTRA_FLAGS
 ./waf -j1 build
 
 # # Cleanup
