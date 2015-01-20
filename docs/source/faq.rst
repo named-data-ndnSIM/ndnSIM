@@ -5,8 +5,7 @@ Boost libraries
 ---------------
 
 .. note::
-    **My ubuntu/redhat/freebsd have an old version of boost libraries.  How can I get the
-     latest one?**
+    **My ubuntu/redhat/freebsd have an old version of boost libraries.  How can I get the latest one?**
 
 .. _Installing boost libraries:
 
@@ -16,8 +15,7 @@ Installing boost libraries to ``/usr/local``
 .. role:: red
 
 .. note::
-    **The following instructions are for those who want to install latest version of boost
-     libraries** :red:`and has root access`.
+    **The following instructions are for those who want to install latest version of boost libraries** :red:`and has root access`.
 
 The following commands would install the latest version of boost libraries (at the time of
 writing, version 1.53) ot ``/usr/local``, assuming you have a root access to your machine.  If
@@ -157,5 +155,4 @@ General questions
     I found an error in the documentation / bug in the code. What should I do?
 
 Please submit a bug report on `redmine <http://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
-or tell us about the error on `our mailing list
-<http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .
+or tell us about the error on `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .

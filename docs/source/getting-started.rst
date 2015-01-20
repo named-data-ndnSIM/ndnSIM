@@ -142,7 +142,11 @@ Compiling and running ndnSIM
 
        .. code-block:: bash
 
-           sudo apt-get install ndn-cxx
+           sudo apt-get install ndn-cxx-dev
+
+       If you are using ndn-cxx from PPA, please make sure that you do not have the existing installation
+       of ndn-cxx library compiled from source (e.g., in /usr/local).  Otherwise, the version mistmach
+       may result in compilation errors.
 
 - Compile NS-3 with ndnSIM module
 

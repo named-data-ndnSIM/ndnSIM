@@ -1965,7 +1965,9 @@ PREDEFINED             = NS3_ASSERT_ENABLE \
                          PROTECTED_WITH_TESTS_ELSE_PRIVATE=private \
                          VIRTUAL_WITH_TESTS \
                          DECL_OVERRIDE \
-                         ATTRIBUTE_HELPER_CPP
+                         ATTRIBUTE_HELPER_CPP \
+                         NDN_CXX_KEYCHAIN_REGISTER_PIB \
+                         NDN_CXX_KEYCHAIN_REGISTER_TPM
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
