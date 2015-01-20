@@ -72,7 +72,7 @@ def build(bld):
         deps.append('visualizer')
 
     if bld.env.ENABLE_EXAMPLES:
-        deps += ['point-to-point-layout', 'csma', 'applications']
+        deps += ['point-to-point-layout', 'csma', 'applications', 'wifi']
 
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.module = 'ndnSIM'

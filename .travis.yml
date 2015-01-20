@@ -1,0 +1,26 @@
+language: cpp
+os:
+  - linux
+compiler:
+  - gcc
+notifications:
+  email:
+    on_success: always
+    on_failure: always
+cache:
+  - ccache
+env:
+  - NODE_LABELS="Linux Ubuntu Ubuntu-12.04"
+before_install:
+  - travis_retry sudo apt-get install -qq ccache
+script:
+  - |
+    git rm -qrf .
+    git clone --depth=1 https://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+    git clone --depth=1 https://github.com/cawka/pybindgen.git pybindgen
+    mkdir -p ns-3/src/ndnSIM
+    mv .git ns-3/src/ndnSIM/
+    (cd ns-3/src/ndnSIM/ && git reset -q && git checkout .)
+  - cd ns-3
+  - export CXX="ccache $CXX"
+  - ./src/ndnSIM/.jenkins

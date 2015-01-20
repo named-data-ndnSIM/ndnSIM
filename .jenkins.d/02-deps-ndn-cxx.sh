@@ -2,6 +2,14 @@
 set -x
 set -e
 
+if [[ $USE_NDN_PPA == "yes" ]]; then
+    sudo apt-get install -y python-software-properties
+    sudo add-apt-repository -qq -y ppa:named-data/ppa
+    sudo apt-get update -qq
+    sudo apt-get install -qq -y ndn-cxx-dev
+    exit 0
+fi
+
 cd /tmp
 BUILD="no"
 if [ ! -d ndn-cxx ]; then

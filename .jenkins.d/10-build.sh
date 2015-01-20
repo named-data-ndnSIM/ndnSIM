@@ -16,7 +16,7 @@ fi
 sudo ./waf -j1 distclean
 
 # Configure/build in debug mode
-./waf -j1 configure --enable-examples --enable-tests $EXTRA_FLAGS
+./waf -j1 configure --enable-modules=ndnSIM --enable-examples --enable-tests $EXTRA_FLAGS
 ./waf -j1 build
 
 # # Cleanup
