@@ -40,13 +40,13 @@ Prerequisites
 .. role:: red
 
 .. note::
-   :red:`!!! ndnSIM requires boost version at least 1.49.` Many linux distribution
+   :red:`ndnSIM requires boost version at least 1.49.` Many linux distribution
    (Fedora 16, 17 at the time of this writing) ship an old version of boost, making it
    impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following
    :ref:`these simple instructions <Installing boost libraries>`.
 
 .. note::
-   !!! If you do not have root permissions to install boost, you can install it in your home
+   If you do not have root permissions to install boost, you can install it in your home
    folder.  However, you need to be make sure that `libboost_iostreams` library is successfully
    compiled and is installed.  Please refer to :ref:`the following example <Installing boost
    libraries>` for the hints how to successfully compile and install boost libraries on Ubuntu
@@ -169,6 +169,12 @@ Compiling and running ndnSIM
         # or run ``sudo port select python python27``
         ./waf
 
+    .. note::
+        On OS X configuration stage may get :ref:`stuck at detecting gtk module <Problems with
+        the gtk python module on OS X>`.  Make sure you have `XQuartz
+        <http://xquartz.macosforge.org>`_ installed or disable python as described in the
+        following instructions.
+
     Python bindings is an optional and not very stable feature of NS-3 simulator.  It is
     possible to disable python bindings compilation either to speed up compilation or to avoid
     certain compilation errors (e.g., "Could not find a task generator for the name
@@ -195,7 +201,7 @@ Simulating using ndnSIM
 
         ./waf --run=ndn-simple
 
-    To run ``ndn-grid.cpp` scenario:
+    To run ``ndn-grid.cpp`` scenario:
 
     .. code-block:: bash
 

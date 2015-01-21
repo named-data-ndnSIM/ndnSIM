@@ -138,6 +138,26 @@ Visualizer problems
 Something is wrong with your python bindings and python bindings dependencies.  Please follow
 the :ref:`requirements` section that lists what should be installed in order to run visualizer.
 
+.. _Problems with the gtk python module on OS X:
+
+Problems with the gtk python module on OS X
+-------------------------------------------
+
+.. topic:: ./waf configure got stuck during the gtk module check
+
+    When running ``./waf configure``, the process freezes at the stage of detecting gtk module::
+
+      ...
+      Checking for 'sqlite3'                                         : yes
+      Checking for header linux/if_tun.h                             : not found
+      Checking for python module 'gtk'                               :
+
+If ``./waf configure`` on OSX got stuck during the gtk python module check, it most likely
+means that something is wrong with X11 required by this module.  You can try to reinstall X11
+(`XQuartz <http://xquartz.macosforge.org>`_) or configure NS-3 without python bindings (``./waf
+configure --disable-python``).  Note that disabling python bindings will also disable the
+visualizer module.
+
 Code questions
 --------------
 
