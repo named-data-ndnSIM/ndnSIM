@@ -22,6 +22,10 @@ def configure(conf):
 
     conf.env['ENABLE_NDNSIM']=False
 
+    if not os.environ.has_key('PKG_CONFIG_PATH'):
+        os.environ['PKG_CONFIG_PATH'] = ':'.join([
+            '/usr/local/lib/pkgconfig',
+            '/opt/local/lib/pkgconfig'])
     conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'],
                    uselib_store='NDN_CXX', mandatory=True)
 
