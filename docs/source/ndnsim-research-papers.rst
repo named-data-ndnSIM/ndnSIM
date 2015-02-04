@@ -7,18 +7,33 @@ General papers about ndnSIM
 ---------------------------
 
 .. note::
-    if you refer to ndnSIM in a published work, please cite this paper, not just the ndnSIM website
+    if you refer to ndnSIM in a published work, please cite the following papers, not just the ndnSIM website
 
-- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <http://named-data.net/techreport/TR005-ndnsim.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`_)
+- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2.0: A new version of the NDN simulator for NS-3," NDN, Technical Report NDN-0028, 2015** (`PDF <http://named-data.net/techreport/ndn-0028-1-ndnsim-v2.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`_)
 
-    Named Data Networking (NDN) is a newly proposed Internet architecture.
-    NDN retains the Internet's hourglass architecture but evolves the thin waist.
-    Instead of pushing data to specific locations, NDN retrieves data by name.
-    On one hand, this simple change allows NDN networks to use almost all of the Internet's well tested engineering properties to solve not only IP's communication problems but also digital distribution and control problems.
-    On the other hand, a distribution architecture differs in fundamental ways from a point-to-point communication architecture of today's Internet and raises many new research challenges.
-    Simulation can serve as a flexible tool to examine and evaluate various aspects of this new architecture.
-    To provide the research community at large with a common simulation platform, we have developed an open source NS-3 based simulator, ndnSIM, which faithfully implemented the basic components of a NDN network in a  modular way.
-    This paper provides an overview of ndnSIM.
+    The fundamental departure of the Named-Data Networking (NDN) communication paradigm from the IP
+    principles requires extensive evaluation through experimentation, and simulation is a necessary
+    tool to enable the experimentation at scale.  We released the first version of ndnSIM, an open
+    source NS-3-based NDN simulator, back in June 2012.  Since then, ndnSIM has undergone
+    substantial development resulting in ndnSIM 2.0, which was released in January 2015.  This paper
+    reports the design and features of this new simulator version.  The goal of the new release is
+    to match the simulation platform to the latest advancements of NDN research.  Therefore, it uses
+    the ndn-cxx library (NDN C++ library with eXperimental eXtensions) and the NDN Forwarding Daemon
+    (NFD) to enable experiments with real code in a simulation environment.
+
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <http://named-data.net/wp-content/uploads/TRndnsim.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`_)
+
+    Named Data Networking (NDN) is a newly proposed Internet architecture.  NDN retains the
+    Internet's hourglass architecture but evolves the thin waist.  Instead of pushing data to
+    specific locations, NDN retrieves data by name.  On one hand, this simple change allows NDN
+    networks to use almost all of the Internet's well tested engineering properties to solve not
+    only IP's communication problems but also digital distribution and control problems.  On the
+    other hand, a distribution architecture differs in fundamental ways from a point-to-point
+    communication architecture of today's Internet and raises many new research challenges.
+    Simulation can serve as a flexible tool to examine and evaluate various aspects of this new
+    architecture.  To provide the research community at large with a common simulation platform, we
+    have developed an open source NS-3 based simulator, ndnSIM, which faithfully implemented the
+    basic components of a NDN network in a modular way.  This paper provides an overview of ndnSIM.
 
 
 Research papers that use ndnSIM
