@@ -31,6 +31,7 @@ Contents:
     examples
     metric
     faq
+    parallel-simulations
     ndnsim-research-papers
 
 .. toctree::
@@ -44,8 +45,8 @@ Contents:
 -------
 
 If you refer to ndnSIM in a published work, please cite the following papers, not just the ndnSIM website. Thank you!
-    **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2.0: A new version of the NDN simulator for NS-3," NDN, Technical Report NDN-0028, 2015** (`PDF <http://named-data.net/techreport/ndn-0028-1-ndnsim-v2.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`_)
+    **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2.0: A new version of the NDN simulator for NS-3," NDN, Technical Report NDN-0028, 2015** (`PDF <http://named-data.net/techreport/ndn-0028-1-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
 
-    **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <http://named-data.net/wp-content/uploads/TRndnsim.pdf>`_, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`_)
+    **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <http://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`__)
 
 .. * :ref:`search`

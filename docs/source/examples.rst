@@ -417,6 +417,11 @@ To run this scenario and see what is happening, use the following command::
 
         NS_LOG=ndn.Consumer:ndn.Producer ./waf --run=ndn-grid-multiple-strategies
 
+Simple parallel scenario using MPI
+----------------------------------
+
+:ref:`simple scenario with MPI support`
+
 3-level binary tree with packet-level trace helpers
 ---------------------------------------------------
 
