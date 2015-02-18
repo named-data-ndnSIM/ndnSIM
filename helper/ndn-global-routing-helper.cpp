@@ -52,6 +52,8 @@
 #include <boost/concept/assert.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
+#include <unordered_map>
+
 #include "boost-graph-ndn-global-routing-helper.hpp"
 
 #include <math.h>
@@ -312,19 +314,18 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     NS_ASSERT(l3 != 0);
 
     // remember interface statuses
-    int faceNumber = 0;
-    std::vector<uint16_t> originalMetric(uint32_t(l3->getForwarder()->getFaceTable().size()));
+    std::list<nfd::FaceId> faceIds;
+    std::unordered_map<nfd::FaceId, uint16_t> originalMetrics;
     for (auto& i : l3->getForwarder()->getFaceTable()) {
-      faceNumber++;
       shared_ptr<Face> nfdFace = std::dynamic_pointer_cast<Face>(i);
-      originalMetric[uint32_t(faceNumber)] = nfdFace->getMetric();
+      faceIds.push_back(nfdFace->getId());
+      originalMetrics[nfdFace->getId()] = nfdFace->getMetric();
       nfdFace->setMetric(std::numeric_limits<uint16_t>::max() - 1);
       // value std::numeric_limits<uint16_t>::max () MUST NOT be used (reserved)
     }
 
-    faceNumber = 0;
-    for (auto& k : l3->getForwarder()->getFaceTable()) {
-      faceNumber++;
+    for (auto& faceId : faceIds) {
+      shared_ptr<Face> k = l3->getForwarder()->getFaceTable().get(faceId);
       shared_ptr<NetDeviceFace> face = std::dynamic_pointer_cast<NetDeviceFace>(k);
       if (face == 0) {
         NS_LOG_DEBUG("Skipping non-netdevice face");
@@ -332,7 +333,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
       }
 
       // enabling only faceId
-      face->setMetric(originalMetric[uint32_t(faceNumber)]);
+      face->setMetric(originalMetrics[faceId]);
 
       boost::DistancesMap distances;
 
@@ -379,11 +380,8 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     }
 
     // recover original interface statuses
-    faceNumber = 0;
-    for (auto& i : l3->getForwarder()->getFaceTable()) {
-      faceNumber++;
-      shared_ptr<Face> face = std::dynamic_pointer_cast<Face>(i);
-      face->setMetric(originalMetric[faceNumber]);
+    for (auto& i : originalMetrics) {
+      l3->getForwarder()->getFaceTable().get(i.first)->setMetric(i.second);
     }
   }
 }
