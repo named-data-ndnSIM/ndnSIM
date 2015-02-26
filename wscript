@@ -81,7 +81,7 @@ def build(bld):
     module = bld.create_ns3_module ('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders'
-    module.uselib = 'NDN_CXX BOOST'
+    module.use += ['NDN_CXX', 'BOOST']
     module.includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
     module.export_includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
 
