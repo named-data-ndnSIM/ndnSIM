@@ -1,13 +1,18 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
-from waflib import Utils, Logs
-
 def build(bld):
-    # This may be necessary for visualizer to work
+    # To allow  tests to use features from all enabled modules
     all_modules = [mod[len("ns3-"):] for mod in bld.env['NS3_ENABLED_MODULES']]
 
-    for i in bld.path.ant_glob(['*.cpp']):
+    # Unit tests
+    tests = bld.create_ns3_program('ndnSIM-unit-tests', all_modules)
+    tests.source = bld.path.ant_glob(['main.cpp', 'unit-tests/**/*.cpp'])
+    tests.includes = ['#', '.', '../NFD/', "../NFD/daemon", "../NFD/core", "../helper", "../model", "../apps", "../utils", "../examples"]
+
+    # Other tests
+    for i in bld.path.ant_glob(['other/*.cpp']):
         name = str(i)[:-len(".cpp")]
         obj = bld.create_ns3_program(name, all_modules)
         obj.source = [i] + bld.path.ant_glob(['%s/**/*.cpp' % name])
         obj.install_path = None
+

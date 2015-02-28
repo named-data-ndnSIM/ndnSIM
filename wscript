@@ -6,7 +6,7 @@ from waflib.Errors import WafError
 
 import wutils
 
-REQUIRED_BOOST_LIBS = ['graph']
+REQUIRED_BOOST_LIBS = ['graph', 'unit_test_framework']
 
 def required_boost_libs(conf):
     conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
