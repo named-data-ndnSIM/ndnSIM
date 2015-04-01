@@ -182,6 +182,36 @@ public:
   static KeyChain&
   getKeyChain();
 
+   /**
+   * \brief Update Ndn stack on a given node (Add faces for new devices)
+   *
+   * \param node The node on which to update the stack.
+   */
+  void
+  Update(Ptr<Node> node);
+
+  /**
+   *\brief Update Ndn stack on given nodes (Add faces for new devices)
+   *
+   * \param c The nodes on which to update the stack.
+   */
+  void
+  Update(const NodeContainer& c);
+
+  /**
+   *\brief Update Ndn stack on a given node name (Add faces for new devices)
+   *
+   * \param nodeName The name of the node on which to update the stack.
+   */
+  void
+  Update(const std::string& nodeName);
+
+  /**
+   *\brief Update Ndn stack on all the nodes (Add faces for new devices)
+   */
+  void
+  UpdateAll();
+
 private:
   shared_ptr<NetDeviceFace>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
@@ -189,6 +219,8 @@ private:
   shared_ptr<NetDeviceFace>
   PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                 Ptr<NetDevice> netDevice) const;
+  shared_ptr<NetDeviceFace>
+  createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const;
 
 public:
   void

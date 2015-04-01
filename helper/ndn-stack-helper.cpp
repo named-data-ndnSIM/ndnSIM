@@ -143,8 +143,8 @@ StackHelper::Install(Ptr<Node> node) const
   Ptr<FaceContainer> faces = Create<FaceContainer>();
 
   if (node->GetObject<L3Protocol>() != 0) {
-    NS_FATAL_ERROR("StackHelper::Install (): Installing "
-                   "a NdnStack to a node with an existing Ndn object");
+    NS_FATAL_ERROR("Cannot re-install NDN stack on node "
+                   << node->GetId());
     return 0;
   }
 
@@ -170,27 +170,7 @@ StackHelper::Install(Ptr<Node> node) const
     // if (DynamicCast<LoopbackNetDevice> (device) != 0)
     //   continue; // don't create face for a LoopbackNetDevice
 
-    shared_ptr<NetDeviceFace> face;
-
-    for (const auto& item : m_netDeviceCallbacks) {
-      if (device->GetInstanceTypeId() == item.first ||
-          device->GetInstanceTypeId().IsChildOf(item.first)) {
-        face = item.second(node, ndn, device);
-        if (face != 0)
-          break;
-      }
-    }
-
-    if (face == 0) {
-      face = DefaultNetDeviceCallback(node, ndn, device);
-    }
-
-    if (m_needSetDefaultRoutes) {
-      // default route with lowest priority possible
-      FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
-    }
-
-    faces->Add(face);
+    faces->Add(this->createAndRegisterFace(node, ndn, device));
   }
 
   return faces;
@@ -259,6 +239,72 @@ StackHelper::Install(const std::string& nodeName) const
 {
   Ptr<Node> node = Names::Find<Node>(nodeName);
   return Install(node);
+}
+
+void
+StackHelper::Update(Ptr<Node> node)
+{
+  if (node->GetObject<L3Protocol>() == 0) {
+    Install(node);
+    return;
+  }
+
+  Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
+
+  for (uint32_t index = 0; index < node->GetNDevices(); index++) {
+
+    Ptr<NetDevice> device = node->GetDevice(index);
+
+    if (ndn->getFaceByNetDevice(device) == nullptr) {
+      this->createAndRegisterFace(node, ndn, device);
+    }
+  }
+}
+
+void
+StackHelper::Update(const NodeContainer& c)
+{
+  for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
+    Update(*i);
+  }
+}
+
+void
+StackHelper::Update(const std::string& nodeName)
+{
+  Ptr<Node> node = Names::Find<Node>(nodeName);
+  Update(node);
+}
+
+void
+StackHelper::UpdateAll()
+{
+  Update(NodeContainer::GetGlobal());
+}
+
+shared_ptr<NetDeviceFace>
+StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const
+{
+  shared_ptr<NetDeviceFace> face;
+
+  for (const auto& item : m_netDeviceCallbacks) {
+    if (device->GetInstanceTypeId() == item.first ||
+        device->GetInstanceTypeId().IsChildOf(item.first)) {
+      face = item.second(node, ndn, device);
+      if (face != 0)
+        break;
+    }
+  }
+
+  if (face == 0) {
+    face = DefaultNetDeviceCallback(node, ndn, device);
+  }
+
+  if (m_needSetDefaultRoutes) {
+    // default route with lowest priority possible
+    FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
+  }
+  return face;
 }
 
 } // namespace ndn
