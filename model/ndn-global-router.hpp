@@ -108,7 +108,12 @@ public:
   const LocalPrefixList&
   GetLocalPrefixes() const;
 
-  // ??
+  /**
+   * @brief Clear global state
+   */
+  static void
+  clear();
+
 protected:
   virtual void
   NotifyNewAggregate(); ///< @brief Notify when the object is aggregated to another object (e.g.,

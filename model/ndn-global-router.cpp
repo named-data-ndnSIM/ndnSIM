@@ -89,11 +89,11 @@ GlobalRouter::GetLocalPrefixes() const
   return m_localPrefixes;
 }
 
-// void
-// GlobalRouter::AddIncidencyChannel (Ptr< NdnFace > face, Ptr< Channel > channel)
-// {
-//   m_incidenciesChannel.push_back (make_tuple (face, channel));
-// }
+void
+GlobalRouter::clear()
+{
+  m_idCounter = 0;
+}
 
 } // namespace ndn
 } // namespace ns3

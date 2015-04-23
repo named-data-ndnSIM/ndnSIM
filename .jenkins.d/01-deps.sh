@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -x
 set -e
 
-IS_OSX=$( python -c "print 'yes' if 'OSX' in '$NODE_LABELS'.strip().split(' ') else 'no'" )
-IS_UBUNTU=$( python -c "print 'yes' if 'Ubuntu' in '$NODE_LABELS'.strip().split(' ') else 'no'" )
+JDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$JDIR"/util.sh
 
-if [[ $IS_OSX == "yes" ]]; then
+if has OSX $NODE_LABELS; then
+    set -x
     brew update
     brew upgrade
     brew install boost cryptopp pkg-config libxml2
@@ -13,13 +13,13 @@ if [[ $IS_OSX == "yes" ]]; then
     brew cleanup
 fi
 
-if [[ $IS_UBUNTU == "yes" ]]; then
+if has Ubuntu $NODE_LABELS; then
+    set -x
     sudo apt-get update -qq -y
     sudo apt-get -qq -y install build-essential
     sudo apt-get -qq -y install libssl-dev libsqlite3-dev libcrypto++-dev
 
-    IS_12_04=$( python -c "print 'yes' if 'Ubuntu-12.04' in '$NODE_LABELS'.strip().split(' ') else 'no'" )
-    if [[ $IS_12_04 == "yes" ]]; then
+    if has Ubuntu-12.04 $NODE_LABELS; then
         sudo apt-get install -qq -y python-software-properties
         sudo add-apt-repository -y ppa:boost-latest/ppa
         sudo apt-get update -qq -y
