@@ -29,6 +29,8 @@
 #include "face/null-face.hpp"
 #include "available-strategies.hpp"
 
+#include "utils/ndn-ns3-packet-tag.hpp"
+
 #include <boost/random/uniform_int_distribution.hpp>
 
 namespace nfd {
@@ -283,11 +285,20 @@ Forwarder::onIncomingData(Face& inFace, const Data& data)
     return;
   }
 
+  // Remove Ptr<Packet> from the Data before inserting into cache, serving two purposes
+  // - reduce amount of memory used by cached entries
+  // - remove all tags that (e.g., hop count tag) that could have been associated with Ptr<Packet>
+  //
+  // Copying of Data is relatively cheap operation, as it copies (mostly) a collection of Blocks
+  // pointing to the same underlying memory buffer.
+  shared_ptr<Data> dataCopyWithoutPacket = make_shared<Data>(data);
+  dataCopyWithoutPacket->removeTag<ns3::ndn::Ns3PacketTag>();
+
   // CS insert
   if (m_csFromNdnSim == nullptr)
-    m_cs.insert(data);
+    m_cs.insert(*dataCopyWithoutPacket);
   else
-    m_csFromNdnSim->Add(data.shared_from_this());
+    m_csFromNdnSim->Add(dataCopyWithoutPacket);
 
   std::set<shared_ptr<Face> > pendingDownstreams;
   // foreach PitEntry
