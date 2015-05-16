@@ -178,6 +178,88 @@ FibHelper::AddRoute(const std::string& nodeName, const Name& prefix,
   AddRoute(node, prefix, otherNode, metric);
 }
 
+void
+FibHelper::RemoveRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face)
+{
+  // Get L3Protocol object
+  Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
+  // Get the forwarder instance
+  shared_ptr<nfd::Forwarder> m_forwarder = L3protocol->getForwarder();
+
+  ControlParameters parameters;
+  parameters.setName(prefix);
+  parameters.setFaceId(face->getId());
+
+  RemoveNextHop(parameters, node);
+}
+
+void
+FibHelper::RemoveRoute(Ptr<Node> node, const Name& prefix, uint32_t faceId)
+{
+  Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
+  NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
+
+  shared_ptr<Face> face = ndn->getFaceById(faceId);
+  NS_ASSERT_MSG(face != 0, "Face with ID [" << faceId << "] does not exist on node ["
+                                            << node->GetId() << "]");
+
+  RemoveRoute(node, prefix, face);
+}
+
+void
+FibHelper::RemoveRoute(const std::string& nodeName, const Name& prefix, uint32_t faceId)
+{
+  Ptr<Node> node = Names::Find<Node>(nodeName);
+  Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
+  NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
+
+  shared_ptr<Face> face = ndn->getFaceById(faceId);
+  NS_ASSERT_MSG(face != 0, "Face with ID [" << faceId << "] does not exist on node ["
+                                            << node->GetId() << "]");
+
+  RemoveRoute(node, prefix, face);
+}
+
+void
+FibHelper::RemoveRoute(Ptr<Node> node, const Name& prefix, Ptr<Node> otherNode)
+{
+  for (uint32_t deviceId = 0; deviceId < node->GetNDevices(); deviceId++) {
+    Ptr<PointToPointNetDevice> netDevice =
+      DynamicCast<PointToPointNetDevice>(node->GetDevice(deviceId));
+    if (netDevice == 0)
+      continue;
+
+    Ptr<Channel> channel = netDevice->GetChannel();
+    if (channel == 0)
+      continue;
+
+    if (channel->GetDevice(0)->GetNode() == otherNode
+        || channel->GetDevice(1)->GetNode() == otherNode) {
+      Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
+      NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
+
+      shared_ptr<Face> face = ndn->getFaceByNetDevice(netDevice);
+      NS_ASSERT_MSG(face != 0, "There is no face associated with the p2p link");
+
+      RemoveRoute(node, prefix, face);
+
+      return;
+    }
+  }
+
+  NS_FATAL_ERROR("Cannot remove route: Node# " << node->GetId() << " and Node# " << otherNode->GetId()
+                                            << " are not connected");
+}
+
+void
+FibHelper::RemoveRoute(const std::string& nodeName, const Name& prefix,
+                    const std::string& otherNodeName)
+{
+  Ptr<Node> node = Names::Find<Node>(nodeName);
+  Ptr<Node> otherNode = Names::Find<Node>(otherNodeName);
+  RemoveRoute(node, prefix, otherNode);
+}
+
 } // namespace ndn
 
 } // namespace ns
