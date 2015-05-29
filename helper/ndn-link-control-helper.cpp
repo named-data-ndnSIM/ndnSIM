@@ -74,16 +74,20 @@ LinkControlHelper::setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRa
     if (nd2->GetNode() == node1)
       nd2 = ppChannel->GetDevice(1);
 
-    ObjectFactory errorFactory("ns3::RateErrorModel");
-    errorFactory.Set("ErrorUnit", StringValue("ERROR_UNIT_PACKET"));
-    errorFactory.Set("ErrorRate", DoubleValue(errorRate));
-    if (errorRate <= 0) {
-      errorFactory.Set("IsEnabled", BooleanValue(false));
-    }
+    if (nd2->GetNode() == node2) {
+      ObjectFactory errorFactory("ns3::RateErrorModel");
+      errorFactory.Set("ErrorUnit", StringValue("ERROR_UNIT_PACKET"));
+      errorFactory.Set("ErrorRate", DoubleValue(errorRate));
+      if (errorRate <= 0) {
+        errorFactory.Set("IsEnabled", BooleanValue(false));
+      }
 
-    nd1->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
-    nd2->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
+      nd1->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
+      nd2->SetAttribute("ReceiveErrorModel", PointerValue(errorFactory.Create<ErrorModel>()));
+      return;
+    }
   }
+  NS_FATAL_ERROR("There is no link to fail between the requested nodes");
 }
 
 void
