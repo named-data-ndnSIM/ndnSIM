@@ -47,6 +47,6 @@ if [[ $IS_UBUNTU_12_04 == "yes" ]]; then
     EXTRA_FLAGS=" --boost-libs=/usr/lib/x86_64-linux-gnu"
 fi
 
-./waf configure -j1 --color=yes --without-osx-keychain $EXTRA_FLAGS
+./waf configure -j1 --color=yes --enable-shared --disable-static --without-osx-keychain $EXTRA_FLAGS
 ./waf -j1 --color=yes
 sudo ./waf install -j1 --color=yes

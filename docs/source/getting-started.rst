@@ -29,6 +29,14 @@ ndnSIM 2.0 has been successfully compiled and used on following platforms:
     Make sure that all other version of boost libraries (``-dev`` packages) are removed,
     otherwise compilation will fail.
 
+.. note::
+   For ndnSIM properly work, ndn-cxx library must be build as a shared library. For example::
+
+       # download ndn-cxx
+       ./waf configure --enable-shared --disable-static
+       ./waf build
+       sudo ./waf install
+
 .. _requirements:
 
 Prerequisites
@@ -132,7 +140,7 @@ Compiling and running ndnSIM
     .. code-block:: bash
 
         cd ndnSIM/ndn-cxx
-        ./waf configure
+        ./waf configure --enable-shared --disable-static
         ./waf
         sudo ./waf install
 
