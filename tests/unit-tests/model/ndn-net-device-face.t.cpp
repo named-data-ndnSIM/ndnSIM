@@ -73,11 +73,12 @@ BOOST_AUTO_TEST_CASE(SendInterest)
 
   auto node1_netDeviceFace = std::dynamic_pointer_cast<NetDeviceFace>(node0_faceContainer->Get(node1Face_iterator));
 
-  Simulator::Stop(Seconds(20.0));
+  Simulator::Stop(Seconds(20.001));
   Simulator::Run();
 
   ::ndn::nfd::FaceStatus faceStatus = node1_netDeviceFace->getFaceStatus();
   BOOST_CHECK_EQUAL(faceStatus.getNInInterests(), 2000);
+
   Simulator::Destroy();
 }
 
