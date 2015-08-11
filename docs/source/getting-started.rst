@@ -254,9 +254,9 @@ Simulating using ndnSIM
 
         mkdir ndnSIM
         cd ndnSIM
-        git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
-        git clone git://github.com/cawka/pybindgen.git pybindgen
-        git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+        git clone https://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+        git clone https://github.com/cawka/pybindgen.git pybindgen
+        git clone https://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
 
         # Build and install NS-3 and ndnSIM
         cd ns-3
@@ -266,7 +266,7 @@ Simulating using ndnSIM
         sudo ./waf install
         cd ..
 
-        git clone git://github.com/cawka/ndnSIM-scenario-template.git scenario
+        git clone https://github.com/cawka/ndnSIM-scenario-template.git scenario
         cd scenario
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
