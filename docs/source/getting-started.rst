@@ -23,27 +23,18 @@ ndnSIM 2.0 has been successfully compiled and used on following platforms:
         sudo apt-get update
         sudo apt-get install libboost1.55-all-dev
 
-        # add  --boost-libs=/usr/lib/x86_64-linux-gnu  to ./waf configure for ndn-cxx and ns3
+        # add  --boost-libs=/usr/lib/x86_64-linux-gnu  to ./waf configure
         # ./waf configure --boost-libs=/usr/lib/x86_64-linux-gnu
 
     Make sure that all other version of boost libraries (``-dev`` packages) are removed,
     otherwise compilation will fail.
-
-.. note::
-   For ndnSIM properly work, ndn-cxx library must be build as a shared library. For example::
-
-       # download ndn-cxx
-       ./waf configure --enable-shared --disable-static
-       ./waf build
-       sudo ./waf install
 
 .. _requirements:
 
 Prerequisites
 -------------
 
-1. `ndnSIM also required ndn-cxx library and all of its prerequisites
-   <http://named-data.net/doc/ndn-cxx/current/INSTALL.html>`_.
+1. `ndn-cxx library prerequisites <http://named-data.net/doc/ndn-cxx/current/INSTALL.html>`__.
 
 .. role:: red
 
@@ -109,7 +100,6 @@ Downloading ndnSIM source
 
 ndnSIM package consists of three pieces:
 
-- `ndn-cxx library <http://named-data.net/doc/ndn-cxx/>`_
 - a custom branch of NS-3 that contains a few useful patches
 - a customized python binding generation library (necessary if you want to use NS-3's python
   bindings and/or visualizer module)
@@ -121,7 +111,6 @@ The following commands download all pieces from GitHub repositories:
 
     mkdir ndnSIM
     cd ndnSIM
-    git clone https://github.com/named-data/ndn-cxx.git ndn-cxx
     git clone https://github.com/named-data-ndnSIM/ns-3-dev.git ns-3
     git clone https://github.com/named-data-ndnSIM/pybindgen.git pybindgen
     git clone --recursive https://github.com/named-data-ndnSIM/ndnSIM.git ns-3/src/ndnSIM
@@ -134,27 +123,6 @@ branch.
 
 Compiling and running ndnSIM
 ----------------------------
-
-- Compile and install ndn-cxx library
-
-    .. code-block:: bash
-
-        cd ndnSIM/ndn-cxx
-        ./waf configure --enable-shared --disable-static
-        ./waf
-        sudo ./waf install
-
-    .. note::
-       On Ubuntu platform you can also install ndn-cxx library from `NDN
-       PPA repository <http://named-data.net/doc/NFD/current/INSTALL.html#installing-nfd-from-binaries>`_
-
-       .. code-block:: bash
-
-           sudo apt-get install ndn-cxx-dev
-
-       If you are using ndn-cxx from PPA, please make sure that you do not have the existing installation
-       of ndn-cxx library compiled from source (e.g., in /usr/local).  Otherwise, the version mistmach
-       may result in compilation errors.
 
 - Compile NS-3 with ndnSIM module
 

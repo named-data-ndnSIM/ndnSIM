@@ -6,19 +6,19 @@ from waflib.Errors import WafError
 
 import wutils
 
-REQUIRED_BOOST_LIBS = ['graph', 'unit_test_framework']
+REQUIRED_BOOST_LIBS = ['graph', 'thread', 'unit_test_framework',
+                       'system', 'random', 'date_time', 'iostreams', 'regex', 'program_options', 'chrono', 'filesystem']
 
 def required_boost_libs(conf):
     conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
 
 def options(opt):
-    opt.load(['dependency-checker',
-              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version'],
-             tooldir=['%s/.waf-tools' % opt.path.abspath()])
+    opt.load(['version'], tooldir=['%s/.waf-tools' % opt.path.abspath()])
+    opt.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'cryptopp', 'sqlite3'],
+             tooldir=['%s/ndn-cxx/.waf-tools' % opt.path.abspath()])
 
 def configure(conf):
-    conf.load(['dependency-checker',
-               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version'])
+    conf.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version', 'cryptopp', 'sqlite3'])
 
     conf.env['ENABLE_NDNSIM']=False
 
@@ -28,8 +28,10 @@ def configure(conf):
             '/usr/local/lib64/pkgconfig',
             '/usr/local/lib32/pkgconfig',
             '/opt/local/lib/pkgconfig'])
-    conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'],
-                   uselib_store='NDN_CXX', mandatory=True)
+
+    conf.check_cxx(lib='pthread', uselib_store='PTHREAD', define_name='HAVE_PTHREAD', mandatory=False)
+    conf.check_sqlite3(mandatory=True)
+    conf.check_cryptopp(mandatory=True, use='PTHREAD')
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
@@ -72,12 +74,24 @@ def configure(conf):
 
     conf.report_optional_feature("ndnSIM", "ndnSIM", True, "")
 
-    conf.write_config_header('NFD/config.hpp', remove=False)
+    conf.write_config_header('../../ns3/ndnSIM/ndn-cxx/ndn-cxx-config.hpp', define_prefix='NDN_CXX_', remove=False)
+    conf.write_config_header('../../ns3/ndnSIM/NFD/config.hpp', remove=False)
 
 def build(bld):
     (base, build, split) = bld.getVersion('NFD')
     bld(features="subst",
-        source='NFD/version.hpp.in', target='NFD/version.hpp',
+        name="version-NFD",
+        source='NFD/version.hpp.in', target='../../ns3/ndnSIM/NFD/version.hpp',
+        install_path=None,
+        VERSION_STRING=base,
+        VERSION_BUILD="%s-ndnSIM" % build,
+        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
+        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+
+    (base, build, split) = bld.getVersion('ndn-cxx')
+    bld(features="subst",
+        name="version-ndn-cxx",
+        source='ndn-cxx/src/version.hpp.in', target='../../ns3/ndnSIM/ndn-cxx/version.hpp',
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
@@ -91,14 +105,29 @@ def build(bld):
     if bld.env.ENABLE_EXAMPLES:
         deps += ['point-to-point-layout', 'csma', 'applications', 'wifi']
 
-    module = bld.create_ns3_module ('ndnSIM', deps)
-    module.module = 'ndnSIM'
-    module.features += ' ns3fullmoduleheaders'
-    module.use += ['NDN_CXX', 'BOOST']
-    module.includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
-    module.export_includes = [".", "./NFD", "./NFD/daemon", "./NFD/core"]
+    ndnCxxSrc = bld.path.ant_glob('ndn-cxx/src/**/*.cpp',
+                                  excl=['ndn-cxx/src/**/*-osx.cpp',
+                                        'ndn-cxx/src/util/dummy-client-face.cpp'])
 
-    headers = bld (features='ns3header')
+    nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon']],
+                               excl=['NFD/core/network-interface.cpp',
+                                     'NFD/daemon/main.cpp',
+                                     'NFD/daemon/nfd.cpp',
+                                     'NFD/daemon/face/ethernet*',
+                                     'NFD/daemon/face/multicast-udp*',
+                                     'NFD/daemon/face/tcp*',
+                                     'NFD/daemon/face/udp*',
+                                     'NFD/daemon/face/unix-stream*',
+                                     'NFD/daemon/face/websocket*'])
+
+    module = bld.create_ns3_module('ndnSIM', deps)
+    module.module = 'ndnSIM'
+    module.features += ' ns3fullmoduleheaders ndncxxheaders'
+    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'CRYPTOPP', 'SQLITE3', 'RT', 'PTHREAD']
+    module.includes = ['../..', '../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', '../../ns3/ndnSIM', '../../ns3/ndnSIM/ndn-cxx']
+    module.export_includes = ['../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', '../../ns3/ndnSIM']
+
+    headers = bld(features='ns3header')
     headers.module = 'ndnSIM'
     headers.source = ["ndn-all.hpp"]
 
@@ -106,23 +135,16 @@ def build(bld):
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
-    module_dirs = ['NFD/core', 'NFD/daemon', 'apps', 'helper', 'model', 'utils']
-
+    module_dirs = ['apps', 'helper', 'model', 'utils']
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
-                                      excl=['model/ip-faces/*',
-                                            'NFD/core/network-interface.cpp',
-                                            'NFD/daemon/main.cpp',
-                                            'NFD/daemon/nfd.*',
-                                            'NFD/daemon/face/ethernet*',
-                                            'NFD/daemon/face/multicast-udp*',
-                                            'NFD/daemon/face/tcp*',
-                                            'NFD/daemon/face/udp*',
-                                            'NFD/daemon/face/unix-stream*',
-                                            'NFD/daemon/face/websocket*'])
+                                      excl=['model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
-    module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob(
-        ['%s/**/*.hpp' % dir for dir in module_dirs])]
+    module_dirs = ['NFD/core', 'NFD/daemon', 'apps', 'helper', 'model', 'utils']
+    module.full_headers = bld.path.ant_glob(['%s/**/*.hpp' % dir for dir in module_dirs])
+    module.full_headers += bld.path.ant_glob('NFD/common.hpp')
 
+    module.ndncxx_headers = bld.path.ant_glob(['ndn-cxx/src/**/*.hpp'],
+                                              excl=['src/**/*-osx.hpp', 'src/detail/**/*'])
     if bld.env.ENABLE_EXAMPLES:
         bld.recurse('examples')
 
@@ -139,10 +161,7 @@ def apply_ns3fullmoduleheaders(self):
 
     mode = getattr(self, "mode", "install")
 
-    for filename in set(self.to_list(self.full_headers)):
-        src_node = self.path.find_resource(filename)
-        if src_node is None:
-            raise WafError("source ns3 header file %s not found" % (filename,))
+    for src_node in set(self.full_headers):
         dst_node = ns3_dir_node.find_or_declare(src_node.path_from(self.bld.path.find_dir('src')))
         assert dst_node is not None
 
@@ -152,6 +171,30 @@ def apply_ns3fullmoduleheaders(self):
         task.mode = getattr(self, 'mode', 'install')
         if task.mode == 'install':
             self.bld.install_files('${INCLUDEDIR}/%s%s/ns3/%s' % (wutils.APPNAME, wutils.VERSION, relpath),
+                                   [src_node])
+            task.set_inputs([src_node])
+            task.set_outputs([dst_node])
+        else:
+            task.header_to_remove = dst_node
+
+@TaskGen.feature('ndncxxheaders')
+@TaskGen.after_method('process_rule')
+def apply_ndnsim_moduleheaders(self):
+    # ## get all of the ns3 headers
+    ndncxx_dir_node = self.bld.path.find_or_declare("ns3/ndnSIM/ndn-cxx")
+
+    mode = getattr(self, "mode", "install")
+
+    for src_node in set(self.ndncxx_headers):
+        dst_node = ndncxx_dir_node.find_or_declare(src_node.path_from(self.bld.path.find_dir('src/ndnSIM/ndn-cxx/src')))
+        assert dst_node is not None
+
+        relpath = src_node.parent.path_from(self.bld.path.find_dir('src/ndnSIM/ndn-cxx/src'))
+
+        task = self.create_task('ns3header')
+        task.mode = getattr(self, 'mode', 'install')
+        if task.mode == 'install':
+            self.bld.install_files('${INCLUDEDIR}/%s%s/ns3/ndnSIM/ndn-cxx/%s' % (wutils.APPNAME, wutils.VERSION, relpath),
                                    [src_node])
             task.set_inputs([src_node])
             task.set_outputs([dst_node])
