@@ -56,25 +56,48 @@ using ::ndn::nfd::ControlParameters;
  * special Interest commands to the manager in order to specify the desired per-name
  * prefix forwarding strategy for one, more or all the nodes of a topology.
  */
-class StrategyChoiceHelper {
+class StrategyChoiceHelper
+{
 public:
-  static void
-  Install(const NodeContainer& c, const Name& namePrefix, const Name& strategy);
-
+  /**
+   * @brief Install a built-in strategy @p strategy on @p node for @namePrefix namespace
+   */
   static void
   Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy);
 
+  /**
+   * @brief Install a built-in strategy @p strategy on nodes in @p c container for
+   *        @namePrefix namespace
+   */
+  static void
+  Install(const NodeContainer& c, const Name& namePrefix, const Name& strategy);
+
+  /**
+   * @brief Install a built-in strategy @p strategy on all nodes for @namePrefix namespace
+   */
   static void
   InstallAll(const Name& namePrefix, const Name& strategy);
 
+  /**
+   * @brief Install a custom strategy on @p node for @namePrefix namespace
+   * @tparam Strategy Class name of the custom strategy
+   */
   template<class Strategy>
   static void
   Install(Ptr<Node> node, const Name& namePrefix);
 
+  /**
+   * @brief Install a custom strategy on nodes in @p c container for @namePrefix namespace
+   * @tparam Strategy Class name of the custom strategy
+   */
   template<class Strategy>
   static void
   Install(const NodeContainer& c, const Name& namePrefix);
 
+  /**
+   * @brief Install a custom strategy on all nodes for @namePrefix namespace
+   * @tparam Strategy Class name of the custom strategy
+   */
   template<class Strategy>
   static void
   InstallAll(const Name& namePrefix);

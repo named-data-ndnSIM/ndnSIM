@@ -18,116 +18,200 @@
  **/
 
 #include "helper/ndn-strategy-choice-helper.hpp"
-#include "helper/ndn-face-container.hpp"
-#include "model/ndn-net-device-face.hpp"
-
-#include "ns3/node-container.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/point-to-point-grid.h"
-#include "ns3/node.h"
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/ndnSIM-module.h"
 
 #include "../tests-common.hpp"
 
 namespace ns3 {
 namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceHelper, CleanupFixture)
-
-BOOST_AUTO_TEST_CASE(GridScenario)
+class StrategyChoiceHelperFixture : public ScenarioHelperWithCleanupFixture
 {
-  ofstream file("/tmp/topo3.txt");
-  file  << "router\n\n"
-        << "#node city  y x mpi-partition\n"
-        << "A3  NA  10 10 1\n"
-        << "B3  NA  20 10 1\n"
-        << "C3  NA  10 20 1\n"
-        << "D3  NA  20 20 1\n\n"
-        << "link\n\n"
-        << "# from  to  capacity  metric  delay queue\n"
-        << "A3      B3  10Mbps    100 1ms 500\n"
-        << "A3      C3  10Mbps    200 1ms 500\n"
-        << "B3      D3  10Mbps    100 1ms 500\n"
-        << "C3      D3  10Mbps    200 1ms 500\n";
-  file.close();
+public:
+  StrategyChoiceHelperFixture()
+  {
+    Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
+    Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("1ms"));
+    Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("500"));
 
-  AnnotatedTopologyReader topologyReader("");
-  topologyReader.SetFileName("/tmp/topo3.txt");
-  topologyReader.Read();
+    // Creating two 3 node topologies:                      //
+    //                                                      //
+    //                 +----+                     +----+    //
+    //              +- | B1 |                  +- | B2 |    //
+    //             /   +----+                 /   +----+    //
+    //  +----+    /                +----+    /              //
+    //  |    | --+                 |    | --+               //
+    //  | A1 |                     | A2 |                   //
+    //  |    | --+                 |    | --+               //
+    //  +----+    \                +----+    \              //
+    //             \   +----+                 \   +----+    //
+    //              +- | C1 |                  +- | C2 |    //
+    //                 +----+                     +----+    //
 
-  // Install NDN stack on all nodes
-  ndn::StackHelper ndnHelper;
-  Ptr<FaceContainer> node_faceContainer = ndnHelper.InstallAll();
-  GlobalRoutingHelper ndnGlobalRoutingHelper;
-  ndnGlobalRoutingHelper.InstallAll();
+    createTopology({
+        {"A1", "B1"},
+        {"A1", "C1"},
+        {"A2", "B2"},
+        {"A2", "C2"}
+      });
 
-  // Install different forwarding strategies
-  StrategyChoiceHelper::Install(Names::Find<Node>("A3"), "/prefix",
-                                "/localhost/nfd/strategy/broadcast");
-  StrategyChoiceHelper::Install(Names::Find<Node>("B3"), "/prefix",
-                                "/localhost/nfd/strategy/best-route");
-  StrategyChoiceHelper::Install(Names::Find<Node>("C3"), "/prefix",
-                                "/localhost/nfd/strategy/broadcast");
-  StrategyChoiceHelper::Install(Names::Find<Node>("D3"), "/prefix",
-                                "/localhost/nfd/strategy/best-route");
+    addRoutes({
+        {"A1", "B1", "/prefix", 200},
+        {"A1", "C1", "/prefix", 100},
+        {"A2", "B2", "/prefix", 100},
+        {"A2", "C2", "/prefix", 200}
+      });
 
-  AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetPrefix("/prefix");
-  consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
-  consumerHelper.Install(Names::Find<Node>("A3"));
+    addApps({
+        {"A1", "ns3::ndn::ConsumerCbr",
+            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
+            "0s", "100s"},
+        {"A2", "ns3::ndn::ConsumerCbr",
+            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
+            "0s", "100s"},
+      });
+  }
+};
 
-  AppHelper producerHelper("ns3::ndn::Producer");
-  producerHelper.SetPrefix("/prefix");
-  producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-  producerHelper.Install(Names::Find<Node>("D3"));
+BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceHelper, StrategyChoiceHelperFixture)
 
-  // Add /prefix origins to ndn::GlobalRouter
-  ndnGlobalRoutingHelper.AddOrigins("/prefix", Names::Find<Node>("D3"));
+BOOST_AUTO_TEST_CASE(DefaultStrategies)
+{
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
 
-  // Calculate and install FIBs
-  GlobalRoutingHelper::CalculateRoutes();
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
 
-  // Node0 is consumer which is connected to intermediate Node1 and Node2
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+}
 
-  FaceContainer::Iterator IntermediateNode1Face1Iterator = node_faceContainer->Begin() + 2; // Node1 with strategy broadcast
-  FaceContainer::Iterator IntermediateNode1Face2Iterator = node_faceContainer->Begin() + 3;
-
-  FaceContainer::Iterator IntermediateNode2Face1Iterator = node_faceContainer->Begin() + 4; // Node2 with strategy best route
-  FaceContainer::Iterator IntermediateNode2Face2Iterator = node_faceContainer->Begin() + 5;
-
-  FaceContainer::Iterator ProducerFaceIterator1 = node_faceContainer->Begin() + 6;
-  FaceContainer::Iterator ProducerFaceIterator2 = node_faceContainer->Begin() + 7;
-
-  auto Producer_netDeviceFace1 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(ProducerFaceIterator1));
-  auto Producer_netDeviceFace2 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(ProducerFaceIterator2));
-
-  auto IntermediateNode1_netDeviceFace1 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(IntermediateNode1Face1Iterator));
-  auto IntermediateNode1_netDeviceFace2 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(IntermediateNode1Face2Iterator));
-
-  auto IntermediateNode2_netDeviceFace1 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(IntermediateNode2Face1Iterator));
-  auto IntermediateNode2_netDeviceFace2 = std::dynamic_pointer_cast<NetDeviceFace>(node_faceContainer->Get(IntermediateNode2Face2Iterator));
+// static void
+// Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy);
+BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNode)
+{
+  StrategyChoiceHelper::Install(getNode("A2"), "/prefix", "/localhost/nfd/strategy/broadcast");
 
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  ::ndn::nfd::FaceStatus producerFace1Status = Producer_netDeviceFace1->getFaceStatus();
-  ::ndn::nfd::FaceStatus producerFace2Status = Producer_netDeviceFace2->getFaceStatus();
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
 
-  ::ndn::nfd::FaceStatus IntermediateNode1Face1Status = IntermediateNode1_netDeviceFace1->getFaceStatus();
-  ::ndn::nfd::FaceStatus IntermediateNode1Face2Status = IntermediateNode1_netDeviceFace2->getFaceStatus();
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+}
 
-  ::ndn::nfd::FaceStatus IntermediateNode2Face1Status = IntermediateNode2_netDeviceFace1->getFaceStatus();
-  ::ndn::nfd::FaceStatus IntermediateNode2Face2Status = IntermediateNode2_netDeviceFace2->getFaceStatus();
+// static void
+// Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy);
+BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNodeContainer)
+{
+  NodeContainer nodes;
+  nodes.Add(getNode("A1"));
+  nodes.Add(getNode("A2"));
 
-  BOOST_CHECK_EQUAL(producerFace1Status.getNInInterests(), 500);
-  BOOST_CHECK_EQUAL(producerFace2Status.getNInInterests(), 0);
-  BOOST_CHECK_EQUAL(IntermediateNode1Face1Status.getNInInterests(), 500);
-  BOOST_CHECK_EQUAL(IntermediateNode1Face2Status.getNInInterests(), 0);
-  BOOST_CHECK_EQUAL(IntermediateNode2Face1Status.getNInInterests(), 0);
-  BOOST_CHECK_EQUAL(IntermediateNode2Face2Status.getNInInterests(), 0);
+  StrategyChoiceHelper::Install(nodes, "/prefix", "/localhost/nfd/strategy/broadcast");
+
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
+
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+}
+
+// static void
+// InstallAll(const Name& namePrefix, const Name& strategy);
+BOOST_AUTO_TEST_CASE(InstallAllBuiltInStrategy)
+{
+  StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/broadcast");
+
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
+
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+}
+
+
+class NullStrategy : public nfd::fw::Strategy {
+public:
+  NullStrategy(nfd::Forwarder& forwarder)
+    : Strategy(forwarder, STRATEGY_NAME)
+  {
+  }
+
+  virtual void
+  afterReceiveInterest(const Face& inFace, const Interest& interest,
+                       shared_ptr<nfd::fib::Entry> fibEntry, shared_ptr<nfd::pit::Entry> pitEntry)
+  {
+    // this strategy doesn't forward interests
+  }
+
+public:
+  static const Name STRATEGY_NAME;
+};
+
+const Name NullStrategy::STRATEGY_NAME = "ndn:/localhost/nfd/strategy/unit-tests/null-strategy";
+
+// template<class Strategy>
+// static void
+// Install(Ptr<Node> node, const Name& namePrefix);
+BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNode)
+{
+  StrategyChoiceHelper::Install<NullStrategy>(getNode("A2"), "/prefix");
+
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
+
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+}
+
+// template<class Strategy>
+// static void
+// Install(const NodeContainer& c, const Name& namePrefix);
+BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNodeContainer)
+{
+  NodeContainer nodes;
+  nodes.Add(getNode("A1"));
+  nodes.Add(getNode("A2"));
+
+  StrategyChoiceHelper::Install<NullStrategy>(nodes, "/prefix");
+
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
+
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 0);
+
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+}
+
+// template<class Strategy>
+// static void
+// InstallAll(const Name& namePrefix);
+BOOST_AUTO_TEST_CASE(InstallAllCustomStrategy)
+{
+  StrategyChoiceHelper::InstallAll<NullStrategy>("/prefix");
+
+  Simulator::Stop(Seconds(5.0));
+  Simulator::Run();
+
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 0);
+
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
