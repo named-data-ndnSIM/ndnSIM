@@ -47,6 +47,17 @@ public:
   /**
    * \brief Add forwarding entry to FIB
    *
+   * \param node   Node
+   * \param prefix Routing prefix
+   * \param face   Face
+   * \param metric Routing metric
+   */
+  static void
+  AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, int32_t metric);
+
+  /**
+   * \brief Add forwarding entry to FIB
+   *
    * \param nodeName Node name
    * \param prefix Routing prefix
    * \param faceId Face index
@@ -65,17 +76,6 @@ public:
    */
   static void
   AddRoute(Ptr<Node> node, const Name& prefix, uint32_t faceId, int32_t metric);
-
-  /**
-   * \brief Add forwarding entry to FIB
-   *
-   * \param node   Node
-   * \param prefix Routing prefix
-   * \param face   Face
-   * \param metric Routing metric
-   */
-  static void
-  AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, int32_t metric);
 
   /**
    * @brief Add forwarding entry to FIB (work only with point-to-point links)

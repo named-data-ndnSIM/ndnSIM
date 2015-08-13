@@ -18,60 +18,88 @@
  **/
 
 #include "helper/ndn-fib-helper.hpp"
-#include "model/ndn-net-device-face.hpp"
-
-#include "ns3/node-container.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/node.h"
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/ndnSIM-module.h"
 
 #include "../tests-common.hpp"
 
 namespace ns3 {
 namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(HelperNdnFibHelper, CleanupFixture)
+BOOST_AUTO_TEST_SUITE(HelperNdnFibHelper)
 
-BOOST_AUTO_TEST_CASE(AddRoute)
+class AddRouteFixture : public ScenarioHelperWithCleanupFixture
 {
- NodeContainer nodes;
- nodes.Create(2);
+public:
+  AddRouteFixture()
+  {
+    createTopology({
+        {"1", "2"}
+      });
 
- PointToPointHelper p2p;
- p2p.Install(nodes.Get(0), nodes.Get(1));
+    addApps({
+        {"1", "ns3::ndn::ConsumerCbr",
+            {{"Prefix", "/prefix"}, {"Frequency", "1"}},
+            "0s", "9.99s"},
+        {"2", "ns3::ndn::Producer",
+            {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
+            "0s", "100s"}
+      });
+  }
 
- StackHelper ndnHelper;
- Ptr<FaceContainer> node0_faceContainer = ndnHelper.InstallAll();
+  ~AddRouteFixture()
+  {
+    Simulator::Stop(Seconds(20.001));
+    Simulator::Run();
 
- ndn::FibHelper::AddRoute(nodes.Get(0), "/prefix/1", nodes.Get(1), 1);
- // Installing applications
- ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
- consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
+    BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNOutInterests(), 10);
+    BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 10);
 
- ndn::AppHelper producerHelper("ns3::ndn::Producer");
- producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
+    BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 10);
+    BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNOutDatas(), 10);
+  }
+};
 
- consumerHelper.SetPrefix("/prefix/1");
- consumerHelper.Install(nodes.Get(0));
+BOOST_FIXTURE_TEST_SUITE(AddRoute, AddRouteFixture)
 
- producerHelper.SetPrefix("/prefix/1");
- producerHelper.Install(nodes.Get(1));
-
- FaceContainer::Iterator node1Face_iterator = node0_faceContainer->Begin() + 1;
-
- auto node1_netDeviceFace = std::dynamic_pointer_cast<NetDeviceFace>(node0_faceContainer->Get(node1Face_iterator));
-
- Simulator::Stop(Seconds(20.0));
- Simulator::Run();
-
- ::ndn::nfd::FaceStatus faceStatus = node1_netDeviceFace->getFaceStatus();
- BOOST_CHECK_EQUAL(faceStatus.getNInInterests(), 200);
+// static void
+// AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, int32_t metric);
+BOOST_AUTO_TEST_CASE(Base)
+{
+  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2"), 1);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+
+// static void
+// AddRoute(const std::string& nodeName, const Name& prefix, uint32_t faceId, int32_t metric);
+BOOST_AUTO_TEST_CASE(Helper1)
+{
+  FibHelper::AddRoute("1", Name("/prefix"), getFace("1", "2")->getId(), 10);
+}
+
+// static void
+// AddRoute(Ptr<Node> node, const Name& prefix, uint32_t faceId, int32_t metric);
+BOOST_AUTO_TEST_CASE(Helper2)
+{
+  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getFace("1", "2")->getId(), 10);
+}
+
+// static void
+// AddRoute(const std::string& nodeName, const Name& prefix, const std::string& otherNodeName,
+//          int32_t metric);
+BOOST_AUTO_TEST_CASE(Helper3)
+{
+  FibHelper::AddRoute("1", "/prefix", "2", 1);
+}
+
+// static void
+// AddRoute(Ptr<Node> node, const Name& prefix, Ptr<Node> otherNode, int32_t metric);
+BOOST_AUTO_TEST_CASE(Helper4)
+{
+  FibHelper::AddRoute(getNode("1"), Name("/prefix"), getNode("2"), 10);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // AddRoute
+
+BOOST_AUTO_TEST_SUITE_END() // HelperNdnFibHelper
 
 } // namespace ndn
 } // namespace ns3
