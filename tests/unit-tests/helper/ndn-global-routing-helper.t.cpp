@@ -35,14 +35,32 @@
 
 #include "../tests-common.hpp"
 
+#include <boost/filesystem.hpp>
+
 namespace ns3 {
 namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(HelperGlobalRoutingHelper, CleanupFixture)
+const boost::filesystem::path TEST_TOPO_TXT = boost::filesystem::path(TEST_CONFIG_PATH) / "topo.txt";
+
+class GlobalRoutingHelperFixture : public CleanupFixture
+{
+public:
+  GlobalRoutingHelperFixture()
+  {
+    boost::filesystem::create_directories(TEST_CONFIG_PATH);
+  }
+
+  ~GlobalRoutingHelperFixture()
+  {
+    boost::filesystem::remove(TEST_TOPO_TXT);
+  }
+};
+
+BOOST_FIXTURE_TEST_SUITE(HelperGlobalRoutingHelper, GlobalRoutingHelperFixture)
 
 BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
 {
-  ofstream file1("/tmp/topo1.txt");
+  ofstream file1(TEST_TOPO_TXT.string().c_str());
   file1 << "router\n\n"
         << "#node city  y x mpi-partition\n"
         << "A1  NA  1 1 1\n"
@@ -56,7 +74,7 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
   file1.close();
 
   AnnotatedTopologyReader topologyReader("");
-  topologyReader.SetFileName("/tmp/topo1.txt");
+  topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
   topologyReader.Read();
 
   // Install NDN stack on all nodes
@@ -82,14 +100,11 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
       isFirst = false;
     }
   }
-
-  Simulator::Stop(Seconds(20.0));
-  Simulator::Run();
 }
 
 BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
 {
-  ofstream file1("/tmp/topo2.txt");
+  ofstream file1(TEST_TOPO_TXT.string().c_str());
   file1 << "router\n\n"
         << "#node city  y x mpi-partition\n"
         << "A2  NA  1 1 1\n"
@@ -103,7 +118,7 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
   file1.close();
 
   AnnotatedTopologyReader topologyReader("");
-  topologyReader.SetFileName("/tmp/topo2.txt");
+  topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
   topologyReader.Read();
 
   // Install NDN stack on all nodes
@@ -129,9 +144,6 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
       isFirst = false;
     }
   }
-
-  Simulator::Stop(Seconds(20.0));
-  Simulator::Run();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

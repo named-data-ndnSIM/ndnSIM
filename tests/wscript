@@ -8,6 +8,7 @@ def build(bld):
     tests = bld.create_ns3_program('ndnSIM-unit-tests', all_modules)
     tests.source = bld.path.ant_glob(['main.cpp', 'unit-tests/**/*.cpp'])
     tests.includes = ['#', '.', '../NFD/', "../NFD/daemon", "../NFD/core", "../helper", "../model", "../apps", "../utils", "../examples"]
+    tests.defines = 'TEST_CONFIG_PATH=\"%s/conf-test\"' %(bld.bldnode)
 
     # Other tests
     for i in bld.path.ant_glob(['other/*.cpp']):
