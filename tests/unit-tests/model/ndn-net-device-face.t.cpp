@@ -19,118 +19,45 @@
 
 
 #include "model/ndn-net-device-face.hpp"
-#include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-ns3.hpp"
-#include "NFD/daemon/face/face-counters.hpp"
-
-#include <ndn-cxx/management/nfd-face-status.hpp>
-
-#include "ns3/net-device.h"
-#include "ns3/log.h"
-#include "ns3/packet.h"
-#include "ns3/node.h"
-#include "ns3/pointer.h"
-#include "ns3/point-to-point-net-device.h"
-#include "ns3/channel.h"
-#include "ndn-face-container.hpp"
-#include "ns3/node-container.h"
-
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/ndnSIM-module.h"
 
 #include "../tests-common.hpp"
 
 namespace ns3 {
 namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(ModelNdnNetDeviceFace, CleanupFixture)
+BOOST_FIXTURE_TEST_SUITE(ModelNdnNetDeviceFace, ScenarioHelperWithCleanupFixture)
 
-BOOST_AUTO_TEST_CASE(SendInterest)
+BOOST_AUTO_TEST_CASE(Basic)
 {
-  NodeContainer nodes;
-  nodes.Create(2);
-  PointToPointHelper p2p;
-  p2p.Install(nodes.Get(0), nodes.Get(1));
+  Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
+  Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
+  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
 
-  StackHelper ndnHelper;
-  ndnHelper.SetDefaultRoutes(true);
+  createTopology({
+      {"1", "2"},
+    });
 
-  Ptr<FaceContainer> node0_faceContainer = ndnHelper.InstallAll();
+  addRoutes({
+      {"1", "2", "/prefix", 1},
+    });
 
-  ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-  consumerHelper.SetPrefix("/prefix");
-  consumerHelper.SetAttribute("Frequency", StringValue("100")); // 100 interests a second
-  consumerHelper.Install(nodes.Get(0));
-
-  ndn::AppHelper producerHelper("ns3::ndn::Producer");
-  producerHelper.SetPrefix("/prefix");
-  producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
-  producerHelper.Install(nodes.Get(1));
-
-  FaceContainer::Iterator node1Face_iterator = node0_faceContainer->Begin() + 1;
-
-  auto node1_netDeviceFace = std::dynamic_pointer_cast<NetDeviceFace>(node0_faceContainer->Get(node1Face_iterator));
+  addApps({
+      {"1", "ns3::ndn::ConsumerCbr",
+          {{"Prefix", "/prefix"}, {"Frequency", "10"}},
+          "0s", "9.99s"},
+      {"2", "ns3::ndn::Producer",
+          {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
+          "0s", "100s"}
+    });
 
   Simulator::Stop(Seconds(20.001));
   Simulator::Run();
 
-  ::ndn::nfd::FaceStatus faceStatus = node1_netDeviceFace->getFaceStatus();
-  BOOST_CHECK_EQUAL(faceStatus.getNInInterests(), 2000);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNOutInterests(), 100);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 100);
 
-  Simulator::Destroy();
-}
-
-BOOST_AUTO_TEST_CASE(SendData)
-{
-
- NodeContainer nodes;
- nodes.Create(2);
- PointToPointHelper p2p;
- p2p.Install(nodes.Get(0), nodes.Get(1));
-
-
- StackHelper ndnHelper;
- ndnHelper.SetDefaultRoutes(true);
-
- Ptr<FaceContainer> node0_faceContainer = ndnHelper.InstallAll();
-
- ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
- consumerHelper.SetPrefix("/prefix");
- consumerHelper.SetAttribute("Frequency", StringValue("10"));
- consumerHelper.Install(nodes.Get(0));
-
- ndn::AppHelper producerHelper("ns3::ndn::Producer");
- producerHelper.SetPrefix("/prefix");
- producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
- producerHelper.Install(nodes.Get(1));
-
- FaceContainer::Iterator node0Face_iterator = node0_faceContainer->Begin();
- FaceContainer::Iterator node1Face_iterator = node0_faceContainer->Begin() + 1;
-
- auto node0_netDeviceFace = std::dynamic_pointer_cast<NetDeviceFace>(node0_faceContainer->Get(node0Face_iterator));
- auto node1_netDeviceFace = std::dynamic_pointer_cast<NetDeviceFace>(node0_faceContainer->Get(node1Face_iterator));
-
- auto interest = std::make_shared<ndn::Interest>("/prefix");
- UniformVariable rand(0, std::numeric_limits<uint32_t>::max());
- interest->setNonce(rand.GetValue());
- interest->setInterestLifetime(ndn::time::seconds(1));
-
- auto data = std::make_shared<ndn::Data>(interest->getName());
- data->setFreshnessPeriod(ndn::time::milliseconds(1000));
- data->setContent(std::make_shared< ::ndn::Buffer>(1024));
- ndn::StackHelper::getKeyChain().sign(*data);
-
- node1_netDeviceFace->sendData(*data);
-
- Simulator::Stop(Seconds(20.0));
- Simulator::Run();
-
- ::ndn::nfd::FaceStatus node0faceStatus = node0_netDeviceFace->getFaceStatus();
- ::ndn::nfd::FaceStatus node1faceStatus = node1_netDeviceFace->getFaceStatus();
- BOOST_CHECK_EQUAL(node1faceStatus.getNOutDatas(), 201);
- Simulator::Destroy();
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 100);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNOutDatas(), 100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
