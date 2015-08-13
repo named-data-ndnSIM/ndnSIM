@@ -21,8 +21,10 @@
 #define NDNSIM_TESTS_UNIT_TESTS_TESTS_COMMON_HPP
 
 #include "ns3/core-module.h"
-#include "boost-test.hpp"
 #include "model/ndn-global-router.hpp"
+#include "helper/ndn-scenario-helper.hpp"
+
+#include "boost-test.hpp"
 
 namespace ns3 {
 namespace ndn {
@@ -36,6 +38,11 @@ public:
     Names::Clear();
     GlobalRouter::clear();
   }
+};
+
+class ScenarioHelperWithCleanupFixture : public ScenarioHelper, public CleanupFixture
+{
+public:
 };
 
 } // namespace ndn
