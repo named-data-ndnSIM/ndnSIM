@@ -341,8 +341,11 @@ Application-level trace helper
     +-----------------+---------------------------------------------------------------------+
     | ``RetxCount``   | number of Interest retransmissions (for LastDelay always equal to 1)|
     +-----------------+---------------------------------------------------------------------+
-    | ``HopCount``    | the number of hops that the retrieved Data packet traveled on the   |
-    |                 | way back from producer application or cache.                        |
+    | ``HopCount``    | the number of network hops that the retrieved Data packet traveled  |
+    |                 | on the way back from producer application or cache.                 |
+    |                 |                                                                     |
+    |                 | Note that semantics of ``HopCount`` field has changed compared to   |
+    |                 | ndnSIM 1.0.                                                         |
     +-----------------+---------------------------------------------------------------------+
 
 .. _app delay trace helper example:

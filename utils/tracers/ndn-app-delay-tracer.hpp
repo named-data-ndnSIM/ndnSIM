@@ -51,10 +51,6 @@ public:
    *
    * @param file File to which traces will be written.  If filename is -, then std::out is used
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
-   *tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   *
    */
   static void
   InstallAll(const std::string& file);
@@ -64,10 +60,6 @@ public:
    *
    * @param nodes Nodes on which to install tracer
    * @param file File to which traces will be written.  If filename is -, then std::out is used
-   *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
-   *tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
    *
    */
   static void
@@ -79,12 +71,7 @@ public:
    * @param nodes Nodes on which to install tracer
    * @param file File to which traces will be written.  If filename is -, then std::out is used
    * @param averagingPeriod How often data will be written into the trace file (default, every half
-   *second)
-   *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
-   *tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
-   *
+   *        second)
    */
   static void
   Install(Ptr<Node> node, const std::string& file);
@@ -95,11 +82,11 @@ public:
    * @param nodes Nodes on which to install tracer
    * @param outputStream Smart pointer to a stream
    * @param averagingPeriod How often data will be written into the trace file (default, every half
-   *second)
+   *        second)
    *
-   * @returns a tuple of reference to output stream and list of tracers. !!! Attention !!! This
-   *tuple needs to be preserved
-   *          for the lifetime of simulation, otherwise SEGFAULTs are inevitable
+   * @returns a tuple of reference to output stream and list of tracers.
+   *          !!! Attention !!! This tuple needs to be preserved for the lifetime of simulation,
+   *          otherwise SEGFAULTs are inevitable
    */
   static Ptr<AppDelayTracer>
   Install(Ptr<Node> node, shared_ptr<std::ostream> outputStream);

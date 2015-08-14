@@ -221,9 +221,9 @@ Consumer::OnData(shared_ptr<const Data> data)
   uint32_t seq = data->getName().at(-1).toSequenceNumber();
   NS_LOG_INFO("< DATA for " << seq);
 
-  int hopCount = -1;
+  int hopCount = 0;
   auto ns3PacketTag = data->getTag<Ns3PacketTag>();
-  if (ns3PacketTag != nullptr) {
+  if (ns3PacketTag != nullptr) { // e.g., packet came from local node's cache
     FwHopCountTag hopCountTag;
     if (ns3PacketTag->getPacket()->PeekPacketTag(hopCountTag)) {
       hopCount = hopCountTag.Get();
