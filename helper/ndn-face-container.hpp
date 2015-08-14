@@ -46,100 +46,89 @@ private:
   typedef std::vector<shared_ptr<Face>> Container;
 
 public:
-  typedef Container::const_iterator Iterator; ///< \brief Iterator over FaceContainer
+  typedef Container::const_iterator Iterator; ///< @brief Iterator over FaceContainer
 
   /**
-   * \brief Create an empty FaceContainer.
+   * @brief Create an empty FaceContainer.
    */
   FaceContainer();
 
   /**
-   * \brief Copy constructor for FaceContainer. Calls AddAll method
+   * @brief Copy constructor for FaceContainer. Calls AddAll method
    *
-   * \see FaceContainer::AddAll
+   * @see FaceContainer::AddAll
    */
   FaceContainer(const FaceContainer& other);
 
   /**
-   * \brief Copy operator for FaceContainer. Empties vector and calls AddAll method
+   * @brief Copy operator for FaceContainer. Empties vector and calls AddAll method
    *
    * All previously obtained iterators (Begin() and End()) will be invalidated
    *
-   * \see FaceContainer::AddAll
+   * @see FaceContainer::AddAll
    */
   FaceContainer&
   operator=(const FaceContainer& other);
 
   /**
-   * \brief Add all entries from other container
+   * Add an entry to the container
    *
-   * \param other smart pointer to a container
+   * @param face a smart pointer to a Face-derived object
+   */
+  void
+  Add(shared_ptr<Face> face);
+
+  /**
+   * @brief Add all entries from other container
+   *
+   * @param other smart pointer to a container
    */
   void
   AddAll(Ptr<FaceContainer> other);
 
   /**
-   * \brief Add all entries from other container
+   * @brief Add all entries from other container
    *
-   * \param other container
+   * @param other container
    */
   void
   AddAll(const FaceContainer& other);
 
+public: // accessors
   /**
-   * \brief Get an iterator which refers to the first pair in the
+   * @brief Get an iterator which refers to the first pair in the
    * container.
    *
-   * \returns an iterator which refers to the first pair in the container.
+   * @returns an iterator which refers to the first pair in the container.
    */
   Iterator
   Begin() const;
 
   /**
-   * \brief Get an iterator which indicates past-the-last Node in the
+   * @brief Get an iterator which indicates past-the-last Node in the
    * container.
    *
-   * \returns an iterator which indicates an ending condition for a loop.
+   * @returns an iterator which indicates an ending condition for a loop.
    */
   Iterator
   End() const;
 
   /**
-   * \brief Get the number of faces stored in this container
+   * @brief Get the number of faces stored in this container
    *
-   * \returns the number of faces stored in this container
+   * @returns the number of faces stored in this container
    */
   uint32_t
   GetN() const;
 
-  // /**
-  //  * \brief Set a metric for all faces in the container
-  //  *
-  //  * \param metric value of metric to assign to all faces in the container
-  //  */
-  // void SetMetricToAll (uint16_t metric);
-
   /**
-   * Add an entry to the container
+   * Get a Face stored in the container
    *
-   * \param face a smart pointer to a Face-derived object
-   *
-   * @see Face
-   */
-  void
-  Add(const shared_ptr<Face>& face);
-
-  /**
-   * Get a smart pointer to Face-derived object stored in the container
-   *
-   * \param i the iterator corresponding to the requested object
-   *
-   * This method is redundant and simple dereferencing of the iterator should be used instead
-   *
-   * @see Face
+   * @param pos index of the Face in the container
+   * @throw std::out_of_range if !(pos < GetN()).
    */
   shared_ptr<Face>
-  Get(Iterator i) const;
+  Get(size_t pos) const;
 
 private:
   Container m_faces;

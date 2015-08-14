@@ -24,9 +24,7 @@
 namespace ns3 {
 namespace ndn {
 
-FaceContainer::FaceContainer()
-{
-}
+FaceContainer::FaceContainer() = default;
 
 FaceContainer::FaceContainer(const FaceContainer& other)
 {
@@ -51,7 +49,13 @@ FaceContainer::AddAll(Ptr<FaceContainer> other)
 void
 FaceContainer::AddAll(const FaceContainer& other)
 {
-  m_faces.insert(m_faces.end(), other.m_faces.begin(), other.m_faces.end());
+  if (this == &other) { // adding self to self, need to make a copy
+    auto copyOfFaces = other.m_faces;
+    m_faces.insert(m_faces.end(), copyOfFaces.begin(), copyOfFaces.end());
+  }
+  else {
+    m_faces.insert(m_faces.end(), other.m_faces.begin(), other.m_faces.end());
+  }
 }
 
 FaceContainer::Iterator
@@ -72,27 +76,16 @@ FaceContainer::GetN(void) const
   return m_faces.size();
 }
 
-// void
-// FaceContainer::SetMetricToAll (uint16_t metric)
-// {
-//   for (FaceContainer::iterator it=m_faces.begin ();
-//        it != m_faces.end ();
-//        it++)
-//     {
-//       (*it)->SetMetric (metric);
-//     }
-// }
-
 void
-FaceContainer::Add(const shared_ptr<Face>& face)
+FaceContainer::Add(shared_ptr<Face> face)
 {
   m_faces.push_back(face);
 }
 
 shared_ptr<Face>
-FaceContainer::Get(FaceContainer::Iterator i) const
+FaceContainer::Get(size_t i) const
 {
-  return *i;
+  return m_faces.at(i);
 }
 
 } // namespace ndn
