@@ -43,6 +43,7 @@
 #include "ns3/ndnSIM/NFD/daemon/mgmt/face-manager.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/strategy-choice-manager.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/status-server.hpp"
+#include "ns3/ndnSIM/NFD/rib/rib-manager.hpp"
 
 #include "ns3/ndnSIM/NFD/daemon/face/null-face.hpp"
 #include "ns3/ndnSIM/NFD/core/config-file.hpp"
@@ -160,6 +161,8 @@ private:
   shared_ptr<nfd::FaceManager> m_faceManager;
   shared_ptr<nfd::StrategyChoiceManager> m_strategyChoiceManager;
   shared_ptr<nfd::StatusServer> m_statusServer;
+  shared_ptr<nfd::rib::RibManager> m_ribManager;
+  shared_ptr< ::ndn::Face> m_face;
 
   nfd::ConfigSection m_config;
 
@@ -183,6 +186,7 @@ L3Protocol::initialize()
   m_impl->m_forwarder = make_shared<nfd::Forwarder>();
 
   initializeManagement();
+  Simulator::ScheduleWithContext(m_node->GetId(), Seconds(0), &L3Protocol::initializeRibManager, this);
 
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(), nfd::FACEID_NULL);
 
@@ -262,6 +266,38 @@ L3Protocol::initializeManagement()
   entry->addNextHop(m_impl->m_internalFace, 0);
 }
 
+void
+L3Protocol::initializeRibManager()
+{
+  using namespace nfd;
+
+  m_impl->m_face = make_shared< ::ndn::Face>();
+  m_impl->m_ribManager = make_shared<rib::RibManager>(*(m_impl->m_face),
+                                                      StackHelper::getKeyChain());
+
+  ConfigFile config([] (const std::string& filename, const std::string& sectionName,
+                        const ConfigSection& section, bool isDryRun) {
+      // Ignore "log" and sections belonging to NFD,
+      // but raise an error if we're missing a handler for a "rib" section.
+      if (sectionName != "rib" || sectionName == "log") {
+        // do nothing
+      }
+      else {
+        // missing NRD section
+        ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
+      }
+    });
+
+  m_impl->m_ribManager->setConfigFile(config);
+
+  // apply config
+  config.parse(m_impl->m_config, false, "ndnSIM.conf");
+
+  m_impl->m_ribManager->registerWithNfd();
+
+  m_impl->m_ribManager->enableLocalControlHeader();
+}
+
 shared_ptr<nfd::Forwarder>
 L3Protocol::getForwarder()
 {
@@ -296,6 +332,8 @@ L3Protocol::NotifyNewAggregate()
   if (m_node == nullptr) {
     m_node = GetObject<Node>();
     if (m_node != nullptr) {
+      initialize();
+
       NS_ASSERT(m_impl->m_forwarder != nullptr);
       m_impl->m_csFromNdnSim = GetObject<ContentStore>();
       if (m_impl->m_csFromNdnSim != nullptr) {

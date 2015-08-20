@@ -90,13 +90,8 @@ public:
    * \brief Default constructor. Creates an empty stack without forwarding strategy set
    */
   L3Protocol();
-  virtual ~L3Protocol();
 
-  /**
-   * \brief Initialize NFD instance
-   */
-  void
-  initialize();
+  virtual ~L3Protocol();
 
   /**
    * \brief Get smart pointer to nfd::Forwarder installed on the node
@@ -179,7 +174,13 @@ protected:
 
 private:
   void
+  initialize();
+
+  void
   initializeManagement();
+
+  void
+  initializeRibManager();
 
 private:
   class Impl;

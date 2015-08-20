@@ -78,7 +78,6 @@ public:
   }
 };
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(SetInterestFilter, 2);
 BOOST_AUTO_TEST_CASE(SetInterestFilter)
 {
   FactoryCallbackApp::Install(getNode("B"), [this] () -> shared_ptr<void> {

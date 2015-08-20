@@ -149,11 +149,7 @@ StackHelper::Install(Ptr<Node> node) const
   }
 
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
-
   ndn->getConfig().put("tables.cs_max_packets", (m_maxCsSize == 0) ? 1 : m_maxCsSize);
-
-  // NFD initialization
-  ndn->initialize();
 
   // Create and aggregate content store if NFD's contest store has been disabled
   if (m_maxCsSize == 0) {
