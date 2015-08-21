@@ -56,6 +56,9 @@ public:
   virtual void
   WillSendOutInterest(uint32_t sequenceNumber);
 
+public:
+  typedef void (*WindowTraceCallback)(uint32_t);
+
 protected:
   /**
    * \brief Constructs the Interest packet and sends it using a callback to the underlying NDN

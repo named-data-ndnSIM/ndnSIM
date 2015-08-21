@@ -27,7 +27,7 @@
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/list.hpp>
 
-#include <ns3/random-variable.h>
+#include <ns3/random-variable-stream.h>
 
 namespace ns3 {
 namespace ndn {
@@ -65,6 +65,7 @@ struct probability_policy_traits {
         : base_(base)
         , max_size_(100)
         , probability_(1.0)
+        , ns3_rand_(CreateObject<UniformRandomVariable>())
       {
       }
 
@@ -76,7 +77,7 @@ struct probability_policy_traits {
       inline bool
       insert(typename parent_trie::iterator item)
       {
-        if (ns3_rand_.GetValue() < probability_) {
+        if (ns3_rand_->GetValue() < probability_) {
           policy_container::push_back(*item);
 
           // allow caching
@@ -138,7 +139,7 @@ struct probability_policy_traits {
       Base& base_;
       size_t max_size_;
       double probability_;
-      UniformVariable ns3_rand_;
+      Ptr<UniformRandomVariable> ns3_rand_;
     };
   };
 };

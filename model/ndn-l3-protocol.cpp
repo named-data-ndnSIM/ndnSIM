@@ -28,7 +28,6 @@
 #include "ns3/object-vector.h"
 #include "ns3/pointer.h"
 #include "ns3/simulator.h"
-#include "ns3/random-variable.h"
 
 #include "ndn-face.hpp"
 
@@ -70,21 +69,27 @@ L3Protocol::GetTypeId(void)
       .AddConstructor<L3Protocol>()
 
       .AddTraceSource("OutInterests", "OutInterests",
-                      MakeTraceSourceAccessor(&L3Protocol::m_outInterests))
+                      MakeTraceSourceAccessor(&L3Protocol::m_outInterests),
+                      "ns3::ndn::L3Protocol::InterestTraceCallback")
       .AddTraceSource("InInterests", "InInterests",
-                      MakeTraceSourceAccessor(&L3Protocol::m_inInterests))
+                      MakeTraceSourceAccessor(&L3Protocol::m_inInterests),
+                      "ns3::ndn::L3Protocol::InterestTraceCallback")
 
       ////////////////////////////////////////////////////////////////////
 
-      .AddTraceSource("OutData", "OutData", MakeTraceSourceAccessor(&L3Protocol::m_outData))
-      .AddTraceSource("InData", "InData", MakeTraceSourceAccessor(&L3Protocol::m_inData))
+      .AddTraceSource("OutData", "OutData", MakeTraceSourceAccessor(&L3Protocol::m_outData),
+                      "ns3::ndn::L3Protocol::DataTraceCallback")
+      .AddTraceSource("InData", "InData", MakeTraceSourceAccessor(&L3Protocol::m_inData),
+                      "ns3::ndn::L3Protocol::DataTraceCallback")
 
       ////////////////////////////////////////////////////////////////////
 
       .AddTraceSource("SatisfiedInterests", "SatisfiedInterests",
-                      MakeTraceSourceAccessor(&L3Protocol::m_satisfiedInterests))
+                      MakeTraceSourceAccessor(&L3Protocol::m_satisfiedInterests),
+                      "ns3::ndn::L3Protocol::SatisfiedInterestsCallback")
       .AddTraceSource("TimedOutInterests", "TimedOutInterests",
-                      MakeTraceSourceAccessor(&L3Protocol::m_timedOutInterests))
+                      MakeTraceSourceAccessor(&L3Protocol::m_timedOutInterests),
+                      "ns3::ndn::L3Protocol::TimedOutInterestsCallback")
     ;
   return tid;
 }

@@ -68,7 +68,7 @@ protected:
 protected:
   double m_frequency; // Frequency of interest packets (in hertz)
   bool m_firstTime;
-  RandomVariable* m_random;
+  Ptr<RandomVariableStream> m_random;
   std::string m_randomType;
 };
 

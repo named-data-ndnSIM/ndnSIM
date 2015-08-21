@@ -64,7 +64,7 @@ ConsumerZipfMandelbrot::ConsumerZipfMandelbrot()
   : m_N(100) // needed here to make sure when SetQ/SetS are called, there is a valid value of N
   , m_q(0.7)
   , m_s(0.7)
-  , m_SeqRng(0.0, 1.0)
+  , m_seqRng(CreateObject<UniformRandomVariable>())
 {
   // SetNumberOfContents is called by NS-3 object system during the initialization
 }
@@ -174,7 +174,7 @@ ConsumerZipfMandelbrot::SendPacket()
   //
 
   shared_ptr<Interest> interest = make_shared<Interest>();
-  interest->setNonce(m_rand.GetValue());
+  interest->setNonce(m_rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
   interest->setName(*nameWithSequence);
 
   // NS_LOG_INFO ("Requesting Interest: \n" << *interest);
@@ -204,9 +204,9 @@ ConsumerZipfMandelbrot::GetNextSeq()
   uint32_t content_index = 1; //[1, m_N]
   double p_sum = 0;
 
-  double p_random = m_SeqRng.GetValue();
+  double p_random = m_seqRng->GetValue();
   while (p_random == 0) {
-    p_random = m_SeqRng.GetValue();
+    p_random = m_seqRng->GetValue();
   }
   // if (p_random == 0)
   NS_LOG_LOGIC("p_random=" << p_random);

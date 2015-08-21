@@ -183,6 +183,10 @@ public:
   static inline Ptr<ContentStore>
   GetContentStore(Ptr<Object> node);
 
+public:
+  typedef void (*CacheHitsCallback)(shared_ptr<const Interest>, shared_ptr<const Data>);
+  typedef void (*CacheMissesCallback)(shared_ptr<const Interest>);
+
 protected:
   TracedCallback<shared_ptr<const Interest>,
                  shared_ptr<const Data>> m_cacheHitsTrace; ///< @brief trace of cache hits

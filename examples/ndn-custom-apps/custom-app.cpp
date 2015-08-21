@@ -29,7 +29,7 @@
 #include "ns3/ndnSIM/helper/ndn-stack-helper.hpp"
 #include "ns3/ndnSIM/helper/ndn-fib-helper.hpp"
 
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 
 NS_LOG_COMPONENT_DEFINE("CustomApp");
 
@@ -76,8 +76,8 @@ CustomApp::SendInterest()
 
   // Create and configure ndn::Interest
   auto interest = std::make_shared<ndn::Interest>("/prefix/sub");
-  UniformVariable rand(0, std::numeric_limits<uint32_t>::max());
-  interest->setNonce(rand.GetValue());
+  Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+  interest->setNonce(rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
   interest->setInterestLifetime(ndn::time::seconds(1));
 
   NS_LOG_DEBUG("Sending Interest packet for " << *interest);

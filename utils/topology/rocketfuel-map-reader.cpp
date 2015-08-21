@@ -40,7 +40,6 @@
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/node-list.h"
-#include "ns3/random-variable.h"
 
 #include "ns3/mobility-model.h"
 
@@ -64,6 +63,7 @@ namespace ns3 {
 RocketfuelMapReader::RocketfuelMapReader(const std::string& path /*=""*/, double scale /*=1.0*/,
                                          const std::string& referenceOspfRate)
   : AnnotatedTopologyReader(path, scale)
+  , m_randVar(CreateObject<UniformRandomVariable>())
   , m_referenceOspfRate(boost::lexical_cast<DataRate>(referenceOspfRate))
 {
 }
@@ -103,15 +103,15 @@ RocketfuelMapReader::CreateLink(string nodeName1, string nodeName2, double avera
   Link link(node1, nodeName1, node2, nodeName2);
 
   DataRate randBandwidth(
-    m_randVar.GetInteger(static_cast<uint32_t>(lexical_cast<DataRate>(minBw).GetBitRate()),
-                         static_cast<uint32_t>(lexical_cast<DataRate>(maxBw).GetBitRate())));
+    m_randVar->GetInteger(static_cast<uint32_t>(lexical_cast<DataRate>(minBw).GetBitRate()),
+                          static_cast<uint32_t>(lexical_cast<DataRate>(maxBw).GetBitRate())));
 
   int32_t metric = std::max(1, static_cast<int32_t>(1.0 * m_referenceOspfRate.GetBitRate()
                                                     / randBandwidth.GetBitRate()));
 
   Time randDelay =
-    Time::FromDouble((m_randVar.GetValue(lexical_cast<Time>(minDelay).ToDouble(Time::US),
-                                         lexical_cast<Time>(maxDelay).ToDouble(Time::US))),
+    Time::FromDouble((m_randVar->GetValue(lexical_cast<Time>(minDelay).ToDouble(Time::US),
+                                          lexical_cast<Time>(maxDelay).ToDouble(Time::US))),
                      Time::US);
 
   uint32_t queue = ceil(averageRtt * (randBandwidth.GetBitRate() / 8.0 / 1100.0));
@@ -273,7 +273,6 @@ RocketfuelMapReader::Read(RocketfuelParams params, bool keepOneComponent /*=true
   ifstream topgen;
   topgen.open(GetFileName().c_str());
   // NodeContainer nodes;
-  UniformVariable var;
 
   istringstream lineBuffer;
   string line;
@@ -708,11 +707,11 @@ RocketfuelMapReader::ConnectBackboneRouters()
     subgraphs[component].push_back(*bb);
   }
 
-  UniformVariable randVar;
+  Ptr<UniformRandomVariable> randVar = CreateObject<UniformRandomVariable>();
 
   for (int i = 1; i < num; i++) {
-    int node1 = randVar.GetInteger(0, subgraphs[i - 1].size() - 1);
-    int node2 = randVar.GetInteger(0, subgraphs[i].size() - 1);
+    int node1 = randVar->GetInteger(0, subgraphs[i - 1].size() - 1);
+    int node2 = randVar->GetInteger(0, subgraphs[i].size() - 1);
 
     Traits::vertex_descriptor v1 = get(vertex_name, bbGraph, subgraphs[i - 1][node1]),
                               v2 = get(vertex_name, bbGraph, subgraphs[i][node2]);

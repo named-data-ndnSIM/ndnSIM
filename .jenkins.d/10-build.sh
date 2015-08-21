@@ -5,10 +5,13 @@ set -e
 JDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source "$JDIR"/util.sh
 
+pushd ns-3 >/dev/null
+
 git submodule update --init
 
 # Cleanup
-sudo ./waf -j1 distclean
+sudo rm -Rf build/ .waf-1* .waf3-1*
+find . -name '*.pyc' | sudo xargs rm -f
 
 if has Ubuntu-12.04 $NODE_LABELS; then
     EXTRA_FLAGS=" --boost-libs=/usr/lib/x86_64-linux-gnu"
@@ -26,3 +29,5 @@ if has Linux $NODE_LABELS; then
 elif has FreeBSD $NODE_LABELS; then
     sudo ldconfig -a
 fi
+
+popd >/dev/null

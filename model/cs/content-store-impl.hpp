@@ -137,6 +137,9 @@ public:
     return super::getPolicy();
   }
 
+public:
+  typedef void (*CsEntryCallback)(Ptr<const Entry>);
+
 private:
   void
   SetMaxSize(uint32_t maxSize);
@@ -157,8 +160,7 @@ private:
 //////////////////////////////////////////
 
 template<class Policy>
-LogComponent
-  ContentStoreImpl<Policy>::g_log = LogComponent(("ndn.cs." + Policy::GetName()).c_str());
+LogComponent ContentStoreImpl<Policy>::g_log = LogComponent(("ndn.cs." + Policy::GetName()).c_str(), __FILE__);
 
 template<class Policy>
 TypeId
@@ -177,7 +179,8 @@ ContentStoreImpl<Policy>::GetTypeId()
 
       .AddTraceSource("DidAddEntry",
                       "Trace fired every time entry is successfully added to the cache",
-                      MakeTraceSourceAccessor(&ContentStoreImpl<Policy>::m_didAddEntry));
+                      MakeTraceSourceAccessor(&ContentStoreImpl<Policy>::m_didAddEntry),
+                      "ns3::ndn::cs::ContentStoreImpl::CsEntryCallback");
 
   return tid;
 }

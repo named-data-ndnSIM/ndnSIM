@@ -38,9 +38,9 @@
 #include "ns3/pointer.h"
 #include "ns3/uinteger.h"
 #include "ns3/ipv4-address.h"
-#include "ns3/random-variable.h"
 #include "ns3/error-model.h"
 #include "ns3/constant-position-mobility-model.h"
+#include "ns3/double.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-face.hpp"
@@ -66,12 +66,18 @@ NS_LOG_COMPONENT_DEFINE("AnnotatedTopologyReader");
 
 AnnotatedTopologyReader::AnnotatedTopologyReader(const std::string& path, double scale /*=1.0*/)
   : m_path(path)
-  , m_randX(0, 100.0)
-  , m_randY(0, 100.0)
+  , m_randX(CreateObject<UniformRandomVariable>())
+  , m_randY(CreateObject<UniformRandomVariable>())
   , m_scale(scale)
   , m_requiredPartitions(1)
 {
   NS_LOG_FUNCTION(this);
+
+  m_randX->SetAttribute("Min", DoubleValue(0));
+  m_randX->SetAttribute("Max", DoubleValue(100.0));
+
+  m_randY->SetAttribute("Min", DoubleValue(0));
+  m_randY->SetAttribute("Max", DoubleValue(100.0));
 
   SetMobilityModel("ns3::ConstantPositionMobilityModel");
 }
@@ -81,8 +87,11 @@ AnnotatedTopologyReader::SetBoundingBox(double ulx, double uly, double lrx, doub
 {
   NS_LOG_FUNCTION(this << ulx << uly << lrx << lry);
 
-  m_randX = UniformVariable(ulx, lrx);
-  m_randY = UniformVariable(uly, lry);
+  m_randX->SetAttribute("Min", DoubleValue(ulx));
+  m_randX->SetAttribute("Max", DoubleValue(lrx));
+
+  m_randY->SetAttribute("Min", DoubleValue(uly));
+  m_randY->SetAttribute("Max", DoubleValue(lry));
 }
 
 void
@@ -188,8 +197,8 @@ AnnotatedTopologyReader::Read(void)
     if (abs(latitude) > 0.001 && abs(latitude) > 0.001)
       node = CreateNode(name, m_scale * longitude, -m_scale * latitude, systemId);
     else {
-      UniformVariable var(0, 200);
-      node = CreateNode(name, var.GetValue(), var.GetValue(), systemId);
+      Ptr<UniformRandomVariable> var = CreateObject<UniformRandomVariable>();
+      node = CreateNode(name, var->GetValue(0, 200), var->GetValue(0, 200), systemId);
       // node = CreateNode (name, systemId);
     }
   }

@@ -24,7 +24,7 @@
 
 #include "ndn-app.hpp"
 
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include "ns3/nstime.h"
 #include "ns3/data-rate.h"
 
@@ -89,6 +89,10 @@ public:
   virtual void
   WillSendOutInterest(uint32_t sequenceNumber);
 
+public:
+  typedef void (*LastRetransmittedInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, int32_t hopCount);
+  typedef void (*FirstInterestDataDelayCallback)(Ptr<App> app, uint32_t seqno, Time delay, uint32_t retxCount, int32_t hopCount);
+
 protected:
   // from App
   virtual void
@@ -125,7 +129,7 @@ protected:
   GetRetxTimer() const;
 
 protected:
-  UniformVariable m_rand; ///< @brief nonce generator
+  Ptr<UniformRandomVariable> m_rand; ///< @brief nonce generator
 
   uint32_t m_seq;      ///< @brief currently requested sequence number
   uint32_t m_seqMax;   ///< @brief maximum number of sequence number

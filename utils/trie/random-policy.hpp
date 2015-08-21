@@ -22,7 +22,7 @@
 
 /// @cond include_hidden
 
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/set.hpp>
@@ -89,9 +89,11 @@ struct random_policy_traits {
 
       type(Base& base)
         : base_(base)
-        , u_rand(0, std::numeric_limits<uint32_t>::max())
+        , u_rand(CreateObject<UniformRandomVariable>())
         , max_size_(100)
       {
+        u_rand->SetAttribute("Min", UintegerValue(0));
+        u_rand->SetAttribute("Max", UintegerValue(std::numeric_limits<uint32_t>::max()));
       }
 
       inline void
@@ -103,7 +105,7 @@ struct random_policy_traits {
       inline bool
       insert(typename parent_trie::iterator item)
       {
-        get_order(item) = u_rand.GetValue();
+        get_order(item) = u_rand->GetValue();
 
         if (max_size_ != 0 && policy_container::size() >= max_size_) {
           if (MemberHookLess<Container>()(*item, *policy_container::begin())) {
@@ -157,7 +159,7 @@ struct random_policy_traits {
 
     private:
       Base& base_;
-      ns3::UniformVariable u_rand;
+      Ptr<UniformRandomVariable> u_rand;
       size_t max_size_;
     };
   };

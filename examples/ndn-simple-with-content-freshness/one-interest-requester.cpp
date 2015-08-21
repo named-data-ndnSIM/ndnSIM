@@ -25,7 +25,7 @@
 #include "ns3/log.h"
 #include "ns3/simulator.h"
 #include "ns3/packet.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include "ns3/string.h"
 
 NS_LOG_COMPONENT_DEFINE("OneInterestRequester");
@@ -85,8 +85,8 @@ OneInterestRequester::SendInterest()
 
   // Create and configure ndn::Interest
   auto interest = std::make_shared<ndn::Interest>(m_name);
-  UniformVariable rand(0, std::numeric_limits<uint32_t>::max());
-  interest->setNonce(rand.GetValue());
+  Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+  interest->setNonce(rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
   interest->setInterestLifetime(ndn::time::seconds(1));
 
   NS_LOG_DEBUG("Sending Interest packet for " << m_name);

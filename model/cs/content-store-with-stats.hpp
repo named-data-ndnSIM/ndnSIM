@@ -63,6 +63,9 @@ public:
   virtual inline void
   Print(std::ostream& os) const;
 
+public:
+  typedef void (*RemoveCsEntryCallback)(Ptr<const Entry>, Time);
+
 private:
   static LogComponent g_log; ///< @brief Logging variable
 
@@ -77,7 +80,7 @@ private:
 
 template<class Policy>
 LogComponent ContentStoreWithStats<Policy>::g_log = LogComponent(("ndn.cs.Stats."
-                                                                  + Policy::GetName()).c_str());
+                                                                  + Policy::GetName()).c_str(), __FILE__);
 
 template<class Policy>
 TypeId
@@ -91,7 +94,8 @@ ContentStoreWithStats<Policy>::GetTypeId()
 
       .AddTraceSource("WillRemoveEntry",
                       "Trace called just before content store entry will be removed",
-                      MakeTraceSourceAccessor(&ContentStoreWithStats<Policy>::m_willRemoveEntry))
+                      MakeTraceSourceAccessor(&ContentStoreWithStats<Policy>::m_willRemoveEntry),
+                      "ns3::ndn::cs::ContentStoreWithStats::RemoveCsEntryCallback")
 
     // trace stuff here
     ;

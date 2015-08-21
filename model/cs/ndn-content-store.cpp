@@ -38,10 +38,12 @@ ContentStore::GetTypeId(void)
       .SetParent<Object>()
 
       .AddTraceSource("CacheHits", "Trace called every time there is a cache hit",
-                      MakeTraceSourceAccessor(&ContentStore::m_cacheHitsTrace))
+                      MakeTraceSourceAccessor(&ContentStore::m_cacheHitsTrace),
+                      "ns3::ndn::ContentStore::CacheHitsCallback")
 
       .AddTraceSource("CacheMisses", "Trace called every time there is a cache miss",
-                      MakeTraceSourceAccessor(&ContentStore::m_cacheMissesTrace));
+                      MakeTraceSourceAccessor(&ContentStore::m_cacheMissesTrace),
+                      "ns3::ndn::ContentStrore::CacheMissesCallback");
 
   return tid;
 }

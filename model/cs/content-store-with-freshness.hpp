@@ -78,7 +78,7 @@ private:
 
 template<class Policy>
 LogComponent ContentStoreWithFreshness<Policy>::g_log = LogComponent(("ndn.cs.Freshness."
-                                                                      + Policy::GetName()).c_str());
+                                                                      + Policy::GetName()).c_str(), __FILE__);
 
 template<class Policy>
 TypeId

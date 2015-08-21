@@ -35,7 +35,7 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 namespace ndn {
@@ -95,7 +95,7 @@ private:
   double m_s;                 // s in (k+q)^s
   std::vector<double> m_Pcum; // cumulative probability
 
-  UniformVariable m_SeqRng; // RNG
+  Ptr<UniformRandomVariable> m_seqRng; // RNG
 };
 
 } /* namespace ndn */

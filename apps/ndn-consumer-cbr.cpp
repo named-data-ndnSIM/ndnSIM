@@ -68,7 +68,6 @@ ConsumerCbr::GetTypeId(void)
 ConsumerCbr::ConsumerCbr()
   : m_frequency(1.0)
   , m_firstTime(true)
-  , m_random(0)
 {
   NS_LOG_FUNCTION_NOARGS();
   m_seqMax = std::numeric_limits<uint32_t>::max();
@@ -76,8 +75,6 @@ ConsumerCbr::ConsumerCbr()
 
 ConsumerCbr::~ConsumerCbr()
 {
-  if (m_random)
-    delete m_random;
 }
 
 void
@@ -99,14 +96,15 @@ ConsumerCbr::ScheduleNextPacket()
 void
 ConsumerCbr::SetRandomize(const std::string& value)
 {
-  if (m_random)
-    delete m_random;
-
   if (value == "uniform") {
-    m_random = new UniformVariable(0.0, 2 * 1.0 / m_frequency);
+    m_random = CreateObject<UniformRandomVariable>();
+    m_random->SetAttribute("Min", DoubleValue(0.0));
+    m_random->SetAttribute("Max", DoubleValue(2 * 1.0 / m_frequency));
   }
   else if (value == "exponential") {
-    m_random = new ExponentialVariable(1.0 / m_frequency, 50 * 1.0 / m_frequency);
+    m_random = CreateObject<ExponentialRandomVariable>();
+    m_random->SetAttribute("Mean", DoubleValue(1.0 / m_frequency));
+    m_random->SetAttribute("Bound", DoubleValue(50 * 1.0 / m_frequency));
   }
   else
     m_random = 0;

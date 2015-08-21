@@ -66,17 +66,19 @@ Consumer::GetTypeId(void)
 
       .AddTraceSource("LastRetransmittedInterestDataDelay",
                       "Delay between last retransmitted Interest and received Data",
-                      MakeTraceSourceAccessor(&Consumer::m_lastRetransmittedInterestDataDelay))
+                      MakeTraceSourceAccessor(&Consumer::m_lastRetransmittedInterestDataDelay),
+                      "ns3::ndn::Consumer::LastRetransmittedInterestDataDelayCallback")
 
       .AddTraceSource("FirstInterestDataDelay",
                       "Delay between first transmitted Interest and received Data",
-                      MakeTraceSourceAccessor(&Consumer::m_firstInterestDataDelay));
+                      MakeTraceSourceAccessor(&Consumer::m_firstInterestDataDelay),
+                      "ns3::ndn::Consumer::FirstInterestDataDelayCallback");
 
   return tid;
 }
 
 Consumer::Consumer()
-  : m_rand(0, std::numeric_limits<uint32_t>::max())
+  : m_rand(CreateObject<UniformRandomVariable>())
   , m_seq(0)
   , m_seqMax(0) // don't request anything
 {
@@ -185,7 +187,7 @@ Consumer::SendPacket()
 
   // shared_ptr<Interest> interest = make_shared<Interest> ();
   shared_ptr<Interest> interest = make_shared<Interest>();
-  interest->setNonce(m_rand.GetValue());
+  interest->setNonce(m_rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
   interest->setName(*nameWithSequence);
   time::milliseconds interestLifeTime(m_interestLifeTime.GetMilliSeconds());
   interest->setInterestLifetime(interestLifeTime);

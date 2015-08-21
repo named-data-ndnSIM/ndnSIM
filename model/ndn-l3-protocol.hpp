@@ -158,6 +158,13 @@ public: // Workaround for python bindings
   static Ptr<L3Protocol>
   getL3Protocol(Ptr<Object> node);
 
+public:
+  typedef void (*InterestTraceCallback)(const Interest&, const Face&);
+  typedef void (*DataTraceCallback)(const Data&, const Face&);
+
+  typedef void (*SatisfiedInterestsCallback)(const nfd::pit::Entry& pitEntry, const Face& inFace, const Data& data);
+  typedef void (*TimedOutInterestsCallback)(const nfd::pit::Entry& pitEntry);
+
 protected:
   virtual void
   DoDispose(void); ///< @brief Do cleanup

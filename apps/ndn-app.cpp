@@ -41,16 +41,20 @@ App::GetTypeId(void)
                         .AddConstructor<App>()
 
                         .AddTraceSource("ReceivedInterests", "ReceivedInterests",
-                                        MakeTraceSourceAccessor(&App::m_receivedInterests))
+                                        MakeTraceSourceAccessor(&App::m_receivedInterests),
+                                        "ns3::ndn::App::InterestTraceCallback")
 
                         .AddTraceSource("ReceivedDatas", "ReceivedDatas",
-                                        MakeTraceSourceAccessor(&App::m_receivedDatas))
+                                        MakeTraceSourceAccessor(&App::m_receivedDatas),
+                                        "ns3::ndn::App::DataTraceCallback")
 
                         .AddTraceSource("TransmittedInterests", "TransmittedInterests",
-                                        MakeTraceSourceAccessor(&App::m_transmittedInterests))
+                                        MakeTraceSourceAccessor(&App::m_transmittedInterests),
+                                        "ns3::ndn::App::InterestTraceCallback")
 
                         .AddTraceSource("TransmittedDatas", "TransmittedDatas",
-                                        MakeTraceSourceAccessor(&App::m_transmittedDatas));
+                                        MakeTraceSourceAccessor(&App::m_transmittedDatas),
+                                        "ns3::ndn::App::DataTraceCallback");
   return tid;
 }
 

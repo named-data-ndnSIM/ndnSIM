@@ -25,7 +25,6 @@
 #include "annotated-topology-reader.hpp"
 
 #include "ns3/net-device-container.h"
-#include "ns3/random-variable.h"
 #include "ns3/data-rate.h"
 
 #include <set>
@@ -147,7 +146,7 @@ private:
   ConnectBackboneRouters();
 
 private:
-  UniformVariable m_randVar;
+  Ptr<UniformRandomVariable> m_randVar;
 
   NodeContainer m_backboneRouters;
   NodeContainer m_gatewayRouters;

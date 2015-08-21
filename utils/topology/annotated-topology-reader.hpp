@@ -23,7 +23,7 @@
 #define __ANNOTATED_TOPOLOGY_READER_H__
 
 #include "ns3/topology-reader.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include "ns3/object-factory.h"
 
 namespace ns3 {
@@ -140,8 +140,8 @@ private:
   AnnotatedTopologyReader&
   operator=(const AnnotatedTopologyReader&);
 
-  UniformVariable m_randX;
-  UniformVariable m_randY;
+  Ptr<UniformRandomVariable> m_randX;
+  Ptr<UniformRandomVariable> m_randY;
 
   ObjectFactory m_mobilityFactory;
   double m_scale;
