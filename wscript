@@ -13,12 +13,12 @@ def required_boost_libs(conf):
 
 def options(opt):
     opt.load(['dependency-checker',
-              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'],
+              'doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version'],
              tooldir=['%s/.waf-tools' % opt.path.abspath()])
 
 def configure(conf):
     conf.load(['dependency-checker',
-               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features'])
+               'doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version'])
 
     conf.env['ENABLE_NDNSIM']=False
 
@@ -72,7 +72,18 @@ def configure(conf):
 
     conf.report_optional_feature("ndnSIM", "ndnSIM", True, "")
 
+    conf.write_config_header('NFD/config.hpp', remove=False)
+
 def build(bld):
+    (base, build, split) = bld.getVersion('NFD')
+    bld(features="subst",
+        source='NFD/version.hpp.in', target='NFD/version.hpp',
+        install_path=None,
+        VERSION_STRING=base,
+        VERSION_BUILD="%s-ndnSIM" % build,
+        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
+        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+
     deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
         deps.append('visualizer')
@@ -95,10 +106,19 @@ def build(bld):
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
-    module_dirs = ['NFD', 'apps', 'helper', 'model', 'utils']
+    module_dirs = ['NFD/core', 'NFD/daemon', 'apps', 'helper', 'model', 'utils']
 
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
-                                      excl=['model/ip-faces/*'])
+                                      excl=['model/ip-faces/*',
+                                            'NFD/core/network-interface.cpp',
+                                            'NFD/daemon/main.cpp',
+                                            'NFD/daemon/nfd.*',
+                                            'NFD/daemon/face/ethernet*',
+                                            'NFD/daemon/face/multicast-udp*',
+                                            'NFD/daemon/face/tcp*',
+                                            'NFD/daemon/face/udp*',
+                                            'NFD/daemon/face/unix-stream*',
+                                            'NFD/daemon/face/websocket*'])
 
     module.full_headers = [p.path_from(bld.path) for p in bld.path.ant_glob(
         ['%s/**/*.hpp' % dir for dir in module_dirs])]
