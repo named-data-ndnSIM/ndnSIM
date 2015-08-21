@@ -61,11 +61,27 @@ App::GetTypeId(void)
 App::App()
   : m_active(false)
   , m_face(0)
+  , m_appId(std::numeric_limits<uint32_t>::max())
 {
 }
 
 App::~App()
 {
+}
+
+void
+App::DoInitialize()
+{
+  NS_LOG_FUNCTION_NOARGS();
+
+  // find out what is application id on the node
+  for (uint32_t id = 0; id < GetNode()->GetNApplications(); ++id) {
+    if (GetNode()->GetApplication(id) == this) {
+      m_appId = id;
+    }
+  }
+
+  Application::DoInitialize();
 }
 
 void
@@ -82,10 +98,7 @@ App::DoDispose(void)
 uint32_t
 App::GetId() const
 {
-  if (m_face == 0)
-    return (uint32_t)-1;
-  else
-    return m_face->getId();
+  return m_appId;
 }
 
 void
