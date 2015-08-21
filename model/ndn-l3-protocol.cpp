@@ -214,7 +214,7 @@ private:
 void
 L3Protocol::initializeManagement()
 {
-  auto keyChain = std::ref(StackHelper::getKeyChain());
+  auto& keyChain = StackHelper::getKeyChain();
   auto& forwarder = m_impl->m_forwarder;
   using namespace nfd;
 

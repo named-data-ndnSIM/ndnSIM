@@ -116,7 +116,6 @@ public:
   shared_ptr<nfd::StrategyChoiceManager>
   getStrategyChoiceManager();
 
-
   /**
    * \brief Add face to NDN stack
    *
