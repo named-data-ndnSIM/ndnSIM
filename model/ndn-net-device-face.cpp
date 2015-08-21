@@ -94,7 +94,7 @@ NetDeviceFace::sendInterest(const Interest& interest)
 {
   NS_LOG_FUNCTION(this << &interest);
 
-  this->onSendInterest(interest);
+  this->emitSignal(onSendInterest, interest);
 
   Ptr<Packet> packet = Convert::ToPacket(interest);
   send(packet);
@@ -105,7 +105,7 @@ NetDeviceFace::sendData(const Data& data)
 {
   NS_LOG_FUNCTION(this << &data);
 
-  this->onSendData(data);
+  this->emitSignal(onSendData, data);
 
   Ptr<Packet> packet = Convert::ToPacket(data);
   send(packet);
@@ -124,11 +124,11 @@ NetDeviceFace::receiveFromNetDevice(Ptr<NetDevice> device, Ptr<const Packet> p, 
     uint32_t type = Convert::getPacketType(p);
     if (type == ::ndn::tlv::Interest) {
       shared_ptr<const Interest> i = Convert::FromPacket<Interest>(packet);
-      this->onReceiveInterest(*i);
+      this->emitSignal(onReceiveInterest, *i);
     }
     else if (type == ::ndn::tlv::Data) {
       shared_ptr<const Data> d = Convert::FromPacket<Data>(packet);
-      this->onReceiveData(*d);
+      this->emitSignal(onReceiveData, *d);
     }
     else {
       NS_LOG_ERROR("Unsupported TLV packet");

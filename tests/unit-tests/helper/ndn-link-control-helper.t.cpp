@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(SixNodeTopology) // Bug #2783
     });
 
   // Choosing forwarding strategy
-  ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/broadcast");
+  ndn::StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/multicast");
 
   addApps({
       {"0", "ns3::ndn::ConsumerCbr",

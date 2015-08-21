@@ -35,7 +35,7 @@ using ns3::ndn::StrategyChoiceHelper;
  * This scenario simulates a grid topology (using PointToPointGrid module)
  *
  * The first six nodes use the best route forwarding strategy, whereas
- * the three remaining nodes use the broadcast forwarding strategy.
+ * the three remaining nodes use the multicast forwarding strategy.
  *
  * (consumer) -- ( ) ----- ( )
  *     |          |         |
@@ -99,7 +99,7 @@ main(int argc, char* argv[])
                                       "/localhost/nfd/strategy/best-route");
       else
         StrategyChoiceHelper::Install(grid.GetNode(row, column), "/prefix",
-                                      "/localhost/nfd/strategy/broadcast");
+                                      "/localhost/nfd/strategy/multicast");
     }
   }
 

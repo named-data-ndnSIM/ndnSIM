@@ -58,7 +58,7 @@ AppFace::sendInterest(const Interest& interest)
 {
   NS_LOG_FUNCTION(this << &interest);
 
-  this->onSendInterest(interest);
+  this->emitSignal(onSendInterest, interest);
 
   // to decouple callbacks
   Simulator::ScheduleNow(&App::OnInterest, m_app, interest.shared_from_this());
@@ -69,10 +69,22 @@ AppFace::sendData(const Data& data)
 {
   NS_LOG_FUNCTION(this << &data);
 
-  this->onSendData(data);
+  this->emitSignal(onSendData, data);
 
   // to decouple callbacks
   Simulator::ScheduleNow(&App::OnData, m_app, data.shared_from_this());
+}
+
+void
+AppFace::onReceiveInterest(const Interest& interest)
+{
+  this->emitSignal(onReceiveInterest, interest);
+}
+
+void
+AppFace::onReceiveData(const Data& data)
+{
+  this->emitSignal(onReceiveData, data);
 }
 
 } // namespace ndn

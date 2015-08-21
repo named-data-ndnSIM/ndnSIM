@@ -15,10 +15,10 @@ echo "Evaluation of memory overhead per PIT entry.."
 
 echo "CS size = " $size, "interest rate = " $rate
 
-# using broadcast forwarding strategy
-echo "Using broadcast forwarding strategy.."
+# using multicast forwarding strategy
+echo "Using multicast forwarding strategy.."
 
-../../../waf --run ndn-test --command-template="%s --old-cs=ns3::ndn::cs::Lru --cs-size=${size} --rate=${rate} --sim-time=${sim_time} --pit=$(true) --strategy="/localhost/nfd/strategy/broadcast" "
+../../../waf --run ndn-test --command-template="%s --old-cs=ns3::ndn::cs::Lru --cs-size=${size} --rate=${rate} --sim-time=${sim_time} --pit=$(true) --strategy="/localhost/nfd/strategy/multicast" "
 
 echo
 
@@ -41,10 +41,10 @@ echo "Evaluation of memory overhead per CS entry.."
 
 echo "CS size = " $size, "interest rate = " $rate
 
-# using broadcast forwarding strategy
-echo "Using broadcast forwarding strategy.."
+# using multicast forwarding strategy
+echo "Using multicast forwarding strategy.."
 
-../../../waf --run ndn-test --command-template="%s --cs-size=${size} --rate=${rate} --strategy="/localhost/nfd/strategy/broadcast" --sim-time=${sim_time}"
+../../../waf --run ndn-test --command-template="%s --cs-size=${size} --rate=${rate} --strategy="/localhost/nfd/strategy/multicast" --sim-time=${sim_time}"
 
 echo
 

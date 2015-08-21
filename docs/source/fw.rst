@@ -35,9 +35,9 @@ Available forwarding strategies
 |                                            | guaranteed to be equivalent.                                                                 |
 +--------------------------------------------+----------------------------------------------------------------------------------------------+
 +--------------------------------------------+----------------------------------------------------------------------------------------------+
-| ``/localhost/nfd/strategy/broadcast``      |  :nfd:`Broadcast Strategy <nfd::fw::BroadcastStrategy>`                                      |
+| ``/localhost/nfd/strategy/multicast``      |  :nfd:`Multicast Strategy <nfd::fw::MulticastStrategy>`                                      |
 |                                            |                                                                                              |
-|                                            |  The broadcast strategy forwards every Interest to all                                       |
+|                                            |  The multicast strategy forwards every Interest to all                                       |
 |                                            |  upstreams, indicated by the supplied FIB entry.                                             |
 +--------------------------------------------+----------------------------------------------------------------------------------------------+
 +--------------------------------------------+----------------------------------------------------------------------------------------------+
@@ -59,11 +59,11 @@ Available forwarding strategies
     +====================+===============================================+
     | ``/``              | ``/localhost/nfd/strategy/best-route``        |
     +--------------------+-----------------------------------------------+
-    | ``/localhost``     | ``/localhost/nfd/strategy/broadcast``         |
+    | ``/localhost``     | ``/localhost/nfd/strategy/multicast``         |
     +--------------------+-----------------------------------------------+
     | ``/localhost/nfd`` | ``/localhost/nfd/strategy/best-route``        |
     +--------------------+-----------------------------------------------+
-    | ``/ndn/broadcast`` | ``/localhost/nfd/strategy/broadcast``         |
+    | ``/ndn/multicast`` | ``/localhost/nfd/strategy/multicast``         |
     +--------------------+-----------------------------------------------+
 
 
@@ -73,7 +73,7 @@ Examples:
       .. code-block:: c++
 
          StrategyChoiceHelper::Install(nodes, prefix,
-                                       "/localhost/nfd/strategy/broadcast");
+                                       "/localhost/nfd/strategy/multicast");
 
 
 .. _Writing your own custom strategy:

@@ -19,6 +19,8 @@
 
 #include "helper/ndn-strategy-choice-helper.hpp"
 
+#include "ns3/ndnSIM/NFD/daemon/fw/strategy.hpp"
+
 #include "../tests-common.hpp"
 
 namespace ns3 {
@@ -90,7 +92,7 @@ BOOST_AUTO_TEST_CASE(DefaultStrategies)
 // Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy);
 BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNode)
 {
-  StrategyChoiceHelper::Install(getNode("A2"), "/prefix", "/localhost/nfd/strategy/broadcast");
+  StrategyChoiceHelper::Install(getNode("A2"), "/prefix", "/localhost/nfd/strategy/multicast");
 
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
@@ -110,7 +112,7 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNodeContainer)
   nodes.Add(getNode("A1"));
   nodes.Add(getNode("A2"));
 
-  StrategyChoiceHelper::Install(nodes, "/prefix", "/localhost/nfd/strategy/broadcast");
+  StrategyChoiceHelper::Install(nodes, "/prefix", "/localhost/nfd/strategy/multicast");
 
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
@@ -126,7 +128,7 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNodeContainer)
 // InstallAll(const Name& namePrefix, const Name& strategy);
 BOOST_AUTO_TEST_CASE(InstallAllBuiltInStrategy)
 {
-  StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/broadcast");
+  StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/multicast");
 
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();

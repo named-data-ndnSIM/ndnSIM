@@ -94,7 +94,7 @@ main(int argc, char* argv[])
   std::string prefix2 = "/prefix2";
 
   // Install different forwarding strategies for prefix1, prefix2
-  StrategyChoiceHelper::InstallAll(prefix1, "/localhost/nfd/strategy/broadcast");
+  StrategyChoiceHelper::InstallAll(prefix1, "/localhost/nfd/strategy/multicast");
   StrategyChoiceHelper::InstallAll(prefix2, "/localhost/nfd/strategy/best-route");
 
   // Install NDN applications

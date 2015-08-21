@@ -116,11 +116,11 @@ forwarding strategies.  By default, the following forwarding strategy configurat
 +====================+==============================+===============================================+
 | ``/``              | :nfd:`fw::BestRouteStrategy` | ``/localhost/nfd/strategy/best-route``        |
 +--------------------+------------------------------+-----------------------------------------------+
-| ``/localhost``     | :nfd:`fw::BroadcastStrategy` | ``/localhost/nfd/strategy/broadcast``         |
+| ``/localhost``     | :nfd:`fw::MulticastStrategy` | ``/localhost/nfd/strategy/multicast``         |
 +--------------------+------------------------------+-----------------------------------------------+
 | ``/localhost/nfd`` | :nfd:`fw::BestRouteStrategy` | ``/localhost/nfd/strategy/best-route``        |
 +--------------------+------------------------------+-----------------------------------------------+
-| ``/ndn/broadcast`` | :nfd:`fw::BroadcastStrategy` | ``/localhost/nfd/strategy/broadcast``         |
+| ``/ndn/multicast`` | :nfd:`fw::MulticastStrategy` | ``/localhost/nfd/strategy/multicast``         |
 +--------------------+------------------------------+-----------------------------------------------+
 
 

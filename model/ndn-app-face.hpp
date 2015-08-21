@@ -55,19 +55,27 @@ public:
 public: // from nfd::Face
   /**
    * @brief Send Interest towards application
-   *
-   * @note To send Interest from application, use `AppFace::onReceiveInterest(interest)`
    */
   virtual void
   sendInterest(const Interest& interest);
 
   /**
    * @brief Send Data towards application
-   *
-   * @note To send Data from application, use `AppFace::onReceiveData(data)`
    */
   virtual void
   sendData(const Data& data);
+
+  /**
+   * @brief Send Interest towards NFD
+   */
+  void
+  onReceiveInterest(const Interest& interest);
+
+  /**
+   * @brief Send Data towards NFD
+   */
+  void
+  onReceiveData(const Data& data);
 
   virtual void
   close();

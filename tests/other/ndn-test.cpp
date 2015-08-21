@@ -171,7 +171,7 @@ Tester::run(int argc, char* argv[])
   cmd.AddValue("pit", "Perform PIT evaluation if this parameter is true",
                m_shouldEvaluatePit);
   cmd.AddValue("strategy", "Choose forwarding strategy "
-                           "(e.g., /localhost/nfd/strategy/broadcast, "
+                           "(e.g., /localhost/nfd/strategy/multicast, "
                            "/localhost/nfd/strategy/best-route, ...) ",
                m_strategy);
   cmd.AddValue("sim-time", "Simulation time", m_simulationTime);

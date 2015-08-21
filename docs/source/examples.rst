@@ -376,7 +376,7 @@ contain constantly increasing sequence number).
 For every received interest, producer replies with a data packet, containing 1024 bytes of
 virtual payload.
 
-In this scenario, we choose the broadcast strategy to be installed for the name prefix
+In this scenario, we choose the multicast strategy to be installed for the name prefix
 "/prefix1" in all the nodes, while for the name prefix "/prefix2", the best-route strategy
 will be installed in all the topology nodes.
 
@@ -396,7 +396,7 @@ To run this scenario and see what is happening, use the following command::
 ---------------------------------------------------------------------
 
 This scenario simulates a grid topology (using PointToPointGrid module). The first six nodes
-use the best route forwarding strategy, whereas the three remaining nodes use the broadcast
+use the best route forwarding strategy, whereas the three remaining nodes use the multicast
 forwarding strategy.
 
 Consumer requests data from producer with frequency 100 interests per second (interests
