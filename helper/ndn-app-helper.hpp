@@ -105,6 +105,47 @@ private:
   ObjectFactory m_factory;
 };
 
+/**
+ * @brief An application that can be created using the supplied callback
+ *
+ * Example:
+ *
+ *     class SomeApp
+ *     {
+ *     public:
+ *       SomeApp(size_t initParameter);
+ *       ...
+ *     };
+ *
+ *     FactoryCallbackApp::Install(node, [] () -> shared_ptr<void> {
+ *         return make_shared<SomeApp>(42);
+ *       })
+ *       .Start(Seconds(1.01));
+ */
+class FactoryCallbackApp : public Application
+{
+public:
+  typedef std::function<shared_ptr<void>()> FactoryCallback;
+
+  FactoryCallbackApp(const FactoryCallback& factory);
+
+public:
+  static ApplicationContainer
+  Install(Ptr<Node> node, const FactoryCallback& factory);
+
+protected:
+  // inherited from Application base class.
+  virtual void
+  StartApplication();
+
+  virtual void
+  StopApplication();
+
+private:
+  FactoryCallback m_factory;
+  std::shared_ptr<void> m_impl;
+};
+
 } // namespace ndn
 } // namespace ns3
 

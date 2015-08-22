@@ -81,7 +81,6 @@ FibHelper::RemoveNextHop(const ControlParameters& parameters, Ptr<Node> node)
 
   Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
   shared_ptr<nfd::FibManager> fibManager = L3protocol->getFibManager();
-  // fibManager->addInterestRule(commandName.toUri(), key, *keyChain.getPublicKey (key));
   fibManager->onFibRequest(*command);
 }
 

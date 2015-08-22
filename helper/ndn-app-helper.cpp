@@ -97,5 +97,35 @@ AppHelper::InstallPriv(Ptr<Node> node)
   return app;
 }
 
+////////////////////////////////////////////////////////////////////////////
+
+FactoryCallbackApp::FactoryCallbackApp(const FactoryCallback& factory)
+  : m_factory(factory)
+{
+}
+
+ApplicationContainer
+FactoryCallbackApp::Install(Ptr<Node> node, const FactoryCallback& factory)
+{
+  ApplicationContainer apps;
+  auto app = CreateObject<FactoryCallbackApp>(factory);
+  node->AddApplication(app);
+  apps.Add(app);
+  return apps;
+}
+
+void
+FactoryCallbackApp::StartApplication()
+{
+  m_impl = m_factory();
+}
+
+void
+FactoryCallbackApp::StopApplication()
+{
+  m_impl.reset();
+}
+
+
 } // namespace ndn
 } // namespace ns3
