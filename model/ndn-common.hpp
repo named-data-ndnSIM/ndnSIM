@@ -63,7 +63,10 @@ using ::ndn::SignatureInfo;
 using ::ndn::Block;
 using ::ndn::KeyChain;
 
+#ifndef DOXYGEN
+// For python bindings
 namespace nfd = ::nfd;
+#endif // DOXYGEN
 
 } // namespace ndn
 } // namespace ns3

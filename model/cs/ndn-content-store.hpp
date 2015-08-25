@@ -115,8 +115,7 @@ public:
   /**
    * \brief Find corresponding CS entry for the given interest
    *
-   * \param interest Interest for which matching content store entry
-   * will be searched
+   * \param interest Interest for which matching content store entry will be searched
    *
    * If an entry is found, it is promoted to the top of most recent
    * used entries index, \see m_contentStore
@@ -126,11 +125,7 @@ public:
 
   /**
    * \brief Add a new content to the content store.
-   *
-   * \param header Fully parsed Data
-   * \param packet Fully formed Ndn packet to add to content store
-   * (will be copied and stripped down of headers)
-   * @returns true if an existing entry was updated, false otherwise
+   * \returns true if an existing entry was updated, false otherwise
    */
   virtual bool
   Add(shared_ptr<const Data> data) = 0;

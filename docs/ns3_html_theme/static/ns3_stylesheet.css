@@ -141,3 +141,12 @@ div.sphinxsidebar a {
     color: red;
     font-weight: bold;
 }
+
+table.contentstable h2 {
+    margin: 0;
+    background-image: none;
+}
+
+table.contentstable td .tile {
+    padding: 0 10px 0 10px;
+}

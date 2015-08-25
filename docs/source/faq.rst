@@ -18,7 +18,7 @@ Installing boost libraries to ``/usr/local``
     **The following instructions are for those who want to install latest version of boost libraries** :red:`and has root access`.
 
 The following commands would install the latest version of boost libraries (at the time of
-writing, version 1.53) ot ``/usr/local``, assuming you have a root access to your machine.  If
+writing, version 1.59) ot ``/usr/local``, assuming you have a root access to your machine.  If
 you don't have root access, please refer to section :ref:`Installing boost libraries to a
 non-privileged location`.
 
@@ -29,9 +29,9 @@ non-privileged location`.
 .. code-block:: bash
    :linenos:
 
-    wget http://downloads.sourceforge.net/project/boost/boost/1.57.0/boost_1_57_0.tar.bz2
-    tar jxf boost_1_57_0.tar.bz2
-    cd boost_1_57_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2
+    tar jxf boost_1_59_0.tar.bz2
+    cd boost_1_59_0
     ./bootstrap.sh
     sudo ./b2 --prefix=/usr/local install
 
@@ -63,15 +63,15 @@ Installing boost libraries to a non-privileged location
     going wrong.**
 
 Normally, to compile and install boost libraries in non-privileged mode, you would need to
-issue following commands (e.g., for boost version 1.57.0):
+issue following commands (e.g., for boost version 1.59.0):
 
 .. code-block:: bash
    :linenos:
 
     export BOOSTDIR=/home/non-privileged-user/boost
-    wget http://downloads.sourceforge.net/project/boost/boost/1.57.0/boost_1_57_0.tar.bz2
-    tar jxf boost_1_57_0.tar.bz2
-    cd boost_1_57_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2
+    tar jxf boost_1_59_0.tar.bz2
+    cd boost_1_59_0
     ./bootstrap.sh
     ./b2 --prefix=$BOOSTDIR install
 

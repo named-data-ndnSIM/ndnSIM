@@ -17,8 +17,8 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_STRATEGY_CHOICE_HELPER_H
-#define NDN_STRATEGY_CHOICE_HELPER_H
+#ifndef NDNSIM_HELPER_NDN_STRATEGY_CHOICE_HELPER_HPP
+#define NDNSIM_HELPER_NDN_STRATEGY_CHOICE_HELPER_HPP
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
@@ -61,26 +61,26 @@ class StrategyChoiceHelper
 {
 public:
   /**
-   * @brief Install a built-in strategy @p strategy on @p node for @namePrefix namespace
+   * @brief Install a built-in strategy @p strategy on @p node for @p namePrefix namespace
    */
   static void
   Install(Ptr<Node> node, const Name& namePrefix, const Name& strategy);
 
   /**
    * @brief Install a built-in strategy @p strategy on nodes in @p c container for
-   *        @namePrefix namespace
+   *        @p namePrefix namespace
    */
   static void
   Install(const NodeContainer& c, const Name& namePrefix, const Name& strategy);
 
   /**
-   * @brief Install a built-in strategy @p strategy on all nodes for @namePrefix namespace
+   * @brief Install a built-in strategy @p strategy on all nodes for @p namePrefix namespace
    */
   static void
   InstallAll(const Name& namePrefix, const Name& strategy);
 
   /**
-   * @brief Install a custom strategy on @p node for @namePrefix namespace
+   * @brief Install a custom strategy on @p node for @p namePrefix namespace
    * @tparam Strategy Class name of the custom strategy
    */
   template<class Strategy>
@@ -88,7 +88,7 @@ public:
   Install(Ptr<Node> node, const Name& namePrefix);
 
   /**
-   * @brief Install a custom strategy on nodes in @p c container for @namePrefix namespace
+   * @brief Install a custom strategy on nodes in @p c container for @p namePrefix namespace
    * @tparam Strategy Class name of the custom strategy
    */
   template<class Strategy>
@@ -96,7 +96,7 @@ public:
   Install(const NodeContainer& c, const Name& namePrefix);
 
   /**
-   * @brief Install a custom strategy on all nodes for @namePrefix namespace
+   * @brief Install a custom strategy on all nodes for @p namePrefix namespace
    * @tparam Strategy Class name of the custom strategy
    */
   template<class Strategy>
@@ -145,4 +145,4 @@ StrategyChoiceHelper::InstallAll(const Name& namePrefix)
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDN_STRATEGY_CHOICE_HELPER_H
+#endif // NDNSIM_HELPER_NDN_STRATEGY_CHOICE_HELPER_HPP

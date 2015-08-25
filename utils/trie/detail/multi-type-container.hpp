@@ -81,6 +81,6 @@ struct multi_type_container
 } // ndn
 } // ns3
 
-/// @cond include_hidden
+/// @endcond include_hidden
 
 #endif // MULTI_TYPE_CONTAINER_H_

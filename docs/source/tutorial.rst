@@ -20,19 +20,17 @@ Contents:
 
     intro
     getting-started
+    faq
+    examples   
     helpers
     cs
     fw
     applications
-
-.. toctree::
-    :maxdepth: 2
-
-    examples
     metric
-    faq
     parallel-simulations
+    guide-to-simulate-real-apps
     ndnsim-research-papers
+
 
 .. toctree::
     :hidden:

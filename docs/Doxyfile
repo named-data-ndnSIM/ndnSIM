@@ -228,7 +228,7 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                =
+ALIASES                = "detail=@details"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -482,7 +482,7 @@ HIDE_FRIEND_COMPOUNDS  = NO
 # blocks will be appended to the function's detailed documentation block.
 # The default value is: NO.
 
-HIDE_IN_BODY_DOCS      = NO
+HIDE_IN_BODY_DOCS      = YES
 
 # The INTERNAL_DOCS tag determines if documentation that is typed after a
 # \internal command is included. If the tag is set to NO then the documentation
@@ -759,8 +759,10 @@ INPUT                  = ../model \
                          ../utils \
                          ../apps \
                          ../NFD \
+                         ../ndn-cxx \
                          introspected-doxygen.hpp \
                          doxygen.hpp
+
 # For example:
 # ../../../build/utils/ns3-dev-print-introspected-doxygen-debug --log --group Ndn > introspected-doxygen.hpp
 
@@ -798,7 +800,11 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                =
+EXCLUDE                = ../NFD/tools \
+                         ../NFD/tests \
+                         ../ndn-cxx/util \
+                         ../ndn-cxx/tools \
+                         ../ndn-cxx/examples
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

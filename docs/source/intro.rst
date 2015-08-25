@@ -10,16 +10,33 @@ Introduction
     .. image:: _static/ndnSIM-structure.*
         :width: 100%
 
-ndnSIM 2.0 is a new release of `NS-3 based Named Data Networking (NDN) simulator
-<http://ndnsim.net/1.0/>`_ that went through extensive refactoring and rewriting.  The key
-new features of the new version:
+- Packet format changed to [NDN Packet Specification](http://named-data.net/doc/ndn-tlv/)
 
-- ndnSIM no longer re-implements basic NDN primitives and directly uses implementation
-  from `ndn-cxx library (NDN C++ library with eXperimental eXtensions)
-  <http://named-data.net/doc/ndn-cxx/>`_.
+- ndnSIM uses implementation of basic NDN primitives from
+  [ndn-cxx library (NDN C++ library with eXperimental eXtensions)](http://named-data.net/doc/ndn-cxx/)
+
+- All NDN forwarding and management is implemented directly using source code of
+  [Named Data Networking Forwarding Daemon (NFD)](http://named-data.net/doc/NFD/)
+
+- Allows [simulation of real applications](http://ndnsim.net/2.1/guide-to-simulate-real-apps.html)
+  written against ndn-cxx library
+
+                
+A new release of `NS-3 based Named Data Networking (NDN) simulator <http://ndnsim.net/1.0/>`__
+went through a number of extensive refactoring and rewriting.  The key new features of the
+new version:
+
+- Packet format changed to the `NDN packet format <http://named-data.net/doc/ndn-tlv/>`_
+
+- ndnSIM uses implementation of basic NDN primitives from
+  `ndn-cxx library (NDN C++ library with eXperimental eXtensions)
+  <http://named-data.net/doc/ndn-cxx/>`_
+
 - All NDN forwarding and management is implemented directly using source code of `Named
   Data Networking Forwarding Daemon (NFD) <http://named-data.net/doc/NFD/>`_
-- Packet format changed to the `NDN packet format <http://named-data.net/doc/ndn-tlv/>`_
+
+- It is possible to :doc:`simulation some real applications <guide-to-simulate-real-apps>`
+  written against ndn-cxx library
 
 .. note::
    Please note that ndnSIM 2.0 has major refactoring and simulation scenario written for
@@ -84,8 +101,11 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 |                 | :ndnsim:`AppFace`),                                                 |
 |                 | etc.                                                                |
 +-----------------+---------------------------------------------------------------------+
-| ``NFD/``        | contains the `NFD`_ source code with few modifications to make it   |
-|                 | compatible with the simulator                                       |
+| ``NFD/``        | submodule of `NDN Forwarding Daemon (NFD)`_ source code with few    |
+|                 | modifications to make it compatible with the simulator              |
++-----------------+---------------------------------------------------------------------+
+| ``ndn-cxx/``    | submodule of `ndn-cxx library`_ source code with few                |
+|                 | modifications to make it compatible with the simulator              |
 +-----------------+---------------------------------------------------------------------+
 | ``apps/``       | applications (in NS-3 sense) that can be installed on the nodes.    |
 |                 | Right now we have one producer (:ndnsim:`Producer`) and a           |
@@ -102,7 +122,9 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 | ``examples/``   | contain :doc:`several example scenarios <examples>`                 |
 +-----------------+---------------------------------------------------------------------+
 
-.. _NFD: http://named-data.net/doc/NFD/
+.. _NDN Forwarding Daemon (NFD): http://named-data.net/doc/NFD/
+
+.. _ndn-cxx library: http://named-data.net/doc/ndn-cxx/
 
 Logging
 -------

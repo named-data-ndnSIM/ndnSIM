@@ -1,10 +1,40 @@
-.. _license:
+=====================
+Copyright and License
+=====================
 
-===================
-License information
-===================
+Copyright © 2011-2015 University of California, Los Angeles
 
-Most parts of ndnSIM code are licensed under GNU GPL License 3.0.
+ndnSIM is licensed under conditions of GNU General Public License version 3.0 or later
+with permission to be linked with NS-3 codebase (GPL 2.0).
+
+ndnSIM uses a number of third-party software and libraries, licensed under the following
+licenses:
+
+- Boost libraries licensed under conditions of `Boost Software License 1.0`_
+
+- CryptoPP library is licensed under conditions of `Boost Software License 1.0`_
+
+- SQLite is in `public domain <http://www.sqlite.org/copyright.html>`__
+
+- waf build system is licensed under conditions of `BSD license
+  <https://github.com/named-data/ndn-cxx/blob/master/waf>`__
+
+- ndn-cxx library licensed under conditions of `GNU LGPL 3.0+
+  <https://github.com/named-data/ndn-cxx/blob/master/COPYING.md>`__
+
+- NDN Forwarding Daemon (NFD) licensed under conditions of `GNU GPL 3.0+
+  <https://github.com/named-data/NFD/blob/master/COPYING.md>`__
+  
+ndnSIM also relies on several other third-party libraries with non-GPL compatible
+license. These library fall into category of "System Libraries" under GPL license
+definitions and are used in accordance with GPL license exception for "System Libraries":
+
+The GPL license is provided below in this file. For more information about these licenses,
+see `<http://www.gnu.org/licenses/>`__
+
+.. _Boost Software License 1.0 : http://www.boost.org/users/license.html
+
+----------------------------------------------------------------------------------
 
 GNU GENERAL PUBLIC LICENSE
 ==========================
