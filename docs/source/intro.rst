@@ -49,7 +49,7 @@ strategies) inside ndnSIM can be directly used within the real NFD implementatio
 
 Specifically, the simulator directly uses NFD implementations of :nfd:`pending Interest
 table (PIT) <nfd::Pit>`, :nfd:`forwarding information base (FIB) <nfd::Fib>`, and
-:nfd:`content store <nfd::Cs>` data structures.  In addition to that, ndnSIM allows
+:nfd:`content store <nfd::cs::Cs>` data structures.  In addition to that, ndnSIM allows
 experimentation with :ndnSIM:`ndnSIM-specific content store <ndn::ContentStore>` along
 with its cache replacement policies ported from the previous version of ndnSIM.
 

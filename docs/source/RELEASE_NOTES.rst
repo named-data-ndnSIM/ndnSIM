@@ -5,8 +5,150 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
-Release 2.0
------------
+Release 2.1 (Changes since release 2.0)
+---------------------------------------
+
+Release date: September 4, 2015
+
+Overview
+~~~~~~~~
+
+- Integration with ndn-cxx and NFD codebases has been refactored to include ndn-cxx and
+  NFD repositories as git submodules within ndnSIM repository (:issue:`3138`).
+
+  This refactoring simplifies upgrading ndn-cxx and NFD to new versions and prevents old
+  simulation code to break because of API changes in newer versions of ndn-cxx library.
+
+  .. note::
+     In order to retrieve the marked versions of ndn-cxx and NFD, use ``--recursive``
+     option to the git clone command or run ``git submodule update --init`` after clone,
+     pull, or merge.
+
+- The official home for ndnSIM codebase has been moved to `GitHub named-data-ndnSIM
+  organization <https://github.com/named-data-ndnSIM>`__ (:issue:`3123`):
+
+  * `ndnSIM codebase <https://github.com/named-data-ndnSIM/ndnSIM>`__
+  * `Modified version of ndn-cxx <https://github.com/named-data-ndnSIM/ndn-cxx>`__
+  * `Modified version of NFD <https://github.com/named-data-ndnSIM/NFD>`__
+  * `Modified version of NS-3 <https://github.com/named-data-ndnSIM/ns-3-dev>`__
+  * `Modified version of python bindings generator <https://github.com/named-data-ndnSIM/pybindgen>`__
+
+- Modified version of NS-3 was updated to (rebased on top of) version 2.23-dev, with
+  ndnSIM codebase adjusted to reflect API changes (:issue:`3122`)
+
+- NFD and ndn-cxx has been upgraded to version 0.3.4 (:issue:`3125`)
+  
+New features
+~~~~~~~~~~~~
+
+- ndnSIM-specific version of :ndnsim:`ndn::Face` (:issue:`2370`)
+
+  The updated version of :ndnsim:`ndn::Face` specially designed to allow writing
+  simulation applications in the same way as real applications.  It is also possible to
+  directly use codebase of the existing applications to drive simulations, provided that
+  the codebase meets or can be adjusted to meet the requirements listed in
+  :doc:`guide-to-simulate-real-apps`.
+
+- Full support for NFD'S RIB manager (:issue:`2370`)
+
+  .. note::
+     RIB manager support is currently available only for applications based on ndn-cxx.
+     :ndnsim:`FibHelper::AddRoute` and :ndnsim:`FibHelper::RemoveRoute` used by
+     :ndnsim:`ndn::Producer` and :ndnsim:`ndn::GlobalRoutingHelper` are currently
+     interacting directly with NFD's FIB manager.  This issue will be resolved in the next
+     release of ndnSIM (:issue:`3121`)
+
+- Tutorial and example on how to speed up simulations with MPI module of NS-3:
+  `<http://ndnsim.net/2.0/parallel-simulations.html>`__
+
+- Two new helpers to simplify writing basic simulation scenarios:
+
+  - :ndnsim:`ScenarioHelper` leverages C++11 constructs to write scenarios. Example:
+
+    .. code-block:: c++
+
+         ScenarioHelper helper;
+         helper.createTopology({
+             {"1", "2"},
+             {"2", "3"}
+           });
+
+         helper.addRoutes({
+             {"1", "2", "/prefix", 1},
+             {"2", "3", "/prefix", 1}
+           });
+
+         helper.addApps({
+             {"1", "ns3::ndn::ConsumerCbr",
+                 {{"Prefix", "/prefix"}, {"Frequency", "1"}},
+                 "0s", "100s"},
+             {"3", "ns3::ndn::Producer",
+                 {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
+                 "0s", "100s"}
+           });
+
+
+  - :ndnsim:`FactoryCallbackApp` simplifies creation of basic apps without creating a
+    separate class that is derived from ``ns3::Applications``. Example:
+
+    .. code-block:: c++
+
+        class SomeApp
+        {
+        public:
+          SomeApp(size_t initParameter);
+          ...
+        };
+
+        FactoryCallbackApp::Install(node, [] () -> shared_ptr<void> {
+            return make_shared<SomeApp>(42);
+          })
+          .Start(Seconds(1.01));
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Updates of ndnSIM documentation
+
+  * Updated the structure for the `ndnSIM website index page <http://ndnsim.net>`__
+  * Updated installation instructions to reflect refactoring and relocation of ndnSIM codebase
+  * API documentation (doxygen) improvements
+  * Updated list of ndnSIM research papers
+
+- The NDN stack can now be updated to handle any simulation topology changes after
+  its initial installation on a node (:issue:`2717`)
+
+- Application ID that appears in :ndnsim:`ndn::AppDelayTracer` output is now ID of the
+  application on the node, not ID of the application face that was used previously.
+
+- FibHelper has been extended to support route removals (:issue:`2358`)
+
+- ndnSIM codebase now partially covered with unit-tests (:issue:`2369`, :issue:`3059`,
+  :issue:`2783`)
+
+- Bugfixes:
+
+  * In :ndnsim:`ndn::GlobalRoutingHelper::CalculateAllPossibleRoutes` that caused crash in
+    some cases (:issue:`2535`)
+
+  * In FailLink and Uplink methods of :ndnsim:`ndn::LinkControlHelper` class that affected
+    more links than requested (:issue:`2783`)
+
+  * With hop count of data packets retrieved from the Contest Store of NFD (:issue:`2764`)
+
+  * In :ndnsim:`ndn::Producer` application that caused a wrong dummy signature to be added
+    to the constructed data packets (:issue:`2927`)
+
+
+
+********************************************************************************
+
+
+
+Release 2.0 (Changes since release 1.0)
+---------------------------------------
+
+Release date: January 13, 2015
 
 Overview
 ~~~~~~~~
@@ -36,7 +178,7 @@ Note RIB Manager is not yet available in ndnSIM.
 New Features
 ~~~~~~~~~~~~
 
--  Integration with NFD codebase:
+-  Integration with NFD codebase.
 -  A realistic behavior is added to the simulations.
 -  Forwarding plane extensions can be used in both ndnSIM simulations and real NFD deployment.
 -  Per namespace forwarding strategies for different namespaces (one strategy per namespace).

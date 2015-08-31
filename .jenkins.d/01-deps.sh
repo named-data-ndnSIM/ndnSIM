@@ -29,7 +29,7 @@ if has Ubuntu $NODE_LABELS; then
         sudo apt-get install -qq -y libboost-all-dev
     fi
 
-    sudo apt-get install -qq -y python-dev python-pygraphviz python-kiwi
+    sudo apt-get install -qq -y python-setuptools python-dev python-pygraphviz python-kiwi
     sudo apt-get install -qq -y python-pygoocanvas python-gnome2
     sudo apt-get install -qq -y python-rsvg ipython
 fi

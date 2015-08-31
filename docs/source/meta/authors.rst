@@ -1,0 +1,4 @@
+ndnSIM Team
+===========
+
+.. include:: ../../../AUTHORS

@@ -11,12 +11,12 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -25,8 +25,32 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [ "sphinx.ext.autodoc", "sphinx.ext.mathjax", "sphinxcontrib.doxylink", "sphinxcontrib.aafig", "sphinxcontrib.googleanalytics", "sphinxcontrib.bibtex" ]
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.mathjax',
+    'sphinxcontrib.doxylink',
+    'sphinxcontrib.aafig',
+    'sphinxcontrib.googleanalytics',
+    'sphinxcontrib.bibtex',
+    'redmine_issue'
+]
 
+# def addExtensionIfExists(extension):
+#     try:
+#         __import__(extension)
+#         extensions.append(extension)
+#     except ImportError:
+#         sys.stderr.write("Extension '%s' in not available. "
+#                          "Some documentation may not build correctly.\n" % extension)
+#         sys.stderr.write("To install, use \n"
+#                          "  sudo pip install %s\n" % extension.replace('.', '-'))
+
+# addExtensionIfExists('sphinxcontrib.doxylink')
+
+# if os.getenv('GOOGLE_ANALYTICS', None):
+#     addExtensionIfExists('sphinxcontrib.googleanalytics')
+
+    
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -255,3 +279,5 @@ googleanalytics_enabled = True
 aafig_format = {'latex': 'pdf', 'html': 'svg', 'text': None}
 
 # aafig_default_options = dict(Fixed=True)
+
+redmine_project_url = "http://redmine.named-data.net/"

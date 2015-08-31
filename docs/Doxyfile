@@ -1966,6 +1966,7 @@ PREDEFINED             = NS3_ASSERT_ENABLE \
                          NS_LOG_COMPONENT_DEFINE \
                          NFD_LOG_INIT \
                          BOOST_CONCEPT_ASSERT \
+                         BOOST_CONCEPT_REQUIRES \
                          PUBLIC_WITH_TESTS_ELSE_PROTECTED=protected \
                          PUBLIC_WITH_TESTS_ELSE_PRIVATE=private \
                          PROTECTED_WITH_TESTS_ELSE_PRIVATE=private \
@@ -1973,7 +1974,11 @@ PREDEFINED             = NS3_ASSERT_ENABLE \
                          DECL_OVERRIDE \
                          ATTRIBUTE_HELPER_CPP \
                          NDN_CXX_KEYCHAIN_REGISTER_PIB \
-                         NDN_CXX_KEYCHAIN_REGISTER_TPM
+                         NDN_CXX_KEYCHAIN_REGISTER_TPM \
+                         NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE \
+                         NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE \
+                         NDN_CXX_DECL_OVERRIDE=override \
+                         NDN_CXX_DECL_FINAL=final
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
