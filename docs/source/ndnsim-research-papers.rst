@@ -305,3 +305,17 @@ Research papers that use ndnSIM
     contention mitigating constraint, and path length constraint. Our simulation results of
     OCRP show the reduction in the server load and round-trip hop distance in comparison to
     those of the shortest path routing and our previously proposed cooperative routing schemes.
+
+#. **Klaus M. Schneider, and Udo R. Krieger, "Beyond Network Selection: Exploiting Access Network
+   Heterogeneity with Named Data Networking", 2nd ACM Conference on Information-Centric
+   Networking, San Francisco, October, 2015** (`DOI: 10.1145/2810156.2810164 <http://dx.doi.org/10.1145/2810156.2810164>`__, `PDF <http://conferences2.sigcomm.org/acm-icn/2015/proceedings/p137-schneider.pdf>`__)
+
+    Today, most mobile devices are equipped with multiple wireless network interfaces, but are
+    constrained to use only one network at the same time. In this paper, we show that using multiple
+    access networks simultaneously can improve user-perceived QoS and cost- effectiveness. We
+    present a system architecture that exploits the adap- tive forwarding plane of Named Data
+    Networking (CCN/NDN) and implement a system prototype based on the NDN Forwarding
+    Daemon (NFD). More specifically, we propose a set of forwarding strate- gies that use
+    fine-grained application requirements together with interfaces estimation techniques for delay,
+    bandwidth, and packet loss. Our simulation results show that our approach can improve QoS
+    and/or reduce access costs in many wireless scenarios.
