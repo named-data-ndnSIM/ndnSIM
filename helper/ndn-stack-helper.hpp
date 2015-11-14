@@ -212,6 +212,30 @@ public:
   void
   UpdateAll();
 
+  /**
+   *\brief Disable the RIB manager of NFD
+   */
+  void
+  disableRibManager();
+
+  /**
+   * \brief Disable Face Manager
+   */
+  void
+  disableFaceManager();
+
+  /**
+   * \brief Disable Strategy Choice Manager
+   */
+  void
+  disableStrategyChoiceManager();
+
+  /**
+   * \brief Disable Status Server
+   */
+  void
+  disableStatusServer();
+
 private:
   shared_ptr<NetDeviceFace>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
@@ -221,6 +245,11 @@ private:
                                 Ptr<NetDevice> netDevice) const;
   shared_ptr<NetDeviceFace>
   createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const;
+
+  bool m_isRibManagerDisabled;
+  bool m_isFaceManagerDisabled;
+  bool m_isStatusServerDisabled;
+  bool m_isStrategyChoiceManagerDisabled;
 
 public:
   void

@@ -17,6 +17,9 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
+#ifndef NDNSIM_HELPER_NDN_SCENARIO_HELPER_HPP
+#define NDNSIM_HELPER_NDN_SCENARIO_HELPER_HPP
+
 #include "ndn-stack-helper.hpp"
 
 #include "ns3/net-device.h"
@@ -154,6 +157,30 @@ public: // topology accessors
   shared_ptr<Face>
   getFace(const std::string& node1, const std::string& node2);
 
+  /**
+   * \brief Disable RIB Manager
+   */
+  void
+  disableRibManager();
+
+  /**
+   * \brief Disable Face Manager
+   */
+  void
+  disableFaceManager();
+
+  /**
+   * \brief Disable Strategy Choice Manager
+   */
+  void
+  disableStrategyChoiceManager();
+
+  /**
+   * \brief Disable Status Server
+   */
+  void
+  disableStatusServer();
+
 private:
   Ptr<Node>
   getOrCreateNode(const std::string& nodeName);
@@ -167,3 +194,5 @@ private:
 
 } // namespace ndn
 } // namespace ns3
+
+#endif // NDNSIM_HELPER_NDN_SCENARIO_HELPER_HPP

@@ -42,6 +42,10 @@ namespace ndn {
 StackHelper::StackHelper()
   : m_needSetDefaultRoutes(false)
   , m_maxCsSize(100)
+  , m_isRibManagerDisabled(false)
+  , m_isFaceManagerDisabled(false)
+  , m_isStatusServerDisabled(false)
+  , m_isStrategyChoiceManagerDisabled(false)
 {
   setCustomNdnCxxClocks();
 
@@ -149,6 +153,23 @@ StackHelper::Install(Ptr<Node> node) const
   }
 
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
+
+  if (m_isRibManagerDisabled) {
+    ndn->getConfig().put("ndnSIM.disable_rib_manager", true);
+  }
+
+  if (m_isFaceManagerDisabled) {
+    ndn->getConfig().put("ndnSIM.disable_face_manager", true);
+  }
+
+  if (m_isStatusServerDisabled) {
+    ndn->getConfig().put("ndnSIM.disable_status_server", true);
+  }
+
+  if (m_isStrategyChoiceManagerDisabled) {
+    ndn->getConfig().put("ndnSIM.disable_strategy_choice_manager", true);
+  }
+
   ndn->getConfig().put("tables.cs_max_packets", (m_maxCsSize == 0) ? 1 : m_maxCsSize);
 
   // Create and aggregate content store if NFD's contest store has been disabled
@@ -301,6 +322,30 @@ StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetD
     FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
   }
   return face;
+}
+
+void
+StackHelper::disableRibManager()
+{
+  m_isRibManagerDisabled = true;
+}
+
+void
+StackHelper::disableFaceManager()
+{
+  m_isFaceManagerDisabled = true;
+}
+
+void
+StackHelper::disableStrategyChoiceManager()
+{
+  m_isStrategyChoiceManagerDisabled = true;
+}
+
+void
+StackHelper::disableStatusServer()
+{
+  m_isStatusServerDisabled = true;
 }
 
 } // namespace ndn

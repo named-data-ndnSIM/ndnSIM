@@ -62,6 +62,30 @@ ScenarioHelper::createTopology(std::initializer_list<std::initializer_list<std::
 }
 
 void
+ScenarioHelper::disableRibManager()
+{
+  ndnHelper.disableRibManager();
+}
+
+void
+ScenarioHelper::disableFaceManager()
+{
+  ndnHelper.disableFaceManager();
+}
+
+void
+ScenarioHelper::disableStrategyChoiceManager()
+{
+  ndnHelper.disableStrategyChoiceManager();
+}
+
+void
+ScenarioHelper::disableStatusServer()
+{
+  ndnHelper.disableStatusServer();
+}
+
+void
 ScenarioHelper::addRoutes(std::initializer_list<ScenarioHelper::RouteInfo> routes)
 {
   for (auto&& route : routes) {

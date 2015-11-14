@@ -186,7 +186,10 @@ L3Protocol::initialize()
   m_impl->m_forwarder = make_shared<nfd::Forwarder>();
 
   initializeManagement();
-  Simulator::ScheduleWithContext(m_node->GetId(), Seconds(0), &L3Protocol::initializeRibManager, this);
+
+  if (!this->getConfig().get<bool>("ndnSIM.disable_rib_manager", false)) {
+    Simulator::ScheduleWithContext(m_node->GetId(), Seconds(0), &L3Protocol::initializeRibManager, this);
+  }
 
   m_impl->m_forwarder->getFaceTable().addReserved(make_shared<nfd::NullFace>(), nfd::FACEID_NULL);
 
@@ -228,20 +231,32 @@ L3Protocol::initializeManagement()
                                                  bind(&Forwarder::getFace, forwarder.get(), _1),
                                                  m_impl->m_internalFace, keyChain);
 
-  m_impl->m_faceManager = make_shared<FaceManager>(std::ref(forwarder->getFaceTable()),
-                                                   m_impl->m_internalFace,
-                                                   keyChain);
-
-  m_impl->m_strategyChoiceManager =
-    make_shared<StrategyChoiceManager>(std::ref(forwarder->getStrategyChoice()),
-                                       m_impl->m_internalFace,
-                                       keyChain);
-
-  m_impl->m_statusServer = make_shared<StatusServer>(m_impl->m_internalFace,
-                                                     ref(*forwarder),
+  if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false)) {
+    m_impl->m_faceManager = make_shared<FaceManager>(std::ref(forwarder->getFaceTable()),
+                                                     m_impl->m_internalFace,
                                                      keyChain);
+  }
+  else {
+    this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("faces");
+  }
 
-  ConfigFile config((IgnoreSections({"general", "log", "rib"})));
+  if (!this->getConfig().get<bool>("ndnSIM.disable_strategy_choice_manager", false)) {
+    m_impl->m_strategyChoiceManager =
+      make_shared<StrategyChoiceManager>(std::ref(forwarder->getStrategyChoice()),
+                                         m_impl->m_internalFace,
+                                         keyChain);
+  }
+  else {
+    this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("strategy-choice");
+  }
+
+  if (!this->getConfig().get<bool>("ndnSIM.disable_status_server", false)) {
+    m_impl->m_statusServer = make_shared<StatusServer>(m_impl->m_internalFace,
+                                                       ref(*forwarder),
+                                                       keyChain);
+  }
+
+  ConfigFile config((IgnoreSections({"general", "log", "rib", "ndnSIM"})));
 
   TablesConfigSection tablesConfig(forwarder->getCs(),
                                    forwarder->getPit(),
