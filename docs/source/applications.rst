@@ -92,9 +92,9 @@ THE following pictures show basic comparison of the generated stream of Interest
 
 
 ConsumerBatches
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 
-:ndnsim:`ConsumerBatches` is an on-off-style application gen- erating a specified number of Interests at specified points of simulation.
+:ndnsim:`ConsumerBatches` is an on-off-style application generating a specified number of Interests at specified points of simulation.
 
 .. code-block:: c++
 
@@ -109,13 +109,23 @@ This applications has the following attributes:
      default: Empty
 
   Specify exact pattern of Interest packets, specifying when and how many Interest packets should be sent.
-  The following example defines that 1 Interest should be requested at time 1s, 5 Interests at time 5s, and 2 Interests at time 10s.:
+  The following example defines that 1 Interest should be requested at time 1s, 5 Interests at time 2s, and 2 Interests at time 10s.
 
   .. code-block:: c++
 
      // Set attribute using the app helper
-     helper.SetAttribute("Batches", StringValue("1s 1 2s 5 10s 2"));
+     consumerHelper.SetAttribute("Batches", StringValue("1s 1 2s 5 10s 2"));
 
+  Note that the specified batch of Interests is not sent out at the specified time at once.  :ndnsim:`ConsumerBatches` starts each batch at the specified time, while each Interests is separated in time by the estimated retransmission time.  For example, the above could result in following Interest sending timeline::
+
+      1s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 0
+      2s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 1
+      2s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 2
+      2.2s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 3
+      2.4s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 4
+      2.6s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 5
+      10s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 6
+      10.2s 0 ndn.Consumer:SendPacket(): [INFO ] > Interest for 7
 
 ConsumerWindow
 ^^^^^^^^^^^^^^^^^^
