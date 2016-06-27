@@ -11,9 +11,10 @@ ndnSIM 2.0 has been successfully compiled and used on following platforms:
 
 - Ubuntu Linux 12.04 (see the note)
 - Ubuntu Linux 14.04 (32- and 64-bit platform)
-- Ubuntu Linux 15.05 (64-bit platform)
+- Ubuntu Linux 16.04 (32- and 64-bit platform)
 - OS X 10.9
 - OS X 10.10
+- OS X 10.11
 
 .. note::
     ndnSIM is currently cannot be compiled on Ubuntu Linux 12.04 with the packaged boost
@@ -71,7 +72,8 @@ development tools and libraries, and ndn-cxx prerequisites.
 
    .. code-block:: bash
 
-       brew install pkg-config boost cryptopp
+       brew install boost cryptopp pkg-config libxml2
+       brew link --force libxml2
 
 - Linux
 
@@ -123,10 +125,7 @@ should be installed:
 
   * OS X with HomeBrew
 
-    .. code-block:: bash
-
-        brew install boost cryptopp pkg-config libxml2
-        brew link --force libxml2
+    Currently, there are many missing dependencies, so it is impossible to use visualizer module with HomeBrew.  Use MacPorts instead.
 
 - Linux
 
