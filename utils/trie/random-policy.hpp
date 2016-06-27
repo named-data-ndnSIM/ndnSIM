@@ -23,6 +23,7 @@
 /// @cond include_hidden
 
 #include "ns3/random-variable-stream.h"
+#include "ns3/double.h"
 
 #include <boost/intrusive/options.hpp>
 #include <boost/intrusive/set.hpp>
@@ -92,8 +93,8 @@ struct random_policy_traits {
         , u_rand(CreateObject<UniformRandomVariable>())
         , max_size_(100)
       {
-        u_rand->SetAttribute("Min", UintegerValue(0));
-        u_rand->SetAttribute("Max", UintegerValue(std::numeric_limits<uint32_t>::max()));
+        u_rand->SetAttribute("Min", DoubleValue(0));
+        u_rand->SetAttribute("Max", DoubleValue(std::numeric_limits<uint32_t>::max()));
       }
 
       inline void

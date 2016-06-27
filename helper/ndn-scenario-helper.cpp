@@ -144,5 +144,11 @@ ScenarioHelper::getFace(const std::string& node1, const std::string& node2)
   throw std::invalid_argument("Link between " + node1 + " and " + node2 + " does not exist");
 }
 
+StackHelper&
+ScenarioHelper::getStackHelper()
+{
+  return ndnHelper;
+}
+
 } // namespace ndn
 } // namespace ns3

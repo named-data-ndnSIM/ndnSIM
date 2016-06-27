@@ -181,6 +181,12 @@ public: // topology accessors
   void
   disableStatusServer();
 
+  /**
+   * \brief Get NDN stack helper, e.g., to adjust its parameters
+   */
+  StackHelper&
+  getStackHelper();
+
 private:
   Ptr<Node>
   getOrCreateNode(const std::string& nodeName);
