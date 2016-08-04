@@ -264,6 +264,27 @@ NOTE: This tracer works ONLY when the content store structure of ndnSIM is used!
 
         ...
 
+    Output file format is tab-separated values, with first row specifying names of the columns.  Refer to the following table for the description of the columns:
+
+    +------------------+----------------------------------------------------------------------+
+    | Column           | Description                                                          |
+    +==================+======================================================================+
+    | ``Time``         | simulation time                                                      |
+    +------------------+----------------------------------------------------------------------+
+    | ``Node``         | node id, globally unique                                             |
+    +------------------+----------------------------------------------------------------------+
+    | ``Type``         | Type of counter for the time period.  Possible values are:           |
+    |                  |                                                                      |
+    |                  | - ``CacheHits``: the ``Packets`` column specifies the number of      |
+    |                  |   Interests that were satisfied from the cache                       |
+    |                  | - ``CacheMisses``: the ``Packets`` column specifies the number of    |
+    |                  |   Interests that were not satisfied from the cache                   |
+    +------------------+----------------------------------------------------------------------+
+    | ``Packets``      | The number of packets for the time period, meaning depends on        |
+    |                  | ``Type`` column                                                      |
+    +------------------+----------------------------------------------------------------------+
+
+
 .. - Tracing lifetime of content store entries
 
 ..     Evaluate lifetime of the content store entries can be accomplished using modified version of the content stores.
