@@ -18,7 +18,7 @@
  **/
 
 
-#include "model/ndn-net-device-face.hpp"
+#include "model/ndn-net-device-link-service.hpp"
 
 #include "../tests-common.hpp"
 
@@ -53,11 +53,11 @@ BOOST_AUTO_TEST_CASE(Basic)
   Simulator::Stop(Seconds(20.001));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNOutInterests(), 100);
-  BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 100);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 100);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 100);
 
-  BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 100);
-  BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNOutDatas(), 100);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 100);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -17,11 +17,11 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_NET_DEVICE_FACE_H
-#define NDN_NET_DEVICE_FACE_H
+#ifndef NDN_NET_DEVICE_LINK_SERVICE_HPP
+#define NDN_NET_DEVICE_LINK_SERVICE_HPP
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
-#include "ns3/ndnSIM/model/ndn-face.hpp"
+#include "ns3/ndnSIM/NFD/daemon/face/link-service.hpp"
 
 #include "ns3/net-device.h"
 
@@ -30,49 +30,58 @@ namespace ndn {
 
 /**
  * \ingroup ndn-face
- * \brief Implementation of layer-2 (Ethernet) Ndn face
+ * \brief Implementation of layer-2 (Ethernet) LinkService (current hack, to be changed eventually)
  *
- * This class defines basic functionality of Ndn face. Face is core
- * component responsible for actual delivery of data packet to and
- * from Ndn stack
- *
- * NdnNetDevice face is permanently associated with one NetDevice
+ * NetDeviceLinkService is permanently associated with one NetDevice
  * object and this object cannot be changed for the lifetime of the
  * face
  *
- * \see NdnAppFace, NdnNetDeviceFace, NdnIpv4Face, NdnUdpFace
+ * \see AppLinkService
  */
-class NetDeviceFace : public Face {
+class NetDeviceLinkService : public nfd::face::LinkService
+{
+
 public:
   /**
    * \brief Constructor
    *
    * @param node Node associated with the face
-   * @param netDevice a smart pointer to NetDevice object to which
-   * this face will be associate
+   * @param netDevice a smart pointer to NetDevice object to which this NetDeviceLinkService will be associate
    */
-  NetDeviceFace(Ptr<Node> node, const Ptr<NetDevice>& netDevice);
+  NetDeviceLinkService(Ptr<Node> node, const Ptr<NetDevice>& netDevice);
 
-  virtual ~NetDeviceFace();
-
-public: // from nfd::Face
-  virtual void
-  sendInterest(const Interest& interest);
-
-  virtual void
-  sendData(const Data& data);
-
-  virtual void
-  close();
+  virtual
+  ~NetDeviceLinkService();
 
 public:
   /**
-   * \brief Get NetDevice associated with the face
-   *
-   * \returns smart pointer to NetDevice associated with the face
+   * \brief Get Node associated with the LinkService
+   */
+  Ptr<Node>
+  GetNode() const;
+
+  /**
+   * \brief Get NetDevice associated with the LinkService
    */
   Ptr<NetDevice>
   GetNetDevice() const;
+
+private:
+  virtual void
+  doSendInterest(const ::ndn::Interest& interest) override;
+
+  virtual void
+  doSendData(const ::ndn::Data& data) override;
+
+  virtual void
+  doSendNack(const ::ndn::lp::Nack& nack) override;
+
+  virtual void
+  doReceivePacket(nfd::face::Transport::Packet&& packet) override
+  {
+    // not used now
+    BOOST_ASSERT(false);
+  }
 
 private:
   void
@@ -91,4 +100,4 @@ private:
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDN_NET_DEVICE_FACE_H
+#endif // NDN_NET_DEVICE_LINK_SERVICE_HPP

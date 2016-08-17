@@ -139,9 +139,13 @@ def build(bld):
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=[
                                           'apps/*',
-                                          'model/**/*',
+                                          'model/ndn-global-router.cpp',
+                                          'model/ndn-app-face.cpp',
+                                          'model/ndn-app-link-service.cpp',
+                                          'model/ndn-l3-protocol.cpp',
                                           'helper/*',
-                                          'utils/**/*',
+                                          'utils/topology/*',
+                                          'utils/tracers/*',
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
     module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils']

@@ -17,8 +17,8 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_COMMON_H
-#define NDN_COMMON_H
+#ifndef NDNSIM_NDN_COMMON_H
+#define NDNSIM_NDN_COMMON_H
 
 #include "ns3/nstime.h"
 #include "ns3/simulator.h"
@@ -35,6 +35,8 @@
 
 #include <ndn-cxx/util/time.hpp>
 
+#include "NFD/daemon/face/face.hpp"
+
 namespace nfd {
 }
 
@@ -50,6 +52,10 @@ namespace time {
 using namespace ::ndn::time;
 }
 
+namespace lp {
+using namespace ::ndn::lp;
+}
+
 using ::ndn::Exclude;
 
 using std::shared_ptr;
@@ -63,12 +69,30 @@ using ::ndn::SignatureInfo;
 using ::ndn::Block;
 using ::ndn::KeyChain;
 
+using ::nfd::Face;
+using ::ndn::util::FaceUri;
+
 #ifndef DOXYGEN
 // For python bindings
 namespace nfd = ::nfd;
 #endif // DOXYGEN
 
+using ::ndn::make_unique;
+
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDN_COMMON_H
+namespace nfd {
+namespace face {
+
+inline std::ostream&
+operator<<(std::ostream& os, const Face& face)
+{
+  os << face.getLocalUri();
+  return os;
+}
+
+} // namespace face
+} // namespace nfd
+
+#endif // NDNSIM_NDN_COMMON_H
