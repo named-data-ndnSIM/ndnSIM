@@ -1,0 +1,15 @@
+#consumer
+$node_(0) set X_ 100
+$node_(0) set Y_ 300
+
+#regular nodes in between
+$node_(1) set X_ 150
+$node_(1) set Y_ 320
+$node_(2) set X_ 200
+$node_(2) set Y_ 300
+$node_(3) set X_ 250
+$node_(3) set Y_ 280
+
+#producer
+$node_(4) set X_ 300
+$node_(4) set Y_ 300
