@@ -20,7 +20,6 @@
 #include "ndn-global-router.hpp"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-face.hpp"
 
 #include "ns3/channel.h"
 

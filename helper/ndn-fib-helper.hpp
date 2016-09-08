@@ -21,7 +21,6 @@
 #define NDN_FIB_HELPER_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
-#include "ns3/ndnSIM/model/ndn-face.hpp"
 
 #include "ns3/node.h"
 #include "ns3/object-vector.h"

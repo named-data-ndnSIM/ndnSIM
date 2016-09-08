@@ -17,8 +17,8 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_STACK_HELPER_H
-#define NDN_STACK_HELPER_H
+#ifndef NDNSIM_HELPER_NDN_STACK_HELPER_HPP
+#define NDNSIM_HELPER_NDN_STACK_HELPER_HPP
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 
@@ -37,7 +37,6 @@ class Node;
 
 namespace ndn {
 
-class NetDeviceFace;
 class L3Protocol;
 
 /**
@@ -88,8 +87,8 @@ public:
                   const std::string& value3 = "", const std::string& attr4 = "",
                   const std::string& value4 = "");
 
-  typedef Callback<shared_ptr<NetDeviceFace>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
-    NetDeviceFaceCreateCallback;
+  typedef Callback<shared_ptr<Face>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
+    FaceCreateCallback;
 
   /**
    * @brief Add callback to create and configure instance of the face, based on supplied Ptr<Node>
@@ -101,7 +100,7 @@ public:
    *(DefaultNetDeviceCallback)
    */
   void
-  AddNetDeviceFaceCreateCallback(TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+  AddFaceCreateCallback(TypeId netDeviceType, FaceCreateCallback callback);
 
   /**
    * @brief Update callback to create and configure instance of the face, based on supplied
@@ -112,14 +111,14 @@ public:
    * Using this method, it is possible to override Face creation for PointToPointNetDevices
    */
   void
-  UpdateNetDeviceFaceCreateCallback(TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+  UpdateFaceCreateCallback(TypeId netDeviceType, FaceCreateCallback callback);
 
   /**
    * @brief Remove callback to create and configure instance of the face, based on supplied
    * Ptr<Node> and Ptr<NetDevice>
    */
   void
-  RemoveNetDeviceFaceCreateCallback(TypeId netDeviceType, NetDeviceFaceCreateCallback callback);
+  RemoveFaceCreateCallback(TypeId netDeviceType, FaceCreateCallback callback);
 
   /**
   * \brief Install Ndn stack on the node
@@ -218,11 +217,12 @@ public:
   void
   disableRibManager();
 
-  /**
-   * \brief Disable Face Manager
-   */
-  void
-  disableFaceManager();
+  // Cannot be disabled for now
+  // /**
+  //  * \brief Disable Face Manager
+  //  */
+  // void
+  // disableFaceManager();
 
   /**
    * \brief Disable Strategy Choice Manager
@@ -231,24 +231,24 @@ public:
   disableStrategyChoiceManager();
 
   /**
-   * \brief Disable Status Server
+   * \brief Disable Forwarder Status Manager
    */
   void
-  disableStatusServer();
+  disableForwarderStatusManager();
 
 private:
-  shared_ptr<NetDeviceFace>
+  shared_ptr<Face>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
 
-  shared_ptr<NetDeviceFace>
+  shared_ptr<Face>
   PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                 Ptr<NetDevice> netDevice) const;
-  shared_ptr<NetDeviceFace>
+  shared_ptr<Face>
   createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const;
 
   bool m_isRibManagerDisabled;
-  bool m_isFaceManagerDisabled;
-  bool m_isStatusServerDisabled;
+  // bool m_isFaceManagerDisabled;
+  bool m_isForwarderStatusManagerDisabled;
   bool m_isStrategyChoiceManagerDisabled;
 
 public:
@@ -262,11 +262,11 @@ private:
   bool m_needSetDefaultRoutes;
   size_t m_maxCsSize;
 
-  typedef std::list<std::pair<TypeId, NetDeviceFaceCreateCallback>> NetDeviceCallbackList;
+  typedef std::list<std::pair<TypeId, FaceCreateCallback>> NetDeviceCallbackList;
   NetDeviceCallbackList m_netDeviceCallbacks;
 };
 
 } // namespace ndn
 } // namespace ns3
 
-#endif /* NDN_STACK_HELPER_H */
+#endif // NDNSIM_HELPER_NDN_STACK_HELPER_HPP

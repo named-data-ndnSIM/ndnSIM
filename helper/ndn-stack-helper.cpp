@@ -25,7 +25,8 @@
 #include "ns3/point-to-point-net-device.h"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-net-device-face.hpp"
+#include "model/ndn-net-device-link-service.hpp"
+#include "model/null-transport.hpp"
 #include "utils/ndn-time.hpp"
 #include "utils/dummy-keychain.hpp"
 #include "model/cs/ndn-content-store.hpp"
@@ -40,12 +41,12 @@ namespace ns3 {
 namespace ndn {
 
 StackHelper::StackHelper()
-  : m_needSetDefaultRoutes(false)
-  , m_maxCsSize(100)
-  , m_isRibManagerDisabled(false)
-  , m_isFaceManagerDisabled(false)
-  , m_isStatusServerDisabled(false)
+  : m_isRibManagerDisabled(false)
+  // , m_isFaceManagerDisabled(false)
+  , m_isForwarderStatusManagerDisabled(false)
   , m_isStrategyChoiceManagerDisabled(false)
+  , m_needSetDefaultRoutes(false)
+  , m_maxCsSize(100)
 {
   setCustomNdnCxxClocks();
 
@@ -158,12 +159,12 @@ StackHelper::Install(Ptr<Node> node) const
     ndn->getConfig().put("ndnSIM.disable_rib_manager", true);
   }
 
-  if (m_isFaceManagerDisabled) {
-    ndn->getConfig().put("ndnSIM.disable_face_manager", true);
-  }
+  // if (m_isFaceManagerDisabled) {
+  //   ndn->getConfig().put("ndnSIM.disable_face_manager", true);
+  // }
 
-  if (m_isStatusServerDisabled) {
-    ndn->getConfig().put("ndnSIM.disable_status_server", true);
+  if (m_isForwarderStatusManagerDisabled) {
+    ndn->getConfig().put("ndnSIM.disable_forwarder_status_manager", true);
   }
 
   if (m_isStrategyChoiceManagerDisabled) {
@@ -194,15 +195,15 @@ StackHelper::Install(Ptr<Node> node) const
 }
 
 void
-StackHelper::AddNetDeviceFaceCreateCallback(TypeId netDeviceType,
-                                            StackHelper::NetDeviceFaceCreateCallback callback)
+StackHelper::AddFaceCreateCallback(TypeId netDeviceType,
+                                   StackHelper::FaceCreateCallback callback)
 {
   m_netDeviceCallbacks.push_back(std::make_pair(netDeviceType, callback));
 }
 
 void
-StackHelper::UpdateNetDeviceFaceCreateCallback(TypeId netDeviceType,
-                                               NetDeviceFaceCreateCallback callback)
+StackHelper::UpdateFaceCreateCallback(TypeId netDeviceType,
+                                      FaceCreateCallback callback)
 {
   for (auto& i : m_netDeviceCallbacks) {
     if (i.first == netDeviceType) {
@@ -213,39 +214,49 @@ StackHelper::UpdateNetDeviceFaceCreateCallback(TypeId netDeviceType,
 }
 
 void
-StackHelper::RemoveNetDeviceFaceCreateCallback(TypeId netDeviceType,
-                                               NetDeviceFaceCreateCallback callback)
+StackHelper::RemoveFaceCreateCallback(TypeId netDeviceType,
+                                      FaceCreateCallback callback)
 {
-  m_netDeviceCallbacks.remove_if([&] (const std::pair<TypeId, NetDeviceFaceCreateCallback>& i) {
+  m_netDeviceCallbacks.remove_if([&] (const std::pair<TypeId, FaceCreateCallback>& i) {
       return (i.first == netDeviceType);
     });
 }
 
-shared_ptr<NetDeviceFace>
+shared_ptr<Face>
 StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                       Ptr<NetDevice> netDevice) const
 {
-  NS_LOG_DEBUG("Creating default NetDeviceFace on node " << node->GetId());
+  NS_LOG_DEBUG("Creating default Face on node " << node->GetId());
 
-  shared_ptr<NetDeviceFace> face = std::make_shared<NetDeviceFace>(node, netDevice);
+  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, netDevice);
+  auto transport = make_unique<NullTransport>("netDevice://", "netDevice://");
+  auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
+  face->setMetric(1);
+
+  // @TODO add netDevice ID
 
   ndn->addFace(face);
-  NS_LOG_LOGIC("Node " << node->GetId() << ": added NetDeviceFace as face #"
+  NS_LOG_LOGIC("Node " << node->GetId() << ": added Face as face #"
                        << face->getLocalUri());
 
   return face;
 }
 
-shared_ptr<NetDeviceFace>
+shared_ptr<Face>
 StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                            Ptr<NetDevice> device) const
 {
-  NS_LOG_DEBUG("Creating point-to-point NetDeviceFace on node " << node->GetId());
+  NS_LOG_DEBUG("Creating point-to-point Face on node " << node->GetId());
 
-  shared_ptr<NetDeviceFace> face = std::make_shared<NetDeviceFace>(node, device);
+  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, device);
+  auto transport = make_unique<NullTransport>("netDevice://", "netDevice://");
+  auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
+  face->setMetric(1);
+
+  // @TODO add netDevice ID
 
   ndn->addFace(face);
-  NS_LOG_LOGIC("Node " << node->GetId() << ": added NetDeviceFace as face #"
+  NS_LOG_LOGIC("Node " << node->GetId() << ": added Face as face #"
                        << face->getLocalUri());
 
   return face;
@@ -299,10 +310,10 @@ StackHelper::UpdateAll()
   Update(NodeContainer::GetGlobal());
 }
 
-shared_ptr<NetDeviceFace>
+shared_ptr<Face>
 StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const
 {
-  shared_ptr<NetDeviceFace> face;
+  shared_ptr<Face> face;
 
   for (const auto& item : m_netDeviceCallbacks) {
     if (device->GetInstanceTypeId() == item.first ||
@@ -319,7 +330,9 @@ StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetD
 
   if (m_needSetDefaultRoutes) {
     // default route with lowest priority possible
-    FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
+
+    // TODO: Restore when FibHelper is available
+    // FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
   }
   return face;
 }
@@ -330,11 +343,11 @@ StackHelper::disableRibManager()
   m_isRibManagerDisabled = true;
 }
 
-void
-StackHelper::disableFaceManager()
-{
-  m_isFaceManagerDisabled = true;
-}
+// void
+// StackHelper::disableFaceManager()
+// {
+//   m_isFaceManagerDisabled = true;
+// }
 
 void
 StackHelper::disableStrategyChoiceManager()
@@ -343,9 +356,9 @@ StackHelper::disableStrategyChoiceManager()
 }
 
 void
-StackHelper::disableStatusServer()
+StackHelper::disableForwarderStatusManager()
 {
-  m_isStatusServerDisabled = true;
+  m_isForwarderStatusManagerDisabled = true;
 }
 
 } // namespace ndn

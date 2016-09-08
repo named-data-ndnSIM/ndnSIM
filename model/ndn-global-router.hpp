@@ -21,7 +21,6 @@
 #define NDN_GLOBAL_ROUTER_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
-#include "ns3/ndnSIM/model/ndn-face.hpp"
 
 #include "ns3/object.h"
 #include "ns3/ptr.h"

@@ -39,10 +39,6 @@ NS_LOG_COMPONENT_DEFINE("ndn.NetDeviceLinkService");
 namespace ns3 {
 namespace ndn {
 
-// TODO: remove as soon as L3Protocol is back
-const uint16_t L3Protocol::ETHERNET_FRAME_TYPE = 0x7777;
-const uint16_t L3Protocol::IP_STACK_PORT = 9695;
-
 NetDeviceLinkService::NetDeviceLinkService(Ptr<Node> node, const Ptr<NetDevice>& netDevice)
   : m_node(node)
   , m_netDevice(netDevice)
