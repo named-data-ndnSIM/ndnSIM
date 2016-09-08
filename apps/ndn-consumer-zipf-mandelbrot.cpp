@@ -21,7 +21,6 @@
 
 #include "ndn-consumer-zipf-mandelbrot.hpp"
 
-#include "model/ndn-app-face.hpp"
 #include "utils/ndn-fw-hop-count-tag.hpp"
 
 #include <math.h>
@@ -193,7 +192,7 @@ ConsumerZipfMandelbrot::SendPacket()
   m_rtt->SentSeq(SequenceNumber32(seq), 1);
 
   m_transmittedInterests(interest, this, m_face);
-  m_face->onReceiveInterest(*interest);
+  m_appLink->onReceiveInterest(*interest);
 
   ConsumerZipfMandelbrot::ScheduleNextPacket();
 }

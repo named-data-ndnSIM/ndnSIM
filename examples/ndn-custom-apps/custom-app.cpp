@@ -85,7 +85,7 @@ CustomApp::SendInterest()
   // Call trace (for logging purposes)
   m_transmittedInterests(interest, this, m_face);
 
-  m_face->onReceiveInterest(*interest);
+  m_appLink->onReceiveInterest(*interest);
 }
 
 // Callback that will be called when Interest arrives
@@ -108,7 +108,7 @@ CustomApp::OnInterest(std::shared_ptr<const ndn::Interest> interest)
   // Call trace (for logging purposes)
   m_transmittedDatas(data, this, m_face);
 
-  m_face->onReceiveData(*data);
+  m_appLink->onReceiveData(*data);
 }
 
 // Callback that will be called when Data arrives

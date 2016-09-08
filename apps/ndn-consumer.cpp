@@ -30,7 +30,6 @@
 #include "ns3/double.h"
 
 #include "utils/ndn-ns3-packet-tag.hpp"
-#include "model/ndn-app-face.hpp"
 #include "utils/ndn-rtt-mean-deviation.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -198,7 +197,7 @@ Consumer::SendPacket()
   WillSendOutInterest(seq);
 
   m_transmittedInterests(interest, this, m_face);
-  m_face->onReceiveInterest(*interest);
+  m_appLink->onReceiveInterest(*interest);
 
   ScheduleNextPacket();
 }

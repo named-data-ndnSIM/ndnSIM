@@ -29,8 +29,6 @@
 #include "ns3/integer.h"
 #include "ns3/double.h"
 
-#include "model/ndn-app-face.hpp"
-
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerCbr");
 
 namespace ns3 {

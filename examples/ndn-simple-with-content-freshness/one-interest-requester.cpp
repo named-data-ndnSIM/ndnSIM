@@ -97,7 +97,7 @@ OneInterestRequester::SendInterest()
   NS_LOG_DEBUG(">> I: " << m_name);
 
   // Forward packet to lower (network) layer
-  m_face->onReceiveInterest(*interest);
+  m_appLink->onReceiveInterest(*interest);
 }
 
 void

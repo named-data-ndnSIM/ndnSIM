@@ -138,8 +138,6 @@ def build(bld):
     module_dirs = ['apps', 'helper', 'model', 'utils']
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=[
-                                          'apps/ndn-consumer*.cpp',
-                                          'apps/ndn-producer*.cpp',
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
     module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils']
@@ -148,8 +146,8 @@ def build(bld):
 
     module.ndncxx_headers = bld.path.ant_glob(['ndn-cxx/src/**/*.hpp'],
                                               excl=['src/**/*-osx.hpp', 'src/detail/**/*'])
-    # if bld.env.ENABLE_EXAMPLES:
-    #     bld.recurse('examples')
+    if bld.env.ENABLE_EXAMPLES:
+        bld.recurse('examples')
 
     if bld.env.ENABLE_TESTS:
         bld.recurse('tests')

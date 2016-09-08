@@ -24,7 +24,6 @@
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 
-#include "model/ndn-app-face.hpp"
 #include "model/ndn-ns3.hpp"
 #include "model/ndn-l3-protocol.hpp"
 #include "helper/ndn-fib-helper.hpp"
@@ -130,7 +129,7 @@ Producer::OnInterest(shared_ptr<const Interest> interest)
   data->wireEncode();
 
   m_transmittedDatas(data, this, m_face);
-  m_face->onReceiveData(*data);
+  m_appLink->onReceiveData(*data);
 }
 
 } // namespace ndn
