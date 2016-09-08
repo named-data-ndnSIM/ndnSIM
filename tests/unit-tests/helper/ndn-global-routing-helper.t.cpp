@@ -21,8 +21,7 @@
 
 #include "model/ndn-global-router.hpp"
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-face.hpp"
-#include "model/ndn-net-device-face.hpp"
+#include "model/ndn-net-device-link-service.hpp"
 
 #include "ns3/channel.h"
 #include "ns3/net-device.h"
@@ -93,10 +92,11 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
   for (const auto& entry : ndn->getForwarder()->getFib()) {
     bool isFirst = true;
     for (auto& nextHop : entry.getNextHops()) {
-      auto face = dynamic_pointer_cast<ndn::NetDeviceFace>(nextHop.getFace());
-      if (face == nullptr)
+      auto face = nextHop.getFace();
+      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+      if (linkService == nullptr)
         continue;
-      BOOST_CHECK_EQUAL(Names::FindName(face->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "C1");
+      BOOST_CHECK_EQUAL(Names::FindName(linkService->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "C1");
       isFirst = false;
     }
   }
@@ -137,10 +137,11 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
   for (const auto& entry : ndn->getForwarder()->getFib()) {
     bool isFirst = true;
     for (auto& nextHop : entry.getNextHops()) {
-      auto face = dynamic_pointer_cast<ndn::NetDeviceFace>(nextHop.getFace());
-      if (face == nullptr)
+      auto face = nextHop.getFace();
+      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+      if (linkService == nullptr)
         continue;
-      BOOST_CHECK_EQUAL(Names::FindName(face->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");
+      BOOST_CHECK_EQUAL(Names::FindName(linkService->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");
       isFirst = false;
     }
   }

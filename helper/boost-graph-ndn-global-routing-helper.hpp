@@ -28,7 +28,6 @@
 #include <boost/graph/properties.hpp>
 #include <boost/ref.hpp>
 
-#include "ns3/ndnSIM/model/ndn-face.hpp"
 #include "ns3/ndnSIM/model/ndn-global-router.hpp"
 
 #include "ns3/node-list.h"

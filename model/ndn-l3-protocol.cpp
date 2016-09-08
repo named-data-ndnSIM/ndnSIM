@@ -233,6 +233,12 @@ private:
 };
 
 void
+L3Protocol::injectInterest(const Interest& interest)
+{
+  m_impl->m_internalFace->sendInterest(interest);
+}
+
+void
 L3Protocol::initializeManagement()
 {
   auto& forwarder = m_impl->m_forwarder;

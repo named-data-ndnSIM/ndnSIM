@@ -32,7 +32,8 @@
 #include "ns3/pointer.h"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-net-device-face.hpp"
+#include "model/ndn-net-device-link-service.hpp"
+#include "NFD/daemon/face/face.hpp"
 
 #include "fw/forwarder.hpp"
 
@@ -56,11 +57,11 @@ LinkControlHelper::setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRa
 
   // iterate over all faces to find the right one
   for (const auto& face : ndn1->getForwarder()->getFaceTable()) {
-    shared_ptr<ndn::NetDeviceFace> ndFace = std::dynamic_pointer_cast<NetDeviceFace>(face);
-    if (ndFace == nullptr)
+    auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+    if (linkService == nullptr)
       continue;
 
-    Ptr<PointToPointNetDevice> nd1 = ndFace->GetNetDevice()->GetObject<PointToPointNetDevice>();
+    Ptr<PointToPointNetDevice> nd1 = linkService->GetNetDevice()->GetObject<PointToPointNetDevice>();
     if (nd1 == nullptr)
       continue;
 

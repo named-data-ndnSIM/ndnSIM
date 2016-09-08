@@ -40,10 +40,9 @@ StrategyChoiceHelper::sendCommand(const ControlParameters& parameters, Ptr<Node>
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
   StackHelper::getKeyChain().sign(*command);
-  Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
-  auto strategyChoiceManager = L3protocol->getStrategyChoiceManager();
-  strategyChoiceManager->onStrategyChoiceRequest(*command);
-  NS_LOG_DEBUG("Forwarding strategy installed in node " << node->GetId());
+
+  Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
+  l3protocol->injectInterest(*command);
 }
 
 void

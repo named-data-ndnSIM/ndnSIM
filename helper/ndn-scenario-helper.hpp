@@ -163,11 +163,12 @@ public: // topology accessors
   void
   disableRibManager();
 
-  /**
-   * \brief Disable Face Manager
-   */
-  void
-  disableFaceManager();
+  // Cannot be disabled for now
+  // /**
+  //  * \brief Disable Face Manager
+  //  */
+  // void
+  // disableFaceManager();
 
   /**
    * \brief Disable Strategy Choice Manager
@@ -176,10 +177,10 @@ public: // topology accessors
   disableStrategyChoiceManager();
 
   /**
-   * \brief Disable Status Server
+   * \brief Disable Forwarder Status Manager
    */
   void
-  disableStatusServer();
+  disableForwarderStatusManager();
 
   /**
    * \brief Get NDN stack helper, e.g., to adjust its parameters

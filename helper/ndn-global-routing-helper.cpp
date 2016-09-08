@@ -27,7 +27,7 @@
 
 #include "model/ndn-l3-protocol.hpp"
 #include "helper/ndn-fib-helper.hpp"
-#include "model/ndn-net-device-face.hpp"
+#include "model/ndn-net-device-link-service.hpp"
 #include "model/ndn-global-router.hpp"
 
 #include "daemon/table/fib.hpp"
@@ -80,14 +80,14 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
   gr = CreateObject<GlobalRouter>();
   node->AggregateObject(gr);
 
-  for (auto& i : ndn->getForwarder()->getFaceTable()) {
-    shared_ptr<NetDeviceFace> face = std::dynamic_pointer_cast<NetDeviceFace>(i);
-    if (face == 0) {
+  for (auto& face : ndn->getForwarder()->getFaceTable()) {
+    auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+    if (linkService == nullptr) {
       NS_LOG_DEBUG("Skipping non-netdevice face");
       continue;
     }
 
-    Ptr<NetDevice> nd = face->GetNetDevice();
+    Ptr<NetDevice> nd = linkService->GetNetDevice();
     if (nd == 0) {
       NS_LOG_DEBUG("Not a NetDevice associated with NetDeviceFace");
       continue;
@@ -325,9 +325,9 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     }
 
     for (auto& faceId : faceIds) {
-      shared_ptr<Face> k = l3->getForwarder()->getFaceTable().get(faceId);
-      shared_ptr<NetDeviceFace> face = std::dynamic_pointer_cast<NetDeviceFace>(k);
-      if (face == 0) {
+      shared_ptr<Face> face = l3->getForwarder()->getFaceTable().get(faceId);
+      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+      if (linkService == nullptr) {
         NS_LOG_DEBUG("Skipping non-netdevice face");
         continue;
       }

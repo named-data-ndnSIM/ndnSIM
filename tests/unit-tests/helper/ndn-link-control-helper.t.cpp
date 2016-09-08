@@ -55,17 +55,17 @@ BOOST_AUTO_TEST_CASE(TwoNodeTopology)
   Simulator::Schedule(Seconds(10.1), ndn::LinkControlHelper::UpLink, getNode("1"), getNode("2"));
 
   nfd::scheduler::schedule(time::milliseconds(5200), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 6);
-      BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 6);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 6);
+      BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 6);
     });
 
   nfd::scheduler::schedule(time::milliseconds(10200), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 6);
-      BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 6);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 6);
+      BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 6);
     });
   nfd::scheduler::schedule(time::milliseconds(15100), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 11);
-      BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 11);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
+      BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 11);
     });
 
   Simulator::Stop(Seconds(15.2));
@@ -125,14 +125,14 @@ BOOST_AUTO_TEST_CASE(SixNodeTopology) // Bug #2783
 
   // just before link failure
   nfd::scheduler::schedule(time::milliseconds(10050), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 11);
-      BOOST_CHECK_EQUAL(getFace("3", "1")->getFaceStatus().getNInInterests(), 11);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
+      BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 11);
     });
 
   // just before link recovery
   nfd::scheduler::schedule(time::milliseconds(20050), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 11);
-      BOOST_CHECK_EQUAL(getFace("3", "1")->getFaceStatus().getNInInterests(), 21);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
+      BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 21);
     });
 
   nfd::scheduler::schedule(time::milliseconds(20100), [&] {
@@ -140,8 +140,8 @@ BOOST_AUTO_TEST_CASE(SixNodeTopology) // Bug #2783
     });
 
   nfd::scheduler::schedule(time::milliseconds(30050), [&] {
-      BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 21);
-      BOOST_CHECK_EQUAL(getFace("3", "1")->getFaceStatus().getNInInterests(), 31);
+      BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 21);
+      BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 31);
     });
 
   Simulator::Stop(Seconds(30.1));

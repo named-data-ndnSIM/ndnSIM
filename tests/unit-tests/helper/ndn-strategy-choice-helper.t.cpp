@@ -81,11 +81,11 @@ BOOST_AUTO_TEST_CASE(DefaultStrategies)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 5);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 0);
 }
 
 // static void
@@ -97,11 +97,11 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNode)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 5);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 5);
 }
 
 // static void
@@ -117,11 +117,11 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNodeContainer)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 5);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 5);
 }
 
 // static void
@@ -133,11 +133,11 @@ BOOST_AUTO_TEST_CASE(InstallAllBuiltInStrategy)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 5);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 5);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 5);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 5);
 }
 
 
@@ -171,11 +171,11 @@ BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNode)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 5);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 5);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 0);
 }
 
 // template<class Strategy>
@@ -192,11 +192,11 @@ BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNodeContainer)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 0);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 0);
 }
 
 // template<class Strategy>
@@ -209,11 +209,11 @@ BOOST_AUTO_TEST_CASE(InstallAllCustomStrategy)
   Simulator::Stop(Seconds(5.0));
   Simulator::Run();
 
-  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A1", "C1")->getCounters().nOutInterests, 0);
 
-  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getFaceStatus().getNOutInterests(), 0);
-  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getFaceStatus().getNOutInterests(), 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "B2")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("A2", "C2")->getCounters().nOutInterests, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

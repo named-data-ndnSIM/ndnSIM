@@ -142,11 +142,7 @@ def build(bld):
                                           'model/ndn-app-face.cpp',
                                           'model/ndn-app-link-service.cpp',
                                           'helper/ndn-app-helper.cpp',
-                                          'helper/ndn-fib-helper.cpp',
-                                          'helper/ndn-global-routing-helper.cpp',
-                                          'helper/ndn-link-control-helper.cpp',
                                           'helper/ndn-scenario-helper.cpp',
-                                          'helper/ndn-strategy-choice-helper.cpp',
                                           'utils/topology/*',
                                           'utils/tracers/*',
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc

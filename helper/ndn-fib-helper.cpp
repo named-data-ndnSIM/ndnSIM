@@ -42,7 +42,6 @@
 #include "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 #include "ns3/ndnSIM/helper/ndn-stack-helper.hpp"
 
-
 namespace ns3 {
 namespace ndn {
 
@@ -62,8 +61,7 @@ FibHelper::AddNextHop(const ControlParameters& parameters, Ptr<Node> node)
   StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
-  shared_ptr<nfd::FibManager> fibManager = l3protocol->getFibManager();
-  fibManager->onFibRequest(*command);
+  l3protocol->injectInterest(*command);
 }
 
 void
@@ -79,9 +77,8 @@ FibHelper::RemoveNextHop(const ControlParameters& parameters, Ptr<Node> node)
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
   StackHelper::getKeyChain().sign(*command);
 
-  Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
-  shared_ptr<nfd::FibManager> fibManager = L3protocol->getFibManager();
-  fibManager->onFibRequest(*command);
+  Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
+  l3protocol->injectInterest(*command);
 }
 
 void

@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE(Basic)
   FaceContainer c1;
   BOOST_CHECK_EQUAL(c1.GetN(), 0);
 
-  c1.Add(std::make_shared<nfd::NullFace>(FaceUri("null://1")));
+  c1.Add(nfd::face::makeNullFace(FaceUri("null://1")));
   BOOST_CHECK_EQUAL(c1.GetN(), 1);
 
-  c1.Add(std::make_shared<nfd::NullFace>(FaceUri("null://2")));
+  c1.Add(nfd::face::makeNullFace(FaceUri("null://2")));
   BOOST_CHECK_EQUAL(c1.GetN(), 2);
 
   FaceContainer c2(c1);
@@ -71,8 +71,8 @@ BOOST_AUTO_TEST_CASE(Basic)
 BOOST_AUTO_TEST_CASE(AddAll)
 {
   FaceContainer c1;
-  c1.Add(std::make_shared<nfd::NullFace>(FaceUri("null://1")));
-  c1.Add(std::make_shared<nfd::NullFace>(FaceUri("null://2")));
+  c1.Add(nfd::face::makeNullFace(FaceUri("null://1")));
+  c1.Add(nfd::face::makeNullFace(FaceUri("null://2")));
 
   FaceContainer c2(c1);
   c2.AddAll(c1);

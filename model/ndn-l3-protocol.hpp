@@ -147,6 +147,12 @@ public:
   nfd::ConfigSection&
   getConfig();
 
+  /**
+   * \brief Inject interest through internal Face
+   */
+  void
+  injectInterest(const Interest& interest);
+
 public: // Workaround for python bindings
   static Ptr<L3Protocol>
   getL3Protocol(Ptr<Object> node);

@@ -67,11 +67,11 @@ ScenarioHelper::disableRibManager()
   ndnHelper.disableRibManager();
 }
 
-void
-ScenarioHelper::disableFaceManager()
-{
-  ndnHelper.disableFaceManager();
-}
+// void
+// ScenarioHelper::disableFaceManager()
+// {
+//   ndnHelper.disableFaceManager();
+// }
 
 void
 ScenarioHelper::disableStrategyChoiceManager()
@@ -80,9 +80,9 @@ ScenarioHelper::disableStrategyChoiceManager()
 }
 
 void
-ScenarioHelper::disableStatusServer()
+ScenarioHelper::disableForwarderStatusManager()
 {
-  ndnHelper.disableStatusServer();
+  ndnHelper.disableForwarderStatusManager();
 }
 
 void

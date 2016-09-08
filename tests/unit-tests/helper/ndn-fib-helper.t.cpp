@@ -50,11 +50,11 @@ public:
     Simulator::Stop(Seconds(20.001));
     Simulator::Run();
 
-    BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNOutInterests(), 10);
-    BOOST_CHECK_EQUAL(getFace("1", "2")->getFaceStatus().getNInDatas(), 10);
+    BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 10);
+    BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 10);
 
-    BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNInInterests(), 10);
-    BOOST_CHECK_EQUAL(getFace("2", "1")->getFaceStatus().getNOutDatas(), 10);
+    BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 10);
+    BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 10);
   }
 };
 
