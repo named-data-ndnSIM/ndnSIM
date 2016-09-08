@@ -43,7 +43,6 @@
 #include "ns3/double.h"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-net-device-face.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
