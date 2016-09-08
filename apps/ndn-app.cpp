@@ -23,7 +23,8 @@
 #include "ns3/packet.h"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-app-face.hpp"
+#include "model/ndn-app-link-service.hpp"
+#include "model/null-transport.hpp"
 
 NS_LOG_COMPONENT_DEFINE("ndn.App");
 
@@ -115,6 +116,15 @@ App::OnData(shared_ptr<const Data> data)
   m_receivedDatas(data, this, m_face);
 }
 
+void
+App::OnNack(shared_ptr<const lp::Nack> nack)
+{
+  NS_LOG_FUNCTION(this << nack);
+
+  // @TODO Implement
+  // m_receivedDatas(data, this, m_face);
+}
+
 // Application Methods
 void
 App::StartApplication() // Called at time specified by Start
@@ -128,7 +138,13 @@ App::StartApplication() // Called at time specified by Start
                 "Ndn stack should be installed on the node " << GetNode());
 
   // step 1. Create a face
-  m_face = std::make_shared<AppFace>(this);
+  auto appLink = make_unique<AppLinkService>(this);
+  auto transport = make_unique<NullTransport>("appFace://", "appFace://",
+                                              ::ndn::nfd::FACE_SCOPE_LOCAL);
+  // @TODO Consider making AppTransport instead
+  m_face = std::make_shared<Face>(std::move(appLink), std::move(transport));
+  m_appLink = static_cast<AppLinkService*>(m_face->getLinkService());
+  m_face->setMetric(1);
 
   // step 2. Add face to the Ndn stack
   GetNode()->GetObject<L3Protocol>()->addFace(m_face);

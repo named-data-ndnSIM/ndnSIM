@@ -138,13 +138,8 @@ def build(bld):
     module_dirs = ['apps', 'helper', 'model', 'utils']
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=[
-                                          'apps/*',
-                                          'model/ndn-app-face.cpp',
-                                          'model/ndn-app-link-service.cpp',
-                                          'helper/ndn-app-helper.cpp',
-                                          'helper/ndn-scenario-helper.cpp',
-                                          'utils/topology/*',
-                                          'utils/tracers/*',
+                                          'apps/ndn-consumer*.cpp',
+                                          'apps/ndn-producer*.cpp',
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
     module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils']
@@ -159,7 +154,7 @@ def build(bld):
     if bld.env.ENABLE_TESTS:
         bld.recurse('tests')
 
-    # bld.ns3_python_bindings()
+    bld.ns3_python_bindings()
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')

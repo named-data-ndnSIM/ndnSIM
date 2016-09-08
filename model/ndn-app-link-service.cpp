@@ -17,7 +17,7 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include "ndn-app-face.hpp"
+#include "ndn-app-link-service.hpp"
 
 #include "ns3/log.h"
 #include "ns3/packet.h"
@@ -27,14 +27,13 @@
 
 #include "apps/ndn-app.hpp"
 
-NS_LOG_COMPONENT_DEFINE("ndn.AppFace");
+NS_LOG_COMPONENT_DEFINE("ndn.AppLinkService");
 
 namespace ns3 {
 namespace ndn {
 
-AppFace::AppFace(Ptr<App> app)
-  : LocalFace(FaceUri("appFace://"), FaceUri("appFace://"))
-  , m_node(app->GetNode())
+AppLinkService::AppLinkService(Ptr<App> app)
+  : m_node(app->GetNode())
   , m_app(app)
 {
   NS_LOG_FUNCTION(this << app);
@@ -42,49 +41,56 @@ AppFace::AppFace(Ptr<App> app)
   NS_ASSERT(m_app != 0);
 }
 
-AppFace::~AppFace()
+AppLinkService::~AppLinkService()
 {
   NS_LOG_FUNCTION_NOARGS();
 }
 
 void
-AppFace::close()
-{
-  this->fail("Close connection");
-}
-
-void
-AppFace::sendInterest(const Interest& interest)
+AppLinkService::doSendInterest(const Interest& interest)
 {
   NS_LOG_FUNCTION(this << &interest);
-
-  this->emitSignal(onSendInterest, interest);
 
   // to decouple callbacks
   Simulator::ScheduleNow(&App::OnInterest, m_app, interest.shared_from_this());
 }
 
 void
-AppFace::sendData(const Data& data)
+AppLinkService::doSendData(const Data& data)
 {
   NS_LOG_FUNCTION(this << &data);
-
-  this->emitSignal(onSendData, data);
 
   // to decouple callbacks
   Simulator::ScheduleNow(&App::OnData, m_app, data.shared_from_this());
 }
 
 void
-AppFace::onReceiveInterest(const Interest& interest)
+AppLinkService::doSendNack(const lp::Nack& nack)
 {
-  this->emitSignal(onReceiveInterest, interest);
+  NS_LOG_FUNCTION(this << &nack);
+
+  // to decouple callbacks
+  // Simulator::ScheduleNow(&App::OnNack, m_app, nack.shared_from_this());
+}
+
+//
+
+void
+AppLinkService::onReceiveInterest(const Interest& interest)
+{
+  this->receiveInterest(interest);
 }
 
 void
-AppFace::onReceiveData(const Data& data)
+AppLinkService::onReceiveData(const Data& data)
 {
-  this->emitSignal(onReceiveData, data);
+  this->receiveData(data);
+}
+
+void
+AppLinkService::onReceiveNack(const lp::Nack& nack)
+{
+  this->receiveNack(nack);
 }
 
 } // namespace ndn

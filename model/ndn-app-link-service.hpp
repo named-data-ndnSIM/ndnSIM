@@ -17,12 +17,11 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#ifndef NDN_APP_FACE_H
-#define NDN_APP_FACE_H
+#ifndef NDN_APP_LINK_SERVICE_HPP
+#define NDN_APP_LINK_SERVICE_HPP
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
-#include "ns3/ndnSIM/NFD/daemon/face/local-face.hpp"
-#include "ns3/ndnSIM/model/ndn-face.hpp"
+#include "ns3/ndnSIM/NFD/daemon/face/link-service.hpp"
 
 namespace ns3 {
 
@@ -35,50 +34,46 @@ class App;
 
 /**
  * \ingroup ndn-face
- * \brief Implementation of application Ndn face
+ * \brief Implementation of LinkService for ndnSIM application
  *
- * This class defines basic functionality of Ndn face. Face is core
- * component responsible for actual delivery of data packet to and
- * from Ndn stack
- *
- * \see AppFace, NdnNetDeviceFace
+ * \see NetDeviceLinkService
  */
-class AppFace : public nfd::LocalFace {
+class AppLinkService : public nfd::face::LinkService
+{
 public:
   /**
    * \brief Default constructor
    */
-  AppFace(Ptr<App> app);
+  AppLinkService(Ptr<App> app);
 
-  virtual ~AppFace();
+  virtual ~AppLinkService();
 
-public: // from nfd::Face
-  /**
-   * @brief Send Interest towards application
-   */
-  virtual void
-  sendInterest(const Interest& interest);
-
-  /**
-   * @brief Send Data towards application
-   */
-  virtual void
-  sendData(const Data& data);
-
-  /**
-   * @brief Send Interest towards NFD
-   */
+public:
   void
   onReceiveInterest(const Interest& interest);
 
-  /**
-   * @brief Send Data towards NFD
-   */
   void
   onReceiveData(const Data& data);
 
+  void
+  onReceiveNack(const lp::Nack& nack);
+
+private:
   virtual void
-  close();
+  doSendInterest(const Interest& interest) override;
+
+  virtual void
+  doSendData(const Data& data) override;
+
+  virtual void
+  doSendNack(const lp::Nack& nack) override;
+
+  virtual void
+  doReceivePacket(nfd::face::Transport::Packet&& packet) override
+  {
+    // does nothing (all operations for now handled by LinkService)
+    BOOST_ASSERT(false);
+  }
 
 private:
   Ptr<Node> m_node;
@@ -88,4 +83,4 @@ private:
 } // namespace ndn
 } // namespace ns3
 
-#endif // NDN_APP_FACE_H
+#endif // NDN_APP_LINK_SERVICE_HPP
