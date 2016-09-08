@@ -3,7 +3,7 @@ ndnSIM
 
 [![Build Status](https://travis-ci.org/named-data-ndnSIM/ndnSIM.svg)](https://travis-ci.org/named-data-ndnSIM/ndnSIM)
 
-A new release of [NS-3 based Named Data Networking (NDN) simulator](http://ndnsim.net/1.0/)
+A new release of [NS-3 based Named Data Networking (NDN) simulator](http://ndnsim.net/)
 went through extensive refactoring and rewriting.  The key new features of the new
 version:
 
@@ -12,10 +12,14 @@ version:
 - ndnSIM uses implementation of basic NDN primitives from
   [ndn-cxx library (NDN C++ library with eXperimental eXtensions)](http://named-data.net/doc/ndn-cxx/)
 
+  Based on version `0.4.1`
+
 - All NDN forwarding and management is implemented directly using source code of
   [Named Data Networking Forwarding Daemon (NFD)](http://named-data.net/doc/NFD/)
 
-- Allows [simulation of real applications](http://ndnsim.net/2.1/guide-to-simulate-real-apps.html)
+  Based on version `0.4.1-1-g704430c`
+
+- Allows [simulation of real applications](http://ndnsim.net/guide-to-simulate-real-apps.html)
   written against ndn-cxx library
 
 [ndnSIM documentation](http://ndnsim.net)

@@ -110,13 +110,12 @@ def build(bld):
                                         'ndn-cxx/src/util/dummy-client-face.cpp'])
 
     nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon', 'NFD/rib']],
-                               excl=['NFD/core/network-interface.cpp',
-                                     'NFD/daemon/main.cpp',
+                               excl=['NFD/daemon/main.cpp',
                                      'NFD/daemon/nfd.cpp',
                                      'NFD/daemon/face/ethernet*',
                                      'NFD/daemon/face/multicast-udp*',
                                      'NFD/daemon/face/tcp*',
-                                     'NFD/daemon/face/udp*',
+                                     'NFD/daemon/face/*udp*',
                                      'NFD/daemon/face/unix-stream*',
                                      'NFD/daemon/face/websocket*',
                                      'NFD/rib/nrd.cpp'])
@@ -138,7 +137,12 @@ def build(bld):
 
     module_dirs = ['apps', 'helper', 'model', 'utils']
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
-                                      excl=['model/ip-faces/*']) + ndnCxxSrc + nfdSrc
+                                      excl=[
+                                          'apps/*',
+                                          'model/**/*',
+                                          'helper/*',
+                                          'utils/**/*',
+                                          'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
     module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils']
     module.full_headers = bld.path.ant_glob(['%s/**/*.hpp' % dir for dir in module_dirs])
@@ -146,13 +150,13 @@ def build(bld):
 
     module.ndncxx_headers = bld.path.ant_glob(['ndn-cxx/src/**/*.hpp'],
                                               excl=['src/**/*-osx.hpp', 'src/detail/**/*'])
-    if bld.env.ENABLE_EXAMPLES:
-        bld.recurse('examples')
+    # if bld.env.ENABLE_EXAMPLES:
+    #     bld.recurse('examples')
 
     if bld.env.ENABLE_TESTS:
         bld.recurse('tests')
 
-    bld.ns3_python_bindings()
+    # bld.ns3_python_bindings()
 
 @TaskGen.feature('ns3fullmoduleheaders')
 @TaskGen.after_method('process_rule')
