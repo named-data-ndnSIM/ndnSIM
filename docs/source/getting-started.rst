@@ -7,33 +7,13 @@ Portability
 .. image:: https://travis-ci.org/named-data-ndnSIM/ndnSIM.svg?branch=test-travis-ci
     :target: https://travis-ci.org/named-data-ndnSIM/ndnSIM
 
-ndnSIM 2.0 has been successfully compiled and used on following platforms:
+ndnSIM 2.x has been successfully compiled and used on following platforms:
 
-- Ubuntu Linux 12.04 (see the note)
 - Ubuntu Linux 14.04 (32- and 64-bit platform)
 - Ubuntu Linux 16.04 (32- and 64-bit platform)
 - OS X 10.9
 - OS X 10.10
 - OS X 10.11
-
-.. note::
-    ndnSIM is currently cannot be compiled on Ubuntu Linux 12.04 with the packaged boost
-    libraries (there is an `issue with boost 1.48 and gcc 4.6
-    <https://svn.boost.org/trac/boost/ticket/6153>`_).  It is still possible to compile ndnSIM
-    on this platform, but either compiler or boost libraries (or both) need to get upgraded.
-
-    More recent version of boost can be installed from "Boost C++ Libraries" team PPA::
-
-        sudo apt-get install python-software-properties
-        sudo add-apt-repository ppa:boost-latest/ppa
-        sudo apt-get update
-        sudo apt-get install libboost1.55-all-dev
-
-        # add  --boost-libs=/usr/lib/x86_64-linux-gnu  to ./waf configure
-        # ./waf configure --boost-libs=/usr/lib/x86_64-linux-gnu
-
-    Make sure that all other version of boost libraries (``-dev`` packages) are removed,
-    otherwise compilation will fail.
 
 .. _requirements:
 
@@ -46,7 +26,7 @@ Prerequisites
 -  ``libsqlite3``
 -  ``libcrypto++``
 -  ``pkg-config``
--  Boost libraries >= 1.49
+-  Boost libraries >= 1.53
 
 .. role:: red
 
@@ -81,16 +61,7 @@ development tools and libraries, and ndn-cxx prerequisites.
 
    .. code-block:: bash
 
-       sudo apt-get install build-essential libsqlite3-dev libcrypto++-dev
-
-       # For Ubuntu 12.04
-       sudo apt-get install python-software-properties
-       sudo add-apt-repository ppa:boost-latest/ppa
-       sudo apt-get update
-       sudo apt-get install libboost1.55-all-dev
-
-       # For all other Ubuntu versions
-       sudo apt-get install libboost-all-dev
+       sudo apt-get install build-essential libsqlite3-dev libcrypto++-dev libboost-all-dev
 
   * Fedora Linux
 

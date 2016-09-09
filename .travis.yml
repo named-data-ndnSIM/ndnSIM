@@ -1,18 +1,14 @@
-language: cpp
-os:
-  - linux
+sudo: required
+language: generic
+os: linux
+dist: trusty
 compiler:
   - gcc
 notifications:
   email:
     on_success: always
     on_failure: always
-cache:
-  - ccache
 env:
-  - NODE_LABELS="Linux Ubuntu Ubuntu-12.04"
-before_install:
-  - travis_retry sudo apt-get install -qq ccache
+  - NODE_LABELS="Linux Ubuntu Ubuntu-14.04"
 script:
-  - export CXX="ccache $CXX"
   - ./.jenkins

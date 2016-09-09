@@ -13,10 +13,6 @@ git submodule update --init
 sudo rm -Rf build/ .waf-1* .waf3-1*
 find . -name '*.pyc' | sudo xargs rm -f
 
-if has Ubuntu-12.04 $NODE_LABELS; then
-    EXTRA_FLAGS=" --boost-libs=/usr/lib/x86_64-linux-gnu"
-fi
-
 # Configure/build in debug mode
 ./waf -j1 configure -d debug --enable-modules=ndnSIM --enable-examples --enable-tests $EXTRA_FLAGS
 ./waf -j1 build
