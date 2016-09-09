@@ -35,7 +35,12 @@ BOOST_AUTO_TEST_CASE(Basic)
 
   createTopology({
       {"1", "2"},
-    });
+    }, false);
+
+  getNetDevice("1", "2")->SetAttribute("Address", StringValue("00:00:00:ff:ff:01"));
+  getNetDevice("2", "1")->SetAttribute("Address", StringValue("00:00:00:ff:ff:02"));
+
+  getStackHelper().InstallAll();
 
   addRoutes({
       {"1", "2", "/prefix", 1},
@@ -58,6 +63,14 @@ BOOST_AUTO_TEST_CASE(Basic)
 
   BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 100);
   BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 100);
+
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(*getFace("1", "2")), "netdev://[00:00:00:ff:ff:01]");
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(*getFace("2", "1")), "netdev://[00:00:00:ff:ff:02]");
+
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(getFace("1", "2")->getLocalUri()),  "netdev://[00:00:00:ff:ff:01]");
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(getFace("1", "2")->getRemoteUri()), "netdev://[00:00:00:ff:ff:02]");
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(getFace("2", "1")->getLocalUri()),  "netdev://[00:00:00:ff:ff:02]");
+  BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(getFace("2", "1")->getRemoteUri()), "netdev://[00:00:00:ff:ff:01]");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

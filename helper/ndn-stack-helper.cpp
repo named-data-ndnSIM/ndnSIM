@@ -23,6 +23,7 @@
 #include "ns3/names.h"
 #include "ns3/string.h"
 #include "ns3/point-to-point-net-device.h"
+#include "ns3/point-to-point-channel.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-link-service.hpp"
@@ -222,6 +223,19 @@ StackHelper::RemoveFaceCreateCallback(TypeId netDeviceType,
     });
 }
 
+std::string
+constructFaceUri(Ptr<NetDevice> netDevice)
+{
+  std::string uri = "netdev://";
+  Address address = netDevice->GetAddress();
+  if (Mac48Address::IsMatchingType(address)) {
+    uri += "[" + boost::lexical_cast<std::string>(Mac48Address::ConvertFrom(address)) + "]";
+  }
+
+  return uri;
+}
+
+
 shared_ptr<Face>
 StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
                                       Ptr<NetDevice> netDevice) const
@@ -229,11 +243,9 @@ StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
   NS_LOG_DEBUG("Creating default Face on node " << node->GetId());
 
   auto netDeviceLink = make_unique<NetDeviceLinkService>(node, netDevice);
-  auto transport = make_unique<NullTransport>("netDevice://", "netDevice://");
+  auto transport = make_unique<NullTransport>(constructFaceUri(netDevice), "netdev://[ff:ff:ff:ff:ff:ff]");
   auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
   face->setMetric(1);
-
-  // @TODO add netDevice ID
 
   ndn->addFace(face);
   NS_LOG_LOGIC("Node " << node->GetId() << ": added Face as face #"
@@ -248,12 +260,22 @@ StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
 {
   NS_LOG_DEBUG("Creating point-to-point Face on node " << node->GetId());
 
-  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, device);
-  auto transport = make_unique<NullTransport>("netDevice://", "netDevice://");
+  Ptr<PointToPointNetDevice> netDevice = DynamicCast<PointToPointNetDevice>(device);
+  NS_ASSERT(netDevice != nullptr);
+
+  // access the other end of the link
+  Ptr<PointToPointChannel> channel = DynamicCast<PointToPointChannel>(netDevice->GetChannel());
+  NS_ASSERT(channel != nullptr);
+
+  Ptr<NetDevice> remoteNetDevice = channel->GetDevice(0);
+  if (remoteNetDevice->GetNode() == node)
+    remoteNetDevice = channel->GetDevice(1);
+
+  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, netDevice);
+
+  auto transport = make_unique<NullTransport>(constructFaceUri(netDevice), constructFaceUri(remoteNetDevice));
   auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
   face->setMetric(1);
-
-  // @TODO add netDevice ID
 
   ndn->addFace(face);
   NS_LOG_LOGIC("Node " << node->GetId() << ": added Face as face #"

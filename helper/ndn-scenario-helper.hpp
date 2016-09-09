@@ -108,7 +108,8 @@ public:
    *       });
    */
   void
-  createTopology(std::initializer_list<std::initializer_list<std::string>/*node clique*/> topology);
+  createTopology(std::initializer_list<std::initializer_list<std::string>/*node clique*/> topology,
+                 bool shouldInstallNdnStack = true);
 
   /**
    * @brief Create routes between topology nodes
@@ -156,6 +157,13 @@ public: // topology accessors
    */
   shared_ptr<Face>
   getFace(const std::string& node1, const std::string& node2);
+
+  /**
+   * @brief Get NetDevice on the @p node1 pointing towards @p node2
+   * @throw std::invalid_argument if the link does not exist
+   */
+  Ptr<NetDevice>
+  getNetDevice(const std::string& node1, const std::string& node2);
 
   /**
    * \brief Disable RIB Manager

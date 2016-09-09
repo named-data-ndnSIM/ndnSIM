@@ -36,7 +36,8 @@ ScenarioHelper::ScenarioHelper()
 }
 
 void
-ScenarioHelper::createTopology(std::initializer_list<std::initializer_list<std::string>/*node clique*/> topology)
+ScenarioHelper::createTopology(std::initializer_list<std::initializer_list<std::string>/*node clique*/> topology,
+                               bool shouldInstallNdnStack)
 {
   if (m_isTopologyInitialized) {
     throw std::logic_error("Topology cannot be created twice");
@@ -57,7 +58,9 @@ ScenarioHelper::createTopology(std::initializer_list<std::initializer_list<std::
     }
   }
 
-  ndnHelper.InstallAll();
+  if (shouldInstallNdnStack) {
+    ndnHelper.InstallAll();
+  }
   m_isTopologyInitialized = true;
 }
 
@@ -133,11 +136,18 @@ ScenarioHelper::getNode(const std::string& nodeName)
 shared_ptr<Face>
 ScenarioHelper::getFace(const std::string& node1, const std::string& node2)
 {
+  Ptr<NetDevice> netDevice = getNetDevice(node1, node2);
+  return netDevice->GetNode()->GetObject<L3Protocol>()->getFaceByNetDevice(netDevice);
+}
+
+Ptr<NetDevice>
+ScenarioHelper::getNetDevice(const std::string& node1, const std::string& node2)
+{
   auto i = links.find(node1);
   if (i != links.end()) {
     auto j = i->second.find(node2);
     if (j != i->second.end()) {
-      return j->second->GetNode()->GetObject<L3Protocol>()->getFaceByNetDevice(j->second);
+      return j->second;
     }
   }
 
