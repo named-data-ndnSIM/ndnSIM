@@ -133,10 +133,10 @@ BOOST_AUTO_TEST_CASE(DisabledStrategyChoiceManager)
                                 receivedDatasets.begin(), receivedDatasets.end());
 }
 
-BOOST_AUTO_TEST_CASE(DisabledStatusServer)
+BOOST_AUTO_TEST_CASE(DisabledForwarderStatusManager)
 {
-  // Disable Status Server manager
-  disableStatusServer();
+  // Disable Forwarder Status Manager
+  disableForwarderStatusManager();
 
   setupAndRun();
 
