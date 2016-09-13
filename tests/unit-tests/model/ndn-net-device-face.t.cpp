@@ -27,7 +27,43 @@ namespace ndn {
 
 BOOST_FIXTURE_TEST_SUITE(ModelNdnNetDeviceFace, ScenarioHelperWithCleanupFixture)
 
-BOOST_AUTO_TEST_CASE(Basic)
+class FixtureWithTracers : public ScenarioHelperWithCleanupFixture
+{
+public:
+  void
+  InInterests(const Interest&, const Face& face)
+  {
+    nInInterests[boost::lexical_cast<std::string>(face)] += 1;
+  }
+
+  void
+  OutInterests(const Interest&, const Face& face)
+  {
+    nOutInterests[boost::lexical_cast<std::string>(face)] += 1;
+  }
+
+  void
+  InData(const Data&, const Face& face)
+  {
+    nInData[boost::lexical_cast<std::string>(face)] += 1;
+  }
+
+  void
+  OutData(const Data&, const Face& face)
+  {
+    nOutData[boost::lexical_cast<std::string>(face)] += 1;
+  }
+
+public:
+  std::map<std::string, uint32_t> nInInterests;
+  std::map<std::string, uint32_t> nOutInterests;
+  std::map<std::string, uint32_t> nInData;
+  std::map<std::string, uint32_t> nOutData;
+
+  // TODO add NACKs
+};
+
+BOOST_FIXTURE_TEST_CASE(Basic, FixtureWithTracers)
 {
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
@@ -55,14 +91,44 @@ BOOST_AUTO_TEST_CASE(Basic)
           "0s", "100s"}
     });
 
+  Config::ConnectWithoutContext("/NodeList/*/$ns3::ndn::L3Protocol/InInterests", MakeCallback(&FixtureWithTracers::InInterests, this));
+  Config::ConnectWithoutContext("/NodeList/*/$ns3::ndn::L3Protocol/OutInterests", MakeCallback(&FixtureWithTracers::OutInterests, this));
+
+  Config::ConnectWithoutContext("/NodeList/*/$ns3::ndn::L3Protocol/InData", MakeCallback(&FixtureWithTracers::InData, this));
+  Config::ConnectWithoutContext("/NodeList/*/$ns3::ndn::L3Protocol/OutData", MakeCallback(&FixtureWithTracers::OutData, this));
+
+  // TODO: implement Nack testing
+  // Config::Connect("/NodeList/*/InNacks", ...);
+  // Config::Connect("/NodeList/*/OutNacks", ...);
+
   Simulator::Stop(Seconds(20.001));
   Simulator::Run();
 
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInInterests, 0);
   BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 100);
   BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 100);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutData, 0);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInNacks, 0);
+  BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutNacks, 0);
+
+  BOOST_CHECK_EQUAL(nInInterests [boost::lexical_cast<std::string>(*getFace("1", "2"))], 0);
+  BOOST_CHECK_EQUAL(nOutInterests[boost::lexical_cast<std::string>(*getFace("1", "2"))], 100);
+  BOOST_CHECK_EQUAL(nInData      [boost::lexical_cast<std::string>(*getFace("1", "2"))], 100);
+  BOOST_CHECK_EQUAL(nOutData     [boost::lexical_cast<std::string>(*getFace("1", "2"))], 0);
+  // TODO add nacks
 
   BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 100);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutInterests, 0);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInData, 0);
   BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutData, 100);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInNacks, 0);
+  BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nOutNacks, 0);
+
+  BOOST_CHECK_EQUAL(nInInterests [boost::lexical_cast<std::string>(*getFace("2", "1"))], 100);
+  BOOST_CHECK_EQUAL(nOutInterests[boost::lexical_cast<std::string>(*getFace("2", "1"))], 0);
+  BOOST_CHECK_EQUAL(nInData      [boost::lexical_cast<std::string>(*getFace("2", "1"))], 0);
+  BOOST_CHECK_EQUAL(nOutData     [boost::lexical_cast<std::string>(*getFace("2", "1"))], 100);
+  // TODO add nacks
 
   BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(*getFace("1", "2")), "netdev://[00:00:00:ff:ff:01]");
   BOOST_CHECK_EQUAL(boost::lexical_cast<std::string>(*getFace("2", "1")), "netdev://[00:00:00:ff:ff:02]");

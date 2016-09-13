@@ -424,13 +424,25 @@ L3Protocol::addFace(shared_ptr<Face> face)
         this->m_inData(data, *face);
       }
     });
+  // TODO Add nack signals
 
-  // TODO: Discover why these signal were removed and fix it
+  auto tracingLink = face->getLinkService();
+  NS_LOG_LOGIC("Adding trace sources for afterSendInterest and afterSendData");
+  tracingLink->afterSendInterest.connect([this, weakFace](const Interest& interest) {
+      shared_ptr<Face> face = weakFace.lock();
+      if (face != nullptr) {
+        this->m_outInterests(interest, *face);
+      }
+    });
 
-  // face->afterSendInterest.connect
-  //   ([this, weakFace](const Interest& interest) { this->m_outInterests(interest, *face); });
+  tracingLink->afterSendData.connect([this, weakFace](const Data& data) {
+      shared_ptr<Face> face = weakFace.lock();
+      if (face != nullptr) {
+        this->m_outData(data, *face);
+      }
+    });
 
-  // face->afterSendData.connect([this, weakFace](const Data& data) { this->m_outData(data, *face); });
+  // TODO Add nack signals
 
   return face->getId();
 }
