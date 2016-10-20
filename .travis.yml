@@ -1,14 +1,24 @@
 sudo: required
 language: generic
-os: linux
-dist: trusty
-compiler:
-  - gcc
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      env:
+        - CXX=g++
+        - NODE_LABELS="Linux Ubuntu Ubuntu-14.04"
+    - os: linux
+      dist: trusty
+      env:
+        - CXX=clang++
+        - NODE_LABELS="Linux Ubuntu Ubuntu-14.04"
+    - os: osx
+      env:
+        - CXX=clang++
+        - NODE_LABELS="OSX OSX-10.9"
 notifications:
   email:
     on_success: always
     on_failure: always
-env:
-  - NODE_LABELS="Linux Ubuntu Ubuntu-14.04"
 script:
   - ./.jenkins
