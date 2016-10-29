@@ -5,6 +5,89 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
+Release 2.2 (Changes since release 2.1)
+---------------------------------------
+
+Release date: November 11, 2016
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been both upgraded to version 0.4.1
+  (:issue:`3560`).
+
+  Features of NFD:
+
+    * Face system is refactored.
+    * Data Retrieval using full names is fixed.
+    * Allow setting CS capacity to 0.
+    * LinkService provides an "adaptation" layer to
+      translate between NDN packets and data blocks communicated through Transport.
+    * Face provides combines Transport and LinkServices, providing high-level
+      interface to work with Interest/Data/Nack packets inside NFD.
+    * Networking NACK in pipelines and best-route strategy.
+    * Refactored implementation of NFD management.
+    * Interest forwarding processes Link included in interest packets.
+
+  Features of ndn-cxx:
+
+    * LocalControlHeader for special signaling between application and NFD has
+      been replaced with NDNLPv2 signaling.
+    * NDNLPv2 Network NACK support in Face abstraction.
+    * New API in Face class to remove all pending Interests.
+
+  .. note::
+     In order to retrieve the marked versions of ndn-cxx and NFD, use
+     ``--recursive`` option to the git clone command or run ``git
+     submodule update --init`` after clone, pull, or merge.
+
+- Replace NetDeviceFace with NetDeviceFaceLinkService and AppFace with
+  AppFaceModel to match NFD's v0.4+ Face model (:issue:`3560`).
+
+  ndnSIM (for now) intentionally uses LinkService instead of Transport for
+  optimization purposes and in order to preserve ns3::Packet Tags. This
+  may be fixed in the future when there is a different mechanism to
+  propagate ns3 Tags.
+
+  .. note::
+     This version of dnSIM does not include support for NDNLPv2 and, thus, cannot
+     yet be used to simulate network-level NACKs across the simulated nodes.
+     This will be addressed in the next release of ndnSIM.
+
+- ndnSIM no longer officially support Ubuntu Linux 12.04, as it now requires
+  a more modern compiler version and dependent libraries.
+
+New features
+~~~~~~~~~~~~
+
+- The NetDevice address is now represented as a LocalUri instance for
+  NetDevice-based Faces (:issue:`2665`).
+
+- Enable configurability of NFD's managers (:issue:`3328`).
+
+  The managers of NFD can be enabled/disabled as specified in a simulation
+  scenario.
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Bugfix in RandomPolicy for the "old-style" ContentStore implementation.
+
+- Updates of the `ndnSIM 2 Technical Report <https://named-data.net/publications/techreports/ndn-0028-2-ndnsim-v2/>`__
+
+  Technical Report became up-to-date with the latest version of ndnSIM.
+  Please see report's change-log for more detailed information.
+
+- Updates of the ndnSIM documentation (:issue:`3835`)
+
+  * Updated out-dated statements about NFD's CS implementation (:issue:`3827`).
+  * Added explanation about the limited support of NDNLPv2 and its implications.
+  * Fixed description of the ConsumerBatches application.
+  * Added homebrew instructions for dependency installation on OS X.
+  * Added specification of ndn::CsTracer output format.
+
+********************************************************************************
+
 Release 2.1 (Changes since release 2.0)
 ---------------------------------------
 
@@ -37,7 +120,7 @@ Overview
   ndnSIM codebase adjusted to reflect API changes (:issue:`3122`)
 
 - NFD and ndn-cxx has been upgraded to version 0.3.4 (:issue:`3125`)
-  
+
 New features
 ~~~~~~~~~~~~
 

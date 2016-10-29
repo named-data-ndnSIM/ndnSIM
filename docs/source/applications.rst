@@ -178,8 +178,8 @@ Producer
 Custom applications
 +++++++++++++++++++
 
-Applications interact with the core of the system using :ndnsim:`AppFace` realization of Face abstraction.
-To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`App` class that takes care of creating :ndnsim:`AppFace` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
+Applications interact with the core of the system using :ndnsim:`AppLinkService` realization of link service abstraction.
+To simplify implementation of specific NDN application, ndnSIM provides a base :ndnsim:`App` class that takes care of creating :ndnsim:`AppLinkService` and registering it inside the NDN protocol stack, as well as provides default processing for incoming Interest and Data packets.
 
 .. Base App class
 .. ^^^^^^^^^^^^^^^^^^

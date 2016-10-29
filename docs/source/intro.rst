@@ -97,8 +97,8 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 | Folder          | Description                                                         |
 +=================+=====================================================================+
 | ``model/``      | implementation of NDN base: :ndnsim:`L3Protocol`, faces             |
-|                 | (:ndnsim:`Face`, :ndnsim:`NetDeviceFace`,                           |
-|                 | :ndnsim:`AppFace`),                                                 |
+|                 | (:ndnsim:`Face`, :ndnsim:`NetDeviceLinkService`,                    |
+|                 | :ndnsim:`AppLinkService`),                                          |
 |                 | etc.                                                                |
 +-----------------+---------------------------------------------------------------------+
 | ``NFD/``        | submodule of `NDN Forwarding Daemon (NFD)`_ source code with few    |
