@@ -3,50 +3,46 @@
 NFD's Content Store
 ++++++++++++++++++++
 
-The current implementation of NFD's Content Store uses a `skip list
-<http://en.wikipedia.org/wiki/Skip_list>`_ as its underlying data structure. Skip lists are a
-probabilistic alternative to balanced trees. Skip lists are balanced by virtue of a random
-number generator. Its average insertion and lookup complexity is O(log n). CS entries are
-placed in the Skip List in ascending order (by Name).
+The Contest Store (CS) is implemented as a set of :ndnsim:`CS entries <nfd::cs::EntryImpl>`),
+ordered by the full data name including the implicit digest.  To manage entries, CS adopts a cache policy interface (:ndnsim:`nfd::cs::Policy`), invoked any time a CS entry is added, removed, updated, or used.
 
-The current implementation evicts CS entries based on prioritized FIFO (First In First Out)
-strategy.  The entries that get removed first are unsolicited Data packets, which are the Data
-packets that got cached opportunistically without preceding forwarding of the corresponding
-Interest packet. Next, the Data packets with expired freshness are removed. Lastly, the Data
-packets are removed from the Content Store on a pure FIFO basis. This cache replacement policy
-is currently hard-coded; it is intended to be replaceable in the future by the NFD developer
-team.
+By default, ndnSIM uses NFD's Content Store with an option to use an old-style ndnSIM-specific content store implementations (see :ref:`old_cs`). The supported cache replacement policies are the following:
 
-The only currently available option to control behavior of NFD's Content Store is to set its
-maximum size using :ndnsim:`StackHelper::setCsSize()`:
++----------------------------------------------+----------------------------------------------------------+
+| **NFD's Content Store Policies**                                                                        |
++----------------------------------------------+----------------------------------------------------------+
+|   ``nfd::cs::lru``                           | Last Recently Used (LRU)                                 |
++----------------------------------------------+----------------------------------------------------------+
+|   ``nfd::cs::priority_fifo``                 | Priority-Based First-In-First-Out (FIFO)                 |
++----------------------------------------------+----------------------------------------------------------+
+
+For more detailed specification refer to the `NFD Developer's Guide
+<https://named-data.net/wp-content/uploads/2016/03/ndn-0021-6-nfd-developer-guide.pdf>`_, section 3.3.
+
+
+To control the maximum size and the policy of NFD's Content Store use :ndnsim:`StackHelper::setCsSize()` and
+:ndnsim:`StackHelper::setPolicy()` methods:
 
       .. code-block:: c++
 
          ndnHelper.setCsSize(<max-size-in-packets>);
+         ndnHelper.setPolicy(<replacement-policy>);
          ...
          ndnHelper.Install(nodes);
 
 Examples:
 
-- Effectively disable NFD content store an all nodes
-
-  Minimum allowed value for NFD content store size is 1.  If 0 is specified, it will be assumed
-  that the old content store implementation should be used.
-
-      .. code-block:: c++
-
-         ndnHelper.setCsSize(1);
-         ...
-         ndnHelper.Install(nodes);
-
-- Set CS size 100 on node1, size 1000 on node1, and size 2000 on all other nodes:
+- To set CS size 100 on node1, size 1000 on node2, and size 2000 on all other nodes.
+  LRU replacement policy for node 1, priority FIFO for the rest:
 
       .. code-block:: c++
 
          ndnHelper.setCsSize(100);
+         ndnHelper.setPolicy("nfd::cs::lru");
          ndnHelper.Install(node1);
 
          ndnHelper.setCsSize(1000);
+         ndnHelper.setPolicy("nfd::cs::priority_fifo");
          ndnHelper.Install(node2);
 
          NodeContainer allOtherNodes;
@@ -56,6 +52,18 @@ Examples:
            }
          }
          ndnHelper.Install(allOtherNodes);
+
+- To effectively disable NFD content store an all nodes
+
+  Minimum allowed value for NFD content store maximum size is 1.  If 0 is specified, it will be assumed
+  that the old content store implementation should be used.
+
+      .. code-block:: c++
+
+         ndnHelper.setCsSize(1);
+         ...
+         ndnHelper.Install(nodes);
+
 
 CS entry
 ~~~~~~~~
@@ -67,40 +75,15 @@ contains:
 - flag indicating whether the Data packet is unsolicited
 - the timestamp at which the cached Data becomes stale
 
-CS
-~~
-
-A multi-index container is maintained in order to support the prioritized FIFO cache
-replacement policy.  In this way, pointers to the Data packets in a particular order are
-kept. Note that this multi-index container is completely separated from the skip list
-container, which indexes Content Store entries by name.
-
-The container (Cs::CleanupIndex) currently supports indexing of unsolicited Data packets,
-indexing by packet staleness and indexing by packet arrival time. Calculation of the indexes is
-performed in the container during the Data packet insertion (Cs::insert) in the Content Store.
-
-Eviction (Cs::evictItem) is performed during the insertion when the CS is full, and when the
-capacity is decreased by management. We decided not to perform periodical cleanups, because its
-CPU overhead causes jitter in packet forwarding.
-
-In the current version of NFD, cache replacement policy can be modified by adding different
-indexes in the Cs::CleanupIndex container (refer to Boost.multiIndex documentation) and
-implementing additional logic in Cs::evictItem function.
-
-For more detailed specification refer to the `NFD Developer's Guide
-<http://named-data.net/wp-content/uploads/2014/07/NFD-developer-guide.pdf>`_, section 3.2.
+.. _old_cs:
 
 Old Content Store Implementations
 +++++++++++++++++++++++++++++++++
 
-NFD's content store implementation takes full consideration of Interest selectors, however is
-not yet flexible when it comes to cache replacement policies.  Feature to extend CS flexibility
-is currently in active development (refer to `Issue #2219 on NFD Redmine
-<http://redmine.named-data.net/issues/2219>`_) and for the time being, we have ported the old
-ndnSIM 1.0 content store implementations to the new code base.  These implementations feature
-different cache replacement policies, but have very limited support for Interest selectors.  If
-your scenario relies on proper selector processing, do not use these implementations as the
-simulation results most likely be incorrect.
+We have also ported the old ndnSIM 1.0 content store implementations to the new code base.
+These implementations feature different cache replacement policies, but have very limited
+support for Interest selectors.  If your scenario relies on proper selector processing,
+do not use these implementations as the simulation results most likely be incorrect.
 
 To select old content store implementations, use :ndnsim:`StackHelper::SetOldContentStore`:
 

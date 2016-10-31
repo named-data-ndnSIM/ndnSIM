@@ -161,14 +161,11 @@ ndnSIM uses NFD's content store implementation, maximum size of which can be con
 
 .. note::
 
-    NFD's content store implementation takes full consideration of Interest selectors, however
-    is not yet flexible when it comes to cache replacement policies.  Feature to extend CS
-    flexibility is currently in active development (refer to `Issue #2219 on NFD Redmine
-    <http://redmine.named-data.net/issues/2219>`_) and for the time being, we have ported the
-    old ndnSIM 1.0 content store implementations to the new code base.  These implementations
-    feature different cache replacement policies, but have very limited support for Interest
-    selectors.  If your scenario relies on proper selector processing, do not use these
-    implementations as the simulation results most likely be incorrect.
+    NFD's content store implementation takes full consideration of Interest selectors.
+    In contrast to that, the old ndnSIM 1.0 content store implementations have very limited
+    support for Interest selectors, but features a number of different replacement policies.
+    If your scenario relies on proper selector processing, do not use these implementations as
+    the simulation results most likely be incorrect.
 
     To select old content store implementations, use :ndnsim:`SetOldContentStore
     <StackHelper::SetOldContentStore>` StackHelper method:

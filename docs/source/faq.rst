@@ -167,6 +167,16 @@ Code questions
 
 Refer to :ref:`Link Control Helper`.
 
+.. topic:: Network-level NACKs
+
+    How the current version of ndnSIM handles network-level NACKs?
+
+ndnSIM 2.2 does not include support for NDNLPv2 and, thus, cannot yet be
+used to simulate network-level NACKs across simulation nodes. This will be
+addressed in the next release of ndnSIM. The way to address that is to
+implement a Link Service specific to ndnSIM, which will come at the cost of
+losing the NS3 tags attached to the packets.
+
 General questions
 -----------------
 
