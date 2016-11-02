@@ -36,6 +36,9 @@
 #include <map>
 #include <boost/lexical_cast.hpp>
 
+#include "ns3/ndnSIM/NFD/daemon/table/cs-policy-priority-fifo.hpp"
+#include "ns3/ndnSIM/NFD/daemon/table/cs-policy-lru.hpp"
+
 NS_LOG_COMPONENT_DEFINE("ndn.StackHelper");
 
 namespace ns3 {
@@ -50,6 +53,11 @@ StackHelper::StackHelper()
   , m_maxCsSize(100)
 {
   setCustomNdnCxxClocks();
+
+  m_csPolicies.insert({"nfd::cs::lru", [] { return make_unique<nfd::cs::LruPolicy>(); }});
+  m_csPolicies.insert({"nfd::cs::priority_fifo", [] () { return make_unique<nfd::cs::PriorityFifoPolicy>(); }});
+
+  m_csPolicyCreationFunc = m_csPolicies["nfd::cs::lru"];
 
   m_ndnFactory.SetTypeId("ns3::ndn::L3Protocol");
   m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
@@ -127,6 +135,22 @@ StackHelper::setCsSize(size_t maxSize)
   m_maxCsSize = maxSize;
 }
 
+void
+StackHelper::setPolicy(const std::string& policy)
+{
+  auto found = m_csPolicies.find(policy);
+  if (found != m_csPolicies.end()) {
+    m_csPolicyCreationFunc = found->second;
+  }
+  else {
+    NS_FATAL_ERROR("Cache replacement policy " << policy << " not found");
+    NS_LOG_DEBUG("Available cache replacement policies: ");
+    for (auto it = m_csPolicies.begin(); it != m_csPolicies.end(); it++) {
+      NS_LOG_DEBUG("    " << it->first);
+    }
+  }
+}
+
 Ptr<FaceContainer>
 StackHelper::Install(const NodeContainer& c) const
 {
@@ -177,6 +201,10 @@ StackHelper::Install(Ptr<Node> node) const
   // Create and aggregate content store if NFD's contest store has been disabled
   if (m_maxCsSize == 0) {
     ndn->AggregateObject(m_contentStoreFactory.Create<ContentStore>());
+  }
+  // if NFD's CS is enabled, check if a replacement policy has been specified
+  else {
+    ndn->setCsReplacementPolicy(m_csPolicyCreationFunc);
   }
 
   // Aggregate L3Protocol on node (must be after setting ndnSIM CS)

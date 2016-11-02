@@ -179,6 +179,7 @@ private:
   nfd::ConfigSection m_config;
 
   Ptr<ContentStore> m_csFromNdnSim;
+  PolicyCreationCallback m_policy;
 };
 
 L3Protocol::L3Protocol()
@@ -239,6 +240,12 @@ L3Protocol::injectInterest(const Interest& interest)
 }
 
 void
+L3Protocol::setCsReplacementPolicy(const PolicyCreationCallback& policy)
+{
+  m_impl->m_policy = policy;
+}
+
+void
 L3Protocol::initializeManagement()
 {
   auto& forwarder = m_impl->m_forwarder;
@@ -279,6 +286,12 @@ L3Protocol::initializeManagement()
   }
 
   ConfigFile config(&ConfigFile::ignoreUnknownSection);
+
+  // if we use NFD's CS, we have to specify a replacement policy
+  m_impl->m_csFromNdnSim = GetObject<ContentStore>();
+  if (m_impl->m_csFromNdnSim == nullptr) {
+    forwarder->getCs().setPolicy(m_impl->m_policy());
+  }
 
   TablesConfigSection tablesConfig(forwarder->getCs(),
                                    forwarder->getPit(),

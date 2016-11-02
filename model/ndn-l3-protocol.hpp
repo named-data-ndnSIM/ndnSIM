@@ -40,6 +40,9 @@ typedef boost::property_tree::ptree ConfigSection;
 namespace pit {
 class Entry;
 } // namespace pit
+namespace cs {
+class Policy;
+} // namespace cs
 } // namespace nfd
 
 namespace ns3 {
@@ -152,6 +155,14 @@ public:
    */
   void
   injectInterest(const Interest& interest);
+
+  typedef std::function<std::unique_ptr<nfd::cs::Policy>()> PolicyCreationCallback;
+
+  /**
+   * \brief Set the replacement policy of NFD's CS
+   */
+  void
+  setCsReplacementPolicy(const PolicyCreationCallback& policy);
 
 public: // Workaround for python bindings
   static Ptr<L3Protocol>

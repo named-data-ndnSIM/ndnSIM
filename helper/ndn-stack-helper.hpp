@@ -31,6 +31,12 @@
 #include "ndn-fib-helper.hpp"
 #include "ndn-strategy-choice-helper.hpp"
 
+namespace nfd {
+namespace cs {
+class Policy;
+} // namespace cs
+} // namespace nfd
+
 namespace ns3 {
 
 class Node;
@@ -73,6 +79,12 @@ public:
    */
   void
   setCsSize(size_t maxSize);
+
+  /**
+   * @brief Set the cache replacement policy for NFD's Content Store
+   */
+  void
+  setPolicy(const std::string& policy);
 
   /**
    * @brief Set ndnSIM 1.0 content store implementation and its attributes
@@ -261,6 +273,11 @@ private:
 
   bool m_needSetDefaultRoutes;
   size_t m_maxCsSize;
+
+  typedef std::function<std::unique_ptr<nfd::cs::Policy>()> PolicyCreationCallback;
+  PolicyCreationCallback m_csPolicyCreationFunc;
+
+  std::map<std::string, PolicyCreationCallback> m_csPolicies;
 
   typedef std::list<std::pair<TypeId, FaceCreateCallback>> NetDeviceCallbackList;
   NetDeviceCallbackList m_netDeviceCallbacks;
