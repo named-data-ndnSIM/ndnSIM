@@ -32,6 +32,8 @@
 #include "utils/ndn-ns3-packet-tag.hpp"
 #include "utils/ndn-rtt-mean-deviation.hpp"
 
+#include <ndn-cxx/lp/tags.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/ref.hpp>
 
@@ -223,14 +225,11 @@ Consumer::OnData(shared_ptr<const Data> data)
   NS_LOG_INFO("< DATA for " << seq);
 
   int hopCount = 0;
-  auto ns3PacketTag = data->getTag<Ns3PacketTag>();
-  if (ns3PacketTag != nullptr) { // e.g., packet came from local node's cache
-    FwHopCountTag hopCountTag;
-    if (ns3PacketTag->getPacket()->PeekPacketTag(hopCountTag)) {
-      hopCount = hopCountTag.Get();
-      NS_LOG_DEBUG("Hop count: " << hopCount);
-    }
+  auto hopCountTag = data->getTag<lp::HopCountTag>();
+  if (hopCountTag != nullptr) { // e.g., packet came from local node's cache
+    hopCount = *hopCountTag;
   }
+  NS_LOG_DEBUG("Hop count: " << hopCount);
 
   SeqTimeoutsContainer::iterator entry = m_seqLastDelay.find(seq);
   if (entry != m_seqLastDelay.end()) {

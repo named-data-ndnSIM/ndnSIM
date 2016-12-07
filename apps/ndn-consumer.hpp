@@ -30,7 +30,6 @@
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
 #include "ns3/ndnSIM/utils/ndn-rtt-estimator.hpp"
-#include "ns3/ndnSIM/utils/ndn-fw-hop-count-tag.hpp"
 
 #include <set>
 #include <map>

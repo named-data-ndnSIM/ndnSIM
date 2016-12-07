@@ -74,7 +74,6 @@ public:
 
 BOOST_FIXTURE_TEST_SUITE(UtilsTracersNdnAppDelayTracer, AppDelayTracerFixture)
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(InstallAll, 1);
 BOOST_AUTO_TEST_CASE(InstallAll)
 {
   AppDelayTracer::InstallAll(TEST_TRACE.string());
@@ -90,15 +89,14 @@ BOOST_AUTO_TEST_CASE(InstallAll)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417424	1	0	0	LastDelay	0.0417424	41742.4	1	2\n"
-    "0.0417424	1	0	0	FullDelay	0.0417424	41742.4	1	2\n"
+    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
+    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n"
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02087	2	0	1	LastDelay	0.0208712	20871.2	1	1\n"
-    "3.02087	2	0	1	FullDelay	0.0208712	20871.2	1	1\n");
+    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
 }
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(InstallNodeContainer, 1);
 BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 {
   NodeContainer nodes;
@@ -117,11 +115,10 @@ BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417424	1	0	0	LastDelay	0.0417424	41742.4	1	2\n"
-    "0.0417424	1	0	0	FullDelay	0.0417424	41742.4	1	2\n");
+    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
+    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n");
 }
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(InstallNode, 1);
 BOOST_AUTO_TEST_CASE(InstallNode)
 {
   AppDelayTracer::Install(getNode("2"), TEST_TRACE.string());
@@ -139,11 +136,10 @@ BOOST_AUTO_TEST_CASE(InstallNode)
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02087	2	0	1	LastDelay	0.0208712	20871.2	1	1\n"
-    "3.02087	2	0	1	FullDelay	0.0208712	20871.2	1	1\n");
+    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
 }
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(InstallNodeDumpStream, 1);
 BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
 {
   auto output = make_shared<boost::test_tools::output_test_stream>();
@@ -157,8 +153,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
   BOOST_CHECK(output->is_equal(
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02087	2	0	1	LastDelay	0.0208712	20871.2	1	1\n"
-    "3.02087	2	0	1	FullDelay	0.0208712	20871.2	1	1\n"));
+    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
+    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

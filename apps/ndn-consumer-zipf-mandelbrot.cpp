@@ -21,8 +21,6 @@
 
 #include "ndn-consumer-zipf-mandelbrot.hpp"
 
-#include "utils/ndn-fw-hop-count-tag.hpp"
-
 #include <math.h>
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerZipfMandelbrot");
