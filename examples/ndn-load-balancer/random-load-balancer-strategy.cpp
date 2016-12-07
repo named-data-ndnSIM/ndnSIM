@@ -94,7 +94,7 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Inter
     }
   } while (!canForwardToNextHop(inFace, pitEntry, *selected));
 
-  this->sendInterest(pitEntry, selected->getFace());
+  this->sendInterest(pitEntry, selected->getFace(), interest);
 }
 
 } // namespace fw
