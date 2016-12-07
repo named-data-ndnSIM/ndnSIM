@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2015  Regents of the University of California.
+ * Copyright (c) 2011-2016  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -25,6 +25,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/node-list.h"
+#include "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 
 #include "daemon/table/pit-entry.hpp"
 
@@ -246,8 +247,10 @@ const double alpha = 0.8;
                        + /*old value*/ (1 - alpha) * STATS(3).fieldName;                           \
                                                                                                    \
   os << time.ToDouble(Time::S) << "\t" << m_node << "\t";                                          \
-  if (stats.first != nullptr) {                                                                    \
-    os << stats.first->getId() << "\t" << stats.first->getLocalUri() << "\t";                      \
+  if (stats.first != nfd::face::INVALID_FACEID) {                                                  \
+    os << stats.first << "\t";                                                                     \
+    NS_ASSERT(m_faceInfos.find(stats.first) != m_faceInfos.end());                                 \
+    os << m_faceInfos.find(stats.first)->second << "\t";                                           \
   }                                                                                                \
   else {                                                                                           \
     os << "-1\tall\t";                                                                             \
@@ -261,7 +264,7 @@ L3RateTracer::Print(std::ostream& os) const
   Time time = Simulator::Now();
 
   for (auto& stats : m_stats) {
-    if (stats.first == nullptr)
+    if (stats.first == nfd::face::INVALID_FACEID)
       continue;
 
     PRINTER("InInterests", m_inInterests);
@@ -269,6 +272,9 @@ L3RateTracer::Print(std::ostream& os) const
 
     PRINTER("InData", m_inData);
     PRINTER("OutData", m_outData);
+
+    PRINTER("InNacks", m_inNack);
+    PRINTER("OutNacks", m_outNack);
 
     PRINTER("InSatisfiedInterests", m_satisfiedInterests);
     PRINTER("InTimedOutInterests", m_timedOutInterests);
@@ -278,7 +284,7 @@ L3RateTracer::Print(std::ostream& os) const
   }
 
   {
-    auto i = m_stats.find(nullptr);
+    auto i = m_stats.find(nfd::face::INVALID_FACEID);
     if (i != m_stats.end()) {
       auto& stats = *i;
       PRINTER("SatisfiedInterests", m_satisfiedInterests);
@@ -290,9 +296,10 @@ L3RateTracer::Print(std::ostream& os) const
 void
 L3RateTracer::OutInterests(const Interest& interest, const Face& face)
 {
-  std::get<0>(m_stats[face.shared_from_this()]).m_outInterests++;
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_outInterests++;
   if (interest.hasWire()) {
-    std::get<1>(m_stats[face.shared_from_this()]).m_outInterests +=
+    std::get<1>(m_stats[face.getId()]).m_outInterests +=
       interest.wireEncode().size();
   }
 }
@@ -300,9 +307,10 @@ L3RateTracer::OutInterests(const Interest& interest, const Face& face)
 void
 L3RateTracer::InInterests(const Interest& interest, const Face& face)
 {
-  std::get<0>(m_stats[face.shared_from_this()]).m_inInterests++;
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_inInterests++;
   if (interest.hasWire()) {
-    std::get<1>(m_stats[face.shared_from_this()]).m_inInterests +=
+    std::get<1>(m_stats[face.getId()]).m_inInterests +=
       interest.wireEncode().size();
   }
 }
@@ -310,9 +318,10 @@ L3RateTracer::InInterests(const Interest& interest, const Face& face)
 void
 L3RateTracer::OutData(const Data& data, const Face& face)
 {
-  std::get<0>(m_stats[face.shared_from_this()]).m_outData++;
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_outData++;
   if (data.hasWire()) {
-    std::get<1>(m_stats[face.shared_from_this()]).m_outData +=
+    std::get<1>(m_stats[face.getId()]).m_outData +=
       data.wireEncode().size();
   }
 }
@@ -320,40 +329,75 @@ L3RateTracer::OutData(const Data& data, const Face& face)
 void
 L3RateTracer::InData(const Data& data, const Face& face)
 {
-  std::get<0>(m_stats[face.shared_from_this()]).m_inData++;
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_inData++;
   if (data.hasWire()) {
-    std::get<1>(m_stats[face.shared_from_this()]).m_inData +=
+    std::get<1>(m_stats[face.getId()]).m_inData +=
       data.wireEncode().size();
+  }
+}
+
+void
+L3RateTracer::OutNack(const lp::Nack& nack, const Face& face)
+{
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_outNack++;
+  if (nack.getInterest().hasWire()) {
+    std::get<1>(m_stats[face.getId()]).m_outNack +=
+      nack.getInterest().wireEncode().size();
+  }
+}
+
+void
+L3RateTracer::InNack(const lp::Nack& nack, const Face& face)
+{
+  AddInfo(face);
+  std::get<0>(m_stats[face.getId()]).m_inNack++;
+  if (nack.getInterest().hasWire()) {
+    std::get<1>(m_stats[face.getId()]).m_inNack +=
+      nack.getInterest().wireEncode().size();
   }
 }
 
 void
 L3RateTracer::SatisfiedInterests(const nfd::pit::Entry& entry, const Face&, const Data&)
 {
-  std::get<0>(m_stats[nullptr]).m_satisfiedInterests++;
+  std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_satisfiedInterests++;
   // no "size" stats
 
   for (const auto& in : entry.getInRecords()) {
-    std::get<0>(m_stats[(in.getFace()).shared_from_this()]).m_satisfiedInterests ++;
+    AddInfo(in.getFace());
+    std::get<0>(m_stats[(in.getFace()).getId()]).m_satisfiedInterests ++;
   }
 
   for (const auto& out : entry.getOutRecords()) {
-    std::get<0>(m_stats[(out.getFace()).shared_from_this()]).m_outSatisfiedInterests ++;
+    AddInfo(out.getFace());
+    std::get<0>(m_stats[(out.getFace()).getId()]).m_outSatisfiedInterests ++;
   }
 }
 
 void
 L3RateTracer::TimedOutInterests(const nfd::pit::Entry& entry)
 {
-  std::get<0>(m_stats[nullptr]).m_timedOutInterests++;
+  std::get<0>(m_stats[nfd::face::INVALID_FACEID]).m_timedOutInterests++;
   // no "size" stats
 
   for (const auto& in : entry.getInRecords()) {
-    std::get<0>(m_stats[(in.getFace()).shared_from_this()]).m_timedOutInterests++;
+    AddInfo(in.getFace());
+    std::get<0>(m_stats[(in.getFace()).getId()]).m_timedOutInterests++;
   }
 
   for (const auto& out : entry.getOutRecords()) {
-    std::get<0>(m_stats[(out.getFace()).shared_from_this()]).m_outTimedOutInterests++;
+    AddInfo(out.getFace());
+    std::get<0>(m_stats[(out.getFace()).getId()]).m_outTimedOutInterests++;
+  }
+}
+
+void
+L3RateTracer::AddInfo(const Face& face)
+{
+  if (m_faceInfos.find(face.getId()) == m_faceInfos.end()) {
+    m_faceInfos.insert(make_pair(face.getId(), boost::lexical_cast<std::string>(face.getLocalUri())));
   }
 }
 

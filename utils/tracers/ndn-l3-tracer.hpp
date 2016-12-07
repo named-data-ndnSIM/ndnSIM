@@ -94,6 +94,12 @@ protected:
   InData(const Data&, const Face&) = 0;
 
   virtual void
+  OutNack(const lp::Nack& nack, const Face&) = 0;
+
+  virtual void
+  InNack(const lp::Nack&, const Face&) = 0;
+
+  virtual void
   SatisfiedInterests(const nfd::pit::Entry&, const Face&, const Data&) = 0;
 
   virtual void
@@ -111,6 +117,8 @@ protected:
       m_outInterests = 0;
       m_inData = 0;
       m_outData = 0;
+      m_inNack = 0;
+      m_outNack = 0;
       m_satisfiedInterests = 0;
       m_timedOutInterests = 0;
 
@@ -122,6 +130,8 @@ protected:
     double m_outInterests;
     double m_inData;
     double m_outData;
+    double m_inNack;
+    double m_outNack;
     double m_satisfiedInterests;
     double m_timedOutInterests;
     double m_outSatisfiedInterests;

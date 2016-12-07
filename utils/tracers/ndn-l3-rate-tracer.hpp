@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2015  Regents of the University of California.
+ * Copyright (c) 2011-2016  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -140,6 +140,12 @@ protected:
   InData(const Data& data, const Face& face);
 
   virtual void
+  OutNack(const lp::Nack& nack, const Face& face);
+
+  virtual void
+  InNack(const lp::Nack& nack, const Face& face);
+
+  virtual void
   SatisfiedInterests(const nfd::pit::Entry&, const Face&, const Data&);
 
   virtual void
@@ -155,12 +161,16 @@ private:
   void
   Reset();
 
+  void
+  AddInfo(const Face& face);
+
 private:
   shared_ptr<std::ostream> m_os;
   Time m_period;
   EventId m_printEvent;
 
-  mutable std::map<shared_ptr<const Face>, std::tuple<Stats, Stats, Stats, Stats>> m_stats;
+  mutable std::map<nfd::FaceId, std::tuple<Stats, Stats, Stats, Stats>> m_stats;
+  std::map<nfd::FaceId, std::string> m_faceInfos; // needed, because face may no longer exists at the time of stat printing
 };
 
 } // namespace ndn
