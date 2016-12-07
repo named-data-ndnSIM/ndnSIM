@@ -5,6 +5,82 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
+Release 2.3 (Changes since release 2.2)
+---------------------------------------
+
+Release date: December 12, 2016
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been both upgraded to version 0.5
+  (:issue:`3875`).
+
+  Features of NFD:
+
+    * Adaptive SRTT-based Forwarding strategy has been added.
+    * Breaking change -- Configurable policy for admission of unsolicited data packets into the
+      content store have been introduced.
+    * Introduce mechanism to update properties (e.g., flags, persistency) of
+      an existing Face.
+    * Breaking change -- ForwarderStatus dataset can now be requested only
+      with /localhost/nfd/status/general interest.
+    * Breaking change -- Strategy API update. FIB entry is no longer supplied
+      to the Strategy::afterReceiveInterest method (i.e., FIB lookup is not
+      performed by the forwarding pipelines). When necessary, a strategy can
+      request FIB lookup using Strategy::lookupFib.
+    * Refactor implementation of RIB Manager to make it uniform with
+      other managers.
+
+  Features of ndn-cxx:
+
+    * New transformation API.
+    * Introduce Name::deepCopy to allow memory optimizations when working
+      with Name objects.
+    * New ndn::security::CommandInterestValidator class.
+    * New FaceUpdateCommand structure for NFD management protocols.
+    * Breaking change - Expose ControlResponse as part of
+      Controller::CommandFailCallback.
+    * Breaking change - Change security constants to corresponding strongly
+      typed enumerations.
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+- Replace NetDeviceFaceLinkService with NetDeviceTransport to add
+  full support of NDNLPv2 and, thus, network-layer NACK handling to
+  ndnSIM (:issue:`3871`).
+
+  ndnSIM now uses an implementation of nfd::face::Transport that enables the
+  full support of NDNLPv2 and the handling of network-layer NACKs generated
+  by NFD. NACKs can reach the ndnSIM applications.
+
+  .. note::
+     NACK handling by ndnSIM came at the cost of losing the NS3 related
+     packet tags. The hopCount tag is now implemented as a tag of a packet
+     directly at the NDNLPv2 layer.
+
+New features
+~~~~~~~~~~~~
+
+- Enable NACK tracing by the network layer tracers (:issue:`3872`).
+
+- NetworkRegionTable helper was added to allow the configuration
+  of the simulated nodes' NetworkRegionTable (:issue:`3806`).
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Internal refactoring to use the ndnSIM-specific transport implementation
+  (ndn::L3Protocol, ndn::StackHelper, ndn::LinkControlHelper,
+  ndn::GlobalRoutingHelper, ndn::Consumer, ndn::Producer).
+
+- Updates of the ndnSIM documentation (:issue:`3876`)
+
+  * Added explanation about the support of NDNLPv2 and its implications.
+
 Release 2.2 (Changes since release 2.1)
 ---------------------------------------
 
@@ -50,7 +126,7 @@ Overview
   propagate ns3 Tags.
 
   .. note::
-     This version of dnSIM does not include support for NDNLPv2 and, thus, cannot
+     This version of ndnSIM does not include support for NDNLPv2 and, thus, cannot
      yet be used to simulate network-level NACKs across the simulated nodes.
      This will be addressed in the next release of ndnSIM.
 
