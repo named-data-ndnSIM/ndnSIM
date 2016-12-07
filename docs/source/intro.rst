@@ -48,7 +48,7 @@ In addition to that, any experiments with NDN forwarding (e.g., custom forwardin
 strategies) inside ndnSIM can be directly used within the real NFD implementation.
 
 Specifically, the simulator directly uses NFD implementations of :nfd:`pending Interest
-table (PIT) <nfd::Pit>`, :nfd:`forwarding information base (FIB) <nfd::Fib>`, and
+table (PIT) <nfd::pit::Pit>`, :nfd:`forwarding information base (FIB) <nfd::fib::Fib>`, and
 :nfd:`content store <nfd::cs::Cs>` data structures.  In addition to that, ndnSIM allows
 experimentation with :ndnSIM:`ndnSIM-specific content store <ndn::ContentStore>` along
 with its cache replacement policies ported from the previous version of ndnSIM.
@@ -62,8 +62,11 @@ perform detailed tracing behavior of every component, as well as NDN traffic flo
 More documentation
 ------------------
 
-Overall structure of ndnSIM is described in our `technical report
-<http://lasr.cs.ucla.edu/afanasyev/data/files/Afanasyev/ndnSIM-TR.pdf>`_.
+Overall structure of ndnSIM is described in our technical reports:
+
+- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
+
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`__)
 
 `ndnSIM API documentation <doxygen/index.html>`_
 
@@ -97,7 +100,7 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 | Folder          | Description                                                         |
 +=================+=====================================================================+
 | ``model/``      | implementation of NDN base: :ndnsim:`L3Protocol`, faces             |
-|                 | (:ndnsim:`Face`, :ndnsim:`NetDeviceLinkService`,                    |
+|                 | (:ndnsim:`Face`, :ndnsim:`NetDeviceTransport`,                      |
 |                 | :ndnsim:`AppLinkService`),                                          |
 |                 | etc.                                                                |
 +-----------------+---------------------------------------------------------------------+

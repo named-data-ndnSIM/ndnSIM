@@ -18,7 +18,7 @@ Installing boost libraries to ``/usr/local``
     **The following instructions are for those who want to install latest version of boost libraries** :red:`and has root access`.
 
 The following commands would install the latest version of boost libraries (at the time of
-writing, version 1.59) ot ``/usr/local``, assuming you have a root access to your machine.  If
+writing, version 1.62) ot ``/usr/local``, assuming you have a root access to your machine.  If
 you don't have root access, please refer to section :ref:`Installing boost libraries to a
 non-privileged location`.
 
@@ -29,9 +29,9 @@ non-privileged location`.
 .. code-block:: bash
    :linenos:
 
-    wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2
-    tar jxf boost_1_59_0.tar.bz2
-    cd boost_1_59_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.62.0/boost_1_62_0.tar.bz2
+    tar jxf boost_1_62_0.tar.bz2
+    cd boost_1_62_0
     ./bootstrap.sh
     sudo ./b2 --prefix=/usr/local install
 
@@ -63,15 +63,15 @@ Installing boost libraries to a non-privileged location
     going wrong.**
 
 Normally, to compile and install boost libraries in non-privileged mode, you would need to
-issue following commands (e.g., for boost version 1.59.0):
+issue following commands (e.g., for boost version 1.62.0):
 
 .. code-block:: bash
    :linenos:
 
     export BOOSTDIR=/home/non-privileged-user/boost
-    wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2
-    tar jxf boost_1_59_0.tar.bz2
-    cd boost_1_59_0
+    wget http://downloads.sourceforge.net/project/boost/boost/1.62.0/boost_1_62_0.tar.bz2
+    tar jxf boost_1_62_0.tar.bz2
+    cd boost_1_62_0
     ./bootstrap.sh
     ./b2 --prefix=$BOOSTDIR install
 
@@ -138,10 +138,10 @@ Visualizer problems
 Something is wrong with your python bindings and python bindings dependencies.  Please follow
 the :ref:`requirements` section that lists what should be installed in order to run visualizer.
 
-.. _Problems with the gtk python module on OS X:
+.. _Problems with the gtk python module on macOS:
 
-Problems with the gtk python module on OS X
--------------------------------------------
+Problems with the gtk python module on macOS
+--------------------------------------------
 
 .. topic:: ./waf configure got stuck during the gtk module check
 
@@ -171,11 +171,8 @@ Refer to :ref:`Link Control Helper`.
 
     How the current version of ndnSIM handles network-level NACKs?
 
-ndnSIM 2.2 does not include support for NDNLPv2 and, thus, cannot yet be
-used to simulate network-level NACKs across simulation nodes. This will be
-addressed in the next release of ndnSIM. The way to address that is to
-implement a Link Service specific to ndnSIM, which will come at the cost of
-losing the NS3 tags attached to the packets.
+ndnSIM 2.3 includes full support of NDNLPv2 and, thus, can be
+used to simulate network-level NACKs across simulation nodes.
 
 General questions
 -----------------

@@ -11,9 +11,9 @@ ndnSIM 2.x has been successfully compiled and used on following platforms:
 
 - Ubuntu Linux 14.04 (32- and 64-bit platform)
 - Ubuntu Linux 16.04 (32- and 64-bit platform)
-- OS X 10.9
-- OS X 10.10
-- OS X 10.11
+- macOS 10.10
+- macOS 10.11
+- macOS 10.12
 
 .. _requirements:
 
@@ -26,7 +26,8 @@ Prerequisites
 -  ``libsqlite3``
 -  ``libcrypto++``
 -  ``pkg-config``
--  Boost libraries >= 1.53
+-  ``openssl``
+-  Boost libraries >= 1.54
 
 .. role:: red
 
@@ -40,19 +41,19 @@ Prerequisites
 Following are the detailed steps for each platform to install the compiler, all necessary
 development tools and libraries, and ndn-cxx prerequisites.
 
-- OS X
+- macOS
 
-  * OS X with MacPorts:
-
-   .. code-block:: bash
-
-       sudo port install pkgconfig boost sqlite3 libcryptopp
-
-  * OS X with HomeBrew:
+  * macOS with MacPorts:
 
    .. code-block:: bash
 
-       brew install boost cryptopp pkg-config libxml2
+       sudo port install pkgconfig boost sqlite3 libcryptopp openssl
+
+  * macOS with HomeBrew:
+
+   .. code-block:: bash
+
+       brew install boost cryptopp pkg-config openssl libxml2
        brew link --force libxml2
 
 - Linux
@@ -61,16 +62,16 @@ development tools and libraries, and ndn-cxx prerequisites.
 
    .. code-block:: bash
 
-       sudo apt-get install build-essential libsqlite3-dev libcrypto++-dev libboost-all-dev
+       sudo apt-get install build-essential libsqlite3-dev libcrypto++-dev libboost-all-dev libssl-dev git python-setuptools
 
   * Fedora Linux
 
    .. code-block:: bash
 
-       sudo yum install gcc-g++ git sqlite-devel cryptopp-devel boost-devel
+       sudo yum install gcc-g++ git sqlite-devel cryptopp-devel boost-devel openssl-devel
 
    .. note::
-      :red:`ndnSIM requires boost version at least 1.49.` Many linux distribution
+      :red:`ndnSIM requires boost version at least 1.54.` Many linux distribution
       (Fedora 16, 17 at the time of this writing) ship an old version of boost, making it
       impossible to compile ndnSIM out-of-the-box.  Please install the latest version, following
       :ref:`these simple instructions <Installing boost libraries>`.
@@ -81,39 +82,32 @@ If you are planning to use NS-3 python bindings, a number of additional dependen
 should be installed.  For example, in order to run `visualizer`_ module, the following
 should be installed:
 
-- OS X
+- macOS
 
-  * OS X with MacPorts:
+  * macOS with MacPorts:
 
     .. code-block:: bash
 
-        sudo port install  py27-pygraphviz py27-goocanvas
+        sudo port install  py27-pygraphviz py27-goocanvas py27-kiwi
 
-        # If you add NDN macports repository, as described in
-        # http://named-data.net/doc/NFD/current/INSTALL.html#install-nfd-using-the-ndn-macports-repository-on-os-x
-        # you will be able to install another useful python module
-        # sudo port install py27-kiwi
-
-  * OS X with HomeBrew
+  * macOS with HomeBrew
 
     Currently, there are many missing dependencies, so it is impossible to use visualizer module with HomeBrew.  Use MacPorts instead.
 
 - Linux
 
   * Ubuntu Linux
-  
+
     .. code-block:: bash
-    
-        sudo apt-get install python-dev python-pygraphviz python-kiwi
-        sudo apt-get install python-pygoocanvas python-gnome2
-        sudo apt-get install python-rsvg ipython
-  
+
+        sudo apt-get install python-dev python-pygraphviz python-kiwi python-pygoocanvas python-gnome2 python-rsvg ipython
+
   * Fedora Linux
-  
+
     .. code-block:: bash
-    
+
         sudo yum install pygoocanvas python-kiwi graphviz-python
-    
+
         # easy_install method, since pygraphviz is not (yet?) packaged into Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=740687)
         sudo yum install graphviz-devel
         sudo yum install python-pip
@@ -173,7 +167,7 @@ sufficient to configure and build ndnSIM with python bindings enabled:
    ./waf configure --enable-examples
    ./waf
 
-On OS X (with MacPorts), you may need to modify the configure command to use MacPorts
+On macOS (with MacPorts), you may need to modify the configure command to use MacPorts
 version of python:
 
 .. code-block:: bash
@@ -184,8 +178,8 @@ version of python:
    ./waf
 
 .. note::
-   On OS X configuration stage may get :ref:`stuck at detecting gtk module <Problems with
-   the gtk python module on OS X>`.  Make sure you have `XQuartz
+   On macOS configuration stage may get :ref:`stuck at detecting gtk module <Problems with
+   the gtk python module on macOS>`.  Make sure you have `XQuartz
    <http://xquartz.macosforge.org>`_ installed or disable python as described in the
    following instructions.
 
@@ -211,37 +205,37 @@ Simulating using ndnSIM
   When NS-3 is configured with ``--with-examples`` flag, you can directly run all examples
   described in :doc:`examples section of this tutorial <examples>`.  For example, to run
   ``ndn-simple.cpp`` scenario, you can run the following command:
-  
+
   .. code-block:: bash
-  
+
       ./waf --run=ndn-simple
-  
+
   To run ``ndn-grid.cpp`` scenario:
-  
+
   .. code-block:: bash
-  
+
       ./waf --run=ndn-grid
-  
+
   To run the sample simulation scenarios with the logging module of NS-3 enabled (note that
   this will work only when NS-3 is compiled in debug mode):
-  
+
   .. code-block:: bash
-  
+
       NS_LOG=ndn.Producer:ndn.Consumer ./waf --run=<scenario name>
-  
+
   If you have compiled with python bindings, then you can try to run these simulations with
   visualizer:
-  
+
   .. code-block:: bash
-  
+
       ./waf --run=ndn-simple --vis
-  
+
   or:
-  
+
   .. code-block:: bash
-  
+
       ./waf --run=ndn-grid --vis
-  
+
   .. note::
      Do not forget to configure and compile NS-3 in optimized mode (``./waf configure -d
      optimized``) in order to run actual simulations.
@@ -249,37 +243,37 @@ Simulating using ndnSIM
 - Real experimentation
 
   Simulation scenarios can be written directly inside NS-3 in ``scratch/`` or ``src/ndnSIM/examples`` folder.
-  
+
   Alternative and a recommended way is to write simulation scenarios in a separate
   repository, not related to either NS-3 or ndnSIM.  For example, you can use the
   following template to write your extensions, simulation scenarios, and metric processing
   scripts: `<http://github.com/cawka/ndnSIM-scenario-template>`_:
-  
+
   .. code-block:: bash
-  
+
       mkdir ndnSIM
       cd ndnSIM
       git clone https://github.com/named-data-ndnSIM/ns-3-dev.git ns-3
       git clone https://github.com/named-data-ndnSIM/pybindgen.git pybindgen
       git clone --recursive https://github.com/named-data-ndnSIM/ndnSIM.git ns-3/src/ndnSIM
-  
+
       # Build and install NS-3 and ndnSIM
       cd ns-3
       ./waf configure -d optimized
       ./waf
-  
+
       sudo ./waf install
       cd ..
-  
+
       git clone https://github.com/named-data-ndnSIM/scenario-template.git scenario
       cd scenario
       export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
       export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-  
+
       ./waf configure
-  
+
       ./waf --run <scenario>
-  
+
   For more detailed information, refer to `README file
   <https://github.com/cawka/ndnSIM-scenario-template/blob/master/README.md>`_.
 

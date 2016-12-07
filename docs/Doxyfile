@@ -1978,7 +1978,11 @@ PREDEFINED             = NS3_ASSERT_ENABLE \
                          NFD_LOG_INCLASS_TEMPLATE_SPECIALIZATION_DEFINE \
                          NFD_LOG_INCLASS_2TEMPLATE_SPECIALIZATION_DEFINE \
                          NDN_CXX_DECL_OVERRIDE=override \
-                         NDN_CXX_DECL_FINAL=final
+                         NDN_CXX_DECL_FINAL=final \
+                         FINAL_UNLESS_WITH_TESTS=final \
+                         NFD_LOG_INCLASS_DEFINE \
+                         NFD_REGISTER_UNSOLICITED_DATA_POLICY \
+                         NDN_LOG_INIT
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

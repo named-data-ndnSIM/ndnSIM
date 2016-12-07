@@ -44,6 +44,8 @@ Packet-level trace helpers
     |                  | - ``OutInterests``  measurements of outgoing Interests              |
     |                  | - ``InData``  measurements of incoming Data                         |
     |                  | - ``OutData``  measurements of outgoing Data                        |
+    |                  | - ``InNacks``  measurements of outgoing NACKs                       |
+    |                  | - ``OutNacks``  measurements of outgoing NACKs                      |
     |                  | - ``SatisfiedInterests`` measurements of satisfied Interests        |
     |                  |   (totals for all faces)                                            |
     |                  | - ``TimedOutInterests`` measurements of timed out Interests         |
@@ -365,8 +367,8 @@ Application-level trace helper
     | ``HopCount``    | the number of network hops that the retrieved Data packet traveled  |
     |                 | on the way back from producer application or cache.                 |
     |                 |                                                                     |
-    |                 | Note that semantics of ``HopCount`` field has changed compared to   |
-    |                 | ndnSIM 1.0.                                                         |
+    |                 | Note that the semantics of the ``HopCount`` field have changed      |
+    |                 | compared to ndnSIM 1.0.                                             |
     +-----------------+---------------------------------------------------------------------+
 
 .. _app delay trace helper example:
