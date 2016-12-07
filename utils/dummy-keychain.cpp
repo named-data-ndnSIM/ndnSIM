@@ -21,6 +21,7 @@
 
 #include <ndn-cxx/util/io.hpp>
 #include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/stream.hpp>
 
 namespace ndn {
 namespace security {
@@ -119,7 +120,7 @@ DummyPublicInfo::getPublicKey(const Name& keyName)
 KeyType
 DummyPublicInfo::getPublicKeyType(const Name& keyName)
 {
-  return KEY_TYPE_RSA;
+  return KeyType::RSA;
 }
 
 bool
@@ -141,7 +142,7 @@ DummyPublicInfo::getCertificate(const Name& certificateName)
     typedef boost::iostreams::stream<boost::iostreams::array_source> arrayStream;
     arrayStream
     is(reinterpret_cast<const char*>(DUMMY_CERT), sizeof(DUMMY_CERT));
-    cert = io::load<IdentityCertificate>(is, io::BASE_64);
+    cert = io::load<IdentityCertificate>(is, io::BASE64);
   }
 
   return cert;

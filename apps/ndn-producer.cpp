@@ -119,7 +119,7 @@ Producer::OnInterest(shared_ptr<const Interest> interest)
   }
 
   signature.setInfo(signatureInfo);
-  signature.setValue(::ndn::nonNegativeIntegerBlock(::ndn::tlv::SignatureValue, m_signature));
+  signature.setValue(::ndn::makeNonNegativeIntegerBlock(::ndn::tlv::SignatureValue, m_signature));
 
   data->setSignature(signature);
 

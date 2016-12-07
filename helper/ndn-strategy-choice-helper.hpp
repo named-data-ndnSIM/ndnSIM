@@ -120,7 +120,7 @@ StrategyChoiceHelper::Install(Ptr<Node> node, const Name& namePrefix)
   nfd::StrategyChoice& strategyChoice = forwarder.getStrategyChoice();
 
   if (!strategyChoice.hasStrategy(Strategy::STRATEGY_NAME)) {
-    strategyChoice.install(make_shared<Strategy>(ref(forwarder)));
+    strategyChoice.install(make_unique<Strategy>(ref(forwarder)));
   }
 
   Install(node, namePrefix, Strategy::STRATEGY_NAME);

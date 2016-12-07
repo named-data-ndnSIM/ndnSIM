@@ -150,7 +150,7 @@ public:
 
   virtual void
   afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       shared_ptr<nfd::fib::Entry> fibEntry, shared_ptr<nfd::pit::Entry> pitEntry)
+                       const shared_ptr<nfd::pit::Entry>& pitEntry)
   {
     // this strategy doesn't forward interests
   }

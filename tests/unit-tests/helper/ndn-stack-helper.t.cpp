@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(TestNfdContentStorePolicy)
   // test that the CS policy for node 0 did not change
   BOOST_CHECK_EQUAL(protoNode0->getForwarder()->getCs().getPolicy()->getName(), "lru");
   // test which CS policy has be selected for node 1
-  BOOST_CHECK_EQUAL(protoNode1->getForwarder()->getCs().getPolicy()->getName(), "fifo");
+  BOOST_CHECK_EQUAL(protoNode1->getForwarder()->getCs().getPolicy()->getName(), "priority_fifo");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

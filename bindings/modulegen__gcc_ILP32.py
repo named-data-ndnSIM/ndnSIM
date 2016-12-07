@@ -242,7 +242,7 @@ def register_methods(root_module):
         # cls.add_method('insert', retval('std::pair<std::shared_ptr<ns3::ndn::nfd::fib::Entry>, bool>'), [param('const ns3::ndn::Name&', 'prefix')])
         cls.add_method('erase', retval('void'), [param('const ns3::ndn::Name&', 'prefix')])
         cls.add_method('erase', retval('void'), [param('const ns3::ndn::nfd::fib::Entry&', 'entry')])
-        cls.add_method('removeNextHopFromAllEntries', retval('void'), [param('std::shared_ptr<ns3::ndn::Face>', 'face')])
+        # cls.add_method('removeNextHopFromAllEntries', retval('void'), [param('std::shared_ptr<ns3::ndn::Face>', 'face')])
 
         def reg_Entry(cls):
             cls.add_method('getPrefix', 'const ns3::ndn::Name&', [], is_const=True)
@@ -251,9 +251,11 @@ def register_methods(root_module):
         reg_Entry(root_module['ns3::ndn::nfd::fib::Entry'])
 
         def reg_NextHop(cls):
-            cls.add_constructor([param('std::shared_ptr<ns3::ndn::Face>', 'face')])
+            cls.add_constructor([param('const ns3::ndn::Face&', 'face')])
 
-            cls.add_method('getFace', 'std::shared_ptr<ns3::ndn::Face>', [], is_const=True)
+            cls.add_function_as_method('getFaceFromFibNextHop', 'std::shared_ptr<ns3::ndn::Face>',
+                                       [param('const ns3::ndn::nfd::fib::NextHop&', 'obj')],
+                                       custom_name='getFace')
             cls.add_method('setCost', 'void', [param('uint64_t', 'cost')])
             cls.add_method('getCost', 'uint64_t', [], is_const=True)
         reg_NextHop(root_module['ns3::ndn::nfd::fib::NextHop'])

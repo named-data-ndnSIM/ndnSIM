@@ -45,7 +45,7 @@
 #include "ns3/ndnSIM/NFD/daemon/mgmt/forwarder-status-manager.hpp"
 // #include "ns3/ndnSIM/NFD/daemon/mgmt/general-config-section.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/tables-config-section.hpp"
-#include "ns3/ndnSIM/NFD/daemon/mgmt/command-validator.hpp"
+#include "ns3/ndnSIM/NFD/daemon/mgmt/command-authenticator.hpp"
 
 #include "ns3/ndnSIM/NFD/rib/rib-manager.hpp"
 
@@ -164,12 +164,13 @@ private:
 
   std::shared_ptr<nfd::Face> m_internalFace;
   std::shared_ptr<::ndn::Face> m_internalClientFace;
-  std::unique_ptr<nfd::CommandValidator> m_validator;
+  std::shared_ptr<nfd::CommandAuthenticator> m_authenticator;
 
   std::shared_ptr<nfd::Face> m_internalRibFace;
   std::shared_ptr<::ndn::Face> m_internalRibClientFace;
 
   std::unique_ptr<::ndn::mgmt::Dispatcher> m_dispatcher;
+  std::unique_ptr<::ndn::mgmt::Dispatcher> m_dispatcherRib;
   std::shared_ptr<nfd::FibManager> m_fibManager;
   std::shared_ptr<nfd::FaceManager> m_faceManager;
   std::shared_ptr<nfd::StrategyChoiceManager> m_strategyChoiceManager;
@@ -255,18 +256,18 @@ L3Protocol::initializeManagement()
   forwarder->getFaceTable().addReserved(m_impl->m_internalFace, face::FACEID_INTERNAL_FACE);
   m_impl->m_dispatcher.reset(new ::ndn::mgmt::Dispatcher(*m_impl->m_internalClientFace, StackHelper::getKeyChain()));
 
-  m_impl->m_validator.reset(new CommandValidator());
+  m_impl->m_authenticator = CommandAuthenticator::create();
 
   m_impl->m_fibManager.reset(new FibManager(forwarder->getFib(),
-                                            bind(&Forwarder::getFace, forwarder.get(), _1),
+                                            forwarder->getFaceTable(),
                                             *m_impl->m_dispatcher,
-                                            *m_impl->m_validator));
+                                            *m_impl->m_authenticator));
 
   // Cannot be disabled for now
   // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false)) {
   m_impl->m_faceManager.reset(new FaceManager(forwarder->getFaceTable(),
                                               *m_impl->m_dispatcher,
-                                              *m_impl->m_validator));
+                                              *m_impl->m_authenticator));
   // }
   // else {
   //   this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("faces");
@@ -275,7 +276,7 @@ L3Protocol::initializeManagement()
   if (!this->getConfig().get<bool>("ndnSIM.disable_strategy_choice_manager", false)) {
     m_impl->m_strategyChoiceManager.reset(new StrategyChoiceManager(forwarder->getStrategyChoice(),
                                                                     *m_impl->m_dispatcher,
-                                                                    *m_impl->m_validator));
+                                                                    *m_impl->m_authenticator));
   }
   else {
     this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("strategy-choice");
@@ -293,15 +294,10 @@ L3Protocol::initializeManagement()
     forwarder->getCs().setPolicy(m_impl->m_policy());
   }
 
-  TablesConfigSection tablesConfig(forwarder->getCs(),
-                                   forwarder->getPit(),
-                                   forwarder->getFib(),
-                                   forwarder->getStrategyChoice(),
-                                   forwarder->getMeasurements(),
-                                   forwarder->getNetworkRegionTable());
+  TablesConfigSection tablesConfig(*forwarder);
   tablesConfig.setConfigFile(config);
 
-  m_impl->m_validator->setConfigFile(config);
+  m_impl->m_authenticator->setConfigFile(config);
 
   // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false)) {
   m_impl->m_faceManager->setConfigFile(config);
@@ -310,12 +306,12 @@ L3Protocol::initializeManagement()
   // apply config
   config.parse(m_impl->m_config, false, "ndnSIM.conf");
 
-  tablesConfig.ensureTablesAreConfigured();
+  tablesConfig.ensureConfigured();
 
   // add FIB entry for NFD Management Protocol
   Name topPrefix("/localhost/nfd");
   auto entry = forwarder->getFib().insert(topPrefix).first;
-  entry->addNextHop(m_impl->m_internalFace, 0);
+  entry->addNextHop(*(m_impl->m_internalFace), 0);
   m_impl->m_dispatcher->addTopPrefix(topPrefix, false);
 }
 
@@ -326,7 +322,10 @@ L3Protocol::initializeRibManager()
 
   std::tie(m_impl->m_internalRibFace, m_impl->m_internalRibClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
   m_impl->m_forwarder->getFaceTable().add(m_impl->m_internalRibFace);
-  m_impl->m_ribManager = make_shared<rib::RibManager>(*(m_impl->m_internalRibClientFace),
+
+  m_impl->m_dispatcherRib.reset(new ::ndn::mgmt::Dispatcher(*m_impl->m_internalRibClientFace, StackHelper::getKeyChain()));
+
+  m_impl->m_ribManager = make_shared<rib::RibManager>(*(m_impl->m_dispatcherRib), *(m_impl->m_internalRibClientFace),
                                                       StackHelper::getKeyChain());
 
   ConfigFile config([] (const std::string& filename, const std::string& sectionName,
@@ -348,8 +347,6 @@ L3Protocol::initializeRibManager()
   config.parse(m_impl->m_config, false, "ndnSIM.conf");
 
   m_impl->m_ribManager->registerWithNfd();
-
-  m_impl->m_ribManager->enableLocalControlHeader();
 }
 
 shared_ptr<nfd::Forwarder>
@@ -463,19 +460,19 @@ L3Protocol::addFace(shared_ptr<Face> face)
 shared_ptr<Face>
 L3Protocol::getFaceById(nfd::FaceId id) const
 {
-  return m_impl->m_forwarder->getFaceTable().get(id);
+  return m_impl->m_forwarder->getFaceTable().get(id)->shared_from_this();
 }
 
 shared_ptr<Face>
 L3Protocol::getFaceByNetDevice(Ptr<NetDevice> netDevice) const
 {
-  for (const auto& i : m_impl->m_forwarder->getFaceTable()) {
-    auto linkService = dynamic_cast<NetDeviceLinkService*>(i->getLinkService());
+  for (auto& i : m_impl->m_forwarder->getFaceTable()) {
+    auto linkService = dynamic_cast<NetDeviceLinkService*>(i.getLinkService());
     if (linkService == nullptr)
       continue;
 
     if (linkService->GetNetDevice() == netDevice)
-      return i;
+      return i.shared_from_this();
   }
   return nullptr;
 }

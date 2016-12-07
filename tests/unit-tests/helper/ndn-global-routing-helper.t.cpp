@@ -92,8 +92,8 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase1)
   for (const auto& entry : ndn->getForwarder()->getFib()) {
     bool isFirst = true;
     for (auto& nextHop : entry.getNextHops()) {
-      auto face = nextHop.getFace();
-      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+      auto& face = nextHop.getFace();
+      auto linkService = dynamic_cast<NetDeviceLinkService*>(face.getLinkService());
       if (linkService == nullptr)
         continue;
       BOOST_CHECK_EQUAL(Names::FindName(linkService->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "C1");
@@ -137,8 +137,8 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
   for (const auto& entry : ndn->getForwarder()->getFib()) {
     bool isFirst = true;
     for (auto& nextHop : entry.getNextHops()) {
-      auto face = nextHop.getFace();
-      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+      auto& face = nextHop.getFace();
+      auto linkService = dynamic_cast<NetDeviceLinkService*>(face.getLinkService());
       if (linkService == nullptr)
         continue;
       BOOST_CHECK_EQUAL(Names::FindName(linkService->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");

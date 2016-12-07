@@ -334,11 +334,11 @@ L3RateTracer::SatisfiedInterests(const nfd::pit::Entry& entry, const Face&, cons
   // no "size" stats
 
   for (const auto& in : entry.getInRecords()) {
-    std::get<0>(m_stats[in.getFace()]).m_satisfiedInterests ++;
+    std::get<0>(m_stats[(in.getFace()).shared_from_this()]).m_satisfiedInterests ++;
   }
 
   for (const auto& out : entry.getOutRecords()) {
-    std::get<0>(m_stats[out.getFace()]).m_outSatisfiedInterests ++;
+    std::get<0>(m_stats[(out.getFace()).shared_from_this()]).m_outSatisfiedInterests ++;
   }
 }
 
@@ -349,11 +349,11 @@ L3RateTracer::TimedOutInterests(const nfd::pit::Entry& entry)
   // no "size" stats
 
   for (const auto& in : entry.getInRecords()) {
-    std::get<0>(m_stats[in.getFace()]).m_timedOutInterests++;
+    std::get<0>(m_stats[(in.getFace()).shared_from_this()]).m_timedOutInterests++;
   }
 
   for (const auto& out : entry.getOutRecords()) {
-    std::get<0>(m_stats[out.getFace()]).m_outTimedOutInterests++;
+    std::get<0>(m_stats[(out.getFace()).shared_from_this()]).m_outTimedOutInterests++;
   }
 }
 

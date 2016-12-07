@@ -43,4 +43,6 @@
 #include "ns3/ndnSIM/NFD/daemon/fw/forwarder.hpp"
 #include "ns3/ndnSIM/NFD/daemon/table/fib.hpp"
 
+#include "ns3/ndnSIM/bindings/module-helpers.hpp"
+
 #endif // NDNSIM_NDN_ALL_HPP

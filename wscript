@@ -7,18 +7,19 @@ from waflib.Errors import WafError
 import wutils
 
 REQUIRED_BOOST_LIBS = ['graph', 'thread', 'unit_test_framework',
-                       'system', 'random', 'date_time', 'iostreams', 'regex', 'program_options', 'chrono', 'filesystem']
+                       'system', 'random', 'date_time', 'iostreams', 'regex',
+                       'program_options', 'chrono', 'filesystem']
 
 def required_boost_libs(conf):
     conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
 
 def options(opt):
     opt.load(['version'], tooldir=['%s/.waf-tools' % opt.path.abspath()])
-    opt.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'cryptopp', 'sqlite3'],
+    opt.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'cryptopp', 'sqlite3', 'openssl'],
              tooldir=['%s/ndn-cxx/.waf-tools' % opt.path.abspath()])
 
 def configure(conf):
-    conf.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version', 'cryptopp', 'sqlite3'])
+    conf.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version', 'cryptopp', 'sqlite3', 'openssl'])
 
     conf.env['ENABLE_NDNSIM']=False
 
@@ -32,11 +33,12 @@ def configure(conf):
     conf.check_cxx(lib='pthread', uselib_store='PTHREAD', define_name='HAVE_PTHREAD', mandatory=False)
     conf.check_sqlite3(mandatory=True)
     conf.check_cryptopp(mandatory=True, use='PTHREAD')
+    conf.check_openssl(mandatory=True, use='OPENSSL', atleast_version=0x10001000)
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                      "Required boost libraries not found")
-        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
+        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.54.0")
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
     else:
@@ -60,12 +62,12 @@ def configure(conf):
             return
 
         boost_version = conf.env.BOOST_VERSION.split('_')
-        if int(boost_version[0]) < 1 or int(boost_version[1]) < 48:
+        if int(boost_version[0]) < 1 or int(boost_version[1]) < 54:
             conf.report_optional_feature("ndnSIM", "ndnSIM", False,
-                                         "ndnSIM requires at least boost version 1.48")
+                                         "ndnSIM requires at least boost version 1.54")
             conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
 
-            Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.48")
+            Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.54")
             Logs.error ("Please upgrade your distribution or install custom boost libraries (http://ndnsim.net/faq.html#boost-libraries)")
             return
 
@@ -75,13 +77,13 @@ def configure(conf):
     conf.report_optional_feature("ndnSIM", "ndnSIM", True, "")
 
     conf.write_config_header('../../ns3/ndnSIM/ndn-cxx/ndn-cxx-config.hpp', define_prefix='NDN_CXX_', remove=False)
-    conf.write_config_header('../../ns3/ndnSIM/NFD/config.hpp', remove=False)
+    conf.write_config_header('../../ns3/ndnSIM/NFD/core/config.hpp', remove=False)
 
 def build(bld):
     (base, build, split) = bld.getVersion('NFD')
     bld(features="subst",
         name="version-NFD",
-        source='NFD/version.hpp.in', target='../../ns3/ndnSIM/NFD/version.hpp',
+        source='NFD/core/version.hpp.in', target='../../ns3/ndnSIM/NFD/core/version.hpp',
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
@@ -118,12 +120,12 @@ def build(bld):
                                      'NFD/daemon/face/*udp*',
                                      'NFD/daemon/face/unix-stream*',
                                      'NFD/daemon/face/websocket*',
-                                     'NFD/rib/nrd.cpp'])
+                                     'NFD/rib/service.cpp'])
 
     module = bld.create_ns3_module('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders ndncxxheaders'
-    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'CRYPTOPP', 'SQLITE3', 'RT', 'PTHREAD']
+    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'CRYPTOPP', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
     module.includes = ['../..', '../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM', '../../ns3/ndnSIM/ndn-cxx']
     module.export_includes = ['../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM']
 
@@ -135,12 +137,12 @@ def build(bld):
         bld.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
 
-    module_dirs = ['apps', 'helper', 'model', 'utils']
+    module_dirs = ['apps', 'helper', 'model', 'utils', 'bindings']
     module.source = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in module_dirs],
                                       excl=[
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
-    module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils']
+    module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils', 'bindings']
     module.full_headers = bld.path.ant_glob(['%s/**/*.hpp' % dir for dir in module_dirs])
     module.full_headers += bld.path.ant_glob('NFD/common.hpp')
 

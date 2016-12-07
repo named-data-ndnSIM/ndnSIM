@@ -82,9 +82,9 @@ main(int argc, char* argv[])
 
       bool isFirst = true;
       for (auto& nextHop : entry.getNextHops()) {
-        cout << *nextHop.getFace();
-        auto face = nextHop.getFace();
-        auto linkService = dynamic_cast<ndn::NetDeviceLinkService*>(face->getLinkService());
+        cout << nextHop.getFace();
+        auto& face = nextHop.getFace();
+        auto linkService = dynamic_cast<ndn::NetDeviceLinkService*>(face.getLinkService());
         if (linkService == nullptr) {
           continue;
         }

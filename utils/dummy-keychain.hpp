@@ -21,6 +21,7 @@
 #define NDNSIM_UTILS_DUMMY_KEYCHAIN_HPP
 
 #include <ndn-cxx/security/key-chain.hpp>
+#include <ndn-cxx/security/security-common.hpp>
 
 namespace ndn {
 namespace security {

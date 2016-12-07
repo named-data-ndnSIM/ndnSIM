@@ -57,7 +57,7 @@ LinkControlHelper::setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRa
 
   // iterate over all faces to find the right one
   for (const auto& face : ndn1->getForwarder()->getFaceTable()) {
-    auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+    auto linkService = dynamic_cast<NetDeviceLinkService*>(face.getLinkService());
     if (linkService == nullptr)
       continue;
 

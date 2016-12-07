@@ -29,6 +29,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include "face/face.hpp"
 #include "fw/strategy.hpp"
+#include "fw/algorithm.hpp"
 
 namespace nfd {
 namespace fw {
@@ -37,11 +38,11 @@ class RandomLoadBalancerStrategy : public Strategy {
 public:
   RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
 
-  virtual ~RandomLoadBalancerStrategy();
+  virtual ~RandomLoadBalancerStrategy() override;
 
   virtual void
   afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       shared_ptr<fib::Entry> fibEntry, shared_ptr<pit::Entry> pitEntry);
+                       const shared_ptr<pit::Entry>& pitEntry) override;
 
 public:
   static const Name STRATEGY_NAME;

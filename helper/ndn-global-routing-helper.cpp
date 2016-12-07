@@ -81,7 +81,7 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
   node->AggregateObject(gr);
 
   for (auto& face : ndn->getForwarder()->getFaceTable()) {
-    auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
+    auto linkService = dynamic_cast<NetDeviceLinkService*>(face.getLinkService());
     if (linkService == nullptr) {
       NS_LOG_DEBUG("Skipping non-netdevice face");
       continue;
@@ -116,7 +116,7 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
         }
         otherGr = otherNode->GetObject<GlobalRouter>();
         NS_ASSERT(otherGr != 0);
-        gr->AddIncidency(face, otherGr);
+        gr->AddIncidency(face.shared_from_this(), otherGr);
       }
     }
     else {
@@ -126,7 +126,7 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
       }
       grChannel = ch->GetObject<GlobalRouter>();
 
-      gr->AddIncidency(face, grChannel);
+      gr->AddIncidency(face.shared_from_this(), grChannel);
     }
   }
 }
@@ -316,16 +316,16 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     // remember interface statuses
     std::list<nfd::FaceId> faceIds;
     std::unordered_map<nfd::FaceId, uint16_t> originalMetrics;
-    for (auto& i : l3->getForwarder()->getFaceTable()) {
-      shared_ptr<Face> nfdFace = std::dynamic_pointer_cast<Face>(i);
-      faceIds.push_back(nfdFace->getId());
-      originalMetrics[nfdFace->getId()] = nfdFace->getMetric();
-      nfdFace->setMetric(std::numeric_limits<uint16_t>::max() - 1);
+    for (auto& nfdFace : l3->getForwarder()->getFaceTable()) {
+      faceIds.push_back(nfdFace.getId());
+      originalMetrics[nfdFace.getId()] = nfdFace.getMetric();
+      nfdFace.setMetric(std::numeric_limits<uint16_t>::max() - 1);
       // value std::numeric_limits<uint16_t>::max () MUST NOT be used (reserved)
     }
 
     for (auto& faceId : faceIds) {
-      shared_ptr<Face> face = l3->getForwarder()->getFaceTable().get(faceId);
+      auto* face = l3->getForwarder()->getFaceTable().get(faceId);
+      NS_ASSERT(face != nullptr);
       auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
       if (linkService == nullptr) {
         NS_LOG_DEBUG("Skipping non-netdevice face");
