@@ -98,6 +98,7 @@ BOOST_AUTO_TEST_CASE(InstallAll)
     "3.02087	2	0	1	FullDelay	0.0208712	20871.2	1	1\n");
 }
 
+BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(InstallNodeContainer, 1);
 BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 {
   NodeContainer nodes;

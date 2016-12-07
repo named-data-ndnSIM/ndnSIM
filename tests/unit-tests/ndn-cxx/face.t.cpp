@@ -22,6 +22,7 @@
 #include <ndn-cxx/util/scheduler-scoped-event-id.hpp>
 
 #include "ns3/ndnSIM/helper/ndn-app-helper.hpp"
+#include "ns3/error-model.h"
 
 #include "../tests-common.hpp"
 
@@ -174,6 +175,11 @@ BOOST_AUTO_TEST_CASE(ExpressInterestTimeout)
         });
     })
     .Start(Seconds(2.01));
+
+  // Make sure NACKs are never received
+  Ptr<ns3::RateErrorModel> model = CreateObject<ns3::RateErrorModel>();
+  model->SetRate(std::numeric_limits<double>::max());
+  Config::Set("/NodeList/*/DeviceList/*/$ns3::PointToPointNetDevice/ReceiveErrorModel", PointerValue(model));
 
   Simulator::Stop(Seconds(20));
   Simulator::Run();

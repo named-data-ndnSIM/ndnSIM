@@ -17,37 +17,53 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include "model/ndn-header.hpp"
-#include "model/ndn-ns3.hpp"
-#include "helper/ndn-stack-helper.hpp"
+#ifndef NDNSIM_NDN_BLOCK_HEADER_HPP
+#define NDNSIM_NDN_BLOCK_HEADER_HPP
 
-#include <ndn-cxx/interest.hpp>
-#include <ndn-cxx/data.hpp>
+#include "ns3/header.h"
 
-#include "../tests-common.hpp"
+#include "ndn-common.hpp"
+
+namespace nfdFace = nfd::face;
 
 namespace ns3 {
 namespace ndn {
 
-BOOST_FIXTURE_TEST_SUITE(ModelNdnHeader, CleanupFixture)
+class BlockHeader : public Header {
+public:
+  static ns3::TypeId
+  GetTypeId();
 
-BOOST_AUTO_TEST_CASE(TypeId)
-{
- auto interest = make_shared<ndn::Interest>("/prefix");
- PacketHeader<Interest> interestPktHeader(*interest);
- BOOST_CHECK_EQUAL(interestPktHeader.GetTypeId().GetName().c_str(), "ns3::ndn::Interest");
+  virtual TypeId
+  GetInstanceTypeId(void) const;
 
- auto data = make_shared<ndn::Data>();
- data->setFreshnessPeriod(ndn::time::milliseconds(1000));
- data->setContent(std::make_shared< ::ndn::Buffer>(1024));
- ndn::StackHelper::getKeyChain().sign(*data);
- PacketHeader<Data> dataPktHeader(*data);
+  BlockHeader();
 
- BOOST_CHECK_EQUAL(dataPktHeader.GetTypeId().GetName().c_str(), "ns3::ndn::Data");
- BOOST_CHECK_EQUAL(dataPktHeader.GetSerializedSize(), 1354); // 328 + 1024
-}
+  BlockHeader(const nfdFace::Transport::Packet& packet);
 
-BOOST_AUTO_TEST_SUITE_END()
+  virtual uint32_t
+  GetSerializedSize(void) const;
+
+  virtual void
+  Serialize(ns3::Buffer::Iterator start) const;
+
+  virtual uint32_t
+  Deserialize(ns3::Buffer::Iterator start);
+
+  virtual void
+  Print(std::ostream& os) const;
+
+  Block&
+  getBlock();
+
+  const Block&
+  getBlock() const;
+
+private:
+  Block m_block;
+};
 
 } // namespace ndn
 } // namespace ns3
+
+#endif // NDNSIM_NDN_BLOCK_HEADER_HPP

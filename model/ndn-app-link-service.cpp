@@ -70,7 +70,7 @@ AppLinkService::doSendNack(const lp::Nack& nack)
   NS_LOG_FUNCTION(this << &nack);
 
   // to decouple callbacks
-  // Simulator::ScheduleNow(&App::OnNack, m_app, nack.shared_from_this());
+  Simulator::ScheduleNow(&App::OnNack, m_app, make_shared<lp::Nack>(nack));
 }
 
 //

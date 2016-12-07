@@ -29,7 +29,7 @@
 #include "ns3/pointer.h"
 #include "ns3/simulator.h"
 
-#include "ndn-net-device-link-service.hpp"
+#include "ndn-net-device-transport.hpp"
 
 #include "../helper/ndn-stack-helper.hpp"
 #include "cs/ndn-content-store.hpp"
@@ -88,6 +88,13 @@ L3Protocol::GetTypeId(void)
                       "ns3::ndn::L3Protocol::DataTraceCallback")
       .AddTraceSource("InData", "InData", MakeTraceSourceAccessor(&L3Protocol::m_inData),
                       "ns3::ndn::L3Protocol::DataTraceCallback")
+
+      ////////////////////////////////////////////////////////////////////
+
+      .AddTraceSource("OutNack", "OutNack", MakeTraceSourceAccessor(&L3Protocol::m_outNack),
+                      "ns3::ndn::L3Protocol::NackTraceCallback")
+      .AddTraceSource("InNack", "InNack", MakeTraceSourceAccessor(&L3Protocol::m_inNack),
+                      "ns3::ndn::L3Protocol::NackTraceCallback")
 
       ////////////////////////////////////////////////////////////////////
 
@@ -434,7 +441,13 @@ L3Protocol::addFace(shared_ptr<Face> face)
         this->m_inData(data, *face);
       }
     });
-  // TODO Add nack signals
+
+  face->afterReceiveNack.connect([this, weakFace](const lp::Nack& nack) {
+      shared_ptr<Face> face = weakFace.lock();
+      if (face != nullptr) {
+        this->m_inNack(nack, *face);
+      }
+    });
 
   auto tracingLink = face->getLinkService();
   NS_LOG_LOGIC("Adding trace sources for afterSendInterest and afterSendData");
@@ -452,7 +465,12 @@ L3Protocol::addFace(shared_ptr<Face> face)
       }
     });
 
-  // TODO Add nack signals
+  tracingLink->afterSendNack.connect([this, weakFace](const lp::Nack& nack) {
+      shared_ptr<Face> face = weakFace.lock();
+      if (face != nullptr) {
+        this->m_outNack(nack, *face);
+      }
+    });
 
   return face->getId();
 }
@@ -467,11 +485,11 @@ shared_ptr<Face>
 L3Protocol::getFaceByNetDevice(Ptr<NetDevice> netDevice) const
 {
   for (auto& i : m_impl->m_forwarder->getFaceTable()) {
-    auto linkService = dynamic_cast<NetDeviceLinkService*>(i.getLinkService());
-    if (linkService == nullptr)
+    auto transport = dynamic_cast<NetDeviceTransport*>(i.getTransport());
+    if (transport == nullptr)
       continue;
 
-    if (linkService->GetNetDevice() == netDevice)
+    if (transport->GetNetDevice() == netDevice)
       return i.shared_from_this();
   }
   return nullptr;

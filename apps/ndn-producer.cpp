@@ -24,7 +24,6 @@
 #include "ns3/packet.h"
 #include "ns3/simulator.h"
 
-#include "model/ndn-ns3.hpp"
 #include "model/ndn-l3-protocol.hpp"
 #include "helper/ndn-fib-helper.hpp"
 

@@ -27,7 +27,7 @@
 
 #include "model/ndn-l3-protocol.hpp"
 #include "helper/ndn-fib-helper.hpp"
-#include "model/ndn-net-device-link-service.hpp"
+#include "model/ndn-net-device-transport.hpp"
 #include "model/ndn-global-router.hpp"
 
 #include "daemon/table/fib.hpp"
@@ -81,15 +81,15 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
   node->AggregateObject(gr);
 
   for (auto& face : ndn->getForwarder()->getFaceTable()) {
-    auto linkService = dynamic_cast<NetDeviceLinkService*>(face.getLinkService());
-    if (linkService == nullptr) {
-      NS_LOG_DEBUG("Skipping non-netdevice face");
+    auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
+    if (transport == nullptr) {
+      NS_LOG_DEBUG("Skipping non ndnSIM-specific transport face");
       continue;
     }
 
-    Ptr<NetDevice> nd = linkService->GetNetDevice();
+    Ptr<NetDevice> nd = transport->GetNetDevice();
     if (nd == 0) {
-      NS_LOG_DEBUG("Not a NetDevice associated with NetDeviceFace");
+      NS_LOG_DEBUG("Not a NetDevice associated with an ndnSIM-specific transport instance");
       continue;
     }
 
@@ -326,9 +326,9 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     for (auto& faceId : faceIds) {
       auto* face = l3->getForwarder()->getFaceTable().get(faceId);
       NS_ASSERT(face != nullptr);
-      auto linkService = dynamic_cast<NetDeviceLinkService*>(face->getLinkService());
-      if (linkService == nullptr) {
-        NS_LOG_DEBUG("Skipping non-netdevice face");
+      auto transport = dynamic_cast<NetDeviceTransport*>(face->getTransport());
+      if (transport == nullptr) {
+        NS_LOG_DEBUG("Skipping non ndnSIM-specific transport face");
         continue;
       }
 

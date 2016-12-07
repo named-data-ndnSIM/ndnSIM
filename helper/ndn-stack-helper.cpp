@@ -26,8 +26,7 @@
 #include "ns3/point-to-point-channel.h"
 
 #include "model/ndn-l3-protocol.hpp"
-#include "model/ndn-net-device-link-service.hpp"
-#include "model/null-transport.hpp"
+#include "model/ndn-net-device-transport.hpp"
 #include "utils/ndn-time.hpp"
 #include "utils/dummy-keychain.hpp"
 #include "model/cs/ndn-content-store.hpp"
@@ -36,6 +35,7 @@
 #include <map>
 #include <boost/lexical_cast.hpp>
 
+#include "ns3/ndnSIM/NFD/daemon/face/generic-link-service.hpp"
 #include "ns3/ndnSIM/NFD/daemon/table/cs-policy-priority-fifo.hpp"
 #include "ns3/ndnSIM/NFD/daemon/table/cs-policy-lru.hpp"
 
@@ -270,9 +270,18 @@ StackHelper::DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
 {
   NS_LOG_DEBUG("Creating default Face on node " << node->GetId());
 
-  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, netDevice);
-  auto transport = make_unique<NullTransport>(constructFaceUri(netDevice), "netdev://[ff:ff:ff:ff:ff:ff]");
-  auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
+  // Create an ndnSIM-specific transport instance
+  ::nfd::face::GenericLinkService::Options opts;
+  opts.allowFragmentation = true;
+  opts.allowReassembly = true;
+
+  auto linkService = make_unique<::nfd::face::GenericLinkService>(opts);
+
+  auto transport = make_unique<NetDeviceTransport>(node, netDevice,
+                                                   constructFaceUri(netDevice),
+                                                   "netdev://[ff:ff:ff:ff:ff:ff]");
+
+  auto face = std::make_shared<Face>(std::move(linkService), std::move(transport));
   face->setMetric(1);
 
   ndn->addFace(face);
@@ -299,10 +308,18 @@ StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
   if (remoteNetDevice->GetNode() == node)
     remoteNetDevice = channel->GetDevice(1);
 
-  auto netDeviceLink = make_unique<NetDeviceLinkService>(node, netDevice);
+  // Create an ndnSIM-specific transport instance
+  ::nfd::face::GenericLinkService::Options opts;
+  opts.allowFragmentation = true;
+  opts.allowReassembly = true;
 
-  auto transport = make_unique<NullTransport>(constructFaceUri(netDevice), constructFaceUri(remoteNetDevice));
-  auto face = std::make_shared<Face>(std::move(netDeviceLink), std::move(transport));
+  auto linkService = make_unique<::nfd::face::GenericLinkService>(opts);
+
+  auto transport = make_unique<NetDeviceTransport>(node, netDevice,
+                                                   constructFaceUri(netDevice),
+                                                   constructFaceUri(remoteNetDevice));
+
+  auto face = std::make_shared<Face>(std::move(linkService), std::move(transport));
   face->setMetric(1);
 
   ndn->addFace(face);

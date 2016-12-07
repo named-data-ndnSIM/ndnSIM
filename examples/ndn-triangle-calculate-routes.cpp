@@ -23,7 +23,7 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-#include "ns3/ndnSIM/model/ndn-net-device-link-service.hpp"
+#include "ns3/ndnSIM/model/ndn-net-device-transport.hpp"
 
 namespace ns3 {
 
@@ -84,8 +84,8 @@ main(int argc, char* argv[])
       for (auto& nextHop : entry.getNextHops()) {
         cout << nextHop.getFace();
         auto& face = nextHop.getFace();
-        auto linkService = dynamic_cast<ndn::NetDeviceLinkService*>(face.getLinkService());
-        if (linkService == nullptr) {
+        auto transport = dynamic_cast<ndn::NetDeviceTransport*>(face.getTransport());
+        if (transport == nullptr) {
           continue;
         }
 
@@ -93,7 +93,7 @@ main(int argc, char* argv[])
 
         if (!isFirst)
           cout << ", ";
-        cout << Names::FindName(linkService->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode());
+        cout << Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode());
         isFirst = false;
       }
       cout << ")" << endl;

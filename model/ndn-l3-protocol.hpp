@@ -213,6 +213,9 @@ private:
   TracedCallback<const Data&, const Face&> m_outData; ///< @brief trace of outgoing Data
   TracedCallback<const Data&, const Face&> m_inData;  ///< @brief trace of incoming Data
 
+  TracedCallback<const lp::Nack&, const Face&> m_outNack; ///< @brief trace of outgoing Nack
+  TracedCallback<const lp::Nack&, const Face&> m_inNack;  ///< @brief trace of incoming Nack
+
   TracedCallback<const nfd::pit::Entry&, const Face&/*in face*/, const Data&> m_satisfiedInterests;
   TracedCallback<const nfd::pit::Entry&> m_timedOutInterests;
 };
