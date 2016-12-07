@@ -49,13 +49,21 @@ App::GetTypeId(void)
                                         MakeTraceSourceAccessor(&App::m_receivedDatas),
                                         "ns3::ndn::App::DataTraceCallback")
 
+                        .AddTraceSource("ReceivedNacks", "ReceivedNacks",
+                                        MakeTraceSourceAccessor(&App::m_receivedNacks),
+                                        "ns3::ndn::App::NackTraceCallback")
+
                         .AddTraceSource("TransmittedInterests", "TransmittedInterests",
                                         MakeTraceSourceAccessor(&App::m_transmittedInterests),
                                         "ns3::ndn::App::InterestTraceCallback")
 
                         .AddTraceSource("TransmittedDatas", "TransmittedDatas",
                                         MakeTraceSourceAccessor(&App::m_transmittedDatas),
-                                        "ns3::ndn::App::DataTraceCallback");
+                                        "ns3::ndn::App::DataTraceCallback")
+
+                        .AddTraceSource("TransmittedNacks", "TransmittedNacks",
+                                        MakeTraceSourceAccessor(&App::m_transmittedNacks),
+                                        "ns3::ndn::App::NackTraceCallback");
   return tid;
 }
 
@@ -122,7 +130,7 @@ App::OnNack(shared_ptr<const lp::Nack> nack)
   NS_LOG_FUNCTION(this << nack);
 
   // @TODO Implement
-  // m_receivedDatas(data, this, m_face);
+  m_receivedNacks(nack, this, m_face);
 }
 
 // Application Methods

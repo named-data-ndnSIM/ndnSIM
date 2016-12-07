@@ -253,6 +253,16 @@ Consumer::OnData(shared_ptr<const Data> data)
 }
 
 void
+Consumer::OnNack(shared_ptr<const lp::Nack> nack)
+{
+  /// tracing inside
+  App::OnNack(nack);
+
+  NS_LOG_INFO("NACK received for: " << nack->getInterest().getName()
+              << ", reason: " << nack->getReason());
+}
+
+void
 Consumer::OnTimeout(uint32_t sequenceNumber)
 {
   NS_LOG_FUNCTION(sequenceNumber);

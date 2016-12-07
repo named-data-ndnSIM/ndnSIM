@@ -83,7 +83,7 @@ public:
 public:
   typedef void (*InterestTraceCallback)(shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>);
   typedef void (*DataTraceCallback)(shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>);
-  // @TODO add NACK
+  typedef void (*NackTraceCallback)(shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>);
 
 protected:
   virtual void
@@ -112,7 +112,8 @@ protected:
   TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
     m_receivedDatas; ///< @brief App-level trace of received Data
 
-  // @TODO add NACK
+  TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
+    m_receivedNacks; ///< @brief App-level trace of received Nacks
 
   TracedCallback<shared_ptr<const Interest>, Ptr<App>, shared_ptr<Face>>
     m_transmittedInterests; ///< @brief App-level trace of transmitted Interests
@@ -120,7 +121,8 @@ protected:
   TracedCallback<shared_ptr<const Data>, Ptr<App>, shared_ptr<Face>>
     m_transmittedDatas; ///< @brief App-level trace of transmitted Data
 
-  // @TODO add NACK
+  TracedCallback<shared_ptr<const lp::Nack>, Ptr<App>, shared_ptr<Face>>
+    m_transmittedNacks; ///< @brief App-level trace of transmitted Nacks
 };
 
 } // namespace ndn

@@ -63,6 +63,10 @@ public:
   virtual void
   OnData(shared_ptr<const Data> contentObject);
 
+  // From App
+  virtual void
+  OnNack(shared_ptr<const lp::Nack> nack);
+
   /**
    * @brief Timeout event
    * @param sequenceNumber time outed sequence number

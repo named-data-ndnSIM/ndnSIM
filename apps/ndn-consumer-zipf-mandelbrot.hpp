@@ -63,6 +63,7 @@ public:
 
   virtual void
   SendPacket();
+
   uint32_t
   GetNextSeq();
 
