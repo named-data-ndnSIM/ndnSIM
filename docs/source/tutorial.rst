@@ -22,6 +22,7 @@ Contents:
     getting-started
     faq
     examples
+    best-practices
     helpers
     cs
     fw
