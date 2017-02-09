@@ -20,6 +20,7 @@
 #include <ndn-cxx/face.hpp>
 #include <ndn-cxx/util/scheduler.hpp>
 #include <ndn-cxx/util/scheduler-scoped-event-id.hpp>
+#include <ndn-cxx/lp/tags.hpp>
 
 #include "ns3/ndnSIM/helper/ndn-app-helper.hpp"
 #include "ns3/error-model.h"
@@ -108,23 +109,21 @@ BOOST_AUTO_TEST_CASE(SetInterestFilter)
 class SingleInterest : public BaseTesterApp
 {
 public:
-  SingleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout)
+  SingleInterest(const Name& name, const std::function<void(const Data&)>& onData, const VoidCallback& onTimeout)
   {
     m_face.expressInterest(name, std::bind([onData] (const Data& data) {
-          onData(data.getName());
+          onData(data);
         }, _2),
       std::bind(onTimeout));
   }
 };
 
-
-
 BOOST_AUTO_TEST_CASE(ExpressInterestLocalhost)
 {
   // Retrieve data from remote
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/localhost", [this] (const Name& data) {
-          BOOST_CHECK(Name("/localhost").isPrefixOf(data));
+      return make_shared<SingleInterest>("/localhost", [this] (const Data& data) {
+          BOOST_CHECK(Name("/localhost").isPrefixOf(data.getName()));
           this->hasFired = true;
           BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 1.01);
         },
@@ -146,8 +145,10 @@ BOOST_AUTO_TEST_CASE(ExpressInterestRemote)
 
   // Retrieve data from remote
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [this] (const Name& data) {
-          BOOST_CHECK_EQUAL(data, "/test/prefix");
+      return make_shared<SingleInterest>("/test/prefix", [this] (const Data& data) {
+          BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
+          BOOST_REQUIRE(data.getTag<lp::HopCountTag>() != nullptr);
+          BOOST_CHECK_EQUAL(*data.getTag<lp::HopCountTag>(), 2);
           this->hasFired = true;
           BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
         },
@@ -166,7 +167,7 @@ BOOST_AUTO_TEST_CASE(ExpressInterestRemote)
 BOOST_AUTO_TEST_CASE(ExpressInterestTimeout)
 {
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [] (const Name&) {
+      return make_shared<SingleInterest>("/test/prefix", [] (const Data&) {
           BOOST_ERROR("Unexpected data");
         },
         [this] {
@@ -195,8 +196,8 @@ BOOST_AUTO_TEST_CASE(ExpressInterestWithRib)
 
   // Retrieve data from remote
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [this] (const Name& data) {
-          BOOST_CHECK_EQUAL(data, "/test/prefix");
+      return make_shared<SingleInterest>("/test/prefix", [this] (const Data& data) {
+          BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
           this->hasFired = true;
           BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
         },
