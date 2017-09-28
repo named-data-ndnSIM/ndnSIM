@@ -36,7 +36,7 @@ namespace fw {
 
 class RandomLoadBalancerStrategy : public Strategy {
 public:
-  RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = STRATEGY_NAME);
+  RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = getStrategyName());
 
   virtual ~RandomLoadBalancerStrategy() override;
 
@@ -44,8 +44,8 @@ public:
   afterReceiveInterest(const Face& inFace, const Interest& interest,
                        const shared_ptr<pit::Entry>& pitEntry) override;
 
-public:
-  static const Name STRATEGY_NAME;
+  static const Name&
+  getStrategyName();
 
 protected:
   boost::random::mt19937 m_randomGenerator;

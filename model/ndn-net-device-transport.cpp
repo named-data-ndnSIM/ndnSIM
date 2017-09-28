@@ -65,14 +65,6 @@ NetDeviceTransport::~NetDeviceTransport()
 }
 
 void
-NetDeviceTransport::beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency)
-{
-  NS_LOG_FUNCTION(this << "Changing persistency for netDevice with URI"
-                  << this->getLocalUri() << "currently does nothing");
-  // do nothing for now
-}
-
-void
 NetDeviceTransport::doClose()
 {
   NS_LOG_FUNCTION(this << "Closing transport for netDevice with URI"

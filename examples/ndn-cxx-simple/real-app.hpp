@@ -45,6 +45,7 @@ public:
     m_scheduler.scheduleEvent(ndn::time::seconds(2), [this] {
         m_faceConsumer.expressInterest(ndn::Interest("/hello/world"),
                                        std::bind([] { std::cout << "Hello!" << std::endl; }),
+                                       std::bind([] { std::cout << "NACK!" << std::endl; }),
                                        std::bind([] { std::cout << "Bye!.." << std::endl; }));
       });
   }

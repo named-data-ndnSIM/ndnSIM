@@ -56,9 +56,6 @@ public:
 
 private:
   virtual void
-  beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency) override;
-
-  virtual void
   doClose() override;
 
   virtual void

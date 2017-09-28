@@ -109,11 +109,13 @@ BOOST_AUTO_TEST_CASE(SetInterestFilter)
 class SingleInterest : public BaseTesterApp
 {
 public:
-  SingleInterest(const Name& name, const std::function<void(const Data&)>& onData, const VoidCallback& onTimeout)
+  SingleInterest(const Name& name, const std::function<void(const Data&)>& onData,
+                 const VoidCallback& onNack, const VoidCallback& onTimeout)
   {
-    m_face.expressInterest(name, std::bind([onData] (const Data& data) {
+    m_face.expressInterest(Interest(name), std::bind([onData] (const Data& data) {
           onData(data);
         }, _2),
+      std::bind(onNack),
       std::bind(onTimeout));
   }
 };
@@ -126,6 +128,9 @@ BOOST_AUTO_TEST_CASE(ExpressInterestLocalhost)
           BOOST_CHECK(Name("/localhost").isPrefixOf(data.getName()));
           this->hasFired = true;
           BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 1.01);
+        },
+        [] {
+          BOOST_ERROR("Unexpected NACK");
         },
         [] {
           BOOST_ERROR("Unexpected timeout");
@@ -153,6 +158,9 @@ BOOST_AUTO_TEST_CASE(ExpressInterestRemote)
           BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
         },
         [] {
+          BOOST_ERROR("Unexpected NACK");
+        },
+        [] {
           BOOST_ERROR("Unexpected timeout");
         });
     })
@@ -167,8 +175,11 @@ BOOST_AUTO_TEST_CASE(ExpressInterestRemote)
 BOOST_AUTO_TEST_CASE(ExpressInterestTimeout)
 {
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [] (const Data&) {
+      return make_shared<SingleInterest>(Name("/test/prefix"), [] (const Data&) {
           BOOST_ERROR("Unexpected data");
+        },
+        [] {
+          BOOST_ERROR("Unexpected NACK");
         },
         [this] {
           BOOST_CHECK_GT(Simulator::Now().ToDouble(Time::S), 6.0);
@@ -188,31 +199,6 @@ BOOST_AUTO_TEST_CASE(ExpressInterestTimeout)
   BOOST_CHECK(hasFired);
 }
 
-// Expected failure until issue #3121 is resolved
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(ExpressInterestWithRib, 2);
-BOOST_AUTO_TEST_CASE(ExpressInterestWithRib)
-{
-  addApps({{"A", "ns3::ndn::Producer", {{"Prefix", "/"}}, "0s", "100s"}});
-
-  // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
-      return make_shared<SingleInterest>("/test/prefix", [this] (const Data& data) {
-          BOOST_CHECK_EQUAL(data.getName(), "/test/prefix");
-          this->hasFired = true;
-          BOOST_CHECK_LE(Simulator::Now().ToDouble(Time::S), 2.0);
-        },
-        [] {
-          BOOST_ERROR("Unexpected timeout");
-        });
-    })
-    .Start(Seconds(1.01));
-
-  Simulator::Stop(Seconds(20));
-  Simulator::Run();
-
-  BOOST_CHECK(hasFired);
-}
-
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -220,24 +206,27 @@ BOOST_AUTO_TEST_CASE(ExpressInterestWithRib)
 class MultipleInterest : public BaseTesterApp
 {
 public:
-  MultipleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout)
+  MultipleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout,
+                   const VoidCallback& onNack)
     : m_scheduler(m_face.getIoService())
     , m_event(m_scheduler)
   {
-    expressNextInterest(name, 0, onData, onTimeout);
+    expressNextInterest(name, 0, onData, onTimeout, onNack);
   }
 
 private:
   void
-  expressNextInterest(const Name& name, uint32_t seqNo, const NameCallback& onData, const VoidCallback& onTimeout)
+  expressNextInterest(const Name& name, uint32_t seqNo, const NameCallback& onData,
+                      const VoidCallback& onTimeout, const VoidCallback& onNack)
   {
-    m_face.expressInterest(Name(name).appendSegment(seqNo), std::bind([=] (const Data& data) {
+    m_face.expressInterest(Interest(Name(name).appendSegment(seqNo)), std::bind([=] (const Data& data) {
           onData(data.getName());
 
           m_event = m_scheduler.scheduleEvent(time::seconds(1),
                                               std::bind(&MultipleInterest::expressNextInterest, this,
-                                                        name, seqNo + 1, onData, onTimeout));
+                                                        name, seqNo + 1, onData, onTimeout, onNack));
         }, _2),
+      std::bind(onNack),
       std::bind(onTimeout));
   }
 
@@ -260,6 +249,9 @@ BOOST_AUTO_TEST_CASE(ExpressMultipleInterests)
         },
         [] {
           BOOST_ERROR("Unexpected timeout");
+        },
+        [] {
+          BOOST_ERROR("Unexpected NACK");
         });
     })
     .Start(Seconds(1.01));
@@ -275,9 +267,12 @@ class SingleInterestWithFaceShutdown : public BaseTesterApp
 public:
   SingleInterestWithFaceShutdown()
   {
-    m_face.expressInterest(Name("/interest/to/timeout"),
+    m_face.expressInterest(Interest(Name("/interest/to/timeout")),
                            std::bind([] {
                                BOOST_ERROR("Unexpected response");
+                             }),
+                           std::bind([this] {
+                               m_face.shutdown();
                              }),
                            std::bind([this] {
                                m_face.shutdown();
@@ -288,7 +283,6 @@ public:
 BOOST_AUTO_TEST_CASE(FaceShutdownFromTimeoutCallback)
 {
   // This test case to check if Face.shutdown from an onTimeout callback doesn't cause segfaults
-
   FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
       return make_shared<SingleInterestWithFaceShutdown>();
     })

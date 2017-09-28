@@ -61,10 +61,12 @@ public:
     FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
         return make_shared<TesterApp>([this] (::ndn::Face& face) {
             for (const Name& dataset : requestedDatasets) {
-              face.expressInterest(dataset, [&] (const Interest& i, Data& data) {
+              Interest i(dataset);
+              face.expressInterest(i, [&] (const Interest& i, const Data& data) {
                   BOOST_TEST_MESSAGE(data.getName());
                   receivedDatasets.insert(data.getName().getPrefix(-2));
                 },
+                std::bind([]{}),
                 std::bind([]{}));
             }
           });

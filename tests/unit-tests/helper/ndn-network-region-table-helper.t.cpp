@@ -19,11 +19,15 @@
 
 #include "helper/ndn-network-region-table-helper.hpp"
 #include "helper/ndn-app-helper.hpp"
+#include <ndn-cxx/link.hpp>
 
 #include "../tests-common.hpp"
 
 namespace ns3 {
 namespace ndn {
+
+using ::ndn::Delegation;
+using ::ndn::DelegationList;
 
 BOOST_AUTO_TEST_SUITE(HelperNdnNetworkRegionTableHelper)
 
@@ -91,13 +95,14 @@ protected:
   ::ndn::Face m_face;
 };
 
-Block
-makeLink(const Name& delegation)
+DelegationList
+makeHint(const Name& delegation)
 {
-  ::ndn::Link link("/LINK");
-  link.addDelegation(1, delegation);
-  ndn::StackHelper::getKeyChain().sign(link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
-  return link.wireEncode();
+  Delegation del;
+  del.name = Name(delegation);
+  del.preference = 1;
+  DelegationList list({del});
+  return list;
 }
 
 class MultiNodeWithAppFixture : public ScenarioHelperWithCleanupFixture
@@ -136,10 +141,10 @@ TesterApp::TesterApp(const Interest& interest, MultiNodeWithAppFixture* fixture)
                              ++fixture->m_nData;
                            }),
                          std::bind([fixture] {
-                             ++fixture->m_nTimeouts;
+                             ++fixture->m_nNacks;
                            }),
                          std::bind([fixture] {
-                             ++fixture->m_nNacks;
+                             ++fixture->m_nTimeouts;
                            }));
 }
 
@@ -150,7 +155,7 @@ BOOST_AUTO_TEST_CASE(WithoutNetworkRegion)
 {
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
+      i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
     .Start(Seconds(0.01));
@@ -169,7 +174,7 @@ BOOST_AUTO_TEST_CASE(WithNetworkRegion)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
+      i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
     .Start(Seconds(0.01));
@@ -188,7 +193,7 @@ BOOST_AUTO_TEST_CASE(WithMoreSpecificNetworkRegion)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix"));
+      i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
     .Start(Seconds(0.01));
@@ -207,7 +212,7 @@ BOOST_AUTO_TEST_CASE(WithLessSpecificLink)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
-      i.setLink(makeLink("/otherPrefix/moreSpecific"));
+      i.setForwardingHint(makeHint(Name("/otherPrefix/moreSpecific")));
       return make_shared<TesterApp>(i, this);
     })
     .Start(Seconds(0.01));

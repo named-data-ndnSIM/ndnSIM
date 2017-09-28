@@ -159,7 +159,6 @@ def register_methods(root_module):
     reg_GlobalRoutingHelper(root_module['ns3::ndn::GlobalRoutingHelper'])
 
     def reg_Name(root_module, cls):
-        cls.implicitly_converts_to(root_module['ns3::ndn::Interest'])
         cls.add_output_stream_operator()
         for op in ['==', '!=', '<', '<=', '>', '>=']:
             cls.add_binary_comparison_operator(op)

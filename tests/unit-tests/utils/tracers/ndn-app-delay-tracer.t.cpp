@@ -89,12 +89,12 @@ BOOST_AUTO_TEST_CASE(InstallAll)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
-    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n"
+    "0.0417664	1	0	0	LastDelay	0.0417664	41766.4	1	2\n"
+    "0.0417664	1	0	0	FullDelay	0.0417664	41766.4	1	2\n"
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
+    "3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1\n"
+    "3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1\n");
 }
 
 BOOST_AUTO_TEST_CASE(InstallNodeContainer)
@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
-    "0.0417712	1	0	0	LastDelay	0.0417712	41771.2	1	2\n"
-    "0.0417712	1	0	0	FullDelay	0.0417712	41771.2	1	2\n");
+    "0.0417664	1	0	0	LastDelay	0.0417664	41766.4	1	2\n"
+    "0.0417664	1	0	0	FullDelay	0.0417664	41766.4	1	2\n");
 }
 
 BOOST_AUTO_TEST_CASE(InstallNode)
@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE(InstallNode)
     "Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount\n"
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n");
+    "3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1\n"
+    "3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1\n");
 }
 
 BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
@@ -153,8 +153,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
   BOOST_CHECK(output->is_equal(
     "2	2	0	0	LastDelay	0	0	1	0\n"
     "2	2	0	0	FullDelay	0	0	1	0\n"
-    "3.02089	2	0	1	LastDelay	0.0208856	20885.6	1	1\n"
-    "3.02089	2	0	1	FullDelay	0.0208856	20885.6	1	1\n"));
+    "3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1\n"
+    "3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1\n"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

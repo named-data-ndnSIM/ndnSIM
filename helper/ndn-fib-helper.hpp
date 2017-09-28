@@ -26,7 +26,7 @@
 #include "ns3/object-vector.h"
 #include "ns3/pointer.h"
 
-#include <ndn-cxx/management/nfd-control-parameters.hpp>
+#include <ndn-cxx/mgmt/nfd/control-parameters.hpp>
 
 namespace ns3 {
 namespace ndn {

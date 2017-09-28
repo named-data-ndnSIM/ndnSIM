@@ -184,6 +184,8 @@ private:
   std::shared_ptr<nfd::ForwarderStatusManager> m_forwarderStatusManager;
   std::shared_ptr<nfd::rib::RibManager> m_ribManager;
 
+  std::shared_ptr<nfd::face::FaceSystem> m_faceSystem;
+
   nfd::ConfigSection m_config;
 
   Ptr<ContentStore> m_csFromNdnSim;
@@ -210,7 +212,6 @@ L3Protocol::initialize()
 
   nfd::FaceTable& faceTable = m_impl->m_forwarder->getFaceTable();
   faceTable.addReserved(nfd::face::makeNullFace(), nfd::face::FACEID_NULL);
-  faceTable.addReserved(nfd::face::makeNullFace(FaceUri("contentstore://")), nfd::face::FACEID_CONTENT_STORE);
 
   if (!this->getConfig().get<bool>("ndnSIM.disable_rib_manager", false)) {
     Simulator::ScheduleWithContext(m_node->GetId(), Seconds(0), &L3Protocol::initializeRibManager, this);
@@ -259,6 +260,8 @@ L3Protocol::initializeManagement()
   auto& forwarder = m_impl->m_forwarder;
   using namespace nfd;
 
+  m_impl->m_faceSystem = make_shared<nfd::face::FaceSystem>(forwarder->getFaceTable(), nullptr);
+
   std::tie(m_impl->m_internalFace, m_impl->m_internalClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
   forwarder->getFaceTable().addReserved(m_impl->m_internalFace, face::FACEID_INTERNAL_FACE);
   m_impl->m_dispatcher.reset(new ::ndn::mgmt::Dispatcher(*m_impl->m_internalClientFace, StackHelper::getKeyChain()));
@@ -271,8 +274,9 @@ L3Protocol::initializeManagement()
                                             *m_impl->m_authenticator));
 
   // Cannot be disabled for now
-  // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false)) {
-  m_impl->m_faceManager.reset(new FaceManager(forwarder->getFaceTable(),
+  // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false))
+
+  m_impl->m_faceManager.reset(new FaceManager(*m_impl->m_faceSystem,
                                               *m_impl->m_dispatcher,
                                               *m_impl->m_authenticator));
   // }

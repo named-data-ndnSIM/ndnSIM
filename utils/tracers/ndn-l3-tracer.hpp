@@ -21,15 +21,10 @@
 #define NDN_L3_TRACER_H
 
 #include "ns3/ndnSIM/model/ndn-common.hpp"
+#include "ns3/ndnSIM/NFD/daemon/table/pit-entry.hpp"
 
 #include "ns3/ptr.h"
 #include "ns3/simple-ref-count.h"
-
-namespace nfd {
-namespace pit {
-class Entry;
-} // namespace pit
-} // namespace nfd
 
 namespace ns3 {
 

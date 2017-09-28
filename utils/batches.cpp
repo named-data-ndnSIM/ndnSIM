@@ -47,7 +47,6 @@ operator>>(std::istream& is, Batches& batch)
     // std::cout << time << ", " << amount << ". \n";
   }
 
-  is.clear();
   return is;
 }
 }

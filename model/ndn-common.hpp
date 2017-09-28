@@ -70,7 +70,7 @@ using ::ndn::Block;
 using ::ndn::KeyChain;
 
 using ::nfd::Face;
-using ::ndn::util::FaceUri;
+using ::ndn::FaceUri;
 
 #ifndef DOXYGEN
 // For python bindings

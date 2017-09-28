@@ -90,7 +90,7 @@ private:
     auto interest = make_shared<Interest>(m_name);
     interest->setInterestLifetime(time::seconds(1));
     if (m_delegation.size() > 0) {
-      interest->setLink(m_link.wireEncode());
+      interest->setForwardingHint(m_link.getDelegationList());
     }
 
     NS_LOG_DEBUG("Sending an Interest for "<< *interest);

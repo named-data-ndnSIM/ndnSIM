@@ -15,11 +15,11 @@ def required_boost_libs(conf):
 
 def options(opt):
     opt.load(['version'], tooldir=['%s/.waf-tools' % opt.path.abspath()])
-    opt.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'cryptopp', 'sqlite3', 'openssl'],
+    opt.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'sqlite3', 'openssl'],
              tooldir=['%s/ndn-cxx/.waf-tools' % opt.path.abspath()])
 
 def configure(conf):
-    conf.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version', 'cryptopp', 'sqlite3', 'openssl'])
+    conf.load(['doxygen', 'sphinx_build', 'type_traits', 'compiler-features', 'version', 'sqlite3', 'openssl'])
 
     conf.env['ENABLE_NDNSIM']=False
 
@@ -32,13 +32,12 @@ def configure(conf):
 
     conf.check_cxx(lib='pthread', uselib_store='PTHREAD', define_name='HAVE_PTHREAD', mandatory=False)
     conf.check_sqlite3(mandatory=True)
-    conf.check_cryptopp(mandatory=True, use='PTHREAD')
     conf.check_openssl(mandatory=True, use='OPENSSL', atleast_version=0x10001000)
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
                                      "Required boost libraries not found")
-        Logs.error ("ndnSIM will not be build as it requires boost libraries of version at least 1.54.0")
+        Logs.error ("ndnSIM will not be built as it requires boost libraries of version at least 1.54.0")
         conf.env['MODULES_NOT_BUILT'].append('ndnSIM')
         return
     else:
@@ -108,14 +107,17 @@ def build(bld):
         deps += ['point-to-point-layout', 'csma', 'applications', 'wifi']
 
     ndnCxxSrc = bld.path.ant_glob('ndn-cxx/src/**/*.cpp',
-                                  excl=['ndn-cxx/src/**/*-osx.cpp',
-                                        'ndn-cxx/src/util/dummy-client-face.cpp'])
+                                  excl=['ndn-cxx/src/net/detail/*.cpp',
+                                        'ndn-cxx/src/net/network-monitor*.cpp',
+                                        'ndn-cxx/src/util/dummy-client-face.cpp',
+                                        'ndn-cxx/src/security/tpm/*osx.cpp',
+                                        'ndn-cxx/src/net/network-interface.cpp'])
 
     nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon', 'NFD/rib']],
                                excl=['NFD/daemon/main.cpp',
                                      'NFD/daemon/nfd.cpp',
-                                     'NFD/daemon/face/ethernet*',
-                                     'NFD/daemon/face/multicast-udp*',
+                                     'NFD/daemon/face/*ethernet*',
+                                     'NFD/daemon/face/*pcap*.cpp',
                                      'NFD/daemon/face/tcp*',
                                      'NFD/daemon/face/*udp*',
                                      'NFD/daemon/face/unix-stream*',
@@ -125,7 +127,7 @@ def build(bld):
     module = bld.create_ns3_module('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders ndncxxheaders'
-    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'CRYPTOPP', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
+    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
     module.includes = ['../..', '../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM', '../../ns3/ndnSIM/ndn-cxx']
     module.export_includes = ['../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM']
 
@@ -148,6 +150,7 @@ def build(bld):
 
     module.ndncxx_headers = bld.path.ant_glob(['ndn-cxx/src/**/*.hpp'],
                                               excl=['src/**/*-osx.hpp', 'src/detail/**/*'])
+
     if bld.env.ENABLE_EXAMPLES:
         bld.recurse('examples')
 

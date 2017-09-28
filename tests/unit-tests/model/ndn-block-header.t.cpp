@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(EncodePrintData)
   nfd::face::Transport::Packet packet(lpPacket.wireEncode());
   BlockHeader header(packet);
 
-  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 1369);
+  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 1350);
 
   {
     Ptr<Packet> packet = Create<Packet>();
