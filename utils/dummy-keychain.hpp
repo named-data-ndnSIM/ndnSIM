@@ -22,97 +22,110 @@
 
 #include <ndn-cxx/security/key-chain.hpp>
 #include <ndn-cxx/security/security-common.hpp>
+#include <ndn-cxx/security/pib/pib-impl.hpp>
+#include <ndn-cxx/security/tpm/back-end.hpp>
+#include <ndn-cxx/security/transform/private-key.hpp>
 
 namespace ndn {
 namespace security {
 
-class DummyPublicInfo : public SecPublicInfo {
+using pib::PibImpl;
+using tpm::BackEnd;
+using tpm::KeyHandle;
+
+class DummyPib : public PibImpl
+{
 public:
-  DummyPublicInfo(const std::string& locator);
+  class Error : public PibImpl::Error
+  {
+  public:
+    explicit
+    Error(const std::string& what)
+      : PibImpl::Error(what)
+    {
+    }
+  };
 
-  virtual bool
-  doesIdentityExist(const Name& identityName);
+public:
+  explicit DummyPib(const std::string& locator);
 
-  virtual void
-  addIdentity(const Name& identityName);
+  // TPM management
+  void
+  setTpmLocator(const std::string& tpmLocator) override;
 
-  virtual bool
-  revokeIdentity();
+  std::string
+  getTpmLocator() const override;
 
-  virtual bool
-  doesPublicKeyExist(const Name& keyName);
+  // Identity manangement
+  bool
+  hasIdentity(const Name& identityName) const override;
 
-  virtual void
-  addKey(const Name& keyName, const PublicKey& publicKey);
+  void
+  addIdentity(const Name& identityName) override;
 
-  virtual shared_ptr<PublicKey>
-  getPublicKey(const Name& keyName);
+  void
+  removeIdentity(const Name& identity) override;
 
-  virtual KeyType
-  getPublicKeyType(const Name& keyName);
+  void
+  clearIdentities() override;
 
-  virtual bool
-  doesCertificateExist(const Name& certificateName);
+  std::set<Name>
+  getIdentities() const override;
 
-  virtual void
-  addCertificate(const IdentityCertificate& certificate);
+  void
+  setDefaultIdentity(const Name& identityName) override;
 
-  virtual shared_ptr<IdentityCertificate>
-  getCertificate(const Name& certificateName);
+  Name
+  getDefaultIdentity() const override;
 
-  virtual Name
-  getDefaultIdentity();
+  // Key management
+  bool
+  hasKey(const Name& keyName) const override;
 
-  virtual Name
-  getDefaultKeyNameForIdentity(const Name& identityName);
+  void
+  addKey(const Name& identity, const Name& keyName, const uint8_t* key,
+         size_t keyLen) override;
 
-  virtual Name
-  getDefaultCertificateNameForKey(const Name& keyName);
+  void
+  removeKey(const Name& keyName) override;
 
-  virtual void
-  getAllIdentities(std::vector<Name>& nameList, bool isDefault);
+  Buffer
+  getKeyBits(const Name& keyName) const override;
 
-  virtual void
-  getAllKeyNames(std::vector<Name>& nameList, bool isDefault);
+  std::set<Name>
+  getKeysOfIdentity(const Name& identity) const override;
 
-  virtual void
-  getAllKeyNamesOfIdentity(const Name& identity, std::vector<Name>& nameList, bool isDefault);
+  void
+  setDefaultKeyOfIdentity(const Name& identity, const Name& keyName) override;
 
-  virtual void
-  getAllCertificateNames(std::vector<Name>& nameList, bool isDefault);
+  Name
+  getDefaultKeyOfIdentity(const Name& identity) const override;
 
-  virtual void
-  getAllCertificateNamesOfKey(const Name& keyName, std::vector<Name>& nameList, bool isDefault);
+  // certificate management
+  bool
+  hasCertificate(const Name& certName) const override;
 
-  virtual void
-  deleteCertificateInfo(const Name& certificateName);
+  void
+  addCertificate(const v2::Certificate& certificate) override;
 
-  virtual void
-  deletePublicKeyInfo(const Name& keyName);
+  void
+  removeCertificate(const Name& certName) override;
 
-  virtual void
-  deleteIdentityInfo(const Name& identity);
+  v2::Certificate
+  getCertificate(const Name& certificateName) const override;
 
-  virtual void
-  setTpmLocator(const std::string& tpmLocator);
+  std::set<Name>
+  getCertificatesOfKey(const Name& keyName) const override;
 
-  virtual std::string
-  getTpmLocator();
+  void
+  setDefaultCertificateOfKey(const Name& keyName, const Name& certName) override;
 
-protected:
-  virtual void
-  setDefaultIdentityInternal(const Name& identityName);
+  v2::Certificate
+  getDefaultCertificateOfKey(const Name& keyName) const override;
 
-  virtual void
-  setDefaultKeyNameForIdentityInternal(const Name& keyName);
-
-  virtual void
-  setDefaultCertificateNameForKeyInternal(const Name& certificateName);
-
-  virtual std::string
+  static std::string
   getScheme();
 
-public:
   static const std::string SCHEME;
 
 private:
@@ -122,71 +135,79 @@ private:
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class DummyTpm : public SecTpm {
+namespace tpm {
+
+class DummyKeyHandle : public KeyHandle
+{
 public:
-  DummyTpm(const std::string& locator);
+  explicit
+  DummyKeyHandle(shared_ptr<transform::PrivateKey> key);
 
-  virtual void
-  setTpmPassword(const uint8_t* password, size_t passwordLength);
+private:
+  ConstBufferPtr
+  doSign(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t size) const final;
 
-  virtual void
-  resetTpmPassword();
+  ConstBufferPtr
+  doDecrypt(const uint8_t* cipherText, size_t cipherTextLen) const final;
 
-  virtual void
-  setInTerminal(bool inTerminal);
+  ConstBufferPtr
+  doDerivePublicKey() const final;
+};
 
-  virtual bool
-  getInTerminal() const;
+} // namespace tpm
 
-  virtual bool
-  isLocked();
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 
-  virtual bool
-  unlockTpm(const char* password, size_t passwordLength, bool usePassword);
+class DummyTpm : public BackEnd
+{
+public:
+  class Error : public BackEnd::Error
+  {
+  public:
+    explicit
+    Error(const std::string& what)
+      : BackEnd::Error(what)
+    {
+    }
+  };
 
-  virtual void
-  generateKeyPairInTpm(const Name& keyName, const KeyParams& params);
+public:
+  explicit DummyTpm(const std::string& locator);
 
-  virtual void
-  deleteKeyPairInTpm(const Name& keyName);
+  bool
+  isTerminalMode() const override;
 
-  virtual shared_ptr<PublicKey>
-  getPublicKeyFromTpm(const Name& keyName);
+  void
+  setTerminalMode(bool isTerminal) const override;
 
-  virtual Block
-  signInTpm(const uint8_t* data, size_t dataLength, const Name& keyName,
-            DigestAlgorithm digestAlgorithm);
+  bool
+  isTpmLocked() const override;
 
-  virtual ConstBufferPtr
-  decryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
+  ConstBufferPtr
+  sign(const uint8_t* buf, size_t size, const Name& keyName, DigestAlgorithm digestAlgorithm) const;
 
-  virtual ConstBufferPtr
-  encryptInTpm(const uint8_t* data, size_t dataLength, const Name& keyName, bool isSymmetric);
-
-  virtual void
-  generateSymmetricKeyInTpm(const Name& keyName, const KeyParams& params);
-
-  virtual bool
-  doesKeyExistInTpm(const Name& keyName, KeyClass keyClass);
-
-  virtual bool
-  generateRandomBlock(uint8_t* res, size_t size);
-
-  virtual void
-  addAppToAcl(const Name& keyName, KeyClass keyClass, const std::string& appPath, AclType acl);
-
-  virtual std::string
+  static std::string
   getScheme();
 
-protected:
-  virtual ConstBufferPtr
-  exportPrivateKeyPkcs8FromTpm(const Name& keyName);
+private:
+  bool
+  doHasKey(const Name& keyName) const final;
 
-  virtual bool
-  importPrivateKeyPkcs8IntoTpm(const Name& keyName, const uint8_t* buffer, size_t bufferSize);
+  unique_ptr<tpm::KeyHandle>
+  doGetKeyHandle(const Name& keyName) const final;
 
-  virtual bool
-  importPublicKeyPkcs1IntoTpm(const Name& keyName, const uint8_t* buffer, size_t bufferSize);
+  unique_ptr<tpm::KeyHandle>
+  doCreateKey(const Name& identity, const KeyParams& params) final;
+
+  void
+  doDeleteKey(const Name& keyName) final;
+
+  ConstBufferPtr
+  doExportKey(const Name& keyName, const char* pw, size_t pwLen) final;
+
+  void
+  doImportKey(const Name& keyName, const uint8_t* pkcs8, size_t pkcs8Len, const char* pw, size_t pwLen) final;
 
 public:
   static const std::string SCHEME;
