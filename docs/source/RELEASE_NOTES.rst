@@ -5,6 +5,50 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
+Release 2.4 (Changes since release 2.3)
+---------------------------------------
+
+Release date: November 1, 2017
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been upgraded to version 0.6.0
+  (:issue:`4306`).
+
+  `NFD 0.6.0 release notes <https://named-data.net/doc/NFD/0.6.0/RELEASE_NOTES.html>`__
+
+  `ndn-cxx 0.6.0 release notes <https://named-data.net/doc/ndn-cxx/0.6.0/RELEASE_NOTES.html>`__
+
+- Upgrade the base NS-3 version to ``ns-3.27-22-g90fb309d5`` (:issue:`4311`).
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+    .. note::
+       To set the maximum size of the used queue when porting already
+       implemented scenarios to ndnSIM 2.4, the QueueBase::MaxPackets attribute
+       has to be set instead of DropTailQueue::MaxPackets.
+
+    .. note::
+       ndnSIM 2.4 requires the following minimal compiler requirements:
+         - g++-4.9 or later (Note:  this is an upgraded requirement from ndnSIM 2.3)
+         - Apple LLVM version 7.0.2 or later 
+         - clang-3.3 or later.
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Internal refactoring of dummy keychain to work with security v2 of ndn-cxx
+  (:issue:`4306`)
+
+- Updates of the ndnSIM documentation and Technical Report (:issue:`4039`, :issue:`4213`)
+
+  * Added page about community contributions to the simulator.
+  * CS tracer documentation update.
+
 Release 2.3 (Changes since release 2.2)
 ---------------------------------------
 
