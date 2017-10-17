@@ -4,9 +4,7 @@ Welcome
 =======
 
 The ndnSIM 2.0 is NS-3 module that implements Named Data Networking (NDN) communication
-model, the clean slate Internet design. ndnSIM is specially optimized for simulation
-purposes and has a cleaner and more extensible internal structure comparing to the
-existing NDN implementation (NDNx).
+model, the clean slate Internet design. 
 
 We invite you to `join our mailing list
 <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
@@ -31,6 +29,7 @@ Contents:
     parallel-simulations
     guide-to-simulate-real-apps
     ndnsim-research-papers
+    community-contributions
 
 
 .. toctree::
@@ -44,6 +43,8 @@ Contents:
 -------
 
 If you refer to ndnSIM in a published work, please cite the following papers, not just the ndnSIM website. Thank you!
+
+- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <http://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
 
 - **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
 

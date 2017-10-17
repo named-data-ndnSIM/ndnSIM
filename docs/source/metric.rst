@@ -248,7 +248,7 @@ Run R script::
 Content store trace helper
 --------------------------
 
-NOTE: This tracer works ONLY when the content store structure of ndnSIM is used!
+NOTE: This tracer works ONLY when the OldContentStore structure is used!
 
 - :ndnsim:`ndn::CsTracer`
 

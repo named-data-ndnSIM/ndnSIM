@@ -17,7 +17,7 @@
  * ndnSIM, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-// ndn-multiple-strategies.cpp
+// ndn-different-strategy-per-prefix.cpp
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"

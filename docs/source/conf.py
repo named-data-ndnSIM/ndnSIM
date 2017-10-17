@@ -50,7 +50,7 @@ extensions = [
 # if os.getenv('GOOGLE_ANALYTICS', None):
 #     addExtensionIfExists('sphinxcontrib.googleanalytics')
 
-    
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -65,14 +65,14 @@ master_doc = 'tutorial'
 
 # General information about the project.
 project = u''
-copyright = u'2011-2015 (c) Alexander Afanasyev, Spyridon Mastorakis, Ilya Moiseenko, and Lixia Zhang'
+copyright = u'2011-2017 (c) Alexander Afanasyev, Spyridon Mastorakis, Ilya Moiseenko, and Lixia Zhang'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '2.1'
+version = '2.4'
 # The full version, including alpha/beta/rc tags.
 release = 'ndnSIM'
 
