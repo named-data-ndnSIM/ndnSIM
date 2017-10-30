@@ -55,7 +55,7 @@ main(int argc, char* argv[])
   // setting default parameters for PointToPoint links and channels
   Config::SetDefault("ns3::CsmaChannel::DataRate", StringValue("1Mbps"));
   Config::SetDefault("ns3::CsmaChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+  Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(20));
 
   // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;

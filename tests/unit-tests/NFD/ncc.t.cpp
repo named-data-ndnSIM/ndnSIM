@@ -33,7 +33,7 @@ public:
   {
     Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
     Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("1ms"));
-    Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("500"));
+    Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(500));
 
       //            Creating a 3 node topology                //
       //                                                      //

@@ -22,6 +22,8 @@ version:
 - Allows [simulation of real applications](http://ndnsim.net/guide-to-simulate-real-apps.html)
   written against ndn-cxx library
 
+- Requires a modified version of NS-3 based on version `ns-3.27-22-g90fb309d5`
+
 [ndnSIM documentation](http://ndnsim.net)
 ---------------------------------------------
 

@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(RandomPolicy)
 {
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::DropTailQueue::MaxPackets", StringValue("20"));
+  Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(20));
 
   getStackHelper().SetOldContentStore("ns3::ndn::cs::Random", "MaxSize", "10");
 

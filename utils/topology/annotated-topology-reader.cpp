@@ -349,7 +349,7 @@ AnnotatedTopologyReader::ApplySettings()
         uint32_t maxPackets = boost::lexical_cast<uint32_t>(link.GetAttribute("MaxPackets"));
 
         // compatibility mode. Only DropTailQueue is supported
-        p2p.SetQueue("ns3::DropTailQueue", "MaxPackets", UintegerValue(maxPackets));
+        p2p.SetQueue("ns3::DropTailQueue<Packet>", "MaxPackets", UintegerValue(maxPackets));
       }
       catch (...) {
         typedef boost::tokenizer<boost::escaped_list_separator<char>> tokenizer;
