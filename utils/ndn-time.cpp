@@ -38,11 +38,11 @@ CustomSystemClock::getSince() const
   return " since start of simulation";
 }
 
-boost::posix_time::time_duration
-CustomSystemClock::toPosixDuration(const system_clock::duration& duration) const
+system_clock::duration
+CustomSystemClock::toWaitDuration(system_clock::duration d) const
 {
   BOOST_ASSERT_MSG(false, "Must not be called");
-  return boost::posix_time::microseconds(1);
+  return time::microseconds(1);
 }
 
 ////////////////////////////////////
@@ -60,11 +60,11 @@ CustomSteadyClock::getSince() const
   return " since start of simulation";
 }
 
-boost::posix_time::time_duration
-CustomSteadyClock::toPosixDuration(const steady_clock::duration& duration) const
+steady_clock::duration
+CustomSteadyClock::toWaitDuration(steady_clock::duration d) const
 {
   BOOST_ASSERT_MSG(false, "Must not be called");
-  return boost::posix_time::microseconds(1);
+  return time::microseconds(1);
 }
 
 } // namespace time

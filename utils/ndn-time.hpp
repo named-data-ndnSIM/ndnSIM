@@ -36,8 +36,8 @@ public:
   std::string
   getSince() const;
 
-  boost::posix_time::time_duration
-  toPosixDuration(const system_clock::duration& duration) const;
+  system_clock::duration
+  toWaitDuration(system_clock::duration d) const;
 };
 
 class CustomSteadyClock : public CustomClock<steady_clock> {
@@ -48,8 +48,8 @@ public:
   std::string
   getSince() const;
 
-  boost::posix_time::time_duration
-  toPosixDuration(const steady_clock::duration& duration) const;
+  steady_clock::duration
+  toWaitDuration(steady_clock::duration d) const;
 };
 
 } // namespace time
