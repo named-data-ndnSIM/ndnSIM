@@ -5,8 +5,38 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
-Release 2.4 (Changes since release 2.3)
----------------------------------------
+Release 2.5
+-----------
+
+Release date: February 23, 2018
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been upgraded to version 0.6.1
+  (:issue:`4514`).
+
+  `NFD 0.6.1 release notes <https://named-data.net/doc/NFD/0.6.1/RELEASE_NOTES.html>`__
+
+  `ndn-cxx 0.6.1 release notes <https://named-data.net/doc/ndn-cxx/0.6.1/RELEASE_NOTES.html>`__
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Fix memory leak related to canceling events scheduled via ndn-cxx's Scheduler interface
+  adapted for NS-3 (:issue:`4509`).
+
+- Fix compilation failure with boost >= 1.66 (:issue:`4471`).
+
+- Updates of the ndnSIM documentation.
+
+Release 2.4
+-----------
 
 Release date: November 1, 2017
 
@@ -35,7 +65,7 @@ Overview
     .. note::
        ndnSIM 2.4 requires the following minimal compiler requirements:
          - g++-4.9 or later (Note:  this is an upgraded requirement from ndnSIM 2.3)
-         - Apple LLVM version 7.0.2 or later 
+         - Apple LLVM version 7.0.2 or later
          - clang-3.3 or later.
 
 Improvements and bug fixes
@@ -49,8 +79,8 @@ Improvements and bug fixes
   * Added page about community contributions to the simulator.
   * CS tracer documentation update.
 
-Release 2.3 (Changes since release 2.2)
----------------------------------------
+Release 2.3
+-----------
 
 Release date: December 12, 2016
 
@@ -125,8 +155,8 @@ Improvements and bug fixes
 
   * Added explanation about the support of NDNLPv2 and its implications.
 
-Release 2.2 (Changes since release 2.1)
----------------------------------------
+Release 2.2
+-----------
 
 Release date: November 11, 2016
 
@@ -208,8 +238,8 @@ Improvements and bug fixes
 
 ********************************************************************************
 
-Release 2.1 (Changes since release 2.0)
----------------------------------------
+Release 2.1
+-----------
 
 Release date: September 4, 2015
 
@@ -347,9 +377,8 @@ Improvements and bug fixes
 ********************************************************************************
 
 
-
-Release 2.0 (Changes since release 1.0)
----------------------------------------
+Release 2.0
+-----------
 
 Release date: January 13, 2015
 
