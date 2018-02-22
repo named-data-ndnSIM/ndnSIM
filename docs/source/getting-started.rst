@@ -10,9 +10,10 @@ Portability
 ndnSIM 2.x has been successfully compiled and used on following platforms:
 
 - Ubuntu Linux 16.04 (32- and 64-bit platform)
-- macOS 10.10
+- Ubuntu Linux 17.10 (64-bit platform)
 - macOS 10.11
 - macOS 10.12
+- macOS 10.13
 
 .. _requirements:
 

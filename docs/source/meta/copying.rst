@@ -2,7 +2,7 @@
 Copyright and License
 =====================
 
-Copyright © 2011-2015 University of California, Los Angeles
+Copyright © 2011-2018 University of California, Los Angeles
 
 ndnSIM is licensed under conditions of GNU General Public License version 3.0 or later
 with permission to be linked with NS-3 codebase (GPL 2.0).
@@ -24,7 +24,7 @@ licenses:
 
 - NDN Forwarding Daemon (NFD) licensed under conditions of `GNU GPL 3.0+
   <https://github.com/named-data/NFD/blob/master/COPYING.md>`__
-  
+
 ndnSIM also relies on several other third-party libraries with non-GPL compatible
 license. These library fall into category of "System Libraries" under GPL license
 definitions and are used in accordance with GPL license exception for "System Libraries":

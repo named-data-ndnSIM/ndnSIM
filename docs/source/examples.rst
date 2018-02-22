@@ -12,6 +12,14 @@ Examples
    If you compiled ndnSIM with examples (``./waf configure --enable-examples``) you can
    directly run the example without putting scenario into ``scratch/`` folder.
 
+.. note::
+   A few mobile simulation scenarios are available. The project code may require a custom version of ndnSIM (see project commits for further details).
+
+   - `Project Repository <https://github.com/4th-ndn-hackathon/ndnSIM-Mobile-Simulation-Package>`__
+   - `Vehicle to Infrastructure Example <https://github.com/4th-ndn-hackathon/ndnSIM-Mobile-Simulation-Package/blob/master/examples/simple-wifi-mobility.cpp>`__
+   - `Vehicle to Vehicle Example <https://github.com/4th-ndn-hackathon/ndnSIM-Mobile-Simulation-Package/blob/master/examples/ndn-v2v-simple.cpp>`__
+
+
 .. _simple-scenario:
 
 Simple scenario

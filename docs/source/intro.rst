@@ -10,18 +10,6 @@ Introduction
     .. image:: _static/ndnSIM-structure.*
         :width: 100%
 
-- Packet format changed to [NDN Packet Specification](http://named-data.net/doc/ndn-tlv/)
-
-- ndnSIM uses implementation of basic NDN primitives from
-  [ndn-cxx library (NDN C++ library with eXperimental eXtensions)](http://named-data.net/doc/ndn-cxx/)
-
-- All NDN forwarding and management is implemented directly using source code of
-  [Named Data Networking Forwarding Daemon (NFD)](http://named-data.net/doc/NFD/)
-
-- Allows [simulation of real applications](http://ndnsim.net/2.1/guide-to-simulate-real-apps.html)
-  written against ndn-cxx library
-
-
 A new release of `NS-3 based Named Data Networking (NDN) simulator <http://ndnsim.net/1.0/>`__
 went through a number of extensive refactoring and rewriting.  The key new features of the
 new version:
@@ -35,12 +23,12 @@ new version:
 - All NDN forwarding and management is implemented directly using source code of `Named
   Data Networking Forwarding Daemon (NFD) <http://named-data.net/doc/NFD/>`_
 
-- It is possible to :doc:`simulation some real applications <guide-to-simulate-real-apps>`
+- It is possible to :doc:`simulate some real applications <guide-to-simulate-real-apps>`
   written against ndn-cxx library
 
 .. note::
-   Please note that ndnSIM 2.0 has major refactoring and simulation scenario written for
-   previous releases most likely would need to be changed to run on ndnSIM 2.0 platform.
+   Please note that ndnSIM >= 2.0 has been through major refactoring and simulation scenario written for
+   ndnSIM 1.0 most likely would need to be changed to run on ndnSIM >= 2.0 platforms.
 
 Such integration with ndn-cxx and NFD ensures that the simulations are maximally realistic
 and can be reproduced in real environments with virtually no changes to the source code.
@@ -62,15 +50,35 @@ perform detailed tracing behavior of every component, as well as NDN traffic flo
 More documentation
 ------------------
 
-Overall structure of ndnSIM is described in our paper and technical reports:
+Overall structure of ndnSIM is described in our paper and technical reports.
+
+**For ndnSIM >= 2.0:**
 
 - **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <http://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
 
 - **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
 
+**For ndnSIM 1.0:**
+
 - **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`__)
 
 `ndnSIM API documentation <doxygen/index.html>`_
+
+Presentations on ndnSIM:
+
+- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Ecosystem for NDN Experimentation", NDN Community Meeting (NDNcomm), Memphis, TN, March 2017** (`Slides <https://www.caida.org/workshops/ndn/1703/slides/ndn1703_smastorakis.pptx>`__)
+
+- **A. Afanasyev and others, “Developing Simple Simulations with ndnSIM.” NDN Tutorial at ACM ICN 2016, Kyoto, Japan, Sep-2016** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-afanasyev2016ndn-tutorial-ndnsim.pdf>`__)
+
+- **S. Mastorakis, "ndnSIM: Current Status & Latest Advancements", 6th NDN Retreat, San Diego, CA, March 2016** (`Slides <https://www.caida.org/workshops/ndn/1603/slides/ndn1603_smastorakis2.pdf>`__)
+
+- **A. Afanasyev, J. Burke, P. Crowley, S. DiBenedetto, V. Jacobson, J. Thompson, B. Zhang, and L. Zhang, “Named Data Networking. ndnSIM: a modular NDN simulator.” An Introduction to NDN and its Software Architecture Tutorial at 1st ACM Conference on Information-Centric Networking (ICN-2014), Sep-2014** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-afanasyev2014ndnsim.pptx>`__)
+
+- **A. Afanasyev, “Tutorial for students: ndnSIM.” AsiaFI 2013 Summer School, Aug-2013** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-afanasyev2013ndnsim-tutorial.pptx>`__)
+
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, “ndnSIM: a modular NDN simulator. Introduction and Tutorial.” 3rd NDN retreat, Oct-2012** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-afanasyev2012ndnsim.pdf>`__)
+
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, “ndnSIM: a modular NDN simulator.” CCNxCon 2012, Sep-2012** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-ccnxcon-afanasyev2012ndnsim.pdf>`__)
 
 Also, you can `join our mailing list
 <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
