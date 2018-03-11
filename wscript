@@ -23,12 +23,8 @@ def configure(conf):
 
     conf.env['ENABLE_NDNSIM']=False
 
-    if not os.environ.has_key('PKG_CONFIG_PATH'):
-        os.environ['PKG_CONFIG_PATH'] = ':'.join([
-            '/usr/local/lib/pkgconfig',
-            '/usr/local/lib64/pkgconfig',
-            '/usr/local/lib32/pkgconfig',
-            '/opt/local/lib/pkgconfig'])
+    if 'PKG_CONFIG_PATH' not in os.environ:
+        os.environ['PKG_CONFIG_PATH'] = Utils.subst_vars('${LIBDIR}/pkgconfig', conf.env)
 
     conf.check_cxx(lib='pthread', uselib_store='PTHREAD', define_name='HAVE_PTHREAD', mandatory=False)
     conf.check_sqlite3(mandatory=True)
