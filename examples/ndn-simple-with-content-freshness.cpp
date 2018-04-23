@@ -39,7 +39,7 @@ namespace ns3 {
  * corresponding data packet will not be considered fresh for more than 2 seconds (can be cached
  * for a shorter time, if entry is evicted earlier)
  *
- *     NS_LOG=DumbRequester ./waf --run ndn-simple-with-content-freshness
+ *     NS_LOG=OneInterestRequester ./waf --run ndn-simple-with-content-freshness
  */
 
 int
