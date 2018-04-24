@@ -66,8 +66,8 @@ main(int argc, char* argv[])
   // Install Ndn stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.SetDefaultRoutes(true);
-  ndnHelper.SetOldContentStore("ns3::ndn::cs::Freshness::Lru", "MaxSize",
-                               "2"); // allow just 2 entries to be cached
+  ndnHelper.setCsSize(2); // allow just 2 entries to be cached
+  ndnHelper.setPolicy("nfd::cs::lru");
   ndnHelper.InstallAll();
 
   // Installing applications
@@ -99,7 +99,7 @@ main(int argc, char* argv[])
   ndn::AppHelper producerHelper("ns3::ndn::Producer");
   producerHelper.SetAttribute("PayloadSize", StringValue("1024"));
 
-  producerHelper.SetAttribute("Freshness", TimeValue(Seconds(-1.0))); // unlimited freshness
+  producerHelper.SetAttribute("Freshness", TimeValue(Years(100))); // freshness long enough
   producerHelper.SetPrefix("/no-freshness");
   producerHelper.Install(nodes.Get(2)); // last node
 

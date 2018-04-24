@@ -88,6 +88,7 @@ OneInterestRequester::SendInterest()
   Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
   interest->setNonce(rand->GetValue(0, std::numeric_limits<uint32_t>::max()));
   interest->setInterestLifetime(ndn::time::seconds(1));
+  interest->setMustBeFresh(true);
 
   NS_LOG_DEBUG("Sending Interest packet for " << m_name);
 
@@ -103,6 +104,7 @@ OneInterestRequester::SendInterest()
 void
 OneInterestRequester::OnData(std::shared_ptr<const ndn::Data> data)
 {
+  App::OnData(data);
   NS_LOG_DEBUG("<< D: " << data->getName());
 }
 
