@@ -60,7 +60,7 @@ main(int argc, char* argv[])
   //////////////////////
   //////////////////////
   //////////////////////
-  WifiHelper wifi = WifiHelper::Default();
+  WifiHelper wifi;
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
   wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",
@@ -77,7 +77,7 @@ main(int argc, char* argv[])
   wifiPhyHelper.Set("TxPowerStart", DoubleValue(5));
   wifiPhyHelper.Set("TxPowerEnd", DoubleValue(5));
 
-  NqosWifiMacHelper wifiMacHelper = NqosWifiMacHelper::Default();
+  WifiMacHelper wifiMacHelper;
   wifiMacHelper.SetType("ns3::AdhocWifiMac");
 
   Ptr<UniformRandomVariable> randomizer = CreateObject<UniformRandomVariable>();
