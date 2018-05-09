@@ -114,8 +114,8 @@ BOOST_AUTO_TEST_CASE(NackTracing)
      << "1	1	257	appFace://	OutTimedOutInterests	0	0	0	0\n";
   BOOST_CHECK(os.match_pattern());
 
-  os << "1	1	-1	all	SatisfiedInterests	3.2	0	4	0\n"
-     << "1	1	-1	all	TimedOutInterests	0	0	0	0\n";
+  os << "1	1	-1	all	SatisfiedInterests	2.4	0	3	0\n"
+     << "1	1	-1	all	TimedOutInterests	0.8	0	1	0\n";
   BOOST_CHECK(os.match_pattern());
 }
 

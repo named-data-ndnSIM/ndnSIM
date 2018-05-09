@@ -242,8 +242,8 @@ BOOST_AUTO_TEST_CASE(ExpressMultipleInterests)
   size_t recvCount = 0;
 
   // Retrieve data from remote
-  FactoryCallbackApp::Install(getNode("A"), [this, &recvCount] () -> shared_ptr<void> {
-      return make_shared<MultipleInterest>("/test/prefix", [this, &recvCount] (const Name& data) {
+  FactoryCallbackApp::Install(getNode("A"), [&recvCount] () -> shared_ptr<void> {
+      return make_shared<MultipleInterest>("/test/prefix", [&recvCount] (const Name& data) {
           BOOST_CHECK_EQUAL(data, Name("/test/prefix").appendSegment(recvCount));
           ++recvCount;
         },
@@ -283,7 +283,7 @@ public:
 BOOST_AUTO_TEST_CASE(FaceShutdownFromTimeoutCallback)
 {
   // This test case to check if Face.shutdown from an onTimeout callback doesn't cause segfaults
-  FactoryCallbackApp::Install(getNode("A"), [this] () -> shared_ptr<void> {
+  FactoryCallbackApp::Install(getNode("A"), [] () -> shared_ptr<void> {
       return make_shared<SingleInterestWithFaceShutdown>();
     })
     .Start(Seconds(1.01));

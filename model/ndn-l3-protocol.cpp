@@ -311,7 +311,7 @@ L3Protocol::initializeManagement()
   m_impl->m_authenticator->setConfigFile(config);
 
   // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false)) {
-  m_impl->m_faceManager->setConfigFile(config);
+  m_impl->m_faceSystem->setConfigFile(config);
   // }
 
   // apply config
