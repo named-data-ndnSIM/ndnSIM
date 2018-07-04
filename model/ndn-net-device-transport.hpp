@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2011-2016  Regents of the University of California.
+/*
+ * Copyright (c) 2011-2018  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -53,6 +53,9 @@ public:
 
   Ptr<NetDevice>
   GetNetDevice() const;
+
+  virtual ssize_t
+  getSendQueueLength() final;
 
 private:
   virtual void

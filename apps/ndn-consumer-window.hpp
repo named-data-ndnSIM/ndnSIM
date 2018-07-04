@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2011-2015  Regents of the University of California.
+/*
+ * Copyright (c) 2011-2018  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -33,7 +33,7 @@ namespace ndn {
  * \brief Ndn application for sending out Interest packets (window-based)
  *
  * !!! ATTENTION !!! This is highly experimental and relies on experimental features of the
- *simulator.
+ * simulator.
  * Behavior may be unpredictable if used incorrectly.
  */
 class ConsumerWindow : public Consumer {
@@ -57,7 +57,7 @@ public:
   WillSendOutInterest(uint32_t sequenceNumber);
 
 public:
-  typedef void (*WindowTraceCallback)(uint32_t);
+  typedef std::function<void(double)> WindowTraceCallback;
 
 protected:
   /**
@@ -92,18 +92,18 @@ private:
   void
   SetSeqMax(uint32_t seqMax);
 
-private:
+protected:
   uint32_t m_payloadSize; // expected payload size
   double m_maxSize;       // max size to request
 
   uint32_t m_initialWindow;
   bool m_setInitialWindowOnTimeout;
 
-  TracedValue<uint32_t> m_window;
+  TracedValue<double> m_window;
   TracedValue<uint32_t> m_inFlight;
 };
 
 } // namespace ndn
 } // namespace ns3
 
-#endif
+#endif // NDN_CONSUMER_WINDOW_H

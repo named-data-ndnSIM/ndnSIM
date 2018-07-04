@@ -163,6 +163,46 @@ This applications has the following attributes:
 
   If ``Size`` is set to -1, Interests will be requested till the end of the simulation.
 
+ConsumerPcon
+^^^^^^^^^^^^^^^^
+
+:ndnsim:`ConsumerPcon` is an application generating variable rate Interest traffic. It implements a sliding-window-based Interest generation mechanism that adjusts window size using the PCON congestion control mechanism developed by K. Schneider et al. (https://named-data.net/publications/practical_congestion_control_scheme/). It is derived from :ndnsim:`ConsumerWindow`.
+
+.. code-block:: c++
+
+    // Create application using the app helper
+    AppHelper consumerHelper("ns3::ndn::ConsumerPcon");
+
+The application has the same attributes as :ndnsim:`ConsumerWindow`, in addition to the following:
+
+* ``Beta``
+
+  .. note::
+     default: ``0.5``
+
+  TCP Multiplicative Decrease factor
+
+* ``AddRttSupress``
+
+  .. note::
+     default: ``0.5``
+
+  Minimum number of RTTs (1 + this factor) between window decreases
+
+* ``ShouldReactToCongestionMarks``
+
+  .. note::
+     default: ``true``
+
+  If true, process received congestion marks; otherwise, ignore them
+
+* ``ShouldUseCwa``
+
+  .. note::
+     default: ``true``
+
+  If true, use Conservative Window Adaptation
+
 Producer
 ^^^^^^^^^^^^
 

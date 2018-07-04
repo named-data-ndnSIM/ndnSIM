@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2011-2016  Regents of the University of California.
+/*
+ * Copyright (c) 2011-2018  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -27,6 +27,8 @@
 #include <ndn-cxx/interest.hpp>
 #include <ndn-cxx/data.hpp>
 
+#include "ns3/queue.h"
+
 NS_LOG_COMPONENT_DEFINE("ndn.NetDeviceTransport");
 
 namespace ns3 {
@@ -49,6 +51,14 @@ NetDeviceTransport::NetDeviceTransport(Ptr<Node> node,
   this->setLinkType(linkType);
   this->setMtu(m_netDevice->GetMtu()); // Use the MTU of the netDevice
 
+  // Get send queue capacity for congestion marking
+  PointerValue txQueueAttribute;
+  if (m_netDevice->GetAttributeFailSafe("TxQueue", txQueueAttribute)) {
+    Ptr<ns3::QueueBase> txQueue = txQueueAttribute.Get<ns3::QueueBase>();
+    // must be put into bytes mode queue
+    this->setSendQueueCapacity(txQueue->GetMaxBytes());
+  }
+
   NS_LOG_FUNCTION(this << "Creating an ndnSIM transport instance for netDevice with URI"
                   << this->getLocalUri());
 
@@ -62,6 +72,19 @@ NetDeviceTransport::NetDeviceTransport(Ptr<Node> node,
 NetDeviceTransport::~NetDeviceTransport()
 {
   NS_LOG_FUNCTION_NOARGS();
+}
+
+ssize_t
+NetDeviceTransport::getSendQueueLength()
+{
+  PointerValue txQueueAttribute;
+  if (m_netDevice->GetAttributeFailSafe("TxQueue", txQueueAttribute)) {
+    Ptr<ns3::QueueBase> txQueue = txQueueAttribute.Get<ns3::QueueBase>();
+    return txQueue->GetNBytes();
+  }
+  else {
+    return nfd::face::QUEUE_UNSUPPORTED;
+  }
 }
 
 void
