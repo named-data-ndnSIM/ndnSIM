@@ -130,7 +130,7 @@ This applications has the following attributes:
 ConsumerWindow
 ^^^^^^^^^^^^^^^^^^
 
-:ndnsim:`ConsumerWindow` is an application generating a variable rate Interest traffic. It implements a simple sliding-window-based Interest generation mechanism.
+:ndnsim:`ConsumerWindow` is an application generating a variable-rate Interest traffic. It implements a simple sliding-window-based Interest generation mechanism.
 
 .. code-block:: c++
 
@@ -166,7 +166,7 @@ This applications has the following attributes:
 ConsumerPcon
 ^^^^^^^^^^^^^^^^
 
-:ndnsim:`ConsumerPcon` is an application generating variable rate Interest traffic. It implements a sliding-window-based Interest generation mechanism that adjusts window size using the PCON congestion control mechanism developed by K. Schneider et al. (https://named-data.net/publications/practical_congestion_control_scheme/). It is derived from :ndnsim:`ConsumerWindow`.
+:ndnsim:`ConsumerPcon` is an application generating variable-rate Interest traffic. It implements a window-based rate control that adjusts window size using the PCON congestion control mechanism developed by K. Schneider et al. (https://named-data.net/publications/practical_congestion_control_scheme/). It is derived from :ndnsim:`ConsumerWindow`.
 
 .. code-block:: c++
 
@@ -175,12 +175,26 @@ ConsumerPcon
 
 The application has the same attributes as :ndnsim:`ConsumerWindow`, in addition to the following:
 
+* ``CcAlgorithm``
+
+  .. note::
+     default: ``AIMD``
+
+  Which window adaptation algorithm to use (AIMD, BIC, or CUBIC)
+
 * ``Beta``
 
   .. note::
      default: ``0.5``
 
   TCP Multiplicative Decrease factor
+
+* ``CubicBeta``
+
+  .. note::
+     default: ``0.8``
+
+  TCP CUBIC Multiplicative Decrease factor
 
 * ``AddRttSupress``
 
@@ -189,19 +203,26 @@ The application has the same attributes as :ndnsim:`ConsumerWindow`, in addition
 
   Minimum number of RTTs (1 + this factor) between window decreases
 
-* ``ShouldReactToCongestionMarks``
+* ``ReactToCongestionMarks``
 
   .. note::
      default: ``true``
 
   If true, process received congestion marks; otherwise, ignore them
 
-* ``ShouldUseCwa``
+* ``UseCwa``
 
   .. note::
      default: ``true``
 
   If true, use Conservative Window Adaptation
+
+* ``UseCubicFastConvergence``
+
+  .. note::
+     default: ``true``
+
+  If true, use TCP CUBIC Fast Convergence
 
 Producer
 ^^^^^^^^^^^^

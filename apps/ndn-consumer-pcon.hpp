@@ -27,11 +27,21 @@
 namespace ns3 {
 namespace ndn {
 
+enum CcAlgorithm {
+  AIMD,
+  BIC,
+  CUBIC
+};
+
 /**
  * @ingroup ndn-apps
- * \brief NDN consumer application (uses a PCON congestion window)
+ * \brief NDN consumer application with more advanced congestion control options
  *
- * Please refer to ConsumerWindow for further documentation on how to use this consumer.
+ * This app uses the algorithms from "A Practical Congestion Control Scheme for Named
+ * Data Networking" (https://dl.acm.org/citation.cfm?id=2984369).
+ *
+ * It implements slow start, conservative window adaptation (RFC 6675),
+ * and 3 different TCP algorithms: AIMD, BIC, and CUBIC (RFC 8312).
  */
 class ConsumerPcon : public ConsumerWindow {
 public:
@@ -53,15 +63,52 @@ private:
   void
   WindowDecrease();
 
+  void
+  CubicIncrease();
+
+  void
+  CubicDecrease();
+
+  void
+  BicIncrease();
+
+  void
+  BicDecrease();
+
 private:
+  CcAlgorithm m_ccAlgorithm;
   double m_beta;
-  double m_addRttSupress;
-  bool m_shouldReactToCongestionMarks;
-  bool m_shouldUseCwa;
+  double m_addRttSuppress;
+  bool m_reactToCongestionMarks;
+  bool m_useCwa;
 
   double m_ssthresh;
   uint32_t m_highData;
   double m_recPoint;
+
+  // TCP CUBIC Parameters //
+  static constexpr double CUBIC_C = 0.4;
+  bool m_useCubicFastConv;
+  double m_cubicBeta;
+
+  double m_cubicWmax;
+  double m_cubicLastWmax;
+  time::steady_clock::TimePoint m_cubicLastDecrease;
+
+  // TCP BIC Parameters //
+  //! Regular TCP behavior (including slow start) until this window size
+  static constexpr uint32_t BIC_LOW_WINDOW = 14;
+
+  //! Sets the maximum (linear) increase of TCP BIC. Should be between 8 and 64.
+  static constexpr uint32_t BIC_MAX_INCREMENT = 16;
+
+  // BIC variables:
+  double m_bicMinWin; //!< last minimum cwnd
+  double m_bicMaxWin; //!< last maximum cwnd
+  double m_bicTargetWin;
+  double m_bicSsCwnd;
+  double m_bicSsTarget;
+  bool m_isBicSs; //!< whether we are currently in the BIC slow start phase
 };
 
 } // namespace ndn
