@@ -41,10 +41,10 @@ ConsumerPcon::GetTypeId()
 
       .AddAttribute("CcAlgorithm",
                     "Specify which window adaptation algorithm to use (AIMD, BIC, or CUBIC)",
-                    EnumValue(CC_ALGORITHM::AIMD),
+                    EnumValue(CcAlgorithm::AIMD),
                     MakeEnumAccessor(&ConsumerPcon::m_ccAlgorithm),
-                    MakeEnumChecker(CC_ALGORITHM::AIMD, "AIMD", CC_ALGORITHM::BIC, "BIC",
-                                    CC_ALGORITHM::CUBIC, "CUBIC"))
+                    MakeEnumChecker(CcAlgorithm::AIMD, "AIMD", CcAlgorithm::BIC, "BIC",
+                                    CcAlgorithm::CUBIC, "CUBIC"))
 
       .AddAttribute("Beta",
                     "TCP Multiplicative Decrease factor",
@@ -152,7 +152,7 @@ ConsumerPcon::OnTimeout(uint32_t sequenceNum)
 void
 ConsumerPcon::WindowIncrease()
 {
-  if (m_ccAlgorithm == CC_ALGORITHM::AIMD) {
+  if (m_ccAlgorithm == CcAlgorithm::AIMD) {
     if (m_window < m_ssthresh) {
       m_window += 1.0;
     }
@@ -160,10 +160,10 @@ ConsumerPcon::WindowIncrease()
       m_window += (1.0 / m_window);
     }
   }
-  else if (m_ccAlgorithm == CC_ALGORITHM::CUBIC) {
+  else if (m_ccAlgorithm == CcAlgorithm::CUBIC) {
     CubicIncrease();
   }
-  else if (m_ccAlgorithm == CC_ALGORITHM::BIC) {
+  else if (m_ccAlgorithm == CcAlgorithm::BIC) {
     BicIncrease();
   }
   else {
@@ -181,15 +181,15 @@ ConsumerPcon::WindowDecrease()
 
     m_recPoint = m_seq + (m_addRttSuppress * diff);
 
-    if (m_ccAlgorithm == CC_ALGORITHM::AIMD) {
+    if (m_ccAlgorithm == CcAlgorithm::AIMD) {
       // Normal TCP Decrease:
       m_ssthresh = m_window * m_beta;
       m_window = m_ssthresh;
     }
-    else if (m_ccAlgorithm == CC_ALGORITHM::CUBIC) {
+    else if (m_ccAlgorithm == CcAlgorithm::CUBIC) {
       CubicDecrease();
     }
-    else if (m_ccAlgorithm == CC_ALGORITHM::BIC) {
+    else if (m_ccAlgorithm == CcAlgorithm::BIC) {
       BicDecrease();
     }
     else {

@@ -20,6 +20,6 @@ if has Ubuntu $NODE_LABELS; then
     sudo apt-get -qq install build-essential pkg-config libboost-all-dev \
                              libcrypto++-dev libsqlite3-dev libssl-dev
     sudo apt-get install -qq -y python-setuptools python-dev python-pygraphviz python-kiwi
-    sudo apt-get install -qq -y python-pygoocanvas python-gnome2
-    sudo apt-get install -qq -y python-rsvg ipython
+    # sudo apt-get install -qq -y python-pygoocanvas python-gnome2
+    # sudo apt-get install -qq -y python-rsvg ipython
 fi
