@@ -5,6 +5,43 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
+Release 2.6
+-----------
+
+Release date: August 7, 2018
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been upgraded to version 0.6.2
+  (:issue:`4514`).
+
+  `NFD 0.6.2 release notes <https://named-data.net/doc/NFD/0.6.2/RELEASE_NOTES.html>`__
+
+  `ndn-cxx 0.6.2 release notes <https://named-data.net/doc/ndn-cxx/0.6.2/RELEASE_NOTES.html>`__
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+- This will be the last release that supports "old" API for content store implementations.
+  Going forward, only NFD-based implementations will be supported.
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Add queue length congestion detection and signaling (:issue:`4578`)
+
+- Implement BIC and CUBIC congestion control in ConsumerPcon (:issue:`4672`)
+
+- Fix compilation failure on some systems with Python 3
+
+- Fix outdated and remove deprecated APIs in the examples
+
+- Updates of the ndnSIM documentation.
+
+
 Release 2.5
 -----------
 
