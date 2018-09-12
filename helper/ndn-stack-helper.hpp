@@ -248,6 +248,12 @@ public:
   void
   disableForwarderStatusManager();
 
+  /**
+   * @brief Set face metric of all faces connected through PointToPoint channel to channel latency
+   */
+  static void
+  SetLinkDelayAsFaceMetric();
+
 private:
   shared_ptr<Face>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;

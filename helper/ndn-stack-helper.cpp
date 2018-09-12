@@ -24,6 +24,7 @@
 #include "ns3/string.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-channel.h"
+#include "ns3/node-list.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
@@ -426,6 +427,29 @@ void
 StackHelper::disableForwarderStatusManager()
 {
   m_isForwarderStatusManagerDisabled = true;
+}
+
+void
+StackHelper::SetLinkDelayAsFaceMetric()
+{
+  for (uint32_t i = 0; i < NodeList::GetNNodes(); ++i) {
+    auto ndn = NodeList::GetNode(i)->GetObject<L3Protocol>();
+    if (ndn == nullptr)
+      continue;
+
+    for (auto& face : ndn->getForwarder()->getFaceTable()) {
+      auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
+      if (transport == nullptr)
+        continue;
+      auto p2p = dynamic_cast<PointToPointChannel*>(&(*(transport->GetNetDevice()->GetChannel())));
+      TimeValue currentDelay;
+      p2p->GetAttribute("Delay", currentDelay);
+      face.setMetric((currentDelay.Get().ToDouble(Time::S)) * 1000);
+
+      std::cout << "Node " << i << ": Face " << face.getId()
+                << " with metric " << face.getMetric() << "\n";
+    }
+  }
 }
 
 } // namespace ndn
