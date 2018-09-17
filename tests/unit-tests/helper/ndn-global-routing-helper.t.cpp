@@ -18,6 +18,7 @@
  **/
 
 #include "helper/ndn-global-routing-helper.hpp"
+#include "helper/ndn-stack-helper.hpp"
 
 #include "model/ndn-global-router.hpp"
 #include "model/ndn-l3-protocol.hpp"
@@ -143,6 +144,48 @@ BOOST_AUTO_TEST_CASE(CalculateRouteCase2)
         continue;
       BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B2");
       isFirst = false;
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(CalculateRoutesBasedOnLinkDelay)
+{
+  ofstream file1(TEST_TOPO_TXT.string().c_str());
+  file1 << "router\n\n"
+        << "#node city  y x mpi-partition\n"
+        << "A3  NA  1 1 1\n"
+        << "B3  NA  80  -40 1\n"
+        << "C3  NA  80  40  1\n\n"
+        << "link\n\n"
+        << "# from  to  capacity  metric  delay queue\n"
+        << "A3      B3  10Mbps    1        1ms 100\n"
+        << "A3      C3  10Mbps    1        10ms 100\n"
+        << "B3      C3  10Mbps    1        1ms 100\n";
+  file1.close();
+
+  AnnotatedTopologyReader topologyReader("");
+  topologyReader.SetFileName(TEST_TOPO_TXT.string().c_str());
+  topologyReader.Read();
+
+  // Install NDN stack on all nodes
+  ndn::StackHelper ndnHelper;
+  ndnHelper.InstallAll();
+
+  ndn::GlobalRoutingHelper ndnGlobalRoutingHelper;
+  ndnGlobalRoutingHelper.InstallAll();
+
+  ndnGlobalRoutingHelper.AddOrigins("/prefix", Names::Find<Node>("C3"));
+  ndn::StackHelper::SetLinkDelayAsFaceMetric(); // should be called right before routes calculation
+  ndn::GlobalRoutingHelper::CalculateRoutes();
+
+  auto ndn = Names::Find<Node>("A3")->GetObject<ndn::L3Protocol>();
+  for (const auto& entry : ndn->getForwarder()->getFib()) {
+    for (auto& nextHop : entry.getNextHops()) {
+      auto& face = nextHop.getFace();
+      auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
+      if (transport == nullptr)
+        continue;
+      BOOST_CHECK_EQUAL(Names::FindName(transport->GetNetDevice()->GetChannel()->GetDevice(1)->GetNode()), "B3");
     }
   }
 }
