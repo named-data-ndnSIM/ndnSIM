@@ -11,7 +11,7 @@ def build(bld):
         examples += bld.path.ant_glob(['*-mpi.cpp'])
 
     for i in examples:
-        name = str(i)[:-len(".cpp")]
+        name = i.change_ext('').path_from(bld.path.get_bld())
         obj = bld.create_ns3_program(name, all_modules)
         obj.source = [i] + bld.path.ant_glob(['%s/**/*.cpp' % name])
 

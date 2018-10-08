@@ -38,7 +38,7 @@ public:
   {
     Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
     Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-    Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(20));
+    Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"));
 
     createTopology({{"A", "B"}});
     addRoutes({{"A", "B", "/test", 1}});

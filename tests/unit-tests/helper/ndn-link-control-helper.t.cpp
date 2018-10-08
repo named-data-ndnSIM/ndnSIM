@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(TwoNodeTopology)
   // setting default parameters for PointToPoint links and channels
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(20));
+  Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"));
 
   createTopology({
       {"1", "2"},
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(SixNodeTopology) // Bug #2783
   // setting default parameters for PointToPoint links and channels
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::QueueBase::MaxPackets", UintegerValue(20));
+  Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"));
 
   // Connecting nodes in 6 node topology:                        //
   //                                                             //

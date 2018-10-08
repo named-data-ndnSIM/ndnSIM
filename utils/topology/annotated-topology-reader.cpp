@@ -346,10 +346,10 @@ AnnotatedTopologyReader::ApplySettings()
       NS_LOG_INFO("MaxPackets = " + link.GetAttribute("MaxPackets"));
 
       try {
-        uint32_t maxPackets = boost::lexical_cast<uint32_t>(link.GetAttribute("MaxPackets"));
+        std::string maxPackets = link.GetAttribute("MaxPackets");
 
         // compatibility mode. Only DropTailQueue is supported
-        p2p.SetQueue("ns3::DropTailQueue<Packet>", "MaxPackets", UintegerValue(maxPackets));
+        p2p.SetQueue("ns3::DropTailQueue<Packet>", "MaxSize", StringValue(maxPackets + "p"));
       }
       catch (...) {
         typedef boost::tokenizer<boost::escaped_list_separator<char>> tokenizer;
