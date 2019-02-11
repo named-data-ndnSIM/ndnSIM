@@ -50,7 +50,7 @@ def make_link_node(rawtext, app, type, slug, options):
         base = app.config.redmine_project_url
         if not base:
             raise AttributeError
-    except AttributeError, err:
+    except AttributeError as err:
         raise ValueError('redmine_project_url configuration value is not set (%s)' % str(err))
     #
     slash = '/' if base[-1] != '/' else ''

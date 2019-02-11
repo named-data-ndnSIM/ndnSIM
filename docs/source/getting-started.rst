@@ -24,7 +24,6 @@ Prerequisites
 
 -  ``python`` >= 2.6
 -  ``libsqlite3``
--  ``libcrypto++``
 -  ``pkg-config``
 -  ``openssl``
 -  Boost libraries >= 1.54
@@ -43,18 +42,12 @@ development tools and libraries, and ndn-cxx prerequisites.
 
 - macOS
 
-  * macOS with MacPorts:
-
-   .. code-block:: bash
-
-       sudo port install pkgconfig boost sqlite3 libcryptopp openssl
-
   * macOS with HomeBrew:
 
    .. code-block:: bash
 
-       brew install boost cryptopp pkg-config openssl libxml2
-       brew link --force libxml2
+       brew install boost pkg-config openssl libxml2
+       export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"   # put this line in ~/.bashrc or manually type before ./waf configure
 
 - Linux
 
@@ -62,13 +55,13 @@ development tools and libraries, and ndn-cxx prerequisites.
 
    .. code-block:: bash
 
-       sudo apt-get install build-essential libsqlite3-dev libcrypto++-dev libboost-all-dev libssl-dev git python-setuptools
+       sudo apt install build-essential libsqlite3-dev libboost-all-dev libssl-dev git python-setuptools castxml
 
   * Fedora Linux
 
    .. code-block:: bash
 
-       sudo yum install gcc-g++ git sqlite-devel cryptopp-devel boost-devel openssl-devel
+       sudo yum install gcc-g++ git sqlite-devel boost-devel openssl-devel
 
    .. note::
       :red:`ndnSIM requires boost version at least 1.54.` Many linux distribution
@@ -84,15 +77,14 @@ should be installed:
 
 - macOS
 
-  * macOS with MacPorts:
-
-    .. code-block:: bash
-
-        sudo port install  py27-pygraphviz py27-goocanvas py27-kiwi
-
   * macOS with HomeBrew
 
-    Currently, there are many missing dependencies, so it is impossible to use visualizer module with HomeBrew.  Use MacPorts instead.
+   .. code-block:: bash
+
+       brew install cairo goocanvas gtk+3 graphviz gobject-introspection castxml
+
+       export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"  # this needed only for running the next line
+       pip install pygraphviz pycairo PyGObject pygccxml
 
 - Linux
 
@@ -100,20 +92,11 @@ should be installed:
 
     .. code-block:: bash
 
-        sudo apt-get install python-dev python-pygraphviz python-kiwi python-pygoocanvas python-gnome2 python-rsvg ipython
+        sudo apt install python-dev python-pygraphviz python-kiwi python-pygoocanvas python-gnome2 python-rsvg ipython libcairo2-dev python3-gi libgirepository1.0-dev python-gi python-gi-cairo gir1.2-gtk-3.0 gir1.2-goocanvas-2.0
+        sudo easy_install pip
+        pip install pygraphviz pycairo PyGObject pygccxml
 
-  * Fedora Linux
-
-    .. code-block:: bash
-
-        sudo yum install pygoocanvas python-kiwi graphviz-python
-
-        # easy_install method, since pygraphviz is not (yet?) packaged into Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=740687)
-        sudo yum install graphviz-devel
-        sudo yum install python-pip
-        sudo easy_install pygraphviz
-
-.. _visualizer: http://www.nsnam.org/wiki/index.php/PyViz
+.. _visualizer: https://www.nsnam.org/wiki/PyViz
 
 Downloading ndnSIM source
 -------------------------

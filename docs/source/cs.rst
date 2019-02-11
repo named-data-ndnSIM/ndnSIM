@@ -20,8 +20,8 @@ For more detailed specification refer to the `NFD Developer's Guide
 <https://named-data.net/wp-content/uploads/2016/03/ndn-0021-6-nfd-developer-guide.pdf>`_, section 3.3.
 
 
-To control the maximum size and the policy of NFD's Content Store use :ndnsim:`StackHelper::setCsSize()` and
-:ndnsim:`StackHelper::setPolicy()` methods:
+To control the maximum size and the policy of NFD's Content Store use ``StackHelper::setCsSize()`` and
+``StackHelper::setPolicy()`` methods:
 
       .. code-block:: c++
 

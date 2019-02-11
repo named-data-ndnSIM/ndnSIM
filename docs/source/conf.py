@@ -30,7 +30,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinxcontrib.doxylink',
     'sphinxcontrib.aafig',
-    'sphinxcontrib.googleanalytics',
+    # 'sphinxcontrib.googleanalytics',
     'sphinxcontrib.bibtex',
     'redmine_issue'
 ]
