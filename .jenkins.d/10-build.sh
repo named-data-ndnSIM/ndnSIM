@@ -14,7 +14,9 @@ sudo rm -Rf build/ .waf-1* .waf3-1*
 find . -name '*.pyc' | sudo xargs rm -f
 
 # Configure/build in debug mode
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libxml2/lib/pkgconfig"
+if has OSX $NODE_LABELS; then
+    export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libxml2/lib/pkgconfig"
+fi
 ./waf -j${WAF_JOBS:-1} configure -d debug --enable-examples --enable-tests $EXTRA_FLAGS
 ./waf -j${WAF_JOBS:-1} build
 

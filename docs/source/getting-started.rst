@@ -4,16 +4,15 @@ Getting Started
 Portability
 ------------
 
-.. image:: https://travis-ci.org/named-data-ndnSIM/ndnSIM.svg?branch=test-travis-ci
+.. image:: https://travis-ci.org/named-data-ndnSIM/ndnSIM.svg?branch=master
     :target: https://travis-ci.org/named-data-ndnSIM/ndnSIM
 
 ndnSIM 2.x has been successfully compiled and used on following platforms:
 
-- Ubuntu Linux 16.04 (32- and 64-bit platform)
-- Ubuntu Linux 17.10 (64-bit platform)
-- macOS 10.11
-- macOS 10.12
+- Ubuntu Linux 18.04
+- Ubuntu Linux 16.04
 - macOS 10.13
+- macOS 10.14
 
 .. _requirements:
 
@@ -22,7 +21,7 @@ Prerequisites
 
 **1. Core dependencies**
 
--  ``python`` >= 2.6
+-  ``python`` >= 2.7
 -  ``libsqlite3``
 -  ``pkg-config``
 -  ``openssl``
@@ -92,9 +91,8 @@ should be installed:
 
     .. code-block:: bash
 
-        sudo apt install python-dev python-pygraphviz python-kiwi python-pygoocanvas python-gnome2 python-rsvg ipython libcairo2-dev python3-gi libgirepository1.0-dev python-gi python-gi-cairo gir1.2-gtk-3.0 gir1.2-goocanvas-2.0
-        sudo easy_install pip
-        pip install pygraphviz pycairo PyGObject pygccxml
+        sudo apt install python-dev python-pygraphviz python-kiwi python-gnome2 ipython libcairo2-dev python3-gi libgirepository1.0-dev python-gi python-gi-cairo gir1.2-gtk-3.0 gir1.2-goocanvas-2.0 python-pip
+        sudo pip install pygraphviz pycairo PyGObject pygccxml
 
 .. _visualizer: https://www.nsnam.org/wiki/PyViz
 
