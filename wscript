@@ -95,7 +95,7 @@ def build(bld):
         VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
         VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
 
-    deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
+    deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet', 'lte']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
         deps.append('visualizer')
 

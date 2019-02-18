@@ -24,6 +24,8 @@
 #include "ns3/string.h"
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-channel.h"
+#include "ns3/lte-ue-net-device.h"
+#include "ns3/loopback-net-device.h"
 #include "ns3/node-list.h"
 #include "ns3/simulator.h"
 
@@ -33,6 +35,7 @@
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
+#include "model/ndn-lte-ue-net-device-transport.hpp"
 #include "utils/ndn-time.hpp"
 #include "utils/dummy-keychain.hpp"
 #include "model/cs/ndn-content-store.hpp"
@@ -66,9 +69,9 @@ StackHelper::StackHelper()
   m_ndnFactory.SetTypeId("ns3::ndn::L3Protocol");
   m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
 
-  m_netDeviceCallbacks.push_back(
-    std::make_pair(PointToPointNetDevice::GetTypeId(),
-                   MakeCallback(&StackHelper::PointToPointNetDeviceCallback, this)));
+  m_netDeviceCallbacks.push_back({LoopbackNetDevice::GetTypeId(), MakeCallback(&StackHelper::LoopbackNetDeviceCallback, this)});
+  m_netDeviceCallbacks.push_back({LteUeNetDevice::GetTypeId(), MakeCallback(&StackHelper::LteUeNetDeviceCallback, this)});
+  m_netDeviceCallbacks.push_back({PointToPointNetDevice::GetTypeId(), MakeCallback(&StackHelper::PointToPointNetDeviceCallback, this)});
   // default callback will be fired if non of others callbacks fit or did the job
 }
 
@@ -328,6 +331,39 @@ StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
   return face;
 }
 
+shared_ptr<Face>
+StackHelper::LteUeNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const
+{
+  NS_LOG_DEBUG("Creating LTE UE Face on node " << node->GetId());
+
+  // Create an ndnSIM-specific transport instance
+  ::nfd::face::GenericLinkService::Options opts;
+  opts.allowFragmentation = true;
+  opts.allowReassembly = true;
+  opts.allowCongestionMarking = true;
+
+  auto linkService = make_unique<::nfd::face::GenericLinkService>(opts);
+
+  auto transport = make_unique<LteUeNetDeviceTransport>(node, netDevice,
+                                                        "lte://",
+                                                        "udp://225.63.63.1:6363");
+
+  auto face = std::make_shared<Face>(std::move(linkService), std::move(transport));
+  face->setMetric(1);
+
+  ndn->addFace(face);
+  NS_LOG_LOGIC("Node " << node->GetId() << ": added Face as face #"
+                       << face->getLocalUri());
+
+  return face;
+}
+
+shared_ptr<Face>
+StackHelper::LoopbackNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const
+{
+  return nullptr;
+}
+
 void
 StackHelper::Install(const std::string& nodeName) const
 {
@@ -385,8 +421,12 @@ StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetD
     if (device->GetInstanceTypeId() == item.first ||
         device->GetInstanceTypeId().IsChildOf(item.first)) {
       face = item.second(node, ndn, device);
-      if (face != 0)
+      if (face != nullptr) {
         break;
+      }
+      else {
+        return nullptr; // prevent default to kick in for this face
+      }
     }
   }
 

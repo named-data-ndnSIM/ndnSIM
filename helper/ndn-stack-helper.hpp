@@ -252,8 +252,14 @@ private:
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
 
   shared_ptr<Face>
-  PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
-                                Ptr<NetDevice> netDevice) const;
+  PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
+
+  shared_ptr<Face>
+  LteUeNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
+
+  shared_ptr<Face>
+  LoopbackNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
+
   shared_ptr<Face>
   createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const;
 
