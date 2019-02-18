@@ -166,19 +166,6 @@ public: // topology accessors
   getNetDevice(const std::string& node1, const std::string& node2);
 
   /**
-   * \brief Disable RIB Manager
-   */
-  void
-  disableRibManager();
-
-  // Cannot be disabled for now
-  // /**
-  //  * \brief Disable Face Manager
-  //  */
-  // void
-  // disableFaceManager();
-
-  /**
    * \brief Disable Strategy Choice Manager
    */
   void

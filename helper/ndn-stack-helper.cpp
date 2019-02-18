@@ -25,6 +25,7 @@
 #include "ns3/point-to-point-net-device.h"
 #include "ns3/point-to-point-channel.h"
 #include "ns3/node-list.h"
+#include "ns3/simulator.h"
 
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
@@ -46,9 +47,7 @@ namespace ns3 {
 namespace ndn {
 
 StackHelper::StackHelper()
-  : m_isRibManagerDisabled(false)
-  // , m_isFaceManagerDisabled(false)
-  , m_isForwarderStatusManagerDisabled(false)
+  : m_isForwarderStatusManagerDisabled(false)
   , m_isStrategyChoiceManagerDisabled(false)
   , m_needSetDefaultRoutes(false)
   , m_maxCsSize(100)
@@ -152,42 +151,38 @@ StackHelper::setPolicy(const std::string& policy)
   }
 }
 
-Ptr<FaceContainer>
+void
 StackHelper::Install(const NodeContainer& c) const
 {
-  Ptr<FaceContainer> faces = Create<FaceContainer>();
   for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i) {
-    faces->AddAll(Install(*i));
+    Install(*i);
   }
-  return faces;
 }
 
-Ptr<FaceContainer>
+void
 StackHelper::InstallAll() const
 {
-  return Install(NodeContainer::GetGlobal());
+  Install(NodeContainer::GetGlobal());
 }
 
-Ptr<FaceContainer>
+void
 StackHelper::Install(Ptr<Node> node) const
 {
-  Ptr<FaceContainer> faces = Create<FaceContainer>();
-
   if (node->GetObject<L3Protocol>() != 0) {
     NS_FATAL_ERROR("Cannot re-install NDN stack on node "
                    << node->GetId());
-    return 0;
+    return;
   }
+  Simulator::ScheduleWithContext(node->GetId(), Seconds(0), &StackHelper::doInstall, this, node);
+  Simulator::Stop(Seconds(0));
+  Simulator::Run(); // to automatically dispatch events on proper nodes
+}
 
+void
+StackHelper::doInstall(Ptr<Node> node) const
+{
+  // async install to ensure proper context
   Ptr<L3Protocol> ndn = m_ndnFactory.Create<L3Protocol>();
-
-  if (m_isRibManagerDisabled) {
-    ndn->getConfig().put("ndnSIM.disable_rib_manager", true);
-  }
-
-  // if (m_isFaceManagerDisabled) {
-  //   ndn->getConfig().put("ndnSIM.disable_face_manager", true);
-  // }
 
   if (m_isForwarderStatusManagerDisabled) {
     ndn->getConfig().put("ndnSIM.disable_forwarder_status_manager", true);
@@ -218,10 +213,8 @@ StackHelper::Install(Ptr<Node> node) const
     // if (DynamicCast<LoopbackNetDevice> (device) != 0)
     //   continue; // don't create face for a LoopbackNetDevice
 
-    faces->Add(this->createAndRegisterFace(node, ndn, device));
+    this->createAndRegisterFace(node, ndn, device);
   }
-
-  return faces;
 }
 
 void
@@ -332,11 +325,11 @@ StackHelper::PointToPointNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn,
   return face;
 }
 
-Ptr<FaceContainer>
+void
 StackHelper::Install(const std::string& nodeName) const
 {
   Ptr<Node> node = Names::Find<Node>(nodeName);
-  return Install(node);
+  Install(node);
 }
 
 void
@@ -400,22 +393,12 @@ StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetD
 
   if (m_needSetDefaultRoutes) {
     // default route with lowest priority possible
-    FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
+    Simulator::ScheduleWithContext(node->GetId(), Seconds(0), MakeEvent([=] {
+          FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
+        }));
   }
   return face;
 }
-
-void
-StackHelper::disableRibManager()
-{
-  m_isRibManagerDisabled = true;
-}
-
-// void
-// StackHelper::disableFaceManager()
-// {
-//   m_isFaceManagerDisabled = true;
-// }
 
 void
 StackHelper::disableStrategyChoiceManager()

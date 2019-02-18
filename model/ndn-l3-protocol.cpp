@@ -42,12 +42,13 @@
 #include "ns3/ndnSIM/NFD/daemon/mgmt/fib-manager.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/face-manager.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/strategy-choice-manager.hpp"
+#include "ns3/ndnSIM/NFD/daemon/mgmt/cs-manager.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/forwarder-status-manager.hpp"
 // #include "ns3/ndnSIM/NFD/daemon/mgmt/general-config-section.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/tables-config-section.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/command-authenticator.hpp"
 
-#include "ns3/ndnSIM/NFD/rib/rib-manager.hpp"
+#include "ns3/ndnSIM/NFD/rib/service.hpp"
 
 #include "ns3/ndnSIM/NFD/daemon/face/null-face.hpp"
 #include "ns3/ndnSIM/NFD/daemon/face/internal-face.hpp"
@@ -167,24 +168,27 @@ private:
 
   friend class L3Protocol;
 
-  std::shared_ptr<nfd::Forwarder> m_forwarder;
+  // note that shared_ptr needed for Python bindings
 
-  std::shared_ptr<nfd::Face> m_internalFace;
+  std::shared_ptr<::nfd::Forwarder> m_forwarder;
+  std::unique_ptr<::nfd::face::FaceSystem> m_faceSystem;
+
+  std::shared_ptr<::nfd::face::Face> m_internalFace;
   std::shared_ptr<::ndn::Face> m_internalClientFace;
-  std::shared_ptr<nfd::CommandAuthenticator> m_authenticator;
-
-  std::shared_ptr<nfd::Face> m_internalRibFace;
-  std::shared_ptr<::ndn::Face> m_internalRibClientFace;
-
   std::unique_ptr<::ndn::mgmt::Dispatcher> m_dispatcher;
-  std::unique_ptr<::ndn::mgmt::Dispatcher> m_dispatcherRib;
-  std::shared_ptr<nfd::FibManager> m_fibManager;
-  std::shared_ptr<nfd::FaceManager> m_faceManager;
-  std::shared_ptr<nfd::StrategyChoiceManager> m_strategyChoiceManager;
-  std::shared_ptr<nfd::ForwarderStatusManager> m_forwarderStatusManager;
-  std::shared_ptr<nfd::rib::RibManager> m_ribManager;
+  std::shared_ptr<::nfd::CommandAuthenticator> m_authenticator;
+  std::unique_ptr<::nfd::ForwarderStatusManager> m_forwarderStatusManager;
+  std::unique_ptr<::nfd::FaceManager> m_faceManager;
+  std::shared_ptr<::nfd::FibManager> m_fibManager;
+  std::unique_ptr<::nfd::CsManager> m_csManager;
+  std::unique_ptr<::nfd::StrategyChoiceManager> m_strategyChoiceManager;
 
-  std::shared_ptr<nfd::face::FaceSystem> m_faceSystem;
+  std::shared_ptr<::nfd::face::Face> m_internalFaceForInjects;
+  std::shared_ptr<::ndn::Face> m_internalClientFaceForInjects;
+
+  std::shared_ptr<::nfd::Face> m_internalRibFace;
+  std::shared_ptr<::ndn::Face> m_internalRibClientFace;
+  std::unique_ptr<::nfd::rib::Service> m_ribService;
 
   nfd::ConfigSection m_config;
 
@@ -206,16 +210,15 @@ L3Protocol::~L3Protocol()
 void
 L3Protocol::initialize()
 {
-  m_impl->m_forwarder = make_shared<nfd::Forwarder>();
+  m_impl->m_forwarder = make_shared<::nfd::Forwarder>();
+
+  ::nfd::FaceTable& faceTable = m_impl->m_forwarder->getFaceTable();
+  faceTable.addReserved(::nfd::face::makeNullFace(), ::nfd::face::FACEID_NULL);
+  // faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
+  m_impl->m_faceSystem = make_unique<::nfd::face::FaceSystem>(faceTable, nullptr);
 
   initializeManagement();
-
-  nfd::FaceTable& faceTable = m_impl->m_forwarder->getFaceTable();
-  faceTable.addReserved(nfd::face::makeNullFace(), nfd::face::FACEID_NULL);
-
-  if (!this->getConfig().get<bool>("ndnSIM.disable_rib_manager", false)) {
-    Simulator::ScheduleWithContext(m_node->GetId(), Seconds(0), &L3Protocol::initializeRibManager, this);
-  }
+  initializeRibManager();
 
   m_impl->m_forwarder->beforeSatisfyInterest.connect(std::ref(m_satisfiedInterests));
   m_impl->m_forwarder->beforeExpirePendingInterest.connect(std::ref(m_timedOutInterests));
@@ -245,7 +248,7 @@ private:
 void
 L3Protocol::injectInterest(const Interest& interest)
 {
-  m_impl->m_internalFace->sendInterest(interest);
+  m_impl->m_internalClientFaceForInjects->expressInterest(interest, nullptr, nullptr, nullptr);
 }
 
 void
@@ -260,41 +263,30 @@ L3Protocol::initializeManagement()
   auto& forwarder = m_impl->m_forwarder;
   using namespace nfd;
 
-  m_impl->m_faceSystem = make_shared<nfd::face::FaceSystem>(forwarder->getFaceTable(), nullptr);
-
   std::tie(m_impl->m_internalFace, m_impl->m_internalClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
   forwarder->getFaceTable().addReserved(m_impl->m_internalFace, face::FACEID_INTERNAL_FACE);
-  m_impl->m_dispatcher.reset(new ::ndn::mgmt::Dispatcher(*m_impl->m_internalClientFace, StackHelper::getKeyChain()));
 
-  m_impl->m_authenticator = CommandAuthenticator::create();
+  std::tie(m_impl->m_internalFaceForInjects, m_impl->m_internalClientFaceForInjects) = face::makeInternalFace(StackHelper::getKeyChain());
+  forwarder->getFaceTable().addReserved(m_impl->m_internalFaceForInjects, face::FACEID_INTERNAL_FACE + 1);
 
-  m_impl->m_fibManager.reset(new FibManager(forwarder->getFib(),
-                                            forwarder->getFaceTable(),
-                                            *m_impl->m_dispatcher,
-                                            *m_impl->m_authenticator));
+  m_impl->m_dispatcher = make_unique<::ndn::mgmt::Dispatcher>(*m_impl->m_internalClientFace, StackHelper::getKeyChain());
+  m_impl->m_authenticator = ::nfd::CommandAuthenticator::create();
 
-  // Cannot be disabled for now
-  // if (!this->getConfig().get<bool>("ndnSIM.disable_face_manager", false))
-
-  m_impl->m_faceManager.reset(new FaceManager(*m_impl->m_faceSystem,
-                                              *m_impl->m_dispatcher,
-                                              *m_impl->m_authenticator));
-  // }
-  // else {
-  //   this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("faces");
-  // }
-
+  if (!this->getConfig().get<bool>("ndnSIM.disable_forwarder_status_manager", false)) {
+    m_impl->m_forwarderStatusManager = make_unique<::nfd::ForwarderStatusManager>(*m_impl->m_forwarder, *m_impl->m_dispatcher);
+  }
+  m_impl->m_faceManager = make_unique<::nfd::FaceManager>(*m_impl->m_faceSystem, *m_impl->m_dispatcher, *m_impl->m_authenticator);
+  m_impl->m_fibManager = make_shared<::nfd::FibManager>(m_impl->m_forwarder->getFib(), m_impl->m_forwarder->getFaceTable(),
+                                                        *m_impl->m_dispatcher, *m_impl->m_authenticator);
+  m_impl->m_csManager = make_unique<::nfd::CsManager>(m_impl->m_forwarder->getCs(), m_impl->m_forwarder->getCounters(),
+                                                      *m_impl->m_dispatcher, *m_impl->m_authenticator);
   if (!this->getConfig().get<bool>("ndnSIM.disable_strategy_choice_manager", false)) {
-    m_impl->m_strategyChoiceManager.reset(new StrategyChoiceManager(forwarder->getStrategyChoice(),
-                                                                    *m_impl->m_dispatcher,
-                                                                    *m_impl->m_authenticator));
+    m_impl->m_strategyChoiceManager = make_unique<::nfd::StrategyChoiceManager>(m_impl->m_forwarder->getStrategyChoice(),
+                                                                                *m_impl->m_dispatcher, *m_impl->m_authenticator);
+
   }
   else {
     this->getConfig().get_child("authorizations").get_child("authorize").get_child("privileges").erase("strategy-choice");
-  }
-
-  if (!this->getConfig().get<bool>("ndnSIM.disable_forwarder_status_manager", false)) {
-    m_impl->m_forwarderStatusManager.reset(new ForwarderStatusManager(*forwarder, *m_impl->m_dispatcher));
   }
 
   ConfigFile config(&ConfigFile::ignoreUnknownSection);
@@ -321,8 +313,7 @@ L3Protocol::initializeManagement()
 
   // add FIB entry for NFD Management Protocol
   Name topPrefix("/localhost/nfd");
-  auto entry = forwarder->getFib().insert(topPrefix).first;
-  entry->addNextHop(*(m_impl->m_internalFace), 0);
+  m_impl->m_forwarder->getFib().insert(topPrefix).first->addOrUpdateNextHop(*m_impl->m_internalFace, 0, 0);
   m_impl->m_dispatcher->addTopPrefix(topPrefix, false);
 }
 
@@ -334,30 +325,9 @@ L3Protocol::initializeRibManager()
   std::tie(m_impl->m_internalRibFace, m_impl->m_internalRibClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
   m_impl->m_forwarder->getFaceTable().add(m_impl->m_internalRibFace);
 
-  m_impl->m_dispatcherRib.reset(new ::ndn::mgmt::Dispatcher(*m_impl->m_internalRibClientFace, StackHelper::getKeyChain()));
-
-  m_impl->m_ribManager = make_shared<rib::RibManager>(*(m_impl->m_dispatcherRib), *(m_impl->m_internalRibClientFace),
-                                                      StackHelper::getKeyChain());
-
-  ConfigFile config([] (const std::string& filename, const std::string& sectionName,
-                        const ConfigSection& section, bool isDryRun) {
-      // Ignore "log" and sections belonging to NFD,
-      // but raise an error if we're missing a handler for a "rib" section.
-      if (sectionName != "rib" || sectionName == "log") {
-        // do nothing
-      }
-      else {
-        // missing RIB section
-        ConfigFile::throwErrorOnUnknownSection(filename, sectionName, section, isDryRun);
-      }
-    });
-
-  m_impl->m_ribManager->setConfigFile(config);
-
-  // apply config
-  config.parse(m_impl->m_config, false, "ndnSIM.conf");
-
-  m_impl->m_ribManager->registerWithNfd();
+  m_impl->m_ribService = make_unique<rib::Service>(m_impl->m_config,
+                                                   std::ref(*m_impl->m_internalRibClientFace),
+                                                   std::ref(StackHelper::getKeyChain()));
 }
 
 shared_ptr<nfd::Forwarder>
@@ -372,10 +342,16 @@ L3Protocol::getFibManager()
   return m_impl->m_fibManager;
 }
 
-shared_ptr<nfd::StrategyChoiceManager>
+nfd::StrategyChoiceManager&
 L3Protocol::getStrategyChoiceManager()
 {
-  return m_impl->m_strategyChoiceManager;
+  return *m_impl->m_strategyChoiceManager;
+}
+
+::nfd::rib::Service&
+L3Protocol::getRibService()
+{
+  return *m_impl->m_ribService;
 }
 
 nfd::ConfigSection&
@@ -415,7 +391,7 @@ L3Protocol::DoDispose(void)
   // MUST HAPPEN BEFORE Simulator IS DESTROYED
   m_impl.reset();
 
-  nfd::scheduler::getGlobalScheduler().cancelAllEvents();
+  nfd::scheduler::resetGlobalScheduler();
 
   m_node = 0;
 

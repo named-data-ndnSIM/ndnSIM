@@ -41,7 +41,6 @@ def register_types(module):
         module.add_class('Interest')
         module.add_class('Data')
         module.add_class('Face', memory_policy=StdSharedPtr('ns3::ndn::Face'))
-        module.add_class('FaceContainer', memory_policy=Ns3PtrMemoryPolicy('::ns3::ndn::FaceContainer'))
 
         def reg_name(module):
             module.add_class('Component')
@@ -52,6 +51,8 @@ def register_types(module):
             module.add_class('Fib')
             module.add_class('Pit')
             module.add_class('Cs')
+            module.add_class('FaceTable')
+            module.add_class('Face')
 
             def reg_fib(module):
                 module.add_class('Entry')#, memory_policy=StdSharedPtr('ns3::ndn::nfd::fib::Entry'))
@@ -76,10 +77,10 @@ def register_methods(root_module):
     def reg_stackhelper(cls):
         cls.add_constructor([])
 
-        cls.add_method('Install', 'ns3::Ptr<ns3::ndn::FaceContainer>', [param('ns3::Ptr<ns3::Node>', 'node')], is_const=True)
-        cls.add_method('Install', 'ns3::Ptr<ns3::ndn::FaceContainer>', [param('std::string const&', 'nodeName')], is_const=True)
-        cls.add_method('Install', 'ns3::Ptr<ns3::ndn::FaceContainer>', [param('const ns3::NodeContainer&', 'c')], is_const=True)
-        cls.add_method('InstallAll', 'ns3::Ptr<ns3::ndn::FaceContainer>', [], is_const=True)
+        cls.add_method('Install', retval('void'), [param('ns3::Ptr<ns3::Node>', 'node')], is_const=True)
+        cls.add_method('Install', retval('void'), [param('std::string const&', 'nodeName')], is_const=True)
+        cls.add_method('Install', retval('void'), [param('const ns3::NodeContainer&', 'c')], is_const=True)
+        cls.add_method('InstallAll', retval('void'), [], is_const=True)
 
         cls.add_method('SetDefaultRoutes', retval('void'), [param('bool', 'isEnabled', default_value='true')], is_const=True)
         cls.add_method('SetStackAttributes',
@@ -210,15 +211,23 @@ def register_methods(root_module):
         cls.add_method('getForwarder', 'std::shared_ptr<ns3::ndn::nfd::Forwarder>', [])
     register_L3Protocol(root_module['ns3::ndn::L3Protocol'])
 
+    # shared_ptr<Face>
     def reg_Face(cls):
         cls.add_output_stream_operator()
         cls.add_method('getId', retval('int64_t'), [], is_const=True)
     reg_Face(root_module['ns3::ndn::Face'])
 
+    # without shared_ptr
+    def reg_nfdFace(cls):
+        cls.add_output_stream_operator()
+        cls.add_method('getId', retval('int64_t'), [], is_const=True)
+    reg_nfdFace(root_module['ns3::ndn::nfd::Face'])
+
     def reg_NfdForwarder(cls):
         cls.add_method('getFib', retval('const ns3::ndn::nfd::Fib&', caller_manages_return=False), [], is_const=True)
         cls.add_method('getPit', retval('const ns3::ndn::nfd::Pit&', caller_manages_return=False), [], is_const=True)
         cls.add_method('getCs', retval('const ns3::ndn::nfd::Cs&', caller_manages_return=False), [], is_const=True)
+        cls.add_method('getFaceTable', retval('const ns3::ndn::nfd::FaceTable&', caller_manages_return=False), [], is_const=True)
     reg_NfdForwarder(root_module['ns3::ndn::nfd::Forwarder'])
 
     #############
@@ -250,7 +259,7 @@ def register_methods(root_module):
         reg_Entry(root_module['ns3::ndn::nfd::fib::Entry'])
 
         def reg_NextHop(cls):
-            cls.add_constructor([param('const ns3::ndn::Face&', 'face')])
+            cls.add_constructor([param('const ns3::ndn::Face&', 'face'), param('uint64_t', 'endpointId')])
 
             cls.add_function_as_method('getFaceFromFibNextHop', 'std::shared_ptr<ns3::ndn::Face>',
                                        [param('const ns3::ndn::nfd::fib::NextHop&', 'obj')],
@@ -296,6 +305,16 @@ def register_methods(root_module):
     reg_NfdCs(root_module, root_module['ns3::ndn::nfd::Cs'])
     #### CS ####
     #############
+
+    ###################
+    #### FaceTable ####
+    def reg_NfdFaceTable(root_module, cls):
+        cls.add_method('size', retval('size_t'), [], is_const=True)
+        cls.add_container_traits(retval('const ns3::ndn::nfd::Face&', caller_manages_return=False),
+                                 begin_method='begin', end_method='end', iterator_type='const_iterator')
+    reg_NfdFaceTable(root_module, root_module['ns3::ndn::nfd::FaceTable'])
+    #### FaceTable ####
+    ###################
 
 def reg_other_modules(root_module):
     def reg_ApplicationContainer(cls):

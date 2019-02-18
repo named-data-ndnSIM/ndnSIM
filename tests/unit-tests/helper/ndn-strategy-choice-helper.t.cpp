@@ -66,10 +66,10 @@ public:
     addApps({
         {"A1", "ns3::ndn::ConsumerCbr",
             {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "100s"},
+            "0.1s", "100s"},
         {"A2", "ns3::ndn::ConsumerCbr",
             {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "100s"},
+            "0.1s", "100s"},
       });
   }
 };
@@ -78,7 +78,7 @@ BOOST_FIXTURE_TEST_SUITE(TestStrategyChoiceHelper, StrategyChoiceHelperFixture)
 
 BOOST_AUTO_TEST_CASE(DefaultStrategies)
 {
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNode)
 {
   StrategyChoiceHelper::Install(getNode("A2"), "/prefix", "/localhost/nfd/strategy/multicast");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(InstallBuiltInStrategyOnNodeContainer)
 
   StrategyChoiceHelper::Install(nodes, "/prefix", "/localhost/nfd/strategy/multicast");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 5);
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(InstallAllBuiltInStrategy)
 {
   StrategyChoiceHelper::InstallAll("/prefix", "/localhost/nfd/strategy/multicast");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 5);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNode)
 {
   StrategyChoiceHelper::Install<NullStrategy>(getNode("A2"), "/prefix");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(InstallCustomStrategyOnNodeContainer)
 
   StrategyChoiceHelper::Install<NullStrategy>(nodes, "/prefix");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(InstallAllCustomStrategy)
 {
   StrategyChoiceHelper::InstallAll<NullStrategy>("/prefix");
 
-  Simulator::Stop(Seconds(5.0));
+  Simulator::Stop(Seconds(5));
   Simulator::Run();
 
   BOOST_CHECK_EQUAL(getFace("A1", "B1")->getCounters().nOutInterests, 0);

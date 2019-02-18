@@ -27,7 +27,6 @@
 #include "ns3/node.h"
 #include "ns3/node-container.h"
 
-#include "ndn-face-container.hpp"
 #include "ndn-fib-helper.hpp"
 #include "ndn-strategy-choice-helper.hpp"
 
@@ -143,7 +142,7 @@ public:
   * \returns list of installed faces in the form of a smart pointer
   * to NdnFaceContainer object
   */
-  Ptr<FaceContainer>
+  void
   Install(const std::string& nodeName) const;
 
   /**
@@ -157,7 +156,7 @@ public:
    * \returns list of installed faces in the form of a smart pointer
    * to FaceContainer object
    */
-  Ptr<FaceContainer>
+  void
   Install(Ptr<Node> node) const;
 
   /**
@@ -172,7 +171,7 @@ public:
    * \returns list of installed faces in the form of a smart pointer
    * to FaceContainer object
    */
-  Ptr<FaceContainer>
+  void
   Install(const NodeContainer& c) const;
 
   /**
@@ -181,7 +180,7 @@ public:
    * \returns list of installed faces in the form of a smart pointer
    * to FaceContainer object
    */
-  Ptr<FaceContainer>
+  void
   InstallAll() const;
 
   /**
@@ -224,19 +223,6 @@ public:
   UpdateAll();
 
   /**
-   *\brief Disable the RIB manager of NFD
-   */
-  void
-  disableRibManager();
-
-  // Cannot be disabled for now
-  // /**
-  //  * \brief Disable Face Manager
-  //  */
-  // void
-  // disableFaceManager();
-
-  /**
    * \brief Disable Strategy Choice Manager
    */
   void
@@ -255,6 +241,10 @@ public:
   SetLinkDelayAsFaceMetric();
 
 private:
+  void
+  doInstall(Ptr<Node> node) const;
+
+private:
   shared_ptr<Face>
   DefaultNetDeviceCallback(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> netDevice) const;
 
@@ -264,8 +254,6 @@ private:
   shared_ptr<Face>
   createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetDevice> device) const;
 
-  bool m_isRibManagerDisabled;
-  // bool m_isFaceManagerDisabled;
   bool m_isForwarderStatusManagerDisabled;
   bool m_isStrategyChoiceManagerDisabled;
 

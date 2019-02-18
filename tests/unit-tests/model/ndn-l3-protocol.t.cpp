@@ -62,6 +62,7 @@ public:
         return make_shared<TesterApp>([this] (::ndn::Face& face) {
             for (const Name& dataset : requestedDatasets) {
               Interest i(dataset);
+              i.setCanBePrefix(true);
               face.expressInterest(i, [&] (const Interest& i, const Data& data) {
                   BOOST_TEST_MESSAGE(data.getName());
                   receivedDatasets.insert(data.getName().getPrefix(-2));
@@ -92,34 +93,6 @@ BOOST_AUTO_TEST_CASE(AllEnabled)
   BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
                                 receivedDatasets.begin(), receivedDatasets.end());
 }
-
-BOOST_AUTO_TEST_CASE(DisabledRibManager)
-{
-  // Disable RIB manager
-  disableRibManager();
-
-  setupAndRun();
-
-  BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
-
-  requestedDatasets.erase("/localhost/nfd/rib/list");
-  BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-                                receivedDatasets.begin(), receivedDatasets.end());
-}
-
-// BOOST_AUTO_TEST_CASE(DisabledFaceManager)
-// {
-//   // Disable Face manager
-//   disableFaceManager();
-
-//   setupAndRun();
-
-//   BOOST_CHECK_EQUAL(requestedDatasets.size(), receivedDatasets.size() + 1);
-
-//   requestedDatasets.erase("/localhost/nfd/faces/list");
-//   BOOST_CHECK_EQUAL_COLLECTIONS(requestedDatasets.begin(), requestedDatasets.end(),
-//                                 receivedDatasets.begin(), receivedDatasets.end());
-// }
 
 BOOST_AUTO_TEST_CASE(DisabledStrategyChoiceManager)
 {

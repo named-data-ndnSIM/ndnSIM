@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(NackTracing)
      << "1	1	1	internal://	OutNacks	0	0	0	0\n"
      << "1	1	1	internal://	InSatisfiedInterests	0	0	0	0\n"
      << "1	1	1	internal://	InTimedOutInterests	0	0	0	0\n"
-     << "1	1	1	internal://	OutSatisfiedInterests	2.4	0	3	0\n"
+     << "1	1	1	internal://	OutSatisfiedInterests	4	0	5	0\n"
      << "1	1	1	internal://	OutTimedOutInterests	0	0	0	0\n";
   BOOST_CHECK(os.match_pattern());
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(NackTracing)
      << "1	1	256	internal://	OutData	0	0	0	0\n"
      << "1	1	256	internal://	InNacks	0	0	0	0\n"
      << "1	1	256	internal://	OutNacks	0	0	0	0\n"
-     << "1	1	256	internal://	InSatisfiedInterests	2.4	0	3	0\n"
+     << "1	1	256	internal://	InSatisfiedInterests	4	0	5	0\n"
      << "1	1	256	internal://	InTimedOutInterests	0	0	0	0\n"
      << "1	1	256	internal://	OutSatisfiedInterests	0	0	0	0\n"
      << "1	1	256	internal://	OutTimedOutInterests	0	0	0	0\n";
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(NackTracing)
      << "1	1	257	appFace://	OutTimedOutInterests	0	0	0	0\n";
   BOOST_CHECK(os.match_pattern());
 
-  os << "1	1	-1	all	SatisfiedInterests	2.4	0	3	0\n"
+  os << "1	1	-1	all	SatisfiedInterests	4	0	5	0\n"
      << "1	1	-1	all	TimedOutInterests	0.8	0	1	0\n";
   BOOST_CHECK(os.match_pattern());
 }

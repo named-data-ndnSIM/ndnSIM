@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE(EncodePrintInterest)
 {
   Interest interest("/prefix");
   interest.setNonce(10);
+  interest.setCanBePrefix(true);
   lp::Packet lpPacket(interest.wireEncode());
   nfd::face::Transport::Packet packet(lpPacket.wireEncode());
   BlockHeader header(packet);
@@ -91,6 +92,7 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
 {
   Interest interest("/prefix");
   interest.setNonce(10);
+  interest.setCanBePrefix(true);
 
   lp::Packet lpPacket;
   lpPacket.add<::ndn::lp::SequenceField>(0); // to make sure that the NDNLP header is added

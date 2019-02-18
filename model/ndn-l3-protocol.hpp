@@ -43,6 +43,9 @@ class Entry;
 namespace cs {
 class Policy;
 } // namespace cs
+namespace rib {
+class Service;
+}
 } // namespace nfd
 
 namespace ns3 {
@@ -108,10 +111,13 @@ public:
   getFibManager();
 
   /**
-   * \brief Get smart pointer to nfd::StrategyChoiceManager, used by node's NFD
+   * \brief Get nfd::StrategyChoiceManager, used by node's NFD
    */
-  shared_ptr<nfd::StrategyChoiceManager>
+  nfd::StrategyChoiceManager&
   getStrategyChoiceManager();
+
+  ::nfd::rib::Service&
+  getRibService();
 
   /**
    * \brief Add face to NDN stack

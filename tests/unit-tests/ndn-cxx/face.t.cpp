@@ -19,7 +19,6 @@
 
 #include <ndn-cxx/face.hpp>
 #include <ndn-cxx/util/scheduler.hpp>
-#include <ndn-cxx/util/scheduler-scoped-event-id.hpp>
 #include <ndn-cxx/lp/tags.hpp>
 
 #include "ns3/ndnSIM/helper/ndn-app-helper.hpp"
@@ -112,7 +111,7 @@ public:
   SingleInterest(const Name& name, const std::function<void(const Data&)>& onData,
                  const VoidCallback& onNack, const VoidCallback& onTimeout)
   {
-    m_face.expressInterest(Interest(name), std::bind([onData] (const Data& data) {
+    m_face.expressInterest(Interest(name).setCanBePrefix(true), std::bind([onData] (const Data& data) {
           onData(data);
         }, _2),
       std::bind(onNack),
@@ -209,7 +208,6 @@ public:
   MultipleInterest(const Name& name, const NameCallback& onData, const VoidCallback& onTimeout,
                    const VoidCallback& onNack)
     : m_scheduler(m_face.getIoService())
-    , m_event(m_scheduler)
   {
     expressNextInterest(name, 0, onData, onTimeout, onNack);
   }
@@ -219,7 +217,7 @@ private:
   expressNextInterest(const Name& name, uint32_t seqNo, const NameCallback& onData,
                       const VoidCallback& onTimeout, const VoidCallback& onNack)
   {
-    m_face.expressInterest(Interest(Name(name).appendSegment(seqNo)), std::bind([=] (const Data& data) {
+    m_face.expressInterest(Interest(Name(name).appendSegment(seqNo)).setCanBePrefix(true), std::bind([=] (const Data& data) {
           onData(data.getName());
 
           m_event = m_scheduler.scheduleEvent(time::seconds(1),
@@ -267,7 +265,7 @@ class SingleInterestWithFaceShutdown : public BaseTesterApp
 public:
   SingleInterestWithFaceShutdown()
   {
-    m_face.expressInterest(Interest(Name("/interest/to/timeout")),
+    m_face.expressInterest(Interest(Name("/interest/to/timeout")).setCanBePrefix(true),
                            std::bind([] {
                                BOOST_ERROR("Unexpected response");
                              }),

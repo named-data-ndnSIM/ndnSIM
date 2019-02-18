@@ -155,6 +155,7 @@ BOOST_AUTO_TEST_CASE(WithoutNetworkRegion)
 {
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
+      i.setCanBePrefix(false);
       i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
@@ -174,6 +175,7 @@ BOOST_AUTO_TEST_CASE(WithNetworkRegion)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
+      i.setCanBePrefix(false);
       i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
@@ -193,6 +195,7 @@ BOOST_AUTO_TEST_CASE(WithMoreSpecificNetworkRegion)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
+      i.setCanBePrefix(false);
       i.setForwardingHint(makeHint(Name("/otherPrefix")));
       return make_shared<TesterApp>(i, this);
     })
@@ -212,6 +215,7 @@ BOOST_AUTO_TEST_CASE(WithLessSpecificLink)
 
   FactoryCallbackApp::Install(getNode("1"), [this] () -> shared_ptr<void> {
       Interest i("/prefix/someData");
+      i.setCanBePrefix(false);
       i.setForwardingHint(makeHint(Name("/otherPrefix/moreSpecific")));
       return make_shared<TesterApp>(i, this);
     })

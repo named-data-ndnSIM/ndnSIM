@@ -60,7 +60,7 @@ public:
       addApps({
           {"A1", "ns3::ndn::ConsumerCbr",
               {{"Prefix", "/prefix"}, {"Frequency", "1000"}},
-              "0s", "5s"},
+              "0.1s", "1.1s"},
           {"A3", "ns3::ndn::Producer",
               {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
               "0s", "10s"},
@@ -79,11 +79,11 @@ BOOST_AUTO_TEST_CASE(DetachedPitEntries)
   Simulator::Stop(Seconds(5.2));
   BOOST_CHECK_NO_THROW(Simulator::Run());
 
-  BOOST_CHECK_EQUAL(getFace("A1", "A2")->getCounters().nOutInterests, 5000);
-  BOOST_CHECK_EQUAL(getFace("A2", "A3")->getCounters().nOutInterests, 5000);
+  BOOST_CHECK_EQUAL(getFace("A1", "A2")->getCounters().nOutInterests, 1000);
+  BOOST_CHECK_EQUAL(getFace("A2", "A3")->getCounters().nOutInterests, 1000);
 
-  BOOST_CHECK_EQUAL(getFace("A3", "A2")->getCounters().nOutData, 5000);
-  BOOST_CHECK_EQUAL(getFace("A2", "A1")->getCounters().nOutData, 5000);
+  BOOST_CHECK_EQUAL(getFace("A3", "A2")->getCounters().nOutData, 1000);
+  BOOST_CHECK_EQUAL(getFace("A2", "A1")->getCounters().nOutData, 1000);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

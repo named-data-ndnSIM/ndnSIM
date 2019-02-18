@@ -84,15 +84,20 @@ AppHelper::Install(NodeContainer c)
 Ptr<Application>
 AppHelper::InstallPriv(Ptr<Node> node)
 {
+  Ptr<Application> app;
+  Simulator::ScheduleWithContext(node->GetId(), Seconds(0), MakeEvent([=, &app] {
 #ifdef NS3_MPI
-  if (MpiInterface::IsEnabled() && node->GetSystemId() != MpiInterface::GetSystemId()) {
-    // don't create an app if MPI is enabled and node is not in the correct partition
-    return 0;
-  }
+        if (MpiInterface::IsEnabled() && node->GetSystemId() != MpiInterface::GetSystemId()) {
+          // don't create an app if MPI is enabled and node is not in the correct partition
+          return 0;
+        }
 #endif
 
-  Ptr<Application> app = m_factory.Create<Application>();
-  node->AddApplication(app);
+        app = m_factory.Create<Application>();
+        node->AddApplication(app);
+      }));
+  Simulator::Stop(Seconds(0));
+  Simulator::Run();
 
   return app;
 }

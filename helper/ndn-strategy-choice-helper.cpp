@@ -39,6 +39,7 @@ StrategyChoiceHelper::sendCommand(const ControlParameters& parameters, Ptr<Node>
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
+  command->setCanBePrefix(false);
   StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
@@ -60,7 +61,11 @@ StrategyChoiceHelper::Install(Ptr<Node> node, const Name& namePrefix, const Name
   parameters.setName(namePrefix);
   NS_LOG_DEBUG("Node ID: " << node->GetId() << " with forwarding strategy " << strategy);
   parameters.setStrategy(strategy);
-  sendCommand(parameters, node);
+
+  Simulator::ScheduleWithContext(node->GetId(), Seconds(0),
+                                 &StrategyChoiceHelper::sendCommand, parameters, node);
+  Simulator::Stop(Seconds(0));
+  Simulator::Run();
 }
 
 void

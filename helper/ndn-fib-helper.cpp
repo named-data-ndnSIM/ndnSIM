@@ -50,7 +50,6 @@ NS_LOG_COMPONENT_DEFINE("ndn.FibHelper");
 void
 FibHelper::AddNextHop(const ControlParameters& parameters, Ptr<Node> node)
 {
-  NS_LOG_DEBUG("Add Next Hop command was initialized");
   Block encodedParameters(parameters.wireEncode());
 
   Name commandName("/localhost/nfd/fib");
@@ -58,6 +57,7 @@ FibHelper::AddNextHop(const ControlParameters& parameters, Ptr<Node> node)
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
+  command->setCanBePrefix(false);
   StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
@@ -67,7 +67,6 @@ FibHelper::AddNextHop(const ControlParameters& parameters, Ptr<Node> node)
 void
 FibHelper::RemoveNextHop(const ControlParameters& parameters, Ptr<Node> node)
 {
-  NS_LOG_DEBUG("Remove Next Hop command was initialized");
   Block encodedParameters(parameters.wireEncode());
 
   Name commandName("/localhost/nfd/fib");
@@ -75,6 +74,7 @@ FibHelper::RemoveNextHop(const ControlParameters& parameters, Ptr<Node> node)
   commandName.append(encodedParameters);
 
   shared_ptr<Interest> command(make_shared<Interest>(commandName));
+  command->setCanBePrefix(false);
   StackHelper::getKeyChain().sign(*command);
 
   Ptr<L3Protocol> l3protocol = node->GetObject<L3Protocol>();
@@ -86,11 +86,6 @@ FibHelper::AddRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face, i
 {
   NS_LOG_LOGIC("[" << node->GetId() << "]$ route add " << prefix << " via " << face->getLocalUri()
                    << " metric " << metric);
-
-  // Get L3Protocol object
-  Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
-  // Get the forwarder instance
-  shared_ptr<nfd::Forwarder> m_forwarder = L3protocol->getForwarder();
 
   ControlParameters parameters;
   parameters.setName(prefix);
@@ -177,6 +172,8 @@ FibHelper::AddRoute(const std::string& nodeName, const Name& prefix,
 void
 FibHelper::RemoveRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face)
 {
+  NS_LOG_LOGIC("[" << node->GetId() << "]$ route del " << prefix << " via " << face->getLocalUri());
+
   // Get L3Protocol object
   Ptr<L3Protocol> L3protocol = node->GetObject<L3Protocol>();
   // Get the forwarder instance
