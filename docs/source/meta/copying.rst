@@ -10,17 +10,22 @@ with permission to be linked with NS-3 codebase (GPL 2.0).
 ndnSIM uses a number of third-party software and libraries, licensed under the following
 licenses:
 
-- Boost libraries licensed under conditions of `Boost Software License 1.0`_
+- The Boost libraries are licensed under the
+  `Boost Software License 1.0`_
 
-- CryptoPP library is licensed under conditions of `Boost Software License 1.0`_
+- any-lite by Martin Moene is licensed under the
+  `Boost Software License 1.0`_
 
-- SQLite is in `public domain <http://www.sqlite.org/copyright.html>`__
+- optional-lite by Martin Moene is licensed under the
+  `Boost Software License 1.0`_
 
-- waf build system is licensed under conditions of `BSD license
-  <https://github.com/named-data/ndn-cxx/blob/master/waf>`__
+- variant-lite by Martin Moene is licensed under the
+  `Boost Software License 1.0`_
 
-- ndn-cxx library licensed under conditions of `GNU LGPL 3.0+
-  <https://github.com/named-data/ndn-cxx/blob/master/COPYING.md>`__
+- SQLite is in the `public domain <https://www.sqlite.org/copyright.html>`__
+
+- The waf build system is licensed under the terms of the
+  `BSD license <https://github.com/named-data/ndn-cxx/blob/master/waf>`__
 
 - NDN Forwarding Daemon (NFD) licensed under conditions of `GNU GPL 3.0+
   <https://github.com/named-data/NFD/blob/master/COPYING.md>`__

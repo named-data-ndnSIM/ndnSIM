@@ -147,7 +147,7 @@ possible to track many internal details.  For example, logging of :ndnsim:`Face`
 :ndnsim:`Consumer` shows everything what happens in :ndnsim:`Face` and :ndnsim:`Consumer`
 classes::
 
-    NS_LOG=ndn.Face:ndn.Consumer ./waf --run=ndn-simple
+    NS_LOG=ndn.Consumer ./waf --run=ndn-simple
 
 Refer to the source code and NS-3 documentation to see what logging interfaces are
 available and about details how enable one or more logging interfaces.

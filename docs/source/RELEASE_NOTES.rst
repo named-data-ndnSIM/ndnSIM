@@ -5,6 +5,51 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
 
+Release 2.7
+-----------
+
+Release date: February 24, 2019
+
+Overview
+~~~~~~~~
+
+- The submodules of NFD and ndn-cxx have been upgraded to version 0.6.5.
+
+  `NFD 0.6.5 release notes <https://named-data.net/doc/NFD/0.6.5/RELEASE_NOTES.html>`__
+
+  `ndn-cxx 0.6.5 release notes <https://named-data.net/doc/ndn-cxx/0.6.5/RELEASE_NOTES.html>`__
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+- Base NS-3 was rebased to version 3.29
+
+- Following changes in NFD and ndn-cxx codebases, the build requirements have been upgraded to gcc
+  >= 5.3 or clang >= 3.6, boost >= 1.58, openssl >= 1.0.2. This effectively drops support for all
+  versions of Ubuntu older than 16.04 that use distribution-provided compilers and packages.
+
+- The compilation now uses the C++14 standard.
+
+Improvements and bug fixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Update face metric based on simulated p2p link delay (:issue:`4733`)
+
+- Remove and replace the previously deprecated and removed in NS-3.29 ``QueueBase::MaxPackets``
+
+- Update installation instructions
+
+Deprecation
+~~~~~~~~~~~
+
+- ndnSIM 2.7 is the last release that supports the legacy content store implementation.  The future versions
+  will only include content store replacement/placement policies implemented using NFD routines.  Please
+  refer to the latest version of NFD Developer's Guide for more information.
+
+********************************************************************************
+
 Release 2.6
 -----------
 
@@ -41,6 +86,7 @@ Improvements and bug fixes
 
 - Updates of the ndnSIM documentation.
 
+********************************************************************************
 
 Release 2.5
 -----------
@@ -71,6 +117,8 @@ Improvements and bug fixes
 - Fix compilation failure with boost >= 1.66 (:issue:`4471`).
 
 - Updates of the ndnSIM documentation.
+
+********************************************************************************
 
 Release 2.4
 -----------
@@ -115,6 +163,8 @@ Improvements and bug fixes
 
   * Added page about community contributions to the simulator.
   * CS tracer documentation update.
+
+********************************************************************************
 
 Release 2.3
 -----------
@@ -191,6 +241,8 @@ Improvements and bug fixes
 - Updates of the ndnSIM documentation (:issue:`3876`)
 
   * Added explanation about the support of NDNLPv2 and its implications.
+
+********************************************************************************
 
 Release 2.2
 -----------
@@ -409,10 +461,7 @@ Improvements and bug fixes
   * In :ndnsim:`ndn::Producer` application that caused a wrong dummy signature to be added
     to the constructed data packets (:issue:`2927`)
 
-
-
 ********************************************************************************
-
 
 Release 2.0
 -----------
