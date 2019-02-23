@@ -64,8 +64,7 @@ StrategyChoiceHelper::Install(Ptr<Node> node, const Name& namePrefix, const Name
 
   Simulator::ScheduleWithContext(node->GetId(), Seconds(0),
                                  &StrategyChoiceHelper::sendCommand, parameters, node);
-  Simulator::Stop(Seconds(0));
-  Simulator::Run();
+  StackHelper::ProcessWarmupEvents();
 }
 
 void

@@ -240,6 +240,9 @@ public:
   static void
   SetLinkDelayAsFaceMetric();
 
+  static void
+  ProcessWarmupEvents();
+
 private:
   void
   doInstall(Ptr<Node> node) const;

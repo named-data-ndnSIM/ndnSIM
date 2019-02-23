@@ -126,6 +126,8 @@ def build(bld):
     module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
     module.includes = ['../..', '../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM', '../../ns3/ndnSIM/ndn-cxx']
     module.export_includes = ['../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM']
+    if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
+        module.defines = ['HAVE_NS3_VISUALIZER=1']
 
     headers = bld(features='ns3header')
     headers.module = 'ndnSIM'

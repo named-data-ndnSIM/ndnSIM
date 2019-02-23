@@ -27,6 +27,10 @@
 #include "ns3/node-list.h"
 #include "ns3/simulator.h"
 
+#if HAVE_NS3_VISUALIZER
+#include "../../visualizer/model/visual-simulator-impl.h"
+#endif // HAVE_NS3_VISUALIZER
+
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
 #include "utils/ndn-time.hpp"
@@ -174,8 +178,7 @@ StackHelper::Install(Ptr<Node> node) const
     return;
   }
   Simulator::ScheduleWithContext(node->GetId(), Seconds(0), &StackHelper::doInstall, this, node);
-  Simulator::Stop(Seconds(0));
-  Simulator::Run(); // to automatically dispatch events on proper nodes
+  ProcessWarmupEvents();
 }
 
 void
@@ -393,9 +396,7 @@ StackHelper::createAndRegisterFace(Ptr<Node> node, Ptr<L3Protocol> ndn, Ptr<NetD
 
   if (m_needSetDefaultRoutes) {
     // default route with lowest priority possible
-    Simulator::ScheduleWithContext(node->GetId(), Seconds(0), MakeEvent([=] {
-          FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
-        }));
+    FibHelper::AddRoute(node, "/", face, std::numeric_limits<int32_t>::max());
   }
   return face;
 }
@@ -434,6 +435,24 @@ StackHelper::SetLinkDelayAsFaceMetric()
     }
   }
 }
+
+void
+StackHelper::ProcessWarmupEvents()
+{
+  Simulator::Stop(Seconds(0));
+#if HAVE_NS3_VISUALIZER
+  auto impl = DynamicCast<VisualSimulatorImpl>(Simulator::GetImplementation());
+  if (impl != nullptr) {
+    impl->RunRealSimulator();
+  }
+  else {
+    Simulator::Run();
+  }
+#else
+  Simulator::Run();
+#endif // HAVE_NS3_VISUALIZER
+}
+
 
 } // namespace ndn
 } // namespace ns3

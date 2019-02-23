@@ -23,6 +23,7 @@
 #include "ns3/names.h"
 
 #include "apps/ndn-app.hpp"
+#include "ndn-stack-helper.hpp"
 
 #ifdef NS3_MPI
 #include "ns3/mpi-interface.h"
@@ -96,8 +97,7 @@ AppHelper::InstallPriv(Ptr<Node> node)
         app = m_factory.Create<Application>();
         node->AddApplication(app);
       }));
-  Simulator::Stop(Seconds(0));
-  Simulator::Run();
+  StackHelper::ProcessWarmupEvents();
 
   return app;
 }

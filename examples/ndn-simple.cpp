@@ -82,7 +82,8 @@ main(int argc, char* argv[])
   // Consumer will request /prefix/0, /prefix/1, ...
   consumerHelper.SetPrefix("/prefix");
   consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
-  consumerHelper.Install(nodes.Get(0));                        // first node
+  auto apps = consumerHelper.Install(nodes.Get(0));                        // first node
+  apps.Stop(Seconds(10.0)); // stop the consumer app at 10 seconds mark
 
   // Producer
   ndn::AppHelper producerHelper("ns3::ndn::Producer");
