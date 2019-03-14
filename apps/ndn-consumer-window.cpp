@@ -26,6 +26,7 @@
 #include "ns3/string.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
+#include <limits>
 
 NS_LOG_COMPONENT_DEFINE("ndn.ConsumerWindow");
 
@@ -127,7 +128,7 @@ ConsumerWindow::SetMaxSize(double size)
 {
   m_maxSize = size;
   if (m_maxSize < 0) {
-    m_seqMax = 0;
+    m_seqMax = std::numeric_limits<uint32_t>::max();
     return;
   }
 
