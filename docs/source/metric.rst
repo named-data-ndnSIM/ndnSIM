@@ -181,7 +181,7 @@ To run this scenario, use the following command::
 
 The successful run will create ``rate-trace.txt`` files in the current directly, which can be analyzed manually or used as input to some graph/stats packages.
 
-.. sidebar:: Graph build using the `R script <http://www.r-project.org/>`_
+.. sidebar:: Graph build using the `R script <https://www.r-project.org/>`_
 
     .. image:: _static/root-rates.png
         :alt: Interest/Data packet rates at the root node
@@ -190,7 +190,7 @@ The successful run will create ``rate-trace.txt`` files in the current directly,
     :language: r
     :linenos:
 
-For more information about R and ggplot2, please refer to `R language manual <http://cran.r-project.org/manuals.html>`_ and `ggplot2 module manual <http://docs.ggplot2.org/current/>`_.
+For more information about R and ggplot2, please refer to `R language manual <https://cran.r-project.org/manuals.html>`_ and `ggplot2 module manual <https://docs.ggplot2.org/current/>`_.
 
     ::
 
@@ -230,7 +230,7 @@ To run this scenario, use the following command::
 
 The successful run will create ``drop-trace.txt`` file in the current directly, which can be analyzed manually or used as input to some graph/stats packages.
 
-For example, the following `R script <http://www.r-project.org/>`_ will build a number of nice graphs:
+For example, the following `R script <https://www.r-project.org/>`_ will build a number of nice graphs:
 
 .. literalinclude:: ../../examples/graphs/drop-graph.R
     :language: r

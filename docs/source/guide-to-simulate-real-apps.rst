@@ -1,7 +1,7 @@
 Simulating real NDN applications
 ================================
 
-The version of `ndn-cxx library <http://named-data.net/doc/ndn-cxx/>`__ bundled with ndnSIM includes
+The version of `ndn-cxx library <https://named-data.net/doc/ndn-cxx/>`__ bundled with ndnSIM includes
 a modified version of :ndnsim:`ndn::Face` to directly send and receive Interest and Data packets to
 and from the simulated instances of NFD.  With this modification, ndnSIM enables support to simulate
 real NDN applications written against the ndn-cxx, if they satisfy requirements listed in this guide
@@ -211,6 +211,6 @@ After all these steps, the repository is ready to run the simulation (see `READM
    an example of how to adapt the source code to be compatible with ndnSIM simulations.
 
 
-.. _NDN Essential Tools: http://github.com/named-data/ndn-tools
+.. _NDN Essential Tools: https://github.com/named-data/ndn-tools
 
 .. _scenario template repository: https://github.com/named-data-ndnSIM/scenario-template

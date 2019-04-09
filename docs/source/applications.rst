@@ -76,7 +76,7 @@ Additional attributes:
     Number of different content (sequence numbers) that will be requested by the applications
 
 
-THE following pictures show basic comparison of the generated stream of Interests versus theoretical `Zipf-Mandelbrot <http://en.wikipedia.org/wiki/Zipf%E2%80%93Mandelbrot_law>`_ function (``NumberOfContents`` set to 100 and ``Frequency`` set to 100)
+THE following pictures show basic comparison of the generated stream of Interests versus theoretical `Zipf-Mandelbrot <https://en.wikipedia.org/wiki/Zipf%E2%80%93Mandelbrot_law>`_ function (``NumberOfContents`` set to 100 and ``Frequency`` set to 100)
 
 .. image:: _static/apps/zipf-n100-frq100-duration10.png
    :alt: Comparsion between simulation and theory with simulation duration 10 seconds

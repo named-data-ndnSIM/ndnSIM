@@ -10,18 +10,18 @@ Introduction
     .. image:: _static/ndnSIM-structure.*
         :width: 100%
 
-A new release of `NS-3 based Named Data Networking (NDN) simulator <http://ndnsim.net/1.0/>`__
+A new release of `NS-3 based Named Data Networking (NDN) simulator <https://ndnsim.net/current/>`__
 went through a number of extensive refactoring and rewriting.  The key new features of the
 new version:
 
-- Packet format changed to the `NDN packet format <http://named-data.net/doc/ndn-tlv/>`_
+- Packet format changed to the `NDN packet format <https://named-data.net/doc/ndn-tlv/>`_
 
 - ndnSIM uses implementation of basic NDN primitives from
   `ndn-cxx library (NDN C++ library with eXperimental eXtensions)
-  <http://named-data.net/doc/ndn-cxx/>`_
+  <https://named-data.net/doc/ndn-cxx/>`_
 
 - All NDN forwarding and management is implemented directly using source code of `Named
-  Data Networking Forwarding Daemon (NFD) <http://named-data.net/doc/NFD/>`_
+  Data Networking Forwarding Daemon (NFD) <https://named-data.net/doc/NFD/>`_
 
 - It is possible to :doc:`simulate some real applications <guide-to-simulate-real-apps>`
   written against ndn-cxx library
@@ -54,13 +54,13 @@ Overall structure of ndnSIM is described in our paper and technical reports.
 
 **For ndnSIM >= 2.0:**
 
-- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <http://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
+- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <https://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
 
-- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
+- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <https://users.cs.fiu.edu/~afanasyev/assets/bibtex/tr-mastorakis2016ndnsim.html>`__)
 
 **For ndnSIM 1.0:**
 
-- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`__)
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://users.cs.fiu.edu/~afanasyev/assets/bibtex/tr-afanasyev2012ndnsim.html>`__)
 
 `ndnSIM API documentation <doxygen/index.html>`_
 
@@ -81,9 +81,9 @@ Presentations on ndnSIM:
 - **A. Afanasyev, I. Moiseenko, and L. Zhang, “ndnSIM: a modular NDN simulator.” CCNxCon 2012, Sep-2012** (`Slides <https://users.cs.fiu.edu/~afanasyev/assets/papers/talks-ccnxcon-afanasyev2012ndnsim.pdf>`__)
 
 Also, you can `join our mailing list
-<http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
+<https://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
 discussions about ndnSIM implementation and simulations in general.  Do not forget to
-check mailling list `archives <http://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_.
+check mailling list `archives <https://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_.
 
 
 Support
@@ -93,11 +93,11 @@ The code of ndnSIM is in active development.  Bug reports (issues) as well as ne
 implementation are always welcome.
 
 To file a bug report, please use `NDN Redmine
-<http://redmine.named-data.net/projects/ndnsim>`_.
+<https://redmine.named-data.net/projects/ndnsim>`_.
 
 To create new feature, please fork the code and submit Pull Request on GitHub.
 
-And of course, `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_
+And of course, `our mailing list <https://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_
 is the best way to communicate with and get support from ndnSIM team and other users of
 ndnSIM.
 
@@ -135,9 +135,9 @@ All the NDN related code is in ``ns-3/src/ndnSIM``
 | ``examples/``   | contain :doc:`several example scenarios <examples>`                 |
 +-----------------+---------------------------------------------------------------------+
 
-.. _NDN Forwarding Daemon (NFD): http://named-data.net/doc/NFD/
+.. _NDN Forwarding Daemon (NFD): https://named-data.net/doc/NFD/
 
-.. _ndn-cxx library: http://named-data.net/doc/ndn-cxx/
+.. _ndn-cxx library: https://named-data.net/doc/ndn-cxx/
 
 Logging
 -------

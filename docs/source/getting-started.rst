@@ -161,7 +161,7 @@ version of python:
 .. note::
    On macOS configuration stage may get :ref:`stuck at detecting gtk module <Problems with
    the gtk python module on macOS>`.  Make sure you have `XQuartz
-   <http://xquartz.macosforge.org>`_ installed or disable python as described in the
+   <https://xquartz.macosforge.org>`_ installed or disable python as described in the
    following instructions.
 
 Python bindings is an optional and not very stable feature of NS-3 simulator.  It is
@@ -228,7 +228,7 @@ Simulating using ndnSIM
   Alternative and a recommended way is to write simulation scenarios in a separate
   repository, not related to either NS-3 or ndnSIM.  For example, you can use the
   following template to write your extensions, simulation scenarios, and metric processing
-  scripts: `<http://github.com/cawka/ndnSIM-scenario-template>`_:
+  scripts: `<https://github.com/cawka/ndnSIM-scenario-template>`_:
 
   .. code-block:: bash
 
@@ -262,22 +262,22 @@ Simulating using ndnSIM
    Examples of template-based simulations
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   1. ndnSIM examples from `<http://ndnsim.net>`_ website and more:
+   1. ndnSIM examples from `<https://ndnsim.net>`_ website and more:
 
-   - `<http://github.com/cawka/ndnSIM-examples>`_, or
+   - `<https://github.com/cawka/ndnSIM-examples>`_, or
 
    2. Script scenarios and graph processing scripts for simulations used in "A Case for Stateful
-      Forwarding Plane" paper by Yi et al. (`<http://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):
+      Forwarding Plane" paper by Yi et al. (`<https://dx.doi.org/10.1016/j.comcom.2013.01.005>`_):
 
-   - `<http://github.com/cawka/ndnSIM-comcom-stateful-fw>`_, or
+   - `<https://github.com/cawka/ndnSIM-comcom-stateful-fw>`_, or
 
    3. Script scenarios and graph processing scripts for simulations used in "Rapid Traffic
       Information Dissemination Using Named Data" paper by Wang et
-      al. (`<http://dx.doi.org/10.1145/2248361.2248365>`_):
+      al. (`<https://dx.doi.org/10.1145/2248361.2248365>`_):
 
-   - `<http://github.com/cawka/ndnSIM-nom-rapid-car2car>`_, or
+   - `<https://github.com/cawka/ndnSIM-nom-rapid-car2car>`_, or
 
    - Rocketfuel-based topology generator for ndnSIM preferred format (randomly assigned link
      delays and bandwidth, based on estimated types of connections between nodes):
 
-   - `<http://github.com/cawka/ndnSIM-sample-topologies>`_, or
+   - `<https://github.com/cawka/ndnSIM-sample-topologies>`_, or

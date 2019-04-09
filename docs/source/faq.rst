@@ -154,7 +154,7 @@ Problems with the gtk python module on macOS
 
 If ``./waf configure`` on OSX got stuck during the gtk python module check, it most likely
 means that something is wrong with X11 required by this module.  You can try to reinstall X11
-(`XQuartz <http://xquartz.macosforge.org>`_) or configure NS-3 without python bindings (``./waf
+(`XQuartz <https://xquartz.macosforge.org>`_) or configure NS-3 without python bindings (``./waf
 configure --disable-python``).  Note that disabling python bindings will also disable the
 visualizer module.
 
@@ -181,5 +181,5 @@ General questions
 
     I found an error in the documentation / bug in the code. What should I do?
 
-Please submit a bug report on `redmine <http://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
-or tell us about the error on `our mailing list <http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .
+Please submit a bug report on `redmine <https://redmine.named-data.net/projects/ndnsim?jump=welcome>`_,
+or tell us about the error on `our mailing list <https://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ .

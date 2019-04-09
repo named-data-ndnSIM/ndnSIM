@@ -13,8 +13,7 @@ strategy.
 
 Please refer to :nfd:`API documentation <nfd::fw::Strategy>` of the forwarding strategy
 interface, which lists all default actions/events. For a more detailed specification, you can
-read `NFD Developer's Guide
-<http://named-data.net/wp-content/uploads/2014/07/NFD-developer-guide.pdf>`_, section 5.
+read the corresponding section of `"NFD Developer's Guide" <https://named-data.net/publications/techreports/>`__.
 
 Available forwarding strategies
 +++++++++++++++++++++++++++++++
@@ -83,8 +82,7 @@ Writing your own custom strategy
 
 One of the objectives and features of ndnSIM 2.0 is that it uses NFD codebase for packet
 forwarding.  Therefore, writing strategy in ndnSIM is almost exactly the same process as
-outlined in `Section 5.3 of the NFD Developer's Guide
-<http://named-data.net/wp-content/uploads/2014/07/NFD-developer-guide.pdf>`_.
+outlined in the `"NFD Developer's Guide" <https://named-data.net/publications/techreports/>`__.
 
 The purpose of the strategy is to decides how to forward Interests and it is not intended to
 override any processing steps in the forwarding pipelines of NFD.  If it is desired to support

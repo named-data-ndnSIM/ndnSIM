@@ -7,9 +7,9 @@ The ndnSIM 2.0 is NS-3 module that implements Named Data Networking (NDN) commun
 model, the clean slate Internet design.
 
 We invite you to `join our mailing list
-<http://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
+<https://www.lists.cs.ucla.edu/mailman/listinfo/ndnsim>`_ to see and participate in
 discussions about ndnSIM implementation and simulations in general (`mailing list archives
-<http://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_).
+<https://www.lists.cs.ucla.edu/pipermail/ndnsim/>`_).
 
 Contents:
 
@@ -46,12 +46,12 @@ If you refer to ndnSIM in a published work, please cite the following papers, no
 
 **For ndnSIM >= 2.0:**
 
-- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <http://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
+- **S. Mastorakis, A. Afanasyev, and L. Zhang, "On the Evolution of ndnSIM: an Open-Source Simulator for NDN Experimentation," ACM SIGCOMM Computer Communication Review (CCR), July 2017** (`PDF <https://ccronline.sigcomm.org/wp-content/uploads/2017/08/sigcomm-ccr-final112-full-letter.pdf>`__, `BibTex <https://web.cs.ucla.edu/~mastorakis/bibtex-ndnsim>`__)
 
-- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/399>`__)
+- **S. Mastorakis, A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM 2: An updated NDN simulator for NS-3," NDN, Technical Report NDN-0028, Revision 2, 2016** (`PDF <https://named-data.net/wp-content/uploads/2016/11/ndn-0028-2-ndnsim-v2.pdf>`__, `BibTex <https://users.cs.fiu.edu/~afanasyev/assets/bibtex/tr-mastorakis2016ndnsim.html>`__)
 
 **For ndnSIM 1.0:**
 
-- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <http://lasr.cs.ucla.edu/afanasyev/bibwiki/bibtex/367>`__)
+- **A. Afanasyev, I. Moiseenko, and L. Zhang, "ndnSIM: NDN simulator for NS-3," NDN, Technical Report NDN-0005, 2012** (`PDF <https://named-data.net/wp-content/uploads/TRndnsim.pdf>`__, `BibTex <https://users.cs.fiu.edu/~afanasyev/assets/bibtex/tr-afanasyev2012ndnsim.html>`__)
 
 .. * :ref:`search`

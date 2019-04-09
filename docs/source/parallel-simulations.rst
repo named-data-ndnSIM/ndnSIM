@@ -4,7 +4,7 @@ How to speed up simulations by parallel execution
 A way to speed up your simulations is to run them in parallel taking advantage of the power of
 all the processors and the memory availability of your machine. This can be done by using the
 Message Passing Interface (MPI) along with the distributed simulator class `provided by NS-3
-<http://www.nsnam.org/docs/models/html/distributed.html#mpi-for-distributed-simulation>`_.
+<https://www.nsnam.org/docs/models/html/distributed.html#mpi-for-distributed-simulation>`_.
 
 To make use of MPI, the network topology needs to be partitioned in a proper way, as the
 potential speedup will not be able to exceed the number of topology partitions. However, it
@@ -30,7 +30,7 @@ memory efficiency, it does simplify routing, since all current routing implement
 will work with distributed simulation.
 
 For more information, you can take a look at the `NS-3 MPI documentation
-<http://www.nsnam.org/docs/models/html/distributed.html#mpi-for-distributed-simulation>`_.
+<https://www.nsnam.org/docs/models/html/distributed.html#mpi-for-distributed-simulation>`_.
 
 Compiling and running ndnSIM with MPI support
 ---------------------------------------------

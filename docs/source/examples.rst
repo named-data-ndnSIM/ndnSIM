@@ -159,7 +159,7 @@ TopologyReader classes: :ndnsim:`AnnotatedTopologyReader` and
 :ndnsim:`RocketfuelWeightsReader`.
 
 While :ndnsim:`RocketfuelWeightsReader` is a specialized version intended to be used with
-`Rocketfuel <http://www.cs.washington.edu/research/networking/rocketfuel/>`_ topology and link
+`Rocketfuel <https://www.cs.washington.edu/research/networking/rocketfuel/>`_ topology and link
 weights files (examples will be provided later), :ndnsim:`AnnotatedTopologyReader` is a more
 general-use class that uses simple user-readable format.
 
@@ -189,7 +189,7 @@ use the method :ndnsim:`AnnotatedTopologyReader::GetNodes` which returns NodeCon
 Alternatively, nodes can be accessed by name using `Names::Find<Node> ("nodename")` call, as in
 the above example.  For this purpose,:ndnsim:`AnnotatedTopologyReader` automatically registers
 all created nodes with names specified in topology file.  For more information about `Names`
-class, please refer to `NS-3 documentation <http://www.nsnam.org/doxygen/classns3_1_1_names.html>`_.
+class, please refer to `NS-3 documentation <https://www.nsnam.org/doxygen/classns3_1_1_names.html>`_.
 
 If the topology file is placed into ``src/ndnSIM/examples/topologies/topo-grid-3x3.txt`` and
 the code is placed into ``scratch/ndn-grid-topo-plugin.cpp``, you can run and see progress of

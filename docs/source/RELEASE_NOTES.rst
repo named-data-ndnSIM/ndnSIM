@@ -3,7 +3,7 @@ ndnSIM Release Notes
 
 This file contains ndnSIM release notes.
 
-All of the ndnSIM documentation is accessible from the `ndnSIM website <http://ndnsim.net>`__.
+All of the ndnSIM documentation is accessible from the `ndnSIM website <https://ndnsim.net>`__.
 
 Release 2.7
 -----------
@@ -381,7 +381,7 @@ New features
      release of ndnSIM (:issue:`3121`)
 
 - Tutorial and example on how to speed up simulations with MPI module of NS-3:
-  `<http://ndnsim.net/2.0/parallel-simulations.html>`__
+  `<https://ndnsim.net/current/parallel-simulations.html>`__
 
 - Two new helpers to simplify writing basic simulation scenarios:
 
@@ -432,7 +432,7 @@ Improvements and bug fixes
 
 - Updates of ndnSIM documentation
 
-  * Updated the structure for the `ndnSIM website index page <http://ndnsim.net>`__
+  * Updated the structure for the `ndnSIM website index page <https://ndnsim.net>`__
   * Updated installation instructions to reflect refactoring and relocation of ndnSIM codebase
   * API documentation (doxygen) improvements
   * Updated list of ndnSIM research papers
@@ -476,19 +476,19 @@ extensive refactoring and rewriting. The key new features of the new version:
 
 -  ndnSIM no longer re-implements basic NDN primitives and directly uses implementation from
    `ndn-cxx library (NDN C++ library with eXperimental
-   eXtensions) <http://named-data.net/doc/ndn-cxx/>`__.
+   eXtensions) <https://named-data.net/doc/ndn-cxx/>`__.
 
 -  All NDN forwarding and management is implemented directly using source code of `Named Data
-   Networking Forwarding Daemon (NFD) <http://named-data.net/doc/NFD/>`__. The current code is based
+   Networking Forwarding Daemon (NFD) <https://named-data.net/doc/NFD/>`__. The current code is based
    on ``a22a2172611b1cb93b2e2f53d9d5da122b384f3e`` commit of `NFD
    repository <https://github.com/named-data/NFD/tree/a22a2172611b1cb93b2e2f53d9d5da122b384f3e>`__.
 
 Note RIB Manager is not yet available in ndnSIM.
 
--  Packet format changed to the `NDN packet format <http://named-data.net/doc/ndn-tlv/>`__.
+-  Packet format changed to the `NDN packet format <https://named-data.net/doc/ndn-tlv/>`__.
 
 -  Code style changes to conform to `ndn-cxx Code Style and Coding
-   Guidelines <http://named-data.net/doc/ndn-cxx/current/code-style.html>`__ This change also
+   Guidelines <https://named-data.net/doc/ndn-cxx/current/code-style.html>`__ This change also
    includes renaming of the header and source files: ``*.h`` -> ``*.hpp``, ``*.cc`` -> ``*.cpp``
 
 -  ndnSIM now uses C++11.
@@ -518,7 +518,7 @@ Changes
    links traversed by a packet). Previously, this tracing was round-trip and included applications
    hops.
 -  Python bindings have changed and, due to limitations of pybindgen, currently cover a smaller
-   subset of C++ code (`Task #2341 <http://redmine.named-data.net/issues/2341>`__).
+   subset of C++ code (`Task #2341 <https://redmine.named-data.net/issues/2341>`__).
 -  LinkControlHelper now uses ErrorRate to simulate link failure/recovery. Previously it was relying
    on Up/Down flag on NDN level.
 -  The Face abstraction of NFD is now used.
@@ -527,15 +527,15 @@ Bug fixes
 ~~~~~~~~~
 
 -  Fix processing files with customized LossRate or Queue model in AnnotatedTopologyReader `Bug
-   #2354 <http://redmine.named-data.net/issues/2354>`__.
+   #2354 <https://redmine.named-data.net/issues/2354>`__.
 
 Removals
 ~~~~~~~~
 
 -  PyNDN emulation
 -  (temporarily) ApiFace. Will be replaced with emulation of ndn-cxx ``ndn::Face`` in future
-   releases (`Issue #2370 <http://redmine.named-data.net/issues/2370>`__).
--  (temporarily) UdpFace, TcpFace (`Issue #2371 <http://redmine.named-data.net/issues/2371>`__).
+   releases (`Issue #2370 <https://redmine.named-data.net/issues/2370>`__).
+-  (temporarily) UdpFace, TcpFace (`Issue #2371 <https://redmine.named-data.net/issues/2371>`__).
 -  Limits, LimitsWindow, LimitsRate.
 -  PIT, FIB with "replacement" policies.
 -  Old deprecated packet formats.

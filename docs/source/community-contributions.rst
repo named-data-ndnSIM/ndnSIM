@@ -8,7 +8,7 @@ the following:
 
 #. **Script for automated installation on Ubuntu 14.04, 15.04, 16.04 and 17.04.**
 
-    The `script <http://mohittahiliani.blogspot.in/2015/10/ns-3-installing-ndnsim-on-ubuntu.html>`__
+    The `script <https://mohittahiliani.blogspot.in/2015/10/ns-3-installing-ndnsim-on-ubuntu.html>`__
     was created and is maintained by Kiran Ramesh, Karthik S, Ayush Agarwal,
     Viyom Mittal, Vivek Jain, and Mohit P. Tahiliani,
     Wireless Information Networking Group (WiNG), NITK Surathkal.
@@ -20,7 +20,7 @@ the following:
 
 #. **Run ndnSIM with scenario template without root access.**
 
-    The `article <http://chkr.at/wordpress/?p=99/>`__
+    The `article <https://chkr.at/wordpress/?p=99/>`__
     was published by Christian Kreuzberger.
 
 #. **How-To: Install ndnSIM with BRITE on Ubuntu 14.04.**
@@ -30,7 +30,7 @@ the following:
 
 #. **Installing ndnSIM on Ubuntu 15.04.**
 
-    The `article <http://bupeanubuntu.blogspot.com/2015/08/installing-ndnsim-on-ubuntu-1504.html>`__
+    The `article <https://bupeanubuntu.blogspot.com/2015/08/installing-ndnsim-on-ubuntu-1504.html>`__
     was published by Bhupendra Moharil.
 
 .. note:: If you have contributed to ndnSIM, please let us know, so that we can

@@ -280,4 +280,4 @@ aafig_format = {'latex': 'pdf', 'html': 'svg', 'text': None}
 
 # aafig_default_options = dict(Fixed=True)
 
-redmine_project_url = "http://redmine.named-data.net/"
+redmine_project_url = "https://redmine.named-data.net/"
