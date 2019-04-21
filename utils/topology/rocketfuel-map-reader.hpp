@@ -181,6 +181,6 @@ private:
   assignGw(Traits::vertex_descriptor vertex, uint32_t degree, node_type_t nodeType);
 }; // end class RocketfuelMapReader
 
-}; // end namespace ns3
+}  // end namespace ns3
 
 #endif /* ROCKETFUEL_MAP_READER_H */

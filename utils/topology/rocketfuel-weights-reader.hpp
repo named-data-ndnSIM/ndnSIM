@@ -110,6 +110,6 @@ RocketfuelWeightsReader::GetDefaultQueue() const
   return m_queue;
 }
 
-}; // end namespace ns3
+}  // end namespace ns3
 
 #endif /* ROCKETFUEL_TOPOLOGY_WEIGHTS_READER_H */
