@@ -85,19 +85,6 @@ public:
   void
   setPolicy(const std::string& policy);
 
-  /**
-   * @brief Set ndnSIM 1.0 content store implementation and its attributes
-   * @param contentStoreClass string, representing class of the content store
-   * @note ndnSIM 1.0 content store implementation have limited support for Interest selectors
-   *       Do not use these implementations if your scenario relies on proper selector processing.
-   */
-  void
-  SetOldContentStore(const std::string& contentStoreClass, const std::string& attr1 = "",
-                  const std::string& value1 = "", const std::string& attr2 = "",
-                  const std::string& value2 = "", const std::string& attr3 = "",
-                  const std::string& value3 = "", const std::string& attr4 = "",
-                  const std::string& value4 = "");
-
   typedef Callback<shared_ptr<Face>, Ptr<Node>, Ptr<L3Protocol>, Ptr<NetDevice>>
     FaceCreateCallback;
 
@@ -266,7 +253,6 @@ public:
 
 private:
   ObjectFactory m_ndnFactory;
-  ObjectFactory m_contentStoreFactory;
 
   bool m_needSetDefaultRoutes;
   size_t m_maxCsSize;

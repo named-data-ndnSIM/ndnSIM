@@ -25,7 +25,6 @@
 #include "ns3/callback.h"
 
 #include "apps/ndn-app.hpp"
-#include "model/cs/ndn-content-store.hpp"
 #include "ns3/simulator.h"
 #include "ns3/node-list.h"
 #include "ns3/log.h"
@@ -200,9 +199,10 @@ CsTracer::~CsTracer(){};
 void
 CsTracer::Connect()
 {
-  Ptr<ContentStore> cs = m_nodePtr->GetObject<ContentStore>();
-  cs->TraceConnectWithoutContext("CacheHits", MakeCallback(&CsTracer::CacheHits, this));
-  cs->TraceConnectWithoutContext("CacheMisses", MakeCallback(&CsTracer::CacheMisses, this));
+  // // @TODO Do the same with NFD content store...
+  // Ptr<ContentStore> cs = m_nodePtr->GetObject<ContentStore>();
+  // cs->TraceConnectWithoutContext("CacheHits", MakeCallback(&CsTracer::CacheHits, this));
+  // cs->TraceConnectWithoutContext("CacheMisses", MakeCallback(&CsTracer::CacheMisses, this));
 
   Reset();
 }

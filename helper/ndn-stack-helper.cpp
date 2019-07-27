@@ -35,7 +35,6 @@
 #include "model/ndn-net-device-transport.hpp"
 #include "utils/ndn-time.hpp"
 #include "utils/dummy-keychain.hpp"
-#include "model/cs/ndn-content-store.hpp"
 
 #include <limits>
 #include <map>
@@ -64,7 +63,6 @@ StackHelper::StackHelper()
   m_csPolicyCreationFunc = m_csPolicies["nfd::cs::lru"];
 
   m_ndnFactory.SetTypeId("ns3::ndn::L3Protocol");
-  m_contentStoreFactory.SetTypeId("ns3::ndn::cs::Lru");
 
   m_netDeviceCallbacks.push_back(
     std::make_pair(PointToPointNetDevice::GetTypeId(),
@@ -111,26 +109,6 @@ StackHelper::SetStackAttributes(const std::string& attr1, const std::string& val
     m_ndnFactory.Set(attr3, StringValue(value3));
   if (attr4 != "")
     m_ndnFactory.Set(attr4, StringValue(value4));
-}
-
-void
-StackHelper::SetOldContentStore(const std::string& contentStore, const std::string& attr1,
-                                const std::string& value1, const std::string& attr2,
-                                const std::string& value2, const std::string& attr3,
-                                const std::string& value3, const std::string& attr4,
-                                const std::string& value4)
-{
-  m_maxCsSize = 0;
-
-  m_contentStoreFactory.SetTypeId(contentStore);
-  if (attr1 != "")
-    m_contentStoreFactory.Set(attr1, StringValue(value1));
-  if (attr2 != "")
-    m_contentStoreFactory.Set(attr2, StringValue(value2));
-  if (attr3 != "")
-    m_contentStoreFactory.Set(attr3, StringValue(value3));
-  if (attr4 != "")
-    m_contentStoreFactory.Set(attr4, StringValue(value4));
 }
 
 void
@@ -197,14 +175,7 @@ StackHelper::doInstall(Ptr<Node> node) const
 
   ndn->getConfig().put("tables.cs_max_packets", (m_maxCsSize == 0) ? 1 : m_maxCsSize);
 
-  // Create and aggregate content store if NFD's contest store has been disabled
-  if (m_maxCsSize == 0) {
-    ndn->AggregateObject(m_contentStoreFactory.Create<ContentStore>());
-  }
-  // if NFD's CS is enabled, check if a replacement policy has been specified
-  else {
-    ndn->setCsReplacementPolicy(m_csPolicyCreationFunc);
-  }
+  ndn->setCsReplacementPolicy(m_csPolicyCreationFunc);
 
   // Aggregate L3Protocol on node (must be after setting ndnSIM CS)
   node->AggregateObject(ndn);

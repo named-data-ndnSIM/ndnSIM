@@ -32,7 +32,6 @@
 #include "ndn-net-device-transport.hpp"
 
 #include "../helper/ndn-stack-helper.hpp"
-#include "cs/ndn-content-store.hpp"
 
 #include <boost/property_tree/info_parser.hpp>
 
@@ -192,7 +191,6 @@ private:
 
   nfd::ConfigSection m_config;
 
-  Ptr<ContentStore> m_csFromNdnSim;
   PolicyCreationCallback m_policy;
 };
 
@@ -291,11 +289,7 @@ L3Protocol::initializeManagement()
 
   ConfigFile config(&ConfigFile::ignoreUnknownSection);
 
-  // if we use NFD's CS, we have to specify a replacement policy
-  m_impl->m_csFromNdnSim = GetObject<ContentStore>();
-  if (m_impl->m_csFromNdnSim == nullptr) {
-    forwarder->getCs().setPolicy(m_impl->m_policy());
-  }
+  forwarder->getCs().setPolicy(m_impl->m_policy());
 
   TablesConfigSection tablesConfig(*forwarder);
   tablesConfig.setConfigFile(config);
@@ -371,12 +365,6 @@ L3Protocol::NotifyNewAggregate()
     m_node = GetObject<Node>();
     if (m_node != nullptr) {
       initialize();
-
-      NS_ASSERT(m_impl->m_forwarder != nullptr);
-      m_impl->m_csFromNdnSim = GetObject<ContentStore>();
-      if (m_impl->m_csFromNdnSim != nullptr) {
-        m_impl->m_forwarder->setCsFromNdnSim(m_impl->m_csFromNdnSim);
-      }
     }
   }
 

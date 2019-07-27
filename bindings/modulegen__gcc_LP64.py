@@ -91,13 +91,6 @@ def register_methods(root_module):
                         param('const std::string&', 'attr4', default_value='""'), param('const std::string&', 'value4', default_value='""')])
 
         cls.add_method('setCsSize', retval('void'), [param('size_t', 'maxSize')])
-        cls.add_method('SetOldContentStore',
-                       retval('void'),
-                       [param('const std::string&', 'contentStoreClass'),
-                        param('const std::string&', 'attr1', default_value='""'), param('const std::string&', 'value1', default_value='""'),
-                        param('const std::string&', 'attr2', default_value='""'), param('const std::string&', 'value2', default_value='""'),
-                        param('const std::string&', 'attr3', default_value='""'), param('const std::string&', 'value3', default_value='""'),
-                        param('const std::string&', 'attr4', default_value='""'), param('const std::string&', 'value4', default_value='""')])
     reg_stackhelper(root_module['ns3::ndn::StackHelper'])
 
     def reg_fibhelper(cls):
