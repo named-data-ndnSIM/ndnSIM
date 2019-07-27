@@ -12,12 +12,12 @@ version:
 - ndnSIM uses implementation of basic NDN primitives from
   [ndn-cxx library (NDN C++ library with eXperimental eXtensions)](http://named-data.net/doc/ndn-cxx/)
 
-  Based on version `0.6.5`
+  Based on version `0.6.6`
 
 - All NDN forwarding and management is implemented directly using source code of
   [Named Data Networking Forwarding Daemon (NFD)](http://named-data.net/doc/NFD/)
 
-  Based on version `0.6.5`
+  Based on version `0.6.6`
 
 - Allows [simulation of real applications](http://ndnsim.net/guide-to-simulate-real-apps.html)
   written against ndn-cxx library

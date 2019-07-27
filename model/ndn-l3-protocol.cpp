@@ -47,12 +47,13 @@
 #include "ns3/ndnSIM/NFD/daemon/mgmt/tables-config-section.hpp"
 #include "ns3/ndnSIM/NFD/daemon/mgmt/command-authenticator.hpp"
 
-#include "ns3/ndnSIM/NFD/rib/service.hpp"
+#include "ns3/ndnSIM/NFD/daemon/rib/service.hpp"
 
 #include "ns3/ndnSIM/NFD/daemon/face/null-face.hpp"
 #include "ns3/ndnSIM/NFD/daemon/face/internal-face.hpp"
 
-#include "ns3/ndnSIM/NFD/core/config-file.hpp"
+#include "ns3/ndnSIM/NFD/daemon/common/global.hpp"
+#include "ns3/ndnSIM/NFD/daemon/common/config-file.hpp"
 
 #include <ndn-cxx/mgmt/dispatcher.hpp>
 
@@ -379,7 +380,7 @@ L3Protocol::DoDispose(void)
   // MUST HAPPEN BEFORE Simulator IS DESTROYED
   m_impl.reset();
 
-  nfd::scheduler::resetGlobalScheduler();
+  nfd::resetGlobalScheduler();
 
   m_node = 0;
 

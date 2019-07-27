@@ -85,6 +85,15 @@ def build(bld):
         VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
         VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
 
+    bld(features="subst",
+        name="versioncpp-NFD",
+        source='NFD/core/version.cpp.in', target='NFD/core/version.cpp',
+        install_path=None,
+        VERSION_STRING=base,
+        VERSION_BUILD="%s-ndnSIM" % build,
+        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
+        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+
     (base, build, split) = bld.getVersion('ndn-cxx')
     bld(features="subst",
         name="version-ndn-cxx",
@@ -94,6 +103,12 @@ def build(bld):
         VERSION_BUILD="%s-ndnSIM" % build,
         VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
         VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+
+    bld.objects(
+        target='version-NFD-objects',
+        source='NFD/core/version.cpp',
+        includes='../../ns3/ndnSIM/NFD',
+        use='version-NFD versioncpp-NFD')
 
     deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
@@ -110,7 +125,7 @@ def build(bld):
                                         'ndn-cxx/ndn-cxx/detail/*osx.cpp',
                                         'ndn-cxx/ndn-cxx/net/network-interface.cpp'])
 
-    nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon', 'NFD/rib']],
+    nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon']],
                                excl=['NFD/daemon/main.cpp',
                                      'NFD/daemon/nfd.cpp',
                                      'NFD/daemon/face/*ethernet*',
@@ -123,7 +138,7 @@ def build(bld):
     module = bld.create_ns3_module('ndnSIM', deps)
     module.module = 'ndnSIM'
     module.features += ' ns3fullmoduleheaders ndncxxheaders'
-    module.use += ['version-ndn-cxx', 'version-NFD', 'BOOST', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
+    module.use += ['version-ndn-cxx', 'version-NFD-objects', 'BOOST', 'SQLITE3', 'RT', 'PTHREAD', 'OPENSSL']
     module.includes = ['../..', '../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM', '../../ns3/ndnSIM/ndn-cxx']
     module.export_includes = ['../../ns3/ndnSIM/NFD', './NFD/core', './NFD/daemon', './NFD/rib', '../../ns3/ndnSIM']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
@@ -142,7 +157,7 @@ def build(bld):
                                       excl=[
                                           'model/ip-faces/*']) + ndnCxxSrc + nfdSrc
 
-    module_dirs = ['NFD/core', 'NFD/daemon', 'NFD/rib', 'apps', 'helper', 'model', 'utils', 'bindings']
+    module_dirs = ['NFD/core', 'NFD/daemon', 'apps', 'helper', 'model', 'utils', 'bindings']
     module.full_headers = bld.path.ant_glob(['%s/**/*.hpp' % dir for dir in module_dirs])
     module.full_headers += bld.path.ant_glob('NFD/common.hpp')
 
