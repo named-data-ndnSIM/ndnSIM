@@ -248,8 +248,6 @@ Run R script::
 Content store trace helper
 --------------------------
 
-NOTE: This tracer works ONLY when the OldContentStore structure is used!
-
 - :ndnsim:`ndn::CsTracer`
 
     With the use of :ndnsim:`ndn::CsTracer` it is possible to obtain statistics of cache hits/cache misses on simulation nodes.

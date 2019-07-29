@@ -149,9 +149,9 @@ public:
     this->setInstanceName(name);
   }
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
-                       const shared_ptr<nfd::pit::Entry>& pitEntry)
+  void
+  afterReceiveInterest(const nfd::FaceEndpoint& ingress, const Interest& interest,
+                       const shared_ptr<nfd::pit::Entry>& pitEntry) override
   {
     // this strategy doesn't forward interests
   }

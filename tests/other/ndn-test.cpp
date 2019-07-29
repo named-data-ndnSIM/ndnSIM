@@ -26,7 +26,6 @@
 
 #include <sys/time.h>
 #include "ns3/ndnSIM/utils/mem-usage.hpp"
-#include "ns3/ndnSIM/model/cs/ndn-content-store.hpp"
 #include "ns3/ndnSIM/utils/mem-usage.hpp"
 
 namespace ns3 {
@@ -63,7 +62,6 @@ public:
   printStats(std::ostream& os, Time nextPrintTime, double beginRealTime);
 
 private:
-  std::string m_oldContentStore;
   size_t m_csSize;
   double m_interestRate;
   bool m_shouldEvaluatePit;
@@ -110,16 +108,9 @@ Tester::printStats(std::ostream& os, Time nextPrintTime, double beginRealTime)
     if (pitSize != 0)
       pitCount += pitSize;
 
-    if (true != true) {
-      Ptr<ndn::ContentStore> cs = (*node)->GetObject<ndn::ContentStore>();
-      if (cs != 0)
-        csCount += cs->GetSize();
-    }
-    else {
-      auto csSize = (*node)->GetObject<ndn::L3Protocol>()->getForwarder()->getCs().size();
-      if (csSize != 0)
-        csCount += csSize;
-    }
+    auto csSize = (*node)->GetObject<ndn::L3Protocol>()->getForwarder()->getCs().size();
+    if (csSize != 0)
+      csCount += csSize;
   }
 
   os << "pit:" << pitCount << "\t";
@@ -163,9 +154,6 @@ Tester::run(int argc, char* argv[])
 
   // Read optional command-line parameters (e.g., enable visualizer with ./waf --run=<> --visualize
   CommandLine cmd;
-  cmd.AddValue("old-cs", "Old content store to use "
-                         "(e.g., ns3::ndn::cs::Lru, ns3::ndn::cs::Lfu, ...)",
-               m_oldContentStore);
   cmd.AddValue("cs-size", "Maximum number of cached packets per node", m_csSize);
   cmd.AddValue("rate", "Interest rate", m_interestRate);
   cmd.AddValue("pit", "Perform PIT evaluation if this parameter is true",
@@ -188,10 +176,6 @@ Tester::run(int argc, char* argv[])
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
   ndnHelper.setCsSize(m_csSize);
-
-  if (!m_oldContentStore.empty()) {
-    ndnHelper.SetOldContentStore(m_oldContentStore, "MaxSize", std::to_string(m_csSize));
-  }
 
   ndnHelper.InstallAll();
 

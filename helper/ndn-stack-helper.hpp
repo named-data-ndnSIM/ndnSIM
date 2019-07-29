@@ -255,7 +255,7 @@ private:
   ObjectFactory m_ndnFactory;
 
   bool m_needSetDefaultRoutes;
-  size_t m_maxCsSize;
+  size_t m_maxCsSize = 100;
 
   typedef std::function<std::unique_ptr<nfd::cs::Policy>()> PolicyCreationCallback;
   PolicyCreationCallback m_csPolicyCreationFunc;

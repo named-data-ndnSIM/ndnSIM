@@ -220,9 +220,9 @@ private:
     m_face.expressInterest(Interest(Name(name).appendSegment(seqNo)).setCanBePrefix(true), std::bind([=] (const Data& data) {
           onData(data.getName());
 
-          m_event = m_scheduler.scheduleEvent(time::seconds(1),
-                                              std::bind(&MultipleInterest::expressNextInterest, this,
-                                                        name, seqNo + 1, onData, onTimeout, onNack));
+          m_event = m_scheduler.schedule(time::seconds(1),
+                                         std::bind(&MultipleInterest::expressNextInterest, this,
+                                                   name, seqNo + 1, onData, onTimeout, onNack));
         }, _2),
       std::bind(onNack),
       std::bind(onTimeout));

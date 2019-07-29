@@ -18,7 +18,7 @@
  **/
 
 #include "helper/ndn-link-control-helper.hpp"
-#include "NFD/core/scheduler.hpp"
+#include "daemon/common/global.hpp"
 
 #include "../tests-common.hpp"
 
@@ -54,16 +54,16 @@ BOOST_AUTO_TEST_CASE(TwoNodeTopology)
   Simulator::Schedule(Seconds(5.1), ndn::LinkControlHelper::FailLink, getNode("1"), getNode("2"));
   Simulator::Schedule(Seconds(10.1), ndn::LinkControlHelper::UpLink, getNode("1"), getNode("2"));
 
-  nfd::scheduler::schedule(time::milliseconds(5200), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(5200), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 6);
       BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 6);
     });
 
-  nfd::scheduler::schedule(time::milliseconds(10200), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(10200), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 6);
       BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 6);
     });
-  nfd::scheduler::schedule(time::milliseconds(15100), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(15100), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
       BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nInData, 11);
     });
@@ -119,27 +119,27 @@ BOOST_AUTO_TEST_CASE(SixNodeTopology) // Bug #2783
           "0s", "100s"}
     });
 
-  nfd::scheduler::schedule(time::milliseconds(10100), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(10100), [&] {
       LinkControlHelper::FailLink(getNode("1"), getNode("2"));
     });
 
   // just before link failure
-  nfd::scheduler::schedule(time::milliseconds(10050), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(10050), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
       BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 11);
     });
 
   // just before link recovery
-  nfd::scheduler::schedule(time::milliseconds(20050), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(20050), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 11);
       BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 21);
     });
 
-  nfd::scheduler::schedule(time::milliseconds(20100), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(20100), [&] {
       LinkControlHelper::UpLink(getNode("1"), getNode("2"));
     });
 
-  nfd::scheduler::schedule(time::milliseconds(30050), [&] {
+  nfd::getScheduler().schedule(time::milliseconds(30050), [&] {
       BOOST_CHECK_EQUAL(getFace("2", "1")->getCounters().nInInterests, 21);
       BOOST_CHECK_EQUAL(getFace("3", "1")->getCounters().nInInterests, 31);
     });

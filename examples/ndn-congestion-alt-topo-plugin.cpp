@@ -69,8 +69,8 @@ main(int argc, char* argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetOldContentStore("ns3::ndn::cs::Lru", "MaxSize",
-                               "1"); // ! Attention ! If set to 0, then MaxSize is infinite
+  ndnHelper.setPolicy("nfd::cs::lru");
+  ndnHelper.setCsSize(1);
   ndnHelper.InstallAll();
 
   // Set BestRoute strategy

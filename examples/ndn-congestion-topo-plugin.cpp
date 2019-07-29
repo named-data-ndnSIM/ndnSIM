@@ -57,7 +57,8 @@ main(int argc, char* argv[])
 
   // Install NDN stack on all nodes
   ndn::StackHelper ndnHelper;
-  ndnHelper.SetOldContentStore("ns3::ndn::cs::Lru", "MaxSize", "10000");
+  ndnHelper.setPolicy("nfd::cs::lru");
+  ndnHelper.setCsSize(10000);
   ndnHelper.InstallAll();
 
   // Choosing forwarding strategy

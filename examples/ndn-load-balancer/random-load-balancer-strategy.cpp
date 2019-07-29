@@ -1,12 +1,12 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014,  Regents of the University of California,
- *                      Arizona Board of Regents,
- *                      Colorado State University,
- *                      University Pierre & Marie Curie, Sorbonne University,
- *                      Washington University in St. Louis,
- *                      Beijing Institute of Technology,
- *                      The University of Memphis
+/*
+ * Copyright (c) 2014-2019, Regents of the University of California,
+ *                          Arizona Board of Regents,
+ *                          Colorado State University,
+ *                          University Pierre & Marie Curie, Sorbonne University,
+ *                          Washington University in St. Louis,
+ *                          Beijing Institute of Technology,
+ *                          The University of Memphis
  *
  * This file is part of NFD (Named Data Networking Forwarding Daemon).
  * See AUTHORS.md for complete list of NFD authors and contributors.
@@ -29,7 +29,7 @@
 
 #include <ndn-cxx/util/random.hpp>
 
-#include "core/logger.hpp"
+#include "daemon/common/logger.hpp"
 
 NFD_LOG_INIT("RandomLoadBalancerStrategy");
 
@@ -61,7 +61,7 @@ hasFaceForForwarding(const Face& inFace, const fib::NextHopList& nexthops, const
 }
 
 void
-RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Interest& interest,
+RandomLoadBalancerStrategy::afterReceiveInterest(const FaceEndpoint& ingress, const Interest& interest,
                                                  const shared_ptr<pit::Entry>& pitEntry)
 {
   NFD_LOG_TRACE("afterReceiveInterest");
@@ -75,7 +75,7 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Inter
   const fib::NextHopList& nexthops = fibEntry.getNextHops();
 
   // Ensure there is at least 1 Face is available for forwarding
-  if (!hasFaceForForwarding(inFace, nexthops, pitEntry)) {
+  if (!hasFaceForForwarding(ingress.face, nexthops, pitEntry)) {
     this->rejectPendingInterest(pitEntry);
     return;
   }
@@ -90,9 +90,9 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const Face& inFace, const Inter
     for (selected = nexthops.begin(); selected != nexthops.end() && currentIndex != randomIndex;
          ++selected, ++currentIndex) {
     }
-  } while (!canForwardToNextHop(inFace, pitEntry, *selected));
+  } while (!canForwardToNextHop(ingress.face, pitEntry, *selected));
 
-  this->sendInterest(pitEntry, selected->getFace(), interest);
+  this->sendInterest(pitEntry, FaceEndpoint(selected->getFace(), 0), interest);
 }
 
 const Name&

@@ -38,10 +38,11 @@ class RandomLoadBalancerStrategy : public Strategy {
 public:
   RandomLoadBalancerStrategy(Forwarder& forwarder, const Name& name = getStrategyName());
 
-  virtual ~RandomLoadBalancerStrategy() override;
+  virtual
+  ~RandomLoadBalancerStrategy() override;
 
-  virtual void
-  afterReceiveInterest(const Face& inFace, const Interest& interest,
+  void
+  afterReceiveInterest(const FaceEndpoint& ingress, const Interest& interest,
                        const shared_ptr<pit::Entry>& pitEntry) override;
 
   static const Name&

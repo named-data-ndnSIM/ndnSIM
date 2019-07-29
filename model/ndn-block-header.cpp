@@ -139,8 +139,13 @@ BlockHeader::Print(std::ostream& os) const
 
           ::ndn::Buffer::const_iterator first, last;
           std::tie(first, last) = p.get<lp::FragmentField>(0);
-          Block fragmentBlock(&*first, std::distance(first, last));
-          decodeAndPrint(fragmentBlock);
+          try {
+            Block fragmentBlock(&*first, std::distance(first, last));
+            decodeAndPrint(fragmentBlock);
+          }
+          catch (const tlv::Error& error) {
+            os << "Non-TLV bytes (size: " << std::distance(first, last) << ")";
+          }
         }
         os << ")";
         break;

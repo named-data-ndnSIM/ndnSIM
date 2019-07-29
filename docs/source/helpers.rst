@@ -161,22 +161,6 @@ ndnSIM uses NFD's content store implementation, maximum size of which can be con
 
 .. note::
 
-    NFD's content store implementation takes full consideration of Interest selectors.
-    In contrast to that, the old ndnSIM 1.0 content store implementations have very limited
-    support for Interest selectors, but features a number of different replacement policies.
-    If your scenario relies on proper selector processing, do not use these implementations as
-    the simulation results most likely be incorrect.
-
-    To select old content store implementations, use :ndnsim:`SetOldContentStore
-    <StackHelper::SetOldContentStore>` StackHelper method:
-
-          .. code-block:: c++
-
-             ndnHelper.SetOldContentStore("<content store implementation>",
-                                         ["<optional parameter>", "<optional parameter's value>" [, ...]]);
-             ...
-             ndnHelper.Install (nodes);
-
     In simulation scenarios it is possible to select one of :ref:`the existing implementations
     of the content store or implement your own <content store>`.
 
