@@ -10,6 +10,8 @@ REQUIRED_BOOST_LIBS = ['graph', 'thread', 'unit_test_framework',
                        'system', 'random', 'date_time', 'iostreams', 'regex',
                        'program_options', 'chrono', 'filesystem']
 
+top = '../..'
+
 def required_boost_libs(conf):
     conf.env.REQUIRED_BOOST_LIBS += REQUIRED_BOOST_LIBS
 
@@ -87,12 +89,19 @@ def build(bld):
 
     bld(features="subst",
         name="versioncpp-NFD",
-        source='NFD/core/version.cpp.in', target='NFD/core/version.cpp',
+        source='NFD/core/version.cpp.in', target=bld.path.find_or_declare('NFD/core/version.cpp'),
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
         VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
         VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+
+    bld.objects(
+        features="cxx",
+        target='version-NFD-objects',
+        source='NFD/core/version.cpp',
+        includes='../../ns3/ndnSIM/NFD',
+        use='version-NFD versioncpp-NFD')
 
     (base, build, split) = bld.getVersion('ndn-cxx')
     bld(features="subst",
@@ -103,12 +112,6 @@ def build(bld):
         VERSION_BUILD="%s-ndnSIM" % build,
         VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
         VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
-
-    bld.objects(
-        target='version-NFD-objects',
-        source='NFD/core/version.cpp',
-        includes='../../ns3/ndnSIM/NFD',
-        use='version-NFD versioncpp-NFD')
 
     deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
