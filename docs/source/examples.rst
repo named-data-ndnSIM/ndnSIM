@@ -508,3 +508,32 @@ optimized mode nothing will be printed out)::
 -----------------------------------
 
 :ref:`Example of packet drop tracer (L2Tracer)`
+
+
+LFID (Loop-Free Inport-Dependent) Routing for ndnSIM
+----------------------------------------------------
+
+LFID (Loop-Free Inport-Dependent) Routing extends the ndnSIM route calculation to provide loop-free and on average shorter loop-free paths than existing work.
+For details see the `tech report.`_
+
+LFID provides a better trade-off than the existing route calculation algorithms:
+
+1. ``CalculateRoutes():`` Only provides a single shortest path nexthop.
+2. ``CalculateAllPossibleRoutes():`` Provides all possible nexthops, but many of them lead to loops.
+
+LFID, on the other hand, maximizes the nexthop choice while also completely avoiding loops.
+
+
+We provide two example topologies (abilene and grid) to compare against the existing route calculation methods:
+
+.. literalinclude:: ../../examples/lfid.cpp
+   :language: c++
+   :linenos:
+   :lines: 71-148
+
+
+Simply run::
+
+     ./waf --run "lfid [--grid] [--routing={lfid|sp|allroutes}]"
+
+The output will show the nexthops at each node for the given name prefix, and any loops during forwarding.

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2015  Regents of the University of California.
+ * Copyright (c) 2011-2019  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -99,6 +99,19 @@ public:
    */
   static void
   CalculateRoutes();
+
+  /**
+   * @brief Calculates a set of loop-free multipath routes.
+   *
+   * For full description please see tech tech report "Hop-by-Hop Multipath Routing:
+   * Choosing the Right Nexthop Set" and the associated Github repository:
+   *
+   * https://github.com/schneiderklaus/ndnSIM-routing
+   *
+   * @sa https://named-data.net/publications/techreports/mp_routing_tech_report/
+   */
+  static void
+  CalculateLfidRoutes();
 
   /**
    * @brief Calculate all possible next-hop independent alternative routes

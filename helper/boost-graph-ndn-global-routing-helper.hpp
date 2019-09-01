@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2015  Regents of the University of California.
+ * Copyright (c) 2011-2019  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -30,7 +30,9 @@
 
 #include "ns3/ndnSIM/model/ndn-global-router.hpp"
 
+#include "ns3/node.h"
 #include "ns3/node-list.h"
+#include "ns3/channel.h"
 #include "ns3/channel-list.h"
 
 #include <list>

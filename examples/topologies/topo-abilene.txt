@@ -1,0 +1,60 @@
+# any empty lines and lines starting with '#' symbol are ignored
+#
+# The file should contain exactly two sections: router and link, each starting with the corresponding keyword
+#
+# router section defines topology nodes and their relative positions (e.g., to use in visualizer)
+router
+
+# each line in this section represents one router and should have the following data
+# node  comment     yPos    xPos
+
+router0   NA        0       1
+router1   NA        1       1
+router2   NA        1       2
+router3   NA        1       3
+router4   NA        1       4
+router5   NA        1       4
+router6   NA        1       4
+router7   NA        1       4
+router8   NA        2       1
+router9   NA        2       1
+producer  NA        2       1
+
+# Note that `node` can be any string. It is possible to access to the node by name using Names::Find, see examples.
+
+# link section defines point-to-point links between nodes and characteristics of these links
+link
+
+# Each line should be in the following format (only first two are required, the rest can be omitted)
+# srcNode   dstNode     bandwidth   metric  delay   queue
+# bandwidth: link bandwidth
+# metric: routing metric // Set real routing metrics inside simulation file!
+# delay:  link delay
+# queue:  MaxPackets for transmission queue on the link (both directions)
+
+
+#        label   LinkType    LinkLabel   LinkNote    cost
+
+router0     router1     100Mbps   71  5ms
+router0     router2     100Mbps   20  5ms
+
+router1     producer    100Mbps   16  5ms
+
+router2     router9     100Mbps   54  5ms
+
+router3     router4     100Mbps   71  5ms
+router3     router6     100Mbps  102  5ms
+
+router4     router5     100Mbps   31  5ms
+router4     router6     100Mbps   93  5ms
+
+router5     router8      10Mbps  137  5ms
+
+router6     router7     100Mbps   55  5ms
+
+router7     router8      10Mbps   65  5ms
+router7     producer     10Mbps   45  5ms
+
+router8     router9      10Mbps   70  5ms
+
+router9     producer     10Mbps   43  5ms
