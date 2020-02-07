@@ -144,9 +144,23 @@ sufficient to configure and build ndnSIM with python bindings enabled:
 
 .. code-block:: bash
 
+   cd <pybindgen-folder>
+   ./waf configure 
+   ./waf
+   sudo ./waf install
+
+.. code-block:: bash
+
    cd <ns-3-folder>
    ./waf configure --enable-examples
    ./waf
+
+If you wish to specify the python version to be used then use the following command while configuring:
+
+.. code-block:: bash
+
+   ./waf configure --python=<python-path(/usr/bin/python3)>
+
 
 On macOS (with MacPorts), you may need to modify the configure command to use MacPorts
 version of python:
