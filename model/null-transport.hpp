@@ -47,19 +47,14 @@ public:
   }
 
 private:
-  virtual void
-  beforeChangePersistency(::ndn::nfd::FacePersistency newPersistency)
-  {
-  }
-
-  virtual void
-  doClose()
+  void
+  doClose() final
   {
     this->setState(nfd::face::TransportState::CLOSED);
   }
 
-  virtual void
-  doSend(Packet&& packet)
+  void
+  doSend(const Block& packet, const nfd::EndpointId& endpoint) final
   {
   }
 };

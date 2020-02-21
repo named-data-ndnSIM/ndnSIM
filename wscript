@@ -124,8 +124,7 @@ def build(bld):
                                   excl=['ndn-cxx/ndn-cxx/net/impl/*.cpp',
                                         'ndn-cxx/ndn-cxx/net/network-monitor*.cpp',
                                         'ndn-cxx/ndn-cxx/util/dummy-client-face.cpp',
-                                        'ndn-cxx/ndn-cxx/security/tpm/*osx.cpp',
-                                        'ndn-cxx/ndn-cxx/detail/*osx.cpp',
+                                        'ndn-cxx/ndn-cxx/**/*osx.cpp',
                                         'ndn-cxx/ndn-cxx/net/network-interface.cpp'])
 
     nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon']],

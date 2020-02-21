@@ -25,6 +25,7 @@
 #include "ns3/topology-reader.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/object-factory.h"
+#include "ns3/node-container.h"
 
 namespace ns3 {
 

@@ -251,6 +251,13 @@ DummyKeyHandle::doSign(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size
   return make_shared<Buffer>(DUMMY_SIGNATURE, sizeof(DUMMY_SIGNATURE));
 }
 
+bool
+DummyKeyHandle::doVerify(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t bufLen,
+                         const uint8_t* sig, size_t sigLen) const
+{
+  throw Error("Not supported");
+}
+
 ConstBufferPtr
 DummyKeyHandle::doDecrypt(const uint8_t* cipherText, size_t cipherTextLen) const
 {
@@ -325,6 +332,12 @@ DummyTpm::doExportKey(const Name& keyName, const char* pw, size_t pwLen)
 
 void
 DummyTpm::doImportKey(const Name& keyName, const uint8_t* pkcs8, size_t pkcs8Len, const char* pw, size_t pwLen)
+{
+  throw Error("Not supported");
+}
+
+void
+DummyTpm::doImportKey(const Name& keyName, shared_ptr<transform::PrivateKey> key)
 {
   throw Error("Not supported");
 }

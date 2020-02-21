@@ -38,7 +38,7 @@ public:
     addApps({
         {"1", "ns3::ndn::ConsumerCbr",
             {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "9.99s"},
+            "0s", "10.5s"},
         {"2", "ns3::ndn::Producer",
             {{"Prefix", "/prefix"}, {"PayloadSize", "1024"}},
             "0s", "100s"}
@@ -47,7 +47,7 @@ public:
 
   ~AddRouteFixture()
   {
-    Simulator::Stop(Seconds(20.001));
+    Simulator::Stop(Seconds(20.101));
     Simulator::Run();
 
     BOOST_CHECK_EQUAL(getFace("1", "2")->getCounters().nOutInterests, 10);

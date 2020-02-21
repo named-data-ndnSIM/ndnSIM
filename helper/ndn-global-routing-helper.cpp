@@ -80,7 +80,7 @@ GlobalRoutingHelper::Install(Ptr<Node> node)
   gr = CreateObject<GlobalRouter>();
   node->AggregateObject(gr);
 
-  for (auto& face : ndn->getForwarder()->getFaceTable()) {
+  for (auto& face : ndn->getFaceTable()) {
     auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
     if (transport == nullptr) {
       NS_LOG_DEBUG("Skipping non ndnSIM-specific transport face");
@@ -316,7 +316,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     // remember interface statuses
     std::list<nfd::FaceId> faceIds;
     std::unordered_map<nfd::FaceId, uint16_t> originalMetrics;
-    for (auto& nfdFace : l3->getForwarder()->getFaceTable()) {
+    for (auto& nfdFace : l3->getFaceTable()) {
       faceIds.push_back(nfdFace.getId());
       originalMetrics[nfdFace.getId()] = nfdFace.getMetric();
       nfdFace.setMetric(std::numeric_limits<uint16_t>::max() - 1);
@@ -324,7 +324,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
     }
 
     for (auto& faceId : faceIds) {
-      auto* face = l3->getForwarder()->getFaceTable().get(faceId);
+      auto* face = l3->getFaceTable().get(faceId);
       NS_ASSERT(face != nullptr);
       auto transport = dynamic_cast<NetDeviceTransport*>(face->getTransport());
       if (transport == nullptr) {
@@ -381,7 +381,7 @@ GlobalRoutingHelper::CalculateAllPossibleRoutes()
 
     // recover original interface statuses
     for (auto& i : originalMetrics) {
-      l3->getForwarder()->getFaceTable().get(i.first)->setMetric(i.second);
+      l3->getFaceTable().get(i.first)->setMetric(i.second);
     }
   }
 }

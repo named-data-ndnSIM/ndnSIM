@@ -62,7 +62,7 @@ private:
   doClose() override;
 
   virtual void
-  doSend(Packet&& packet) override;
+  doSend(const Block& packet, const nfd::EndpointId& endpoint) override;
 
   void
   receiveFromNetDevice(Ptr<NetDevice> device,

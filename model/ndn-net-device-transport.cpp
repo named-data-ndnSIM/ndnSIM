@@ -106,7 +106,7 @@ NetDeviceTransport::doClose()
 }
 
 void
-NetDeviceTransport::doSend(Packet&& packet)
+NetDeviceTransport::doSend(const Block& packet, const nfd::EndpointId& endpoint)
 {
   NS_LOG_FUNCTION(this << "Sending packet from netDevice with URI"
                   << this->getLocalUri());
@@ -125,10 +125,10 @@ NetDeviceTransport::doSend(Packet&& packet)
 // callback
 void
 NetDeviceTransport::receiveFromNetDevice(Ptr<NetDevice> device,
-                                      Ptr<const ns3::Packet> p,
-                                      uint16_t protocol,
-                                      const Address& from, const Address& to,
-                                      NetDevice::PacketType packetType)
+                                         Ptr<const ns3::Packet> p,
+                                         uint16_t protocol,
+                                         const Address& from, const Address& to,
+                                         NetDevice::PacketType packetType)
 {
   NS_LOG_FUNCTION(device << p << protocol << from << to << packetType);
 
@@ -138,9 +138,7 @@ NetDeviceTransport::receiveFromNetDevice(Ptr<NetDevice> device,
   BlockHeader header;
   packet->RemoveHeader(header);
 
-  auto nfdPacket = Packet(std::move(header.getBlock()));
-
-  this->receive(std::move(nfdPacket));
+  this->receive(std::move(header.getBlock()));
 }
 
 Ptr<NetDevice>

@@ -47,7 +47,7 @@ AppLinkService::~AppLinkService()
 }
 
 void
-AppLinkService::doSendInterest(const Interest& interest)
+AppLinkService::doSendInterest(const Interest& interest, const nfd::EndpointId& endpoint)
 {
   NS_LOG_FUNCTION(this << &interest);
 
@@ -56,7 +56,7 @@ AppLinkService::doSendInterest(const Interest& interest)
 }
 
 void
-AppLinkService::doSendData(const Data& data)
+AppLinkService::doSendData(const Data& data, const nfd::EndpointId& endpoint)
 {
   NS_LOG_FUNCTION(this << &data);
 
@@ -65,7 +65,7 @@ AppLinkService::doSendData(const Data& data)
 }
 
 void
-AppLinkService::doSendNack(const lp::Nack& nack)
+AppLinkService::doSendNack(const lp::Nack& nack, const nfd::EndpointId& endpoint)
 {
   NS_LOG_FUNCTION(this << &nack);
 
@@ -78,19 +78,19 @@ AppLinkService::doSendNack(const lp::Nack& nack)
 void
 AppLinkService::onReceiveInterest(const Interest& interest)
 {
-  this->receiveInterest(interest);
+  this->receiveInterest(interest, 0);
 }
 
 void
 AppLinkService::onReceiveData(const Data& data)
 {
-  this->receiveData(data);
+  this->receiveData(data, 0);
 }
 
 void
 AppLinkService::onReceiveNack(const lp::Nack& nack)
 {
-  this->receiveNack(nack);
+  this->receiveNack(nack, 0);
 }
 
 } // namespace ndn

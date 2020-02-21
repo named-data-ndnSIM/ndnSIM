@@ -42,7 +42,7 @@ public:
                                      std::bind([]{}), std::bind([]{}));
 
     // use scheduler to send interest later on consumer face
-    m_scheduler.scheduleEvent(ndn::time::seconds(2), [this] {
+    m_scheduler.schedule(ndn::time::seconds(2), [this] {
         m_faceConsumer.expressInterest(ndn::Interest("/hello/world"),
                                        std::bind([] { std::cout << "Hello!" << std::endl; }),
                                        std::bind([] { std::cout << "NACK!" << std::endl; }),

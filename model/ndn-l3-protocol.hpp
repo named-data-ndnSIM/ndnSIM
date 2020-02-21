@@ -35,6 +35,7 @@
 namespace nfd {
 class Forwarder;
 class FibManager;
+class FaceTable;
 class StrategyChoiceManager;
 typedef boost::property_tree::ptree ConfigSection;
 namespace pit {
@@ -103,6 +104,9 @@ public:
    */
   shared_ptr<nfd::Forwarder>
   getForwarder();
+
+  nfd::FaceTable&
+  getFaceTable();
 
   /**
    * \brief Get smart pointer to nfd::FibManager, used by node's NFD

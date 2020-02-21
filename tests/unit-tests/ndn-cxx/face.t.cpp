@@ -230,7 +230,7 @@ private:
 
 private:
   ::ndn::Scheduler m_scheduler;
-  ::ndn::util::scheduler::ScopedEventId m_event;
+  ::ndn::scheduler::ScopedEventId m_event;
 };
 
 BOOST_AUTO_TEST_CASE(ExpressMultipleInterests)

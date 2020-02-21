@@ -56,8 +56,6 @@ namespace lp {
 using namespace ::ndn::lp;
 }
 
-using ::ndn::Exclude;
-
 using std::shared_ptr;
 using std::make_shared;
 

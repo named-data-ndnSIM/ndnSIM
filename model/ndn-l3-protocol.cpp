@@ -171,6 +171,7 @@ private:
   // note that shared_ptr needed for Python bindings
 
   std::shared_ptr<::nfd::Forwarder> m_forwarder;
+  std::unique_ptr<::nfd::FaceTable> m_faceTable;
   std::unique_ptr<::nfd::face::FaceSystem> m_faceSystem;
 
   std::shared_ptr<::nfd::face::Face> m_internalFace;
@@ -209,12 +210,9 @@ L3Protocol::~L3Protocol()
 void
 L3Protocol::initialize()
 {
-  m_impl->m_forwarder = make_shared<::nfd::Forwarder>();
-
-  ::nfd::FaceTable& faceTable = m_impl->m_forwarder->getFaceTable();
-  faceTable.addReserved(::nfd::face::makeNullFace(), ::nfd::face::FACEID_NULL);
-  // faceTable.addReserved(face::makeNullFace(FaceUri("contentstore://")), face::FACEID_CONTENT_STORE);
-  m_impl->m_faceSystem = make_unique<::nfd::face::FaceSystem>(faceTable, nullptr);
+  m_impl->m_faceTable = make_unique<::nfd::FaceTable>();
+  m_impl->m_forwarder = make_shared<::nfd::Forwarder>(*m_impl->m_faceTable);
+  m_impl->m_faceSystem = make_unique<::nfd::face::FaceSystem>(*m_impl->m_faceTable, nullptr);
 
   initializeManagement();
   initializeRibManager();
@@ -263,10 +261,10 @@ L3Protocol::initializeManagement()
   using namespace nfd;
 
   std::tie(m_impl->m_internalFace, m_impl->m_internalClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
-  forwarder->getFaceTable().addReserved(m_impl->m_internalFace, face::FACEID_INTERNAL_FACE);
+  m_impl->m_faceTable->addReserved(m_impl->m_internalFace, face::FACEID_INTERNAL_FACE);
 
   std::tie(m_impl->m_internalFaceForInjects, m_impl->m_internalClientFaceForInjects) = face::makeInternalFace(StackHelper::getKeyChain());
-  forwarder->getFaceTable().addReserved(m_impl->m_internalFaceForInjects, face::FACEID_INTERNAL_FACE + 1);
+  m_impl->m_faceTable->addReserved(m_impl->m_internalFaceForInjects, face::FACEID_INTERNAL_FACE + 1);
 
   m_impl->m_dispatcher = make_unique<::ndn::mgmt::Dispatcher>(*m_impl->m_internalClientFace, StackHelper::getKeyChain());
   m_impl->m_authenticator = ::nfd::CommandAuthenticator::create();
@@ -275,7 +273,7 @@ L3Protocol::initializeManagement()
     m_impl->m_forwarderStatusManager = make_unique<::nfd::ForwarderStatusManager>(*m_impl->m_forwarder, *m_impl->m_dispatcher);
   }
   m_impl->m_faceManager = make_unique<::nfd::FaceManager>(*m_impl->m_faceSystem, *m_impl->m_dispatcher, *m_impl->m_authenticator);
-  m_impl->m_fibManager = make_shared<::nfd::FibManager>(m_impl->m_forwarder->getFib(), m_impl->m_forwarder->getFaceTable(),
+  m_impl->m_fibManager = make_shared<::nfd::FibManager>(m_impl->m_forwarder->getFib(), *m_impl->m_faceTable,
                                                         *m_impl->m_dispatcher, *m_impl->m_authenticator);
   m_impl->m_csManager = make_unique<::nfd::CsManager>(m_impl->m_forwarder->getCs(), m_impl->m_forwarder->getCounters(),
                                                       *m_impl->m_dispatcher, *m_impl->m_authenticator);
@@ -308,7 +306,8 @@ L3Protocol::initializeManagement()
 
   // add FIB entry for NFD Management Protocol
   Name topPrefix("/localhost/nfd");
-  m_impl->m_forwarder->getFib().insert(topPrefix).first->addOrUpdateNextHop(*m_impl->m_internalFace, 0, 0);
+  auto entry = m_impl->m_forwarder->getFib().insert(topPrefix).first;
+  m_impl->m_forwarder->getFib().addOrUpdateNextHop(*entry, *m_impl->m_internalFace, 0);
   m_impl->m_dispatcher->addTopPrefix(topPrefix, false);
 }
 
@@ -318,7 +317,7 @@ L3Protocol::initializeRibManager()
   using namespace nfd;
 
   std::tie(m_impl->m_internalRibFace, m_impl->m_internalRibClientFace) = face::makeInternalFace(StackHelper::getKeyChain());
-  m_impl->m_forwarder->getFaceTable().add(m_impl->m_internalRibFace);
+  m_impl->m_faceTable->add(m_impl->m_internalRibFace);
 
   m_impl->m_ribService = make_unique<rib::Service>(m_impl->m_config,
                                                    std::ref(*m_impl->m_internalRibClientFace),
@@ -329,6 +328,12 @@ shared_ptr<nfd::Forwarder>
 L3Protocol::getForwarder()
 {
   return m_impl->m_forwarder;
+}
+
+nfd::FaceTable&
+L3Protocol::getFaceTable()
+{
+  return *m_impl->m_faceTable;
 }
 
 shared_ptr<nfd::FibManager>
@@ -392,26 +397,26 @@ L3Protocol::addFace(shared_ptr<Face> face)
 {
   NS_LOG_FUNCTION(this << face.get());
 
-  m_impl->m_forwarder->addFace(face);
+  m_impl->m_faceTable->add(face);
 
   std::weak_ptr<Face> weakFace = face;
 
   // // Connect Signals to TraceSource
-  face->afterReceiveInterest.connect([this, weakFace](const Interest& interest) {
+  face->afterReceiveInterest.connect([this, weakFace](const Interest& interest, const nfd::EndpointId&) {
       shared_ptr<Face> face = weakFace.lock();
       if (face != nullptr) {
         this->m_inInterests(interest, *face);
       }
     });
 
-  face->afterReceiveData.connect([this, weakFace](const Data& data) {
+  face->afterReceiveData.connect([this, weakFace](const Data& data, const nfd::EndpointId&) {
       shared_ptr<Face> face = weakFace.lock();
       if (face != nullptr) {
         this->m_inData(data, *face);
       }
     });
 
-  face->afterReceiveNack.connect([this, weakFace](const lp::Nack& nack) {
+  face->afterReceiveNack.connect([this, weakFace](const lp::Nack& nack, const nfd::EndpointId&) {
       shared_ptr<Face> face = weakFace.lock();
       if (face != nullptr) {
         this->m_inNack(nack, *face);
@@ -447,13 +452,13 @@ L3Protocol::addFace(shared_ptr<Face> face)
 shared_ptr<Face>
 L3Protocol::getFaceById(nfd::FaceId id) const
 {
-  return m_impl->m_forwarder->getFaceTable().get(id)->shared_from_this();
+  return m_impl->m_faceTable->get(id)->shared_from_this();
 }
 
 shared_ptr<Face>
 L3Protocol::getFaceByNetDevice(Ptr<NetDevice> netDevice) const
 {
-  for (auto& i : m_impl->m_forwarder->getFaceTable()) {
+  for (auto& i : *m_impl->m_faceTable) {
     auto transport = dynamic_cast<NetDeviceTransport*>(i.getTransport());
     if (transport == nullptr)
       continue;

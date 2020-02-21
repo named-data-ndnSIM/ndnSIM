@@ -56,17 +56,17 @@ BOOST_AUTO_TEST_CASE(EncodePrintInterest)
   interest.setNonce(10);
   interest.setCanBePrefix(true);
   lp::Packet lpPacket(interest.wireEncode());
-  nfd::face::Transport::Packet packet(lpPacket.wireEncode());
+  auto packet(lpPacket.wireEncode());
   BlockHeader header(packet);
 
-  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 18); // 18
+  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 20); // 20
 
   {
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (Interest: /prefix?ndn.Nonce=10)"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (Interest: /prefix?CanBePrefix&Nonce=10)"));
   }
 }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(EncodePrintData)
   data.setContent(std::make_shared< ::ndn::Buffer>(1024));
   ndn::StackHelper::getKeyChain().sign(data);
   lp::Packet lpPacket(data.wireEncode());
-  nfd::face::Transport::Packet packet(lpPacket.wireEncode());
+  auto packet(lpPacket.wireEncode());
   BlockHeader header(packet);
 
   BOOST_CHECK_EQUAL(header.GetSerializedSize(), 1350);
@@ -102,23 +102,23 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
   lpPacket.add<::ndn::lp::FragmentField>(std::make_pair(interest.wireEncode().begin(), interest.wireEncode().end()));
 
   {
-    BlockHeader header(nfd::face::Transport::Packet(lpPacket.wireEncode()));
+    BlockHeader header(lpPacket.wireEncode());
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?ndn.Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=10))"));
   }
 
   lpPacket.add<::ndn::lp::NackField>(::ndn::lp::NackHeader().setReason(::ndn::lp::NackReason::NO_ROUTE));
 
   {
-    BlockHeader header(nfd::face::Transport::Packet(lpPacket.wireEncode()));
+    BlockHeader header(lpPacket.wireEncode());
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(NACK(NoRoute) for Interest: /prefix?ndn.Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(NACK(NoRoute) for Interest: /prefix?CanBePrefix&Nonce=10))"));
   }
 
   lpPacket.remove<::ndn::lp::NackField>();
@@ -126,18 +126,18 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
   lpPacket.add<::ndn::lp::FragCountField>(1);
 
   {
-    BlockHeader header(nfd::face::Transport::Packet(lpPacket.wireEncode()));
+    BlockHeader header(lpPacket.wireEncode());
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?ndn.Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=10))"));
   }
 
   lpPacket.set<::ndn::lp::FragCountField>(2);
 
   {
-    BlockHeader header(nfd::face::Transport::Packet(lpPacket.wireEncode()));
+    BlockHeader header(lpPacket.wireEncode());
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
   lpPacket.remove<::ndn::lp::FragIndexField>();
 
   {
-    BlockHeader header(nfd::face::Transport::Packet(lpPacket.wireEncode()));
+    BlockHeader header(lpPacket.wireEncode());
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;

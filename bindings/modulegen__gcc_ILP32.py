@@ -202,6 +202,7 @@ def register_methods(root_module):
     def register_L3Protocol(cls):
         cls.add_method('getL3Protocol', 'ns3::Ptr<ns3::ndn::L3Protocol>', [param('ns3::Ptr<ns3::Object>', 'node')], is_static=True)
         cls.add_method('getForwarder', 'std::shared_ptr<ns3::ndn::nfd::Forwarder>', [])
+        cls.add_method('getFaceTable', retval('const ns3::ndn::nfd::FaceTable&', caller_manages_return=False), [], is_const=True)
     register_L3Protocol(root_module['ns3::ndn::L3Protocol'])
 
     # shared_ptr<Face>
@@ -220,7 +221,6 @@ def register_methods(root_module):
         cls.add_method('getFib', retval('const ns3::ndn::nfd::Fib&', caller_manages_return=False), [], is_const=True)
         cls.add_method('getPit', retval('const ns3::ndn::nfd::Pit&', caller_manages_return=False), [], is_const=True)
         cls.add_method('getCs', retval('const ns3::ndn::nfd::Cs&', caller_manages_return=False), [], is_const=True)
-        cls.add_method('getFaceTable', retval('const ns3::ndn::nfd::FaceTable&', caller_manages_return=False), [], is_const=True)
     reg_NfdForwarder(root_module['ns3::ndn::nfd::Forwarder'])
 
     #############
@@ -252,7 +252,7 @@ def register_methods(root_module):
         reg_Entry(root_module['ns3::ndn::nfd::fib::Entry'])
 
         def reg_NextHop(cls):
-            cls.add_constructor([param('const ns3::ndn::Face&', 'face'), param('uint64_t', 'endpointId')])
+            cls.add_constructor([param('const ns3::ndn::Face&', 'face')])
 
             cls.add_function_as_method('getFaceFromFibNextHop', 'std::shared_ptr<ns3::ndn::Face>',
                                        [param('const ns3::ndn::nfd::fib::NextHop&', 'obj')],

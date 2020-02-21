@@ -60,16 +60,16 @@ public:
 
 private:
   virtual void
-  doSendInterest(const Interest& interest) override;
+  doSendInterest(const Interest& interest, const nfd::EndpointId& endpoint) override;
 
   virtual void
-  doSendData(const Data& data) override;
+  doSendData(const Data& data, const nfd::EndpointId& endpoint) override;
 
   virtual void
-  doSendNack(const lp::Nack& nack) override;
+  doSendNack(const lp::Nack& nack, const nfd::EndpointId& endpoint) override;
 
   virtual void
-  doReceivePacket(nfd::face::Transport::Packet&& packet) override
+  doReceivePacket(const Block& packet, const nfd::EndpointId& endpoint) override
   {
     // does nothing (all operations for now handled by LinkService)
     BOOST_ASSERT(false);

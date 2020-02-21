@@ -39,7 +39,7 @@ public:
 
   BlockHeader();
 
-  BlockHeader(const nfdFace::Transport::Packet& packet);
+  BlockHeader(const Block& packet);
 
   virtual uint32_t
   GetSerializedSize(void) const;

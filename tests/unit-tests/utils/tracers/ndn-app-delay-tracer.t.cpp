@@ -54,7 +54,7 @@ public:
     addApps({
         {"1", "ns3::ndn::ConsumerCbr",
             {{"Prefix", "/prefix"}, {"Frequency", "1"}},
-            "0s", "0.9s"}, // send just one packet
+            "1s", "1.9s"}, // send just one packet
         // Second consumer will capture effect of the bug #2764
         {"2", "ns3::ndn::ConsumerCbr",
             {{"Prefix", "/prefix"}, {"Frequency", "1"}},
@@ -89,12 +89,12 @@ BOOST_AUTO_TEST_CASE(InstallAll)
 
   BOOST_CHECK_EQUAL(buffer.str(),
                     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
-0.0417744	1	0	0	LastDelay	0.0417744	41774.4	1	2
-0.0417744	1	0	0	FullDelay	0.0417744	41774.4	1	2
+1.04177	1	0	0	LastDelay	0.0417664	41766.4	1	2
+1.04177	1	0	0	FullDelay	0.0417664	41766.4	1	2
 2	2	0	0	LastDelay	0	0	1	1
 2	2	0	0	FullDelay	0	0	1	1
-3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
-3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
+3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1
+3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1
 )STR");
 }
 
@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
-0.0417744	1	0	0	LastDelay	0.0417744	41774.4	1	2
-0.0417744	1	0	0	FullDelay	0.0417744	41774.4	1	2
+1.04177	1	0	0	LastDelay	0.0417664	41766.4	1	2
+1.04177	1	0	0	FullDelay	0.0417664	41766.4	1	2
 )STR");
 }
 
@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE(InstallNode)
     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
 2	2	0	0	LastDelay	0	0	1	1
 2	2	0	0	FullDelay	0	0	1	1
-3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
-3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
+3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1
+3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1
 )STR");
 }
 
@@ -156,8 +156,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
   BOOST_CHECK(output->is_equal(
     R"STR(2	2	0	0	LastDelay	0	0	1	1
 2	2	0	0	FullDelay	0	0	1	1
-3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
-3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
+3.02088	2	0	1	LastDelay	0.0208832	20883.2	1	1
+3.02088	2	0	1	FullDelay	0.0208832	20883.2	1	1
 )STR"));
 }
 

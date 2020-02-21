@@ -147,6 +147,10 @@ private:
   ConstBufferPtr
   doSign(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t size) const final;
 
+  bool
+  doVerify(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t bufLen,
+           const uint8_t* sig, size_t sigLen) const final;
+
   ConstBufferPtr
   doDecrypt(const uint8_t* cipherText, size_t cipherTextLen) const final;
 
@@ -208,6 +212,9 @@ private:
 
   void
   doImportKey(const Name& keyName, const uint8_t* pkcs8, size_t pkcs8Len, const char* pw, size_t pwLen) final;
+
+  void
+  doImportKey(const Name& keyName, shared_ptr<transform::PrivateKey> key) final;
 
 public:
   static const std::string SCHEME;

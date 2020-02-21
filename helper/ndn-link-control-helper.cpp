@@ -56,7 +56,7 @@ LinkControlHelper::setErrorRate(Ptr<Node> node1, Ptr<Node> node2, double errorRa
   NS_ASSERT(ndn1 != nullptr && ndn2 != nullptr);
 
   // iterate over all faces to find the right one
-  for (const auto& face : ndn1->getForwarder()->getFaceTable()) {
+  for (const auto& face : ndn1->getFaceTable()) {
     auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
     if (transport == nullptr)
       continue;

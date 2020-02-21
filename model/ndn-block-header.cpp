@@ -56,8 +56,8 @@ BlockHeader::BlockHeader()
 {
 }
 
-BlockHeader::BlockHeader(const nfdFace::Transport::Packet& packet)
-  : m_block(packet.packet)
+BlockHeader::BlockHeader(const Block& packet)
+  : m_block(packet)
 {
 }
 

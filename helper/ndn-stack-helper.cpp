@@ -391,7 +391,7 @@ StackHelper::SetLinkDelayAsFaceMetric()
     if (ndn == nullptr)
       continue;
 
-    for (auto& face : ndn->getForwarder()->getFaceTable()) {
+    for (auto& face : ndn->getFaceTable()) {
       auto transport = dynamic_cast<NetDeviceTransport*>(face.getTransport());
       if (transport == nullptr)
         continue;
