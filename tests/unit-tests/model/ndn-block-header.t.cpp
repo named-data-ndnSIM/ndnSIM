@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
- * Copyright (c) 2011-2015  Regents of the University of California.
+ * Copyright (c) 2011-2019  Regents of the University of California.
  *
  * This file is part of ndnSIM. See AUTHORS for complete list of ndnSIM authors and
  * contributors.
@@ -21,6 +21,7 @@
 #include "helper/ndn-stack-helper.hpp"
 
 #include <ndn-cxx/lp/packet.hpp>
+#include <ndn-cxx/encoding/block.hpp>
 
 #include "ns3/ndnSIM/NFD/daemon/face/transport.hpp"
 #include "ns3/packet.h"
@@ -29,6 +30,8 @@
 
 namespace ns3 {
 namespace ndn {
+
+using ::ndn::operator "" _block;
 
 BOOST_FIXTURE_TEST_SUITE(ModelNdnBlockHeader, CleanupFixture)
 
@@ -142,8 +145,8 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
     BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(fragment 1 out of 2))"));
   }
 
-  ::ndn::Buffer buf(10);
-  lpPacket.set<::ndn::lp::FragmentField>(std::make_pair(buf.begin(), buf.end()));
+  Block unknown = "8808 0000 0000 0000 0000"_block;
+  lpPacket.set<::ndn::lp::FragmentField>(std::make_pair(unknown.begin(), unknown.end()));
   lpPacket.remove<::ndn::lp::FragCountField>();
   lpPacket.remove<::ndn::lp::FragIndexField>();
 

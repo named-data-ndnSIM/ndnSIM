@@ -89,12 +89,12 @@ BOOST_AUTO_TEST_CASE(InstallAll)
 
   BOOST_CHECK_EQUAL(buffer.str(),
                     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
-0.0417968	1	0	0	LastDelay	0.0417968	41796.8	1	2
-0.0417968	1	0	0	FullDelay	0.0417968	41796.8	1	2
-2	2	0	0	LastDelay	0	0	1	0
-2	2	0	0	FullDelay	0	0	1	0
-3.0209	2	0	1	LastDelay	0.0208984	20898.4	1	1
-3.0209	2	0	1	FullDelay	0.0208984	20898.4	1	1
+0.0417744	1	0	0	LastDelay	0.0417744	41774.4	1	2
+0.0417744	1	0	0	FullDelay	0.0417744	41774.4	1	2
+2	2	0	0	LastDelay	0	0	1	1
+2	2	0	0	FullDelay	0	0	1	1
+3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
+3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
 )STR");
 }
 
@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE(InstallNodeContainer)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
-0.0417968	1	0	0	LastDelay	0.0417968	41796.8	1	2
-0.0417968	1	0	0	FullDelay	0.0417968	41796.8	1	2
+0.0417744	1	0	0	LastDelay	0.0417744	41774.4	1	2
+0.0417744	1	0	0	FullDelay	0.0417744	41774.4	1	2
 )STR");
 }
 
@@ -136,10 +136,10 @@ BOOST_AUTO_TEST_CASE(InstallNode)
 
   BOOST_CHECK_EQUAL(buffer.str(),
     R"STR(Time	Node	AppId	SeqNo	Type	DelayS	DelayUS	RetxCount	HopCount
-2	2	0	0	LastDelay	0	0	1	0
-2	2	0	0	FullDelay	0	0	1	0
-3.0209	2	0	1	LastDelay	0.0208984	20898.4	1	1
-3.0209	2	0	1	FullDelay	0.0208984	20898.4	1	1
+2	2	0	0	LastDelay	0	0	1	1
+2	2	0	0	FullDelay	0	0	1	1
+3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
+3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
 )STR");
 }
 
@@ -154,10 +154,10 @@ BOOST_AUTO_TEST_CASE(InstallNodeDumpStream)
   tracer = nullptr; // destroy tracer
 
   BOOST_CHECK(output->is_equal(
-    R"STR(2	2	0	0	LastDelay	0	0	1	0
-2	2	0	0	FullDelay	0	0	1	0
-3.0209	2	0	1	LastDelay	0.0208984	20898.4	1	1
-3.0209	2	0	1	FullDelay	0.0208984	20898.4	1	1
+    R"STR(2	2	0	0	LastDelay	0	0	1	1
+2	2	0	0	FullDelay	0	0	1	1
+3.02089	2	0	1	LastDelay	0.0208872	20887.2	1	1
+3.02089	2	0	1	FullDelay	0.0208872	20887.2	1	1
 )STR"));
 }
 
