@@ -9,9 +9,9 @@ Portability
 
 ndnSIM 2.x has been successfully compiled and used on following platforms:
 
+- Ubuntu Linux 20.04
 - Ubuntu Linux 18.04
-- Ubuntu Linux 16.04
-- macOS 10.13
+- macOS 10.15
 - macOS 10.14
 
 .. _requirements:
@@ -21,7 +21,7 @@ Prerequisites
 
 **1. Core dependencies**
 
--  ``python`` >= 2.7
+-  ``python`` >= 3.5
 -  ``libsqlite3``
 -  ``pkg-config``
 -  ``openssl``
@@ -50,11 +50,17 @@ development tools and libraries, and ndn-cxx prerequisites.
 
 - Linux
 
-  * Ubuntu Linux
+  * Ubuntu Linux 18.04
 
    .. code-block:: bash
 
        sudo apt install build-essential libsqlite3-dev libboost-all-dev libssl-dev git python-setuptools castxml
+
+  * Ubuntu Linux 20.04
+
+   .. code-block:: bash
+
+       sudo apt install build-essential libsqlite3-dev libboost-all-dev libssl-dev git python3-setuptools castxml
 
   * Fedora Linux
 
@@ -87,12 +93,17 @@ should be installed:
 
 - Linux
 
-  * Ubuntu Linux
+  * Ubuntu Linux 18.04
 
     .. code-block:: bash
 
         sudo apt install python-dev python-pygraphviz python-kiwi python-gnome2 ipython libcairo2-dev python3-gi libgirepository1.0-dev python-gi python-gi-cairo gir1.2-gtk-3.0 gir1.2-goocanvas-2.0 python-pip
         sudo pip install pygraphviz pycairo PyGObject pygccxml
+
+  * Ubuntu Linux 20.04
+
+        sudo apt install gir1.2-goocanvas-2.0 gir1.2-gtk-3.0 libgirepository1.0-dev python3-dev python3-gi python3-gi-cairo python3-pip python3-pygraphviz python3-pygccxml
+        sudo pip3 install kiwi
 
 .. _visualizer: https://www.nsnam.org/wiki/PyViz
 
@@ -146,16 +157,6 @@ sufficient to configure and build ndnSIM with python bindings enabled:
 
    cd <ns-3-folder>
    ./waf configure --enable-examples
-   ./waf
-
-On macOS (with MacPorts), you may need to modify the configure command to use MacPorts
-version of python:
-
-.. code-block:: bash
-
-   cd <ns-3-folder>
-   ./waf configure --with-python=/opt/local/bin/python2.7 --enable-examples
-   # or run ``sudo port select python python27``
    ./waf
 
 .. note::

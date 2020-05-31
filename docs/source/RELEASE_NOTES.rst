@@ -5,6 +5,32 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <https://ndnsim.net>`__.
 
+Release 2.8
+-----------
+
+- The submodules of NFD and ndn-cxx have been upgraded to version 0.7.0.
+
+  `NFD 0.7.0 release notes <https://named-data.net/doc/NFD/0.7.0/RELEASE_NOTES.html>`__
+
+  `ndn-cxx 0.7.0 release notes <https://named-data.net/doc/ndn-cxx/0.7.0/RELEASE_NOTES.html>`__
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+- With the underlying NFD/ndn-cxx upgrade, ndnSIM now operates with NDN Packet format version 0.3.
+
+- Base NS-3 was rebased to version 3.30.1
+
+- Add Loop-Free In-port Dependent (LFID) route calculation that provides a set of
+  loop-free paths (:issue:`4985`)
+
+- Fix wrong behaviour of default Size in ConsumerWindow
+
+- **Remove** legacy content store implementation. Use content store replacement/placement
+  policies implemented using NFD routines.
+
 Release 2.7
 -----------
 
