@@ -2,7 +2,7 @@
 Copyright and License
 =====================
 
-Copyright © 2011-2018 University of California, Los Angeles
+Copyright © 2011-2020 University of California, Los Angeles
 
 ndnSIM is licensed under conditions of GNU General Public License version 3.0 or later
 with permission to be linked with NS-3 codebase (GPL 2.0).

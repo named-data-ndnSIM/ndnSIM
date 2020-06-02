@@ -514,7 +514,7 @@ LFID (Loop-Free Inport-Dependent) Routing for ndnSIM
 ----------------------------------------------------
 
 LFID (Loop-Free Inport-Dependent) Routing extends the ndnSIM route calculation to provide loop-free and on average shorter loop-free paths than existing work.
-For details see the `tech report.`_
+For details see the `tech report. <https://named-data.net/publications/techreports/mp_routing_tech_report/>`__
 
 LFID provides a better trade-off than the existing route calculation algorithms:
 

@@ -1,8 +1,9 @@
-# ndnSIM Authors
+ndnSIM Authors
+--------------
 
 The following lists maintainers, primary developers, and all much-appreciated contributors to ndnSIM in alphabetic order.
-The specific contributions of individual authors can be obtained from the git history of the [official ndnSIM repository](https://github.com/named-data/ndnSIM).
-If you would like to become a contributor to the official repository, please follow the recommendations in https://github.com/named-data/.github/blob/master/CONTRIBUTING.md.
+The specific contributions of individual authors can be obtained from the git history of the `official ndnSIM repository <https://github.com/named-data/ndnSIM>`__.
+If you would like to become a contributor to the official repository, please follow the recommendations in the `contribution guide <https://github.com/named-data/.github/blob/master/CONTRIBUTING.md>`__.
 
 * Jerald Paul Abraham <https://cs.arizona.edu/~jeraldabraham>
 * ***(Maintainer)*** Alexander Afanasyev <https://users.cs.fiu.edu/~afanasyev>
@@ -44,6 +45,7 @@ If you would like to become a contributor to the official repository, please fol
 * Yu Zhang <https://github.com/YuZhang>
 * Zongyi Zhao <https://github.com/xinshengzzy>
 
-## Technical Advisors
+Technical Advisors
+^^^^^^^^^^^^^^^^^^
 
 * Lixia Zhang <https://web.cs.ucla.edu/~lixia>
