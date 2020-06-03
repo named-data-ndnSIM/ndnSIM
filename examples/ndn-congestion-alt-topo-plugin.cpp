@@ -95,7 +95,7 @@ main(int argc, char* argv[])
     /////////////////////////////////////////////////////////////////////////////////
 
     ndn::AppHelper consumerHelper("ns3::ndn::ConsumerCbr");
-    consumerHelper.SetAttribute("Frequency", StringValue("10")); // 100 interests a second
+    consumerHelper.SetAttribute("Frequency", StringValue("10")); // 10 interests a second
 
     consumerHelper.SetPrefix(prefix);
     ApplicationContainer consumer = consumerHelper.Install(consumers[i]);
