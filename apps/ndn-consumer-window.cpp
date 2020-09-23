@@ -199,8 +199,7 @@ ConsumerWindow::OnData(shared_ptr<const Data> contentObject)
 void
 ConsumerWindow::OnTimeout(uint32_t sequenceNumber)
 {
-  if (m_inFlight > static_cast<uint32_t>(0))
-    m_inFlight--;
+  m_inFlight = m_seqTimeouts.size();
 
   if (m_setInitialWindowOnTimeout) {
     // m_window = std::max<uint32_t> (0, m_window - 1);
@@ -214,8 +213,8 @@ ConsumerWindow::OnTimeout(uint32_t sequenceNumber)
 void
 ConsumerWindow::WillSendOutInterest(uint32_t sequenceNumber)
 {
-  m_inFlight++;
   Consumer::WillSendOutInterest(sequenceNumber);
+  m_inFlight = m_seqTimeouts.size();
 }
 
 } // namespace ndn
