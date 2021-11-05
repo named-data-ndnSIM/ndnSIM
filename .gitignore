@@ -1,3 +1,5 @@
+# Visual Studio Code
+.vscode/
 *.pyc
 .waf3-*
 .waf-1*

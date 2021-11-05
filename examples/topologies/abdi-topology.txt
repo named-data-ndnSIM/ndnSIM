@@ -1,0 +1,60 @@
+# topo-grid-3x3.txt
+
+#   /--------\	    /-\	        /-\
+#   |Consumer|<---->| |<------->| |
+#   \--------/	    \-/	        \-/
+#       ^   	     ^ 	         ^
+#       |            |           |   1Mbps/10ms delay
+#       v            v           v
+#      /-\          /-\         /-\
+#      | |<-------->| |<------->| |
+#      \-/          \-/         \-/
+#       ^   	     ^ 	         ^
+#       |            |           |
+#       v            v           v
+#      /-\	    /-\	     /--------\
+#      | |<-------->| |<---->|Producer|
+#      \-/          \-/      \--------/
+
+# any empty lines and lines starting with '#' symbol is ignored
+#
+# The file should contain exactly two sections: router and link, each starting with the corresponding keyword
+#
+# router section defines topology nodes and their relative positions (e.g., to use in visualizer)
+router
+
+# each line in this section represents one router and should have the following data
+# node  comment     yPos    xPos
+Client0   NA          3       1
+Router1   NA          3       2
+Router2   NA          3       3
+Router3   NA          2       1
+Router4   NA          2       2
+Router5   NA          2       3
+Router6   NA          1       1
+Router7   NA          1       2
+Server8   NA          1       3
+# Note that `node` can be any string. It is possible to access to the node by name using Names::Find, see examples.
+
+# link section defines point-to-point links between nodes and characteristics of these links
+link
+
+# Each line should be in the following format (only first two are required, the rest can be omitted)
+# srcNode   dstNode     bandwidth   metric  delay   queue
+# bandwidth: link bandwidth
+# metric: routing metric
+# delay:  link delay
+# queue:  MaxPackets for transmission queue on the link (both directions)
+Client0       Router1       1Mbps       1       10ms    10
+Client0       Router3       1Mbps       1       10ms    10
+Router1       Router2       1Mbps       1       10ms    10
+Router1       Router4       1Mbps       1       10ms    10
+Router2       Router5       1Mbps       1       10ms    10
+Router3       Router4       1Mbps       1       10ms    10
+Router3       Router6       1Mbps       1       10ms    10
+Router4       Router5       1Mbps       1       10ms    10
+Router4       Router7       1Mbps       1       10ms    10
+Router5       Server8       1Mbps       1       10ms    10
+Router6       Router7       1Mbps       1       10ms    10
+Router7       Server8       1Mbps       1       10ms    10
+
