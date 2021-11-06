@@ -2,7 +2,9 @@
 	path = NFD
 	url = https://github.com/rezaghfi/NFD
 	branch = NFD-0.7.0-ndnSIM
+	ignore = dirty
 [submodule "ndn-cxx"]
 	path = ndn-cxx
 	url = https://github.com/rezaghfi/ndn-cxx
 	branch = ndn-cxx-0.7.0-ndnSIM
+	ignore = dirty
