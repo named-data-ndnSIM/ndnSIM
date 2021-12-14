@@ -173,10 +173,10 @@ private:
   Connect();
 
   void
-  CacheHits(shared_ptr<const Interest>, shared_ptr<const Data>);
+  CacheHits(const Interest&, const Data&);
 
   void
-  CacheMisses(shared_ptr<const Interest>);
+  CacheMisses(const Interest&);
 
 private:
   void
