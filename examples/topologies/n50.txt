@@ -1,0 +1,218 @@
+# topo-nima-4p4c.txt
+
+
+
+# any empty lines and lines starting with '#' symbol is ignored
+#
+# The file should contain exactly two sections: router and link, each starting with the corresponding keyword
+#
+# router section defines topology nodes and their relative positions (node57.node87., to use in visualizer)
+router
+
+# each line in this section represents one router and should have the following data
+# node  comment     yPos    xPos
+node0	NA	22	13
+node1	NA	23	11
+node2	NA	21	9
+node3	NA	22	8
+node4	NA	23	7
+node5	NA	24	7
+node6	NA	25	8
+node7	NA	26	9
+node8	NA	27	10
+node9	NA	24	13
+node10	NA	25	13
+node11	NA	25	14
+node12	NA	25	15
+node13	NA	25	16
+node14	NA	17	13
+node15	NA	17	11
+node16	NA	17	10
+node17	NA	18	9
+node18	NA	19	10
+node19	NA	20	9
+node20	NA	14	12
+node21	NA	18	8
+node22	NA	16	9
+node23	NA	15	8
+node24	NA	14	7
+node25	NA	13	8
+node26	NA	12	9
+node27	NA	8	8
+node28	NA	20	18
+node29	NA	18	17
+node30	NA	18	15
+node31	NA	17	15
+node32	NA	17	16
+node33	NA	17	17
+node34	NA	17	18
+node35	NA	17	19
+node36	NA	17	20
+node37	NA	21	18
+node38	NA	23	17
+node39	NA	23	18
+node40	NA	23	19
+node41	NA	23	20
+node42	NA	21	19			
+node43	NA	15	14
+node44	NA	13	13
+node45	NA	11	12
+node46	NA	11	11
+node47	NA	11	10
+node48	NA	11	9
+node49	NA	13	16
+
+
+c1      NA  	21	5
+c2      NA    22	5
+c3      NA	23	5
+c4      NA	24	5
+c5      NA	25	5
+c6      NA	26	5
+c7      NA	27	5
+c8      NA	27	13
+c9  NA	27	14
+c10  NA	27	15
+c11  NA	27	16
+c12 NA	17	5
+c13  NA	18	5
+c14  NA	19	5
+c15  NA	20	5
+c16  NA	18	5
+c17  NA	16	5
+c18  NA	15	5
+c19  NA	14	5
+c20  NA	13	5
+c21  NA	12	5
+c22  NA	8	5
+c23  NA	18	15
+c24  NA	16	14
+c25  NA	16	15
+c26  NA	16	16
+c27  NA	16	17
+c28  NA	16	18
+c29  NA	16	19
+c30  NA	25	17
+c31  NA	25	18
+c32  NA	25	19
+c33  NA	24	20
+c34  NA	21	19
+s1  NA	9	12
+s2  NA	9	11
+s3  NA	9	10
+s4  NA	9	9
+s5  NA	13	18
+
+
+
+
+
+
+# Note that `node` can be any string. It is possible to access to the node by name using Names::Find, see examples.
+
+# link section defines point-to-point links between nodes and characteristics of these links
+link
+
+# Each line should be in the following format (only first two are required, the rest can be omitted)
+# srcNode   dstNode     bandwidth   metric  delay   queue
+# bandwidth: link bandwidth
+# metric: routing metric
+# delay:  link delay
+# queue:  MaxPackets for transmission queue on the link (both directions)
+node0              node14          100Mbps      1        10ms     10
+node0              node28          100Mbps      1        10ms     10
+node14             node28          100Mbps      1        10ms     10
+node14             node43          100Mbps      1        10ms     10
+node0              node1           100Mbps      1        10ms     10
+node0              node9           100Mbps      1        10ms     10
+node14             node15          100Mbps      1        10ms     10
+node14             node20          100Mbps      1        10ms     10
+node28             node29          100Mbps      1        10ms     10
+node28             node37          100Mbps      1        10ms     10
+node43             node44          100Mbps      1        10ms     10
+node43             node49          100Mbps      1        10ms     10
+node1              node2           100Mbps      1        10ms     10
+node1              node3           100Mbps      1        10ms     10
+node1              node4           100Mbps      1        10ms     10
+node1              node5           100Mbps      1        10ms     10
+node1              node6           100Mbps      1        10ms     10
+node1              node7           100Mbps      1        10ms     10
+node1              node8           100Mbps      1        10ms     10
+node9              node10          100Mbps      1        10ms     10
+node9              node11          100Mbps      1        10ms     10
+node9              node12          100Mbps      1        10ms     10
+node9              node13          100Mbps      1        10ms     10
+node15             node16          100Mbps      1        10ms     10
+node15             node17          100Mbps      1        10ms     10
+node15             node18          100Mbps      1        10ms     10
+node15             node19          100Mbps      1        10ms     10
+node20             node21          100Mbps      1        10ms     10
+node20             node22          100Mbps      1        10ms     10
+node20             node23          100Mbps      1        10ms     10
+node20             node24          100Mbps      1        10ms     10
+node20             node25          100Mbps      1        10ms     10
+node20             node26          100Mbps      1        10ms     10
+node20             node27          100Mbps      1        10ms     10
+node29             node30          100Mbps      1        10ms     10
+node29             node31          100Mbps      1        10ms     10
+node29             node32          100Mbps      1        10ms     10
+node29             node33          100Mbps      1        10ms     10
+node29             node34          100Mbps      1        10ms     10
+node29             node35          100Mbps      1        10ms     10
+node29             node36          100Mbps      1        10ms     10
+node37             node38          100Mbps      1        10ms     10
+node37             node39          100Mbps      1        10ms     10
+node37             node40          100Mbps      1        10ms     10
+node37             node41          100Mbps      1        10ms     10
+node37             node42          100Mbps      1        10ms     10
+node44             node45          100Mbps      1        10ms     10
+node44             node46          100Mbps      1        10ms     10
+node44             node47          100Mbps      1        10ms     10
+node44             node48          100Mbps      1        10ms     10
+
+node2  	c1	          100Mbps      1        10ms     10
+node3	  c2	          100Mbps      1        10ms     10
+node4	  c3	          100Mbps      1        10ms     10
+node5	  c4	          100Mbps      1        10ms     10
+node6	  c5	          100Mbps      1        10ms     10
+node7	  c6	          100Mbps      1        10ms     10
+node8	  c7	          100Mbps      1        10ms     10
+node10	c8	          100Mbps      1        10ms     10
+node11	c9	          100Mbps      1        10ms     10
+node12	c10	          100Mbps      1        10ms     10
+node13	c11	          100Mbps      1        10ms     10
+node16	c12	          100Mbps      1        10ms     10
+node17	c13	          100Mbps      1        10ms     10
+node18	c14	          100Mbps      1        10ms     10
+node19	c15	          100Mbps      1        10ms     10
+node21	c16	          100Mbps      1        10ms     10
+node22	c17	          100Mbps      1        10ms     10
+node23	c18	          100Mbps      1        10ms     10
+node24	c19	          100Mbps      1        10ms     10
+node25	c20	          100Mbps      1        10ms     10
+node26	c21	          100Mbps      1        10ms     10
+node27	c22	          100Mbps      1        10ms     10
+node30	c23	          100Mbps      1        10ms     10
+node31	c24	          100Mbps      1        10ms     10
+node32	c25	          100Mbps      1        10ms     10
+node33	c26	          100Mbps      1        10ms     10
+node34	c27	          100Mbps      1        10ms     10
+node35	c28	          100Mbps      1        10ms     10
+node36	c29	          100Mbps      1        10ms     10
+node38	c30	          100Mbps      1        10ms     10
+node39	c31	          100Mbps      1        10ms     10
+node40	c32	          100Mbps      1        10ms     10
+node41	c33	          100Mbps      1        10ms     10
+node42	c34	          100Mbps      1        10ms     10
+node45	s1	          100Mbps      1        10ms     10
+node46	s2	          100Mbps      1        10ms     10
+node47	s3	          100Mbps      1        10ms     10
+node48	s4	          100Mbps      1        10ms     10
+node49	s5	          100Mbps      1        10ms     10
+
+
+
+
+
+
+

@@ -1,0 +1,770 @@
+# topo-nima-4p4c.txt
+
+
+
+# any empty lines and lines starting with '#' symbol is ignored
+#
+# The file should contain exactly two sections: router and link, each starting with the corresponding keyword
+#
+# router section defines topology nodes and their relative positions (node57.node87., to use in visualizer)
+router
+
+# each line in this section represents one router and should have the following data
+# node  comment     yPos    xPos
+node0	NA	22	13
+node1	NA	23	11
+node2	NA	21	9
+node3	NA	22	8
+node4	NA	23	7
+node5	NA	24	7
+node6	NA	25	8
+node7	NA	26	9
+node8	NA	27	10
+node9	NA	24	13
+node10	NA	25	13
+node11	NA	25	14
+node12	NA	25	15
+node13	NA	25	16
+node14	NA	17	13
+node15	NA	17	11
+node16	NA	17	10
+node17	NA	18	9
+node18	NA	19	10
+node19	NA	20	9
+node20	NA	14	12
+node21	NA	18	8
+node22	NA	16	9
+node23	NA	15	8
+node24	NA	14	7
+node25	NA	13	8
+node26	NA	12	9
+node27	NA	8	8
+node28	NA	20	18
+node29	NA	18	17
+node30	NA	18	15
+node31	NA	17	15
+node32	NA	17	16
+node33	NA	17	17
+node34	NA	17	18
+node35	NA	17	19
+node36	NA	17	20
+node37	NA	21	18
+node38	NA	23	17
+node39	NA	23	18
+node40	NA	23	19
+node41	NA	23	20
+node42	NA	21	19			
+node43	NA	15	14
+node44	NA	13	13
+node45	NA	11	12
+node46	NA	11	11
+node47	NA	11	10
+node48	NA	11	9
+node49	NA	13	16
+node50	NA	11	14
+node51	NA	11	15
+node52	NA	11	16
+node53	NA	11	17
+node54	NA	11	18
+node55	NA	11	19
+node56	NA	11	20
+node57	NA	21	23
+node58	NA	22	21
+node59	NA	24	20
+node60	NA	24	21
+node61	NA	24	22
+node62	NA	19	22
+node63	NA	16	22
+node64	NA	16	21
+node65	NA	16	20
+node66	NA	16	19
+node67	NA	16	18
+node68	NA	16	17
+node69	NA	16	16
+node70	NA	16	15			
+node71	NA	13	23
+node72	NA	10	21
+node73	NA	8	15
+node74	NA	8	16
+node75	NA	8	17
+node76	NA	8	18
+node77	NA	8	19
+node78	NA	10	24
+node79	NA	8	20
+node80	NA	7	21
+node81	NA	6	22
+node82	NA	5	23
+node83	NA	6	24
+node84	NA	6	25
+node85	NA	7	26
+node86	NA	8	27
+node87	NA	21	27
+node88	NA	25	24
+node89	NA	27	23
+node90	NA	26	24
+node91	NA	26	25
+node92	NA	26	26
+node93	NA	26	27
+node94	NA	26	28
+node95	NA	26	29
+node96	NA	23	26
+node97	NA	20	26
+node98	NA	17	24
+node99	NA	17	25			
+node100	NA	16	28
+node101	NA	6	27
+node102	NA	5	26
+node103	NA	5	25
+node104	NA	5	24
+node105	NA	6	29
+node106	NA	1	28
+node107	NA	5	28
+node108	NA	4	29
+node109	NA	5	30
+node110	NA	4	31
+node111	NA	5	32
+node112	NA	4	33
+node113	NA	5	34
+node114	NA	22	30
+node115	NA	28	29
+node116	NA	27	31
+node117	NA	33	28
+node118	NA	34	27
+node119	NA	35	26
+node120	NA	36	25
+node121	NA	37	24
+node122	NA	29	23
+node123	NA	32	22
+node124	NA	30	21
+node125	NA	33	30
+node126	NA	34	29
+node127	NA	29	33
+node128	NA	29	34			
+node129	NA	19	32
+node130	NA	17	32
+node131	NA	16	30
+node132	NA	16	31
+node133	NA	16	32
+node134	NA	16	33
+node135	NA	16	34
+node136	NA	19	34
+node137	NA	20	35
+node138	NA	18	36
+node139	NA	17	37
+node140	NA	16	38
+node141	NA	15	39
+node142	NA	16	40
+node143	NA	17	41
+node144	NA	18	42
+node145	NA	19	43
+node146	NA	22	33
+node147	NA	22	38
+node148	NA	21	35
+node149	NA	21	36
+node150	NA	20	37
+node151	NA	20	38
+node152	NA	24	45
+node153	NA	16	46
+node154	NA	17	47
+node155	NA	18	48
+node156	NA	19	49
+node157	NA	20	50
+node158	NA	21	51
+node159	NA	22	52
+node160	NA	23	53
+node161	NA	24	54
+node162	NA      30      50
+node163	NA      35      40
+node164	NA      40      41
+node165	NA      39      42
+node166	NA      38      43
+node167	NA      37      44
+node168	NA      36      45
+node169	NA      35      46
+node170	NA      34      47
+node171	NA      33      48
+node172	NA      32      49
+node173	NA      31      50
+node174	NA      25      65
+node175	NA      30      53
+node176	NA      30      54
+node177	NA      30      55
+node178	NA      31      56
+node179	NA      32      57
+node180	NA      33      58
+node181	NA      35      57
+node182	NA      34      59
+node183	NA      33      60
+node184	NA      32      62
+node185	NA      31      63
+node186	NA      30      64
+node187	NA      31      52
+node188	NA      39      45
+node189	NA      38      47
+node190	NA      37      48
+node191	NA      36      49
+node192	NA      40      49
+node193	NA      39      50 
+node194	NA      38      51 
+node195	NA      37      52
+node196	NA      36      53 
+node197	NA      35      54
+node198	NA      34      55
+node199	NA      33      56
+
+c1	NA	21	5
+c2	NA	22	5
+c3	NA	23	5
+c4	NA	24	5
+c5	NA	25	5
+c6	NA	26	5
+c7	NA	27	5
+c8	NA	27	13
+c9	NA	27	14
+c10	NA	27	15
+c11	NA	27	16
+c12	NA	17	5
+c13	NA	18	5
+c14	NA	19	5
+c15	NA	20	5
+c16	NA	18	5
+c17	NA	16	5
+c18	NA	15	5
+c19	NA	14	5
+c20	NA	13	5
+c21	NA	12	5
+c22	NA	8	5
+c23	NA	18	15
+c24	NA	17	14
+c25	NA	17	15
+c26	NA	17	16
+c27	NA	17	17
+c28	NA	17	18
+c29	NA	17	19
+c30	NA	25	17
+c31	NA	25	18
+c32	NA	25	19
+c33	NA	24	19
+c34	NA	21	19
+c35	NA	9	12
+c36	NA	9	11
+c37	NA	9	10
+c38	NA	9	9
+c39	NA	13	13
+c40	NA	10	15
+c41	NA	10	16
+c42	NA	10	17
+c43	NA	10	18
+c44	NA	10	19
+c45	NA	10	20
+c46	NA	25	20
+c47	NA	25	21
+c48	NA	25	22
+c49	NA	15	22
+c50	NA	15	21
+c51	NA	15	20
+c52	NA	15	19
+c53	NA	15	18
+c54	NA	15	17
+c55	NA	15	16
+c56	NA	15	15
+c57	NA	6	15
+c58	NA	6	16
+c59	NA	6	17
+c60	NA	6	18
+c61	NA	6	19
+c62	NA	6	20
+c63	NA	6	21
+c64	NA	5	22
+c65	NA	4	23
+c66	NA	6	23
+c67	NA	6	26
+c68	NA	6	26
+c69	NA	8	28
+c70	NA	27	22
+c71	NA	27	24
+c72	NA	27	25
+c73	NA	27	26
+c74	NA	27	27
+c75	NA	27	28
+c76	NA	25	28
+c77	NA	16	24
+c78	NA	16	25
+c79	NA	4	26
+c80	NA	4	25
+c81	NA	4	24
+c82	NA	1	26
+c83	NA	4	28
+c84	NA	3	29
+c85	NA	4	30
+c86	NA	3	31
+c87	NA	4	32
+c88	NA	3	33
+c89	NA	4	34
+c90	NA	25	33
+c91	NA	34	28
+c92	NA	35	27
+c93	NA	36	26
+c94	NA	37	25
+c95	NA	38	24
+c96	NA	30	23
+c97	NA	33	22
+c98	NA	31	21
+c99	NA	35	29
+c100	NA	28	33
+c101	NA	28	34
+c102	NA	15	30
+c103	NA	15	31
+c104	NA	15	32
+c105	NA	15	33
+c106	NA	15	34
+c107	NA	20	36
+c108	NA	15	36
+c109	NA	14	37
+c110	NA	13	38
+c111	NA	14	39
+c112	NA	15	40
+c113	NA	16	41
+c114	NA	17	42
+c115	NA	18	43
+c116	NA	21	35
+c117	NA	21	37
+c118	NA	19	37
+c119	NA	20	39
+c120	NA	15	46
+c121	NA	16	47
+c122	NA	17	48
+c123	NA	18	49
+c124	NA	19	50
+c125	NA	20	51
+c126	NA	21	52
+c127	NA	22	53
+c128	NA	23	54
+c129	NA	40	42
+c130	NA	39	43
+c131	NA	38	44
+c132	NA	37	45
+c133	NA	36	46
+c134	NA	35	47
+c135	NA	34	48
+c136	NA	33	49
+c137	NA	32	50
+c138	NA	31	51
+s1	NA	31	53
+s2	NA	31	54
+s3	NA	31	55
+s4	NA	31	56
+s5	NA	31	57
+s6	NA	31	58
+s7	NA	36	57
+s8	NA	35	59
+s9	NA	34	60
+s10	NA	33	62
+s11	NA	32	63
+s12	NA	31	64
+s13	NA	39	45
+s14	NA	39	47
+s15	NA	38	48
+s16	NA	37	49
+s17	NA	41	49
+s18	NA	40	50
+s19	NA	39	51
+s20	NA	38	52
+s21	NA	37	53
+s22	NA	36	54
+s23	NA	35	55
+s24	NA	34	56
+
+
+
+
+
+
+# Note that `node` can be any string. It is possible to access to the node by name using Names::Find, see examples.
+
+# link section defines point-to-point links between nodes and characteristics of these links
+link
+
+# Each line should be in the following format (only first two are required, the rest can be omitted)
+# srcNode   dstNode     bandwidth   metric  delay   queue
+# bandwidth: link bandwidth
+# metric: routing metric
+# delay:  link delay
+# queue:  MaxPackets for transmission queue on the link (both directions)
+node0              node14          100Mbps      1        10ms     10
+node0              node28          100Mbps      1        10ms     10
+node14             node28          100Mbps      1        10ms     10
+node14             node43          100Mbps      1        10ms     10
+node28             node57          100Mbps      1        10ms     10
+node43             node71          100Mbps      1        10ms     10
+node57             node87          100Mbps      1        10ms     10
+node57             node71          100Mbps      1        10ms     10
+node71             node100         100Mbps      1        10ms     10
+node87             node114         100Mbps      1        10ms     10
+node87             node100         100Mbps      1        10ms     10
+node100            node129         100Mbps      1        10ms     10
+node114            node146         100Mbps      1        10ms     10
+node129            node146         100Mbps      1        10ms     10
+node0              node1           100Mbps      1        10ms     10
+node0              node9           100Mbps      1        10ms     10
+node14             node15          100Mbps      1        10ms     10
+node14             node20          100Mbps      1        10ms     10
+node28             node29          100Mbps      1        10ms     10
+node28             node37          100Mbps      1        10ms     10
+node43             node44          100Mbps      1        10ms     10
+node43             node49          100Mbps      1        10ms     10
+node57             node58          100Mbps      1        10ms     10
+node57             node62          100Mbps      1        10ms     10
+node71             node72          100Mbps      1        10ms     10
+node71             node78          100Mbps      1        10ms     10
+node87             node88          100Mbps      1        10ms     10
+node87             node97          100Mbps      1        10ms     10
+node100            node101         100Mbps      1        10ms     10
+node100            node105         100Mbps      1        10ms     10
+node114            node115         100Mbps      1        10ms     10
+node114            node125         100Mbps      1        10ms     10
+node129            node130         100Mbps      1        10ms     10
+node129            node136         100Mbps      1        10ms     10
+node146            node147         100Mbps      1        10ms     10
+node146            node152         100Mbps      1        10ms     10
+node1              node2           100Mbps      1        10ms     10
+node1              node3           100Mbps      1        10ms     10
+node1              node4           100Mbps      1        10ms     10
+node1              node5           100Mbps      1        10ms     10
+node1              node6           100Mbps      1        10ms     10
+node1              node7           100Mbps      1        10ms     10
+node1              node8           100Mbps      1        10ms     10
+node9              node10          100Mbps      1        10ms     10
+node9              node11          100Mbps      1        10ms     10
+node9              node12          100Mbps      1        10ms     10
+node9              node13          100Mbps      1        10ms     10
+node15             node16          100Mbps      1        10ms     10
+node15             node17          100Mbps      1        10ms     10
+node15             node18          100Mbps      1        10ms     10
+node15             node19          100Mbps      1        10ms     10
+node20             node21          100Mbps      1        10ms     10
+node20             node22          100Mbps      1        10ms     10
+node20             node23          100Mbps      1        10ms     10
+node20             node24          100Mbps      1        10ms     10
+node20             node25          100Mbps      1        10ms     10
+node20             node26          100Mbps      1        10ms     10
+node20             node27          100Mbps      1        10ms     10
+node29             node30          100Mbps      1        10ms     10
+node29             node31          100Mbps      1        10ms     10
+node29             node32          100Mbps      1        10ms     10
+node29             node33          100Mbps      1        10ms     10
+node29             node34          100Mbps      1        10ms     10
+node29             node35          100Mbps      1        10ms     10
+node29             node36          100Mbps      1        10ms     10
+node37             node38          100Mbps      1        10ms     10
+node37             node39          100Mbps      1        10ms     10
+node37             node40          100Mbps      1        10ms     10
+node37             node41          100Mbps      1        10ms     10
+node37             node42          100Mbps      1        10ms     10
+node44             node45          100Mbps      1        10ms     10
+node44             node46          100Mbps      1        10ms     10
+node44             node47          100Mbps      1        10ms     10
+node44             node48          100Mbps      1        10ms     10
+node49             node50          100Mbps      1        10ms     10
+node49             node51          100Mbps      1        10ms     10
+node49             node52          100Mbps      1        10ms     10
+node49             node53          100Mbps      1        10ms     10
+node49             node54          100Mbps      1        10ms     10
+node49             node55          100Mbps      1        10ms     10
+node49             node56          100Mbps      1        10ms     10
+node58             node59          100Mbps      1        10ms     10
+node58             node60          100Mbps      1        10ms     10
+node58             node61          100Mbps      1        10ms     10
+node62             node63          100Mbps      1        10ms     10
+node62             node64          100Mbps      1        10ms     10
+node62             node65          100Mbps      1        10ms     10
+node62             node65          100Mbps      1        10ms     10
+node62             node66          100Mbps      1        10ms     10
+node62             node67          100Mbps      1        10ms     10
+node62             node68          100Mbps      1        10ms     10
+node62             node69          100Mbps      1        10ms     10
+node62             node70          100Mbps      1        10ms     10
+node72             node73          100Mbps      1        10ms     10
+node72             node74          100Mbps      1        10ms     10
+node72             node75          100Mbps      1        10ms     10
+node72             node76          100Mbps      1        10ms     10
+node72             node77          100Mbps      1        10ms     10
+node78             node79          100Mbps      1        10ms     10
+node78             node80          100Mbps      1        10ms     10
+node78             node81          100Mbps      1        10ms     10
+node78             node82          100Mbps      1        10ms     10
+node78             node83          100Mbps      1        10ms     10
+node78             node84          100Mbps      1        10ms     10
+node78             node85          100Mbps      1        10ms     10
+node78             node86          100Mbps      1        10ms     10
+node88             node89          100Mbps      1        10ms     10
+node88             node90          100Mbps      1        10ms     10
+node88             node91          100Mbps      1        10ms     10
+node88             node92          100Mbps      1        10ms     10
+node88             node93          100Mbps      1        10ms     10
+node88             node94          100Mbps      1        10ms     10
+node88             node95          100Mbps      1        10ms     10
+node88             node96          100Mbps      1        10ms     10
+node97             node98          100Mbps      1        10ms     10
+node97             node99          100Mbps      1        10ms     10
+node101            node102         100Mbps      1        10ms     10
+node101            node103         100Mbps      1        10ms     10
+node101            node104         100Mbps      1        10ms     10
+node105            node106         100Mbps      1        10ms     10
+node105            node107         100Mbps      1        10ms     10
+node105            node108         100Mbps      1        10ms     10
+node105            node109         100Mbps      1        10ms     10
+node105            node110         100Mbps      1        10ms     10
+node105            node111         100Mbps      1        10ms     10
+node105            node112         100Mbps      1        10ms     10
+node105            node113         100Mbps      1        10ms     10
+node115            node116         100Mbps      1        10ms     10
+node115            node117         100Mbps      1        10ms     10
+node115            node118         100Mbps      1        10ms     10
+node115            node119         100Mbps      1        10ms     10
+node115            node120         100Mbps      1        10ms     10
+node115            node121         100Mbps      1        10ms     10
+node115            node122         100Mbps      1        10ms     10
+node115            node123         100Mbps      1        10ms     10
+node115            node124         100Mbps      1        10ms     10
+node125            node126         100Mbps      1        10ms     10
+node125            node127         100Mbps      1        10ms     10
+node125            node128         100Mbps      1        10ms     10
+node130            node131         100Mbps      1        10ms     10
+node130            node132         100Mbps      1        10ms     10
+node130            node133         100Mbps      1        10ms     10
+node130            node134         100Mbps      1        10ms     10
+node130            node135         100Mbps      1        10ms     10
+node136            node137         100Mbps      1        10ms     10
+node136            node138         100Mbps      1        10ms     10
+node136            node139         100Mbps      1        10ms     10
+node136            node140         100Mbps      1        10ms     10
+node136            node141         100Mbps      1        10ms     10
+node136            node142         100Mbps      1        10ms     10
+node136            node143         100Mbps      1        10ms     10
+node136            node144         100Mbps      1        10ms     10
+node136            node145         100Mbps      1        10ms     10
+node147            node148         100Mbps      1        10ms     10
+node147            node149         100Mbps      1        10ms     10
+node147            node150         100Mbps      1        10ms     10
+node147            node151         100Mbps      1        10ms     10
+node152            node153         100Mbps      1        10ms     10
+node152            node154         100Mbps      1        10ms     10
+node152            node155         100Mbps      1        10ms     10
+node152            node156         100Mbps      1        10ms     10
+node152            node157         100Mbps      1        10ms     10
+node152            node158         100Mbps      1        10ms     10
+node152            node159         100Mbps      1        10ms     10
+node152            node160         100Mbps      1        10ms     10
+node152            node161         100Mbps      1        10ms     10
+node146            node162         100Mbps      1        10ms     10
+node114            node162         100Mbps      1        10ms     10
+node163            node162         100Mbps      1        10ms     10
+node163            node164         100Mbps      1        10ms     10
+node163            node165         100Mbps      1        10ms     10
+node163            node166         100Mbps      1        10ms     10
+node163            node167         100Mbps      1        10ms     10
+node163            node168         100Mbps      1        10ms     10
+node163            node169         100Mbps      1        10ms     10
+node163            node170         100Mbps      1        10ms     10
+node163            node171         100Mbps      1        10ms     10
+node163            node172         100Mbps      1        10ms     10
+node163            node173         100Mbps      1        10ms     10
+node174            node162         100Mbps      1        10ms     10
+node174            node175         100Mbps      1        10ms     10
+node174            node176         100Mbps      1        10ms     10
+node174            node177         100Mbps      1        10ms     10
+node174            node178         100Mbps      1        10ms     10
+node174            node179         100Mbps      1        10ms     10
+node174            node180         100Mbps      1        10ms     10
+node174            node181         100Mbps      1        10ms     10
+node174            node182         100Mbps      1        10ms     10
+node174            node183         100Mbps      1        10ms     10
+node174            node184         100Mbps      1        10ms     10
+node174            node185         100Mbps      1        10ms     10
+node174            node186         100Mbps      1        10ms     10
+node187            node162         100Mbps      1        10ms     10
+node187            node188         100Mbps      1        10ms     10
+node187            node189         100Mbps      1        10ms     10
+node187            node190         100Mbps      1        10ms     10
+node187            node191         100Mbps      1        10ms     10
+node187            node192         100Mbps      1        10ms     10
+node187            node193         100Mbps      1        10ms     10
+node187            node194         100Mbps      1        10ms     10
+node187            node195         100Mbps      1        10ms     10
+node187            node196         100Mbps      1        10ms     10
+node187            node197         100Mbps      1        10ms     10
+node187            node198         100Mbps      1        10ms     10
+node187            node199         100Mbps      1        10ms     10
+
+node2	c1	 100Mbps      1        10ms     10
+node3	c2	 100Mbps      1        10ms     10
+node4	c3	 100Mbps      1        10ms     10
+node5	c4	 100Mbps      1        10ms     10
+node6	c5	 100Mbps      1        10ms     10
+node7	c6	 100Mbps      1        10ms     10
+node8	c7	 100Mbps      1        10ms     10
+node10	c8	 100Mbps      1        10ms     10
+node11	c9	 100Mbps      1        10ms     10
+node12	c10	 100Mbps      1        10ms     10
+node13	c11	 100Mbps      1        10ms     10
+node16	c12	 100Mbps      1        10ms     10
+node17	c13	 100Mbps      1        10ms     10
+node18	c14	 100Mbps      1        10ms     10
+node19	c15	 100Mbps      1        10ms     10
+node21	c16	 100Mbps      1        10ms     10
+node22	c17	 100Mbps      1        10ms     10
+node23	c18	 100Mbps      1        10ms     10
+node24	c19	 100Mbps      1        10ms     10
+node25	c20	 100Mbps      1        10ms     10
+node26	c21	 100Mbps      1        10ms     10
+node27	c22	 100Mbps      1        10ms     10
+node30	c23	 100Mbps      1        10ms     10
+node31	c24	 100Mbps      1        10ms     10
+node32	c25	 100Mbps      1        10ms     10
+node33	c26	 100Mbps      1        10ms     10
+node34	c27	 100Mbps      1        10ms     10
+node35	c28	 100Mbps      1        10ms     10
+node36	c29	 100Mbps      1        10ms     10
+node38	c30	 100Mbps      1        10ms     10
+node39	c31	 100Mbps      1        10ms     10
+node40	c32	 100Mbps      1        10ms     10
+node41	c33	 100Mbps      1        10ms     10
+node42	c34	 100Mbps      1        10ms     10
+node45	c35	 100Mbps      1        10ms     10
+node46	c36	 100Mbps      1        10ms     10
+node47	c37	 100Mbps      1        10ms     10
+node48	c38	 100Mbps      1        10ms     10
+node50	c39	 100Mbps      1        10ms     10
+node51	c40	 100Mbps      1        10ms     10
+node52	c41	 100Mbps      1        10ms     10
+node53	c42	 100Mbps      1        10ms     10
+node54	c43	 100Mbps      1        10ms     10
+node55	c44	 100Mbps      1        10ms     10
+node56	c45	 100Mbps      1        10ms     10
+node59	c46	 100Mbps      1        10ms     10
+node60	c47	 100Mbps      1        10ms     10
+node61	c48	 100Mbps      1        10ms     10
+node63	c49	 100Mbps      1        10ms     10
+node64	c50	 100Mbps      1        10ms     10
+node65	c51	 100Mbps      1        10ms     10
+node66	c52	 100Mbps      1        10ms     10
+node67	c53	 100Mbps      1        10ms     10
+node68	c54	 100Mbps      1        10ms     10
+node69	c55	 100Mbps      1        10ms     10
+node70	c56	 100Mbps      1        10ms     10
+node73	c57	 100Mbps      1        10ms     10
+node74	c58	 100Mbps      1        10ms     10
+node75	c59	 100Mbps      1        10ms     10
+node76	c60	 100Mbps      1        10ms     10
+node77	c61	 100Mbps      1        10ms     10
+node79	c62	 100Mbps      1        10ms     10
+node80	c63	 100Mbps      1        10ms     10
+node81	c64	 100Mbps      1        10ms     10
+node82	c65	 100Mbps      1        10ms     10
+node83	c66	 100Mbps      1        10ms     10
+node84	c67	 100Mbps      1        10ms     10
+node85	c68	 100Mbps      1        10ms     10
+node86	c69	 100Mbps      1        10ms     10
+node89	c70	 100Mbps      1        10ms     10
+node90	c71	 100Mbps      1        10ms     10
+node91	c72	 100Mbps      1        10ms     10
+node92	c73	 100Mbps      1        10ms     10
+node93	c74	 100Mbps      1        10ms     10
+node94	c75	 100Mbps      1        10ms     10
+node95	c76	 100Mbps      1        10ms     10
+node98	c77	 100Mbps      1        10ms     10
+node99	c78	 100Mbps      1        10ms     10
+node102	c79	 100Mbps      1        10ms     10
+node103	c80	 100Mbps      1        10ms     10
+node104	c81	 100Mbps      1        10ms     10
+node106	c82	 100Mbps      1        10ms     10
+node107	c83	 100Mbps      1        10ms     10
+node108	c84	 100Mbps      1        10ms     10
+node109	c85	 100Mbps      1        10ms     10
+node110	c86	 100Mbps      1        10ms     10
+node111	c87	 100Mbps      1        10ms     10
+node112	c88	 100Mbps      1        10ms     10
+node113	c89	 100Mbps      1        10ms     10
+node116	c90	 100Mbps      1        10ms     10
+node117	c91	 100Mbps      1        10ms     10
+node118	c92	 100Mbps      1        10ms     10
+node119	c93	 100Mbps      1        10ms     10
+node120	c94	 100Mbps      1        10ms     10
+node121	c95	 100Mbps      1        10ms     10
+node122	c96	 100Mbps      1        10ms     10
+node123	c97	 100Mbps      1        10ms     10
+node124	c98	 100Mbps      1        10ms     10
+node126	c99	 100Mbps      1        10ms     10
+node127	c100	 100Mbps      1        10ms     10
+node128	c101	 100Mbps      1        10ms     10
+node131	c102	 100Mbps      1        10ms     10
+node132	c103	 100Mbps      1        10ms     10
+node133	c104	 100Mbps      1        10ms     10
+node134	c105	 100Mbps      1        10ms     10
+node135	c106	 100Mbps      1        10ms     10
+node137	c107	 100Mbps      1        10ms     10
+node138	c108	 100Mbps      1        10ms     10
+node139	c109	 100Mbps      1        10ms     10
+node140	c110	 100Mbps      1        10ms     10
+node141	c111	 100Mbps      1        10ms     10
+node142	c112	 100Mbps      1        10ms     10
+node143	c113	 100Mbps      1        10ms     10
+node144	c114	 100Mbps      1        10ms     10
+node145	c115	 100Mbps      1        10ms     10
+node148	c116	 100Mbps      1        10ms     10
+node149	c117	 100Mbps      1        10ms     10
+node150	c118	 100Mbps      1        10ms     10
+node151	c119	 100Mbps      1        10ms     10
+node153	c120	 100Mbps      1        10ms     10
+node154	c121	 100Mbps      1        10ms     10
+node155	c122	 100Mbps      1        10ms     10
+node156	c123	 100Mbps      1        10ms     10
+node157	c124	 100Mbps      1        10ms     10
+node158	c125	 100Mbps      1        10ms     10
+node159	c126	 100Mbps      1        10ms     10
+node160	c127	 100Mbps      1        10ms     10
+node161	c128	 100Mbps      1        10ms     10
+node164	c129	 100Mbps      1        10ms     10
+node165	c130	 100Mbps      1        10ms     10
+node166	c131	 100Mbps      1        10ms     10
+node167	c132	 100Mbps      1        10ms     10
+node168	c133	 100Mbps      1        10ms     10
+node169	c134	 100Mbps      1        10ms     10
+node170	c135	 100Mbps      1        10ms     10
+node171	c136	 100Mbps      1        10ms     10
+node172	c137	 100Mbps      1        10ms     10
+node173	c138	 100Mbps      1        10ms     10
+node175	s1	 100Mbps      1        10ms     10
+node176	s2	 100Mbps      1        10ms     10
+node177	s3	 100Mbps      1        10ms     10
+node178	s4	 100Mbps      1        10ms     10
+node179	s5	 100Mbps      1        10ms     10
+node180	s6	 100Mbps      1        10ms     10
+node181	s7	 100Mbps      1        10ms     10
+node182	s8	 100Mbps      1        10ms     10
+node183	s9	 100Mbps      1        10ms     10
+node184	s10	 100Mbps      1        10ms     10
+node185	s11	 100Mbps      1        10ms     10
+node186	s12	 100Mbps      1        10ms     10
+node188	s13	 100Mbps      1        10ms     10
+node189	s14	 100Mbps      1        10ms     10
+node190	s15	 100Mbps      1        10ms     10
+node191	s16	 100Mbps      1        10ms     10
+node192	s17	 100Mbps      1        10ms     10
+node193	s18	 100Mbps      1        10ms     10
+node194	s19	 100Mbps      1        10ms     10
+node195	s20	 100Mbps      1        10ms     10
+node196	s21	 100Mbps      1        10ms     10
+node197	s22	 100Mbps      1        10ms     10
+node198	s23	 100Mbps      1        10ms     10
+node199	s24	 100Mbps      1        10ms     10
+
+
+
+
+
+
+
+
+
