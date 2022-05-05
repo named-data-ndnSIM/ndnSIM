@@ -80,8 +80,6 @@ BOOST_AUTO_TEST_CASE(EncodePrintData)
   auto packet(lpPacket.wireEncode());
   BlockHeader header(packet);
 
-  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 1350);
-
   {
     Ptr<Packet> packet = Create<Packet>();
     packet->AddHeader(header);
@@ -89,6 +87,9 @@ BOOST_AUTO_TEST_CASE(EncodePrintData)
     packet->Print(output);
     BOOST_CHECK(output.is_equal("ns3::ndn::Packet (Data: /other/prefix)"));
   }
+
+  BOOST_TEST(data.getKeyLocator()->getName() == "/dummy/KEY/-%9C%28r%B8%AA%3B%60/NA/%FD%00%00%01%5E%DF%3C%C6%7C");
+  BOOST_CHECK_EQUAL(header.GetSerializedSize(), 1365);
 }
 
 BOOST_AUTO_TEST_CASE(PrintLpPacket)
