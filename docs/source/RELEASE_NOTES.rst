@@ -5,6 +5,28 @@ This file contains ndnSIM release notes.
 
 All of the ndnSIM documentation is accessible from the `ndnSIM website <https://ndnsim.net>`__.
 
+Release 2.9 (NFD 22.02)
+-----------------------
+
+- Update the submodule of NFD to version 22.02
+
+  `NFD 22.02 release notes <https://named-data.net/doc/NFD/22.02/RELEASE_NOTES.html>`__
+
+    .. note::
+       In order to retrieve the marked versions of ndn-cxx and NFD, use
+       ``--recursive`` option to the git clone command or run ``git
+       submodule update --init`` after clone, pull, or merge.
+
+- Update the submodule of ndn-cxx to version 0.8.0-18-g4999b2ed
+
+  `ndn-cxx 0.8.0 release notes <https://named-data.net/doc/ndn-cxx/0.8.0/RELEASE_NOTES.html>`__
+
+- Base NS-3 was rebased to version 3.35
+
+- The compilation now uses the C++17 standard.
+
+- Update uses of ``QueueBase::MaxSize`` to ``DropTailQueue<Packet>::MaxSize``
+
 Release 2.8
 -----------
 

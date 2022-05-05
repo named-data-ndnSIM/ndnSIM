@@ -9,10 +9,10 @@ Portability
 
 ndnSIM 2.x has been successfully compiled and used on following platforms:
 
-- Ubuntu Linux 20.04
-- Ubuntu Linux 18.04
-- macOS 10.15
-- macOS 10.14
+-  Ubuntu 20.04 (amd64)
+-  Ubuntu 21.10 (amd64)
+-  macOS 12 (Intel only)
+-  macOS 11 (Intel only)
 
 .. _requirements:
 
@@ -21,11 +21,13 @@ Prerequisites
 
 **1. Core dependencies**
 
--  ``python`` >= 3.5
--  ``libsqlite3``
--  ``pkg-config``
--  ``openssl``
--  Boost libraries >= 1.54
+-  GCC >= 7.4 or clang >= 4.0 (on Linux and FreeBSD)
+-  Xcode >= 9.0 (on macOS)
+-  Python >= 3.6
+-  pkg-config
+-  Boost >= 1.65.1
+-  OpenSSL >= 1.0.2
+-  SQLite 3.x
 
 .. role:: red
 

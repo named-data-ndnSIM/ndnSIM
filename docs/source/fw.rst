@@ -21,7 +21,7 @@ Available forwarding strategies
 +--------------------------------------------+----------------------------------------------------------------------------------------------+
 | Strategy Name                              | Description                                                                                  |
 +============================================+==============================================================================================+
-| ``/localhost/nfd/strategy/best-route``     | :nfd:`Best Route Strategy <nfd::fw::BestRouteStrategy2>` **(default)**                       |
+| ``/localhost/nfd/strategy/best-route``     | :nfd:`Best Route Strategy <nfd::fw::BestRouteStrategy>` **(default)**                        |
 |                                            |                                                                                              |
 |                                            | The best route strategy forwards an Interest to the                                          |
 |                                            | upstream with lowest routing cost.                                                           |
