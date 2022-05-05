@@ -47,7 +47,7 @@ AppLinkService::~AppLinkService()
 }
 
 void
-AppLinkService::doSendInterest(const Interest& interest, const nfd::EndpointId& endpoint)
+AppLinkService::doSendInterest(const Interest& interest)
 {
   NS_LOG_FUNCTION(this << &interest);
 
@@ -56,7 +56,7 @@ AppLinkService::doSendInterest(const Interest& interest, const nfd::EndpointId& 
 }
 
 void
-AppLinkService::doSendData(const Data& data, const nfd::EndpointId& endpoint)
+AppLinkService::doSendData(const Data& data)
 {
   NS_LOG_FUNCTION(this << &data);
 
@@ -65,7 +65,7 @@ AppLinkService::doSendData(const Data& data, const nfd::EndpointId& endpoint)
 }
 
 void
-AppLinkService::doSendNack(const lp::Nack& nack, const nfd::EndpointId& endpoint)
+AppLinkService::doSendNack(const lp::Nack& nack)
 {
   NS_LOG_FUNCTION(this << &nack);
 

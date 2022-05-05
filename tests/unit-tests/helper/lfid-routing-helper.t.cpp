@@ -24,7 +24,7 @@
 #include "model/ndn-l3-protocol.hpp"
 #include "model/ndn-net-device-transport.hpp"
 
-#include "NFD/daemon/fw/best-route-strategy2.hpp"
+#include "NFD/daemon/fw/best-route-strategy.hpp"
 
 #include "ns3/channel.h"
 #include "ns3/net-device.h"
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(CalculateRouteAbilene)
 
   // IMPORTANT: Some strategy needs to be installed for test to work.
   ndn::StrategyChoiceHelper str;
-  str.InstallAll<nfd::fw::BestRouteStrategy2>("/");
+  str.InstallAll<nfd::fw::BestRouteStrategy>("/");
 
   int numNexthops = 0;
 

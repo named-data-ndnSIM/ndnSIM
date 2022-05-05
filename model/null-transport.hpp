@@ -54,7 +54,7 @@ private:
   }
 
   void
-  doSend(const Block& packet, const nfd::EndpointId& endpoint) final
+  doSend(const Block& packet) final
   {
   }
 };

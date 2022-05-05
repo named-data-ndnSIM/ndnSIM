@@ -106,7 +106,7 @@ NetDeviceTransport::doClose()
 }
 
 void
-NetDeviceTransport::doSend(const Block& packet, const nfd::EndpointId& endpoint)
+NetDeviceTransport::doSend(const Block& packet)
 {
   NS_LOG_FUNCTION(this << "Sending packet from netDevice with URI"
                   << this->getLocalUri());

@@ -60,13 +60,13 @@ public:
 
 private:
   virtual void
-  doSendInterest(const Interest& interest, const nfd::EndpointId& endpoint) override;
+  doSendInterest(const Interest& interest) override;
 
   virtual void
-  doSendData(const Data& data, const nfd::EndpointId& endpoint) override;
+  doSendData(const Data& data) override;
 
   virtual void
-  doSendNack(const lp::Nack& nack, const nfd::EndpointId& endpoint) override;
+  doSendNack(const lp::Nack& nack) override;
 
   virtual void
   doReceivePacket(const Block& packet, const nfd::EndpointId& endpoint) override

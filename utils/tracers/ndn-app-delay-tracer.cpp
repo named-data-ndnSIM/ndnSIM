@@ -197,13 +197,12 @@ AppDelayTracer::~AppDelayTracer(){};
 void
 AppDelayTracer::Connect()
 {
-  Config::ConnectWithoutContext("/NodeList/" + m_node
-                                  + "/ApplicationList/*/LastRetransmittedInterestDataDelay",
-                                MakeCallback(&AppDelayTracer::LastRetransmittedInterestDataDelay,
-                                             this));
+  Config::ConnectWithoutContextFailSafe("/NodeList/" + m_node + "/ApplicationList/*/LastRetransmittedInterestDataDelay",
+                                        MakeCallback(&AppDelayTracer::LastRetransmittedInterestDataDelay,
+                                                     this));
 
-  Config::ConnectWithoutContext("/NodeList/" + m_node + "/ApplicationList/*/FirstInterestDataDelay",
-                                MakeCallback(&AppDelayTracer::FirstInterestDataDelay, this));
+  Config::ConnectWithoutContextFailSafe("/NodeList/" + m_node + "/ApplicationList/*/FirstInterestDataDelay",
+                                        MakeCallback(&AppDelayTracer::FirstInterestDataDelay, this));
 }
 
 void

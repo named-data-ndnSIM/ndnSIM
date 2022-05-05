@@ -140,7 +140,7 @@ BlockHeader::Print(std::ostream& os) const
           ::ndn::Buffer::const_iterator first, last;
           std::tie(first, last) = p.get<lp::FragmentField>(0);
           try {
-            Block fragmentBlock(&*first, std::distance(first, last));
+            Block fragmentBlock(::ndn::make_span(&*first, std::distance(first, last)));
             decodeAndPrint(fragmentBlock);
           }
           catch (const tlv::Error& error) {

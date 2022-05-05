@@ -83,8 +83,7 @@ public:
   hasKey(const Name& keyName) const override;
 
   void
-  addKey(const Name& identity, const Name& keyName, const uint8_t* key,
-         size_t keyLen) override;
+  addKey(const Name& identity, const Name& keyName, span<const uint8_t> key) override;
 
   void
   removeKey(const Name& keyName) override;
@@ -106,12 +105,12 @@ public:
   hasCertificate(const Name& certName) const override;
 
   void
-  addCertificate(const v2::Certificate& certificate) override;
+  addCertificate(const Certificate& certificate) override;
 
   void
   removeCertificate(const Name& certName) override;
 
-  v2::Certificate
+  Certificate
   getCertificate(const Name& certificateName) const override;
 
   std::set<Name>
@@ -120,7 +119,7 @@ public:
   void
   setDefaultCertificateOfKey(const Name& keyName, const Name& certName) override;
 
-  v2::Certificate
+  Certificate
   getDefaultCertificateOfKey(const Name& keyName) const override;
 
   static std::string
@@ -145,14 +144,13 @@ public:
 
 private:
   ConstBufferPtr
-  doSign(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t size) const final;
+  doSign(DigestAlgorithm digestAlgorithm, const InputBuffers& bufs) const final;
 
   bool
-  doVerify(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t bufLen,
-           const uint8_t* sig, size_t sigLen) const final;
+  doVerify(DigestAlgorithm digestAlgorithm, const InputBuffers& bufs, span<const uint8_t> sig) const final;
 
   ConstBufferPtr
-  doDecrypt(const uint8_t* cipherText, size_t cipherTextLen) const final;
+  doDecrypt(span<const uint8_t> cipherText) const final;
 
   ConstBufferPtr
   doDerivePublicKey() const final;
@@ -211,7 +209,7 @@ private:
   doExportKey(const Name& keyName, const char* pw, size_t pwLen) final;
 
   void
-  doImportKey(const Name& keyName, const uint8_t* pkcs8, size_t pkcs8Len, const char* pw, size_t pwLen) final;
+  doImportKey(const Name& keyName, span<const uint8_t> pkcs8, const char* pw, size_t pwLen) final;
 
   void
   doImportKey(const Name& keyName, shared_ptr<transform::PrivateKey> key) final;

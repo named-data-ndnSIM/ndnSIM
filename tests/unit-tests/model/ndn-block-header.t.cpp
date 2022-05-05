@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(EncodePrintInterest)
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (Interest: /prefix?CanBePrefix&Nonce=10)"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (Interest: /prefix?CanBePrefix&Nonce=0000000a)"));
   }
 }
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=0000000a))"));
   }
 
   lpPacket.add<::ndn::lp::NackField>(::ndn::lp::NackHeader().setReason(::ndn::lp::NackReason::NO_ROUTE));
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(NACK(NoRoute) for Interest: /prefix?CanBePrefix&Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(NACK(NoRoute) for Interest: /prefix?CanBePrefix&Nonce=0000000a))"));
   }
 
   lpPacket.remove<::ndn::lp::NackField>();
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(PrintLpPacket)
     packet->AddHeader(header);
     boost::test_tools::output_test_stream output;
     packet->Print(output);
-    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=10))"));
+    BOOST_CHECK(output.is_equal("ns3::ndn::Packet (NDNLP(Interest: /prefix?CanBePrefix&Nonce=0000000a))"));
   }
 
   lpPacket.set<::ndn::lp::FragCountField>(2);

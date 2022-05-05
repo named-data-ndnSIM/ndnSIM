@@ -110,17 +110,18 @@ Producer::OnInterest(shared_ptr<const Interest> interest)
 
   data->setContent(make_shared< ::ndn::Buffer>(m_virtualPayloadSize));
 
-  Signature signature;
   SignatureInfo signatureInfo(static_cast< ::ndn::tlv::SignatureTypeValue>(255));
 
   if (m_keyLocator.size() > 0) {
     signatureInfo.setKeyLocator(m_keyLocator);
   }
 
-  signature.setInfo(signatureInfo);
-  signature.setValue(::ndn::makeNonNegativeIntegerBlock(::ndn::tlv::SignatureValue, m_signature));
+  data->setSignatureInfo(signatureInfo);
 
-  data->setSignature(signature);
+  ::ndn::EncodingEstimator estimator;
+  ::ndn::EncodingBuffer encoder(estimator.appendVarNumber(m_signature), 0);
+  encoder.appendVarNumber(m_signature);
+  data->setSignatureValue(encoder.getBuffer());
 
   NS_LOG_INFO("node(" << GetNode()->GetId() << ") responding with Data: " << data->getName());
 

@@ -30,7 +30,7 @@
 #include "ns3/ndnSIM/model/ndn-l3-protocol.hpp"
 #include "ns3/ndnSIM/model/ndn-net-device-transport.hpp"
 //#include "ns3/ndnSIM/NFD/daemon/fw/random-strategy.hpp"
-#include "ns3/ndnSIM/NFD/daemon/fw/best-route-strategy2.hpp"
+#include "ns3/ndnSIM/NFD/daemon/fw/best-route-strategy.hpp"
 #include "ns3/ndnSIM/utils/topology/annotated-topology-reader.hpp"
 
 namespace ns3 {
@@ -120,7 +120,7 @@ main(int argc, char* argv[])
 
   // IMPORTANT: Some strategy needs to be installed for displayRoutes() to work.
   ndn::StrategyChoiceHelper strategyHelper;
-  strategyHelper.InstallAll<nfd::fw::BestRouteStrategy2>("/");
+  strategyHelper.InstallAll<nfd::fw::BestRouteStrategy>("/");
 
   // TODO: Needs RandomStrategy for test to work!
   // Uncomment after NFD version has been updated.

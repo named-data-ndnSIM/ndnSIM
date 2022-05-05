@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(TestNfdContentStorePolicy)
   // setting default parameters for PointToPoint links and channels
   Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
   Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-  Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"));
+  Config::SetDefault("ns3::DropTailQueue<Packet>::MaxSize", StringValue("20p"));
 
   // Creating nodes
   NodeContainer nodes;

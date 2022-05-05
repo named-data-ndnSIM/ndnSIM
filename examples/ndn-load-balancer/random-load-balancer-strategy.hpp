@@ -42,7 +42,7 @@ public:
   ~RandomLoadBalancerStrategy() override;
 
   void
-  afterReceiveInterest(const FaceEndpoint& ingress, const Interest& interest,
+  afterReceiveInterest(const Interest& interest, const FaceEndpoint& ingress,
                        const shared_ptr<pit::Entry>& pitEntry) override;
 
   static const Name&

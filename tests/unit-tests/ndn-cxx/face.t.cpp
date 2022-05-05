@@ -37,7 +37,7 @@ public:
   {
     Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
     Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"));
-    Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"));
+    Config::SetDefault("ns3::DropTailQueue<Packet>::MaxSize", StringValue("20p"));
 
     createTopology({{"A", "B"}});
     addRoutes({{"A", "B", "/test", 1}});
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(SetInterestFilter)
 {
   FactoryCallbackApp::Install(getNode("B"), [this] () -> shared_ptr<void> {
       return make_shared<BasicProducer>("/test", [this] (const Name& interest) {
-          BOOST_CHECK_EQUAL(interest, "/test/prefix/%FE%00");
+          BOOST_CHECK_EQUAL(interest, "/test/prefix/seq=0");
           this->hasFired = true;
         },
         [] {

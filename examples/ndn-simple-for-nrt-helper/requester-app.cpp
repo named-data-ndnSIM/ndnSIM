@@ -72,7 +72,7 @@ private:
     m_delegation = delegation;
 
     m_link = ::ndn::Link(Name(m_name).append("/LINK"));
-    m_link.addDelegation(1, m_delegation);
+    m_link.addDelegation(m_delegation);
     ndn::StackHelper::getKeyChain().sign(m_link, ::ndn::security::SigningInfo(::ndn::security::SigningInfo::SIGNER_TYPE_SHA256));
 
     NS_LOG_DEBUG("Created Link Object "<< m_link);
@@ -90,7 +90,7 @@ private:
     auto interest = make_shared<Interest>(m_name);
     interest->setInterestLifetime(time::seconds(1));
     if (m_delegation.size() > 0) {
-      interest->setForwardingHint(m_link.getDelegationList());
+      interest->setForwardingHint({m_link.getDelegationList().begin(), m_link.getDelegationList().end()});
     }
 
     NS_LOG_DEBUG("Sending an Interest for "<< *interest);

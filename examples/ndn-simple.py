@@ -47,7 +47,7 @@ from ns.ndnSIM import *
 # Set default parameters for PointToPoint links and channels
 Config.SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"))
 Config.SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"))
-Config.SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"))
+Config.SetDefault("ns3::DropTailQueue<Packet>::MaxSize", StringValue("20p"))
 
 # Read optional command-line parameters (e.g., enable visualizer with ./waf --pyrun=<> --visualize
 import sys; cmd = CommandLine(); cmd.Parse(sys.argv);

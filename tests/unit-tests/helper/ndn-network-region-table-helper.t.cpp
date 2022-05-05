@@ -26,9 +26,6 @@
 namespace ns3 {
 namespace ndn {
 
-using ::ndn::Delegation;
-using ::ndn::DelegationList;
-
 BOOST_AUTO_TEST_SUITE(HelperNdnNetworkRegionTableHelper)
 
 class BasicFixture : public ScenarioHelperWithCleanupFixture
@@ -95,14 +92,12 @@ protected:
   ::ndn::Face m_face;
 };
 
-DelegationList
+std::vector<Name>
 makeHint(const Name& delegation)
 {
-  Delegation del;
-  del.name = Name(delegation);
-  del.preference = 1;
-  DelegationList list({del});
-  return list;
+  std::vector<Name> ret;
+  ret.push_back(delegation);
+  return ret;
 }
 
 class MultiNodeWithAppFixture : public ScenarioHelperWithCleanupFixture

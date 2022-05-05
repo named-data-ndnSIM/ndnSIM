@@ -49,8 +49,7 @@ RandomLoadBalancerStrategy::~RandomLoadBalancerStrategy()
 static bool
 canForwardToNextHop(const Face& inFace, shared_ptr<pit::Entry> pitEntry, const fib::NextHop& nexthop)
 {
-  return !wouldViolateScope(inFace, pitEntry->getInterest(), nexthop.getFace()) &&
-    canForwardToLegacy(*pitEntry, nexthop.getFace());
+  return !wouldViolateScope(inFace, pitEntry->getInterest(), nexthop.getFace());
 }
 
 static bool
@@ -61,7 +60,7 @@ hasFaceForForwarding(const Face& inFace, const fib::NextHopList& nexthops, const
 }
 
 void
-RandomLoadBalancerStrategy::afterReceiveInterest(const FaceEndpoint& ingress, const Interest& interest,
+RandomLoadBalancerStrategy::afterReceiveInterest(const Interest& interest, const FaceEndpoint& ingress,
                                                  const shared_ptr<pit::Entry>& pitEntry)
 {
   NFD_LOG_TRACE("afterReceiveInterest");
@@ -92,7 +91,7 @@ RandomLoadBalancerStrategy::afterReceiveInterest(const FaceEndpoint& ingress, co
     }
   } while (!canForwardToNextHop(ingress.face, pitEntry, *selected));
 
-  this->sendInterest(pitEntry, FaceEndpoint(selected->getFace(), 0), interest);
+  this->sendInterest(interest, selected->getFace(), pitEntry);
 }
 
 const Name&

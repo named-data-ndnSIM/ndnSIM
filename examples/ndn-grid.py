@@ -51,7 +51,7 @@ from ns.ndnSIM import *
 
 Config.SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"))
 Config.SetDefault("ns3::PointToPointChannel::Delay", StringValue("10ms"))
-Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("20p"))
+Config::SetDefault("ns3::DropTailQueue<Packet>::MaxSize", StringValue("20p"))
 
 import sys; cmd = CommandLine(); cmd.Parse(sys.argv);
 

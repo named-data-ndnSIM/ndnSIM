@@ -66,8 +66,8 @@ static const uint8_t DUMMY_SIGNATURE[] =
 const std::string DummyPib::SCHEME = "pib-dummy";
 const std::string DummyTpm::SCHEME = "tpm-dummy";
 
-NDN_CXX_V2_KEYCHAIN_REGISTER_PIB_BACKEND(DummyPib);
-NDN_CXX_V2_KEYCHAIN_REGISTER_TPM_BACKEND(DummyTpm);
+NDN_CXX_KEYCHAIN_REGISTER_PIB_BACKEND(DummyPib);
+NDN_CXX_KEYCHAIN_REGISTER_TPM_BACKEND(DummyTpm);
 
 DummyPib::DummyPib(const std::string& locator)
 {
@@ -132,8 +132,7 @@ DummyPib::hasKey(const Name& keyName) const
 }
 
 void
-DummyPib::addKey(const Name& identity, const Name& keyName,
-                 const uint8_t* key, size_t keyLen)
+DummyPib::addKey(const Name& identity, const Name& keyName, span<const uint8_t> key)
 {
 }
 
@@ -148,7 +147,7 @@ DummyPib::getKeyBits(const Name& keyName) const
     typedef boost::iostreams::stream<boost::iostreams::array_source> arrayStream;
     arrayStream
     is(reinterpret_cast<const char*>(DUMMY_CERT), sizeof(DUMMY_CERT));
-    auto cert = io::load<v2::Certificate>(is, io::BASE64);
+    auto cert = io::load<Certificate>(is, io::BASE64);
     return cert->getPublicKey();
 }
 
@@ -178,7 +177,7 @@ DummyPib::hasCertificate(const Name& certName) const
 }
 
 void
-DummyPib::addCertificate(const v2::Certificate& certificate)
+DummyPib::addCertificate(const Certificate& certificate)
 {
 }
 
@@ -187,15 +186,15 @@ DummyPib::removeCertificate(const Name& certName)
 {
 }
 
-v2::Certificate
+Certificate
 DummyPib::getCertificate(const Name& certificateName) const
 {
-  static shared_ptr<v2::Certificate> cert = nullptr;
+  static shared_ptr<Certificate> cert = nullptr;
   if (cert == nullptr) {
     typedef boost::iostreams::stream<boost::iostreams::array_source> arrayStream;
     arrayStream
     is(reinterpret_cast<const char*>(DUMMY_CERT), sizeof(DUMMY_CERT));
-    cert = io::load<v2::Certificate>(is, io::BASE64);
+    cert = io::load<Certificate>(is, io::BASE64);
   }
 
   return *cert;
@@ -214,15 +213,15 @@ DummyPib::setDefaultCertificateOfKey(const Name& keyName, const Name& certName)
 {
 }
 
-v2::Certificate
+Certificate
 DummyPib::getDefaultCertificateOfKey(const Name& keyName) const
 {
-  static shared_ptr<v2::Certificate> cert = nullptr;
+  static shared_ptr<Certificate> cert = nullptr;
   if (cert == nullptr) {
     typedef boost::iostreams::stream<boost::iostreams::array_source> arrayStream;
     arrayStream
     is(reinterpret_cast<const char*>(DUMMY_CERT), sizeof(DUMMY_CERT));
-    cert = io::load<v2::Certificate>(is, io::BASE64);
+    cert = io::load<Certificate>(is, io::BASE64);
   }
 
   return *cert;
@@ -246,20 +245,19 @@ DummyKeyHandle::DummyKeyHandle(shared_ptr<transform::PrivateKey> key)
 }
 
 ConstBufferPtr
-DummyKeyHandle::doSign(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t size) const
+DummyKeyHandle::doSign(DigestAlgorithm digestAlgorithm, const InputBuffers& bufs) const
 {
   return make_shared<Buffer>(DUMMY_SIGNATURE, sizeof(DUMMY_SIGNATURE));
 }
 
 bool
-DummyKeyHandle::doVerify(DigestAlgorithm digestAlgorithm, const uint8_t* buf, size_t bufLen,
-                         const uint8_t* sig, size_t sigLen) const
+DummyKeyHandle::doVerify(DigestAlgorithm digestAlgorithm, const InputBuffers& bufs, span<const uint8_t> sig) const
 {
   throw Error("Not supported");
 }
 
 ConstBufferPtr
-DummyKeyHandle::doDecrypt(const uint8_t* cipherText, size_t cipherTextLen) const
+DummyKeyHandle::doDecrypt(span<const uint8_t> cipherText) const
 {
   throw Error("Not supported");
 }
@@ -331,7 +329,7 @@ DummyTpm::doExportKey(const Name& keyName, const char* pw, size_t pwLen)
 }
 
 void
-DummyTpm::doImportKey(const Name& keyName, const uint8_t* pkcs8, size_t pkcs8Len, const char* pw, size_t pwLen)
+DummyTpm::doImportKey(const Name& keyName, span<const uint8_t> pkcs8, const char* pw, size_t pwLen)
 {
   throw Error("Not supported");
 }

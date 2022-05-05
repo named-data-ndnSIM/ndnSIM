@@ -62,17 +62,16 @@ main(int argc, char* argv[])
   //////////////////////
   WifiHelper wifi;
   // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
-  wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
+  wifi.SetStandard(WIFI_STANDARD_80211a);
   wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",
                                StringValue("OfdmRate24Mbps"));
 
-  YansWifiChannelHelper wifiChannel; // = YansWifiChannelHelper::Default ();
+  YansWifiChannelHelper wifiChannel;
   wifiChannel.SetPropagationDelay("ns3::ConstantSpeedPropagationDelayModel");
   wifiChannel.AddPropagationLoss("ns3::ThreeLogDistancePropagationLossModel");
   wifiChannel.AddPropagationLoss("ns3::NakagamiPropagationLossModel");
 
-  // YansWifiPhy wifiPhy = YansWifiPhy::Default();
-  YansWifiPhyHelper wifiPhyHelper = YansWifiPhyHelper::Default();
+  YansWifiPhyHelper wifiPhyHelper;
   wifiPhyHelper.SetChannel(wifiChannel.Create());
   wifiPhyHelper.Set("TxPowerStart", DoubleValue(5));
   wifiPhyHelper.Set("TxPowerEnd", DoubleValue(5));

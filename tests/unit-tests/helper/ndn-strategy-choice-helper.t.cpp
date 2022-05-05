@@ -33,7 +33,7 @@ public:
   {
     Config::SetDefault("ns3::PointToPointNetDevice::DataRate", StringValue("10Mbps"));
     Config::SetDefault("ns3::PointToPointChannel::Delay", StringValue("1ms"));
-    Config::SetDefault("ns3::QueueBase::MaxSize", StringValue("500p"));
+    Config::SetDefault("ns3::DropTailQueue<Packet>::MaxSize", StringValue("500p"));
 
     // Creating two 3 node topologies:                      //
     //                                                      //
@@ -150,7 +150,7 @@ public:
   }
 
   void
-  afterReceiveInterest(const nfd::FaceEndpoint& ingress, const Interest& interest,
+  afterReceiveInterest(const Interest& interest, const nfd::FaceEndpoint& ingress,
                        const shared_ptr<nfd::pit::Entry>& pitEntry) override
   {
     // this strategy doesn't forward interests

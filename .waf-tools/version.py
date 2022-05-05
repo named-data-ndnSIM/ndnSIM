@@ -23,7 +23,7 @@ def getVersion(conf, submodule, **kw):
         p = Utils.subprocess.Popen(cmd, stdout=Utils.subprocess.PIPE,
                                    cwd=submodule.abspath(),
                                    stderr=None, stdin=None)
-        out = str(p.communicate()[0].strip())
+        out = p.communicate()[0].strip().decode('utf-8')
         didGetVersion = (p.returncode == 0 and out != "")
         if didGetVersion:
             if out.startswith(tagPrefix):
@@ -33,7 +33,7 @@ def getVersion(conf, submodule, **kw):
     except OSError:
         pass
 
-    versionFile = submodule.find_node('VERSION')
+    versionFile = submodule.find_node('VERSION.info')
 
     if not didGetVersion and versionFile is not None:
         try:
@@ -49,7 +49,7 @@ def getVersion(conf, submodule, **kw):
         except (OSError, IOError):
             Logs.warn("VERSION file exists, but not readable")
     else:
-        versionFile = submodule.make_node('VERSION')
+        versionFile = submodule.make_node('VERSION.info')
 
     if versionFile:
         try:

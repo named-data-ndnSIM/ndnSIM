@@ -30,7 +30,7 @@ def configure(conf):
 
     conf.check_cxx(lib='pthread', uselib_store='PTHREAD', define_name='HAVE_PTHREAD', mandatory=False)
     conf.check_sqlite3(mandatory=True)
-    conf.check_openssl(mandatory=True, use='OPENSSL', atleast_version=0x10001000)
+    conf.check_openssl(mandatory=True, use='OPENSSL', atleast_version='1.1.1')
 
     if not conf.env['LIB_BOOST']:
         conf.report_optional_feature("ndnSIM", "ndnSIM", False,
@@ -77,15 +77,22 @@ def configure(conf):
     conf.write_config_header('../../ns3/ndnSIM/NFD/core/config.hpp', remove=False)
 
 def build(bld):
-    (base, build, split) = bld.getVersion('NFD')
+    (base, build, VERSION_SPLIT) = bld.getVersion('NFD')
+
+    vmajor = int(VERSION_SPLIT[0])
+    vminor = int(VERSION_SPLIT[1]) if len(VERSION_SPLIT) >= 2 else 0
+    vpatch = int(VERSION_SPLIT[2]) if len(VERSION_SPLIT) >= 3 else 0
+
     bld(features="subst",
         name="version-NFD",
         source='NFD/core/version.hpp.in', target='../../ns3/ndnSIM/NFD/core/version.hpp',
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
-        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
-        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+        VERSION=vmajor * 1000000 + vminor * 1000 + vpatch,
+        VERSION_MAJOR=str(vmajor),
+        VERSION_MINOR=str(vminor),
+        VERSION_PATCH=str(vpatch))
 
     bld(features="subst",
         name="versioncpp-NFD",
@@ -93,8 +100,10 @@ def build(bld):
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
-        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
-        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+        VERSION=vmajor * 1000000 + vminor * 1000 + vpatch,
+        VERSION_MAJOR=str(vmajor),
+        VERSION_MINOR=str(vminor),
+        VERSION_PATCH=str(vpatch))
 
     bld.objects(
         features="cxx",
@@ -103,15 +112,21 @@ def build(bld):
         includes='../../ns3/ndnSIM/NFD',
         use='version-NFD versioncpp-NFD')
 
-    (base, build, split) = bld.getVersion('ndn-cxx')
+    (base, build, VERSION_SPLIT) = bld.getVersion('ndn-cxx')
+    vmajor = int(VERSION_SPLIT[0])
+    vminor = int(VERSION_SPLIT[1]) if len(VERSION_SPLIT) >= 2 else 0
+    vpatch = int(VERSION_SPLIT[2]) if len(VERSION_SPLIT) >= 3 else 0
+
     bld(features="subst",
         name="version-ndn-cxx",
         source='ndn-cxx/ndn-cxx/version.hpp.in', target='../../ns3/ndnSIM/ndn-cxx/version.hpp',
         install_path=None,
         VERSION_STRING=base,
         VERSION_BUILD="%s-ndnSIM" % build,
-        VERSION=int(split[0]) * 1000000 + int(split[1]) * 1000 + int(split[2]),
-        VERSION_MAJOR=split[0], VERSION_MINOR=split[1], VERSION_PATCH=split[2])
+        VERSION=vmajor * 1000000 + vminor * 1000 + vpatch,
+        VERSION_MAJOR=str(vmajor),
+        VERSION_MINOR=str(vminor),
+        VERSION_PATCH=str(vpatch))
 
     deps = ['core', 'network', 'point-to-point', 'topology-read', 'mobility', 'internet']
     if 'ns3-visualizer' in bld.env['NS3_ENABLED_MODULES']:
@@ -125,7 +140,8 @@ def build(bld):
                                         'ndn-cxx/ndn-cxx/net/network-monitor*.cpp',
                                         'ndn-cxx/ndn-cxx/util/dummy-client-face.cpp',
                                         'ndn-cxx/ndn-cxx/**/*osx.cpp',
-                                        'ndn-cxx/ndn-cxx/net/network-interface.cpp'])
+                                        'ndn-cxx/ndn-cxx/net/network-interface.cpp',
+                                        'ndn-cxx/**/*-android.cpp'])
 
     nfdSrc = bld.path.ant_glob(['%s/**/*.cpp' % dir for dir in ['NFD/core', 'NFD/daemon']],
                                excl=['NFD/daemon/main.cpp',

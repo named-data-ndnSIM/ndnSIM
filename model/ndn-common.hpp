@@ -27,7 +27,6 @@
 
 #include <ndn-cxx/interest.hpp>
 #include <ndn-cxx/encoding/block.hpp>
-#include <ndn-cxx/signature.hpp>
 #include <ndn-cxx/signature-info.hpp>
 #include <ndn-cxx/name.hpp>
 #include <ndn-cxx/data.hpp>
@@ -62,7 +61,6 @@ using std::make_shared;
 using ::ndn::Interest;
 using ::ndn::Data;
 using ::ndn::KeyLocator;
-using ::ndn::Signature;
 using ::ndn::SignatureInfo;
 using ::ndn::Block;
 using ::ndn::KeyChain;
