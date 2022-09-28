@@ -126,9 +126,7 @@ ConsumerPcon::OnData(shared_ptr<const Data> data)
     WindowIncrease();
   }
 
-  if (m_inFlight > static_cast<uint32_t>(0)) {
-    m_inFlight--;
-  }
+  m_inFlight = m_seqTimeouts.size();
 
   NS_LOG_DEBUG("Window: " << m_window << ", InFlight: " << m_inFlight);
 
@@ -140,9 +138,7 @@ ConsumerPcon::OnTimeout(uint32_t sequenceNum)
 {
   WindowDecrease();
 
-  if (m_inFlight > static_cast<uint32_t>(0)) {
-    m_inFlight--;
-  }
+  m_inFlight = m_seqTimeouts.size();
 
   NS_LOG_DEBUG("Window: " << m_window << ", InFlight: " << m_inFlight);
 
