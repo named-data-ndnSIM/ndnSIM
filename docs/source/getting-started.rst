@@ -103,6 +103,8 @@ should be installed:
         sudo pip install pygraphviz pycairo PyGObject pygccxml
 
   * Ubuntu Linux 20.04
+    
+    .. code-block:: bash
 
         sudo apt install gir1.2-goocanvas-2.0 gir1.2-gtk-3.0 libgirepository1.0-dev python3-dev python3-gi python3-gi-cairo python3-pip python3-pygraphviz python3-pygccxml
         sudo pip3 install kiwi
